@@ -3,16 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NTell World Ink — Cybersecurity, AI literacy and digital skills training</title>
-<meta name="description" content="Hands-on learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. Real datasets; real exercises; downloadable materials.">
+<title>AI & Online Cyber Safety Skills &middot; AI Literacy &middot; NTell World Ink</title>
+<meta name="description" content="A one-day, beginner-friendly introduction to AI tools, safe use of online services, data privacy, and how to spot digital risks. Designed for workforce entrants and the general com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, AI Literacy Course 1; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+
+  .tool-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin: 18px 0;
+  }
+  .tool-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px; padding: 18px 20px;
+  }
+  .tool-card h5 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px;
+    color: var(--text); margin: 0 0 10px; font-weight: 500;
+  }
+  .tool-card p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0 0 8px; }
+  .tool-card p:last-child { margin: 0; }
+
+  .session-list { display: grid; gap: 14px; margin: 12px 0 24px; }
+  .session-list-item {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .session-list-item:hover { border-color: var(--accent); background: rgba(26,201,201,0.03); }
+  .session-list-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 28px;
+    color: var(--accent); font-weight: 500;
+  }
+  .session-list-body h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .session-list-body .when {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+  }
+  .session-list-body ul { margin: 6px 0 0 0; padding-left: 18px; color: var(--text-2); }
+  .session-list-body ul li { font-size: 14.5px; line-height: 1.6; margin-bottom: 3px; }
+
+  .resource-list { display: grid; gap: 12px; margin: 12px 0 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .resource-list-item {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s, background 0.15s;
+  }
+  .resource-list-item:hover { background: rgba(240,192,96,0.04); }
+  .resource-list-item h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .resource-list-item p { color: var(--text-2); font-size: 14px; line-height: 1.55; margin: 0; }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  table.data-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  table.data-table th {
+    text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    padding: 10px 12px; border-bottom: 1px solid var(--rule-2); background: var(--bg-2);
+  }
+  table.data-table td {
+    padding: 12px; border-bottom: 1px solid var(--rule);
+    color: var(--text-2); line-height: 1.55; vertical-align: top;
+  }
+  table.data-table tr:hover td { background: rgba(26,201,201,0.02); }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .session-list-item { grid-template-columns: 1fr; gap: 8px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+  }
+</style>
 </head>
 <body>
 <div class="noise-overlay"></div>
 
-<!-- =============== HEADER =============== -->
+<!-- HEADER -->
 <header class="site">
   <div class="container site-inner">
     <a class="brand" href="/">
@@ -20,309 +167,226 @@
       <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
     </a>
     <nav class="site-nav">
-      <a href="#library">Library</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
     </nav>
   </div>
 </header>
 
-<!-- =============== HERO BANNER =============== -->
-<section class="hero-banner">
-  <div class="banner-wrap">
-    <img src="NTellWorldInk_Banner.png"
-         alt="NTell World Ink — Intelligence Inked. Legacies Written."
-         class="banner-img">
-    <div class="banner-fade"></div>
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/files/ai-literacy/">AI Literacy</a>
+    <span class="sep">/</span>
+    <span>AI & Online Cyber Safety Skills</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">AI Literacy &middot; Course 1</div>
+  <h1>AI & Online Cyber Safety Skills</h1>
+  <p class="subtitle">A one-day, beginner-friendly introduction to AI tools, safe use of online services, data privacy, and how to spot digital risks. Designed for workforce entrants and the general community, no prior tech experience required.</p>
+  <div class="page-meta">
+    <span class="page-meta-item"><strong>1 day</strong> · Saturday delivery</span>
+    <span class="page-meta-item"><strong>Beginner</strong> level</span>
+    <span class="page-meta-item">Up to <strong>15</strong> participants</span>
+    <span class="page-meta-item"><strong>Free</strong>: Barkly Workforce Grant funded</span>
   </div>
-  <div class="banner-cta container">
-    <div class="banner-tagline">connect &middot; create &middot; leave a mark</div>
-    <p class="lead">Learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. Real datasets; real exercises; everything downloadable and yours to keep.</p>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="#library">
-        Browse the library
-        <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <a class="btn btn-ghost" href="#about">What this is</a>
-    </div>
+  <div class="back-strip">
+    <a class="back-link" href="/#library">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to library
+    </a>
   </div>
 </section>
 
-<!-- =============== ABOUT =============== -->
-<section class="about" id="about">
-  <div class="container">
-    <div class="about-inner">
-      <div class="section-eyebrow">// about</div>
-      <h2>Digital literacy topics that stick.</h2>
-      <p>Most digital training is forgotten by Friday. NT World Ink builds learning materials designed to stick; with realistic data, downloadable exercises, and skills that transfer to your work.</p>
-    </div>
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#welcome">Welcome</a></li>
+    <li><a href="#what-youll-learn">What You'll Learn</a></li>
+    <li><a href="#who-its-for">Who It's For</a></li>
+    <li><a href="#day-at-a-glance">Day at a Glance</a></li>
+    <li><a href="#sessions">Sessions</a></li>
+    <li><a href="#takeaways">What You'll Take Away</a></li>
+    <li><a href="#resources">Take-Home Resources</a></li>
+    </ul>
   </div>
-</section>
+</div>
 
-<!-- =============== LIBRARY =============== -->
-<section class="container library" id="library">
-  <div class="library-header">
-    <div class="library-header-text">
-      <div class="section-eyebrow">// library</div>
-      <h2>Course library</h2>
-      <p>Click a title to expand.</p>
-    </div>
-  </div>
+<main class="content-body">
 
-  <!-- Course 1: Power Query (live) -->
-  <details class="course" name="course" open>
-    <summary>
-      <span class="course-num">01</span>
-      <span class="course-title">Power Query: Surveillance Data Analysis</span>
-      <span class="course-tag available">Available</span>
-      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </summary>
-    <div class="course-body">
-      <div>
-        <p class="desc">Learn Microsoft Excel's Power Query through six exercises set inside a fictional dystopian Australian outback town. You'll combine messy CSV files, merge relational tables, write custom M-language functions, and reshape data for executive briefings. The dataset doubles as a discussion prompt about algorithmic bias and surveillance ethics.</p>
-        <div class="course-meta">
-          <span class="course-meta-item">DURATION · <strong>3 hrs</strong></span>
-          <span class="course-meta-item">LEVEL · <strong>Beginner to intermediate</strong></span>
-          <span class="course-meta-item">FORMAT · <strong>HTML dossier + 13 CSVs</strong></span>
-        </div>
-        <a class="btn btn-primary" href="/pandanus-reach/">
-          Open course
-          <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<section class="content-section container-content" id="welcome">
+            <div class="section-eyebrow">// welcome</div>
+      <h2>Welcome</h2>
+            <p>This course is a plain-English introduction to the AI tools that are reshaping how we work, study, and live online, and to the everyday cyber safety skills everyone now needs.</p>
+                <p>We'll try AI tools hands-on, look at how they actually work (and where they get things wrong), and build practical habits for protecting your accounts, your data, and your family online.</p>
+                <div class="callout callout-tip">
+  <div class="callout-title">No prior tech experience required</div>
+  <p>If you can send an email or use a phone, you'll be fine. The pace is built for the whole room, we'll meet you where you are.</p>
+</div>
+            
+        </section>
+
+        <section class="content-section container-content" id="what-youll-learn">
+            <div class="section-eyebrow">// what youll learn</div>
+      <h2>What You'll Learn</h2>
+            <p><strong>AI fundamentals</strong>: what AI chatbots actually are, what they're good at, and what they get wrong.</p>
+                <p><strong>Safe use of online tools</strong>: how to use AI, social media, and everyday apps without giving away more than you mean to.</p>
+                <p><strong>Data privacy basics</strong>: what personal information is, where it goes, and how to keep control of it.</p>
+                <p><strong>Recognising digital risks</strong>: scams, phishing, deepfakes, and the warning signs to watch for.</p>
+                <p><strong>Practical habits</strong>: strong passwords, two-factor authentication, and the small routines that protect you day-to-day.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="who-its-for">
+            <div class="section-eyebrow">// who its</div>
+      <h2>Who It's For</h2>
+            <p>Workforce entrants, jobseekers, and anyone in the community who wants a confident start with AI and online safety. No background in IT, office work, or formal study is assumed.</p>
+                <p>The course is especially useful if you're thinking about work that involves computers, if you want to help family and friends stay safer online, or if you're simply curious about what AI is and isn't.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="day-at-a-glance">
+            <div class="section-eyebrow">// day glance</div>
+      <h2>Day at a Glance</h2>
+            <p><strong>Morning</strong>: What AI actually is, trying the main tools, how to talk to them (prompting basics), and where they go wrong.</p>
+                <p><strong>Middle of the day</strong>: Staying safe online: accounts, passwords, privacy, and recognising scams and dodgy content.</p>
+                <p><strong>Afternoon</strong>: Deepfakes and AI-generated content, cyber safety for family and community, and building your own "safe use" checklist to take home.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="sessions">
+            <div class="section-eyebrow">// sessions</div>
+      <h2>Sessions</h2>
+
+            <div class="session-list">
+                <a class="session-list-item" href="session-1-what-is-ai.html">
+      <div class="session-list-num">01</div>
+      <div class="session-list-body">
+        <div class="when">Morning</div>
+        <h4>What Is AI, Really?</h4>
+        <ul>
+            <li>Plain-English explanation of AI chatbots and what they do</li>
+            <li>A quick tour of ChatGPT, Claude, Gemini, and Copilot</li>
+            <li>What AI is good at, and where it makes things up</li>
+            <li>Free vs paid: what you can actually do without spending money</li>
+        </ul>
+      </div>
+    </a>
+
+                <a class="session-list-item" href="session-2-prompting-basics.html">
+      <div class="session-list-num">02</div>
+      <div class="session-list-body">
+        <div class="when">Morning</div>
+        <h4>Talking to AI, Prompting Basics</h4>
+        <ul>
+            <li>How to ask for what you actually want</li>
+            <li>Giving context, role, and examples</li>
+            <li>Hands-on: using AI for everyday tasks (letters, summaries, ideas, questions)</li>
+            <li>Spotting when the answer is wrong or made up</li>
+        </ul>
+      </div>
+    </a>
+
+                <a class="session-list-item" href="session-3-accounts-and-data.html">
+      <div class="session-list-num">03</div>
+      <div class="session-list-body">
+        <div class="when">Midday</div>
+        <h4>Your Accounts and Your Data</h4>
+        <ul>
+            <li>What personal data is, and who has yours</li>
+            <li>Strong passwords and password managers, the simple version</li>
+            <li>Two-factor authentication: turning it on and why it matters</li>
+            <li>What to share (and what not to share) with AI tools</li>
+        </ul>
+      </div>
+    </a>
+
+                <a class="session-list-item" href="session-4-scams-and-phishing.html">
+      <div class="session-list-num">04</div>
+      <div class="session-list-body">
+        <div class="when">Afternoon</div>
+        <h4>Scams, Phishing, and Dodgy Messages</h4>
+        <ul>
+            <li>How to recognise a scam email, text, or call</li>
+            <li>Common scams targeting Australians right now</li>
+            <li>What to do if you've clicked something you shouldn't have</li>
+            <li>Reporting: Scamwatch, ReportCyber, and your bank</li>
+        </ul>
+      </div>
+    </a>
+
+                <a class="session-list-item" href="session-5-deepfakes.html">
+      <div class="session-list-num">05</div>
+      <div class="session-list-body">
+        <div class="when">Afternoon</div>
+        <h4>Deepfakes and AI-Generated Content</h4>
+        <ul>
+            <li>What deepfakes are and how they're made</li>
+            <li>Spotting AI-generated images, voices, and video</li>
+            <li>Misinformation and what to trust online</li>
+            <li>Protecting your own face, voice, and name</li>
+        </ul>
+      </div>
+    </a>
+
+                <a class="session-list-item" href="session-6-staying-safe.html">
+      <div class="session-list-num">06</div>
+      <div class="session-list-body">
+        <div class="when">Afternoon</div>
+        <h4>Staying Safe, For You, Family and Community</h4>
+        <ul>
+            <li>Kids, teens, and online safety (eSafety Commissioner resources)</li>
+            <li>Helping older family members stay safe</li>
+            <li>Your "safe use" checklist to take home</li>
+            <li>Where to go for help and further learning</li>
+        </ul>
+      </div>
+    </a>
+            </div>
+        </section>
+
+        <section class="content-section container-content" id="takeaways">
+            <div class="section-eyebrow">// what youll take away</div>
+      <h2>What You'll Take Away</h2>
+            <p>A working understanding of what AI tools can and can't do, and confidence using at least one of them.</p>
+                <p>A personal cyber safety checklist, passwords, 2FA, privacy settings, and warning signs.</p>
+                <p>A short list of trusted places to go when something looks wrong (Scamwatch, ReportCyber, eSafety Commissioner).</p>
+                <p>A CDU TAFE attendance record, and a clearer picture of what further digital skills training is available.</p>
+            
+        </section>
+
+
+        <section class="content-section container-content" id="resources">
+      <div class="section-eyebrow">// resources</div>
+      <h2>Take-Home Resources</h2>
+      <p>Three reference pages you can keep open, share with classmates, or revisit after the day.</p>
+      <div class="resource-list">
+        <a class="resource-list-item" href="just-ask-it.html">
+          <h4>Just Ask It</h4>
+          <p>A short list of practical "just ask the AI" prompts for everyday tasks. The starter set we hand out on the day.</p>
+        </a>
+        <a class="resource-list-item" href="remote-ai-use.html">
+          <h4>Using AI Remotely</h4>
+          <p>Bandwidth, data use, and practical tips for AI on a 4G bar, a Starlink dish, or a shared venue Wi-Fi. What works, what chews data.</p>
+        </a>
+        <a class="resource-list-item" href="prompt-gallery.html">
+          <h4>Prompt Gallery</h4>
+          <p>A larger collection of worked prompts, each with the rationale and a sample answer, organised by everyday task.</p>
         </a>
       </div>
-      <aside class="course-aside">
-        <div class="course-aside-label">// what you will learn</div>
-        <ul>
-          <li>Loading and cleaning CSV data</li>
-          <li>Combining files from a folder</li>
-          <li>Merge queries and aggregations</li>
-          <li>Pivot and unpivot transformations</li>
-          <li>Custom functions in the M language</li>
-          <li>Cross-tabulation and group-by analysis</li>
-        </ul>
-      </aside>
-    </div>
-  </details>
+        </section>
+</main>
 
-  <!-- Course 2 -->
-  <details class="course" name="course">
-    <summary>
-      <span class="course-num">02</span>
-      <span class="course-title">Microsoft Excel: Foundations to Power User</span>
-      <span class="course-tag soon">Coming soon</span>
-      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </summary>
-    <div class="course-body">
-      <div>
-        <p class="desc">From cell formatting to pivot tables, conditional logic, and lookup functions. A single working scenario that grows in complexity across the course, so each technique you learn is immediately applied to data you already know.</p>
-        <div class="course-meta">
-          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
-          <span class="course-meta-item">EXPECTED · <strong>Q3 2026</strong></span>
-        </div>
-      </div>
-      <aside class="course-aside">
-        <div class="course-aside-label">// planned modules</div>
-        <ul>
-          <li>Spreadsheet anatomy and good habits</li>
-          <li>Formulas and references</li>
-          <li>Conditional logic and lookup functions</li>
-          <li>Pivot tables and dashboards</li>
-          <li>Charts that communicate</li>
-        </ul>
-      </aside>
-    </div>
-  </details>
-
-  <!-- Course 3 -->
-  <details class="course" name="course">
-    <summary>
-      <span class="course-num">03</span>
-      <span class="course-title">Microsoft Word: Documents That Get Read</span>
-      <span class="course-tag available">Available</span>
-      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </summary>
-    <div class="course-body">
-      <div>
-        <p class="desc">Word as a document engineering tool, not a typewriter. A scenario-based group activity where you take Janelle's chaotic draft and turn it into Australia's formal bid to host the 2034 Olympics in Darwin. Practise the styles pane, multilevel numbered lists, the Table of Contents tool, tracked changes, Compare Documents, and Copilot Chat for drafting and fact-checking.</p>
-        <div class="course-meta">
-          <span class="course-meta-item">DURATION · <strong>4 hrs</strong></span>
-          <span class="course-meta-item">LEVEL · <strong>Beginner to intermediate</strong></span>
-          <span class="course-meta-item">FORMAT · <strong>Group activity + 5 resources</strong></span>
-        </div>
-        <a class="btn btn-primary" href="/word/">
-          Open course
-          <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </div>
-      <aside class="course-aside">
-        <div class="course-aside-label">// what you will learn</div>
-        <ul>
-          <li>Heading styles and the styles pane</li>
-          <li>Multilevel numbered lists and auto-generated Tables of Contents</li>
-          <li>Section breaks and page numbering</li>
-          <li>Tracked changes and Compare Documents</li>
-          <li>Copilot Chat for drafting, trimming, and fact-checking</li>
-          <li>The Accessibility Checker</li>
-        </ul>
-      </aside>
-    </div>
-  </details>
-
-  <!-- Course 4 -->
-  <details class="course" name="course">
-    <summary>
-      <span class="course-num">04</span>
-      <span class="course-title">Microsoft PowerPoint: Effective Visual Communication</span>
-      <span class="course-tag soon">Coming soon</span>
-      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </summary>
-    <div class="course-body">
-      <div>
-        <p class="desc">Slide design as a thinking discipline. How to structure an argument, when to use a chart over a table, the typography choices that make a deck feel professional, and how to avoid the eight bad habits that mark someone out as a novice.</p>
-        <div class="course-meta">
-          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
-          <span class="course-meta-item">EXPECTED · <strong>Q4 2026</strong></span>
-        </div>
-      </div>
-      <aside class="course-aside">
-        <div class="course-aside-label">// planned modules</div>
-        <ul>
-          <li>Structuring an argument across slides</li>
-          <li>Layout, hierarchy, and white space</li>
-          <li>Type, colour, and contrast</li>
-          <li>Charts, tables, and diagrams</li>
-          <li>Speaker notes and rehearsal</li>
-        </ul>
-      </aside>
-    </div>
-  </details>
-
-  <!-- Course 5 -->
-  <details class="course" name="course">
-    <summary>
-      <span class="course-num">05</span>
-      <span class="course-title">Digital Literacy: Workplace Skills</span>
-      <span class="course-tag soon">Coming soon</span>
-      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </summary>
-    <div class="course-body">
-      <div>
-        <p class="desc">Foundational digital skills for adults entering or re-entering the workforce. File management, browsers, email, calendars, video conferencing, password hygiene, and the everyday literacies that quiet quitters of technology never quite learned.</p>
-        <div class="course-meta">
-          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
-          <span class="course-meta-item">EXPECTED · <strong>Q4 2026</strong></span>
-        </div>
-      </div>
-      <aside class="course-aside">
-        <div class="course-aside-label">// planned modules</div>
-        <ul>
-          <li>Files, folders, and finding things</li>
-          <li>Email as a craft</li>
-          <li>Calendars and scheduling</li>
-          <li>Video calls without the awkward</li>
-          <li>Passwords and basic safety</li>
-        </ul>
-      </aside>
-    </div>
-  </details>
-
-  <!-- Course 6 -->
-  <details class="course" name="course">
-    <summary>
-      <span class="course-num">06</span>
-      <span class="course-title">Cybersecurity Fundamentals for Non-Specialists</span>
-      <span class="course-tag soon">Coming soon</span>
-      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </summary>
-    <div class="course-body">
-      <div>
-        <p class="desc">A grown-up introduction to cybersecurity for people who don't intend to become security professionals but do intend to stop being a vulnerability. Threats, defences, and the everyday habits that protect a household, a small business, or a workplace.</p>
-        <div class="course-meta">
-          <span class="course-meta-item">STATUS · <strong>Planned</strong></span>
-          <span class="course-meta-item">EXPECTED · <strong>2027</strong></span>
-        </div>
-      </div>
-      <aside class="course-aside">
-        <div class="course-aside-label">// topics</div>
-        <ul>
-          <li>How attacks actually work</li>
-          <li>Identity, MFA, and password managers</li>
-          <li>Phishing and social engineering</li>
-          <li>Devices, networks, and updates</li>
-          <li>What to do when things go wrong</li>
-        </ul>
-      </aside>
-    </div>
-  </details>
-
-  <!-- Course 7 -->
-  <details class="course" name="course">
-    <summary>
-      <span class="course-num">07</span>
-      <span class="course-title">AI Literacy for the Workplace</span>
-      <span class="course-tag available">Available</span>
-      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </summary>
-    <div class="course-body">
-      <div>
-        <p class="desc">A one-day, beginner-friendly introduction to AI tools, safe online use, data privacy, and how to spot digital risks. Six hands-on sessions plus three take-home resource pages. Designed for workforce entrants and the wider community; no prior tech experience required.</p>
-        <div class="course-meta">
-          <span class="course-meta-item">DURATION · <strong>1 day</strong></span>
-          <span class="course-meta-item">LEVEL · <strong>Beginner</strong></span>
-          <span class="course-meta-item">FORMAT · <strong>10 HTML pages</strong></span>
-        </div>
-        <a class="btn btn-primary" href="/files/ai-literacy/">
-          Open course
-          <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </div>
-      <aside class="course-aside">
-        <div class="course-aside-label">// sessions</div>
-        <ul>
-          <li><a href="/files/ai-literacy/session-1-what-is-ai.html">01 &middot; What Is AI, Really?</a></li>
-          <li><a href="/files/ai-literacy/session-2-prompting-basics.html">02 &middot; Talking to AI, Prompting Basics</a></li>
-          <li><a href="/files/ai-literacy/session-3-accounts-and-data.html">03 &middot; Your Accounts and Your Data</a></li>
-          <li><a href="/files/ai-literacy/session-4-scams-and-phishing.html">04 &middot; Scams, Phishing, and Dodgy Messages</a></li>
-          <li><a href="/files/ai-literacy/session-5-deepfakes.html">05 &middot; Deepfakes and AI-Generated Content</a></li>
-          <li><a href="/files/ai-literacy/session-6-staying-safe.html">06 &middot; Staying Safe, For You, Family and Community</a></li>
-        </ul>
-        <div class="course-aside-label" style="margin-top:14px;">// resources</div>
-        <ul>
-          <li><a href="/files/ai-literacy/just-ask-it.html">Just Ask It</a></li>
-          <li><a href="/files/ai-literacy/remote-ai-use.html">Using AI Remotely</a></li>
-          <li><a href="/files/ai-literacy/prompt-gallery.html">Prompt Gallery</a></li>
-        </ul>
-      </aside>
-    </div>
-  </details>
-
-  <!-- Course 8 -->
-  <details class="course" name="course">
-    <summary>
-      <span class="course-num">08</span>
-      <span class="course-title">More to come</span>
-      <span class="course-tag soon">In planning</span>
-      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </summary>
-    <div class="course-body">
-      <div>
-        <p class="desc">NT World Ink is built one course at a time. Future courses are likely to cover automation and scripting, working with PDFs, data visualisation fundamentals, and a deeper dive into red-team thinking. If there's a topic you'd like to see, get in touch.</p>
-        <a class="btn btn-ghost" href="#contact">Suggest a topic</a>
-      </div>
-      <aside class="course-aside">
-        <div class="course-aside-label">// candidate topics</div>
-        <ul>
-          <li>Automation and basic scripting</li>
-          <li>Working with PDFs at scale</li>
-          <li>Data visualisation that communicates</li>
-          <li>Red-team thinking for defenders</li>
-        </ul>
-      </aside>
-    </div>
-  </details>
-</section>
-
-<!-- =============== FOOTER =============== -->
+<!-- FOOTER -->
 <footer class="site" id="contact">
   <div class="container">
     <div class="footer-grid">
@@ -331,26 +395,28 @@
           <div class="brand-mark"></div>
           <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
         </a>
-        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. No paywall; no email harvesting; no nonsense.</p>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
       </div>
       <div class="footer-col">
         <h4>// library</h4>
         <ul>
           <li><a href="/pandanus-reach/">Power Query</a></li>
-          <li><a href="#library">All courses</a></li>
+          <li><a href="/files/word/">Microsoft Word</a></li>
+          <li><a href="/files/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>// elsewhere</h4>
         <ul>
-          <li><a href="#about">About this site</a></li>
+          <li><a href="/#about">About</a></li>
           <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <span>&copy; 2026 NT World Ink. Made in the Australian outback.</span>
-      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
     </div>
   </div>
 </footer>
