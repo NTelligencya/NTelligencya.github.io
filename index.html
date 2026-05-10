@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NT World Ink — Practical training in cybersecurity, AI, and digital skills</title>
+<title>NTell World Ink — Cybersecurity, AI literacy and digital skills training</title>
 <meta name="description" content="Hands-on learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. Real datasets; real exercises; downloadable materials.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0a0c;
@@ -16,10 +16,10 @@
     --text: #f5f5f7;
     --text-2: #9b9ba0;
     --text-3: #6b6b70;
-    --accent: #3b82f6;
-    --accent-2: #60a5fa;
-    --accent-deep: #1e3a8a;
-    --accent-glow: rgba(59, 130, 246, 0.18);
+    --accent: #1ac9c9;
+    --accent-2: #4ddcdc;
+    --accent-deep: #0b5555;
+    --accent-glow: rgba(26, 201, 201, 0.14);
     --rule: #1f1f23;
     --rule-2: #2a2a30;
     --warm: #f0c060;
@@ -123,10 +123,10 @@
   }
 
   .brand-name {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: -0.02em;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 500;
+    font-size: 20px;
+    letter-spacing: 0.04em;
   }
 
   .brand-name .dot {
@@ -149,58 +149,60 @@
 
   nav.site-nav a:hover { color: var(--text); }
 
-  /* ============ HERO ============ */
-  .hero {
-    padding: 96px 0 80px;
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: 64px;
-    align-items: center;
+  /* ============ HERO BANNER ============ */
+  .hero-banner {
+    padding: 0;
   }
 
-  .hero-eyebrow {
+  .banner-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+  }
+
+  .banner-img {
+    width: 100%;
+    display: block;
+    max-height: 540px;
+    object-fit: cover;
+    object-position: center 40%;
+  }
+
+  .banner-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 140px;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+    pointer-events: none;
+  }
+
+  .banner-cta {
+    padding: 36px 32px 80px;
+    text-align: center;
+  }
+
+  .banner-tagline {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--accent-2);
-    letter-spacing: 0.18em;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
-    margin-bottom: 24px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
+    margin-bottom: 20px;
   }
 
-  .hero-eyebrow::before {
-    content: '';
-    width: 24px;
-    height: 1px;
-    background: var(--accent-2);
-  }
-
-  .hero h1 {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 800;
-    font-size: clamp(40px, 6vw, 72px);
-    line-height: 1.02;
-    letter-spacing: -0.035em;
-    margin-bottom: 28px;
-  }
-
-  .hero h1 .accent {
-    background: linear-gradient(135deg, var(--accent-2), var(--accent));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    font-style: italic;
-    font-weight: 700;
-  }
-
-  .hero p.lead {
-    font-size: 19px;
+  .banner-cta .lead {
+    font-size: 18px;
     color: var(--text-2);
-    line-height: 1.6;
-    max-width: 540px;
-    margin-bottom: 40px;
+    line-height: 1.65;
+    max-width: 620px;
+    margin: 0 auto 36px;
+  }
+
+  .banner-cta .cta-row {
+    justify-content: center;
   }
 
   .cta-row {
@@ -234,7 +236,7 @@
 
   .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.5),
+    box-shadow: 0 0 0 1px rgba(77, 220, 220, 0.5),
                 0 12px 28px -8px var(--accent-glow);
   }
 
@@ -262,134 +264,7 @@
     transform: translateX(3px);
   }
 
-  /* ============ HERO VISUAL ============ */
-  .hero-visual {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    border-radius: 16px;
-    overflow: hidden;
-    background: linear-gradient(180deg, var(--bg-2), var(--bg));
-    border: 1px solid var(--rule-2);
-  }
 
-  .hero-visual::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 30% 30%, var(--accent-glow), transparent 50%),
-      radial-gradient(circle at 70% 70%, rgba(240, 192, 96, 0.08), transparent 50%);
-  }
-
-  .hero-visual::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
-
-  /* Floating geometric elements */
-  .orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(40px);
-    opacity: 0.6;
-  }
-
-  .orb-1 {
-    width: 200px;
-    height: 200px;
-    background: var(--accent);
-    top: 20%;
-    left: 15%;
-    animation: float-1 12s ease-in-out infinite;
-  }
-
-  .orb-2 {
-    width: 160px;
-    height: 160px;
-    background: var(--warm);
-    bottom: 20%;
-    right: 15%;
-    animation: float-2 14s ease-in-out infinite;
-  }
-
-  @keyframes float-1 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(20px, -15px); }
-  }
-
-  @keyframes float-2 {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(-25px, 20px); }
-  }
-
-  .hero-visual-content {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    z-index: 2;
-    padding: 32px;
-  }
-
-  .visual-glyph {
-    width: 140px;
-    height: 140px;
-    position: relative;
-    margin-bottom: 24px;
-  }
-
-  .visual-glyph svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .visual-glyph svg .ring {
-    fill: none;
-    stroke: var(--accent-2);
-    stroke-width: 1.5;
-    opacity: 0.9;
-  }
-
-  .visual-glyph svg .ring-2 { stroke: var(--accent); opacity: 0.6; }
-  .visual-glyph svg .ring-3 { stroke: var(--warm); opacity: 0.7; }
-
-  .visual-glyph svg .node {
-    fill: var(--text);
-  }
-
-  .visual-glyph svg .line {
-    stroke: var(--text-3);
-    stroke-width: 1;
-    opacity: 0.5;
-  }
-
-  .visual-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-3);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-  }
-
-  .visual-replace-hint {
-    position: absolute;
-    bottom: 12px;
-    right: 14px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    color: var(--text-3);
-    opacity: 0.5;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    z-index: 3;
-  }
 
   /* ============ ABOUT ============ */
   .about {
@@ -415,11 +290,11 @@
   }
 
   h2 {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 700;
-    font-size: clamp(28px, 4vw, 44px);
-    line-height: 1.1;
-    letter-spacing: -0.025em;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(32px, 4.5vw, 52px);
+    line-height: 1.08;
+    letter-spacing: 0.01em;
     margin-bottom: 24px;
   }
 
@@ -477,7 +352,7 @@
   }
 
   details.course[open] {
-    background: linear-gradient(180deg, rgba(59, 130, 246, 0.025), transparent);
+    background: linear-gradient(180deg, rgba(26, 201, 201, 0.025), transparent);
   }
 
   details.course summary {
@@ -506,11 +381,11 @@
   }
 
   .course-title {
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 700;
-    font-size: clamp(20px, 2.4vw, 28px);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(22px, 2.6vw, 32px);
     color: var(--text);
-    letter-spacing: -0.015em;
+    letter-spacing: 0.01em;
     line-height: 1.2;
   }
 
@@ -527,8 +402,8 @@
   }
 
   .course-tag.available {
-    background: rgba(59, 130, 246, 0.08);
-    border-color: rgba(59, 130, 246, 0.4);
+    background: rgba(26, 201, 201, 0.08);
+    border-color: rgba(26, 201, 201, 0.4);
     color: var(--accent-2);
   }
 
@@ -695,15 +570,24 @@
     gap: 16px;
   }
 
+  /* Grain texture overlay matching banner aesthetic */
+  .noise-overlay {
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    opacity: 0.028;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
   /* ============ RESPONSIVE ============ */
   @media (max-width: 900px) {
-    .hero {
-      grid-template-columns: 1fr;
-      gap: 40px;
-      padding: 64px 0 56px;
-    }
+    .banner-img { max-height: 340px; }
 
-    .hero-visual { aspect-ratio: 16 / 10; }
+    .banner-cta { padding: 28px 20px 64px; }
+
+    .banner-cta .lead { font-size: 16px; }
 
     .course-body {
       grid-template-columns: 1fr;
@@ -729,11 +613,12 @@
   @media (max-width: 540px) {
     .course-tag { display: none; }
     details.course summary { grid-template-columns: 1fr auto; }
-    .visual-glyph { width: 100px; height: 100px; }
+    .banner-img { max-height: 260px; }
   }
 </style>
 </head>
 <body>
+<div class="noise-overlay"></div>
 
 <!-- =============== HEADER =============== -->
 <header class="site">
@@ -750,12 +635,17 @@
   </div>
 </header>
 
-<!-- =============== HERO =============== -->
-<section class="container hero">
-  <div class="hero-text">
-    <div class="hero-eyebrow">Practical Learning, Designed to Stick</div>
-    <h1>Training that <span class="accent">earns</span> the click.</h1>
-    <p class="lead">Learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills, designed to stick. Real datasets; real exercises; everything you need is downloadable and yours to keep.</p>
+<!-- =============== HERO BANNER =============== -->
+<section class="hero-banner">
+  <div class="banner-wrap">
+    <img src="NTellWorldInk_Banner.png"
+         alt="NTell World Ink — Intelligence Inked. Legacies Written."
+         class="banner-img">
+    <div class="banner-fade"></div>
+  </div>
+  <div class="banner-cta container">
+    <div class="banner-tagline">connect &middot; create &middot; leave a mark</div>
+    <p class="lead">Learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. Real datasets; real exercises; everything downloadable and yours to keep.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#library">
         Browse the library
@@ -764,29 +654,6 @@
       <a class="btn btn-ghost" href="#about">What this is</a>
     </div>
   </div>
-
-  <div class="hero-visual">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="hero-visual-content">
-      <div class="visual-glyph">
-        <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
-          <circle class="ring" cx="70" cy="70" r="60"/>
-          <circle class="ring ring-2" cx="70" cy="70" r="42"/>
-          <circle class="ring ring-3" cx="70" cy="70" r="24"/>
-          <line class="line" x1="70" y1="10" x2="70" y2="130"/>
-          <line class="line" x1="10" y1="70" x2="130" y2="70"/>
-          <circle class="node" cx="70" cy="10" r="3"/>
-          <circle class="node" cx="130" cy="70" r="3"/>
-          <circle class="node" cx="70" cy="130" r="3"/>
-          <circle class="node" cx="10" cy="70" r="3"/>
-          <circle class="node" cx="70" cy="70" r="4" fill="#3b82f6"/>
-        </svg>
-      </div>
-      <div class="visual-label">// learn · practise · keep</div>
-    </div>
-    <div class="visual-replace-hint">// hero image slot</div>
-  </div>
 </section>
 
 <!-- =============== ABOUT =============== -->
@@ -794,9 +661,8 @@
   <div class="container">
     <div class="about-inner">
       <div class="section-eyebrow">// about</div>
-      <h2>Hard topics, made stickable.</h2>
+      <h2>Digital literacy topics that stick.</h2>
       <p>Most digital training is forgotten by Friday. NT World Ink builds learning materials designed to stick; with realistic data, downloadable exercises, and skills that transfer to your work.</p>
-    </div>
     </div>
   </div>
 </section>
