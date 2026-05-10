@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power Query: Surveillance Data Analysis · NTell World Ink</title>
+<meta name="description" content="Learn Microsoft Excel's Power Query through six exercises set inside a fictional dystopian Australian outback town. Combine messy CSVs, merge relational tables, write custom M-language functions, and reshape data for executive briefings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* ============================================================
+     PAGE-SCOPED ADDITIONS, Pandanus Reach Dossier
+     Reuses tokens from styles.css (--accent, --warm, --bg-2 etc).
+     ============================================================ */
+
+  /* Slightly wider container; the dossier has wide tables and grids */
+  .container-dossier {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* DOC-ID strip beneath h1 */
+  .doc-meta-strip {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin: 28px 0;
+  }
+
+  /* PREPARED BY / FOR / STREAM grid */
+  .doc-meta-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 36px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-2);
+    padding: 6px 0 24px;
+  }
+
+  .doc-meta-block strong {
+    display: block;
+    color: var(--text-3);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  /* Table of contents */
+  .doc-toc {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 32px auto 56px;
+  }
+
+  .doc-toc h2 {
+    font-size: 24px;
+    margin: 0 0 14px;
+    padding: 0;
+    border: none;
+  }
+
+  .doc-toc ol {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    list-style: none;
+    counter-reset: tocstep;
+    padding: 0;
+    margin: 0;
+  }
+
+  .doc-toc ol li {
+    counter-increment: tocstep;
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .doc-toc ol li:last-child { border-bottom: none; }
+
+  .doc-toc ol li::before {
+    content: counter(tocstep, decimal-leading-zero);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .doc-toc ol li a {
+    color: var(--text);
+    flex: 1;
+    text-decoration: none;
+  }
+
+  .doc-toc ol li a:hover { color: var(--accent-2); }
+
+  .doc-toc ol li::after {
+    content: attr(data-skill);
+    color: var(--text-3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Data assets / download grid */
+  .data-assets {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 0 auto 56px;
+  }
+
+  .data-assets h2 {
+    font-size: 28px;
+    padding: 0;
+    margin: 0 0 8px;
+    border: none;
+  }
+
+  .data-assets .blurb {
+    color: var(--text-2);
+    font-style: italic;
+    margin-bottom: 24px;
+    font-size: 15px;
+  }
+
+  .download-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+
+  .dl-card {
+    display: block;
+    background: var(--bg-3);
+    border: 1px solid var(--rule-2);
+    border-left: 3px solid transparent;
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: var(--text);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    transition: all 0.15s ease;
+  }
+
+  .dl-card:hover {
+    border-left-color: var(--accent);
+    background: rgba(26,201,201,0.04);
+    color: var(--accent-2);
+  }
+
+  .dl-card .dl-name {
+    display: block;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+
+  .dl-card .dl-meta {
+    color: var(--text-3);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Provenance / origin story panel */
+  .provenance {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    padding: 44px 48px;
+    margin: 0 auto 56px;
+    max-width: 880px;
+  }
+
+  .provenance h2 {
+    font-size: 32px;
+    margin: 0 0 24px;
+    padding: 0;
+    border: none;
+  }
+
+  .provenance .lede {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.45;
+    color: var(--text);
+    margin-bottom: 24px;
+    padding-left: 18px;
+    border-left: 2px solid var(--accent);
+  }
+
+  .provenance p {
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--text-2);
+    margin-bottom: 1.2em;
+  }
+
+  .provenance .signoff {
+    text-align: right;
+    font-style: italic;
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    margin-top: 24px;
+  }
+
+  /* Hygiene brief panel */
+  .brief {
+    border: 1px dashed var(--rule-2);
+    border-radius: 12px;
+    padding: 36px 40px;
+    background: rgba(240,192,96,0.03);
+    max-width: 880px;
+    margin: 0 auto 80px;
+  }
+
+  .brief h2 {
+    font-size: 30px;
+    padding: 0;
+    margin: 0 0 14px;
+    border: none;
+  }
+
+  .brief > p {
+    color: var(--text-2);
+    font-size: 16px;
+    line-height: 1.75;
+    margin-bottom: 1.2em;
+  }
+
+  .brief h4 {
+    color: var(--warm);
+    margin: 24px 0 12px;
+  }
+
+  .brief ul {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-2);
+    list-style: none;
+    padding: 0;
+    margin: 16px 0;
+  }
+
+  .brief ul li {
+    padding: 9px 0 9px 22px;
+    position: relative;
+    border-bottom: 1px dotted var(--rule);
+  }
+
+  .brief ul li:last-child { border-bottom: none; }
+
+  .brief ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
+
+  .brief .warn {
+    color: var(--warm);
+    font-style: italic;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
+
+  /* Exercise wrapper */
+  .exercise {
+    max-width: 880px;
+    margin: 0 auto 88px;
+    padding-top: 48px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .ex-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .ex-num {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .exercise > h2 {
+    font-size: clamp(28px, 3.5vw, 40px);
+    margin: 4px 0 24px;
+    padding: 0;
+    border: none;
+  }
+
+  .exercise > h4 {
+    color: var(--accent);
+    margin: 32px 0 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* Memo block (FROM / TO / DATE / RE / CLASS) */
+  .memo {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 22px 0 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .memo dl.memo-header {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px 18px;
+    margin: 0 0 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule-2);
+  }
+
+  .memo dl.memo-header dt {
+    color: var(--text-3);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-size: 10px;
+    align-self: center;
+  }
+
+  .memo dl.memo-header dd {
+    margin: 0;
+    color: var(--text);
+  }
+
+  .memo p { margin: 0; color: var(--text-2); }
+  .memo code {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--accent-2);
+    font-size: inherit;
+  }
+
+  /* Analyst note (D. Vance italic commentary) */
+  .analyst-note {
+    background: linear-gradient(135deg, rgba(240,192,96,0.05), var(--bg-2));
+    border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm);
+    border-radius: 12px;
+    padding: 28px 32px 24px;
+    margin: 28px 0;
+    position: relative;
+  }
+
+  .analyst-note::before {
+    content: 'ANALYST NOTE  ·  D. VANCE';
+    position: absolute;
+    top: -10px;
+    left: 22px;
+    background: var(--bg);
+    padding: 0 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--warm);
+    font-weight: 500;
+  }
+
+  .analyst-note p {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--text);
+    margin: 0 0 14px;
+  }
+
+  .analyst-note p:last-child { margin-bottom: 0; }
+
+  .analyst-note code {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 0.85em;
+    background: var(--bg-3);
+    border: 1px solid var(--rule-2);
+    color: var(--accent-2);
+    padding: 1px 6px;
+  }
+
+  /* Objectives panel */
+  .objectives {
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin: 24px 0;
+  }
+
+  .objectives h4 {
+    color: var(--accent-2);
+    margin: 0 0 12px;
+  }
+
+  .objectives ul {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--text-2);
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .objectives li { margin-bottom: 4px; }
+
+  /* Numbered steps */
+  ol.steps {
+    counter-reset: step;
+    padding: 0;
+    margin: 16px 0 24px;
+    list-style: none;
+  }
+
+  ol.steps li {
+    counter-increment: step;
+    padding: 18px 0 18px 64px;
+    position: relative;
+    border-bottom: 1px solid var(--rule);
+    color: var(--text-2);
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  ol.steps li:last-child { border-bottom: none; }
+
+  ol.steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--accent);
+    font-size: 12px;
+    border: 1px solid rgba(26,201,201,0.4);
+    border-radius: 6px;
+    padding: 4px 9px;
+    letter-spacing: 0.05em;
+  }
+
+  ol.steps li pre {
+    margin: 12px 0 4px;
+    font-size: 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent);
+    color: var(--accent-2);
+  }
+
+  ol.steps li code {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    color: var(--accent-2);
+  }
+
+  /* Findings panel */
+  .findings {
+    background: linear-gradient(135deg, rgba(26,201,201,0.06), var(--bg-2));
+    border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 26px 30px 22px;
+    margin: 32px 0 0;
+    position: relative;
+  }
+
+  .findings::before {
+    content: '// FINDINGS';
+    position: absolute;
+    top: -10px;
+    left: 22px;
+    background: var(--bg);
+    padding: 0 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .findings h4 {
+    color: var(--accent);
+    margin: 4px 0 10px;
+  }
+
+  .findings p {
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 1.75;
+    margin-bottom: 0.8em;
+  }
+
+  .findings p:last-child { margin-bottom: 0; }
+
+  .findings p.warn {
+    color: var(--warm);
+    font-style: italic;
+    margin-top: 14px;
+  }
+
+  /* Redacted text utility */
+  .redact {
+    background: var(--text-3);
+    color: var(--text-3);
+    user-select: none;
+    padding: 0 4px;
+    border-radius: 2px;
+    transition: color 0.2s;
+  }
+
+  .redact:hover { color: var(--warm); }
+
+  /* End-of-dossier metadata */
+  .doc-end {
+    border-top: 1px solid var(--rule);
+    margin: 64px auto 0;
+    padding-top: 36px;
+    max-width: 880px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.12em;
+    line-height: 1.9;
+    text-transform: uppercase;
+  }
+
+  .doc-end .signature {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--text);
+    letter-spacing: 0.01em;
+    margin-bottom: 14px;
+    text-transform: none;
+    line-height: 1.4;
+  }
+
+  /* Closing out-of-character disclaimer */
+  .doc-disclaimer {
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    padding: 26px 30px;
+    margin: 28px auto 0;
+    max-width: 880px;
+    color: var(--text-2);
+    font-size: 14px;
+    line-height: 1.7;
+    background: var(--bg-2);
+  }
+
+  .doc-disclaimer strong {
+    color: var(--text);
+    display: block;
+    margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    .container-dossier { padding: 0 20px; }
+    .doc-meta-block { grid-template-columns: 1fr; gap: 14px 0; }
+    .provenance, .brief { padding: 28px 22px; }
+    .data-assets, .doc-toc { padding: 24px 20px; }
+    .memo { padding: 20px 22px; }
+    .analyst-note { padding: 24px 22px 22px; }
+    .exercise { padding-top: 36px; }
+    ol.steps li { padding-left: 52px; }
+    .doc-toc ol li { gap: 8px; }
+    .doc-toc ol li::after { font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../#library">Library</a>
+      <a href="../#about">About</a>
+      <a href="../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container-dossier">
+  <nav class="breadcrumb">
+    <a href="../">Home</a>
+    <span class="sep">/</span>
+    <a href="../#library">Library</a>
+    <span class="sep">/</span>
+    <span>Power Query: Surveillance Data Analysis</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container-dossier">
+  <div class="series-label">NTell Internal Training Dossier 0341</div>
+  <h1>Pandanus Reach Civic Harmony Pilot</h1>
+  <p class="subtitle">Internal Training Dossier; Power Query Familiarisation, Six Exercises</p>
+
+  <div class="page-meta">
+    <span class="page-meta-item">DURATION · <strong>~3 hrs</strong></span>
+    <span class="page-meta-item">LEVEL · <strong>Beginner to intermediate</strong></span>
+    <span class="page-meta-item">FORMAT · <strong>Single-page dossier + 12 CSVs</strong></span>
+  </div>
+
+  <div class="doc-meta-strip">
+    <span>DOC-ID: NT-PR-2026-0341</span>
+    <span>VERSION 2026.06.30 / R3</span>
+    <span>PAGES 01 / 12</span>
+  </div>
+
+  <dl class="doc-meta-block">
+    <div><strong>PREPARED BY</strong>Damien Vance, Senior Analyst (Civic Harmony Stream); PhD (cancelled), GAICD</div>
+    <div><strong>FOR</strong>Trainee analysts, intake quarter Q2 2026</div>
+    <div><strong>STREAM</strong>Civic Harmony &middot; Predictive Validity Unit</div>
+    <div><strong>CLASSIFICATION</strong>PROTECTED &middot; Compartmented to Pilot Personnel</div>
+    <div><strong>SUPERSEDES</strong>NT-PR-2026-0287, 2026-0301, 2026-0319</div>
+    <div><strong>REVIEW DATE</strong>30 September 2026 (or upon Upper House inquiry, whichever first)</div>
+  </dl>
+</section>
+
+<main class="content-body">
+
+  <!-- DATA ASSETS -->
+  <section class="data-assets container-dossier" id="downloads">
+    <div class="section-eyebrow">// data assets</div>
+    <h2>Working Datasets</h2>
+    <p class="blurb">Place these files in a single folder before commencing Exercise 02. Buttons below assume the dossier and the data sit in the same directory; if your shell has been hardened by IT, contact <span class="redact">REDACTED</span>.</p>
+
+    <div class="download-grid">
+      <a class="dl-card" href="./citizens.csv" download><span class="dl-name">citizens.csv</span><span class="dl-meta">3,005 rows &middot; master register</span></a>
+      <a class="dl-card" href="./households.csv" download><span class="dl-name">households.csv</span><span class="dl-meta">1,150 rows &middot; dwellings</span></a>
+      <a class="dl-card" href="./locations.csv" download><span class="dl-name">locations.csv</span><span class="dl-meta">30 rows &middot; sensor nodes</span></a>
+      <a class="dl-card" href="./reason_codes.csv" download><span class="dl-name">reason_codes.csv</span><span class="dl-meta">30 rows &middot; lookup table</span></a>
+      <a class="dl-card" href="./surveillance_events_2026_01.csv" download><span class="dl-name">surveillance_events_2026_01.csv</span><span class="dl-meta">5,070 rows &middot; January</span></a>
+      <a class="dl-card" href="./surveillance_events_2026_02.csv" download><span class="dl-name">surveillance_events_2026_02.csv</span><span class="dl-meta">4,806 rows &middot; February</span></a>
+      <a class="dl-card" href="./surveillance_events_2026_03.csv" download><span class="dl-name">surveillance_events_2026_03.csv</span><span class="dl-meta">4,621 rows &middot; March (schema drift)</span></a>
+      <a class="dl-card" href="./surveillance_events_2026_04.csv" download><span class="dl-name">surveillance_events_2026_04.csv</span><span class="dl-meta">5,371 rows &middot; April</span></a>
+      <a class="dl-card" href="./surveillance_events_2026_05.csv" download><span class="dl-name">surveillance_events_2026_05.csv</span><span class="dl-meta">4,981 rows &middot; May</span></a>
+      <a class="dl-card" href="./surveillance_events_2026_06.csv" download><span class="dl-name">surveillance_events_2026_06.csv</span><span class="dl-meta">4,606 rows &middot; June</span></a>
+      <a class="dl-card" href="./search_logs.csv" download><span class="dl-name">search_logs.csv</span><span class="dl-meta">15,000 rows &middot; query logs</span></a>
+      <a class="dl-card" href="./social_credit_history.csv" download><span class="dl-name">social_credit_history.csv</span><span class="dl-meta">12,000 rows &middot; score deltas</span></a>
+    </div>
+  </section>
+
+  <!-- TABLE OF CONTENTS -->
+  <section class="doc-toc container-dossier" id="contents">
+    <div class="section-eyebrow">// contents</div>
+    <h2>Contents</h2>
+    <ol>
+      <li data-skill="LOAD &middot; CLEAN &middot; CONDITIONAL"><a href="#ex1">Foundations: Single-File Hygiene</a></li>
+      <li data-skill="FROM FOLDER &middot; SCHEMA DRIFT"><a href="#ex2">Combine Files from a Folder</a></li>
+      <li data-skill="MERGE &middot; AGGREGATE"><a href="#ex3">Merges: Building the Citizen Story</a></li>
+      <li data-skill="GROUP BY &middot; CROSS-TAB"><a href="#ex4">Demographic Predictive Validity</a></li>
+      <li data-skill="PIVOT &middot; UNPIVOT"><a href="#ex5">Reshaping for the Steering Committee</a></li>
+      <li data-skill="M LANGUAGE &middot; FUNCTIONS"><a href="#ex6">Custom M Classifiers</a></li>
+    </ol>
+  </section>
+
+  <!-- PROVENANCE -->
+  <section class="provenance container-dossier" id="provenance">
+    <div class="section-eyebrow">// origins of the dataset</div>
+    <h2>On the Origins of the Dataset</h2>
+    <p class="lede">The Pandanus Reach Covert Statistics Office occupies a converted bottle shop on Federation Street. We have retained the original signage; we feel it adds character.</p>
+
+    <p>The PRCSO was established in early 2024 under amendments to the Northern Region Information Sharing Memorandum. These amendments were tabled at 4:47 pm on the final sitting day of the year, debated for eleven minutes, and passed on the voices. They authorise inter-agency exchange of <em>data of demonstrable civic interest</em> between the Regional Department of Civic Harmony, Regional Police, the Regional Department of Health, the Federal Internal Affairs Office, and three private contractors. NTell is the lead contractor. The other two prefer not to be named.</p>
+
+    <p>Staff at the PRCSO are listed on departmental organisational charts as <em>Tourism Liaison Officers</em>. They have been issued business cards to that effect. They are advised, when asked at barbecues, to speak vaguely about visitor flow analytics; they are further advised that the question rarely comes up twice.</p>
+
+    <p>Data inputs include automatic number plate recognition (148 cameras, of which 142 are operational on any given day), CCTV with facial recognition (62 nodes), biometric kiosks at all government and major retail entry points, smartcard logs from the local Skills Institute, geolocation pings harvested from Vector Telecom and Aurora Communications tower data under a national-security cooperation arrangement that is not, technically, in writing, smartmeter telemetry, search history collected via a transparent proxy, and social media activity flagged by an automated classifier of which we are quietly proud. These feeds are aggregated nightly and pushed to NTell's analytical platform via an SFTP endpoint located, for tax reasons, in an offshore jurisdiction.</p>
+
+    <p>Citizens were not informed of their participation in the pilot, on the grounds that informing them would invalidate the pilot. The Civic Harmony Act 2026, currently before the Regional Assembly, will provide retrospective legal cover. Until it passes, you are reminded that this dossier is classified PROTECTED and that unauthorised disclosure carries consequences, both legal and informal.</p>
+
+    <p>The dataset before you covers the first six months of pilot operation: 1 January to 30 June 2026. It comprises 3,005 individual citizen records (five of which are duplicates introduced by an unfortunate database migration; the engineer responsible has been reassigned to <em>asset reconciliation</em>), 1,150 households, 30 surveillance nodes, approximately 30,000 surveillance events, 15,000 search log entries, and 12,000 social credit score adjustments. We consider this a small, well-curated dataset by NTell standards.</p>
+
+    <p class="signoff">D. Vance</p>
+  </section>
+
+  <!-- HYGIENE BRIEF -->
+  <section class="brief container-dossier" id="brief">
+    <div class="section-eyebrow">// pre-exercise</div>
+    <h2>Pre-Exercise Hygiene Brief</h2>
+    <p>Before any of the six exercises, the analyst must perform standard data hygiene. The Pandanus Reach data, like all real-world data, is imperfect. Some imperfections are technical (whitespace, capitalisation). Some are political (one analyst, since reassigned, renamed a column on a whim in March). Some are pedagogical, in that they exist to teach you what to expect when client data arrives in poor condition. All are your problem.</p>
+
+    <h4>Hygiene checklist</h4>
+    <ul>
+      <li>Trim whitespace from text fields (notably <code>occupation</code>)</li>
+      <li>Standardise capitalisation in <code>first_name</code> and <code>surname</code></li>
+      <li>Identify duplicate citizen records (identical name plus DOB but different IDs; five exist)</li>
+      <li>Reconcile schema drift between the six monthly surveillance files (March uses <code>cam_id</code> not <code>location_id</code>)</li>
+      <li>Parse three different timestamp formats correctly across the monthly files</li>
+      <li>Handle approximately 20 missing <code>annual_income_aud</code> values (impute by sector median)</li>
+      <li>Flag the malformed latitude in <code>locations.csv</code> at LOC-014</li>
+    </ul>
+
+    <p class="warn">You will not be promoted for completing these tasks. You will be terminated for failing to.</p>
+  </section>
+
+  <!-- EXERCISE 1 -->
+  <article class="exercise container-dossier" id="ex1">
+    <div class="ex-header">
+      <span><span class="ex-num">EXERCISE 01</span> &nbsp;//&nbsp; FILE-REF NT-PR-PQ-001</span>
+      <span>EST. 25 MIN</span>
+    </div>
+    <h2>Foundations: Single-File Hygiene</h2>
+
+    <div class="memo">
+      <dl class="memo-header">
+        <dt>FROM</dt><dd>D. Vance, Senior Analyst (Civic Harmony Stream)</dd>
+        <dt>TO</dt><dd>Trainee Analyst</dd>
+        <dt>DATE</dt><dd>2026-07-01</dd>
+        <dt>RE</dt><dd>Initial conditioning of <code>citizens.csv</code></dd>
+        <dt>CLASS</dt><dd>PROTECTED</dd>
+      </dl>
+      <p>You will today learn to load and clean a single citizen register. There is nothing exotic in this task; we are merely making the data fit for human consumption, in the limited sense in which any of this is fit for human consumption.</p>
+    </div>
+
+    <div class="analyst-note">
+      <p>Citizens are inconsistent record-keepers. Some submit their surnames in capital letters, as if declaring war. Some forget to disclose income. Some are duplicates of themselves, which is metaphysically interesting and operationally inconvenient. We begin, as one always does in this trade, with housekeeping.</p>
+      <p>A particular subgroup will emerge from this exercise: elderly Tier-D citizens who are simultaneously aged and non-compliant. The available explanations are dementia or sedition; both are manageable. We will visit them.</p>
+    </div>
+
+    <div class="objectives">
+      <h4>What this exercise teaches in Power Query</h4>
+      <ul>
+        <li>Loading a CSV via Get Data &gt; From File &gt; From Text/CSV</li>
+        <li>Trim, Clean, and Capitalise Each Word transformations</li>
+        <li>Imputing nulls using Group By plus Merge</li>
+        <li>Conditional column logic</li>
+        <li>Identifying duplicates on a composite key</li>
+      </ul>
+    </div>
+
+    <h4>Step by step</h4>
+    <ol class="steps">
+      <li>In Excel: <strong>Data &gt; Get Data &gt; From File &gt; From Text/CSV</strong>. Select <code>citizens.csv</code>. Click <strong>Transform Data</strong>; do not click Load. (A trainee who clicks Load is a trainee we watch.)</li>
+      <li>In the Power Query Editor, select the <code>surname</code> column. Right-click &gt; <strong>Transform &gt; Capitalise Each Word</strong>. Repeat for <code>first_name</code>. The shouty surnames will quieten.</li>
+      <li>Select <code>occupation</code>. Right-click &gt; <strong>Transform &gt; Trim</strong>. This removes the trailing whitespace one of our junior staff added in a moment of unsupervised zeal.</li>
+      <li>To impute the missing income figures: with the citizens query open, go to <strong>Home &gt; Reference</strong> to create a copy. In the copy, <strong>Group By</strong> <code>employment_sector</code>; aggregate <strong>Median of annual_income_aud</strong>. Save as <code>income_by_sector</code>.</li>
+      <li>Return to the citizens query. <strong>Home &gt; Merge Queries</strong>. Match <code>employment_sector</code> to the lookup. Expand the median column. Add a custom column: <code>if [annual_income_aud] = null then [median_income] else [annual_income_aud]</code>.</li>
+      <li>Add a conditional column <code>flag_for_review</code>: if <code>age &gt;= 65</code> AND <code>tier = "D"</code>, return <em>"REVIEW"</em>; else null.</li>
+      <li>To find duplicates: select <code>first_name</code>, <code>surname</code>, <code>date_of_birth</code> (Ctrl+click). Right-click &gt; <strong>Group By</strong> &gt; Count Rows. Filter where Count &gt; 1. Five suspect groups will appear.</li>
+      <li>Click <strong>Close &amp; Load</strong>. Return to Excel. Survey your work. Have a cup of tea.</li>
+    </ol>
+
+    <div class="findings">
+      <h4>What you will discover</h4>
+      <p>A clean register of 3,000 citizens. Approximately 20 income values now imputed from sector medians (introducing measurement error which we will not be mentioning to the client). A short list of elderly Tier-D residents flagged for review. Five duplicate records exposed; report these by close of business.</p>
+    </div>
+  </article>
+
+  <!-- EXERCISE 2 -->
+  <article class="exercise container-dossier" id="ex2">
+    <div class="ex-header">
+      <span><span class="ex-num">EXERCISE 02</span> &nbsp;//&nbsp; FILE-REF NT-PR-PQ-002</span>
+      <span>EST. 35 MIN</span>
+    </div>
+    <h2>Combine Files from a Folder</h2>
+
+    <div class="memo">
+      <dl class="memo-header">
+        <dt>FROM</dt><dd>D. Vance, Senior Analyst</dd>
+        <dt>TO</dt><dd>Trainee Analyst</dd>
+        <dt>DATE</dt><dd>2026-07-02</dd>
+        <dt>RE</dt><dd>Aggregation of monthly surveillance event extracts</dd>
+        <dt>CLASS</dt><dd>PROTECTED</dd>
+      </dl>
+      <p>The PRCSO produces one surveillance event extract per calendar month. Each is, in subtle ways, different from the last. Your task is to combine them despite this.</p>
+    </div>
+
+    <div class="analyst-note">
+      <p>Our junior analysts at the Pandanus Reach Covert Statistics Office (a fine team of seven, all of whom believe they work for the Department of Tourism) generate one surveillance file per month. They differ slightly each month, because juniors are creative and creativity is a known correlate of error.</p>
+      <p>In March, an enterprising junior renamed <code>location_id</code> to <code>cam_id</code> on the basis that it was, in his words, <em>"more intuitive"</em>. He has been reassigned. The naming convention has not. You are now responsible for combining six files of varying schemas and three timestamp formats. Master the From Folder feature; it will save you hundreds of hours over the course of your career, much of which you will spend at NTell.</p>
+    </div>
+
+    <div class="objectives">
+      <h4>What this exercise teaches in Power Query</h4>
+      <ul>
+        <li>The <strong>From Folder</strong> connector and its auto-generated helper queries</li>
+        <li>The Sample File and Transform File function pattern</li>
+        <li>Handling schema drift across files (using <code>MissingField.Ignore</code>)</li>
+        <li>Multi-format date parsing with <code>try ... otherwise</code></li>
+        <li>Verifying combined output integrity</li>
+      </ul>
+    </div>
+
+    <h4>Step by step</h4>
+    <ol class="steps">
+      <li>Place all six <code>surveillance_events_2026_*.csv</code> files in a single folder. (Do not include the citizens or households files; the connector will read them too if you do, and you will spend an embarrassing morning debugging it.)</li>
+      <li><strong>Data &gt; Get Data &gt; From File &gt; From Folder</strong>. Browse to the folder. Power Query lists the six files.</li>
+      <li>Click <strong>Combine &gt; Combine and Transform Data</strong>. When prompted for a sample file, accept the default (the first file).</li>
+      <li>Power Query auto-generates four objects: <em>Sample File</em>, <em>Transform Sample File</em>, <em>Transform File</em> (a function), and the combined query. Open <em>Transform Sample File</em>.</li>
+      <li>Add a step to handle the schema drift. In the formula bar, replace the auto-promoted-headers step with: <pre>= Table.RenameColumns(#"Promoted Headers", {{"cam_id", "location_id"}}, MissingField.Ignore)</pre> The <code>MissingField.Ignore</code> option is critical: it lets the same step run safely against files where <code>cam_id</code> does not exist.</li>
+      <li>Convert the timestamp column. Add a custom column: <pre>try DateTime.From([timestamp])
+otherwise try DateTime.FromText([timestamp], "dd/MM/yyyy HH:mm")
+otherwise null</pre> This handles the three formats. Replace the original timestamp column.</li>
+      <li>Return to the combined query. Verify the row count: roughly 29,455 across the six files. If you see fewer, one of the renames failed; check the merge step.</li>
+      <li><strong>Close &amp; Load</strong>. The combined surveillance dataset is now refreshable; when next month's file arrives, drop it in the folder and click Refresh.</li>
+    </ol>
+
+    <div class="findings">
+      <h4>What you will discover</h4>
+      <p>A unified surveillance event table spanning six months. You can now ask questions such as <em>"how many times has citizen PR-00123 been recorded by ANPR this quarter"</em>; the answer is generally an integer larger than the citizen would expect. The combined query is the foundation for every subsequent exercise.</p>
+    </div>
+  </article>
+
+  <!-- EXERCISE 3 -->
+  <article class="exercise container-dossier" id="ex3">
+    <div class="ex-header">
+      <span><span class="ex-num">EXERCISE 03</span> &nbsp;//&nbsp; FILE-REF NT-PR-PQ-003</span>
+      <span>EST. 40 MIN</span>
+    </div>
+    <h2>Merges: Building the Citizen Story</h2>
+
+    <div class="memo">
+      <dl class="memo-header">
+        <dt>FROM</dt><dd>D. Vance, Senior Analyst</dd>
+        <dt>TO</dt><dd>Trainee Analyst</dd>
+        <dt>DATE</dt><dd>2026-07-04</dd>
+        <dt>RE</dt><dd>Cross-table joins; production of the canonical enriched register</dd>
+        <dt>CLASS</dt><dd>PROTECTED</dd>
+      </dl>
+      <p>Joins are the heart of analytical work. A row in isolation is a fact; a row joined to its context is a narrative.</p>
+    </div>
+
+    <div class="analyst-note">
+      <p>A surveillance event in isolation is meaningless. A row in <code>social_credit_history</code> is just a number. Our craft is to transform these atoms into a narrative.</p>
+      <p>Join the citizen to the household, the household to the suburb, the surveillance event to the citizen, the score change to its reason, and you have what NTell internally calls <em>a story</em>. Stories are what we sell to government clients. The data is the raw material; the story is the product. Most of our higher-tier government work is, in essence, the same enriched citizen table with different cover sheets.</p>
+    </div>
+
+    <div class="objectives">
+      <h4>What this exercise teaches in Power Query</h4>
+      <ul>
+        <li>Merge Queries (Left Outer, Inner, Anti)</li>
+        <li>Expanding merged columns and avoiding column-name collisions</li>
+        <li>Aggregation as part of a merge (Sum, Count)</li>
+        <li>Building a multi-step query graph; referencing one query from another</li>
+        <li>Sanity-checking a join with a count comparison</li>
+      </ul>
+    </div>
+
+    <h4>Step by step</h4>
+    <ol class="steps">
+      <li>Ensure the following queries are loaded: <code>citizens</code> (cleaned, from Exercise 01), <code>households</code>, <code>surveillance_events</code> (combined, from Exercise 02), <code>social_credit_history</code>, and <code>reason_codes</code>.</li>
+      <li>On <code>citizens</code>: <strong>Home &gt; Merge Queries As New</strong>. Match <code>household_id</code> to <code>households.household_id</code>. Use Left Outer. Expand <code>suburb</code>, <code>dwelling_type</code>, <code>utility_rationing_band</code>. Save as <code>citizens_enriched</code>.</li>
+      <li>From <code>surveillance_events</code>: <strong>Home &gt; Reference</strong>, then <strong>Group By</strong> on <code>citizen_id</code> with two aggregations: Count Rows (call it <code>event_count</code>); Sum of <code>severity</code> (call it <code>severity_total</code>). Save as <code>events_per_citizen</code>.</li>
+      <li>Merge <code>events_per_citizen</code> onto <code>citizens_enriched</code> using <code>citizen_id</code>; expand both new columns. Replace nulls in <code>event_count</code> with 0 (some citizens are blissfully unobserved).</li>
+      <li>From <code>social_credit_history</code>: merge to <code>reason_codes</code> on <code>reason_code</code>; expand <code>reason_description</code>. Group by <code>citizen_id</code>, sum of <code>score_delta</code>. Save as <code>score_changes_per_citizen</code>.</li>
+      <li>Merge <code>score_changes_per_citizen</code> onto <code>citizens_enriched</code>. Expand the sum. Add a calculated column comparing this calculated delta against the published <code>social_credit_score</code>; the two will not match exactly, because the published score reflects inputs we have not provided.</li>
+      <li>Sanity-check: Group By <code>tier</code>, count rows. Compare to the original distribution from Exercise 01. Numbers should be identical; if they are not, an inner join has dropped rows somewhere and you should find out where.</li>
+      <li><strong>Close &amp; Load</strong>. The result is the canonical product of analytical work at NTell. Take a moment to appreciate it; this is what most of our deliverables are.</li>
+    </ol>
+
+    <div class="findings">
+      <h4>What you will discover</h4>
+      <p>A single enriched register that tells, per row, the entire surveilled life of a Pandanus Reach resident: address, household type, utility band, total surveillance events, sum of severity, net score change, and reason. Sort it by <code>severity_total</code> descending; the top of the list is who Strategy will want to discuss on Monday.</p>
+    </div>
+  </article>
+
+  <!-- EXERCISE 4 -->
+  <article class="exercise container-dossier" id="ex4">
+    <div class="ex-header">
+      <span><span class="ex-num">EXERCISE 04</span> &nbsp;//&nbsp; FILE-REF NT-PR-PQ-004</span>
+      <span>EST. 30 MIN &middot; SENSITIVE</span>
+    </div>
+    <h2>Demographic Predictive Validity</h2>
+
+    <div class="memo">
+      <dl class="memo-header">
+        <dt>FROM</dt><dd>D. Vance, Senior Analyst</dd>
+        <dt>TO</dt><dd>Trainee Analyst</dd>
+        <dt>DATE</dt><dd>2026-07-07</dd>
+        <dt>RE</dt><dd>Validation of model performance across demographic strata</dd>
+        <dt>CLASS</dt><dd>PROTECTED &middot; SENSITIVE &middot; LEGAL HOLD</dd>
+      </dl>
+      <p>You will produce, in under five minutes of Power Query work, the most reliable finding in the Civic Harmony Pilot. Then you will not speak of it.</p>
+    </div>
+
+    <div class="analyst-note">
+      <p>It has been alleged, by activists, by the Federal Rights Commission, by one tediously persistent Upper House committee, and by a recent <em>Sunlight</em> episode we have asked our lawyers to address, that the Civic Harmony scoring algorithm exhibits <em>"bias"</em> against Indigenous Australians and against residents of Boundary Flats.</p>
+      <p>We at NTell prefer the term <em>demographic predictive validity</em>. The algorithm identifies real patterns of civic risk. If those patterns happen to correlate with Indigenous status and postcode, that is what the data says. We do not write the data; we make it actionable.</p>
+      <p>You are advised not to draw any conclusions about the model itself. Conclusions are for the Strategy team. Your job is to confirm the validity, document the magnitude, and move on. If you find yourself unsettled by what you see in this exercise, you may book a session with our Wellbeing Partner; they have signed the same NDA you have.</p>
+    </div>
+
+    <div class="objectives">
+      <h4>What this exercise teaches in Power Query</h4>
+      <ul>
+        <li>Group By with multiple aggregations (Average, Count)</li>
+        <li>Multi-key grouping</li>
+        <li>Pivoting categorical groupings into contingency tables</li>
+        <li>Composing a sequence of merges and groupings to interrogate a hypothesis</li>
+        <li>Restraint in interpretation</li>
+      </ul>
+    </div>
+
+    <h4>Step by step</h4>
+    <ol class="steps">
+      <li>From <code>citizens_enriched</code> (Exercise 03), reference a new query. Group By <code>indigenous_status</code>; aggregate Average of <code>social_credit_score</code> and Count Rows. Sort. Note the gap.</li>
+      <li>Repeat for <code>suburb</code>; same aggregations. Sort by Average descending. Locate Boundary Flats. Note where it sits.</li>
+      <li>Cross-tabulate. Group By <code>indigenous_status</code> AND <code>tier</code> (Ctrl+click both); aggregate Count Rows. Then <strong>Pivot Column</strong> on <code>tier</code> with the Count as values, Sum aggregation. You now have a 2&times;4 contingency table.</li>
+      <li>From your event-merged enriched query, Group By <code>tier</code> and aggregate Average <code>event_count</code>. Verify that lower tiers attract proportionally more surveillance events (they do; this is by design and we call it <em>"self-reinforcing operational accuracy"</em>).</li>
+      <li>Bonus task. From <code>search_logs</code>, filter where <code>flagged_category = "Y"</code>. Group By <code>citizen_id</code>, Count. Merge back to <code>citizens_enriched</code>. Group by <code>tier</code>, average flagged-search count. Tier D will lead. The question of whether they search differently or whether the algorithm flags their searches more readily is one the Strategy team will not answer.</li>
+      <li>Save your output as <code>predictive_validity_summary</code>. Submit to Strategy. Do not save a personal copy.</li>
+    </ol>
+
+    <div class="findings">
+      <h4>What you will discover</h4>
+      <p>The Civic Harmony score correlates strongly with Indigenous status (Indigenous citizens average approximately 130 points lower). It correlates with suburb of residence (Boundary Flats sits well below the others). Surveillance frequency increases as scores decrease, creating what some call a feedback loop and we call self-reinforcing operational accuracy. These findings are robust and replicate across every reporting period since pilot inception.</p>
+      <p class="warn">You will not raise these findings outside this dossier. Your line manager has been briefed.</p>
+    </div>
+  </article>
+
+  <!-- EXERCISE 5 -->
+  <article class="exercise container-dossier" id="ex5">
+    <div class="ex-header">
+      <span><span class="ex-num">EXERCISE 05</span> &nbsp;//&nbsp; FILE-REF NT-PR-PQ-005</span>
+      <span>EST. 25 MIN</span>
+    </div>
+    <h2>Reshaping for the Steering Committee</h2>
+
+    <div class="memo">
+      <dl class="memo-header">
+        <dt>FROM</dt><dd>D. Vance, Senior Analyst</dd>
+        <dt>TO</dt><dd>Trainee Analyst</dd>
+        <dt>DATE</dt><dd>2026-07-09</dd>
+        <dt>RE</dt><dd>Pivot and unpivot transformations for executive briefings</dd>
+        <dt>CLASS</dt><dd>PROTECTED</dd>
+      </dl>
+      <p>Reshaping data is not merely technical; it is an act of executive cognition support. Long tables fatigue Steering Committees. We pivot to soothe.</p>
+    </div>
+
+    <div class="analyst-note">
+      <p>The Civic Harmony Steering Committee comprises seven senior bureaucrats and a Deputy Administrator. They enjoy single-page briefings. They do not enjoy 12,000-row tables. Reshaping data is therefore not merely a technical skill but a service to executive cognition.</p>
+      <p>A pivot table is our offering to the gods of seniority. An unpivot is how the model team rebuilds reality after the gods have moved on. The same data set, looked at one way, suggests a triumph; looked at another, suggests a problem. The trick is to know which way to present it on which day.</p>
+    </div>
+
+    <div class="objectives">
+      <h4>What this exercise teaches in Power Query</h4>
+      <ul>
+        <li>Pivot Column transformation; choosing aggregation type</li>
+        <li>Unpivot Columns transformation; the inverse operation</li>
+        <li>Group By followed by Pivot (the canonical pattern)</li>
+        <li>Adding derived date components for time-series pivots</li>
+      </ul>
+    </div>
+
+    <h4>Step by step</h4>
+    <ol class="steps">
+      <li>From <code>search_logs</code>: Group By <code>citizen_id</code> AND <code>category</code>; aggregate Count Rows.</li>
+      <li>Select the <code>category</code> column. <strong>Transform &gt; Pivot Column</strong>. Values column: the Count from the previous step. Aggregate: Sum. (Or "Don't aggregate", since the prior Group By has already done so.)</li>
+      <li>You now have one row per citizen, one column per search category, counts as values. Save as <code>search_profile_wide</code>.</li>
+      <li>To reverse: take <code>search_profile_wide</code>, select all category columns, <strong>Transform &gt; Unpivot Columns</strong>. You are back to long format. Both forms are the same data. Both are valid. Both are presented to different audiences.</li>
+      <li>From <code>social_credit_history</code>: Add Column &gt; Date &gt; Month. Group By <code>citizen_id</code> and Month; sum <code>score_delta</code>. Pivot the Month column. You now have a citizen-by-month score-change matrix.</li>
+      <li>Save the matrix as <code>score_matrix</code>. The Steering Committee receives the wide form on a single A4 sheet, which they will read on the way to the meeting. The model team receives the long form, which they will load into their Jupyter notebooks.</li>
+    </ol>
+
+    <div class="findings">
+      <h4>What you will discover</h4>
+      <p>The pivot is reversible. The Steering Committee will see the pivoted summary; the model team will see the unpivoted detail. Both believe they are looking at <em>the data</em>. Both are correct. Both are also wrong.</p>
+    </div>
+  </article>
+
+  <!-- EXERCISE 6 -->
+  <article class="exercise container-dossier" id="ex6">
+    <div class="ex-header">
+      <span><span class="ex-num">EXERCISE 06</span> &nbsp;//&nbsp; FILE-REF NT-PR-PQ-006</span>
+      <span>EST. 50 MIN</span>
+    </div>
+    <h2>Custom M Classifiers</h2>
+
+    <div class="memo">
+      <dl class="memo-header">
+        <dt>FROM</dt><dd>D. Vance, Senior Analyst</dd>
+        <dt>TO</dt><dd>Trainee Analyst</dd>
+        <dt>DATE</dt><dd>2026-07-12</dd>
+        <dt>RE</dt><dd>Authoring a bespoke risk classifier in M</dd>
+        <dt>CLASS</dt><dd>PROTECTED</dd>
+      </dl>
+      <p>The M language is where the senior analyst works. The trainee drags and drops; the senior writes a function. Today you will write a function.</p>
+    </div>
+
+    <div class="analyst-note">
+      <p>The M language is where seniority manifests. Anyone can drag and drop. The senior analyst writes functions. With M, you can encode an entire risk taxonomy in a single classifier and apply it across millions of rows, faster than the official model and without its inconvenient governance.</p>
+      <p>Your function is your fingerprint. Some careers at NTell have been built on a single well-tuned classifier. Mine, regrettably, was not one of them; mine was built on cocktail receptions and the strategic withholding of opinions. You should aim higher.</p>
+    </div>
+
+    <div class="objectives">
+      <h4>What this exercise teaches in Power Query</h4>
+      <ul>
+        <li>Defining a custom M function (signature, body, return type)</li>
+        <li>Conditional logic in M (<code>if / then / else</code>)</li>
+        <li><code>List.Accumulate</code> for stateful accumulation across a list</li>
+        <li>Invoking a custom function as a column transformation</li>
+        <li>Refactoring a multi-argument function to take a record</li>
+      </ul>
+    </div>
+
+    <h4>Step by step</h4>
+    <ol class="steps">
+      <li>In Power Query: <strong>Home &gt; New Source &gt; Blank Query</strong>. Open <strong>View &gt; Advanced Editor</strong>. Replace the contents with the function below; save as <code>fnRiskClassify</code>.<pre>(suburb as text, sector as text, flagged_searches as number) =&gt;
+let
+    suburb_score =
+        if suburb = "Boundary Flats" then 30
+        else if suburb = "Mining Worker Camp North" or
+                suburb = "Mining Worker Camp South" then 20
+        else 0,
+    sector_score =
+        if sector = "Unemployed" then 25
+        else if sector = "Government" or sector = "Public Safety" then -10
+        else 0,
+    search_score = flagged_searches * 5,
+    total = suburb_score + sector_score + search_score
+in
+    total</pre></li>
+      <li>Return to <code>citizens_enriched</code>. <strong>Add Column &gt; Invoke Custom Function</strong>. Choose <code>fnRiskClassify</code>. Map its arguments to your columns: suburb to <code>suburb</code>, sector to <code>employment_sector</code>, flagged_searches to your flagged-searches count from Exercise 04. Power Query computes a value per row.</li>
+      <li>Filter where the risk score exceeds 50. These are your <em>elevated attention</em> citizens. Compare against the official Tier-D list. Note the citizens who appear in your list but not in theirs; these are catches the official model has missed.</li>
+      <li>Refactor the function to take a record. Replace the signature with <code>(row as record) =&gt;</code> and access fields with <code>row[suburb]</code>. Re-invoke with a single argument. This is more idiomatic M and senior reviewers will respect it.</li>
+      <li>Bonus. Use <code>List.Accumulate</code> to compute, for each citizen, a rolling 30-day net score change from <code>social_credit_history</code>. Pre-sort by <code>change_date</code>. The signature is <code>List.Accumulate(list, seed, accumulator)</code>. The accumulator is a function of the form <code>(state, current) =&gt; new_state</code>.</li>
+      <li>Submit your top 30 elevated-attention citizens to Strategy. They will be interested. They are always interested in catches the official model fails to make.</li>
+    </ol>
+
+    <div class="findings">
+      <h4>What you will discover</h4>
+      <p>You have built, in approximately twenty lines of M, a parallel scoring function the official Civic Harmony algorithm does not know about. You can identify citizens the official model has missed. You have, in effect, written shadow policy. Welcome to senior analytical practice.</p>
+    </div>
+  </article>
+
+  <!-- END OF DOSSIER -->
+  <div class="doc-end container-dossier">
+    <div class="signature">D. Vance, Senior Analyst, Civic Harmony Stream, NTell Australia</div>
+    <div>END OF DOSSIER NT-PR-2026-0341</div>
+    <div>NEXT VERSION SCHEDULED 2026-09-30; OR UPON SENATE INQUIRY, WHICHEVER FIRST</div>
+  </div>
+
+  <!-- OUT-OF-CHARACTER DISCLAIMER -->
+  <div class="doc-disclaimer container-dossier">
+    <strong>Out-of-character note for the actual reader.</strong>
+    This dossier is satire. NTell, the Pandanus Reach Covert Statistics Office, the Civic Harmony Pilot, the Civic Harmony Act 2026, and Damien Vance do not exist. The dataset is synthetic and contains no real people. The analyst character is voiced as morally bankrupt on purpose; the discomfort he produces is the point of the exercise. If you are using this material in teaching, the intended discussion is about the language industry actors use to euphemise harm, the dynamics of algorithmic feedback loops, the limits of voluntary consent in pervasive-surveillance settings, and the obligations created by Indigenous data sovereignty frameworks (CARE Principles, AIATSIS Code of Ethics) and the Australian Privacy Principles. The Power Query lessons stand on their own technical merit; the framing is what makes them memorable.
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="../">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="../pandanus-reach/">Power Query</a></li>
+          <li><a href="../#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="../#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made in the Australian outback.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
