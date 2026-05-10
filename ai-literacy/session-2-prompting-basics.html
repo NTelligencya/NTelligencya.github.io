@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talking to AI, Prompting Basics &middot; AI Literacy &middot; NTell World Ink</title>
+<meta name="description" content="The single skill that separates 'AI is a bit rubbish' from 'AI is actually useful' is how you ask. This session is about asking better, without turning it into a science.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, AI Literacy Course 1; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+
+  .tool-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin: 18px 0;
+  }
+  .tool-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px; padding: 18px 20px;
+  }
+  .tool-card h5 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px;
+    color: var(--text); margin: 0 0 10px; font-weight: 500;
+  }
+  .tool-card p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0 0 8px; }
+  .tool-card p:last-child { margin: 0; }
+
+  .session-list { display: grid; gap: 14px; margin: 12px 0 24px; }
+  .session-list-item {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .session-list-item:hover { border-color: var(--accent); background: rgba(26,201,201,0.03); }
+  .session-list-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 28px;
+    color: var(--accent); font-weight: 500;
+  }
+  .session-list-body h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .session-list-body .when {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+  }
+  .session-list-body ul { margin: 6px 0 0 0; padding-left: 18px; color: var(--text-2); }
+  .session-list-body ul li { font-size: 14.5px; line-height: 1.6; margin-bottom: 3px; }
+
+  .resource-list { display: grid; gap: 12px; margin: 12px 0 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .resource-list-item {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s, background 0.15s;
+  }
+  .resource-list-item:hover { background: rgba(240,192,96,0.04); }
+  .resource-list-item h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .resource-list-item p { color: var(--text-2); font-size: 14px; line-height: 1.55; margin: 0; }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  table.data-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  table.data-table th {
+    text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    padding: 10px 12px; border-bottom: 1px solid var(--rule-2); background: var(--bg-2);
+  }
+  table.data-table td {
+    padding: 12px; border-bottom: 1px solid var(--rule);
+    color: var(--text-2); line-height: 1.55; vertical-align: top;
+  }
+  table.data-table tr:hover td { background: rgba(26,201,201,0.02); }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .session-list-item { grid-template-columns: 1fr; gap: 8px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/files/ai-literacy/">AI Literacy</a>
+    <span class="sep">/</span>
+    <span>Talking to AI, Prompting Basics</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">AI Literacy &middot; Course 1</div>
+  <h1>Talking to AI, Prompting Basics</h1>
+  <p class="subtitle">The single skill that separates "AI is a bit rubbish" from "AI is actually useful" is how you ask. This session is about asking better, without turning it into a science.</p>
+  <div class="back-strip">
+    <a class="back-link" href="/files/ai-literacy/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to AI Literacy overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#what-is-prompt">What a Prompt Is</a></li>
+    <li><a href="#anatomy">The Four Parts of a Good Prompt</a></li>
+    <li><a href="#weak-vs-strong">Weak vs Strong Prompts</a></li>
+    <li><a href="#give-context">Give It Context</a></li>
+    <li><a href="#set-role">Set a Role (When It Helps)</a></li>
+    <li><a href="#show-example">Show an Example</a></li>
+    <li><a href="#iterating">Keep Going, Don't Restart</a></li>
+    <li><a href="#spotting-wrong">Spotting When It's Wrong</a></li>
+    <li><a href="#try-it">Try It Yourself</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+<section class="content-section container-content" id="what-is-prompt">
+            <div class="section-eyebrow">// what prompt</div>
+      <h2>What a Prompt Is</h2>
+            <p>A "prompt" is just the message you type to the AI. That's the whole definition. You might see the phrase "prompt engineering" and think it's a technical field. It's not. It's writing clearly, in plain English, to a patient helper.</p>
+                <p class="pullquote">A good prompt is not a magic spell. It's an instruction you'd be comfortable giving a new co-worker on their first day.</p>
+                <p>If you'd describe the task clearly to a human helper, you already know how to prompt an AI. The tricks below just help you do it a bit more reliably.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="anatomy">
+            <div class="section-eyebrow">// four parts good prompt</div>
+      <h2>The Four Parts of a Good Prompt</h2>
+            <p>The four ingredients. Not every prompt needs all four, but once you know them you'll recognise when one is missing.</p>
+                <p><strong>1. Task.</strong> What do you actually want it to do? "Write a letter." "Explain this word." "Give me three ideas."</p>
+                <p><strong>2. Context.</strong> What's the situation? "I'm a volunteer at a community centre." "My daughter is ten years old." "We're planning a small family dinner."</p>
+                <p><strong>3. Role (optional).</strong> Who should the AI pretend to be? "Act as a friendly mechanic." "Explain it like a maths teacher." Giving it a role sharpens the tone.</p>
+                <p><strong>4. Format.</strong> What should the answer look like? "Keep it short." "Give me a list." "Make it sound friendly, not corporate." "Leave spaces for me to fill in the details."</p>
+                <div class="callout callout-tip">
+  <div class="callout-title">You don't have to label them</div>
+  <p>You don't write "Task:" and "Context:" like filling in a form. You just write a normal sentence that happens to include those bits. The AI picks them up without help.</p>
+</div>
+            
+        </section>
+
+        <section class="content-section container-content" id="weak-vs-strong">
+            <div class="section-eyebrow">// weak vs strong prompts</div>
+      <h2>Weak vs Strong Prompts</h2>
+            <p>Same task, two different prompts. See the difference.</p>
+
+                <div class="compare-box">
+                    <div class="weak">
+                        <h5>Weak prompt</h5>
+                        <div class="prompt-text">Write me a complaint letter.</div>
+                        <p class="note">The AI has no idea who you are, what happened, or who the letter is to. You'll get a generic template that doesn't fit.</p>
+                    </div>
+                    <div class="strong">
+                        <h5>Strong prompt</h5>
+                        <div class="prompt-text">Can you draft a complaint letter to my electricity retailer? They charged me a late fee on a bill I paid on time, I have the receipt. I want the fee refunded. Keep it firm but polite, leave spaces for the account number and dates, and keep it under half a page.</div>
+                        <p class="note">Task, context, tone, and format are all in one message. The reply will be ready to use with a few tweaks.</p>
+                    </div>
+                </div>
+
+                <div class="compare-box">
+                    <div class="weak">
+                        <h5>Weak prompt</h5>
+                        <div class="prompt-text">Help me plan meals.</div>
+                        <p class="note">Meals for who, on what budget, with what equipment? The AI will guess and probably miss.</p>
+                    </div>
+                    <div class="strong">
+                        <h5>Strong prompt</h5>
+                        <div class="prompt-text">Can you help me plan a week of dinners for two adults and two kids? We've got a budget of about $150, a standard oven and cooktop but no microwave, and the kids don't eat mushrooms. Give me a shopping list at the end.</div>
+                        <p class="note">The AI now has the who, the budget, the constraints, and the format for the answer.</p>
+                    </div>
+                </div>
+
+                <div class="compare-box">
+                    <div class="weak">
+                        <h5>Weak prompt</h5>
+                        <div class="prompt-text">Explain superannuation.</div>
+                        <p class="note">Pitched at who? A textbook answer, probably too long, probably too formal.</p>
+                    </div>
+                    <div class="strong">
+                        <h5>Strong prompt</h5>
+                        <div class="prompt-text">Can you explain in plain English how superannuation works? Pretend you're explaining to a friend who's never had a full-time job before. Use a real-life example with real numbers. Keep it short.</div>
+                        <p class="note">Reading level, audience, example type, length. The answer lands.</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:18px"><strong>The pattern.</strong> Weak prompts leave the AI guessing. Strong prompts tell the AI enough to do the job properly. The difference is usually one or two extra sentences of context.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="give-context">
+            <div class="section-eyebrow">// give it context</div>
+      <h2>Give It Context</h2>
+            <p>This is the single most useful habit. Before asking your question, tell the AI one or two things about your situation. You'll get an answer built for you, not a generic one.</p>
+                <p><strong>What kind of context helps?</strong></p>
+                <p>Who you are: "I'm a community health worker." "I'm retired." "I'm a student at TAFE."</p>
+                <p>What you know: "I haven't done maths since school." "I've used Word but never Excel." "I know nothing about cars."</p>
+                <p>What the situation is: "I'm writing this on my phone." "I'm in a hurry." "I'm dealing with a family member who's unwell."</p>
+                <p>What you've already tried: "I've already Googled this and the answers were confusing."</p>
+
+                <div class="prompt-demo">
+                    <h5>Example, adding context to the same question</h5>
+                    <div class="prompt-text">I'm a volunteer who's just been asked to take the minutes at a monthly community meeting. I've never done this before. The meetings run about an hour, with about 12 people and a loose agenda. Can you tell me in plain English what good minutes look like, what to write down and what to leave out, and suggest a simple format I could use the first time?</div>
+                    <p class="note">Without the first sentence, you'd get a textbook explanation of meeting minutes. With it, you get advice a first-time note-taker can actually use.</p>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="set-role">
+            <div class="section-eyebrow">// set role when it helps</div>
+      <h2>Set a Role (When It Helps)</h2>
+            <p>Telling the AI who to pretend to be gives you a different flavour of answer for the same question. It's optional, but it's a cheap trick that works.</p>
+
+                <div class="prompt-demo">
+                    <h5>Different roles, same topic</h5>
+                    <div class="prompt-text">Act as a friendly mechanic and explain what a timing belt is, and why it matters when you're buying a second-hand car.</div>
+                    <p class="note">You'll get a reply that sounds like a tradie talking across a workbench, not a Wikipedia article.</p>
+                </div>
+
+                <div class="prompt-demo">
+                    <h5>Another one</h5>
+                    <div class="prompt-text">Act as a gentle tutor who's explaining things to a high school student. Explain how interest on a credit card builds up over a year, using a real-world example.</div>
+                    <p class="note">Same information, but patient, worked-through, and at a pitched reading level.</p>
+                </div>
+
+                <p><strong>When a role helps.</strong> When you want a particular tone (friendly, formal, cautious, direct). When you want a specific viewpoint (a small business owner, a teacher, a nurse). When you want the AI to stay in one lane rather than covering every angle.</p>
+                <p><strong>When a role doesn't help.</strong> For quick factual questions, or where you actually want the AI's own voice, which is usually clear and even-handed.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="show-example">
+            <div class="section-eyebrow">// show example</div>
+      <h2>Show an Example</h2>
+            <p>The fastest way to get the AI to produce exactly what you want is to show it one that's like what you want.</p>
+
+                <div class="prompt-demo">
+                    <h5>Example, style-matching</h5>
+                    <div class="prompt-text">Here's a text message I sent last week that I was happy with: [paste message]. Can you write me a new message to a different person but in the same tone? This one's going to my boss, asking to shift my start time on Thursday because of a medical appointment.</div>
+                    <p class="note">The AI will match your voice, not invent a corporate one. This works brilliantly for emails, texts, and social posts.</p>
+                </div>
+
+                <div class="prompt-demo">
+                    <h5>Example, shape-matching</h5>
+                    <div class="prompt-text">Here's a meal plan someone made for me last year that I really liked: [paste plan]. Can you make me a new one, same layout, same length, same level of detail, but for this week based on what's in my fridge?</div>
+                    <p class="note">Showing the AI a finished example is 10 times faster than describing what you want in words.</p>
+                </div>
+
+                <p style="margin-top:16px">This trick is called "few-shot" in the technical literature. You don't need to know the name. You just need to know: if you want a specific style, show the AI a sample of that style.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="iterating">
+            <div class="section-eyebrow">// keep going dont restart</div>
+      <h2>Keep Going, Don't Restart</h2>
+            <p>The most common beginner mistake is giving up on a prompt because the first answer wasn't right, and starting over. Don't. The AI remembers everything in the same conversation, and it's really good at fixing its own work when you tell it what's wrong.</p>
+
+                <p class="pullquote">If the first answer isn't right, say what's wrong. The second one will almost always be better.</p>
+
+                <p><strong>Things to say back to the AI:</strong></p>
+                <p>"That's too long. Make it half the length, same points."</p>
+                <p>"That's too formal. Rewrite it the way a friend would say it."</p>
+                <p>"The third point isn't right because [why]. Try again."</p>
+                <p>"I like the second paragraph. Keep it. Rewrite the first one to match that tone."</p>
+                <p>"Explain more about the first idea. Drop the others for now."</p>
+
+                <div class="callout callout-tip">
+  <div class="callout-title">The AI won't be offended</div>
+  <p>It's fine to say "no, that's wrong", "I don't like this", or "try again, differently". It has no ego. It will just do another version.</p>
+</div>
+            
+        </section>
+
+        <section class="content-section container-content" id="spotting-wrong">
+            <div class="section-eyebrow">// spotting when its wrong</div>
+      <h2>Spotting When It's Wrong</h2>
+            <p>Remember from Session 1: AI is confident in a way that can fool you. Prompting better doesn't stop hallucinations. It just makes them easier to spot, because your answer is more specific.</p>
+                <p><strong>Warning signs.</strong> Keep your eye out for these:</p>
+                <p>A quote or a statistic with no source. If the AI says "a 2024 study found that...", ask "which study, exactly?"</p>
+                <p>Very specific facts about small places, niche topics, or local organisations. The AI is guessing more than you'd think.</p>
+                <p>Phone numbers, web addresses, or book titles. These are hallucination hotspots. Verify before acting.</p>
+                <p>A tone that sounds completely sure when the question was genuinely hard. Real experts hedge. An AI that doesn't hedge on a hard question is often wrong.</p>
+
+                <div class="prompt-demo">
+                    <h5>The honesty check</h5>
+                    <div class="prompt-text">Before you answer, tell me: is this question something you're sure about, or something you might be making up parts of? And if I wanted to verify your answer, where should I look?</div>
+                    <p class="note">Works on every AI on the market. It won't catch every mistake, but it catches a lot, and it's a good habit.</p>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="try-it">
+            <div class="section-eyebrow">// try it yourself</div>
+      <h2>Try It Yourself</h2>
+            <div class="activity-box">
+                    <span class="label">Activity, 10 minutes</span>
+                    <h4>Take a weak prompt and rebuild it in front of the AI.</h4>
+                    <p><strong>Round 1.</strong> Type a short, lazy prompt: "Write me an email." Just those four words. See what you get.</p>
+                    <p><strong>Round 2.</strong> In the same chat, type: "Let's make that better. The email is to my landlord. The hot water has been off for three days. I want it fixed but I'm not angry yet. Keep it short. Can you try again?"</p>
+                    <p><strong>Round 3.</strong> Read the new version. Find something you'd change. Say so: "That second line sounds too stiff, can you rewrite just that line in a friendlier way?"</p>
+                    <p><strong>Round 4.</strong> Ask one last thing: "If they don't reply within 24 hours, what should I send next?"</p>
+                    <p style="margin-top:10px">Notice how different the final output is from Round 1. That's prompting. The first attempt is almost always weak. The third or fourth is where the AI genuinely earns its keep.</p>
+                </div>
+
+                <p style="margin-top:18px"><strong>The takeaway.</strong> You don't need to learn prompt engineering. You need one habit: treat the AI like a new helper who doesn't know you yet. Tell it who you are, what you want, what "good" looks like. When the first answer misses, say what's wrong. Keep going in the same chat. That's it.</p>
+            
+        </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/pandanus-reach/">Power Query</a></li>
+          <li><a href="/files/word/">Microsoft Word</a></li>
+          <li><a href="/files/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made in the Australian outback.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

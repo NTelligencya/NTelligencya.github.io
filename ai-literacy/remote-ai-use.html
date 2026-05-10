@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using AI Remotely &middot; AI Literacy &middot; NTell World Ink</title>
+<meta name="description" content="Bandwidth, data use, and practical tips for AI on a 4G bar, a Starlink dish, or a shared venue Wi-Fi. What works, what chews data, and what to do when the connection drops.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, AI Literacy Course 1; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+
+  .tool-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin: 18px 0;
+  }
+  .tool-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px; padding: 18px 20px;
+  }
+  .tool-card h5 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px;
+    color: var(--text); margin: 0 0 10px; font-weight: 500;
+  }
+  .tool-card p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0 0 8px; }
+  .tool-card p:last-child { margin: 0; }
+
+  .session-list { display: grid; gap: 14px; margin: 12px 0 24px; }
+  .session-list-item {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .session-list-item:hover { border-color: var(--accent); background: rgba(26,201,201,0.03); }
+  .session-list-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 28px;
+    color: var(--accent); font-weight: 500;
+  }
+  .session-list-body h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .session-list-body .when {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+  }
+  .session-list-body ul { margin: 6px 0 0 0; padding-left: 18px; color: var(--text-2); }
+  .session-list-body ul li { font-size: 14.5px; line-height: 1.6; margin-bottom: 3px; }
+
+  .resource-list { display: grid; gap: 12px; margin: 12px 0 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .resource-list-item {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s, background 0.15s;
+  }
+  .resource-list-item:hover { background: rgba(240,192,96,0.04); }
+  .resource-list-item h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .resource-list-item p { color: var(--text-2); font-size: 14px; line-height: 1.55; margin: 0; }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  table.data-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  table.data-table th {
+    text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    padding: 10px 12px; border-bottom: 1px solid var(--rule-2); background: var(--bg-2);
+  }
+  table.data-table td {
+    padding: 12px; border-bottom: 1px solid var(--rule);
+    color: var(--text-2); line-height: 1.55; vertical-align: top;
+  }
+  table.data-table tr:hover td { background: rgba(26,201,201,0.02); }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .session-list-item { grid-template-columns: 1fr; gap: 8px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/files/ai-literacy/">AI Literacy</a>
+    <span class="sep">/</span>
+    <span>Using AI Remotely</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">AI Literacy &middot; Course 1</div>
+  <h1>Using AI Remotely</h1>
+  <p class="subtitle">Bandwidth, data use, and practical tips for AI on a 4G bar, a Starlink dish, or a shared venue Wi-Fi. What works, what chews data, and what to do when the connection drops.</p>
+  <div class="back-strip">
+    <a class="back-link" href="/files/ai-literacy/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to AI Literacy overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#why-this-matters">Why This Matters</a></li>
+    <li><a href="#how-honest">How Honest Are These Numbers</a></li>
+    <li><a href="#data-table">Data Use Per Tool, Per Mode</a></li>
+    <li><a href="#connections">What Remote NT Connections Actually Deliver</a></li>
+    <li><a href="#traffic-light">Traffic Light Guide for a Tethered 4G Hotspot</a></li>
+    <li><a href="#voice-trap">The Voice Mode Trap</a></li>
+    <li><a href="#image-cost">Images Cost Far More Than Text</a></li>
+    <li><a href="#monthly-budget">A Month of AI Use, Translated to GB</a></li>
+    <li><a href="#offline">What Works Offline or Cached</a></li>
+    <li><a href="#connection-drops">When Your Connection Drops Mid-Prompt</a></li>
+    <li><a href="#vendor-silence">What the Vendors Don't Tell You</a></li>
+    <li><a href="#practical-checklist">Practical Checklist</a></li>
+    <li><a href="#references">References</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+<section class="content-section container-content" id="why-this-matters">
+            <div class="section-eyebrow">// why this matters</div>
+      <h2>Why This Matters</h2>
+            <p>In a city, the AI tool you pick is about features. Remote, it's also about what your connection can carry. A tool that runs fine on city fibre can stall on a single 4G bar, burn through a prepaid data cap in a week, or fall over the moment 15 people on a venue Wi-Fi try it at the same time.</p>
+                <p>This page gives you practical numbers for each of the main tools: text chat, voice mode, image generation, file uploads, and video. It then translates those numbers into guidance for the kinds of connections you actually have in remote NT: Telstra 4G, Optus 4G, Starlink, venue Wi-Fi, and tethered hotspots.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="how-honest">
+            <div class="section-eyebrow">// how honest are these numbers</div>
+      <h2>How Honest Are These Numbers</h2>
+            <p>An honesty note before the figures. None of the major AI vendors, OpenAI, Anthropic, Microsoft, Google, or Perplexity, publish official "megabytes per message" or "minimum kilobits per second" figures for their consumer chat products. What they publish is general guidance like "requires a stable internet connection".</p>
+                <p>The numbers below are <strong>engineering estimates</strong>, built from the underlying audio codec bitrates, typical text chat payload sizes, observed image and audio file sizes, and the Telstra and Ookla speed data cited in the Tennant Creek connectivity research. Treat them as ballparks for planning, not promises. Where a number comes from a published vendor limit (for example Claude's 30 MB file upload cap), it's marked as <em>published</em>. Everything else is <em>estimate</em>, with a range.</p>
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Check the references before quoting a figure</h4>
+                        <p>If you plan to print these numbers on a handout or quote them to a funder, open the reference links at the bottom of the page and verify against the vendor's current documentation. Bitrates and limits change as the products evolve.</p>
+                    </div>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="data-table">
+            <div class="section-eyebrow">// data use per tool per</div>
+      <h2>Data Use Per Tool, Per Mode</h2>
+            <p>One-line summary in the first column, data cost in the second, minimum comfortable bandwidth in the third, source basis in the fourth. Specifics are estimates unless marked.</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Tool, mode</th><th>Typical data per use</th><th>Min usable bandwidth</th><th>Source basis</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="tool-col">ChatGPT, text</td><td>~2 to 50 KB per exchange (estimate)</td><td>~50 kbps</td><td>Typical streaming JSON payloads</td></tr>
+                        <tr><td class="tool-col">ChatGPT, Advanced Voice</td><td>~1 to 2 MB per minute (estimate)</td><td>~64 to 128 kbps sustained</td><td>Opus codec at typical speech bitrates</td></tr>
+                        <tr><td class="tool-col">ChatGPT, image generation</td><td>~0.5 to 3 MB per image (estimate)</td><td>Slow 4G works; painful on weak signal</td><td>Observed PNG sizes at 1024×1024</td></tr>
+                        <tr><td class="tool-col">ChatGPT, image upload</td><td>~150 to 500 KB after client resize; original phone photo can be 1 to 5 MB (estimate)</td><td>Upload headroom ~256 kbps+</td><td>OpenAI vision tiling docs</td></tr>
+                        <tr><td class="tool-col">Claude, text</td><td>~2 to 80 KB per exchange (estimate, replies often longer)</td><td>~50 to 100 kbps</td><td>Streaming payload observation</td></tr>
+                        <tr><td class="tool-col">Claude, file upload</td><td>Equal to file size; <strong>30 MB per file, 500 MB per project</strong> (published)</td><td>Upload headroom matters more than download</td><td>Anthropic published limits</td></tr>
+                        <tr><td class="tool-col">Claude, image upload</td><td>Equal to image size, often 0.5 to 3 MB (estimate)</td><td>Upload-limited</td><td>Anthropic vision docs</td></tr>
+                        <tr><td class="tool-col">Claude, artifacts</td><td>Tens of KB; preview renders locally (estimate)</td><td>Same as text chat</td><td>Artifact payload is text or code</td></tr>
+                        <tr><td class="tool-col">Copilot, web chat</td><td>~5 to 50 KB per exchange (estimate)</td><td>~50 kbps</td><td>Comparable streaming chat UX</td></tr>
+                        <tr><td class="tool-col">Copilot, in Word, Excel, Outlook</td><td>~100s of KB to low MB per Copilot action on a whole document (estimate)</td><td>Broadband preferred; each action is a cloud round-trip</td><td>Context window plus document payload</td></tr>
+                        <tr><td class="tool-col">Copilot, voice</td><td>~1 to 2 MB per minute (estimate)</td><td>~64 to 128 kbps</td><td>Teams media bitrate as closest analogue (~30 to 130 kbps)</td></tr>
+                        <tr><td class="tool-col">Gemini, text</td><td>~2 to 80 KB per exchange (estimate)</td><td>~50 to 100 kbps</td><td>Streaming payload observation</td></tr>
+                        <tr><td class="tool-col">Gemini, voice (non-Live)</td><td>~1 to 2 MB per minute (estimate)</td><td>~64 to 128 kbps</td><td>Standard speech codec bitrates</td></tr>
+                        <tr><td class="tool-col">Gemini Live, video plus voice</td><td>~3 to 10 MB per minute (estimate); video uplink dominates</td><td>~500 kbps floor, ~1 Mbps up comfortable</td><td>Real-time WebRTC-style video</td></tr>
+                        <tr><td class="tool-col">NotebookLM, source upload</td><td>Equal to file size; <strong>200 MB or 500,000 words per source</strong> (published)</td><td>Upload-limited</td><td>Google NotebookLM help</td></tr>
+                        <tr><td class="tool-col">NotebookLM, text Q&amp;A</td><td>~10 to 80 KB per exchange (estimate)</td><td>~50 to 100 kbps</td><td>Streaming text</td></tr>
+                        <tr><td class="tool-col">NotebookLM, Audio Overview</td><td>~10 to 25 MB for a 10 to 20 minute piece (estimate, MP3 at 64 to 128 kbps)</td><td>Download once, play offline</td><td>Observed Audio Overview file sizes</td></tr>
+                        <tr><td class="tool-col">Perplexity, text answer</td><td>~20 to 100 KB per answer with sources (estimate)</td><td>~100 kbps</td><td>Browser devtools observation</td></tr>
+                        <tr><td class="tool-col">Perplexity, image search</td><td>~0.2 to 3 MB per batch of 5 to 20 thumbnails (estimate)</td><td>~256 kbps+</td><td>Typical web thumbnail sizes</td></tr>
+                    </tbody>
+                </table>
+
+                <p><strong>The four rules of thumb that come out of this table:</strong></p>
+                <p>Text chat, on any of the six tools, is cheap. A full hour of heavy back-and-forth text is typically well under 10 MB. You can do this on a weak 4G bar.</p>
+                <p>Voice mode is roughly 10 to 20 times the data cost of the same conversation typed. That's still modest in absolute terms (around 60 to 120 MB per hour), but it adds up fast if you're on a prepaid SIM or a shared hotspot.</p>
+                <p>Image generation is the biggest single-click cost in everyday use. A batch of four images can move 5 to 10 MB in a few seconds.</p>
+                <p>Gemini Live with video on is the worst case. It's the only common consumer mode that genuinely needs broadband-class upload, not just download.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="connections">
+            <div class="section-eyebrow">// what remote nt connections actually</div>
+      <h2>What Remote NT Connections Actually Deliver</h2>
+            <p>These figures come from the Tennant Creek connectivity research already done for this project (see <em>TC deep-research-report.md</em> in the project folder), with the bandwidth research overlay on top.</p>
+
+                <p><strong>Telstra 4G in remote NT towns.</strong> Present in Tennant Creek and most regional centres. Telstra's own typical speed range is 2 to 500 Mbps on 4G, with 5G running 10 Mbps to 1 Gbps where available. In practice, a useful planning floor is "a few Mbps" on a decent bar, which is more than enough for any text or voice AI use.</p>
+
+                <p><strong>Optus and Vodafone.</strong> Present in Tennant Creek but with smaller footprints outside town. Broadly comparable speeds to Telstra on a good bar, more variable on the edges.</p>
+
+                <p><strong>Northern Territory regional median (Ookla 2025, via WhistleOut).</strong> Around 72 Mbps download. That's a regional median, not a remote-community median, so take it as an optimistic ceiling rather than what you'll see in the bush.</p>
+
+                <p><strong>Starlink residential in remote Australia.</strong> Community reviews commonly report 50 to 200 Mbps down and 10 to 20 Mbps up. That's effectively fixed broadband for every AI tool on the table above, including Gemini Live.</p>
+
+                <p><strong>Starlink Mini on the Roam plan.</strong> Often lower, commonly 20 to 100 Mbps, variable by time of day and sky obstruction. Still broadband-class for every AI mode if you have line-of-sight.</p>
+
+                <p><strong>Public and venue Wi-Fi.</strong> Shared, and the most-variable thing on this list. A 50 Mbps venue link that tests fine with one person can collapse when 15 people all hit voice mode at once. Plan around congestion, not the speed test.</p>
+
+                <div class="callout callout-tip">
+  <div class="callout-title">One signal bar is not the same as no signal</div>
+  <p>Text AI tools will usually work on a single 4G bar if the bar is stable. What kills the experience isn't the peak speed, it's the jitter and the packet loss. If your bar flickers between 1 and zero, text chat will feel frozen even though a speed test might pass.</p>
+</div>
+            
+        </section>
+
+        <section class="content-section container-content" id="traffic-light">
+            <div class="section-eyebrow">// traffic light guide tethered 4g</div>
+      <h2>Traffic Light Guide for a Tethered 4G Hotspot</h2>
+            <p>If you're tethering to a single phone or using a basic mobile hotspot, here's the shortcut. Green is fine, amber needs care, red is usually a mistake.</p>
+
+                <div class="tier-grid">
+                    <div class="tier-card safe">
+                        <h4>Green, safe on 4G</h4>
+                        <p>Text chat on any tool.</p>
+                        <p>Short bursts of voice mode (minutes, not hours).</p>
+                        <p>Document uploads under 5 MB.</p>
+                        <p>Reading Perplexity answers.</p>
+                        <p>Claude artifacts and code preview.</p>
+                    </div>
+                    <div class="tier-card caution">
+                        <h4>Amber, with care</h4>
+                        <p>Long voice sessions (budget the data).</p>
+                        <p>Phone-photo image uploads (crop or resize first).</p>
+                        <p>Image generation in small batches.</p>
+                        <p>PDF uploads of 5 to 20 MB.</p>
+                        <p>More than one person on the hotspot.</p>
+                    </div>
+                    <div class="tier-card avoid">
+                        <h4>Red, prefer broadband</h4>
+                        <p>Gemini Live with video on.</p>
+                        <p>10+ image generations in a session.</p>
+                        <p>NotebookLM Audio Overviews streamed live.</p>
+                        <p>PDFs bigger than 20 MB.</p>
+                        <p>Any class activity with 5+ people on the same hotspot at once.</p>
+                    </div>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="voice-trap">
+            <div class="section-eyebrow">// voice mode trap</div>
+      <h2>The Voice Mode Trap</h2>
+            <p>Voice mode feels magical. It also quietly eats your data. Here's the maths that matters:</p>
+                <p><strong>One hour of ChatGPT, Copilot, or Gemini voice</strong>, by our estimate, moves about 60 to 120 MB in each direction, so 120 to 240 MB total. That's nothing on home broadband, but on a shared venue hotspot with five people doing it at once, you're pushing 500 MB per hour through one phone. That single phone will collapse under the load.</p>
+                <p>Voice costs roughly 10 to 20 times more data than typing the same conversation. If the job is to ask the AI to summarise a meeting or draft an email, type it. Save voice for situations where you genuinely need hands-free, or where speaking is faster than typing on a small screen.</p>
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg>
+                    <div>
+                        <h4>When voice mode is a bad idea</h4>
+                        <p>On a shared venue hotspot with more than five people on it.</p>
+                        <p>On a tight prepaid SIM with less than 5 GB remaining for the cycle.</p>
+                        <p>Any time the same job could be done by typing.</p>
+                    </div>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="image-cost">
+            <div class="section-eyebrow">// images cost far more than</div>
+      <h2>Images Cost Far More Than Text</h2>
+            <p>A single phone photo uploaded for the AI to look at is typically 100 to 500 times the size of a text question about the same topic. A modern phone photo can easily be 3 to 5 MB. The same question described in words is maybe 100 to 500 bytes.</p>
+                <p>On a solid connection this doesn't matter. On a weak 4G bar or a constrained hotspot, it's the difference between a snappy chat and a hanging upload.</p>
+                <p><strong>What to do about it.</strong> If the AI doesn't need to see the exact picture, describe it in words. If it does, crop the photo tight to the bit that matters, or resize it before sending. Most phones have a built-in "edit and crop" step that can turn a 4 MB photo into a 400 KB one without losing the information you actually need.</p>
+                <p>For bulk image generation (say, drafting a flyer), do it on broadband or Starlink. For one-off image generation (a logo, an icon), 4G will cope.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="monthly-budget">
+            <div class="section-eyebrow">// month ai use translated gb</div>
+      <h2>A Month of AI Use, Translated to GB</h2>
+            <p>So what does all this mean for your monthly data bill? Three realistic profiles, estimated at the high end so you don't get caught short.</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Use profile</th><th>What it looks like</th><th>Monthly data (estimate)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="tool-col">Light</td><td>A few text chats a day, the odd document upload, no voice.</td><td><strong>~0.2 to 0.5 GB</strong></td></tr>
+                        <tr><td class="tool-col">Moderate</td><td>Daily text chats, 30 minutes of voice most days, occasional image generation, a weekly PDF upload.</td><td><strong>~2 to 5 GB</strong></td></tr>
+                        <tr><td class="tool-col">Heavy</td><td>Lots of text, regular voice, Gemini Live video sessions, bulk image generation, large document uploads.</td><td><strong>~10 to 20 GB</strong></td></tr>
+                    </tbody>
+                </table>
+
+                <p>Typical Australian postpaid mobile plans sit in the 20 to 150 GB per month range. Budget prepaid is often 10 to 40 GB. Even heavy AI use fits inside a normal postpaid plan. The gotcha is the <em>shared</em> heavy use case: one hotspot, five family members, everyone using voice mode, no one checking the counter. That can eat 30 to 50 GB before anyone notices.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="offline">
+            <div class="section-eyebrow">// what works offline cached</div>
+      <h2>What Works Offline or Cached</h2>
+            <p>The honest answer: nothing in the consumer tier is genuinely offline. All of ChatGPT, Claude, Copilot, Gemini, NotebookLM, and Perplexity need a live connection to produce any answer. "It's in Word" does not mean Copilot works without the internet. Every Copilot action in a desktop M365 app still goes to the cloud and back.</p>
+                <p><strong>What you can pre-cache and use without a connection:</strong></p>
+                <p>NotebookLM Audio Overviews. Generate on good connection, download the MP3, play back anywhere. This is the single best offline-friendly feature on any of these tools.</p>
+                <p>ChatGPT and Claude chat transcripts. Save or export as text or PDF so you can re-read without going back online.</p>
+                <p>Perplexity answers. Export or screenshot the answer and the source list.</p>
+                <p>Generated images. Save them locally once created.</p>
+                <div class="callout callout-tip">
+  <div class="callout-title">For genuinely offline AI, look at local models</div>
+  <p>Tools like Ollama and LM Studio let you run small language models directly on a laptop with no internet. They're not as capable as Claude or GPT-class models, and they need a reasonably modern machine with enough RAM, but they work on the plane, in the bush, or when the tower is down. Worth knowing about, not a first stop for beginners.</p>
+</div>
+            
+        </section>
+
+        <section class="content-section container-content" id="connection-drops">
+            <div class="section-eyebrow">// when your connection drops mid-prompt</div>
+      <h2>When Your Connection Drops Mid-Prompt</h2>
+            <p>It happens. Here's what each tool does and what you can do.</p>
+                <p><strong>Text chat (any tool).</strong> The reply usually stops mid-sentence. Wait for signal to come back, refresh or reload the chat, and either scroll up to see what did arrive or just ask again. Your prompt is typically preserved. Nothing is "lost" in a damaging sense.</p>
+                <p><strong>Voice mode.</strong> The session usually ends. You'll need to start it again. Unlike text, there's no transcript by default unless you turned it on, so the content of the conversation is gone. Worth knowing before you rely on voice for anything important.</p>
+                <p><strong>Image generation.</strong> If the generation completed on the server side, the image is usually waiting for you when you reconnect, in the same chat. If it was still running when the connection dropped, you'll need to ask again.</p>
+                <p><strong>File upload.</strong> Interrupted uploads fail. Start again. For big files (over 10 MB) on a flaky connection, try uploading in the strongest part of your signal, or split the file into smaller pieces.</p>
+                <p><strong>Copilot in M365 apps.</strong> You may see a "Copilot is unavailable" banner. The rest of Word, Excel, or Outlook keeps working. The document itself is safe, only the AI features pause.</p>
+                <div class="callout callout-tip">
+  <div class="callout-title">Habit worth building</div>
+  <p>Before a long session on a flaky connection, type your most important prompt first so it's saved in the chat history. If you drop out halfway, you can reconnect and just say "continue", and the AI will usually pick up where it left off.</p>
+</div>
+            
+        </section>
+
+        <section class="content-section container-content" id="vendor-silence">
+            <div class="section-eyebrow">// what vendors dont tell you</div>
+      <h2>What the Vendors Don't Tell You</h2>
+            <p>Short version: none of OpenAI, Anthropic, Microsoft, Google, or Perplexity publish a supported minimum bandwidth for their chat products. The closest vendor statements are:</p>
+                <p><strong>OpenAI</strong> describes Voice Mode as needing "a stable internet connection" and recommends Wi-Fi for long sessions. No numeric floor. ChatGPT does not support offline use.</p>
+                <p><strong>Anthropic</strong> requires a live connection for Claude. Published limits are about file size (30 MB per file, 500 MB per project), not bandwidth.</p>
+                <p><strong>Microsoft</strong> publishes network guidance for Teams (audio in the 30 to 130 kbps range depending on quality) which is the closest numeric signal for Copilot voice, but it's Teams data, not Copilot-specific.</p>
+                <p><strong>Google</strong> requires a connection for Gemini and Gemini Live. The Gemini API "Live" documentation describes real-time sessions but doesn't publish a supported client minimum bandwidth. NotebookLM documents source-size limits (200 MB per source, 500,000 words per source), not bandwidth.</p>
+                <p><strong>Perplexity</strong> publishes no bandwidth guidance. Requires a connection.</p>
+                <p>The practical implication: don't expect a vendor service level agreement on "will this work on my 4G bar". The useful guidance is the rules of thumb above, not vendor policy.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="practical-checklist">
+            <div class="section-eyebrow">// practical checklist</div>
+      <h2>Practical Checklist</h2>
+            <p>Ten things to do, in rough order of usefulness, if you're using AI from a remote NT connection.</p>
+                <p><strong>1.</strong> Default to text chat unless voice is genuinely needed.</p>
+                <p><strong>2.</strong> Crop or resize phone photos before uploading for analysis.</p>
+                <p><strong>3.</strong> For NotebookLM audio, generate on the best connection available, download the MP3, then play offline.</p>
+                <p><strong>4.</strong> Don't put more than five people on the same hotspot running voice or image-heavy sessions at once.</p>
+                <p><strong>5.</strong> Split big PDF uploads into smaller files when on 4G.</p>
+                <p><strong>6.</strong> Save important AI conversations as text or PDF before you lose signal.</p>
+                <p><strong>7.</strong> Turn off video in Gemini Live if you're on mobile data.</p>
+                <p><strong>8.</strong> Watch your monthly data counter if you share a hotspot or a prepaid SIM with others.</p>
+                <p><strong>9.</strong> If a connection is flaky, type one short prompt to anchor the chat before doing anything long.</p>
+                <p><strong>10.</strong> Know the local backup, the nearest public library or service with reliable Wi-Fi, for the moments when you really need it.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="references">
+            <div class="section-eyebrow">// references</div>
+      <h2>References</h2>
+            <p>These are the canonical pages to verify any specific figure against before printing it in a handout or quoting it to a funder. Bitrates and limits change as the products evolve.</p>
+                <div class="ref-list">
+                    <p>OpenAI, Voice Mode FAQ: <a href="https://help.openai.com/en/articles/8400625-voice-mode-faq" target="_blank">help.openai.com/en/articles/8400625-voice-mode-faq</a></p>
+                    <p>OpenAI, ChatGPT system and connection requirements: <a href="https://help.openai.com/en/collections/3742473-chatgpt" target="_blank">help.openai.com/en/collections/3742473-chatgpt</a></p>
+                    <p>OpenAI, Images (DALL·E / GPT Image) help: <a href="https://help.openai.com/en/articles/6582391-how-can-i-use-dall-e" target="_blank">help.openai.com/en/articles/6582391-how-can-i-use-dall-e</a></p>
+                    <p>Anthropic, Claude file upload limits: <a href="https://support.anthropic.com/en/articles/7996608-getting-started-with-claude-ai" target="_blank">support.anthropic.com/en/articles/7996608</a></p>
+                    <p>Anthropic, Vision / image input docs: <a href="https://docs.anthropic.com/en/docs/build-with-claude/vision" target="_blank">docs.anthropic.com/en/docs/build-with-claude/vision</a></p>
+                    <p>Microsoft, Copilot for Microsoft 365 requirements: <a href="https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-requirements" target="_blank">learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-requirements</a></p>
+                    <p>Microsoft, Teams media bitrate reference (closest analogue for Copilot voice): <a href="https://learn.microsoft.com/en-us/microsoftteams/prepare-network" target="_blank">learn.microsoft.com/en-us/microsoftteams/prepare-network</a></p>
+                    <p>Google, NotebookLM help (source limits): <a href="https://support.google.com/notebooklm" target="_blank">support.google.com/notebooklm</a></p>
+                    <p>Google, Gemini API "Live" real-time docs: <a href="https://ai.google.dev/gemini-api/docs/live" target="_blank">ai.google.dev/gemini-api/docs/live</a></p>
+                    <p>Google, Gemini app help: <a href="https://support.google.com/gemini" target="_blank">support.google.com/gemini</a></p>
+                    <p>Perplexity, help centre: <a href="https://www.perplexity.ai/hub/faq" target="_blank">perplexity.ai/hub/faq</a></p>
+                    <p>ACMA, mobile coverage terminology: <a href="https://www.acma.gov.au/" target="_blank">acma.gov.au</a></p>
+                    <p>Telstra, published 4G / 5G typical speeds: <a href="https://www.telstra.com.au/mobile-phones/coverage-networks" target="_blank">telstra.com.au/mobile-phones/coverage-networks</a></p>
+                    <p>WhistleOut, NT regional median (Ookla 2025 via): <a href="https://www.whistleout.com.au/" target="_blank">whistleout.com.au</a></p>
+                    <p>Starlink Australia, plans and pricing: <a href="https://www.starlink.com/au" target="_blank">starlink.com/au</a></p>
+                    <p>Opus audio codec specification (underlies Gemini Live / WebRTC voice): <a href="https://opus-codec.org/" target="_blank">opus-codec.org</a></p>
+                </div>
+                <p style="margin-top:14px;font-size:0.85rem;color:var(--text-3);font-style:italic">Prepared 2026-04-19. Per-tool figures are engineering estimates unless flagged as published. Re-verify against the primary sources above before printing to a participant-facing handout.</p>
+            
+        </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/pandanus-reach/">Power Query</a></li>
+          <li><a href="/files/word/">Microsoft Word</a></li>
+          <li><a href="/files/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made in the Australian outback.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

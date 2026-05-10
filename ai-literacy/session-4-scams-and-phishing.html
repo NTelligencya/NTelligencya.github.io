@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scams, Phishing, and Dodgy Messages &middot; AI Literacy &middot; NTell World Ink</title>
+<meta name="description" content="How to spot a scam email, text, or phone call, what the common scams going around in Australia look like, how AI is making them harder to spot, and what to do if you've already cli">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, AI Literacy Course 1; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+
+  .tool-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin: 18px 0;
+  }
+  .tool-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px; padding: 18px 20px;
+  }
+  .tool-card h5 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px;
+    color: var(--text); margin: 0 0 10px; font-weight: 500;
+  }
+  .tool-card p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0 0 8px; }
+  .tool-card p:last-child { margin: 0; }
+
+  .session-list { display: grid; gap: 14px; margin: 12px 0 24px; }
+  .session-list-item {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .session-list-item:hover { border-color: var(--accent); background: rgba(26,201,201,0.03); }
+  .session-list-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 28px;
+    color: var(--accent); font-weight: 500;
+  }
+  .session-list-body h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .session-list-body .when {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+  }
+  .session-list-body ul { margin: 6px 0 0 0; padding-left: 18px; color: var(--text-2); }
+  .session-list-body ul li { font-size: 14.5px; line-height: 1.6; margin-bottom: 3px; }
+
+  .resource-list { display: grid; gap: 12px; margin: 12px 0 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .resource-list-item {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s, background 0.15s;
+  }
+  .resource-list-item:hover { background: rgba(240,192,96,0.04); }
+  .resource-list-item h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .resource-list-item p { color: var(--text-2); font-size: 14px; line-height: 1.55; margin: 0; }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  table.data-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  table.data-table th {
+    text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    padding: 10px 12px; border-bottom: 1px solid var(--rule-2); background: var(--bg-2);
+  }
+  table.data-table td {
+    padding: 12px; border-bottom: 1px solid var(--rule);
+    color: var(--text-2); line-height: 1.55; vertical-align: top;
+  }
+  table.data-table tr:hover td { background: rgba(26,201,201,0.02); }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .session-list-item { grid-template-columns: 1fr; gap: 8px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/files/ai-literacy/">AI Literacy</a>
+    <span class="sep">/</span>
+    <span>Scams, Phishing, and Dodgy Messages</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">AI Literacy &middot; Course 1</div>
+  <h1>Scams, Phishing, and Dodgy Messages</h1>
+  <p class="subtitle">How to spot a scam email, text, or phone call, what the common scams going around in Australia look like, how AI is making them harder to spot, and what to do if you've already clicked something you shouldn't have.</p>
+  <div class="back-strip">
+    <a class="back-link" href="/files/ai-literacy/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to AI Literacy overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#why-it-works">Why Scams Work</a></li>
+    <li><a href="#the-tells">The Five Tells</a></li>
+    <li><a href="#common-scams">The Scams Going Around Right Now</a></li>
+    <li><a href="#ai-makes-worse">How AI Makes It Worse</a></li>
+    <li><a href="#verify">How to Verify Without Clicking</a></li>
+    <li><a href="#if-you-clicked">If You've Already Clicked</a></li>
+    <li><a href="#reporting">Where to Report</a></li>
+    <li><a href="#try-it">Try It Yourself</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+<section class="content-section container-content" id="why-it-works">
+            <div class="section-eyebrow">// why scams work</div>
+      <h2>Why Scams Work</h2>
+            <p>Scams aren't clever, they're patient. Criminals send the same message to hundreds of thousands of people. Most people ignore it. A few click. A few of those click quickly, without thinking. That's all the scammer needs.</p>
+                <p>The feeling scammers are after isn't stupidity, it's hurry. They want you to act now, before you think. Almost every scam uses one of three emotional levers:</p>
+                <p><strong>Fear.</strong> "Your account has been compromised." "You've been fined." "Your parcel couldn't be delivered."</p>
+                <p><strong>Greed or hope.</strong> "You've won." "Claim your refund." "Unclaimed super waiting."</p>
+                <p><strong>Love or trust.</strong> "Hi Mum, I've lost my phone, this is my new number." "I saw your profile and..."</p>
+                <p class="pullquote">The scammer's job is to rush you. Your job is to slow down. That's the whole fight, in one sentence.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="the-tells">
+            <div class="section-eyebrow">// five tells</div>
+      <h2>The Five Tells</h2>
+            <p>Five warning signs. If a message has one, be careful. If it has two or more, it's almost certainly a scam.</p>
+
+                <div class="scam-card">
+                    <h5>1. Urgency</h5>
+                    <p><strong>The phrase:</strong> "Act within 24 hours or your account will be closed." "Pay now to avoid a court summons." "Your parcel will be returned today."</p>
+                    <p>Real organisations give you time. Real banks don't threaten to close your account in an hour by text. Urgency is the single most reliable tell.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>2. A link you weren't expecting</h5>
+                    <p><strong>The shape:</strong> A text with a tracking link. An email asking you to "verify" by clicking. A "reset your password" message you didn't ask for.</p>
+                    <p>If you didn't ask for it, don't click it. Go to the service's website by typing the address yourself, or by opening the app you already have installed.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>3. Asking for something a real organisation wouldn't</h5>
+                    <p><strong>The ask:</strong> Your password. Your full card details including CVV. Payment in gift cards. Payment by bank transfer to a new account. Remote access to your computer.</p>
+                    <p>No real bank, tax office, Centrelink, Telstra, or delivery company will ever ask for these. Gift cards as payment, in particular, is a scam every single time.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>4. An address or number that's almost right</h5>
+                    <p><strong>The giveaway:</strong> An email from "service@paypa1.com" (note the number 1 instead of the letter l). A text from "Australia Post" but with an unusual overseas-looking phone number. A web link that says "mygov-update.net" instead of "my.gov.au".</p>
+                    <p>The details are nearly right, which is the point. Zoom in. Check the exact spelling.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>5. Something's off, and you can't say exactly why</h5>
+                    <p><strong>The feeling:</strong> The language is slightly stiff or overly formal. Or too friendly. Or it addresses you as "Dear customer" when your bank usually uses your name. Or your cousin "has had an emergency and really needs money".</p>
+                    <p>Trust the feeling. If something is slightly off, slow down. Ask a friend. Call the organisation directly using a number you already have for them.</p>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="common-scams">
+            <div class="section-eyebrow">// scams going around right now</div>
+      <h2>The Scams Going Around Right Now</h2>
+            <p>What Australians are losing money to, roughly in order of how common they are.</p>
+
+                <div class="scam-card">
+                    <h5>The missed-parcel text</h5>
+                    <p>A text from "Australia Post" or "StarTrack" saying you have a parcel waiting, click here to reschedule or pay a small fee. The link takes you to a fake website that either steals your card or installs spyware.</p>
+                    <div class="message-sample">AusPost: Your parcel has been held due to incomplete address. Please update: https://auspost-redelivery.info/verify</div>
+                    <p><strong>What to do.</strong> If you're expecting a parcel, open the real Australia Post app or website yourself. Ignore the text.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>The "Hi Mum" scam</h5>
+                    <p>A WhatsApp or text message from an unknown number saying "Hi Mum, I've broken my phone, this is my new number, can you send $800 for the replacement." It sounds like your kid in trouble. It isn't.</p>
+                    <p><strong>What to do.</strong> Before you send any money, call your actual child on the number you already have for them. If they don't answer, call someone who'd know where they are.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>The fake bank call</h5>
+                    <p>Someone calls saying they're from your bank's fraud team. They've "detected suspicious activity". They need you to move money to a "safe account" or read out a code that was just texted to you. The code is actually the one that lets them into your real account.</p>
+                    <p><strong>What to do.</strong> Hang up. Call your bank back on the number on the back of your card. Never share a code with anyone who called you.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>Romance scams</h5>
+                    <p>Someone online, often on Facebook, a dating app, or Instagram, starts a relationship with you over weeks or months. Eventually they need money, for a medical emergency, a visa, an investment, or to come and visit. They always have a reason they can't video call.</p>
+                    <p><strong>What to do.</strong> Insist on a video call before sending any money, ever. If they always have a reason to avoid it, they're not real. A trusted friend reality-check is worth more than any romance you've only ever typed to.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>Investment scams and "crypto opportunities"</h5>
+                    <p>A message, often on Facebook or WhatsApp, inviting you to an exclusive investment group, a cryptocurrency opportunity, or a trader who makes guaranteed returns. Starts small. Asks for more. Shows you a fake account dashboard with your "profits". When you try to withdraw, there are fees, delays, and eventually, nothing.</p>
+                    <p><strong>What to do.</strong> Check any investment firm on the <a href="https://moneysmart.gov.au/check-and-report-scams/investor-alert-list" target="_blank">ASIC Investor Alert List</a> before putting a cent in. Guaranteed returns don't exist.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>Tax and MyGov scams</h5>
+                    <p>An email or text about a tax refund you can claim, or a debt you need to pay immediately, with a link to "log in to MyGov". The link is fake and captures your credentials.</p>
+                    <p><strong>What to do.</strong> Never click a link in an email or text from "MyGov" or "ATO". Open the MyGov app or type the address yourself.</p>
+                </div>
+
+                <div class="scam-card">
+                    <h5>The fake job offer</h5>
+                    <p>A message out of the blue, often on LinkedIn or Indeed, offering you a well-paid remote job. They ask for your details upfront, or they need you to buy equipment with your own money and they'll reimburse you. They won't.</p>
+                    <p><strong>What to do.</strong> Real jobs don't require you to pay anything to get started. Real employers interview you before making an offer. If it starts with money, walk away.</p>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="ai-makes-worse">
+            <div class="section-eyebrow">// how ai makes it worse</div>
+      <h2>How AI Makes It Worse</h2>
+            <p>Scams used to be easier to spot. The old tells, broken English, obvious grammar mistakes, strange phrasing, are mostly gone, because scammers use AI to write their messages now.</p>
+                <p><strong>What AI has changed:</strong></p>
+                <p>Scam emails are now in perfect English, or perfect whatever-language-you-prefer.</p>
+                <p>Voice scams can clone a family member's voice from a 10-second sample on Facebook.</p>
+                <p>Fake customer service chats can hold long, convincing conversations.</p>
+                <p>Romance scam photos and videos can be generated on demand.</p>
+
+                <div class="pullquote">The old rule "bad English means scam" is dead. The new rule is "unexpected plus urgent means scam".</div>
+
+                <p><strong>What hasn't changed.</strong> Scams still rely on urgency, on asking for things real organisations don't ask for, and on links you weren't expecting. Those three remain the best tells regardless of how good the writing is.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="verify">
+            <div class="section-eyebrow">// how verify without clicking</div>
+      <h2>How to Verify Without Clicking</h2>
+            <p>The single most useful habit: when in doubt, don't click the thing in front of you. Go to the source yourself.</p>
+                <div class="checklist-box">
+                    <h4>The verify-without-clicking routine</h4>
+                    <p><strong>Banking:</strong> Open the app you already have installed, or type your bank's address yourself into a browser. Never click a link from a text or email.</p>
+                    <p><strong>MyGov and government:</strong> Open the MyGov app, or type my.gov.au directly. Government agencies never send you a login link by text.</p>
+                    <p><strong>Delivery companies:</strong> Open the Australia Post app, or the courier's website directly. Legitimate tracking lives there, not in a random text.</p>
+                    <p><strong>A phone call from a "service":</strong> Hang up. Call back on a number you find yourself, from your own records, from the back of a card, or from the company's real website.</p>
+                    <p><strong>A message from a friend asking for money:</strong> Call them, voice, not text, on the number you already have for them. If that number doesn't work, call someone who'd know where they are.</p>
+                </div>
+
+                <div class="callout callout-tip">
+  <div class="callout-title">Use AI as a scam checker</div>
+  <p>If you're not sure about a message, you can paste it into an AI chatbot and ask: "Does this look like a scam to you? What are the warning signs?" The AI has seen tens of thousands of scam examples and is usually pretty accurate. Just don't paste your actual account numbers in with it.</p>
+</div>
+            
+        </section>
+
+        <section class="content-section container-content" id="if-you-clicked">
+            <div class="section-eyebrow">// if youve already clicked</div>
+      <h2>If You've Already Clicked</h2>
+            <p>First: don't panic, and don't feel stupid. Scams are designed by full-time professionals to catch people. You're not the first and you won't be the last.</p>
+                <p>What matters is what you do in the next few hours. In order:</p>
+                <p><strong>1. If you entered a password.</strong> Change that password right now on the real site. Also change it anywhere else you used the same password (this is why reuse is so dangerous, see Session 3).</p>
+                <p><strong>2. If you entered bank or card details.</strong> Call your bank on the number on the back of your card. Ask them to block the card and watch the account. They've dealt with this a thousand times before. They'll know what to do.</p>
+                <p><strong>3. If you sent money.</strong> Call your bank straight away. If the transfer is recent enough they may be able to recall it. Speed matters here, minutes can be the difference.</p>
+                <p><strong>4. If you installed software they asked for, or gave remote access.</strong> Disconnect from the internet, shut down the computer, and get it looked at by someone you trust. If it's a work computer, tell your IT team immediately.</p>
+                <p><strong>5. If you gave your Medicare, tax file number, or ID details.</strong> Contact IDCARE (1800 595 160). They're a free government-funded service that helps you recover from identity theft.</p>
+
+                <div class="callout urgent">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M13,18H11V16H13M13,14H11V10H13"/></svg>
+                    <div>
+                        <h4>Speed matters more than pride</h4>
+                        <p>Report it even if you're embarrassed. Every hour you wait, money moves further away. Your bank and IDCARE have seen every version of this, they won't judge, and they can sometimes recover money that's already been sent.</p>
+                    </div>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="reporting">
+            <div class="section-eyebrow">// where report</div>
+      <h2>Where to Report</h2>
+            <p>Reporting a scam doesn't always get your money back, but it helps authorities warn others and catch the people behind it. Keep this list handy.</p>
+                <div class="checklist-box">
+                    <h4>Who to tell</h4>
+                    <p><strong>Scamwatch</strong> (ACCC, scamwatch.gov.au), for any scam, whether you lost money or not. This is the main Australian reporting channel.</p>
+                    <p><strong>ReportCyber</strong> (cyber.gov.au/report-and-recover/report), if you've been hacked, had money stolen, or your identity used. Goes to the AFP and state police.</p>
+                    <p><strong>IDCARE</strong> (1800 595 160, idcare.org), if your personal details have been compromised. Free case workers who help you fix the damage.</p>
+                    <p><strong>Your bank,</strong> for anything involving bank details, transfers, or cards. First call if money is involved.</p>
+                    <p><strong>eSafety Commissioner</strong> (esafety.gov.au), for online abuse, image-based abuse, or social media issues.</p>
+                    <p><strong>The platform itself.</strong> Facebook, Instagram, WhatsApp, and Gmail all have "report" buttons. Use them, you're helping the next person.</p>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="try-it">
+            <div class="section-eyebrow">// try it yourself</div>
+      <h2>Try It Yourself</h2>
+            <div class="activity-box">
+                    <span class="label">Activity, 10 minutes</span>
+                    <h4>Find a suspicious message on your own phone.</h4>
+                    <p>Scroll through your text messages, spam email folder, or Facebook Messenger requests. Find one that feels off. Don't click anything.</p>
+                    <p><strong>1.</strong> Open Claude, ChatGPT, or Copilot on the computer next to you.</p>
+                    <p><strong>2.</strong> Type what the message says (or screenshot it). Ask: "Does this look like a scam? What are the warning signs?"</p>
+                    <p><strong>3.</strong> Compare the AI's answer to the five tells in this session. Did it spot them all? Did it spot one you missed?</p>
+                    <p><strong>4.</strong> If it's clearly a scam, report it on scamwatch.gov.au before you leave. It takes two minutes.</p>
+                    <p style="margin-top:10px">The point of this exercise isn't the reporting, it's training your eye. After you've run a few real messages past the AI, you'll start spotting the tells yourself.</p>
+                </div>
+            
+        </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/pandanus-reach/">Power Query</a></li>
+          <li><a href="/files/word/">Microsoft Word</a></li>
+          <li><a href="/files/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made in the Australian outback.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

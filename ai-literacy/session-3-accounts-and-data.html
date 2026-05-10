@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Accounts and Your Data &middot; AI Literacy &middot; NTell World Ink</title>
+<meta name="description" content="The practical habits that protect you online. Strong passwords without the pain, two-factor authentication in plain English, what's safe to share with AI tools, and a couple of pri">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, AI Literacy Course 1; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+
+  .tool-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin: 18px 0;
+  }
+  .tool-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px; padding: 18px 20px;
+  }
+  .tool-card h5 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px;
+    color: var(--text); margin: 0 0 10px; font-weight: 500;
+  }
+  .tool-card p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0 0 8px; }
+  .tool-card p:last-child { margin: 0; }
+
+  .session-list { display: grid; gap: 14px; margin: 12px 0 24px; }
+  .session-list-item {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .session-list-item:hover { border-color: var(--accent); background: rgba(26,201,201,0.03); }
+  .session-list-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 28px;
+    color: var(--accent); font-weight: 500;
+  }
+  .session-list-body h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .session-list-body .when {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+  }
+  .session-list-body ul { margin: 6px 0 0 0; padding-left: 18px; color: var(--text-2); }
+  .session-list-body ul li { font-size: 14.5px; line-height: 1.6; margin-bottom: 3px; }
+
+  .resource-list { display: grid; gap: 12px; margin: 12px 0 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .resource-list-item {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s, background 0.15s;
+  }
+  .resource-list-item:hover { background: rgba(240,192,96,0.04); }
+  .resource-list-item h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .resource-list-item p { color: var(--text-2); font-size: 14px; line-height: 1.55; margin: 0; }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  table.data-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+  table.data-table th {
+    text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    padding: 10px 12px; border-bottom: 1px solid var(--rule-2); background: var(--bg-2);
+  }
+  table.data-table td {
+    padding: 12px; border-bottom: 1px solid var(--rule);
+    color: var(--text-2); line-height: 1.55; vertical-align: top;
+  }
+  table.data-table tr:hover td { background: rgba(26,201,201,0.02); }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .session-list-item { grid-template-columns: 1fr; gap: 8px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/files/ai-literacy/">AI Literacy</a>
+    <span class="sep">/</span>
+    <span>Your Accounts and Your Data</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">AI Literacy &middot; Course 1</div>
+  <h1>Your Accounts and Your Data</h1>
+  <p class="subtitle">The practical habits that protect you online. Strong passwords without the pain, two-factor authentication in plain English, what's safe to share with AI tools, and a couple of privacy settings worth actually changing.</p>
+  <div class="back-strip">
+    <a class="back-link" href="/files/ai-literacy/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to AI Literacy overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#why-it-matters">Why This Matters</a></li>
+    <li><a href="#personal-data">What Personal Data Is</a></li>
+    <li><a href="#passwords">Strong Passwords, the Simple Version</a></li>
+    <li><a href="#password-manager">The Password Manager Trick</a></li>
+    <li><a href="#two-factor">Two-Factor Authentication</a></li>
+    <li><a href="#ai-sharing">What to Share With AI, and What Not To</a></li>
+    <li><a href="#privacy-settings">Privacy Settings That Actually Matter</a></li>
+    <li><a href="#try-it">Try It Yourself</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+<section class="content-section container-content" id="why-it-matters">
+            <div class="section-eyebrow">// why this matters</div>
+      <h2>Why This Matters</h2>
+            <p>Almost everything about modern life runs through online accounts: email, banking, MyGov, Centrelink, power bills, the kids' school, Facebook, WhatsApp, photos, medical records. If someone gets into one of those accounts, they can often get into many of the others.</p>
+                <p>You don't need to become an IT expert to stay safe. You need three habits:</p>
+                <p class="pullquote">Strong passwords you don't have to remember. A second layer of protection on important accounts. A sensible rule for what you put online.</p>
+                <p>That's the whole session.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="personal-data">
+            <div class="section-eyebrow">// what personal data</div>
+      <h2>What Personal Data Is</h2>
+            <p>"Personal data" is anything that, on its own or combined with other information, could identify you or be used to pretend to be you. Some of it is obvious, some less so.</p>
+                <p><strong>The very private stuff.</strong> Tax file number. Medicare number. Driver's licence number. Passport number. Bank account and card numbers. These are what criminals want. Treat them like cash.</p>
+                <p><strong>The moderately private stuff.</strong> Your full date of birth. Your full address. Your mother's maiden name. The suburb you grew up in. Your first pet's name. These are the answers to "security questions", so sharing them publicly means someone might be able to reset your accounts.</p>
+                <p><strong>The stuff that seems harmless but isn't always.</strong> Your daily routine. Photos of the inside of your house. When you're away on holiday. The school your kids go to. Useful to a stranger with bad intentions.</p>
+                <p><strong>The stuff you probably don't need to worry about.</strong> Your name. The town you live in. Your age (roughly). Opinions, interests, photos of food. Normal life.</p>
+                <div class="callout callout-tip">
+  <div class="callout-title">The rule of thumb</div>
+  <p>Before you post or paste something, ask: "if a stranger saw this, could they use it to pretend to be me, or to guess the answer to one of my security questions?" If yes, don't share it.</p>
+</div>
+            
+        </section>
+
+        <section class="content-section container-content" id="passwords">
+            <div class="section-eyebrow">// strong passwords simple version</div>
+      <h2>Strong Passwords, the Simple Version</h2>
+            <p>Everyone tells you to use "strong passwords" and nobody says what that actually means. Here's the honest version.</p>
+                <p><strong>A strong password is long.</strong> Length matters more than adding symbols and capitals. Twelve characters minimum, and longer is better.</p>
+                <p><strong>A strong password is unique.</strong> Using the same password on multiple sites is the single biggest mistake people make. When one site gets hacked (they all do, eventually), the attackers try that same password on your email, your bank, and everything else.</p>
+                <p><strong>A strong password is not based on your life.</strong> Your kid's name, your birthday, your pet, your footy team. Anything a stranger could guess from your Facebook isn't strong.</p>
+
+                <div class="dos-donts">
+                    <div class="do">
+                        <h5>Stronger</h5>
+                        <p><strong>correct-horse-battery-staple-42</strong></p>
+                        <p>Long, random, easy for you to remember, almost impossible to guess or crack.</p>
+                        <p>Four random words plus a number is a solid recipe.</p>
+                    </div>
+                    <div class="dont">
+                        <h5>Weaker</h5>
+                        <p><strong>Sarah2019!</strong></p>
+                        <p>Short, based on a real name and a real year, with the "!" that hackers expect. Easy to crack with modern tools.</p>
+                    </div>
+                </div>
+
+                <p><strong>The passphrase trick.</strong> Instead of one word with symbols jammed in, string four random words together with a few extras: <em>wombat-stereo-rocket-yellow-88</em>. That's much harder for a computer to guess than <em>P@ssw0rd1</em>, and easier for you to remember.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="password-manager">
+            <div class="section-eyebrow">// password manager trick</div>
+      <h2>The Password Manager Trick</h2>
+            <p>Here's the secret everyone in IT uses but rarely explains clearly: you don't remember your passwords. A program remembers them for you.</p>
+                <p>A password manager is an app that stores all your passwords safely, fills them in for you when you log in, and generates strong new ones when you need them. You only ever have to remember one password (the one for the manager itself). That one should be very strong and never used anywhere else.</p>
+
+                <div class="pullquote">You remember one good password. The manager remembers everything else.</div>
+
+                <p><strong>Good free options:</strong></p>
+                <p><strong>Bitwarden.</strong> Free, well-regarded, works on everything. Probably the easiest start.</p>
+                <p><strong>Built into your browser.</strong> Chrome, Safari, Firefox and Edge all have built-in password savers. Not quite as strong as a dedicated manager, but miles better than reusing passwords.</p>
+                <p><strong>Built into your phone.</strong> iPhones (Keychain) and Androids (Google Password Manager) both offer to save passwords. Again, not perfect, but a huge improvement over typing the same password into 30 sites.</p>
+
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>The notebook method is OK, with caution</h4>
+                        <p>Writing your passwords in a little notebook and keeping it at home is safer than reusing passwords, and way better than nothing. The risk is different, someone in your home, not someone on the internet. If that works for you, use it. Just don't write the name of the site right next to the password, use a hint only you'd understand.</p>
+                    </div>
+                </div>
+            
+        </section>
+
+        <section class="content-section container-content" id="two-factor">
+            <div class="section-eyebrow">// two-factor authentication</div>
+      <h2>Two-Factor Authentication</h2>
+            <p>Two-factor authentication, or "2FA", is a second lock on your most important accounts. Even if someone steals your password, they can't get in without the second factor, which is usually a code sent to your phone or generated by an app.</p>
+                <p>You've probably already used it without knowing the name. When your bank texts you a code to confirm a payment, that's two-factor. The password is the first factor, the code is the second.</p>
+                <p class="pullquote">Passwords alone are like a front door with one lock. 2FA is the deadbolt.</p>
+                <p><strong>Accounts that really need 2FA turned on:</strong></p>
+                <p>Your primary email address. This is the master key. If someone gets into your email, they can reset the passwords to everything else.</p>
+                <p>MyGov.</p>
+                <p>Your bank (usually on by default now).</p>
+                <p>Facebook, Instagram, and any social media where losing access would hurt.</p>
+                <p>Your Apple ID or Google account (these control your phone).</p>
+
+                <div class="callout callout-tip">
+  <div class="callout-title">Text codes are OK, authenticator apps are better</div>
+  <p>The code texted to your phone (SMS 2FA) is the most common kind and far better than nothing. An "authenticator app" (Google Authenticator, Microsoft Authenticator, or 1Password's built-in one) is a step safer because it can't be intercepted by someone switching your SIM. Start with SMS if that's what the site offers, upgrade to an app when you're ready.</p>
+</div>
+
+                <p><strong>Backup codes.</strong> When you turn 2FA on, the site usually offers you a set of backup codes in case you lose your phone. Save them. Print them out, or save them in your password manager. Otherwise if your phone is lost or stolen, you're locked out of your own accounts.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="ai-sharing">
+            <div class="section-eyebrow">// what share ai what not</div>
+      <h2>What to Share With AI, and What Not To</h2>
+            <p>AI chatbots are useful, and most of what you'd type in is completely fine. But they're not a private diary and they're not your bank. A quick rule of thumb keeps you out of trouble.</p>
+                <p class="pullquote">Don't paste anything into a free AI tool that you wouldn't want a stranger to read.</p>
+
+                <div class="dos-donts">
+                    <div class="do">
+                        <h5>Fine to share</h5>
+                        <p>Your first name, your general location (town or state), your age, your job type.</p>
+                        <p>Documents with your name and address but not your sensitive numbers.</p>
+                        <p>A copy of a letter where you've blacked out the account numbers.</p>
+                        <p>Photos you'd happily post on Facebook.</p>
+                        <p>Opinions, preferences, plans, ideas.</p>
+                    </div>
+                    <div class="dont">
+                        <h5>Don't share</h5>
+                        <p>Tax file number, Medicare number, driver's licence or passport details.</p>
+                        <p>Full bank account numbers, credit card numbers, the CVV on the back.</p>
+                        <p>Passwords to any account.</p>
+                        <p>Confidential work documents if the tool isn't one your workplace approves.</p>
+                        <p>Other people's personal details they haven't agreed to share.</p>
+                    </div>
+                </div>
+
+                <p><strong>Why.</strong> Free AI tools may use what you type to improve their model, meaning a future version of the AI could have seen it. Paid and enterprise versions usually don't do this, but the safe default is to assume anything you type could be read by a human reviewer, stored indefinitely, or show up somewhere you don't expect.</p>
+                <p><strong>The workaround that always works.</strong> Blank out the sensitive bits before pasting. Instead of pasting a bill with your account number, type "[account number]" where the number was. The AI still understands the letter, you stay safe.</p>
+            
+        </section>
+
+        <section class="content-section container-content" id="privacy-settings">
+            <div class="section-eyebrow">// privacy settings that actually matter</div>
+      <h2>Privacy Settings That Actually Matter</h2>
+            <p>You could spend a full day tweaking privacy settings on every app. Here are the five that return the most benefit for the time.</p>
+                <div class="checklist-box">
+                    <h4>The five quick wins</h4>
+                    <p><strong>Your Facebook profile privacy.</strong> Set who can see your posts to "Friends" not "Public" by default. Set who can send you friend requests to "Friends of friends".</p>
+                    <p><strong>Your Google account.</strong> Visit myaccount.google.com once a year. Check which apps have access to your data, remove any you no longer use.</p>
+                    <p><strong>Your phone's app permissions.</strong> On both iPhone and Android, you can see which apps have access to your location, microphone, camera and contacts. Turn off any that don't genuinely need it.</p>
+                    <p><strong>Location on photos.</strong> Modern phones tag every photo with the exact GPS location it was taken. Turn this off if you share photos online, or at least know it's happening.</p>
+                    <p><strong>Two-factor on the big three.</strong> Primary email, MyGov, main bank. If you do nothing else from this session, do this.</p>
+                </div>
+
+                <div class="callout callout-tip">
+  <div class="callout-title">Ask the AI for a walkthrough</div>
+  <p>You don't need to remember where each setting is. You can literally ask an AI: "Can you walk me through turning on two-factor authentication for my Gmail account, one step at a time?" It'll take you through it. Same for any of the settings above.</p>
+</div>
+            
+        </section>
+
+        <section class="content-section container-content" id="try-it">
+            <div class="section-eyebrow">// try it yourself</div>
+      <h2>Try It Yourself</h2>
+            <div class="activity-box">
+                    <span class="label">Activity, 15 minutes</span>
+                    <h4>Do one thing from this session before you leave the room.</h4>
+                    <p><strong>Option 1.</strong> Check whether your email address has been in a data breach. Go to <a href="https://haveibeenpwned.com/" target="_blank">haveibeenpwned.com</a> and paste in your email. If it's been in a breach (it probably has), change that password today, starting with any site where you were reusing it.</p>
+                    <p><strong>Option 2.</strong> Turn on two-factor authentication for your primary email account. Ask an AI to walk you through it if you need help.</p>
+                    <p><strong>Option 3.</strong> Install Bitwarden (free) on your phone and save five passwords into it. Not all at once, just start.</p>
+                    <p><strong>Option 4.</strong> Go into your phone settings and check which apps have access to your location. Turn it off for anything that doesn't genuinely need it.</p>
+                    <p style="margin-top:10px"><strong>One is enough.</strong> You don't need to fix everything today. One new habit, done properly, is worth more than a long list you'll never do.</p>
+                </div>
+            
+        </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/pandanus-reach/">Power Query</a></li>
+          <li><a href="/files/word/">Microsoft Word</a></li>
+          <li><a href="/files/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made in the Australian outback.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
