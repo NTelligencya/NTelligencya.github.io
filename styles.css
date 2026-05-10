@@ -1,0 +1,1188 @@
+/* ============================================================
+   NTell World Ink — Shared Design System
+   styles.css  ·  v1.0  ·  2026
+   ============================================================
+
+   FONT LINK — add this to the <head> of every page:
+
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+   ============================================================ */
+
+
+/* ============================================================
+   1. DESIGN TOKENS
+   ============================================================ */
+
+:root {
+  /* Backgrounds */
+  --bg:   #0a0a0c;
+  --bg-2: #111114;
+  --bg-3: #17171b;
+
+  /* Text */
+  --text:   #f5f5f7;
+  --text-2: #9b9ba0;
+  --text-3: #6b6b70;
+
+  /* Teal accent — pulled from the NTell World Ink banner */
+  --accent:      #1ac9c9;
+  --accent-2:    #4ddcdc;
+  --accent-deep: #0b5555;
+  --accent-glow: rgba(26, 201, 201, 0.14);
+
+  /* Warm secondary */
+  --warm: #f0c060;
+
+  /* Rules / borders */
+  --rule:   #1f1f23;
+  --rule-2: #2a2a30;
+
+  /* Content page readable width */
+  --content-width: 760px;
+}
+
+
+/* ============================================================
+   2. RESET & BASE
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* Ambient teal gradient */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 75% 20%, var(--accent-glow), transparent 45%),
+    radial-gradient(circle at 15% 80%, rgba(240, 192, 96, 0.04), transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grid lines */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 64px 64px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+img { max-width: 100%; display: block; }
+a { color: var(--accent-2); }
+
+
+/* ============================================================
+   3. NOISE OVERLAY (grain texture echoing the banner)
+   ============================================================ */
+
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.028;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+
+/* ============================================================
+   4. LAYOUT
+   ============================================================ */
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Narrower container for readable content pages */
+.container-content {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ============================================================
+   5. TYPOGRAPHY
+   ============================================================ */
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  line-height: 1.1;
+}
+
+h1 {
+  font-weight: 300;
+  font-size: clamp(36px, 5vw, 64px);
+  letter-spacing: 0.01em;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-weight: 300;
+  font-size: clamp(28px, 4vw, 48px);
+  letter-spacing: 0.01em;
+  margin-bottom: 20px;
+}
+
+h3 {
+  font-weight: 400;
+  font-size: clamp(20px, 2.5vw, 28px);
+  letter-spacing: 0.01em;
+  margin-bottom: 14px;
+}
+
+h4 {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 12px;
+}
+
+p { margin-bottom: 1.2em; color: var(--text-2); }
+p:last-child { margin-bottom: 0; }
+
+strong { color: var(--text); font-weight: 600; }
+
+code, pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: var(--bg-2);
+  border: 1px solid var(--rule-2);
+  border-radius: 6px;
+  color: var(--accent-2);
+}
+
+code { padding: 2px 6px; }
+
+pre {
+  padding: 20px 24px;
+  overflow-x: auto;
+  line-height: 1.7;
+  margin: 20px 0;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   6. HEADER / NAVIGATION
+   ============================================================ */
+
+header.site {
+  padding: 28px 0;
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+  z-index: 10;
+}
+
+.site-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-mark::before,
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  border: 1.5px solid var(--accent);
+  border-radius: 4px;
+}
+
+.brand-mark::before {
+  inset: 4px;
+  border-color: var(--accent);
+}
+
+.brand-mark::after {
+  inset: 4px;
+  transform: rotate(45deg);
+  border-color: var(--accent-2);
+  opacity: 0.5;
+}
+
+.brand-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+}
+
+.brand-name .dot { color: var(--accent); }
+
+nav.site-nav {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+nav.site-nav a {
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+nav.site-nav a:hover { color: var(--text); }
+
+
+/* ============================================================
+   7. BUTTONS
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border-radius: 10px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  white-space: nowrap;
+}
+
+/* Filled teal */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+  color: white;
+  box-shadow: 0 0 0 1px rgba(26, 201, 201, 0.3),
+              0 8px 24px -8px var(--accent-glow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px rgba(77, 220, 220, 0.5),
+              0 12px 28px -8px var(--accent-glow);
+  color: white;
+}
+
+/* Outlined */
+.btn-ghost {
+  color: var(--text);
+  border: 1px solid var(--rule-2);
+  background: transparent;
+}
+
+.btn-ghost:hover {
+  border-color: var(--text-2);
+  background: var(--bg-2);
+  color: var(--text);
+}
+
+/* Download — mono style, teal border */
+.btn-download {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  border: 1px solid rgba(26, 201, 201, 0.35);
+  background: rgba(26, 201, 201, 0.04);
+  padding: 12px 20px;
+  border-radius: 8px;
+}
+
+.btn-download:hover {
+  background: rgba(26, 201, 201, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: none;
+}
+
+/* Arrow / download icon inside buttons */
+.btn .arrow, .btn .icon {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn:hover .arrow { transform: translateX(3px); }
+.btn:hover .icon-down { transform: translateY(2px); }
+
+.cta-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+
+/* ============================================================
+   8. SECTION EYEBROW LABEL
+   ============================================================ */
+
+.section-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+
+/* ============================================================
+   9. HOMEPAGE — HERO BANNER
+   ============================================================ */
+
+.hero-banner { padding: 0; }
+
+.banner-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.banner-img {
+  width: 100%;
+  display: block;
+  max-height: 540px;
+  object-fit: cover;
+  object-position: center 40%;
+}
+
+.banner-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.banner-cta {
+  padding: 36px 32px 80px;
+  text-align: center;
+}
+
+.banner-tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent-2);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.banner-cta .lead {
+  font-size: 18px;
+  color: var(--text-2);
+  line-height: 1.65;
+  max-width: 620px;
+  margin: 0 auto 36px;
+}
+
+.banner-cta .cta-row { justify-content: center; }
+
+
+/* ============================================================
+   10. HOMEPAGE — ABOUT
+   ============================================================ */
+
+.about {
+  padding: 80px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.about-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.about p {
+  font-size: 17px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   11. HOMEPAGE — COURSE LIBRARY ACCORDION
+   ============================================================ */
+
+.library { padding: 96px 0 64px; }
+
+.library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 48px;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.library-header-text { max-width: 560px; }
+.library-header h2 { margin-bottom: 16px; }
+
+.library-header p {
+  color: var(--text-2);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.library-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-3);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border: 1px solid var(--rule-2);
+  border-radius: 100px;
+}
+
+details.course {
+  border-top: 1px solid var(--rule);
+  transition: background 0.2s ease;
+}
+
+details.course:last-of-type { border-bottom: 1px solid var(--rule); }
+
+details.course[open] {
+  background: linear-gradient(180deg, rgba(26,201,201,0.025), transparent);
+}
+
+details.course summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 28px 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 24px;
+  transition: padding 0.2s ease;
+}
+
+details.course summary::-webkit-details-marker { display: none; }
+details.course summary:hover { padding-left: 12px; }
+
+.course-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-3);
+  letter-spacing: 0.1em;
+  width: 48px;
+}
+
+.course-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(22px, 2.6vw, 32px);
+  color: var(--text);
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.course-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--rule-2);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.course-tag.available {
+  background: rgba(26,201,201,0.08);
+  border-color: rgba(26,201,201,0.4);
+  color: var(--accent-2);
+}
+
+.course-tag.soon { color: var(--text-3); }
+
+.chevron {
+  width: 20px;
+  height: 20px;
+  stroke: var(--text-2);
+  stroke-width: 2;
+  fill: none;
+  transition: transform 0.25s ease;
+}
+
+details.course[open] .chevron {
+  transform: rotate(180deg);
+  stroke: var(--text);
+}
+
+.course-body {
+  padding: 0 0 36px 72px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 48px;
+  align-items: start;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.course-body p.desc {
+  font-size: 16px;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.course-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.course-meta-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.course-meta-item strong { color: var(--text); font-weight: 500; }
+
+.course-aside {
+  background: var(--bg-2);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.course-aside-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.course-aside ul { list-style: none; padding: 0; }
+
+.course-aside li {
+  font-size: 13px;
+  color: var(--text-2);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  gap: 10px;
+}
+
+.course-aside li:last-child { border-bottom: none; }
+
+.course-aside li::before {
+  content: '◆';
+  color: var(--accent);
+  font-size: 9px;
+  margin-top: 6px;
+}
+
+
+/* ============================================================
+   12. FOOTER
+   ============================================================ */
+
+footer.site {
+  border-top: 1px solid var(--rule);
+  padding: 64px 0 48px;
+  margin-top: 80px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 48px;
+  margin-bottom: 48px;
+}
+
+.footer-brand p {
+  color: var(--text-2);
+  font-size: 14px;
+  margin-top: 16px;
+  max-width: 360px;
+  line-height: 1.6;
+}
+
+.footer-col h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 8px; }
+
+.footer-col a {
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.footer-col a:hover { color: var(--text); }
+
+.footer-bottom {
+  padding-top: 32px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-3);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+
+/* ============================================================
+   13. CONTENT PAGES — BREADCRUMB
+   ============================================================ */
+
+.breadcrumb {
+  padding: 24px 0 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.breadcrumb a {
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb a:hover { color: var(--accent-2); }
+
+.breadcrumb .sep { opacity: 0.4; }
+
+
+/* ============================================================
+   14. CONTENT PAGES — PAGE MASTHEAD
+   ============================================================ */
+
+.page-masthead {
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 0;
+}
+
+.page-masthead .series-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-masthead .series-label::before {
+  content: '';
+  width: 20px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.page-masthead h1 {
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.page-masthead .subtitle {
+  font-size: 18px;
+  color: var(--text-2);
+  line-height: 1.6;
+  max-width: 680px;
+  margin-bottom: 32px;
+}
+
+.page-meta {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.page-meta-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.page-meta-item strong {
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+/* Download strip inside masthead */
+.download-strip {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.download-strip-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   15. CONTENT PAGES — BODY & SECTIONS
+   ============================================================ */
+
+.content-body {
+  padding: 60px 0 0;
+}
+
+.content-section {
+  max-width: var(--content-width);
+  margin: 0 auto 64px;
+}
+
+.content-section h2 {
+  font-size: clamp(26px, 3.5vw, 40px);
+  margin-bottom: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+
+.content-section h3 {
+  font-size: clamp(20px, 2.5vw, 28px);
+  margin-bottom: 14px;
+  margin-top: 32px;
+  color: var(--text);
+}
+
+.content-section p {
+  font-size: 17px;
+  line-height: 1.75;
+  margin-bottom: 1.3em;
+}
+
+.content-section ul, .content-section ol {
+  padding-left: 1.4em;
+  margin-bottom: 1.2em;
+}
+
+.content-section li {
+  font-size: 16px;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin-bottom: 0.5em;
+}
+
+.section-rule {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 48px 0;
+  max-width: var(--content-width);
+}
+
+
+/* ============================================================
+   16. CONTENT PAGES — CALLOUT BOXES
+   ============================================================ */
+
+.callout {
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 28px 0;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-2);
+  position: relative;
+}
+
+.callout-key {
+  border-left-color: var(--accent);
+  background: linear-gradient(135deg, rgba(26,201,201,0.06), var(--bg-2));
+}
+
+.callout-warning {
+  border-left-color: var(--warm);
+  background: linear-gradient(135deg, rgba(240,192,96,0.06), var(--bg-2));
+}
+
+.callout-warning .callout-title { color: var(--warm); }
+
+.callout-tip {
+  border-left-color: var(--text-3);
+  background: var(--bg-2);
+}
+
+.callout-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.callout p {
+  font-size: 15px;
+  color: var(--text-2);
+  margin-bottom: 0;
+  line-height: 1.7;
+}
+
+.callout p:not(:last-child) { margin-bottom: 0.8em; }
+
+
+/* ============================================================
+   17. CONTENT PAGES — APP CARD GRID
+   Used for: Microsoft 365 app overviews, tool comparisons
+   ============================================================ */
+
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 28px 0;
+}
+
+.app-card {
+  background: var(--bg-2);
+  border: 1px solid var(--rule-2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  transition: border-color 0.2s ease;
+}
+
+.app-card:hover { border-color: rgba(26,201,201,0.25); }
+
+.app-card-category {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.app-card h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 8px;
+  margin-top: 0;
+}
+
+.app-card p {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.65;
+  margin-bottom: 0;
+}
+
+/* Span full width — use on a single "wide" card */
+.app-card-wide {
+  grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   18. CONTENT PAGES — CHECKLIST
+   Used for: settings, quick wins, action items
+   ============================================================ */
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 16px;
+  color: var(--text-2);
+  line-height: 1.65;
+}
+
+.checklist li:last-child { border-bottom: none; }
+
+.checklist li::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--accent);
+  border-radius: 5px;
+  flex-shrink: 0;
+  margin-top: 3px;
+  background: rgba(26,201,201,0.06);
+}
+
+/* Interactive checkbox variant — add class="checklist-interactive" to ul */
+.checklist-interactive li { cursor: pointer; }
+
+.checklist-interactive li.done { color: var(--text-3); text-decoration: line-through; }
+
+.checklist-interactive li.done::before {
+  background: var(--accent-deep);
+  border-color: var(--accent);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 8l3.5 3.5L13 5' stroke='%234ddcdc' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: 14px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+
+/* ============================================================
+   19. CONTENT PAGES — TENANT / COMPARISON GRID
+   Used for: inside vs outside tenant, pros vs cons, etc.
+   ============================================================ */
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 28px 0;
+}
+
+.compare-col {
+  background: var(--bg-2);
+  border: 1px solid var(--rule-2);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.compare-col-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule-2);
+}
+
+.compare-col.col-yes .compare-col-label { color: var(--accent-2); }
+.compare-col.col-no  .compare-col-label { color: var(--warm); }
+
+.compare-col ul { list-style: none; padding: 0; }
+
+.compare-col li {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.6;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  gap: 10px;
+}
+
+.compare-col li:last-child { border-bottom: none; }
+
+.compare-col.col-yes li::before { content: '◆'; color: var(--accent); font-size: 8px; margin-top: 7px; flex-shrink: 0; }
+.compare-col.col-no  li::before { content: '◆'; color: var(--warm);   font-size: 8px; margin-top: 7px; flex-shrink: 0; }
+
+
+/* ============================================================
+   20. CONTENT PAGES — SESSION NAVIGATION
+   ============================================================ */
+
+.session-nav {
+  border-top: 1px solid var(--rule);
+  padding: 40px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: var(--content-width);
+  margin: 0 auto;
+}
+
+.session-nav-item {
+  background: var(--bg-2);
+  border: 1px solid var(--rule-2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.session-nav-item:hover {
+  border-color: rgba(26,201,201,0.3);
+  background: var(--bg-3);
+  color: var(--text);
+}
+
+.session-nav-item.next { text-align: right; }
+
+.session-nav-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.session-nav-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+
+/* ============================================================
+   21. RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+  /* Banner */
+  .banner-img       { max-height: 340px; }
+  .banner-cta       { padding: 28px 20px 64px; }
+  .banner-cta .lead { font-size: 16px; }
+
+  /* Accordion */
+  .course-body {
+    grid-template-columns: 1fr;
+    padding: 0 0 28px 0;
+    gap: 24px;
+  }
+
+  details.course summary {
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    padding: 22px 0;
+  }
+
+  .course-num { display: none; }
+
+  /* Footer */
+  .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+
+  /* Nav */
+  nav.site-nav { display: none; }
+
+  /* Layout */
+  .container, .container-content { padding: 0 20px; }
+
+  /* App cards */
+  .app-grid { grid-template-columns: 1fr; }
+
+  /* Compare grid */
+  .compare-grid { grid-template-columns: 1fr; }
+
+  /* Session nav */
+  .session-nav { grid-template-columns: 1fr; }
+  .session-nav-item.next { text-align: left; }
+}
+
+@media (max-width: 540px) {
+  .course-tag { display: none; }
+  details.course summary { grid-template-columns: 1fr auto; }
+  .banner-img { max-height: 260px; }
+  .page-meta  { gap: 16px; }
+  .download-strip { flex-direction: column; align-items: flex-start; }
+}
