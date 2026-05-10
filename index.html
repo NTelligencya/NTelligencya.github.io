@@ -3,873 +3,342 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Microsoft Word: Documents That Get Read · NTell World Ink</title>
-<meta name="description" content="A four-hour scenario-based activity using Microsoft Word's long-document tooling and Copilot Chat to turn a chaotic draft into a polished Olympic bid document for Darwin 2034.">
+<title>NTell World Ink — Cybersecurity, AI literacy and digital skills training</title>
+<meta name="description" content="Hands-on learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. Real datasets; real exercises; downloadable materials.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css">
-<style>
-  /* ============================================================
-     PAGE-SCOPED ADDITIONS, Microsoft Word: Olympic Bid Activity
-     Reuses tokens from styles.css.
-     ============================================================ */
-
-  .container-activity {
-    max-width: 920px;
-    margin: 0 auto;
-    padding: 0 32px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Department / agency band beneath h1 */
-  .agency-band {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-3);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    padding: 12px 0;
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    margin: 24px 0 0;
-  }
-
-  /* Welcome aboard intro block */
-  .welcome-block {
-    background: var(--bg-2);
-    border: 1px solid var(--rule-2);
-    border-left: 3px solid var(--accent);
-    border-radius: 12px;
-    padding: 32px 36px;
-    margin: 0 auto 56px;
-    max-width: 880px;
-  }
-
-  .welcome-block h2 {
-    font-size: 30px;
-    margin: 0 0 18px;
-    padding: 0;
-    border: none;
-  }
-
-  .welcome-block p {
-    font-size: 16px;
-    line-height: 1.75;
-    color: var(--text-2);
-    margin-bottom: 1.2em;
-  }
-
-  .welcome-block p:last-child { margin-bottom: 0; }
-
-  .welcome-block ol {
-    margin: 12px 0 16px 24px;
-    color: var(--text-2);
-    font-size: 16px;
-    line-height: 1.7;
-  }
-
-  .welcome-block ol li { margin-bottom: 6px; }
-
-  /* Resources / data assets section */
-  .resources-section {
-    background: var(--bg-2);
-    border: 1px solid var(--rule-2);
-    border-radius: 12px;
-    padding: 32px;
-    margin: 0 auto 64px;
-  }
-
-  .resources-section h2 {
-    font-size: 28px;
-    padding: 0;
-    margin: 0 0 8px;
-    border: none;
-  }
-
-  .resources-section .blurb {
-    color: var(--text-2);
-    font-style: italic;
-    margin-bottom: 24px;
-    font-size: 15px;
-  }
-
-  .resource-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 12px;
-  }
-
-  .resource-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    background: var(--bg-3);
-    border: 1px solid var(--rule-2);
-    border-left: 3px solid transparent;
-    border-radius: 8px;
-    padding: 16px 18px;
-    color: var(--text);
-    text-decoration: none;
-    transition: all 0.15s ease;
-  }
-
-  .resource-card:hover {
-    border-left-color: var(--accent);
-    background: rgba(26,201,201,0.04);
-    color: var(--accent-2);
-  }
-
-  .resource-icon {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--accent);
-    background: rgba(26,201,201,0.08);
-    border: 1px solid rgba(26,201,201,0.3);
-    border-radius: 4px;
-    padding: 4px 6px;
-    letter-spacing: 0.08em;
-    flex-shrink: 0;
-    min-width: 44px;
-    text-align: center;
-  }
-
-  .resource-card:hover .resource-icon {
-    background: rgba(26,201,201,0.15);
-  }
-
-  .resource-text {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .resource-name {
-    font-family: 'Manrope', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.35;
-    margin-bottom: 4px;
-    word-break: break-word;
-  }
-
-  .resource-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--text-3);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  /* Section banner (replaces docx navy band) */
-  .section-banner {
-    max-width: 880px;
-    margin: 56px auto 28px;
-    padding: 18px 28px;
-    background: linear-gradient(135deg, var(--bg-3), var(--bg-2));
-    border: 1px solid var(--rule-2);
-    border-left: 4px solid var(--accent);
-    border-radius: 10px;
-  }
-
-  .section-banner .banner-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--accent);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .section-banner h2 {
-    font-size: clamp(24px, 3vw, 34px);
-    margin: 0 0 6px;
-    padding: 0;
-    border: none;
-    color: var(--text);
-  }
-
-  .section-banner p {
-    font-size: 14px;
-    color: var(--text-2);
-    margin: 0;
-    font-style: italic;
-  }
-
-  /* Email block */
-  .email-block {
-    max-width: 880px;
-    margin: 0 auto 48px;
-    background: var(--bg-2);
-    border: 1px solid var(--rule-2);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .email-header {
-    background: var(--bg-3);
-    padding: 20px 28px;
-    border-bottom: 1px solid var(--rule-2);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--text-2);
-  }
-
-  .email-header dl {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: 6px 18px;
-    margin: 0;
-  }
-
-  .email-header dt {
-    color: var(--text-3);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-size: 10px;
-    align-self: center;
-  }
-
-  .email-header dd {
-    margin: 0;
-    color: var(--text);
-    word-break: break-word;
-  }
-
-  .email-body {
-    padding: 28px 32px;
-  }
-
-  .email-body p {
-    font-size: 15.5px;
-    line-height: 1.75;
-    color: var(--text-2);
-    margin-bottom: 1.1em;
-  }
-
-  .email-body p:last-child { margin-bottom: 0; }
-
-  .email-body p.salutation,
-  .email-body p.signoff-name {
-    color: var(--text);
-  }
-
-  .email-body ol {
-    margin: 8px 0 16px 24px;
-    color: var(--text-2);
-    font-size: 15.5px;
-    line-height: 1.7;
-  }
-
-  .email-body ol li {
-    margin-bottom: 12px;
-    padding-left: 6px;
-  }
-
-  .email-body .signature-block {
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid var(--rule);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    color: var(--text-3);
-    line-height: 1.7;
-  }
-
-  .email-body .signature-block strong {
-    color: var(--text);
-    display: block;
-    font-family: 'Manrope', sans-serif;
-    font-size: 14px;
-    margin-bottom: 4px;
-  }
-
-  /* Teams message bubble */
-  .teams-message {
-    max-width: 720px;
-    margin: 0 auto 32px;
-    padding: 22px 26px;
-    background: linear-gradient(135deg, rgba(77,220,220,0.06), var(--bg-2));
-    border: 1px solid var(--rule-2);
-    border-radius: 16px 16px 16px 4px;
-    position: relative;
-  }
-
-  .teams-message::before {
-    content: 'TEAMS  ·  JANELLE  →  DAMO';
-    position: absolute;
-    top: -10px;
-    left: 22px;
-    background: var(--bg);
-    padding: 0 12px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  .teams-message p {
-    font-size: 15.5px;
-    line-height: 1.7;
-    color: var(--text-2);
-    margin-bottom: 14px;
-  }
-
-  .teams-message p:last-child { margin-bottom: 0; }
-
-  /* Narrative bridge paragraph (between teams msg and mission) */
-  .bridge {
-    max-width: 720px;
-    margin: 28px auto 56px;
-    padding: 0 12px;
-    color: var(--text-3);
-    font-style: italic;
-    font-size: 15px;
-    line-height: 1.7;
-    text-align: center;
-  }
-
-  /* Mission section */
-  .mission {
-    max-width: 880px;
-    margin: 0 auto 64px;
-  }
-
-  .mission > p {
-    font-size: 17px;
-    line-height: 1.75;
-    color: var(--text-2);
-    margin-bottom: 1.3em;
-  }
-
-  /* Phase blocks */
-  .phase {
-    background: var(--bg-2);
-    border: 1px solid var(--rule-2);
-    border-radius: 12px;
-    padding: 28px 32px;
-    margin-bottom: 20px;
-    position: relative;
-  }
-
-  .phase-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .phase-label::before {
-    content: '';
-    width: 18px;
-    height: 1px;
-    background: var(--accent);
-  }
-
-  .phase h3 {
-    font-size: 24px;
-    margin: 0 0 14px;
-    color: var(--text);
-  }
-
-  .phase p {
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--text-2);
-    margin-bottom: 1em;
-  }
-
-  .phase p:last-child { margin-bottom: 0; }
-
-  /* Team chapters table */
-  .team-table-wrap {
-    max-width: 880px;
-    margin: 0 auto 56px;
-  }
-
-  .team-table-wrap h3 {
-    font-size: 22px;
-    margin-bottom: 16px;
-    color: var(--text);
-  }
-
-  .team-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--bg-2);
-    border: 1px solid var(--rule-2);
-    border-radius: 12px;
-    overflow: hidden;
-    font-family: 'Manrope', sans-serif;
-  }
-
-  .team-table th,
-  .team-table td {
-    padding: 14px 20px;
-    text-align: left;
-    border-bottom: 1px solid var(--rule);
-    font-size: 15px;
-  }
-
-  .team-table thead th {
-    background: var(--bg-3);
-    color: var(--text-3);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-
-  .team-table tbody tr:last-child td {
-    border-bottom: none;
-  }
-
-  .team-table tbody td:first-child {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--accent);
-    width: 80px;
-  }
-
-  .team-table tbody td:nth-child(2) {
-    color: var(--text);
-  }
-
-  /* Ground rules block */
-  .ground-rules {
-    background: linear-gradient(135deg, rgba(240,192,96,0.04), var(--bg-2));
-    border: 1px solid var(--rule-2);
-    border-left: 3px solid var(--warm);
-    border-radius: 12px;
-    padding: 32px 36px;
-    margin: 0 auto 64px;
-    max-width: 880px;
-  }
-
-  .ground-rules h2 {
-    font-size: 28px;
-    margin: 0 0 18px;
-    padding: 0;
-    border: none;
-  }
-
-  .ground-rules ul {
-    list-style: none;
-    padding: 0;
-    margin: 12px 0 0;
-  }
-
-  .ground-rules li {
-    padding: 12px 0 12px 28px;
-    position: relative;
-    border-bottom: 1px solid var(--rule);
-    color: var(--text-2);
-    font-size: 15.5px;
-    line-height: 1.7;
-  }
-
-  .ground-rules li:last-child { border-bottom: none; }
-
-  .ground-rules li::before {
-    content: '◆';
-    position: absolute;
-    left: 0;
-    top: 14px;
-    color: var(--warm);
-    font-size: 10px;
-  }
-
-  /* At the end / debrief */
-  .debrief {
-    max-width: 880px;
-    margin: 0 auto 64px;
-    text-align: center;
-    padding: 36px 32px;
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .debrief h2 {
-    font-size: 28px;
-    margin: 0 0 14px;
-    padding: 0;
-    border: none;
-  }
-
-  .debrief p {
-    font-size: 16px;
-    color: var(--text-2);
-    line-height: 1.7;
-    margin-bottom: 1em;
-  }
-
-  .debrief ul {
-    list-style: none;
-    padding: 0;
-    margin: 16px 0 0;
-    display: inline-block;
-    text-align: left;
-  }
-
-  .debrief li {
-    padding: 6px 0 6px 22px;
-    position: relative;
-    color: var(--text-2);
-    font-size: 15px;
-  }
-
-  .debrief li::before {
-    content: '·';
-    position: absolute;
-    left: 8px;
-    color: var(--accent);
-    font-weight: bold;
-  }
-
-  /* Responsive */
-  @media (max-width: 720px) {
-    .container-activity { padding: 0 20px; }
-    .welcome-block, .resources-section, .ground-rules { padding: 24px 22px; }
-    .email-body { padding: 22px 22px; }
-    .email-header { padding: 18px 22px; }
-    .phase { padding: 24px 22px; }
-    .resource-grid { grid-template-columns: 1fr; }
-    .team-table th, .team-table td { padding: 12px 14px; font-size: 14px; }
-    .section-banner { padding: 16px 22px; margin: 40px auto 24px; }
-  }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="noise-overlay"></div>
 
-<!-- HEADER -->
+<!-- =============== HEADER =============== -->
 <header class="site">
   <div class="container site-inner">
-    <a class="brand" href="../">
+    <a class="brand" href="/">
       <div class="brand-mark"></div>
       <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
     </a>
     <nav class="site-nav">
-      <a href="../#library">Library</a>
-      <a href="../#about">About</a>
-      <a href="../#contact">Contact</a>
+      <a href="#library">Library</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
     </nav>
   </div>
 </header>
 
-<!-- BREADCRUMB -->
-<div class="container-activity">
-  <nav class="breadcrumb">
-    <a href="../">Home</a>
-    <span class="sep">/</span>
-    <a href="../#library">Library</a>
-    <span class="sep">/</span>
-    <span>Microsoft Word: Documents That Get Read</span>
-  </nav>
-</div>
-
-<!-- PAGE MASTHEAD -->
-<section class="page-masthead container-activity">
-  <div class="series-label">Microsoft Word: Documents That Get Read</div>
-  <h1>Darwin 2034 Olympic Bid: Document Working Group</h1>
-  <p class="subtitle">A scenario-based group activity. Take Janelle's chaotic Word draft and turn it into Australia's formal bid to host the XXVII Olympiad in Darwin in 2034. Use the styles pane, navigation pane, multilevel numbered lists, the Table of Contents tool, captions, tracked changes, Compare Documents, and Copilot Chat.</p>
-
-  <div class="page-meta">
-    <span class="page-meta-item">DURATION · <strong>~4 hrs</strong></span>
-    <span class="page-meta-item">LEVEL · <strong>Beginner to intermediate</strong></span>
-    <span class="page-meta-item">FORMAT · <strong>Scenario-based group activity</strong></span>
-    <span class="page-meta-item">TOOLS · <strong>Microsoft Word + Copilot Chat</strong></span>
+<!-- =============== HERO BANNER =============== -->
+<section class="hero-banner">
+  <div class="banner-wrap">
+    <img src="NTellWorldInk_Banner.png"
+         alt="NTell World Ink — Intelligence Inked. Legacies Written."
+         class="banner-img">
+    <div class="banner-fade"></div>
   </div>
-
-  <div class="agency-band">Department of the Chief Minister  ·  Northern Territory Government  ·  Bid Document Working Group</div>
+  <div class="banner-cta container">
+    <div class="banner-tagline">connect &middot; create &middot; leave a mark</div>
+    <p class="lead">Learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. Real datasets; real exercises; everything downloadable and yours to keep.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#library">
+        Browse the library
+        <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="btn btn-ghost" href="#about">What this is</a>
+    </div>
+  </div>
 </section>
 
-<main class="content-body">
-
-  <!-- WELCOME ABOARD -->
-  <section class="welcome-block container-activity" id="welcome">
-    <div class="section-eyebrow">// orientation</div>
-    <h2>Welcome aboard</h2>
-    <p>You've just walked into the Department of the Chief Minister's Olympic Bid Document Working Group. Congratulations.</p>
-    <p>For the next four hours you're part of a team helping Janelle Pemberton, Senior Procurement Officer (acting), turn a chaotic Word draft into Australia's formal bid to host the XXVII Olympiad in Darwin in 2034. The IOC has prescriptive formatting standards. The Commonwealth is enthusiastic. The Prime Minister has indicated in-principle support for $4 billion in Federal infrastructure underwriting. The bid is due COB.</p>
-    <p>Janelle's draft is downloadable here.</p>
-    <p>Damo is on annual leave. You will be using Microsoft Word, the styles pane, the Navigation pane, multilevel numbered lists, the Table of Contents tool, captions, tracked changes, Compare Documents, and a fair amount of Copilot Chat. By the end of the afternoon you will have a polished, professional Olympic bid document, lodged via the IOC City Bid Portal.</p>
-    <p>Your context documents include:</p>
-    <ol>
-      <li>Damo's original email to Janelle, eight weeks ago, instructing the bid be drafted</li>
-      <li>Janelle's reply, sent at 3:47am the following morning</li>
-      <li>Janelle's attempt at a draft</li>
-      <li>Janelle's Copilot Designer attempt to create the Mascot (supplementary fun only)</li>
-      <li>Perth's perfect bid document</li>
-    </ol>
-    <p>It is, to be very clear, a fictional scenario. The bureaucratic setting is the carrier for the actual training: getting genuinely fluent with Microsoft Word's long-document tooling and Copilot Chat, the two skills that turn a 10-page mess into a decent deliverable in an afternoon.</p>
-  </section>
-
-  <!-- RESOURCES -->
-  <section class="resources-section container-activity" id="resources">
-    <div class="section-eyebrow">// activity resources</div>
-    <h2>Working files</h2>
-    <p class="blurb">Download these into a single working folder before you start. The bid draft, the formatting guidelines, the prompt pack, the reference exemplar, and Janelle's mascot pitch deck.</p>
-
-    <div class="resource-grid">
-
-      <a class="resource-card" href="Janelle_BID_DRAFT_v0.7_FINAL_FINAL.docx" download>
-        <span class="resource-icon">DOCX</span>
-        <span class="resource-text">
-          <span class="resource-name">Janelle's bid draft (v0.7 FINAL FINAL)</span>
-          <span class="resource-meta">16 KB  ·  the working draft you'll fix</span>
-        </span>
-      </a>
-
-      <a class="resource-card" href="Copilot_Chat_Prompt_Pack.docx" download>
-        <span class="resource-icon">DOCX</span>
-        <span class="resource-text">
-          <span class="resource-name">Copilot Chat Prompt Pack</span>
-          <span class="resource-meta">32 KB  ·  starter prompts for drafting and fact-checking</span>
-        </span>
-      </a>
-
-      <a class="resource-card" href="IOC_Bid_Document_Formatting_Guidelines.pdf" download>
-        <span class="resource-icon">PDF</span>
-        <span class="resource-text">
-          <span class="resource-name">IOC Bid Document Formatting Guidelines</span>
-          <span class="resource-meta">190 KB  ·  the IOC house style</span>
-        </span>
-      </a>
-
-      <a class="resource-card" href="Perth_2032_Bid_Document_REFERENCE_EXAMPLE.docx" download>
-        <span class="resource-icon">DOCX</span>
-        <span class="resource-text">
-          <span class="resource-name">Perth 2032 Bid Document, reference example</span>
-          <span class="resource-meta">458 KB  ·  what good looks like</span>
-        </span>
-      </a>
-
-      <a class="resource-card" href="Copilot%20Designer%20%E2%80%94%20Janelle%20Pemberton%20%E2%80%94%2014%20October%202025.pdf" download>
-        <span class="resource-icon">PDF</span>
-        <span class="resource-text">
-          <span class="resource-name">Copilot Designer, Janelle Pemberton, 14 October 2025</span>
-          <span class="resource-meta">3.4 MB  ·  the Plover Pete mascot pitch</span>
-        </span>
-      </a>
-
+<!-- =============== ABOUT =============== -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-inner">
+      <div class="section-eyebrow">// about</div>
+      <h2>Digital literacy topics that stick.</h2>
+      <p>Most digital training is forgotten by Friday. NT World Ink builds learning materials designed to stick; with realistic data, downloadable exercises, and skills that transfer to your work.</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- DAMO'S EMAIL -->
-  <div class="section-banner container-activity">
-    <div class="banner-eyebrow">// context document 01</div>
-    <h2>Damo's email to Janelle</h2>
-    <p>Forwarded to all Working Group members for situational awareness. Original sent 1 October 2025.</p>
+<!-- =============== LIBRARY =============== -->
+<section class="container library" id="library">
+  <div class="library-header">
+    <div class="library-header-text">
+      <div class="section-eyebrow">// library</div>
+      <h2>Course library</h2>
+      <p>Click a title to expand.</p>
+    </div>
   </div>
 
-  <article class="email-block container-activity">
-    <header class="email-header">
-      <dl>
-        <dt>FROM</dt><dd>Damien Routledge  &lt;damien.routledge@nt.gov.au&gt;</dd>
-        <dt>TO</dt><dd>Janelle Pemberton  &lt;janelle.pemberton@nt.gov.au&gt;</dd>
-        <dt>SENT</dt><dd>Wednesday, 1 October 2025  4:47 PM ACST</dd>
-        <dt>SUBJECT</dt><dd>Olympics bid, you're on this, need by Friday three weeks</dd>
-      </dl>
-    </header>
-    <div class="email-body">
-      <p class="salutation">Janelle,</p>
-      <p>Just out of a meeting with the CM. The Department is going to lodge an Australian bid for a future Olympic Games. Darwin as host. CM is enthusiastic, PM has indicated in-principle support for Commonwealth co-funding of infrastructure (north of $4b, but don't put a figure in the doc until I confirm). Treasury is on board. Tourism NT is going to lose its mind.</p>
-      <p>I need a draft bid document on my desk by Friday three weeks from now. Aim for the Summer Games, a future cycle, dates to be negotiated. The IOC City Bid Portal opens later this month for bids against the 2034 cycle. We will lodge formally before the end of October.</p>
-      <p>Use the IOC formatting guidelines (find them on the bid portal, they're very prescriptive). 30 to 40 pages, formal tone, all the trimmings, Executive Summary, Vision, venues, athletes, transport, financials, risk, the lot. The IOC house style is Calibri 11pt with navy headings. They will reject anything that doesn't comply on first-page review.</p>
-      <p>The angle: lean hard into NT aircon knowhow. Athlete welfare in tropical conditions is the unique selling point, refrigerated villages, climate-controlled venues, cooled medal podiums. We have the engineering capability, we have the Federal backing, we have the cultural offer. Make all of that land hard.</p>
-      <p>I'm on annual leave from the 7th. Hannah will be your point of contact for anything internal. CM expects to read the final draft over the long weekend.</p>
-      <p>Don't overthink it. How hard can it be?</p>
-      <p class="signoff-name">Damo</p>
-      <div class="signature-block">
-        <strong>Damien Routledge</strong>
-        Deputy Chief Executive<br>
-        Department of the Chief Minister
+  <!-- Course 1: Power Query (live) -->
+  <details class="course" name="course" open>
+    <summary>
+      <span class="course-num">01</span>
+      <span class="course-title">Power Query: Surveillance Data Analysis</span>
+      <span class="course-tag available">Available</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">Learn Microsoft Excel's Power Query through six exercises set inside a fictional dystopian Australian outback town. You'll combine messy CSV files, merge relational tables, write custom M-language functions, and reshape data for executive briefings. The dataset doubles as a discussion prompt about algorithmic bias and surveillance ethics.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">DURATION · <strong>3 hrs</strong></span>
+          <span class="course-meta-item">LEVEL · <strong>Beginner to intermediate</strong></span>
+          <span class="course-meta-item">FORMAT · <strong>HTML dossier + 13 CSVs</strong></span>
+        </div>
+        <a class="btn btn-primary" href="/pandanus-reach/">
+          Open course
+          <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
       </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// what you will learn</div>
+        <ul>
+          <li>Loading and cleaning CSV data</li>
+          <li>Combining files from a folder</li>
+          <li>Merge queries and aggregations</li>
+          <li>Pivot and unpivot transformations</li>
+          <li>Custom functions in the M language</li>
+          <li>Cross-tabulation and group-by analysis</li>
+        </ul>
+      </aside>
     </div>
-  </article>
+  </details>
 
-  <!-- JANELLE'S REPLY -->
-  <div class="section-banner container-activity">
-    <div class="banner-eyebrow">// context document 02</div>
-    <h2>Janelle's reply</h2>
-    <p>Sent at 3:47am the following morning. Damo never replied; he was on annual leave by then.</p>
-  </div>
-
-  <article class="email-block container-activity">
-    <header class="email-header">
-      <dl>
-        <dt>FROM</dt><dd>Janelle Pemberton  &lt;janelle.pemberton@nt.gov.au&gt;</dd>
-        <dt>TO</dt><dd>Damien Routledge  &lt;damien.routledge@nt.gov.au&gt;</dd>
-        <dt>SENT</dt><dd>Thursday, 2 October 2025  3:47 AM ACST</dd>
-        <dt>SUBJECT</dt><dd>RE: Olympics bid, you're on this, need by Friday three weeks</dd>
-      </dl>
-    </header>
-    <div class="email-body">
-      <p class="salutation">Damo,</p>
-      <p>Thanks for the heads up. Quick questions before I start:</p>
-      <ol>
-        <li>Have we got a budget allocated for venue refrigeration costings? I can ballpark but I don't want the financial table to be wishful.</li>
-        <li>Are we naming the Prime Minister in the document or just "the Commonwealth"? PMC said the PM's comments at the press conference were "in-principle" which I read as not yet a public number.</li>
-        <li>The IOC formatting guidelines, am I OK to download them from the City Bid Portal directly, or do you need me to coordinate with the Department of Foreign Affairs first?</li>
-        <li>Capacity figures for TIO Stadium, the website says 14,500 across configurations but you mentioned a much higher number at the meeting. Is the higher number a planned expansion, or a different stadium?</li>
-        <li>Population data for Darwin, I've seen 150,000 most places but you were quoting 1.2 million metropolitan. Is that including the wider Top End or projected growth or a different definition?</li>
-        <li>Litchfield National Park elevation, you mentioned 2,400m for endurance events. Is that a different Litchfield? Our one is mostly low-lying tropical and I don't want to put numbers in that the IOC will fact-check. Plus where's the consultation with owners at?</li>
-        <li>Can you forward me the in-principle Federal funding commitment letter? I want to quote from it accurately.</li>
-      </ol>
-      <p>I know you're heading off Tuesday, happy to grab 15 minutes Monday if that helps clarify any of the above. Otherwise I'll go on what we discussed and Hannah can flag anything that needs your sign-off when you're back.</p>
-      <p>Three weeks is doable. I've already started a working draft on the shared drive (Janelle_BID_DRAFT_v0.7_FINAL_FINAL.docx, version naming TBD).</p>
-      <p class="signoff-name">Janelle</p>
-      <div class="signature-block">
-        <strong>Janelle Pemberton</strong>
-        Senior Procurement Officer (acting)<br>
-        Department of the Chief Minister
+  <!-- Course 2 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">02</span>
+      <span class="course-title">Microsoft Excel: Foundations to Power User</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">From cell formatting to pivot tables, conditional logic, and lookup functions. A single working scenario that grows in complexity across the course, so each technique you learn is immediately applied to data you already know.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>Q3 2026</strong></span>
+        </div>
       </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// planned modules</div>
+        <ul>
+          <li>Spreadsheet anatomy and good habits</li>
+          <li>Formulas and references</li>
+          <li>Conditional logic and lookup functions</li>
+          <li>Pivot tables and dashboards</li>
+          <li>Charts that communicate</li>
+        </ul>
+      </aside>
     </div>
-  </article>
+  </details>
 
-  <!-- TEAMS MESSAGE -->
-  <div class="section-banner container-activity">
-    <div class="banner-eyebrow">// context document 03</div>
-    <h2>Janelle's Teams message to Damo</h2>
-    <p>Sent late evening of the same day. About a mascot.</p>
-  </div>
-
-  <div class="teams-message container-activity">
-    <p>Damo, hear me out, I know we said no mascot until the IOC approves the cultural programme, but I had Copilot Designer running last night and I think we've got something. The Plover (technically the Masked Lapwing, Vanellus miles) is unmistakably Australian, native to the Top End, and projects exactly the right amount of Territory energy. Voted Australia's favourite native bird in three consecutive National Geographic Australian Wildlife Polls (2019, 2021, 2023). Working name: "Plover Pete".</p>
-    <p>I'm proposing 200 volunteers in custom plover suits for the Opening Ceremony, they enter from the four corners of TIO Stadium during "The Sky" segment, perform a synchronised territorial display, and converge centre-pitch for an aerial stooping formation finale. It's bold, distinctive, and nothing any other host city would do. NT-developed micro-refrigeration units worn under the costume keep performers below 22°C even during peak February humidity (Territory aircon knowhow at scale).</p>
-  </div>
-
-  <p class="bridge container-activity">Damo did not reply. He was on annual leave from 7 October. Hannah took five weeks of personal leave starting 14 October. The Federal funding letter never arrived. Janelle wrote the document she could write with the information she had. Three weeks later, you arrived. This is where you come in.</p>
-
-  <!-- YOUR MISSION -->
-  <div class="section-banner container-activity">
-    <div class="banner-eyebrow">// the work</div>
-    <h2>Your mission</h2>
-    <p>Five teams, three phases, one bid by close of business.</p>
-  </div>
-
-  <section class="mission container-activity" id="mission">
-    <p>You'll work as part of one of five teams. Janelle has been told to deliver this bid by COB. That deadline is today. Your team has a chapter of the bid document to draft, polish, and contribute to the merged final version.</p>
-
-    <h3 style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400; font-size:24px; color:var(--text); margin:32px 0 16px;">The work, in three phases</h3>
-
-    <div class="phase">
-      <div class="phase-label">Phase 1</div>
-      <h3>Fix Janelle's mess</h3>
-      <p>Open Janelle's draft from the SharePoint site.</p>
-      <p>Apply Heading 1, Heading 2, and Heading 3 styles consistently across the document. Modify the heading styles to match the IOC house style (navy, Calibri, the right sizes). Add multilevel numbered list formatting. Insert an auto-generated Table of Contents. Add a section break before the body so page numbering starts at 1 in the right place. Run the Accessibility Checker.</p>
+  <!-- Course 3 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">03</span>
+      <span class="course-title">Microsoft Word: Documents That Get Read</span>
+      <span class="course-tag available">Available</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">Word as a document engineering tool, not a typewriter. A scenario-based group activity where you take Janelle's chaotic draft and turn it into Australia's formal bid to host the 2034 Olympics in Darwin. Practise the styles pane, multilevel numbered lists, the Table of Contents tool, tracked changes, Compare Documents, and Copilot Chat for drafting and fact-checking.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">DURATION · <strong>4 hrs</strong></span>
+          <span class="course-meta-item">LEVEL · <strong>Beginner to intermediate</strong></span>
+          <span class="course-meta-item">FORMAT · <strong>Group activity + 5 resources</strong></span>
+        </div>
+        <a class="btn btn-primary" href="/word/">
+          Open course
+          <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// what you will learn</div>
+        <ul>
+          <li>Heading styles and the styles pane</li>
+          <li>Multilevel numbered lists and auto-generated Tables of Contents</li>
+          <li>Section breaks and page numbering</li>
+          <li>Tracked changes and Compare Documents</li>
+          <li>Copilot Chat for drafting, trimming, and fact-checking</li>
+          <li>The Accessibility Checker</li>
+        </ul>
+      </aside>
     </div>
+  </details>
 
-    <div class="phase">
-      <div class="phase-label">Phase 2</div>
-      <h3>Draft your team's chapter using Copilot Chat</h3>
-      <p>Each team takes its assigned chapter (see below). You will use Copilot Chat as your drafting partner. Word limits are tight; the IOC enforces them on first-page review. Copilot will help you trim, expand, rewrite for tone, generate tables, and, critically, fact-check Janelle's claims.</p>
-      <p>Janelle has populated the draft with claims she didn't verify. Some of them are suspect. Use Copilot Chat to fact-check anything that looks shaky. Replace the claims you can't support.</p>
-      <p>The activity can be completed in TEAMS working on one section each for large groups.</p>
+  <!-- Course 4 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">04</span>
+      <span class="course-title">Microsoft PowerPoint: Effective Visual Communication</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">Slide design as a thinking discipline. How to structure an argument, when to use a chart over a table, the typography choices that make a deck feel professional, and how to avoid the eight bad habits that mark someone out as a novice.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>Q4 2026</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// planned modules</div>
+        <ul>
+          <li>Structuring an argument across slides</li>
+          <li>Layout, hierarchy, and white space</li>
+          <li>Type, colour, and contrast</li>
+          <li>Charts, tables, and diagrams</li>
+          <li>Speaker notes and rehearsal</li>
+        </ul>
+      </aside>
     </div>
-  </section>
+  </details>
 
-  <!-- TEAM CHAPTERS -->
-  <div class="team-table-wrap container-activity" id="teams">
-    <h3 style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:400;">Each team owns one chapter of the bid</h3>
-    <table class="team-table">
-      <thead>
-        <tr>
-          <th>Team</th>
-          <th>Chapter</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>01</td>
-          <td>Vision + Federal Government Support (sections 2 to 3)</td>
-        </tr>
-        <tr>
-          <td>02</td>
-          <td>Venues (section 4, six venue precincts)</td>
-        </tr>
-        <tr>
-          <td>03</td>
-          <td>Athletes' Village + Transport (sections 5 to 6)</td>
-        </tr>
-        <tr>
-          <td>04</td>
-          <td>Cultural Programme + Opening Ceremony (section 8)</td>
-        </tr>
-        <tr>
-          <td>05</td>
-          <td>Financial Plan + Risk Register (sections 9 to 10)</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- Course 5 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">05</span>
+      <span class="course-title">Digital Literacy: Workplace Skills</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">Foundational digital skills for adults entering or re-entering the workforce. File management, browsers, email, calendars, video conferencing, password hygiene, and the everyday literacies that quiet quitters of technology never quite learned.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>Q4 2026</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// planned modules</div>
+        <ul>
+          <li>Files, folders, and finding things</li>
+          <li>Email as a craft</li>
+          <li>Calendars and scheduling</li>
+          <li>Video calls without the awkward</li>
+          <li>Passwords and basic safety</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
 
-  <!-- GROUND RULES -->
-  <section class="ground-rules container-activity" id="rules">
-    <div class="section-eyebrow">// ground rules</div>
-    <h2>A few ground rules</h2>
-    <ul>
-      <li>Use Heading 1, 2, and 3 styles. Never manually bold a paragraph and call it a heading. The IOC will return non-compliant documents on first-page review.</li>
-      <li>Word limits are real. Use Word's word count and Copilot's trim feature.</li>
-      <li>Fact-check Janelle's claims. She wrote the draft at 3:47am with no source material. Some of her numbers are suspect. Verify before you build on them.</li>
-      <li>Have a go. If you don't know what a button does, click it. You can't break Word from inside this activity.</li>
-      <li>Don't trust Copilot's output uncritically. Oh, and don't trust Janelle's either. When you ask Copilot to fact-check a claim, read its answer carefully and verify against an authoritative source if it matters.</li>
-      <li>It's allowed to be funny. Lean into stupidity of being asked to write a 30-page Olympic bid in two hours. That's the point.</li>
-    </ul>
-  </section>
+  <!-- Course 6 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">06</span>
+      <span class="course-title">Cybersecurity Fundamentals for Non-Specialists</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">A grown-up introduction to cybersecurity for people who don't intend to become security professionals but do intend to stop being a vulnerability. Threats, defences, and the everyday habits that protect a household, a small business, or a workplace.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>Planned</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>2027</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// topics</div>
+        <ul>
+          <li>How attacks actually work</li>
+          <li>Identity, MFA, and password managers</li>
+          <li>Phishing and social engineering</li>
+          <li>Devices, networks, and updates</li>
+          <li>What to do when things go wrong</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
 
-  <!-- AT THE END -->
-  <section class="debrief container-activity" id="debrief">
-    <div class="section-eyebrow">// at the end</div>
-    <h2>The debrief</h2>
-    <p>We'll debrief for 30 minutes. We'll talk about:</p>
-    <ul>
-      <li>What worked in your team's collaboration</li>
-      <li>What didn't</li>
-    </ul>
-  </section>
+  <!-- Course 7 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">07</span>
+      <span class="course-title">AI Literacy for the Workplace</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">What large language models actually do, where they fail, how to prompt them well, and how to use them responsibly in a professional context where the wrong output has consequences.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>Planned</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>2027</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// topics</div>
+        <ul>
+          <li>What an LLM is and isn't</li>
+          <li>Prompting as a skill</li>
+          <li>Hallucination, drift, and verification</li>
+          <li>Privacy, IP, and confidentiality</li>
+          <li>Workflows that hold up under scrutiny</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
 
-</main>
+  <!-- Course 8 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">08</span>
+      <span class="course-title">More to come</span>
+      <span class="course-tag soon">In planning</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">NT World Ink is built one course at a time. Future courses are likely to cover automation and scripting, working with PDFs, data visualisation fundamentals, and a deeper dive into red-team thinking. If there's a topic you'd like to see, get in touch.</p>
+        <a class="btn btn-ghost" href="#contact">Suggest a topic</a>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// candidate topics</div>
+        <ul>
+          <li>Automation and basic scripting</li>
+          <li>Working with PDFs at scale</li>
+          <li>Data visualisation that communicates</li>
+          <li>Red-team thinking for defenders</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
+</section>
 
-<!-- FOOTER -->
+<!-- =============== FOOTER =============== -->
 <footer class="site" id="contact">
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a class="brand" href="../">
+        <a class="brand" href="/">
           <div class="brand-mark"></div>
           <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
         </a>
-        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. No paywall; no email harvesting; no nonsense.</p>
       </div>
       <div class="footer-col">
         <h4>// library</h4>
         <ul>
-          <li><a href="../pandanus-reach/">Power Query</a></li>
-          <li><a href="../word/">Microsoft Word</a></li>
-          <li><a href="../#library">All courses</a></li>
+          <li><a href="/pandanus-reach/">Power Query</a></li>
+          <li><a href="#library">All courses</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>// elsewhere</h4>
         <ul>
-          <li><a href="../#about">About</a></li>
+          <li><a href="#about">About this site</a></li>
           <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <span>&copy; 2026 NT World Ink. Made in the Australian outback.</span>
-      <span style="font-family:'JetBrains Mono',monospace;">v1.0  ·  2026</span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
     </div>
   </div>
 </footer>
