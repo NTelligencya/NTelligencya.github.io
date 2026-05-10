@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cybersecurity Ink — Practical training in cybersecurity, AI, and digital skills</title>
+<meta name="description" content="Hands-on learning scenarios in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. Real datasets; real exercises; downloadable materials.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --bg-2: #111114;
+    --bg-3: #17171b;
+    --text: #f5f5f7;
+    --text-2: #9b9ba0;
+    --text-3: #6b6b70;
+    --accent: #3b82f6;
+    --accent-2: #60a5fa;
+    --accent-deep: #1e3a8a;
+    --accent-glow: rgba(59, 130, 246, 0.18);
+    --rule: #1f1f23;
+    --rule-2: #2a2a30;
+    --warm: #f0c060;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* Subtle ambient grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 75% 20%, var(--accent-glow), transparent 45%),
+      radial-gradient(circle at 15% 80%, rgba(240, 192, 96, 0.04), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+    background-size: 64px 64px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ============ HEADER ============ */
+  header.site {
+    padding: 28px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .site-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .brand-mark::before,
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+  }
+
+  .brand-mark::before {
+    inset: 4px;
+    transform: rotate(0deg);
+    border-color: var(--accent);
+  }
+
+  .brand-mark::after {
+    inset: 4px;
+    transform: rotate(45deg);
+    border-color: var(--accent-2);
+    opacity: 0.5;
+  }
+
+  .brand-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-name .dot {
+    color: var(--accent);
+  }
+
+  nav.site-nav {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+
+  nav.site-nav a {
+    color: var(--text-2);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  nav.site-nav a:hover { color: var(--text); }
+
+  /* ============ HERO ============ */
+  .hero {
+    padding: 96px 0 80px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent-2);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--accent-2);
+  }
+
+  .hero h1 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 .accent {
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-style: italic;
+    font-weight: 700;
+  }
+
+  .hero p.lead {
+    font-size: 19px;
+    color: var(--text-2);
+    line-height: 1.6;
+    max-width: 540px;
+    margin-bottom: 40px;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 26px;
+    border-radius: 10px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent-deep), var(--accent));
+    color: white;
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3),
+                0 8px 24px -8px var(--accent-glow);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.5),
+                0 12px 28px -8px var(--accent-glow);
+  }
+
+  .btn-ghost {
+    color: var(--text);
+    border: 1px solid var(--rule-2);
+    background: transparent;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--text-2);
+    background: var(--bg-2);
+  }
+
+  .btn .arrow {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    transition: transform 0.2s ease;
+  }
+
+  .btn:hover .arrow {
+    transform: translateX(3px);
+  }
+
+  /* ============ HERO VISUAL ============ */
+  .hero-visual {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--bg-2), var(--bg));
+    border: 1px solid var(--rule-2);
+  }
+
+  .hero-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 30%, var(--accent-glow), transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(240, 192, 96, 0.08), transparent 50%);
+  }
+
+  .hero-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Floating geometric elements */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.6;
+  }
+
+  .orb-1 {
+    width: 200px;
+    height: 200px;
+    background: var(--accent);
+    top: 20%;
+    left: 15%;
+    animation: float-1 12s ease-in-out infinite;
+  }
+
+  .orb-2 {
+    width: 160px;
+    height: 160px;
+    background: var(--warm);
+    bottom: 20%;
+    right: 15%;
+    animation: float-2 14s ease-in-out infinite;
+  }
+
+  @keyframes float-1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(20px, -15px); }
+  }
+
+  @keyframes float-2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-25px, 20px); }
+  }
+
+  .hero-visual-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 2;
+    padding: 32px;
+  }
+
+  .visual-glyph {
+    width: 140px;
+    height: 140px;
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .visual-glyph svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .visual-glyph svg .ring {
+    fill: none;
+    stroke: var(--accent-2);
+    stroke-width: 1.5;
+    opacity: 0.9;
+  }
+
+  .visual-glyph svg .ring-2 { stroke: var(--accent); opacity: 0.6; }
+  .visual-glyph svg .ring-3 { stroke: var(--warm); opacity: 0.7; }
+
+  .visual-glyph svg .node {
+    fill: var(--text);
+  }
+
+  .visual-glyph svg .line {
+    stroke: var(--text-3);
+    stroke-width: 1;
+    opacity: 0.5;
+  }
+
+  .visual-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .visual-replace-hint {
+    position: absolute;
+    bottom: 12px;
+    right: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-3);
+    opacity: 0.5;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    z-index: 3;
+  }
+
+  /* ============ ABOUT ============ */
+  .about {
+    padding: 80px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .about-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .section-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: inline-block;
+  }
+
+  h2 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    margin-bottom: 24px;
+  }
+
+  .about p {
+    font-size: 17px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+
+  /* ============ LIBRARY (ACCORDION) ============ */
+  .library {
+    padding: 96px 0 64px;
+  }
+
+  .library-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 48px;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .library-header-text { max-width: 560px; }
+
+  .library-header h2 {
+    margin-bottom: 16px;
+  }
+
+  .library-header p {
+    color: var(--text-2);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .library-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-3);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border: 1px solid var(--rule-2);
+    border-radius: 100px;
+  }
+
+  /* Accordion */
+  details.course {
+    border-top: 1px solid var(--rule);
+    transition: background 0.2s ease;
+  }
+
+  details.course:last-of-type {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  details.course[open] {
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.025), transparent);
+  }
+
+  details.course summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 28px 0;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 24px;
+    transition: padding 0.2s ease;
+  }
+
+  details.course summary::-webkit-details-marker { display: none; }
+
+  details.course summary:hover {
+    padding-left: 12px;
+  }
+
+  .course-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+    width: 48px;
+  }
+
+  .course-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: clamp(20px, 2.4vw, 28px);
+    color: var(--text);
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+
+  .course-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 100px;
+    border: 1px solid var(--rule-2);
+    color: var(--text-2);
+    white-space: nowrap;
+  }
+
+  .course-tag.available {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: var(--accent-2);
+  }
+
+  .course-tag.soon {
+    color: var(--text-3);
+  }
+
+  .chevron {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-2);
+    stroke-width: 2;
+    fill: none;
+    transition: transform 0.25s ease;
+  }
+
+  details.course[open] .chevron {
+    transform: rotate(180deg);
+    stroke: var(--text);
+  }
+
+  /* expanded content */
+  .course-body {
+    padding: 0 0 36px 72px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 48px;
+    align-items: start;
+    animation: slideDown 0.3s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .course-body p.desc {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .course-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .course-meta-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .course-meta-item strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .course-aside {
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .course-aside-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .course-aside ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .course-aside li {
+    font-size: 13px;
+    color: var(--text-2);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    gap: 10px;
+  }
+
+  .course-aside li:last-child { border-bottom: none; }
+
+  .course-aside li::before {
+    content: '◆';
+    color: var(--accent);
+    font-size: 9px;
+    margin-top: 6px;
+  }
+
+  /* ============ FOOTER ============ */
+  footer.site {
+    border-top: 1px solid var(--rule);
+    padding: 64px 0 48px;
+    margin-top: 80px;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+
+  .footer-brand p {
+    color: var(--text-2);
+    font-size: 14px;
+    margin-top: 16px;
+    max-width: 360px;
+    line-height: 1.6;
+  }
+
+  .footer-col h4 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+
+  .footer-col ul {
+    list-style: none;
+  }
+
+  .footer-col li {
+    margin-bottom: 8px;
+  }
+
+  .footer-col a {
+    color: var(--text-2);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+
+  .footer-col a:hover { color: var(--text); }
+
+  .footer-bottom {
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-3);
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      padding: 64px 0 56px;
+    }
+
+    .hero-visual { aspect-ratio: 16 / 10; }
+
+    .course-body {
+      grid-template-columns: 1fr;
+      padding: 0 0 28px 0;
+      gap: 24px;
+    }
+
+    details.course summary {
+      grid-template-columns: auto 1fr auto;
+      gap: 16px;
+      padding: 22px 0;
+    }
+
+    .course-num { display: none; }
+
+    .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+
+    nav.site-nav { display: none; }
+
+    .container { padding: 0 20px; }
+  }
+
+  @media (max-width: 540px) {
+    .course-tag { display: none; }
+    details.course summary { grid-template-columns: 1fr auto; }
+    .visual-glyph { width: 100px; height: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- =============== HEADER =============== -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">cybersecurity<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="#library">Library</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- =============== HERO =============== -->
+<section class="container hero">
+  <div class="hero-text">
+    <div class="hero-eyebrow">Practical Learning, Designed to Stick</div>
+    <h1>Training that <span class="accent">earns</span> the click.</h1>
+    <p class="lead">Learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills, designed to stick. Real datasets; real exercises; everything you need is downloadable and yours to keep.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#library">
+        Browse the library
+        <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="btn btn-ghost" href="#about">What this is</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="hero-visual-content">
+      <div class="visual-glyph">
+        <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+          <circle class="ring" cx="70" cy="70" r="60"/>
+          <circle class="ring ring-2" cx="70" cy="70" r="42"/>
+          <circle class="ring ring-3" cx="70" cy="70" r="24"/>
+          <line class="line" x1="70" y1="10" x2="70" y2="130"/>
+          <line class="line" x1="10" y1="70" x2="130" y2="70"/>
+          <circle class="node" cx="70" cy="10" r="3"/>
+          <circle class="node" cx="130" cy="70" r="3"/>
+          <circle class="node" cx="70" cy="130" r="3"/>
+          <circle class="node" cx="10" cy="70" r="3"/>
+          <circle class="node" cx="70" cy="70" r="4" fill="#3b82f6"/>
+        </svg>
+      </div>
+      <div class="visual-label">// learn · practise · keep</div>
+    </div>
+    <div class="visual-replace-hint">// hero image slot</div>
+  </div>
+</section>
+
+<!-- =============== ABOUT =============== -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="about-inner">
+      <div class="section-eyebrow">// about</div>
+      <h2>Hard topics, made stickable.</h2>
+      <p>Most digital training is forgotten by Friday. Cybersecurity Ink builds learning materials designed to stick; with realistic data, downloadable exercises, and skills that transfer to your work.</p>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============== LIBRARY =============== -->
+<section class="container library" id="library">
+  <div class="library-header">
+    <div class="library-header-text">
+      <div class="section-eyebrow">// library</div>
+      <h2>Course library</h2>
+      <p>Click a title to expand.</p>
+    </div>
+  </div>
+
+  <!-- Course 1: Power Query (live) -->
+  <details class="course" name="course" open>
+    <summary>
+      <span class="course-num">01</span>
+      <span class="course-title">Power Query: Surveillance Data Analysis</span>
+      <span class="course-tag available">Available</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">Learn Microsoft Excel's Power Query through six exercises set inside a fictional dystopian Australian outback town. You'll combine messy CSV files, merge relational tables, write custom M-language functions, and reshape data for executive briefings. The dataset doubles as a discussion prompt about algorithmic bias and surveillance ethics.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">DURATION · <strong>3 hrs</strong></span>
+          <span class="course-meta-item">LEVEL · <strong>Beginner to intermediate</strong></span>
+          <span class="course-meta-item">FORMAT · <strong>HTML dossier + 13 CSVs</strong></span>
+        </div>
+        <a class="btn btn-primary" href="/pandanus-reach/">
+          Open course
+          <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// what you will learn</div>
+        <ul>
+          <li>Loading and cleaning CSV data</li>
+          <li>Combining files from a folder</li>
+          <li>Merge queries and aggregations</li>
+          <li>Pivot and unpivot transformations</li>
+          <li>Custom functions in the M language</li>
+          <li>Cross-tabulation and group-by analysis</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
+
+  <!-- Course 2 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">02</span>
+      <span class="course-title">Microsoft Excel: Foundations to Power User</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">From cell formatting to pivot tables, conditional logic, and lookup functions. A single working scenario that grows in complexity across the course, so each technique you learn is immediately applied to data you already know.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>Q3 2026</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// planned modules</div>
+        <ul>
+          <li>Spreadsheet anatomy and good habits</li>
+          <li>Formulas and references</li>
+          <li>Conditional logic and lookup functions</li>
+          <li>Pivot tables and dashboards</li>
+          <li>Charts that communicate</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
+
+  <!-- Course 3 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">03</span>
+      <span class="course-title">Microsoft Word: Documents That Get Read</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">Word as a document engineering tool, not a typewriter. Styles, templates, sections, headers, tables of contents, mail merge, tracked changes, and the small habits that separate a clean document from a tangled one.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>Q3 2026</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// planned modules</div>
+        <ul>
+          <li>Styles and the discipline of consistency</li>
+          <li>Templates that scale</li>
+          <li>Sections, page numbering, and TOCs</li>
+          <li>Tracked changes and review workflows</li>
+          <li>Mail merge for real situations</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
+
+  <!-- Course 4 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">04</span>
+      <span class="course-title">Microsoft PowerPoint: Effective Visual Communication</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">Slide design as a thinking discipline. How to structure an argument, when to use a chart over a table, the typography choices that make a deck feel professional, and how to avoid the eight bad habits that mark someone out as a novice.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>Q4 2026</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// planned modules</div>
+        <ul>
+          <li>Structuring an argument across slides</li>
+          <li>Layout, hierarchy, and white space</li>
+          <li>Type, colour, and contrast</li>
+          <li>Charts, tables, and diagrams</li>
+          <li>Speaker notes and rehearsal</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
+
+  <!-- Course 5 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">05</span>
+      <span class="course-title">Digital Literacy: Workplace Skills</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">Foundational digital skills for adults entering or re-entering the workforce. File management, browsers, email, calendars, video conferencing, password hygiene, and the everyday literacies that quiet quitters of technology never quite learned.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>In development</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>Q4 2026</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// planned modules</div>
+        <ul>
+          <li>Files, folders, and finding things</li>
+          <li>Email as a craft</li>
+          <li>Calendars and scheduling</li>
+          <li>Video calls without the awkward</li>
+          <li>Passwords and basic safety</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
+
+  <!-- Course 6 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">06</span>
+      <span class="course-title">Cybersecurity Fundamentals for Non-Specialists</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">A grown-up introduction to cybersecurity for people who don't intend to become security professionals but do intend to stop being a vulnerability. Threats, defences, and the everyday habits that protect a household, a small business, or a workplace.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>Planned</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>2027</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// topics</div>
+        <ul>
+          <li>How attacks actually work</li>
+          <li>Identity, MFA, and password managers</li>
+          <li>Phishing and social engineering</li>
+          <li>Devices, networks, and updates</li>
+          <li>What to do when things go wrong</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
+
+  <!-- Course 7 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">07</span>
+      <span class="course-title">AI Literacy for the Workplace</span>
+      <span class="course-tag soon">Coming soon</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">What large language models actually do, where they fail, how to prompt them well, and how to use them responsibly in a professional context where the wrong output has consequences.</p>
+        <div class="course-meta">
+          <span class="course-meta-item">STATUS · <strong>Planned</strong></span>
+          <span class="course-meta-item">EXPECTED · <strong>2027</strong></span>
+        </div>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// topics</div>
+        <ul>
+          <li>What an LLM is and isn't</li>
+          <li>Prompting as a skill</li>
+          <li>Hallucination, drift, and verification</li>
+          <li>Privacy, IP, and confidentiality</li>
+          <li>Workflows that hold up under scrutiny</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
+
+  <!-- Course 8 -->
+  <details class="course" name="course">
+    <summary>
+      <span class="course-num">08</span>
+      <span class="course-title">More to come</span>
+      <span class="course-tag soon">In planning</span>
+      <svg class="chevron" viewBox="0 0 20 20"><path d="m5 8 5 5 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </summary>
+    <div class="course-body">
+      <div>
+        <p class="desc">Cybersecurity Ink is built one scenario at a time. Future courses are likely to cover automation and scripting, working with PDFs, data visualisation fundamentals, and a deeper dive into red-team thinking. If there's a topic you'd like to see, get in touch.</p>
+        <a class="btn btn-ghost" href="#contact">Suggest a topic</a>
+      </div>
+      <aside class="course-aside">
+        <div class="course-aside-label">// candidate topics</div>
+        <ul>
+          <li>Automation and basic scripting</li>
+          <li>Working with PDFs at scale</li>
+          <li>Data visualisation that communicates</li>
+          <li>Red-team thinking for defenders</li>
+        </ul>
+      </aside>
+    </div>
+  </details>
+</section>
+
+<!-- =============== FOOTER =============== -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">cybersecurity<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. No paywall; no email harvesting; no nonsense.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/pandanus-reach/">Power Query</a></li>
+          <li><a href="#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="#about">About this site</a></li>
+          <li><a href="mailto:hello@cybersecurityink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Cybersecurity Ink. Made in the Australian outback.</span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
