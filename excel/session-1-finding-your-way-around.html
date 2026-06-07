@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finding Your Way Around Excel &middot; Excel Fundamentals &middot; NTell World Ink</title>
+<meta name="description" content="Session 1 of Excel Fundamentals for Employment: naming the parts of the Excel window, moving around, entering text, numbers and dates, AutoFill and custom lists, and saving and naming your work. Plain language, hands-on, no experience needed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Excel Fundamentals, Session 1; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+  .activity-box ol, .activity-box ul { color: var(--text-2); line-height: 1.7; padding-left: 22px; margin: 0 0 10px; }
+  .activity-box li { margin-bottom: 5px; }
+
+  /* Reusable card for the parts-of-the-window list */
+  .point-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .point-card h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .point-card p { color: var(--text-2); font-size: 15px; line-height: 1.65; margin: 0 0 8px; }
+  .point-card p:last-child { margin: 0; }
+
+  /* ===== Excel-style worksheet grid ===== */
+  .xl-wrap { margin: 18px 0; overflow-x: auto; }
+  .xl-grid {
+    border-collapse: collapse; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: var(--text); background: var(--bg-2);
+  }
+  .xl-grid caption {
+    caption-side: top; text-align: left; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 0 0 8px;
+  }
+  .xl-grid th, .xl-grid td {
+    border: 1px solid var(--rule-2); padding: 6px 14px; text-align: left; white-space: nowrap;
+  }
+  .xl-grid thead th, .xl-grid tbody th {
+    background: #17171b; color: var(--text-3); font-weight: 500; text-align: center;
+  }
+  .xl-grid tbody th { width: 30px; }
+  .xl-grid .corner { background: #0f0f12; }
+  .xl-grid td.num { text-align: right; }
+  .xl-grid td.formula { color: var(--accent-2); }
+  .xl-grid td.head { color: var(--text); font-weight: 500; }
+
+  /* ===== Copyable formula block ===== */
+  .xl-formula {
+    display: flex; align-items: stretch; margin: 16px 0;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 8px; overflow: hidden;
+  }
+  .xl-formula code {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text);
+    padding: 12px 16px; flex: 1; overflow-x: auto; white-space: pre;
+  }
+  .xl-formula button {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-3); background: transparent;
+    border: none; border-left: 1px solid var(--rule-2); padding: 0 16px; cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .xl-formula button:hover { color: var(--accent-2); background: rgba(26,201,201,0.05); }
+  .xl-formula button.copied { color: var(--accent); }
+
+  /* Knowledge check: question with a reveal-able answer */
+  .check-intro {
+    background: rgba(26,201,201,0.04); border: 1px solid var(--rule-2);
+    border-radius: 12px; padding: 18px 24px; margin: 18px 0 22px;
+  }
+  .check-intro p { margin: 0; color: var(--text-2); line-height: 1.65; }
+  details.check {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; margin: 12px 0; overflow: hidden;
+  }
+  details.check > summary {
+    cursor: pointer; list-style: none; padding: 18px 22px;
+    color: var(--text); font-weight: 600; font-size: 15.5px; line-height: 1.55;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  details.check > summary::-webkit-details-marker { display: none; }
+  details.check > summary .q {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    flex: 0 0 auto; padding-top: 2px;
+  }
+  details.check > summary .reveal {
+    margin-left: auto; flex: 0 0 auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    border: 1px solid var(--rule-2); border-radius: 4px; padding: 3px 8px; white-space: nowrap;
+  }
+  details.check[open] > summary .reveal { color: var(--accent-2); border-color: var(--accent); }
+  details.check[open] > summary .reveal::after { content: " shown"; }
+  details.check .answer {
+    padding: 0 22px 20px 22px; color: var(--text-2); line-height: 1.7; font-size: 15px;
+    border-top: 1px solid var(--rule); margin-top: 2px; padding-top: 16px;
+  }
+  details.check .answer strong { color: var(--text); }
+  details.check .answer code { font-family: 'JetBrains Mono', monospace; color: var(--accent-2); }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+  .content-section p code, .content-section li code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.92em;
+    color: var(--accent-2); background: rgba(26,201,201,0.06);
+    padding: 1px 6px; border-radius: 4px;
+  }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+    details.check > summary { flex-wrap: wrap; }
+    details.check > summary .reveal { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/excel/">Excel Fundamentals</a>
+    <span class="sep">/</span>
+    <span>Session 1</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Microsoft Excel &middot; Course 2 &middot; Session 1</div>
+  <h1>Finding Your Way Around Excel</h1>
+  <p class="subtitle">A gentle first session at the keyboard. We name the parts of the Excel window so the instructions stop feeling like a foreign language, learn to move around and select cells, enter text, numbers and dates, speed up typing with AutoFill, and finish by saving your work somewhere you can find it again. The aim is to make the screen feel familiar.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">Session &middot; <strong>01 of 04</strong></span>
+    <span class="page-meta-item">Duration &middot; <strong>~3 hours</strong></span>
+    <span class="page-meta-item">Level &middot; <strong>Foundation</strong></span>
+  </div>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/session-1-handout.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this session (Word)
+    </a>
+    <a class="btn btn-download" href="downloads/session-1-starter.xlsx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Practice workbook (starter)
+    </a>
+    <a class="btn btn-download" href="downloads/session-1-solution.xlsx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Solution workbook
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/excel/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+      <li><a href="#start-here">Start Here</a></li>
+      <li><a href="#the-window">The Excel Window</a></li>
+      <li><a href="#cells">Cells, Rows and Columns</a></li>
+      <li><a href="#moving">Moving Around and Selecting</a></li>
+      <li><a href="#entering">Entering Text, Numbers and Dates</a></li>
+      <li><a href="#editing">Editing and Deleting</a></li>
+      <li><a href="#autofill">AutoFill and Custom Lists</a></li>
+      <li><a href="#saving">Saving and Naming Your Work</a></li>
+      <li><a href="#try-it">Try It at the Keyboard</a></li>
+      <li><a href="#check">Knowledge Check</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="start-here">
+    <div class="section-eyebrow">// start here</div>
+    <h2>Start Here</h2>
+    <p>A spreadsheet is just a tidy grid for holding numbers and lists. That is the whole idea. Excel is the most common spreadsheet program, and when you first open it you are faced with a big grid and a lot of buttons. It looks busier than it is. Almost everything you will ever use lives in a handful of named areas, and once you can name them, the instructions, including the ones on this page, suddenly make sense.</p>
+    <p>This session is about getting comfortable: knowing what you are looking at, moving around without feeling lost, putting data into cells, and saving it safely. None of it is hard, and you cannot wear it out by practising.</p>
+    <p class="pullquote">You cannot break Excel by having a go. Almost everything can be undone with Ctrl + Z. The fastest way to learn a spreadsheet is to click around in one.</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">A note on what your screen looks like</div>
+      <p>Excel comes in several versions and Microsoft updates it often, so the screen in front of you may not match this page exactly. That is normal. The core ideas, cells, formulas, formatting, work the same across versions; only the odd button moves. If a button is not where this page says, it has most likely moved, not disappeared. Ask your trainer, or use the "Search" box at the top of the Excel window and type what you want to do.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="the-window">
+    <div class="section-eyebrow">// the excel window</div>
+    <h2>The Excel Window</h2>
+    <p>Being able to name the parts of the window is half the battle. When the trainer or a handout says "go to the Formula Bar" or "look at the Name Box", you will know exactly where to look. These are the parts worth knowing:</p>
+
+    <div class="point-card">
+      <h4>The Ribbon</h4>
+      <p>The strip of buttons across the top, organised into tabs: Home, Insert, Page Layout, Formulas, Data, Review, View. Each tab holds related tools grouped together. You will spend most of your time on the <strong>Home</strong> tab, which holds fonts, alignment and number formats.</p>
+    </div>
+    <div class="point-card">
+      <h4>The Name Box</h4>
+      <p>The small box on the left, just above the grid. It shows the address of the cell you have selected, like <code>A1</code>. You can also type an address into it and press Enter to jump straight there.</p>
+    </div>
+    <div class="point-card">
+      <h4>The Formula Bar</h4>
+      <p>The long bar to the right of the Name Box. It shows what is really in the selected cell. This matters: a cell might display <code>14</code> on the grid, but the Formula Bar reveals it is actually <code>=A1+A2</code>. When a result looks wrong, the Formula Bar is where the truth lives.</p>
+    </div>
+    <div class="point-card">
+      <h4>The Worksheet Area</h4>
+      <p>The grid itself, made of rows, columns and cells. This is where everything you type actually goes.</p>
+    </div>
+    <div class="point-card">
+      <h4>The Status Bar</h4>
+      <p>The strip along the very bottom. Select a few numbers and it instantly shows their Sum, Average and Count, without you typing anything. It is the fastest calculator in Excel.</p>
+    </div>
+    <div class="point-card">
+      <h4>The Quick Access Toolbar</h4>
+      <p>A small row of handy buttons (often Save, Undo, Redo) that you can customise with the commands you use most.</p>
+    </div>
+    <div class="callout callout-tip">
+      <div class="callout-title">If the Ribbon ever vanishes</div>
+      <p>Double-click any tab name to bring it back, or press Ctrl + F1 to switch it on and off. It is easy to hide by accident, and just as easy to get back.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="cells">
+    <div class="section-eyebrow">// cells, rows and columns</div>
+    <h2>Cells, Rows and Columns</h2>
+    <p>Five words get used constantly, so it is worth pinning them down once. They nest inside each other like a set of containers:</p>
+    <ul>
+      <li>A <strong>workbook</strong> is the whole Excel file, the thing you save and share. One workbook can hold many worksheets.</li>
+      <li>A <strong>worksheet</strong> (or "sheet", or "tab") is a single page inside the workbook. The tabs appear along the bottom. You might keep January on one sheet and February on another.</li>
+      <li><strong>Rows</strong> run across, left to right, and are numbered down the side: 1, 2, 3.</li>
+      <li><strong>Columns</strong> run up and down and are lettered across the top: A, B, C. After Z they double up: AA, AB, and so on.</li>
+      <li>A <strong>cell</strong> is a single box where a row and a column meet. It is the basic unit of Excel, the place where everything you type goes.</li>
+    </ul>
+    <p>Every cell has an address made of its column letter and its row number. The cell where column B meets row 5 is called <code>B5</code>, column first, then row. This naming is what lets a formula point at data: <code>=B5+B6</code> means "add whatever is in B5 and B6". Click any cell and the Name Box (top left) shows its address.</p>
+
+    <div class="xl-wrap">
+      <table class="xl-grid">
+        <caption>// a worksheet: the cell where column B meets row 5 is B5</caption>
+        <thead>
+          <tr><th class="corner"></th><th>A</th><th>B</th><th>C</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>1</th><td class="head">Name</td><td class="head">Town</td><td class="head">Phone</td></tr>
+          <tr><th>2</th><td>Mia</td><td>Nightcliff</td><td>08 8900 1234</td></tr>
+          <tr><th>3</th><td>Jack</td><td>Casuarina</td><td>08 8900 5678</td></tr>
+          <tr><th>4</th><td>Grace</td><td>Karama</td><td>08 8900 9012</td></tr>
+          <tr><th>5</th><td>Noah</td><td>Parap</td><td>08 8900 3456</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>In the grid above, the cell holding "Nightcliff" is <code>B2</code>. "Karama" is in <code>B4</code>. The whole block of names is the range <code>A2:A5</code>, written with a colon, which means "A2 through A5".</p>
+  </section>
+
+  <section class="content-section container-content" id="moving">
+    <div class="section-eyebrow">// moving around and selecting</div>
+    <h2>Moving Around and Selecting</h2>
+    <p>A spreadsheet can have hundreds of rows. Scrolling with the mouse gets tedious fast, and selecting exactly the cells you want is the thing you do before almost every action: formatting, sums, charts. A few keyboard habits make this much quicker, and they are worth building early.</p>
+    <h3>Moving around</h3>
+    <ul>
+      <li><strong>Arrow keys</strong> move one cell at a time.</li>
+      <li><strong>Ctrl + an arrow key</strong> jumps to the edge of your data in that direction. In a long list, Ctrl + Down leaps to the last filled row instantly.</li>
+      <li><strong>Ctrl + Home</strong> goes to the top-left, cell A1. <strong>Ctrl + End</strong> goes to the bottom-right corner of the used area.</li>
+      <li>The <strong>Name Box</strong> is a teleport: type <code>B250</code> and press Enter to jump straight there.</li>
+    </ul>
+    <h3>Selecting</h3>
+    <ul>
+      <li><strong>Click and drag</strong> to select a block of cells.</li>
+      <li><strong>Shift + arrow keys</strong> extend the selection one cell at a time.</li>
+      <li><strong>Ctrl + Shift + an arrow key</strong> selects everything from here to the edge of the data, perfect for grabbing a whole column of figures in one move.</li>
+      <li>Click a <strong>column letter</strong> or <strong>row number</strong> to select the entire column or row.</li>
+    </ul>
+    <div class="callout callout-tip">
+      <div class="callout-title">The one combination worth memorising first</div>
+      <p>Ctrl + Shift + Down selects a whole column of data in one keystroke, ready to sum, format or chart. Then Ctrl + Home shoots you back to A1.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="entering">
+    <div class="section-eyebrow">// entering text, numbers and dates</div>
+    <h2>Entering Text, Numbers and Dates</h2>
+    <p>Excel quietly sorts everything you type into one of a few types, and it treats each differently. The three you will meet constantly are:</p>
+    <ul>
+      <li><strong>Text</strong>, words and labels: names, towns, notes, anything not meant for arithmetic.</li>
+      <li><strong>Numbers</strong>, values you might calculate with: amounts, quantities, hours.</li>
+      <li><strong>Dates</strong>, which Excel actually stores as special numbers behind the scenes, and just displays as a date.</li>
+    </ul>
+    <p>Why care? Because Excel will only do maths on things it considers numbers. A figure that is secretly stored as text will not add up, even though it looks identical on screen. The fastest clue is alignment: by default Excel lines <strong>text up on the left</strong>, and <strong>numbers and dates up on the right</strong>. If a column of "numbers" is sitting on the left, they are probably stored as text.</p>
+
+    <div class="xl-wrap">
+      <table class="xl-grid">
+        <caption>// alignment is the clue: text lines up left, numbers and dates line up right</caption>
+        <thead>
+          <tr><th class="corner"></th><th>A</th><th>B</th><th>C</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>1</th><td class="head">Item</td><td class="head">Quantity</td><td class="head">Date counted</td></tr>
+          <tr><th>2</th><td>Hi-vis shirts</td><td class="num">24</td><td class="num">12/05/2026</td></tr>
+          <tr><th>3</th><td>Safety boots</td><td class="num">8</td><td class="num">12/05/2026</td></tr>
+          <tr><th>4</th><td>Hard hats</td><td class="num">15</td><td class="num">12/05/2026</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Entering data</h3>
+    <ul>
+      <li>Click a cell and start typing.</li>
+      <li>Press <strong>Enter</strong> to confirm and drop down to the cell below, or <strong>Tab</strong> to confirm and move right. This makes typing across a row, then down to the next, smooth and mouse-free.</li>
+      <li>Press <strong>Esc</strong> at any point to cancel what you were typing and leave the cell unchanged.</li>
+    </ul>
+    <div class="callout callout-warning">
+      <div class="callout-title">Codes and numbers that must not change</div>
+      <p>Excel can be too helpful. It drops leading zeros (it reads <code>007</code> as <code>7</code>) and it will quietly turn things that look like dates into dates. If a column must stay exactly as typed, like a phone number, an ID, or a product code, format those cells as <strong>Text</strong> first (Home tab, Number group), then type. We come back to number formats in Session 3.</p>
+    </div>
+
+    <h3>A curious thing about dates</h3>
+    <p>Behind the scenes, Excel does not store a date like "21 May 2026" as words at all. It stores a plain number counting the days since <strong>1 January 1900</strong>, and just dresses it up to look like a date. So 1 January 1900 is day <code>1</code>, and a date in 2026 is around <code>46000</code>. You can see this for yourself: type a date into a cell, then change its format to Number (Home tab, Number group), and the date turns into a five-digit number.</p>
+    <p>This is not just a curiosity; it is genuinely useful. Because dates are really numbers, Excel can do maths with them. Subtract one date from another and you get the number of days between them, which is how a spreadsheet works out someone's age, or how many days until a deadline.</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">Did you know: dates are secretly numbers</div>
+      <p>The "1900" system is why a date can be added, subtracted and sorted like any other number. It also explains the odd moment when a cell you expected to show a date suddenly shows something like <code>46164</code>: the value is fine, the cell has just lost its date format. Set it back to Short Date and the date reappears.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="editing">
+    <div class="section-eyebrow">// editing and deleting</div>
+    <h2>Editing and Deleting</h2>
+    <p>Putting data in, changing it when it is wrong, and removing it when it is not needed: none of this is complicated, but a few small habits make it fast and mistake-free.</p>
+    <h3>Changing what is already in a cell</h3>
+    <ul>
+      <li><strong>Edit in the cell:</strong> double-click it (or select it and press F2) to put the cursor inside, then change the contents.</li>
+      <li><strong>Edit in the Formula Bar:</strong> select the cell and click into the Formula Bar at the top. Handy for long entries where there is more room to see what you are doing.</li>
+    </ul>
+    <p>Press Enter to save the change, or Esc to abandon it.</p>
+    <h3>Deleting and clearing</h3>
+    <ul>
+      <li>The <strong>Delete</strong> key removes the contents of the selected cells but leaves the formatting behind.</li>
+      <li>To remove an entire row or column, right-click its number or letter and choose <strong>Delete</strong>. The remaining rows or columns shift to close the gap.</li>
+    </ul>
+    <div class="callout callout-key">
+      <div class="callout-title">Made a mistake? Ctrl + Z</div>
+      <p>Ctrl + Z undoes your last action, and you can press it repeatedly to step back through several. Ctrl + Y redoes. This is your safety net: it is why you cannot really break anything by trying.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="autofill">
+    <div class="section-eyebrow">// autofill and custom lists</div>
+    <h2>AutoFill and Custom Lists</h2>
+    <p>AutoFill is the feature that finishes repetitive typing for you. Type <code>Monday</code>, drag, and Excel writes out Tuesday, Wednesday, and so on. Type <code>1</code> and <code>2</code>, drag, and it counts up. It works for numbers, dates, days, months, and copies of a single value, anything with an obvious pattern.</p>
+    <p>The tool you use is the <strong>fill handle</strong>: the tiny square at the bottom-right corner of a selected cell. When your mouse is over it, the cursor turns into a thin black cross. Click and drag it down or across, and Excel continues the pattern.</p>
+
+    <div class="xl-wrap">
+      <table class="xl-grid">
+        <caption>// type the first cell of each column, then drag the fill handle down</caption>
+        <thead>
+          <tr><th class="corner"></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>1</th><td class="head">Day</td><td class="head">Month</td><td class="head">Quarter</td><td class="head">Count</td></tr>
+          <tr><th>2</th><td>Monday</td><td>January</td><td>Qtr 1</td><td class="num">1</td></tr>
+          <tr><th>3</th><td>Tuesday</td><td>February</td><td>Qtr 2</td><td class="num">2</td></tr>
+          <tr><th>4</th><td>Wednesday</td><td>March</td><td>Qtr 3</td><td class="num">3</td></tr>
+          <tr><th>5</th><td>Thursday</td><td>April</td><td>Qtr 4</td><td class="num">4</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Counting in steps</h3>
+    <p>To count in steps other than 1, give Excel two cells to learn from. Type <code>5</code> in one cell and <code>10</code> in the next, select both, then drag the fill handle. Excel sees the gap of 5 and continues 15, 20, 25.</p>
+
+    <h3>Custom lists: teach Excel your own list</h3>
+    <p>Excel already knows the days and months. You can also teach it a list you use often, so AutoFill finishes it for you, for example a set of local suburbs, your team's names, or the categories in a budget. Go to <strong>File then Options then Advanced</strong>, scroll to "Edit Custom Lists", type your list (one item per line) or import it from cells, and click Add. After that, type the first item and drag, and the rest fill in.</p>
+
+    <div class="xl-wrap">
+      <table class="xl-grid">
+        <caption>// a custom list of Territory places, ready to AutoFill</caption>
+        <thead>
+          <tr><th class="corner"></th><th>A</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>1</th><td class="head">Community</td></tr>
+          <tr><th>2</th><td>Alawa</td></tr>
+          <tr><th>3</th><td>Brinkin</td></tr>
+          <tr><th>4</th><td>Coconut Grove</td></tr>
+          <tr><th>5</th><td>Durack</td></tr>
+          <tr><th>6</th><td>Galiwinku</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">A quick way to copy a formula down a long list</div>
+      <p>Instead of dragging, double-click the fill handle and Excel fills down as far as the column next to it has data. You will use this a lot in Session 2 to copy a formula down a whole column at once.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="saving">
+    <div class="section-eyebrow">// saving and naming your work</div>
+    <h2>Saving and Naming Your Work</h2>
+    <p>Saving is the unglamorous skill that saves you from the worst spreadsheet experience there is: losing an hour's work. It is worth doing properly from the very start.</p>
+    <h3>How to save</h3>
+    <ul>
+      <li><strong>Save</strong> with <strong>Ctrl + S</strong> keeps the current file up to date. Do this early and often, it costs a second and prevents disasters.</li>
+      <li><strong>Save As</strong> (F12) creates a new copy. Useful when you want to keep the original and branch off a version. You choose the name, the place, and the file type.</li>
+      <li>The normal file type is <strong>Excel Workbook (.xlsx)</strong>. It keeps your formulas and formatting and can be reopened and edited. Choose <strong>PDF</strong> only when you want a fixed, read-only snapshot to share, and keep the .xlsx as your editable master.</li>
+    </ul>
+    <h3>Naming files, and where they live</h3>
+    <p>Give files clear, dated names like <code>Team Roster 2026-05.xlsx</code> rather than <code>Book1.xlsx</code> or <code>final final v3</code>. Your future self will thank you. A good name says what it is and when it is from.</p>
+    <p>When you save, you also choose <em>where</em> the file goes. The two everyday places are:</p>
+    <div class="compare-grid">
+      <div class="compare-col col-yes">
+        <div class="compare-col-label">// this PC</div>
+        <ul>
+          <li>The Documents folder, or a folder you make, on the computer in front of you.</li>
+          <li>Make a clearly named folder so you can find your work again.</li>
+          <li>Remember the file only lives on that one computer.</li>
+        </ul>
+      </div>
+      <div class="compare-col col-no">
+        <div class="compare-col-label">// a USB stick</div>
+        <ul>
+          <li>Save or copy your file to a USB stick to carry it between computers.</li>
+          <li>Always close the file and "eject" or "safely remove" the stick before pulling it out.</li>
+          <li>A USB stick is small and easy to lose, so keep a copy of anything important in two places.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout callout-key">
+      <div class="callout-title">The save habit, in one line</div>
+      <p>Press Ctrl + S every few minutes, give the file a clear dated name, and know which folder or USB stick it is on. Do those three things and you will never lose your work.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="try-it">
+    <div class="section-eyebrow">// try it at the keyboard</div>
+    <h2>Try It at the Keyboard</h2>
+    <p>Open the starter workbook for this session (or a blank workbook) and have a go. There is nothing here you can break.</p>
+    <div class="activity-box">
+      <span class="label">Practice</span>
+      <h4>Build a small contact list</h4>
+      <ol>
+        <li>Click cell <strong>A1</strong> and check the Name Box agrees. Type the headings <strong>Name</strong>, <strong>Town</strong>, <strong>Phone</strong> across A1, B1 and C1, pressing Tab between them.</li>
+        <li>Enter three or four people down the rows, pressing Enter to drop to the next line. Notice the names sit to the left and any all-number phone fields behave differently.</li>
+        <li>Type <strong>Monday</strong> in a spare cell, then drag the fill handle down five rows and watch AutoFill write the rest of the week.</li>
+        <li>Double-click a cell to fix a spelling, then press Ctrl + Z twice to watch your changes reverse.</li>
+        <li>Press <strong>Ctrl + S</strong>, give the file a clear name like <strong>My Contact List 2026.xlsx</strong>, and choose a folder or USB stick you will remember.</li>
+      </ol>
+      <p>That is a real, useful spreadsheet, built from nothing, saved where you can find it. Everything else in this course builds on these same moves.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="check">
+    <div class="section-eyebrow">// knowledge check</div>
+    <h2>Knowledge Check</h2>
+    <div class="check-intro">
+      <p>A few quick questions to see what has landed. Have a think first, then click "reveal" to check your answer. There is no mark and no rush.</p>
+    </div>
+
+    <details class="check">
+      <summary><span class="q">Q1</span><span>What is the address of the cell where column C meets row 4, and how do you read it?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>It is <strong><code>C4</code></strong>. Cell addresses are always written column letter first, then row number. So it is C4, not 4C. Click the cell and the Name Box (top left) confirms it.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q2</span><span>You type a list of phone numbers and they line up on the left of their cells. What does that tell you?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>Excel is treating them as <strong>text</strong>, not numbers, because by default it lines text up on the left and numbers on the right. That is fine for phone numbers (you are not doing maths on them), and in fact formatting a column as Text first is the safe way to stop Excel dropping a leading zero or "tidying" the number.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q3</span><span>You want to fill cells with January, February, March and so on. What is the quickest way?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>Use <strong>AutoFill</strong>. Type <code>January</code> in one cell, select it, then drag the small square at the bottom-right corner (the fill handle) down. Excel already knows the months and writes the rest for you. The same trick works for days of the week and for counting numbers.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q4</span><span>What is the single most important thing to do every few minutes while you work, and how?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p><strong>Save</strong>, by pressing <strong>Ctrl + S</strong>. It keeps your file up to date and prevents losing work. Pair it with a clear, dated file name and knowing which folder or USB stick the file is on.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q5</span><span>The Ribbon disappears from the top of your screen. How do you get it back?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>Double-click any tab name (Home, Insert, and so on), or press <strong>Ctrl + F1</strong>. The Ribbon is easy to hide by accident and just as easy to bring back; nothing is broken.</p></div>
+    </details>
+  </section>
+
+</main>
+
+<!-- SESSION NAV -->
+<div class="container">
+  <nav class="session-nav">
+    <span></span>
+    <a class="session-nav-item next" href="session-2-formulas-and-functions.html">
+      <span class="session-nav-label">Next session &rarr;</span>
+      <span class="session-nav-title">Formulas and Functions</span>
+    </a>
+  </nav>
+</div>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this course</h4>
+        <ul>
+          <li><a href="/excel/">Excel overview</a></li>
+          <li><a href="excel-words-in-plain-english.html">Excel words in plain English</a></li>
+          <li><a href="downloads/session-1-handout.docx" download>Session 1 handout</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Reveal-on-open already handled by <details>. Copy buttons for any formula blocks:
+  document.querySelectorAll('.xl-formula button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var code = btn.parentElement.querySelector('code').innerText;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(function () {
+          var old = btn.textContent;
+          btn.textContent = 'copied'; btn.classList.add('copied');
+          setTimeout(function () { btn.textContent = old; btn.classList.remove('copied'); }, 1200);
+        });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

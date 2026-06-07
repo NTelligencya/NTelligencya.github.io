@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI, Deepfakes, and the New Shape of Online Deception &middot; Cyber Security Awareness &middot; NTell World Ink</title>
+<meta name="description" content="How AI is making scams more convincing, what deepfakes are and how to spot them, a simple way to check whether something online is true before you act or share, and a plain rule for keeping workplace information out of AI tools.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Cyber Security Awareness, Session 3; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .point-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .point-card h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .point-card p { color: var(--text-2); font-size: 15px; line-height: 1.65; margin: 0 0 8px; }
+  .point-card p:last-child { margin: 0; }
+
+  .do-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 12px;
+    padding: 20px 24px; margin: 22px 0;
+  }
+  .do-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 21px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .do-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .do-box p:last-child { margin: 0; }
+
+  /* Disaster-imagery case study */
+  .thumb-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 18px; margin: 20px 0;
+  }
+  .thumb-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; overflow: hidden;
+  }
+  .thumb-card img { width: 100%; height: auto; display: block; border-bottom: 1px solid var(--rule-2); background: #050506; }
+  .thumb-card .cap { padding: 14px 16px; }
+  .thumb-card .cap .src {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--warm); margin-bottom: 6px;
+  }
+  .thumb-card .cap p { color: var(--text-2); font-size: 13.5px; line-height: 1.6; margin: 0; }
+  .figure-note {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3);
+    text-align: center; margin: -6px 0 10px;
+  }
+
+  /* Knowledge check */
+  .check-intro {
+    background: rgba(26,201,201,0.04); border: 1px solid var(--rule-2);
+    border-radius: 12px; padding: 18px 24px; margin: 18px 0 22px;
+  }
+  .check-intro p { margin: 0; color: var(--text-2); line-height: 1.65; }
+  details.check {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; margin: 12px 0; overflow: hidden;
+  }
+  details.check > summary {
+    cursor: pointer; list-style: none; padding: 18px 22px;
+    color: var(--text); font-weight: 600; font-size: 15.5px; line-height: 1.55;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  details.check > summary::-webkit-details-marker { display: none; }
+  details.check > summary .q {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    flex: 0 0 auto; padding-top: 2px;
+  }
+  details.check > summary .reveal {
+    margin-left: auto; flex: 0 0 auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    border: 1px solid var(--rule-2); border-radius: 4px; padding: 3px 8px; white-space: nowrap;
+  }
+  details.check[open] > summary .reveal { color: var(--accent-2); border-color: var(--accent); }
+  details.check[open] > summary .reveal::after { content: " shown"; }
+  details.check .answer {
+    padding: 0 22px 20px 22px; color: var(--text-2); line-height: 1.7; font-size: 15px;
+    border-top: 1px solid var(--rule); margin-top: 2px; padding-top: 16px;
+  }
+  details.check .answer strong { color: var(--text); }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+    details.check > summary { flex-wrap: wrap; }
+    details.check > summary .reveal { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/cybersecurity/">Cyber Security Awareness</a>
+    <span class="sep">/</span>
+    <span>Session 3</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Cybersecurity &middot; Course 6 &middot; Session 3</div>
+  <h1>AI, Deepfakes, and the New Shape of Online Deception</h1>
+  <p class="subtitle">The threats that have changed recently. AI tools have made scams cheaper to produce and far more convincing, and have brought new risks: fake audio, fake video, and information leaking out of everyday tools. This session brings you up to date, without assuming any technical knowledge.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">Session &middot; <strong>03 of 04</strong></span>
+    <span class="page-meta-item">Duration &middot; <strong>~2 hours</strong></span>
+    <span class="page-meta-item">Level &middot; <strong>Foundations</strong></span>
+  </div>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/session-3-handout.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this session (Word)
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/cybersecurity/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#start-here">Start Here</a></li>
+    <li><a href="#ai-scams">AI Makes Scams Convincing</a></li>
+    <li><a href="#deepfakes">Deepfakes</a></li>
+    <li><a href="#misinformation">What to Trust Online</a></li>
+    <li><a href="#disaster">After a Disaster</a></li>
+    <li><a href="#info-in-ai">Keeping Info Out of AI</a></li>
+    <li><a href="#your-identity">Protecting Your Identity</a></li>
+    <li><a href="#take-away">What to Take Away</a></li>
+    <li><a href="#knowledge-check">Knowledge Check</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="start-here">
+    <div class="section-eyebrow">// start here</div>
+    <h2>Start Here</h2>
+    <p>In Session 2 we learned to spot the convincing message. This session is about what has changed in the last couple of years, because AI tools have moved the goalposts. Scams are cheaper to make, easier to personalise, and a lot more believable than they used to be. On top of that, there are new tricks: fake voices, fake video, and the quiet risk of leaking information into the very tools we are starting to use for work.</p>
+    <p>This is the safety side of our AI training. Where the AI series shows you how to get value from these tools, this session shows you the risks to watch for: both how scammers use AI against you, and how to avoid handing your information to the tools you use yourself. No technical background needed.</p>
+    <p class="pullquote">The tools changed. The defence did not. Slow down, check the source, and never act on a message, a voice, or a video on its own.</p>
+  </section>
+
+  <section class="content-section container-content" id="ai-scams">
+    <div class="section-eyebrow">// ai makes scams convincing</div>
+    <h2>How AI Is Making Scams More Convincing</h2>
+    <p>For years the advice was simple: watch for bad spelling and clumsy English. A scam email full of mistakes was easy to spot. That advice is now out of date. Scammers use the same AI writing tools everyone else does, so their messages are in perfect English, or perfect any language, every time.</p>
+    <p>What AI has changed for scammers:</p>
+    <div class="point-card">
+      <h4>The writing is flawless now</h4>
+      <p>No more typos or odd phrasing to give it away. A scam email can read exactly like a real one from your bank, a supplier, or your manager.</p>
+    </div>
+    <div class="point-card">
+      <h4>Scams are personalised at scale</h4>
+      <p>AI can take public information about you, your name, job, workplace, and posts, and write a message tailored to you, for thousands of people at once. It feels personal because, in a way, it is.</p>
+    </div>
+    <div class="point-card">
+      <h4>Fake voices and faces are cheap to make</h4>
+      <p>A short clip of someone's voice from social media is enough to clone it. We come to this next.</p>
+    </div>
+    <div class="callout callout-key">
+      <div class="callout-title">The old rule is dead; the new rule still works</div>
+      <p>"Bad English means scam" no longer holds. The reliable rule now is the one from Session 2: unexpected plus urgent means stop and check. Good writing proves nothing about who really sent a message.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="deepfakes">
+    <div class="section-eyebrow">// deepfakes</div>
+    <h2>Deepfakes: Fake Voices, Fake Video, Fake Calls</h2>
+    <p>A deepfake is audio, video, or an image made or altered by AI to look and sound real. It might be a voice on the phone that sounds exactly like a family member, a video of a public figure saying something they never said, or a photo of an event that never happened.</p>
+    <p>Where you are most likely to meet one:</p>
+    <div class="point-card">
+      <h4>A phone call in a voice you know</h4>
+      <p>The "family emergency" scam, supercharged. You get a call, and it is your son's or your daughter's voice, upset, saying they are in trouble and need money now. The voice can be cloned from a few seconds of audio taken from social media. The same trick is used at work, a call in the voice of your manager or CEO.</p>
+    </div>
+    <div class="point-card">
+      <h4>A video on social media</h4>
+      <p>A clip of a politician, a celebrity, or a "doctor" promoting an investment or a miracle product, or saying something shocking. The face and voice look right, but the words are put in their mouth by AI.</p>
+    </div>
+    <h3>The tells that still give them away</h3>
+    <ul>
+      <li>The story is urgent and emotional, and it pushes you to act now. Same lever as every other scam.</li>
+      <li>In video, look for odd edges, blurring around the face or hair, strange blinking, lips not quite matching the words, or a flat, robotic tone.</li>
+      <li>The request is the giveaway, not the voice. A real loved one in trouble, or a real manager, will not refuse to verify who they are.</li>
+    </ul>
+    <div class="callout callout-key">
+      <div class="callout-title">Agree a verification step, at home and at work</div>
+      <p>The simplest defence against a cloned voice is a question only the real person could answer, or a word your family agrees on in advance. If a panicked call asks for money, hang up and call the person back on the number you already have. At work, confirm any unusual request through a second channel, exactly as in Session 2. A real person is never harmed by you taking a minute to check.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="misinformation">
+    <div class="section-eyebrow">// what to trust online</div>
+    <h2>Misinformation and What to Trust Online</h2>
+    <p>Not everything fake is trying to steal from you. A lot of it is just trying to get your attention, your click, your share. AI has made it easy and cheap to produce dramatic images, videos, and headlines that are exaggerated, taken out of context, or simply made up. The danger is not only being fooled yourself; it is passing it on to others who trust you.</p>
+    <p>This matters most when feelings are running high, and there is no higher-feeling moment than right after a disaster.</p>
+  </section>
+
+  <section class="content-section container-content" id="disaster">
+    <div class="section-eyebrow">// after a disaster</div>
+    <h2>A Real Example: After the Cyclone</h2>
+    <p>When a cyclone affected the Top End, these two videos appeared in search results within hours, while people were still anxious and looking for information. Both use the real cyclone's name, dramatic imagery, and alarming claims to pull in views.</p>
+
+    <div class="thumb-grid">
+      <div class="thumb-card">
+        <img src="images/cyclone-fina-thumbnail-1.png" alt="YouTube thumbnail from a channel called DisasterToday, titled Tropical Cyclone Fina Hits Australia Today, showing a wrecked suburban street with toppled trees.">
+        <div class="cap">
+          <div class="src">DisasterToday &middot; 15k views</div>
+          <p>"Tropical Cyclone Fina Hits Australia Today! Strong Winds, Heavy Rain and Damage in Darwin!" The footage shows flattened gum trees and tiled-roof houses that look more like a southern suburb than tropical Darwin.</p>
+        </div>
+      </div>
+      <div class="thumb-card">
+        <img src="images/cyclone-fina-thumbnail-2.png" alt="YouTube thumbnail from a channel called Wild WeatherUS, titled Cyclone Fina Slams Darwin with Winds Up to 200 km/h, showing a flooded high-rise beachfront with cars swept by storm surge.">
+        <div class="cap">
+          <div class="src">Wild WeatherUS &middot; 27k views</div>
+          <p>"Cyclone Fina Slams Darwin with Winds Up to 200 km/h, Rescue Mission Underway." A flooded high-rise beachfront that does not match Darwin's foreshore, posted by a United States channel.</p>
+        </div>
+      </div>
+    </div>
+    <div class="figure-note">// real screenshots, captured in the days after the cyclone</div>
+
+    <p>Neither is a careful news report. They are built for clicks, and they are a textbook example of what to be wary of after any disaster.</p>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">The warning signs in these two</div>
+      <p>Sensational, fear-loaded titles ("Slams", "Up to 200 km/h", "Rescue Mission Underway") designed to make you click during an emergency. A channel that does not match the place: "Wild WeatherUS" reporting on Darwin; content farms repackage every disaster worldwide for views. Pictures that do not match the place, streetscapes and beachfronts that look nothing like Darwin, or look too dramatic to be true, a sign of recycled footage from other events or AI-generated images. Vague, round numbers and no named, credible source. And the timing: they appear fast, while real information is still coming out, exactly when people are anxious and likely to share.</p>
+    </div>
+
+    <p class="pullquote">In the wake of a disaster we are primed to believe the worst. That is exactly when fake and exaggerated imagery spreads fastest, and exactly when to slow down.</p>
+
+    <h3>How to check before you believe it, or share it</h3>
+    <div class="do-box">
+      <h4>A quick truth check</h4>
+      <p><strong>Pause before you share.</strong> Strong feelings are the point. If something makes you scared or outraged, that is the moment to slow down, not to hit share.</p>
+      <p><strong>Go to the source.</strong> For weather and emergencies in the Territory, that means the Bureau of Meteorology (bom.gov.au), the NT Government's emergency and SecureNT pages, and ABC Emergency, not a random YouTube channel or social media post.</p>
+      <p><strong>Check the place and the date.</strong> Does the image really show here, and now? Dramatic disaster footage is very often from another country or another year, relabelled. Ask plainly: "does this even look like Darwin?"</p>
+      <p><strong>Be extra careful right after an event.</strong> The first hours of any disaster are when misinformation is thickest. Wait for, and pass on, official advice only.</p>
+    </div>
+
+    <div class="callout callout-key">
+      <div class="callout-title">Why this matters for Council and community</div>
+      <p>Staff are trusted, so what you share gets believed and passed on further. Sharing a fake or exaggerated image during an emergency can cause real panic, or send people the wrong way at the worst possible time. Sticking to official sources, and helping the people around you do the same, is part of keeping the community safe.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="info-in-ai">
+    <div class="section-eyebrow">// keeping info out of ai</div>
+    <h2>Keeping Council Information Out of AI Tools</h2>
+    <p>AI chatbots are genuinely useful, and more of us are using them. But it is worth understanding where your words go when you type them in. With many free public tools, what you type can be stored, and may be used to help train the next version of the tool. In plain terms: it leaves your control.</p>
+    <p>That is fine for a recipe or a draft birthday speech. It is not fine for information about residents, staff, or Council business.</p>
+    <div class="point-card">
+      <h4>Free, paid, and enterprise accounts are not the same</h4>
+      <p>Free public tools usually offer the least privacy. Paid personal accounts may offer more control. Enterprise or workplace accounts, set up by your organisation, are built so your data stays inside and is not used for training. The safe choice for work is whatever tool your workplace has approved, not a personal free account.</p>
+    </div>
+    <div class="callout callout-warning">
+      <div class="callout-title">A plain rule for what never to paste into an AI tool</div>
+      <p>Do not paste personal or sensitive information (names with details, addresses, dates of birth, health or financial information), anything confidential about Council business, or any password, into a public AI tool. A simple test: if you would not put it on a public noticeboard, do not put it into a chatbot. For work, use only the tools your workplace has approved.</p>
+    </div>
+    <p>If an AI tool would genuinely help with a work task that involves real information, the answer is not to avoid AI; it is to use an approved tool, or to remove the identifying details first. If you are not sure, ask before you paste.</p>
+  </section>
+
+  <section class="content-section container-content" id="your-identity">
+    <div class="section-eyebrow">// protecting your identity</div>
+    <h2>Protecting Your Own Identity</h2>
+    <p>Deepfakes and impersonation need raw material: photos of your face, recordings of your voice, video of you. The more of that is publicly available, the easier you are to copy. You do not have to disappear from the internet; you just reduce what is freely on offer.</p>
+    <ul>
+      <li>Check the privacy settings on your social media so that photos and videos are not public to the whole world.</li>
+      <li>Think before posting long clips of your own voice or your children's voices publicly.</li>
+      <li>Be cautious with "fun" apps and quizzes that ask for photos, your voice, or personal details; that is raw material too.</li>
+      <li>Agree a verification word or question with family, so a cloned voice cannot fool them, or you.</li>
+    </ul>
+    <div class="callout callout-tip">
+      <div class="callout-title">This is about lowering the odds, not living in fear</div>
+      <p>You cannot remove every trace, and you do not need to. Reducing what is public, and having a verification step agreed in advance, takes you from an easy target to a hard one. That is the whole game.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="take-away">
+    <div class="section-eyebrow">// what to take away</div>
+    <h2>What to Take Away</h2>
+    <p>Your up-to-date deception checklist. Click an item to tick it off.</p>
+    <ul class="checklist checklist-interactive">
+      <li>Stop trusting good spelling and grammar as a sign an email is real; AI writes perfectly now.</li>
+      <li>Treat an unexpected, urgent phone call in a familiar voice as possibly fake; hang up and call back on a known number.</li>
+      <li>Agree a verification word or question with my family, and use a second channel to check unusual requests at work.</li>
+      <li>Pause before sharing anything dramatic online, especially right after a disaster.</li>
+      <li>Check weather and emergency news at official sources (BOM, NT Government, ABC Emergency), not random channels.</li>
+      <li>Never paste personal, sensitive, or confidential information, or passwords, into a public AI tool.</li>
+      <li>Use only workplace-approved AI tools for any work that involves real information.</li>
+      <li>Tighten my social media privacy so my face and voice are not public to everyone.</li>
+    </ul>
+  </section>
+
+  <section class="content-section container-content" id="knowledge-check">
+    <div class="section-eyebrow">// knowledge check</div>
+    <h2>Knowledge Check</h2>
+    <div class="check-intro">
+      <p>Five quick scenarios to see what has landed. Read each, decide what you would do, then click to reveal the answer. No score, no wrong answers; it is just a way to check your thinking.</p>
+    </div>
+
+    <details class="check">
+      <summary><span class="q">01</span><span>A dramatic video of a flooded street, said to be your town during the cyclone, is being shared fast in a community group. Do you share it on to warn people?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>No, not until you have checked it.</strong> Disaster footage is very often from another place or another year, or made or exaggerated by AI. Before sharing, check an official source (the Bureau of Meteorology, the NT Government emergency page, or ABC Emergency) and ask whether the image even matches your town. Sharing a fake during an emergency can cause real panic. If you want to help, pass on the official advice instead.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">02</span><span>You get a phone call. It is your daughter's voice, crying, saying she has had an accident and needs money sent right now. What do you do?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Do not send anything. Hang up and call your daughter back on the number you already have for her.</strong> A voice can be cloned from a few seconds of audio online, and the panic is there to stop you thinking. If you cannot reach her, call someone who would know where she is. This is exactly why agreeing a verification word with family in advance is so useful; a cloned voice cannot answer it.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">03</span><span>A scam email arrives in perfect English, with the Council logo and writing that sounds just like your manager. Does the good English and familiar style mean it is safe?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>No. Good writing now proves nothing.</strong> Scammers use the same AI writing tools as everyone else, so flawless English and a convincing style are easy to produce, and logos are easy to copy. Rely on the checks from Session 2 instead: was it expected, is it urgent, does it ask for money, a payment change, a login, or secrecy? Verify through a second channel before acting.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">04</span><span>You want to use a free AI chatbot to help write a letter to a resident. It would be quicker to paste in the resident's name, address, and case notes. Is that okay?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>No. Do not paste a resident's personal information into a free public AI tool.</strong> What you type can be stored and used to train the tool, which means it leaves Council's control and may breach privacy rules. Either use a workplace-approved AI tool that keeps data inside, or write the letter with the identifying details removed and add them yourself afterwards. The simple test: if you would not put it on a public noticeboard, do not paste it into a chatbot.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">05</span><span>A video on social media shows a well-known doctor recommending an investment scheme. The face and voice look completely real. Should you trust it?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Be very sceptical. This is a common deepfake scam.</strong> A real face and voice can be generated by AI, with the words put in their mouth. Look for the tells, odd edges or blurring, lips not quite matching, a flat tone, and remember the biggest one: a genuine expert is not selling you a get-rich scheme through a social media clip. Never act on a video like this; check the claim through a reputable, named source first.</p>
+      </div>
+    </details>
+  </section>
+
+</main>
+
+<!-- SESSION NAV -->
+<div class="container">
+  <nav class="session-nav">
+    <a class="session-nav-item prev" href="session-2-scams-and-phishing.html">
+      <span class="session-nav-label">&larr; Previous session</span>
+      <span class="session-nav-title">Scams, Phishing, and the Message Designed to Trick You</span>
+    </a>
+    <a class="session-nav-item next" href="session-4-when-things-go-wrong.html">
+      <span class="session-nav-label">Next session &rarr;</span>
+      <span class="session-nav-title">When Something Goes Wrong: Reporting, Response, and Shared Responsibility</span>
+    </a>
+  </nav>
+</div>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/cybersecurity/">Cyber Security Awareness</a></li>
+          <li><a href="/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Interactive take-away checklist: click to tick off
+  document.querySelectorAll('.checklist-interactive li').forEach(function (li) {
+    li.addEventListener('click', function () { li.classList.toggle('done'); });
+  });
+</script>
+
+</body>
+</html>

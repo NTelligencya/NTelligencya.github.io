@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Security Awareness &middot; NTell World Ink</title>
+<meta name="description" content="A four-session online series that helps every staff member become a harder target and a faster reporter. Plain language, real Australian examples, and habits you can use the same afternoon. Built for Northern Territory workplaces and communities.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Cyber Security Awareness; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .session-list { display: grid; gap: 14px; margin: 12px 0 24px; }
+  .session-list-item {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .session-list-item:hover { border-color: var(--accent); background: rgba(26,201,201,0.03); }
+  .session-list-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 28px;
+    color: var(--accent); font-weight: 500;
+  }
+  .session-list-body h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .session-list-body .when {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+  }
+  .session-list-body ul { margin: 6px 0 0 0; padding-left: 18px; color: var(--text-2); }
+  .session-list-body ul li { font-size: 14.5px; line-height: 1.6; margin-bottom: 3px; }
+  .session-list-item.pending { opacity: 0.72; }
+  .session-list-item.pending .tag {
+    display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    border: 1px solid var(--rule-2); border-radius: 4px; padding: 2px 7px; margin-left: 8px;
+  }
+
+  .resource-list { display: grid; gap: 12px; margin: 12px 0 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .resource-list-item {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none;
+  }
+  .resource-list-item h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .resource-list-item p { color: var(--text-2); font-size: 14px; line-height: 1.55; margin: 0; }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .session-list-item { grid-template-columns: 1fr; gap: 8px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <span>Cyber Security Awareness</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Cybersecurity &middot; Course 6</div>
+  <h1>Cyber Security Awareness</h1>
+  <p class="subtitle">Most cyber trouble does not start with clever hacking. It starts with an ordinary person, on an ordinary day, clicking the wrong thing. This four-session series helps every staff member become a harder target and a faster reporter, with plain language, real Australian examples, and habits you can use the same afternoon.</p>
+  <div class="page-meta">
+    <span class="page-meta-item"><strong>4 &times; 2-hour sessions</strong> &middot; one per week</span>
+    <span class="page-meta-item"><strong>Optimised for online delivery</strong> &middot; join from anywhere</span>
+    <span class="page-meta-item">Recorded for <strong>catch-up</strong> &amp; low-bandwidth sites</span>
+    <span class="page-meta-item"><strong>Beginner</strong> &middot; no tech background needed</span>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/#library">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to library
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#who-its-for">Who It's For</a></li>
+    <li><a href="#how-it-runs">How It Runs</a></li>
+    <li><a href="#joining-online">Joining Online</a></li>
+    <li><a href="#why-these-four">Why These Four Sessions</a></li>
+    <li><a href="#sessions">The Sessions</a></li>
+    <li><a href="#takeaways">What You'll Take Away</a></li>
+    <li><a href="#resources">Resources</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="overview">
+    <div class="section-eyebrow">// overview</div>
+    <h2>Overview</h2>
+    <p>Most cyber incidents in a workplace do not begin with a clever hacker. They begin with a normal person having a busy day, clicking a link that looked fine. The aim of this series is simple: make every staff member harder to trick, and quicker to speak up when something feels wrong.</p>
+    <p>The series uses plain language, real examples of the kinds of scams Australians are facing right now, and habits people can start using the same afternoon. It pairs with our AI training, but it stands on its own. Where the AI series teaches people to use the tools well, this series teaches them to keep themselves, and their workplace, safe while doing it.</p>
+    <p class="pullquote">The scammer's job is to rush you. Your job is to slow down. Most of this series comes back to that one idea.</p>
+  </section>
+
+  <section class="content-section container-content" id="who-its-for">
+    <div class="section-eyebrow">// who its for</div>
+    <h2>Who It's For</h2>
+    <p>Everyone. Office staff and people working out in the communities. No technical background is needed. The series works just as well for someone who is still finding the buttons in their email as it does for a confident computer user. The scams land on everyone the same way.</p>
+    <p>The language is kept plain and free of jargon. Where a technical word is unavoidable, it is explained in everyday terms the first time it appears.</p>
+  </section>
+
+  <section class="content-section container-content" id="how-it-runs">
+    <div class="section-eyebrow">// how it runs</div>
+    <h2>How It Runs</h2>
+    <p>Four live online sessions, two hours each, usually one per week. The whole series is built for online delivery: it runs on Microsoft Teams and is optimised to work even where the internet is patchy. Every session is recorded, so anyone who misses one, or who is at a low-bandwidth site, can catch up later.</p>
+    <p>Each session stands on its own, so missing one still leaves you with plenty. But the four are built to flow in order, from everyday habits, to spotting scams, to the newer AI threats, and finally to what to do and who to tell when something goes wrong.</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">A short take-home for every session</div>
+      <p>Each session comes with a one-page download: a checklist, the trusted links, and the contacts that matter. Keep them on your phone or pin them near your desk.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="joining-online">
+    <div class="section-eyebrow">// joining online</div>
+    <h2>Joining Online</h2>
+    <p>Every session runs live on Microsoft Teams, and is recorded so you can catch up later or rewatch on a low-bandwidth day. You do not need a fancy setup. A phone, tablet, or computer with the Teams app, or a web browser, is enough. Here is how to join smoothly, even where the internet is patchy.</p>
+
+    <h3>Tips for a patchy or low-bandwidth connection</h3>
+    <ul>
+      <li><strong>Turn your camera off.</strong> Video uses far more data and bandwidth than anything else. If your connection is struggling, switching your camera off is the single biggest fix; you can still hear, talk, and see the slides.</li>
+      <li><strong>Stay on mute unless you are speaking.</strong> It keeps the session clear for everyone and uses a little less bandwidth.</li>
+      <li><strong>Use the phone audio option if your internet drops.</strong> Teams can dial you in by phone for the sound while you follow the slides. Ask the trainer if you need this.</li>
+      <li><strong>Close other apps and downloads.</strong> Streaming, big downloads, or another video call on the same connection will slow Teams down. Close them before you join.</li>
+      <li><strong>Get close to the wi-fi, or use mobile data.</strong> A stronger signal means a steadier call. If the wi-fi is poor, your phone's mobile data or a hotspot may hold up better.</li>
+      <li><strong>Watch the recording later.</strong> If the connection will not cooperate on the day, every session is recorded; you lose nothing by catching up when the internet is better.</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">The one that matters most</div>
+      <p>If the call is breaking up, turn your camera off first. It frees up more bandwidth than anything else and usually steadies the sound straight away.</p>
+    </div>
+
+    <h3>Finding your way around Teams</h3>
+    <p>When you join, a small bar of buttons sits at the top or bottom of the screen. Move your mouse, or tap the screen on a phone, to make it appear. The ones you will use:</p>
+    <ul>
+      <li><strong>Mute and unmute.</strong> The microphone button. A line through it means you are muted and others cannot hear you. Tap it to speak, and tap it again to mute when you are done. Please stay muted unless you are talking.</li>
+      <li><strong>Camera on and off.</strong> The camera button, next to the microphone. A line through it means your camera is off. Turn it off to save bandwidth on a poor connection.</li>
+      <li><strong>Chat.</strong> The speech-bubble button opens the chat panel on the side. You can type a question there at any time, which is handy if your microphone is not working or you would rather not speak up. The trainer keeps an eye on the chat.</li>
+      <li><strong>Raise hand.</strong> The hand button, sometimes tucked under a "React" button, puts a small hand up next to your name so the trainer knows you have a question, without interrupting. Tap it again to lower it.</li>
+      <li><strong>Leave.</strong> The red "Leave" button ends the call for you. If you drop out by accident, just click the meeting link again to rejoin.</li>
+    </ul>
+
+    <div class="callout callout-key">
+      <div class="callout-title">Housekeeping, in one line</div>
+      <p>Join on mute, camera off if your connection is shaky, ask questions in the chat or with the raise-hand button, and do not worry if you drop out; you can rejoin, and it is all recorded.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="why-these-four">
+    <div class="section-eyebrow">// why these four</div>
+    <h2>Why These Four Sessions</h2>
+    <p><strong>Session 1</strong> sets the foundation: where the soft spots are, and the small daily habits that stop most everyday trouble.</p>
+    <p><strong>Session 2</strong> goes deep on the single biggest risk to any workplace: the convincing message built to trick a person.</p>
+    <p><strong>Session 3</strong> covers what has changed lately: AI-made scams, deepfakes, and the risk of leaking information into new tools.</p>
+    <p><strong>Session 4</strong> makes it about the whole organisation: what to do when something goes wrong, how and when to report, and the shared job of keeping everyone safe.</p>
+  </section>
+
+  <section class="content-section container-content" id="sessions">
+    <div class="section-eyebrow">// the sessions</div>
+    <h2>The Sessions</h2>
+
+    <div class="session-list">
+      <a class="session-list-item" href="session-1-digital-footprint.html">
+        <div class="session-list-num">01</div>
+        <div class="session-list-body">
+          <div class="when">Foundations</div>
+          <h4>Your Digital Footprint and the Daily Habits That Protect It</h4>
+          <ul>
+            <li>Where the everyday soft spots are: accounts, passwords, devices</li>
+            <li>Passphrases and password managers, the simple version</li>
+            <li>Two-step login (multi-factor), and why it stops most account theft</li>
+            <li>Staying safe on devices, public wi-fi, and out in the communities</li>
+            <li>What counts as personal and sensitive information</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="session-2-scams-and-phishing.html">
+        <div class="session-list-num">02</div>
+        <div class="session-list-body">
+          <div class="when">The big one</div>
+          <h4>Scams, Phishing, and the Message Designed to Trick You</h4>
+          <ul>
+            <li>Why scams work on careful people: it's hurry, not stupidity</li>
+            <li>The tells that give away a dodgy email, text, or call</li>
+            <li>Scams aimed at workplaces and public money</li>
+            <li>How to check a message is real before you click</li>
+            <li>The calm, no-blame steps if you have already clicked</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="session-3-ai-and-deepfakes.html">
+        <div class="session-list-num">03</div>
+        <div class="session-list-body">
+          <div class="when">What's changed</div>
+          <h4>AI, Deepfakes, and the New Shape of Online Deception</h4>
+          <ul>
+            <li>How AI is making scams more convincing</li>
+            <li>Deepfakes: fake voices, fake video, fake calls, and the tells</li>
+            <li>Checking whether something online is actually true</li>
+            <li>Keeping workplace information out of AI tools</li>
+            <li>Protecting your own face, voice, and name</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="session-4-when-things-go-wrong.html">
+        <div class="session-list-num">04</div>
+        <div class="session-list-body">
+          <div class="when">When it goes wrong</div>
+          <h4>When Something Goes Wrong: Reporting, Response, and Shared Responsibility</h4>
+          <ul>
+            <li>What a security incident actually looks like day to day</li>
+            <li>Reporting inside your workplace: speed beats certainty</li>
+            <li>Reporting outside: ReportCyber, Scamwatch, IDCARE, eSafety</li>
+            <li>Your part in keeping the whole workplace secure</li>
+            <li>Turning the series into lasting habits</li>
+          </ul>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="takeaways">
+    <div class="section-eyebrow">// what youll take away</div>
+    <h2>What You'll Take Away</h2>
+    <p>A clear picture of where the everyday risks sit, and the small habits that head off most of them.</p>
+    <p>A working ability to spot a scam before it costs you or your workplace anything.</p>
+    <p>An up-to-date sense of how AI and deepfakes change the picture, and a plain rule for what never to paste into an AI tool at work.</p>
+    <p>A clear, practised understanding of what to do when something goes wrong, and exactly who to tell.</p>
+    <p>A short list of free, trusted tools and contacts to keep: cyber.gov.au, Have I Been Pwned, a password manager, Scamwatch, ReportCyber, and IDCARE.</p>
+  </section>
+
+  <section class="content-section container-content" id="resources">
+    <div class="section-eyebrow">// resources</div>
+    <h2>Resources</h2>
+    <p>A one-page printable take-home accompanies each session, in Word so you can print it or pin it by your desk. There is also a plain-English reference for any tricky words.</p>
+    <div class="resource-list">
+      <a class="resource-list-item" href="tech-words-in-plain-english.html" style="border-left-color:var(--accent);">
+        <h4>Reference &middot; Tech Words, in Plain English</h4>
+        <p>Every tricky word from the series, explained simply with an everyday example: two-step login, security keys, the cloud, OneDrive, HTTPS, encryption, VPNs, public wi-fi, shared devices, crypto, and QR-code scams.</p>
+      </a>
+      <a class="resource-list-item" href="downloads/session-1-cyber-hygiene-checklist.docx" download>
+        <h4>Session 1 &middot; Cyber hygiene checklist</h4>
+        <p>The personal and workplace habits checklist, plus the free tools to start with the same day. Word document.</p>
+      </a>
+      <a class="resource-list-item" href="downloads/session-2-scam-spotting-card.docx" download>
+        <h4>Session 2 &middot; Scam-spotting card</h4>
+        <p>How to spot a scam, the verify-before-you-click routine, what to do if you have clicked, and who to report to. Word document.</p>
+      </a>
+      <a class="resource-list-item" href="downloads/session-3-spotting-ai-deception-card.docx" download>
+        <h4>Session 3 &middot; Spotting AI deception</h4>
+        <p>The new rules for AI scams and deepfakes, a quick truth check before you share, and the rule for what never to paste into an AI tool. Word document.</p>
+      </a>
+      <a class="resource-list-item" href="downloads/session-4-reporting-and-response-card.docx" download>
+        <h4>Session 4 &middot; Reporting &amp; response</h4>
+        <p>What counts as an incident, how to report it inside Council, the legal clocks that make speed matter, and who to contact for personal incidents. Word document.</p>
+      </a>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/pandanus-reach/">Power Query</a></li>
+          <li><a href="/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

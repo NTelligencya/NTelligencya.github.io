@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Words, in Plain English &middot; Cyber Security Awareness &middot; NTell World Ink</title>
+<meta name="description" content="A plain-English reference for the words that come up in the Cyber Security Awareness series: two-step login, security keys, the cloud, OneDrive, HTTPS, encryption, VPNs, public wi-fi, shared devices, cryptocurrency, and QR-code scams. Each one explained with an everyday example.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Cyber Security Awareness, Glossary; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 28px; padding-bottom: 12px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px;
+    margin: 0 0 6px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section > p { color: var(--text-2); line-height: 1.7; margin: 0 0 8px; }
+
+  /* Glossary term card */
+  .term {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 10px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .term h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 4px; font-weight: 500;
+  }
+  .term .akas {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+  }
+  .term p { color: var(--text-2); line-height: 1.7; margin: 0 0 10px; font-size: 15px; }
+  .term p:last-child { margin: 0; }
+  .term .analogy {
+    background: rgba(26,201,201,0.05); border-radius: 8px;
+    padding: 10px 14px; color: var(--text-2); font-style: italic;
+  }
+  .term .analogy strong { font-style: normal; color: var(--accent-2); font-weight: 600; }
+  .term .do {
+    border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 10px;
+    font-size: 14.5px;
+  }
+  .term .do .tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-right: 8px;
+  }
+  .term strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 23px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/cybersecurity/">Cyber Security Awareness</a>
+    <span class="sep">/</span>
+    <span>Tech Words, in Plain English</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Cyber Security Awareness &middot; Reference</div>
+  <h1>Tech Words, in Plain English</h1>
+  <p class="subtitle">Every tricky word from the series, explained simply, with an everyday example for each. You do not need to learn these by heart. Keep this page handy and look them up whenever one comes past.</p>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/tech-words-in-plain-english.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this guide (Word)
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/cybersecurity/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// jump to</div>
+    <ul>
+    <li><a href="#logins">Logins and accounts</a></li>
+    <li><a href="#files">Your files and the cloud</a></li>
+    <li><a href="#internet">Out on the internet</a></li>
+    <li><a href="#networks">Devices and networks</a></li>
+    <li><a href="#money">Money and scam words</a></li>
+    </ul>
+  </div>
+
+  <div class="callout callout-tip" style="margin-bottom:8px;">
+    <div class="callout-title">You cannot break anything by reading this</div>
+    <p>None of these words are tests, and none of this is as complicated as it sounds. If a word ever throws you in a session, it is explained here in plain language. Ask any time; nobody was born knowing this.</p>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="logins">
+    <div class="section-eyebrow">// logins and accounts</div>
+    <h2>Logins and Accounts</h2>
+
+    <div class="term">
+      <h3>Two-step login</h3>
+      <div class="akas">also called: multi-factor authentication &middot; MFA &middot; 2FA &middot; two-factor</div>
+      <p>A second check, on top of your password, that proves the person logging in is really you. Usually a code sent to your phone, a tap in an app, or your fingerprint or face.</p>
+      <p>Security people describe it as proving who you are with two of these three things: <strong>something you know</strong> (your password), <strong>something you have</strong> (your phone or a security key), and <strong>something you are</strong> (your fingerprint or face). A password on its own is just one. Adding a second one is what makes it strong.</p>
+      <p class="analogy"><strong>Like a bank card:</strong> a thief needs both the card (something you have) and the PIN (something you know). Knowing just one of them gets them nowhere. Two-step login does the same for your accounts.</p>
+      <p class="do"><span class="tag">why it works</span> Even if a crook steals or guesses your password, they still cannot get in, because they do not have your phone in their hand. It stops the large majority of account break-ins on its own.</p>
+    </div>
+
+    <div class="term">
+      <h3>Security key (YubiKey)</h3>
+      <div class="akas">also called: hardware key &middot; physical key</div>
+      <p>A small physical key, often like a little USB stick, that you plug into a computer or tap on your phone to prove it is you. It is the "something you have" in two-step login, in a form a scammer on the other side of the world simply cannot copy.</p>
+      <p class="analogy"><strong>Like a key to a locked door:</strong> even someone who knows your password cannot get in without the actual key in their hand.</p>
+      <p class="do"><span class="tag">good to know</span> Security keys are useful in remote communities and where phone signal is poor, because many of them work without internet or a texted code. If your workplace offers one, it is one of the strongest protections there is.</p>
+    </div>
+
+    <div class="term">
+      <h3>Passkey</h3>
+      <p>A newer, password-free way to log in. Instead of typing a password, your phone or laptop unlocks the account with your fingerprint or face. There is nothing to remember, and nothing for a scammer to trick out of you.</p>
+      <p class="do"><span class="tag">good to know</span> When an account offers a passkey, it is usually safer and easier than a password. You will see more of these over time.</p>
+    </div>
+
+    <div class="term">
+      <h3>Password manager</h3>
+      <p>A free app that acts like a locked notebook for your passwords. It makes a strong, different password for every site, stores them all, and fills them in for you. You only remember one strong passphrase to open it.</p>
+      <p class="analogy"><strong>Like a key safe:</strong> all your keys in one locked box, and you only carry the one key that opens the box.</p>
+      <p class="do"><span class="tag">do this</span> Bitwarden is free and works on phone and computer. Your web browser also has one built in.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="files">
+    <div class="section-eyebrow">// your files and the cloud</div>
+    <h2>Your Files and the Cloud</h2>
+
+    <div class="term">
+      <h3>The cloud</h3>
+      <p>"The cloud" just means your files and information are kept safe on big computers in a data centre somewhere, instead of only on the device in front of you. Because they live there, you can reach them by logging in from any device.</p>
+      <p class="analogy"><strong>Like a locker you can open from any town:</strong> your stuff is kept somewhere safe, and you can get to it wherever you are, as long as you have the key (your login).</p>
+      <p class="do"><span class="tag">good to know</span> There is a personal cloud (like iCloud or Google) and a work cloud. Keep work things in the work cloud and personal things in your personal one; do not mix them.</p>
+    </div>
+
+    <div class="term">
+      <h3>OneDrive and SharePoint</h3>
+      <p>These are the Microsoft "work cloud". Your work files live here. Because they are in the cloud, they are backed up automatically and can be shared with the right people, and you can reach them from any work device you log in to.</p>
+      <p class="do"><span class="tag">do this</span> Save work files to OneDrive or SharePoint, not onto a personal phone or laptop or a USB stick. That keeps them safe, backed up, and inside the workplace's control.</p>
+    </div>
+
+    <div class="term">
+      <h3>Backup</h3>
+      <p>A spare copy of your files kept somewhere separate, so that if a device is lost, broken, or locked up by ransomware, you have not lost everything.</p>
+      <p class="analogy"><strong>Like a photocopy of important papers kept at a relative's house:</strong> if the originals are lost, you still have a copy.</p>
+      <p class="do"><span class="tag">good to know</span> Saving work files to OneDrive or SharePoint backs them up for you. For personal photos, a cloud account or a separate hard drive does the job.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="internet">
+    <div class="section-eyebrow">// out on the internet</div>
+    <h2>Out on the Internet</h2>
+
+    <div class="term">
+      <h3>HTTPS and the padlock</h3>
+      <div class="akas">the little padlock in the address bar</div>
+      <p>When a web address starts with <strong>https</strong> (with an "s") and shows a small padlock, it means your connection to that website is private: scrambled so nobody in between can read what you send, like your password or card number.</p>
+      <p class="analogy"><strong>Like a sealed envelope instead of a postcard:</strong> a postcard (http, no "s") can be read by anyone who handles it; a sealed envelope (https) cannot.</p>
+      <p class="do"><span class="tag">important</span> The padlock does <strong>not</strong> mean the website is honest. Scam sites can have a padlock too. It only means the connection is private, not that the people running the site can be trusted. So: no padlock means do not enter anything; a padlock means "private, but still check who you are dealing with".</p>
+    </div>
+
+    <div class="term">
+      <h3>Encryption</h3>
+      <p>Scrambling information so that only the right person can unscramble and read it. It is what the "s" in https is doing, and it is what protects the messages in apps like WhatsApp.</p>
+      <p class="analogy"><strong>Like a secret code:</strong> you and the person you are talking to share the way to read it, and to anyone in between it just looks like nonsense.</p>
+    </div>
+
+    <div class="term">
+      <h3>VPN</h3>
+      <div class="akas">virtual private network</div>
+      <p>A tool that makes a private, protected path for your internet connection, even over a network you do not trust. Workplaces often give staff a VPN so that people working from home or out in communities can reach work systems safely.</p>
+      <p class="analogy"><strong>Like a private tunnel through a public space:</strong> you are walking through the same place as everyone else, but inside your own tunnel where no one can see in.</p>
+      <p class="do"><span class="tag">do this</span> If your workplace gives you a VPN for working remotely, use it, especially on wi-fi you do not control. If you are not sure, ask IT.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="networks">
+    <div class="section-eyebrow">// devices and networks</div>
+    <h2>Devices and Networks</h2>
+
+    <div class="term">
+      <h3>Public wi-fi</h3>
+      <p>The free wi-fi at an airport, shop, club, or shared venue. It is handy, but you cannot be sure who else is connected to it or who set it up.</p>
+      <p class="analogy"><strong>Like talking in a crowded room:</strong> fine for a chat about the weather, not for reading out your bank details.</p>
+      <p class="do"><span class="tag">do this</span> Avoid banking and important logins on public wi-fi. Use your own phone's mobile data, or your phone as a hotspot, for anything sensitive. A workplace VPN makes it safer again.</p>
+    </div>
+
+    <div class="term">
+      <h3>Shared and community devices</h3>
+      <p>A computer or tablet that more than one person uses, like a shared machine in a community office. The risk is leaving yourself logged in, so the next person is using your account.</p>
+      <p class="analogy"><strong>Like a shared front door:</strong> never walk away leaving your key in the lock.</p>
+      <p class="do"><span class="tag">do this</span> Always <strong>log out</strong> when you finish. Never let the browser "remember" or "save" your password on a shared device, always say no to that pop-up. And do not tick "keep me signed in".</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="money">
+    <div class="section-eyebrow">// money and scam words</div>
+    <h2>Money and Scam Words</h2>
+
+    <div class="term">
+      <h3>Cryptocurrency</h3>
+      <div class="akas">also called: crypto &middot; Bitcoin is one kind</div>
+      <p>A kind of digital money that is not held or controlled by any bank. People buy and send it over the internet.</p>
+      <p><strong>Why scammers love it:</strong> once you send crypto, the payment usually <strong>cannot be reversed</strong>, there is no bank to ring and claw it back, and it is hard to trace where it went. That is exactly why so many scams ask to be paid in crypto.</p>
+      <p class="do"><span class="tag">red flag</span> If anyone you have not met in person pressures you to buy or send cryptocurrency, especially an "investment" or someone you have only chatted to online, treat it as a scam. The same goes for being asked to pay in gift cards.</p>
+    </div>
+
+    <div class="term">
+      <h3>QR-code scams</h3>
+      <div class="akas">sometimes called: quishing</div>
+      <p>A QR code is the little square barcode you scan with your phone camera. It usually just opens a website. But a QR code can send your phone to a <strong>fake</strong> website just as easily as a dodgy link can, and you cannot tell where it goes by looking at it.</p>
+      <p>Scammers stick fake QR codes over real ones on posters and parking meters, or put them in emails, to send you to a page that steals your details or takes a payment.</p>
+      <p class="do"><span class="tag">do this</span> Be wary of scanning QR codes from posters, flyers, or emails you were not expecting. After you scan, check the web address that comes up before you type anything or pay. When in doubt, go to the real website yourself instead.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content">
+    <p style="color:var(--text-3);font-size:14px;">Part of the <a href="/cybersecurity/" style="color:var(--accent-2);">Cyber Security Awareness</a> series. Every term here is used in plain language across the four sessions.</p>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/cybersecurity/">Cyber Security Awareness</a></li>
+          <li><a href="/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

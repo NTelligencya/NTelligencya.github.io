@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulas and Functions &middot; Excel Fundamentals &middot; NTell World Ink</title>
+<meta name="description" content="Session 2 of Excel Fundamentals for Employment: writing formulas with + - * /, the order of operations (BODMAS), relative and absolute cell references, and the five everyday functions SUM, AVERAGE, COUNT, MAX and MIN, with AutoSum. Plain language, hands-on.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Excel Fundamentals, Session 2; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+  .activity-box ol, .activity-box ul { color: var(--text-2); line-height: 1.7; padding-left: 22px; margin: 0 0 10px; }
+  .activity-box li { margin-bottom: 5px; }
+
+  .point-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .point-card h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .point-card p { color: var(--text-2); font-size: 15px; line-height: 1.65; margin: 0 0 8px; }
+  .point-card p:last-child { margin: 0; }
+
+  /* ===== Excel-style worksheet grid ===== */
+  .xl-wrap { margin: 18px 0; overflow-x: auto; }
+  .xl-grid {
+    border-collapse: collapse; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: var(--text); background: var(--bg-2);
+  }
+  .xl-grid caption {
+    caption-side: top; text-align: left; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 0 0 8px;
+  }
+  .xl-grid th, .xl-grid td {
+    border: 1px solid var(--rule-2); padding: 6px 14px; text-align: left; white-space: nowrap;
+  }
+  .xl-grid thead th, .xl-grid tbody th {
+    background: #17171b; color: var(--text-3); font-weight: 500; text-align: center;
+  }
+  .xl-grid tbody th { width: 30px; }
+  .xl-grid .corner { background: #0f0f12; }
+  .xl-grid td.num { text-align: right; }
+  .xl-grid td.formula { color: var(--accent-2); }
+  .xl-grid td.head { color: var(--text); font-weight: 500; }
+
+  /* ===== Copyable formula block ===== */
+  .xl-formula {
+    display: flex; align-items: stretch; margin: 16px 0;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 8px; overflow: hidden;
+  }
+  .xl-formula code {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text);
+    padding: 12px 16px; flex: 1; overflow-x: auto; white-space: pre;
+  }
+  .xl-formula button {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-3); background: transparent;
+    border: none; border-left: 1px solid var(--rule-2); padding: 0 16px; cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .xl-formula button:hover { color: var(--accent-2); background: rgba(26,201,201,0.05); }
+  .xl-formula button.copied { color: var(--accent); }
+
+  .check-intro {
+    background: rgba(26,201,201,0.04); border: 1px solid var(--rule-2);
+    border-radius: 12px; padding: 18px 24px; margin: 18px 0 22px;
+  }
+  .check-intro p { margin: 0; color: var(--text-2); line-height: 1.65; }
+  details.check {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; margin: 12px 0; overflow: hidden;
+  }
+  details.check > summary {
+    cursor: pointer; list-style: none; padding: 18px 22px;
+    color: var(--text); font-weight: 600; font-size: 15.5px; line-height: 1.55;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  details.check > summary::-webkit-details-marker { display: none; }
+  details.check > summary .q {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    flex: 0 0 auto; padding-top: 2px;
+  }
+  details.check > summary .reveal {
+    margin-left: auto; flex: 0 0 auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    border: 1px solid var(--rule-2); border-radius: 4px; padding: 3px 8px; white-space: nowrap;
+  }
+  details.check[open] > summary .reveal { color: var(--accent-2); border-color: var(--accent); }
+  details.check[open] > summary .reveal::after { content: " shown"; }
+  details.check .answer {
+    padding: 0 22px 20px 22px; color: var(--text-2); line-height: 1.7; font-size: 15px;
+    border-top: 1px solid var(--rule); margin-top: 2px; padding-top: 16px;
+  }
+  details.check .answer strong { color: var(--text); }
+  details.check .answer code { font-family: 'JetBrains Mono', monospace; color: var(--accent-2); }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+  .content-section p code, .content-section li code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.92em;
+    color: var(--accent-2); background: rgba(26,201,201,0.06);
+    padding: 1px 6px; border-radius: 4px;
+  }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+    details.check > summary { flex-wrap: wrap; }
+    details.check > summary .reveal { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/excel/">Excel Fundamentals</a>
+    <span class="sep">/</span>
+    <span>Session 2</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Microsoft Excel &middot; Course 2 &middot; Session 2</div>
+  <h1>Formulas and Functions</h1>
+  <p class="subtitle">This is the heart of a spreadsheet: instead of typing answers, you type the sum and Excel works it out, and keeps it up to date. We start with the equals sign and the four operators, learn the order Excel does the maths in, see how to copy a formula safely, and meet the five everyday functions that answer most questions a column of numbers will ever ask.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">Session &middot; <strong>02 of 04</strong></span>
+    <span class="page-meta-item">Duration &middot; <strong>~3 hours</strong></span>
+    <span class="page-meta-item">Level &middot; <strong>Foundation</strong></span>
+  </div>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/session-2-handout.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this session (Word)
+    </a>
+    <a class="btn btn-download" href="downloads/session-2-starter.xlsx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Practice workbook (starter)
+    </a>
+    <a class="btn btn-download" href="downloads/session-2-solution.xlsx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Solution workbook
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/excel/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+      <li><a href="#start-here">Start Here</a></li>
+      <li><a href="#first-formula">Your First Formula</a></li>
+      <li><a href="#order">The Order of Operations</a></li>
+      <li><a href="#copying">Copying Formulas: the $ Lock</a></li>
+      <li><a href="#functions">The Five Everyday Functions</a></li>
+      <li><a href="#autosum">AutoSum and the Status Bar</a></li>
+      <li><a href="#worked">Worked Example: a Stock List</a></li>
+      <li><a href="#try-it">Try It at the Keyboard</a></li>
+      <li><a href="#check">Knowledge Check</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="start-here">
+    <div class="section-eyebrow">// start here</div>
+    <h2>Start Here</h2>
+    <p>A formula is an instruction that tells Excel to calculate something. Instead of typing the answer into a cell, you type the sum, and Excel works it out and keeps it up to date. This is what makes a spreadsheet a living document rather than a static page of numbers: change a number and every total that depends on it updates by itself.</p>
+    <p>Every formula begins with an equals sign, <code>=</code>. That <code>=</code> is how Excel knows you want a calculation rather than plain text. A formula can mix three ingredients: numbers you type directly, cell references that point at other cells, and operators that say what to do.</p>
+    <p class="pullquote">The real power is in cell references. <code>=A1+B1</code> does not add "10 and 5". It adds whatever happens to be in A1 and B1 right now. Change A1, and the answer updates itself.</p>
+  </section>
+
+  <section class="content-section container-content" id="first-formula">
+    <div class="section-eyebrow">// your first formula</div>
+    <h2>Your First Formula</h2>
+    <p>Here is the whole move, start to finish:</p>
+    <ol>
+      <li>Click the cell where you want the answer to appear.</li>
+      <li>Type <code>=</code> to start the formula.</li>
+      <li>Build the calculation using numbers, cell references and operators, for example <code>=B2+B3+B4</code>. You can click a cell instead of typing its reference; Excel inserts it for you.</li>
+      <li>Press Enter. The cell shows the result; click back on it and the Formula Bar shows the formula behind it.</li>
+    </ol>
+
+    <h3>The operators</h3>
+    <p>An operator is the symbol that says what to do. There are four you will use constantly, plus two worth recognising:</p>
+    <div class="xl-wrap">
+      <table class="xl-grid">
+        <caption>// the operators you type into a formula</caption>
+        <thead>
+          <tr><th class="corner"></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>1</th><td class="head">Operator</td><td class="head">Does</td><td class="head">Example</td><td class="head">Result</td></tr>
+          <tr><td></td></tr>
+          <tr><th>2</th><td>+</td><td>Add</td><td>=5+3</td><td class="num">8</td></tr>
+          <tr><th>3</th><td>-</td><td>Subtract</td><td>=10-4</td><td class="num">6</td></tr>
+          <tr><th>4</th><td>*</td><td>Multiply</td><td>=6*7</td><td class="num">42</td></tr>
+          <tr><th>5</th><td>/</td><td>Divide</td><td>=20/4</td><td class="num">5</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Note that multiply is a star (<code>*</code>), not an x, and divide is a slash (<code>/</code>). Here is a formula that adds three cells together; copy it and try it in your own sheet:</p>
+    <div class="xl-formula"><code>=B2+B3+B4</code><button type="button">copy</button></div>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">If a cell shows the formula instead of the answer</div>
+      <p>If a cell literally displays <code>=A1+A2</code> as text rather than working it out, the cell is probably formatted as Text. Set it back to General (Home tab, Number group), then re-enter the formula. More on number formats in Session 3.</p>
+    </div>
+
+    <h3>See every formula at once: Ctrl + `</h3>
+    <p>Normally a cell shows its <em>answer</em>, and you have to click each one to see the formula behind it in the Formula Bar. Sometimes you want to see <strong>all</strong> the formulas on a sheet at once, to check your work or understand a sheet someone else built. There is a shortcut for exactly that.</p>
+    <p>Press <strong>Ctrl + `</strong> (the backtick or "tilde" key, top-left of the keyboard, just under Esc) to switch <strong>Show Formulas</strong> on. Every cell flips from showing its result to showing the formula inside it. Press <strong>Ctrl + `</strong> again to switch it back. It is a toggle, so the same keys turn it on and off. (You can also find it on the Formulas tab as the "Show Formulas" button.)</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">A quick way to check a whole sheet</div>
+      <p>Ctrl + ` is the fastest way to scan a sheet for mistakes: with every formula on show, you can read straight down a column and spot the one cell where a number was typed by hand instead of a formula, or where a reference drifted. Toggle it off again when you are done.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="order">
+    <div class="section-eyebrow">// the order of operations</div>
+    <h2>The Order of Operations (BODMAS)</h2>
+    <p>Excel does not simply work left to right. It follows the standard maths order you may know as <strong>BODMAS</strong> (or PEMDAS), the same rule taught in school:</p>
+    <ul>
+      <li><strong>B</strong>rackets first</li>
+      <li><strong>O</strong>rders (powers, like squared)</li>
+      <li><strong>D</strong>ivision and <strong>M</strong>ultiplication, left to right</li>
+      <li><strong>A</strong>ddition and <strong>S</strong>ubtraction, left to right</li>
+    </ul>
+    <p>So in <code>=A1+A2*A3</code>, Excel multiplies A2 by A3 first, then adds A1. If you want the addition to happen first, wrap it in brackets. These two formulas give different answers:</p>
+    <div class="xl-formula"><code>=A1+A2*A3</code><button type="button">copy</button></div>
+    <div class="xl-formula"><code>=(A1+A2)*A3</code><button type="button">copy</button></div>
+    <p>If A1 is 10, A2 is 4 and A3 is 2: the first gives <strong>18</strong> (it does 4&times;2 first, then adds 10), and the second gives <strong>28</strong> (it adds 10+4 first, then times 2).</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">When in doubt, add brackets</div>
+      <p>Brackets cost nothing and make your intention obvious to anyone reading the sheet later, including future you. If you are unsure how Excel will read a formula, wrap the part you want done first in brackets.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="copying">
+    <div class="section-eyebrow">// copying formulas</div>
+    <h2>Copying Formulas: the Dollar-Sign Lock</h2>
+    <p>Here is a puzzle that trips up almost everyone at first. You write a perfect formula, copy it down a column, and some answers come out wrong. Nothing is broken; Excel is doing exactly what you told it. You just need to know the difference between two kinds of reference.</p>
+    <ul>
+      <li>A <strong>relative reference</strong> like <code>B2</code> is a direction, not a fixed address. Copy a formula down a row and <code>B2</code> becomes <code>B3</code>, then <code>B4</code>. This is usually exactly what you want, so each row uses its own number.</li>
+      <li>An <strong>absolute reference</strong> like <code>$E$1</code> is a fixed address. The dollar signs pin it in place so it never moves, no matter where you copy the formula. Use this for a value every row must share, like a single rate or total.</li>
+    </ul>
+    <p>The <code>$</code> is the whole trick: a dollar sign before the column letter locks the column, and a dollar sign before the row number locks the row. You do not have to type the dollar signs by hand: while editing a reference, press <strong>F4</strong> to cycle through <code>A1 &rarr; $A$1 &rarr; A$1 &rarr; $A1</code>.</p>
+
+    <h3>Worked example: GST on a list of prices</h3>
+    <p>Suppose the GST rate (10%) lives in cell <code>E1</code>, and your prices run down column B. In C2 you want the GST amount. Lock the rate so it does not drift when you copy down:</p>
+    <div class="xl-formula"><code>=B2*$E$1</code><button type="button">copy</button></div>
+    <p><code>B2</code> is relative, so copying down gives B3, B4, B5, each row using its own price. <code>$E$1</code> is absolute, so it always points at the single GST rate. Copy C2 down and every row is correct; change the rate in E1 once, and the whole column recalculates.</p>
+    <div class="callout callout-warning">
+      <div class="callout-title">The most common reason a copied column "goes wrong"</div>
+      <p>A forgotten dollar sign. If a copied formula returns 0, blanks, or wildly wrong numbers, check whether a reference that should have been locked has drifted. The fix is almost always a missing <code>$</code>. Lock the shared value <em>before</em> you copy.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="functions">
+    <div class="section-eyebrow">// the five everyday functions</div>
+    <h2>The Five Everyday Functions</h2>
+    <p>A function is a ready-made formula that Excel has already written for you. Rather than typing <code>=B2+B3+B4+B5+B6+B7</code>, you hand a function a range of cells and let it do the work: <code>=SUM(B2:B7)</code>. Every function follows the same simple shape: <code>=FUNCTION(arguments)</code>, where the arguments go inside the brackets, usually a range like <code>B2:B7</code>. The colon means "through", so <code>B2:B7</code> is "B2 through B7".</p>
+    <p>These five cover the bulk of everyday work. Learn them and you can already answer most questions a spreadsheet of numbers will ever ask:</p>
+    <div class="xl-wrap">
+      <table class="xl-grid">
+        <caption>// the five functions that do most everyday work</caption>
+        <thead>
+          <tr><th class="corner"></th><th>A</th><th>B</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>1</th><td class="head">Function</td><td class="head">What it does</td></tr>
+          <tr><th>2</th><td class="formula">=SUM(B2:B7)</td><td>Adds all the numbers in a range</td></tr>
+          <tr><th>3</th><td class="formula">=AVERAGE(B2:B7)</td><td>Works out the mean (the average)</td></tr>
+          <tr><th>4</th><td class="formula">=COUNT(B2:B7)</td><td>Counts how many cells hold numbers</td></tr>
+          <tr><th>5</th><td class="formula">=MAX(B2:B7)</td><td>Finds the largest value</td></tr>
+          <tr><th>6</th><td class="formula">=MIN(B2:B7)</td><td>Finds the smallest value</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>To write one: click the result cell, type <code>=</code>, the function name and an opening bracket (for example <code>=SUM(</code>), select the range by dragging across the cells, type the closing bracket <code>)</code> and press Enter.</p>
+
+    <h3>COUNT and COUNTA, a useful pair</h3>
+    <p><strong>COUNT</strong> counts only cells that contain numbers; text and blanks are ignored. <strong>COUNTA</strong> counts every non-empty cell, including text. So to count how many people are in a contact list (names are text), use COUNTA. To count how many amounts were entered in a budget column, use COUNT.</p>
+    <div class="xl-formula"><code>=COUNTA(A2:A50)</code><button type="button">copy</button></div>
+    <div class="callout callout-tip">
+      <div class="callout-title">Stuck on which formula to use? Ask Copilot</div>
+      <p>If you know what you want but not the formula for it, Microsoft Copilot (on newer, online versions of Excel) can suggest one from a plain-English description, and explain or fix a formula too. You do not need to know the function's name. See <a href="using-copilot-in-excel.html">Using Copilot in Excel</a> for how to ask well, with example prompts. Always check the result it gives you.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="autosum">
+    <div class="section-eyebrow">// autosum and the status bar</div>
+    <h2>AutoSum and the Status Bar</h2>
+    <h3>AutoSum: the one-key total</h3>
+    <p>For SUM especially, you rarely need to type anything. Click the empty cell below a column of numbers and press <strong>Alt + =</strong> (or click AutoSum on the Home tab, far right). Excel guesses the range, shows it to you, and you press Enter to accept. The AutoSum dropdown also offers Average, Count, Max and Min.</p>
+    <h3>The status bar: the fastest calculator in Excel</h3>
+    <p>You do not even need a formula for a quick check. Select a range of numbers and glance at the <strong>status bar</strong> along the very bottom of the window: Excel instantly shows their Sum, Average and Count, with nothing typed at all. It is the quickest way to sanity-check a column.</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">A handy fact about functions and formatting</div>
+      <p>Functions use a cell's underlying value, not how it looks. So SUM happily adds cells that are formatted as currency, dollar signs and all. Formatting changes the costume, not the number; we look at that properly in Session 3.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="worked">
+    <div class="section-eyebrow">// worked example</div>
+    <h2>Worked Example: a Stock List</h2>
+    <p>Here is Dave's T-Shirt Shoppe, a small retail stock list. We want the profit on each line, which is <strong>(price minus cost) times the number of units</strong>, and then a grand total. The profit column uses a formula, and the total uses SUM.</p>
+    <div class="xl-wrap">
+      <table class="xl-grid">
+        <caption>// Dave's T-Shirt Shoppe: profit = (RRP - Wholesale) x Units</caption>
+        <thead>
+          <tr><th class="corner"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>1</th><td class="head">Product</td><td class="head">Wholesale</td><td class="head">RRP</td><td class="head">Units</td><td class="head">Profit</td></tr>
+          <tr><th>2</th><td>Widgets</td><td class="num">$5.00</td><td class="num">$10.00</td><td class="num">10</td><td class="formula">=(C2-B2)*D2</td></tr>
+          <tr><th>3</th><td>T-shirts</td><td class="num">$3.89</td><td class="num">$25.00</td><td class="num">10</td><td class="formula">=(C3-B3)*D3</td></tr>
+          <tr><th>4</th><td>Jumpers</td><td class="num">$9.80</td><td class="num">$35.00</td><td class="num">10</td><td class="formula">=(C4-B4)*D4</td></tr>
+          <tr><th>5</th><td>Hoodies</td><td class="num">$13.40</td><td class="num">$40.00</td><td class="num">10</td><td class="formula">=(C5-B5)*D5</td></tr>
+          <tr><th>6</th><td class="head">Total</td><td></td><td></td><td></td><td class="formula">=SUM(E2:E5)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The profit formula for the first line, with brackets so the subtraction happens before the multiply:</p>
+    <div class="xl-formula"><code>=(C2-B2)*D2</code><button type="button">copy</button></div>
+    <p>You only type it once in E2, then double-click the fill handle to copy it down the whole column (remember that trick from Session 1). Each row's references shift to its own line. Then the grand total in E6:</p>
+    <div class="xl-formula"><code>=SUM(E2:E5)</code><button type="button">copy</button></div>
+    <p>And to find the most and least profitable lines, and the typical profit:</p>
+    <div class="xl-formula"><code>=MAX(E2:E5)</code><button type="button">copy</button></div>
+    <div class="xl-formula"><code>=AVERAGE(E2:E5)</code><button type="button">copy</button></div>
+  </section>
+
+  <section class="content-section container-content" id="try-it">
+    <div class="section-eyebrow">// try it at the keyboard</div>
+    <h2>Try It at the Keyboard</h2>
+    <p>Open the starter workbook for this session, which has the stock list and a small weekly budget ready to go.</p>
+    <div class="activity-box">
+      <span class="label">Practice</span>
+      <h4>Total a weekly budget, then find the extremes</h4>
+      <ol>
+        <li>In the budget sheet, click the empty cell at the bottom of the amounts column and press <strong>Alt + =</strong> to drop in a SUM. Press Enter and read the total.</li>
+        <li>In a spare cell, type <code>=AVERAGE(</code> then drag across the same amounts, close the bracket and press Enter. That is your typical weekly amount.</li>
+        <li>Do the same with <code>=MAX(...)</code> and <code>=MIN(...)</code> to find your biggest and smallest weeks.</li>
+        <li>On the stock sheet, type the profit formula <code>=(C2-B2)*D2</code> in E2, then double-click the fill handle to copy it down. Watch each row calculate its own profit.</li>
+        <li>Change a price and watch the profit and the grand total update on their own. That is the spreadsheet earning its keep.</li>
+      </ol>
+      <p>When you are happy, compare your sheet with the solution workbook for this session to check your formulas match.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="check">
+    <div class="section-eyebrow">// knowledge check</div>
+    <h2>Knowledge Check</h2>
+    <div class="check-intro">
+      <p>A few quick questions to see what has landed. Have a think first, then click "reveal". No mark, no rush.</p>
+    </div>
+
+    <details class="check">
+      <summary><span class="q">Q1</span><span>What single character must every formula start with, and why does it matter?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>The equals sign, <strong><code>=</code></strong>. It is how Excel knows you want a calculation rather than plain text. Without it, Excel just stores what you typed as words.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q2</span><span>What does <code>=(A1+A2)*A3</code> work out first, and how is that different from <code>=A1+A2*A3</code>?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>Because of <strong>brackets first</strong> (the B in BODMAS), <code>=(A1+A2)*A3</code> adds A1 and A2 together first, then multiplies by A3. Without the brackets, <code>=A1+A2*A3</code> multiplies A2 by A3 first, then adds A1, so the two give different answers.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q3</span><span>You copy <code>=B2*E1</code> down a column to work out GST, but the lower rows go wrong. What is the likely cause and fix?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>The rate reference <code>E1</code> drifted to E2, E3 and so on as you copied down, so the lower rows multiplied by empty cells. Lock it as an <strong>absolute reference</strong>: <code>=B2*$E$1</code>. The <code>$</code> signs pin E1 in place. Press F4 while editing the reference to add them quickly.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q4</span><span>You want to count how many people are in a contact list, where the names are text. SUM, COUNT or COUNTA?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p><strong>COUNTA</strong>. COUNT only counts cells that hold numbers, so it would ignore the names. COUNTA counts every non-empty cell, including text, which is what you want for a list of names.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q5</span><span>What is the quickest way to total a column of numbers without typing a formula by hand?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>Click the empty cell just below the column and press <strong>Alt + =</strong> (AutoSum). Excel guesses the range and writes the SUM for you; press Enter to accept. For an even quicker check with no formula at all, just select the numbers and read the total on the <strong>status bar</strong> at the bottom.</p></div>
+    </details>
+  </section>
+
+</main>
+
+<!-- SESSION NAV -->
+<div class="container">
+  <nav class="session-nav">
+    <a class="session-nav-item prev" href="session-1-finding-your-way-around.html">
+      <span class="session-nav-label">&larr; Previous session</span>
+      <span class="session-nav-title">Finding Your Way Around Excel</span>
+    </a>
+    <a class="session-nav-item next" href="session-3-formatting-and-charts.html">
+      <span class="session-nav-label">Next session &rarr;</span>
+      <span class="session-nav-title">Making It Clear: Formatting and Charts</span>
+    </a>
+  </nav>
+</div>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this course</h4>
+        <ul>
+          <li><a href="/excel/">Excel overview</a></li>
+          <li><a href="excel-words-in-plain-english.html">Excel words in plain English</a></li>
+          <li><a href="downloads/session-2-handout.docx" download>Session 2 handout</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.xl-formula button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var code = btn.parentElement.querySelector('code').innerText;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(function () {
+          var old = btn.textContent;
+          btn.textContent = 'copied'; btn.classList.add('copied');
+          setTimeout(function () { btn.textContent = old; btn.classList.remove('copied'); }, 1200);
+        });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

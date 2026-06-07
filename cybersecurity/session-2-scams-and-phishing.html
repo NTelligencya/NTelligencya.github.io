@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scams, Phishing, and the Message Designed to Trick You &middot; Cyber Security Awareness &middot; NTell World Ink</title>
+<meta name="description" content="Why scams work on careful people, the tells that give away a dodgy email, text, or call, the scams aimed at workplaces and public money, how to check a message is real before you click, and the calm steps to take if you already have.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Cyber Security Awareness, Session 2; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+
+  .point-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .point-card h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .point-card p { color: var(--text-2); font-size: 15px; line-height: 1.65; margin: 0 0 8px; }
+  .point-card p:last-child { margin: 0; }
+
+  .do-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 12px;
+    padding: 20px 24px; margin: 22px 0;
+  }
+  .do-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 21px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .do-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .do-box p:last-child { margin: 0; }
+
+  /* A quoted example of a scam message */
+  .msg-sample {
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px; line-height: 1.6;
+    color: var(--text-2); background: #0d0d10; border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 8px;
+    padding: 16px 18px; margin: 14px 0; white-space: pre-wrap;
+  }
+  .msg-sample .from { color: var(--text-3); display: block; margin-bottom: 8px; font-size: 12px; }
+  .msg-sample .flag { color: var(--warm); }
+
+  /* Knowledge check: question with a reveal-able answer */
+  .check-intro {
+    background: rgba(26,201,201,0.04); border: 1px solid var(--rule-2);
+    border-radius: 12px; padding: 18px 24px; margin: 18px 0 22px;
+  }
+  .check-intro p { margin: 0; color: var(--text-2); line-height: 1.65; }
+  details.check {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; margin: 12px 0; overflow: hidden;
+  }
+  details.check > summary {
+    cursor: pointer; list-style: none; padding: 18px 22px;
+    color: var(--text); font-weight: 600; font-size: 15.5px; line-height: 1.55;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  details.check > summary::-webkit-details-marker { display: none; }
+  details.check > summary .q {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    flex: 0 0 auto; padding-top: 2px;
+  }
+  details.check > summary .reveal {
+    margin-left: auto; flex: 0 0 auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    border: 1px solid var(--rule-2); border-radius: 4px; padding: 3px 8px; white-space: nowrap;
+  }
+  details.check[open] > summary .reveal { color: var(--accent-2); border-color: var(--accent); }
+  details.check[open] > summary .reveal::after { content: " shown"; }
+  details.check .answer {
+    padding: 0 22px 20px 22px; color: var(--text-2); line-height: 1.7; font-size: 15px;
+    border-top: 1px solid var(--rule); margin-top: 2px; padding-top: 16px;
+  }
+  details.check .answer strong { color: var(--text); }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+    details.check > summary { flex-wrap: wrap; }
+    details.check > summary .reveal { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/cybersecurity/">Cyber Security Awareness</a>
+    <span class="sep">/</span>
+    <span>Session 2</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Cybersecurity &middot; Course 6 &middot; Session 2</div>
+  <h1>Scams, Phishing, and the Message Designed to Trick You</h1>
+  <p class="subtitle">The most valuable session in the series, because the convincing message is how most trouble begins. We look at why scams work on capable, careful people, the patterns they follow, the ones aimed squarely at workplaces, and the simple checks that catch them before a click does any harm.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">Session &middot; <strong>02 of 04</strong></span>
+    <span class="page-meta-item">Duration &middot; <strong>~2 hours</strong></span>
+    <span class="page-meta-item">Level &middot; <strong>Foundations</strong></span>
+  </div>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/session-2-handout.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this session (Word)
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/cybersecurity/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#start-here">Start Here</a></li>
+    <li><a href="#why-it-works">Why Scams Work</a></li>
+    <li><a href="#the-tells">The Tells</a></li>
+    <li><a href="#at-work">Scams Aimed at Workplaces</a></li>
+    <li><a href="#newer-tricks">QR Codes &amp; Investment Scams</a></li>
+    <li><a href="#verify">Verify Before You Click</a></li>
+    <li><a href="#already-clicked">If You've Already Clicked</a></li>
+    <li><a href="#take-away">What to Take Away</a></li>
+    <li><a href="#knowledge-check">Knowledge Check</a></li>
+    <li><a href="#inbox-detective">Inbox Detective</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="start-here">
+    <div class="section-eyebrow">// start here</div>
+    <h2>Start Here</h2>
+    <p>Almost every serious cyber incident in a workplace starts the same way: not with a hacker breaking through a wall, but with an ordinary message that talked one person into doing one thing. Clicking a link. Opening a file. Paying an invoice. Reading out a code.</p>
+    <p>The good news is that this also makes it the most fixable problem we have. You do not need to be technical to stop it. You need to know the handful of patterns these messages use, and one simple habit: slow down and check before you act. That is this whole session.</p>
+    <p class="pullquote">The scammer's job is to rush you. Your job is to slow down. That is the entire fight, in one sentence.</p>
+  </section>
+
+  <section class="content-section container-content" id="why-it-works">
+    <div class="section-eyebrow">// why scams work</div>
+    <h2>Why Scams Work: It's Hurry, Not Stupidity</h2>
+    <p>Scams do not catch people because those people are silly. They catch people who are busy, helpful, and trying to do the right thing quickly. A scammer's whole craft is getting you to act before you think. To do that, they push on a feeling. Almost every scam leans on one of these three:</p>
+
+    <div class="point-card">
+      <h4>Fear</h4>
+      <p>"Your account has been suspended." "There is a problem with a payment." "You are about to be fined." Fear makes you want to fix the problem right now, before you have stopped to ask whether the problem is even real.</p>
+    </div>
+    <div class="point-card">
+      <h4>Urgency</h4>
+      <p>"Respond in the next two hours." "The invoice is overdue and the supplier is threatening to stop work." A deadline switches off careful thinking. Real organisations almost always give you time. Pressure to act this minute is itself a warning sign.</p>
+    </div>
+    <div class="point-card">
+      <h4>Authority</h4>
+      <p>"This is the CEO." "It's the IT team, we need your password to fix your account." Most of us are wired to help someone important who asks directly. Scammers borrow that authority by pretending to be the boss, the bank, or the help desk.</p>
+    </div>
+
+    <div class="callout callout-key">
+      <div class="callout-title">The one habit that beats all three</div>
+      <p>Slowing down. Fear, urgency, and authority all rely on you reacting in the moment. The single most effective defence is to pause and check through a different channel before you do what the message asks. Nothing genuine is ever ruined by taking five minutes to confirm it.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="the-tells">
+    <div class="section-eyebrow">// the tells</div>
+    <h2>The Tells: Spotting a Dodgy Email, Text, or Call</h2>
+    <p>The same warning signs show up again and again, whether the scam arrives by email, text message, or phone call. If a message has one of these, be careful. Two or more, and it is almost certainly a scam.</p>
+
+    <div class="point-card">
+      <h4>It pushes you to act now</h4>
+      <p>A deadline, a threat, a problem that supposedly needs fixing this minute. As above: urgency is the most reliable tell of all.</p>
+    </div>
+    <div class="point-card">
+      <h4>It asks for something a real organisation would not</h4>
+      <p>Your password. A code from your phone. Payment by gift cards or to a new bank account. Remote access to your computer. No real bank, agency, or IT team asks for these. Gift cards as payment is a scam every single time.</p>
+    </div>
+    <div class="point-card">
+      <h4>There is a link or attachment you were not expecting</h4>
+      <p>A "click here to verify" button, a tracking link, a "reset your password" message you did not ask for, an invoice you were not waiting on. If you did not expect it, do not click it.</p>
+    </div>
+
+    <h3>Read the sender address, not just the name</h3>
+    <p>The display name on an email or text is just a label. Anyone can set it to "Australia Post", "ATO", or even your manager's name. What matters is the actual address underneath. On a phone, tap the sender's name to see the real email address. Look closely at the exact spelling.</p>
+    <div class="msg-sample"><span class="from">From: Council Payroll  &lt;payroll@council-nt-services.<span class="flag">info</span>&gt;</span>The display name says "Council Payroll", but the real address is a made-up domain that has nothing to do with your workplace. The mismatch is the giveaway.</div>
+
+    <h3>Read the link before you trust it</h3>
+    <p>On a computer, hover your mouse over a link without clicking; the real address shows at the bottom of the screen. On a phone, press and hold the link to preview where it really goes. Scammers use addresses that are nearly right, which is the point.</p>
+    <div class="msg-sample"><span class="from">The text you see:  my.gov.au login</span>Where it actually goes:  <span class="flag">mygov-secure-login.info</span>, which is not the real my.gov.au at all.</div>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Phone calls are scams too</div>
+      <p>A voice on the phone is not proof of who is calling. "Your bank's fraud team", "the tax office", or "Microsoft support" ringing out of the blue and creating pressure is a classic scam. The tells are the same: urgency, a request a real organisation would not make, and pressure not to hang up.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="at-work">
+    <div class="section-eyebrow">// scams aimed at workplaces</div>
+    <h2>Scams Aimed at Workplaces</h2>
+    <p>Some scams target organisations on purpose, because that is where the larger money is. Councils and similar bodies are a particular target: they handle public money, pay many suppliers, and have staff who are, quite rightly, trained to be helpful. Here are the workplace scams worth knowing by name.</p>
+
+    <div class="point-card">
+      <h4>Invoice and payment redirection</h4>
+      <p>A scammer pretends to be a supplier you already deal with and sends a message: "Our bank details have changed, please use this new account for future payments." The next genuine invoice gets paid straight into the scammer's account. By the time the real supplier asks where their money is, it is long gone.</p>
+      <p><strong>The defence:</strong> any change to a supplier's bank details is confirmed by ringing them on a number you already have, never the number or email in the message asking for the change.</p>
+    </div>
+    <div class="point-card">
+      <h4>The fake boss (CEO or manager fraud)</h4>
+      <p>An email or text that looks like it comes from a manager or the CEO: "I'm in a meeting and can't talk, I need you to urgently pay this invoice / buy these gift cards / send these staff details. Keep it between us for now." It uses authority and urgency together, and the secrecy is designed to stop you checking.</p>
+      <div class="msg-sample"><span class="from">From: "Regional Director"  &lt;director.office@gmail.com&gt;</span>Are you at your desk? I need a quick favour and I'm about to go into a meeting. Can you organise a payment for me? Don't call, just reply here. <span class="flag">[urgency + authority + secrecy + a personal email address = scam]</span></div>
+      <p><strong>The defence:</strong> a real manager will not mind you confirming. Check in person, by phone, or through Teams using contact details you already have, not by replying to the message.</p>
+    </div>
+    <div class="point-card">
+      <h4>The fake IT or help desk message</h4>
+      <p>"This is IT. Your account will be locked unless you confirm your password here." Or a pop-up or call claiming your computer has a virus and offering to "fix" it if you let them in. Real IT teams do not ask for your password; they do not need it.</p>
+      <p><strong>The defence:</strong> never give your password to anyone, ever, including someone claiming to be IT. If in doubt, contact your IT team yourself through the normal channel.</p>
+    </div>
+
+    <div class="callout callout-key">
+      <div class="callout-title">Why this matters beyond your own account</div>
+      <p>At work, a single click can affect residents, suppliers, colleagues, and public money, not just you. That is not meant to frighten you; it is the reason the simple checks in this session are worth the few minutes they take.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="newer-tricks">
+    <div class="section-eyebrow">// two more to watch</div>
+    <h2>Two More to Watch: QR Codes and Investment Scams</h2>
+    <p>Two scams worth knowing by name, because they are everywhere right now and because they follow people home from work. Spotting them protects you, your family, and the communities you serve.</p>
+
+    <h3>QR-code scams</h3>
+    <p>A QR code is the little square barcode you scan with your phone camera; it usually just opens a website. But a QR code can send your phone to a fake website just as easily as a dodgy link can, and you cannot tell where it leads by looking at it. Scammers stick fake codes over real ones on posters and parking meters, or drop them into emails, to send you to a page that steals your details or takes a payment.</p>
+    <div class="callout callout-warning">
+      <div class="callout-title">Before you scan</div>
+      <p>Be wary of QR codes on posters, flyers, or emails you were not expecting. After you scan, check the web address that comes up before you type anything or pay. When in doubt, go to the real website yourself instead of scanning. There is more in <a href="tech-words-in-plain-english.html#money">Tech Words, in Plain English</a>.</p>
+    </div>
+
+    <h3>Investment scams and "pig butchering"</h3>
+    <p>This is the long con, and it is doing real harm. It often starts with a friendly message out of the blue on WhatsApp, Facebook, or a dating app; sometimes a "wrong number" text that turns into a chat. Over days or weeks a warm relationship builds. Then comes the opportunity: an investment, usually in cryptocurrency, that is supposedly making them great money, and they would love to help you in too.</p>
+    <p>A fake website or app shows your "profits" climbing, so you put in more. When you try to take money out, there are fees, then taxes, then delays, and eventually the person, the website, and your money are all gone. The ugly nickname, "pig butchering", is about fattening someone up with trust before the kill.</p>
+    <div class="msg-sample"><span class="from">WhatsApp &middot; unknown number</span>Hi! Is this Sarah from the tennis club? ... oh sorry, wrong number! You seem nice though, how has your day been? <span class="flag">[a friendly "wrong number" opener is a very common start]</span></div>
+    <p><strong>Why it uses cryptocurrency.</strong> Once you send crypto, the payment usually cannot be reversed; there is no bank to ring and claw it back, and it is hard to trace where it went. That is exactly why scammers ask for it. Anyone you have only ever met online steering you toward crypto is the clearest red flag there is. There is a plain explainer of cryptocurrency in <a href="tech-words-in-plain-english.html#money">Tech Words</a>.</p>
+    <div class="callout callout-key">
+      <div class="callout-title">The rule that keeps you, and the mob, safe</div>
+      <p>No real investment ever comes from a stranger who messaged you first. If someone you have not met in person is building a friendship and steering you toward an investment or cryptocurrency, it is a scam, full stop. Check any investment offer on the ASIC list at <a href="https://moneysmart.gov.au/check-and-report-scams/investor-alert-list" target="_blank" rel="noopener">moneysmart.gov.au</a> first, and tell a friend before you send a cent. These scams have hit people right across the Territory; passing this warning on to family and community is one of the most useful things you can do.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="verify">
+    <div class="section-eyebrow">// verify before you click</div>
+    <h2>How to Verify Before You Click</h2>
+    <p>Here is the single most useful habit in the whole series. When a message asks you to do something, do not act on the message itself. Go to the source yourself, through a channel you already trust.</p>
+
+    <div class="do-box">
+      <h4>The verify-before-you-click routine</h4>
+      <p><strong>Go to the source yourself.</strong> Do not click the link in the message. Open the app you already have, or type the website address in yourself, or use a bookmark you saved earlier.</p>
+      <p><strong>Confirm by a second channel.</strong> If an email asks for money or a change, confirm by phone or in person. If a text claims to be a colleague, ring them. Use a different channel than the one the message came through.</p>
+      <p><strong>Never trust the contact details inside a suspicious message.</strong> The phone number or "click to chat" link in a scam message just connects you back to the scammer. Find the real contact details yourself.</p>
+      <p><strong>When in doubt, ask.</strong> Show the message to a colleague, your manager, or IT. A thirty-second "does this look right to you?" has stopped countless incidents.</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">No blame for checking</div>
+      <p>You will never get in trouble for taking a moment to confirm something is genuine, even if it turns out it was. Checking is exactly what good staff do. The only mistake is feeling too rushed or too embarrassed to ask.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="already-clicked">
+    <div class="section-eyebrow">// if youve already clicked</div>
+    <h2>If You've Already Clicked</h2>
+    <p>First: do not panic, and do not feel stupid. These messages are built by full-time professionals to catch capable people. What matters now is not how it happened; it is what you do in the next few minutes. Speed matters far more than getting it perfect.</p>
+
+    <div class="do-box">
+      <h4>The first few minutes</h4>
+      <p><strong>1. Tell someone straight away.</strong> Report it to your IT team or manager immediately, even if you are not certain anything is wrong. Early is everything. We cover exactly how and where to report in Session 4.</p>
+      <p><strong>2. If you typed a password, change it now</strong> on the real site, and anywhere else you used the same one. This is why never reusing passwords, from Session 1, matters so much.</p>
+      <p><strong>3. If money or bank details were involved, raise the alarm fast.</strong> The quicker a payment is flagged, the better the chance of stopping or recovering it. Minutes count.</p>
+      <p><strong>4. If you let someone into your computer, or installed something they asked for,</strong> disconnect it from the internet and tell IT right away. Do not keep using it.</p>
+      <p><strong>5. Keep the evidence.</strong> Do not delete the message. IT and the authorities may need it. Take a screenshot if you can.</p>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Reporting quickly matters more than reporting perfectly</div>
+      <p>The most damaging thing anyone can do after clicking is stay quiet out of embarrassment. A workplace where people report early and without fear is the safest workplace there is. You are helping everyone by speaking up, not letting anyone down.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="take-away">
+    <div class="section-eyebrow">// what to take away</div>
+    <h2>What to Take Away</h2>
+    <p>Your scam-spotting habits, in a short list. Click an item to tick it off.</p>
+    <ul class="checklist checklist-interactive">
+      <li>When a message creates fear or urgency, treat that as a warning sign, not a reason to hurry.</li>
+      <li>Read the real sender address and the real link, not just the display name.</li>
+      <li>Never give my password or a phone code to anyone, including "IT" or "the bank".</li>
+      <li>Confirm any change to bank or payment details by phone, using a number I already have.</li>
+      <li>Treat "urgent, secret, and from the boss" as the classic fake-boss pattern.</li>
+      <li>Verify by going to the source myself, never by the link or number in the message.</li>
+      <li>If something feels off, ask a colleague or IT before acting.</li>
+      <li>Be careful scanning QR codes; check where they go before I type anything or pay.</li>
+      <li>Treat any stranger who messages me and steers me toward crypto or an investment as a scam, and warn family and community.</li>
+      <li>If I have already clicked, report it straight away; speed beats certainty.</li>
+    </ul>
+    <p>The download at the top of this page puts these on one printable page, with the reporting contacts, to keep by your desk.</p>
+  </section>
+
+  <section class="content-section container-content" id="knowledge-check">
+    <div class="section-eyebrow">// knowledge check</div>
+    <h2>Knowledge Check</h2>
+    <div class="check-intro">
+      <p>Five quick scenarios to see what has landed. Read each, decide what you would do, then click to reveal the answer. No score, no wrong answers; it is just a way to check your thinking.</p>
+    </div>
+
+    <details class="check">
+      <summary><span class="q">01</span><span>You get an email from a supplier you know, saying their bank account has changed and to use the new details for the next invoice. What do you do before paying?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Ring the supplier on a number you already have for them, and confirm the change verbally.</strong> This is the classic invoice-redirection scam. Do not use the phone number or email in the message asking for the change; that just reaches the scammer. A genuine supplier will be glad you checked. Until you have confirmed by a trusted channel, do not change any payment details.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">02</span><span>A text arrives that looks like it is from your manager: "At my desk? Need a quick favour, about to go into a meeting, please don't call, just reply." Real or not?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Treat it as a scam until proven otherwise.</strong> Urgency, authority, and "don't call me" secrecy together are the fake-boss pattern; the "don't call" part exists precisely to stop you checking. Confirm with your manager in person, or on a number or Teams account you already have. A real manager will not mind. Never act on the message alone, especially if it leads to a payment or sharing staff details.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">03</span><span>Someone phones saying they are from IT and need your password to fix a problem with your account. Do you give it to them?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>No. Never give your password to anyone, including IT.</strong> A real IT team does not need your password to do their job and will never ask for it. Hang up and, if you want to be sure, contact IT yourself through your normal channel. Anyone who phones and asks for your password is running a scam.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">04</span><span>An email says "Your mailbox is full, click here to verify your login and keep your account active." The button looks like it goes to your email provider. How do you check safely?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Do not click the button. Check the real destination first.</strong> On a computer, hover over the link to see the real address at the bottom of the screen; on a phone, press and hold to preview it. A login or "verify" message you did not expect is a common phishing trick. If you are worried about your account, open your email settings the way you normally do, not through the link. When in doubt, send it to IT.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">05</span><span>You clicked a link in a dodgy email and typed your work password into the page before realising. It is the end of the day. What do you do?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Report it now, do not wait until tomorrow, and change that password straight away.</strong> Tell your IT team or manager immediately, even though it is late and even though you feel embarrassed; speed is what limits the damage. Change the password on the real site, and anywhere else you used the same one. Keep the email as evidence rather than deleting it. Reporting quickly is exactly the right move, and you will not be in trouble for it.</p>
+      </div>
+    </details>
+  </section>
+
+  <section class="content-section container-content" id="inbox-detective">
+    <div class="section-eyebrow">// try it live</div>
+    <h2>Inbox Detective</h2>
+    <p>Now put it into practice. <strong>Inbox Detective</strong> is a simulated council inbox. Some emails are genuine; some are scams aimed straight at a regional council. Open each one, decide whether it is a scam or real, and get instant feedback on the warning signs.</p>
+    <div class="activity-box">
+      <span class="label">Interactive &middot; ~15 minutes</span>
+      <h4>Open the simulated inbox and call each email</h4>
+      <p>Nine emails are waiting in the accounts inbox: gift-card requests from the "CEO", a supplier asking you to change their bank account, a payroll switch, a fake Microsoft login, and some that are perfectly genuine. Your job is to tell them apart.</p>
+      <p><strong>Running it as a group?</strong> Share your screen in Teams, read each email together, ask everyone to vote SCAM or REAL in the chat or with the raise-hand button, then reveal the answer and talk through the flags.</p>
+      <p style="margin-top:16px">
+        <a class="btn btn-primary" href="inbox-detective.html" target="_blank" rel="noopener">
+          Launch Inbox Detective
+          <svg class="arrow" viewBox="0 0 14 14"><path d="M3 7h8m-3-3 3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<!-- SESSION NAV -->
+<div class="container">
+  <nav class="session-nav">
+    <a class="session-nav-item prev" href="session-1-digital-footprint.html">
+      <span class="session-nav-label">&larr; Previous session</span>
+      <span class="session-nav-title">Your Digital Footprint and the Daily Habits That Protect It</span>
+    </a>
+    <a class="session-nav-item next" href="session-3-ai-and-deepfakes.html">
+      <span class="session-nav-label">Next session &rarr;</span>
+      <span class="session-nav-title">AI, Deepfakes, and the New Shape of Online Deception</span>
+    </a>
+  </nav>
+</div>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/cybersecurity/">Cyber Security Awareness</a></li>
+          <li><a href="/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Interactive take-away checklist: click to tick off
+  document.querySelectorAll('.checklist-interactive li').forEach(function (li) {
+    li.addEventListener('click', function () { li.classList.toggle('done'); });
+  });
+</script>
+
+</body>
+</html>

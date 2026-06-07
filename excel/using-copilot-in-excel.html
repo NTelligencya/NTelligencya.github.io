@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using Copilot in Excel &middot; Excel Fundamentals &middot; NTell World Ink</title>
+<meta name="description" content="How to ask Microsoft Copilot to build a formula or fix an error in Excel, in plain English, with example prompts. You do not need to know the function name; describe what you want and let Copilot suggest it, then check the answer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Excel Fundamentals, Copilot reference; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 28px; padding-bottom: 12px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px;
+    margin: 0 0 12px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 21px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+  .content-section p code, .content-section li code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.92em;
+    color: var(--accent-2); background: rgba(26,201,201,0.06);
+    padding: 1px 6px; border-radius: 4px;
+  }
+
+  /* Prompt example card: what you ask, and what Copilot is likely to suggest */
+  .prompt-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 12px; padding: 20px 22px; margin: 16px 0;
+  }
+  .prompt-card .want {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;
+  }
+  .prompt-card .ask {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px; line-height: 1.45;
+    color: var(--text); font-style: italic; margin: 0 0 14px;
+    padding-left: 14px; border-left: 3px solid var(--warm);
+  }
+  .prompt-card .gives {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 6px;
+  }
+  .prompt-card p { color: var(--text-2); font-size: 14.5px; line-height: 1.65; margin: 8px 0 0; }
+
+  /* Copyable formula block */
+  .xl-formula {
+    display: flex; align-items: stretch; margin: 6px 0 0;
+    background: var(--bg); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 8px; overflow: hidden;
+  }
+  .xl-formula code {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text);
+    padding: 12px 16px; flex: 1; overflow-x: auto; white-space: pre;
+  }
+  .xl-formula button {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-3); background: transparent;
+    border: none; border-left: 1px solid var(--rule-2); padding: 0 16px; cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .xl-formula button:hover { color: var(--accent-2); background: rgba(26,201,201,0.05); }
+  .xl-formula button.copied { color: var(--accent); }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 23px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/excel/">Excel Fundamentals</a>
+    <span class="sep">/</span>
+    <span>Using Copilot in Excel</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Microsoft Excel &middot; Course 2 &middot; Reference</div>
+  <h1>Using Copilot in Excel</h1>
+  <p class="subtitle">One of the most useful things about Copilot, Microsoft's AI assistant, is that you do not need to know the name of a function to use it. You describe what you want in plain English, and Copilot suggests the formula. This reference shows how to ask well, with example prompts you can adapt, and the one rule that matters most: always check the answer.</p>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/using-copilot-in-excel.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this reference (Word)
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/excel/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+      <li><a href="#what">What Copilot Is</a></li>
+      <li><a href="#good">What It Does Well</a></li>
+      <li><a href="#short">Where It Falls Short</a></li>
+      <li><a href="#prompts">How to Ask Well</a></li>
+      <li><a href="#build">Prompts: Build a Formula</a></li>
+      <li><a href="#fix">Prompts: Fix an Error</a></li>
+      <li><a href="#verify">Always Check the Answer</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="what">
+    <div class="section-eyebrow">// what copilot is</div>
+    <h2>What Copilot Is</h2>
+    <p>Copilot is Microsoft's AI assistant, built into newer, online versions of Microsoft 365. In Excel it sits as a button on the Home tab (its exact spot moves between updates). You type a request in plain language and it answers in the side panel.</p>
+    <p>It is an optional helper, not a part of the course you must have. It needs a recent, internet-connected version of Excel and the right licence, so it may not be available on every computer, and that is fine. Everything in this course works without it. Where Copilot does help, it helps most with one thing in particular: turning "what I am trying to do" into "the formula that does it".</p>
+    <p class="pullquote">You do not need to know that the function is called CONCAT or SUMIF. You only need to describe, in ordinary words, what you want to happen. Naming the function is Copilot's job; knowing what you want is yours.</p>
+  </section>
+
+  <section class="content-section container-content" id="good">
+    <div class="section-eyebrow">// what it does well</div>
+    <h2>What It Does Well</h2>
+    <p>Copilot is genuinely good at the language side of spreadsheets:</p>
+    <ul>
+      <li><strong>Suggesting a formula from a description.</strong> You say what you want in plain English; it writes the formula, even when you do not know the function's name.</li>
+      <li><strong>Explaining a formula you have inherited.</strong> Paste a formula from someone else's sheet and ask "what does this do?"; it explains it in plain language.</li>
+      <li><strong>Helping fix an error.</strong> Show it the error and the formula, and it suggests the likely cause and a fix.</li>
+      <li><strong>Summarising and describing.</strong> It can describe trends in a table or draft wording for a report.</li>
+    </ul>
+  </section>
+
+  <section class="content-section container-content" id="short">
+    <div class="section-eyebrow">// where it falls short</div>
+    <h2>Where It Falls Short</h2>
+    <p>Copilot is a confident writer, which is a strength and a trap. It can give a wrong answer in the same calm, sure voice as a right one. So it is weak exactly where being confidently wrong matters:</p>
+    <ul>
+      <li><strong>Do not trust it for exact numbers.</strong> Let it write the formula, but check the result against a real calculation. Do not take a total it simply tells you as fact.</li>
+      <li><strong>Menu steps can be out of date.</strong> Buttons move between Excel versions, so step-by-step "click here, then there" can be slightly wrong. Use it as a pointer, then look for the button.</li>
+      <li><strong>It does not know your data.</strong> It cannot see whether a column is text-that-looks-like-numbers, or whether your dates are real dates. You still need the basics from this course to spot that.</li>
+    </ul>
+  </section>
+
+  <section class="content-section container-content" id="prompts">
+    <div class="section-eyebrow">// how to ask well</div>
+    <h2>How to Ask Well</h2>
+    <p>A good prompt gives Copilot three things: <strong>where your data is</strong>, <strong>what you want to happen</strong>, and <strong>where the answer should go</strong>. The more plainly you say those, the better the formula you get back.</p>
+    <ul>
+      <li><strong>Name the columns or cells.</strong> "Column A", "the amount in B2", "the dates in column D".</li>
+      <li><strong>Say what you want in everyday words.</strong> "join them into one", "add up only the Darwin ones", "show a blank instead of an error".</li>
+      <li><strong>Say where the answer goes.</strong> "in column C", "in the cell next to it".</li>
+      <li><strong>Give an example if you can.</strong> "like 'Jordan' and 'Lee' becoming 'Jordan Lee'." An example removes almost all guesswork.</li>
+    </ul>
+    <p>The examples below show the pattern. Each is the kind of thing you could type, even without knowing the function's name.</p>
+  </section>
+
+  <section class="content-section container-content" id="build">
+    <div class="section-eyebrow">// prompts: build a formula</div>
+    <h2>Prompts: Build a Formula</h2>
+
+    <div class="prompt-card">
+      <div class="want">// you want to join two columns (you may not know the word "concatenate")</div>
+      <p class="ask">"I have first names in column A and surnames in column B. In column C I want the full name, like 'Jordan Lee', with a space in between. What formula do I use?"</p>
+      <div class="gives">Copilot is likely to suggest</div>
+      <div class="xl-formula"><code>=A2&" "&B2</code><button type="button">copy</button></div>
+      <p>The <code>&</code> joins pieces of text together, and <code>" "</code> is the space between them. Copilot might instead suggest <code>=CONCAT(A2," ",B2)</code> or <code>=TEXTJOIN(" ",TRUE,A2,B2)</code>; all three do the same job.</p>
+    </div>
+
+    <div class="prompt-card">
+      <div class="want">// you want a word that depends on a condition</div>
+      <p class="ask">"In column E, I want it to say 'Over' when the amount in column B is bigger than the budget in column A, and 'OK' otherwise."</p>
+      <div class="gives">Copilot is likely to suggest</div>
+      <div class="xl-formula"><code>=IF(B2>A2,"Over","OK")</code><button type="button">copy</button></div>
+      <p>That is the IF function: a test, then what to show if it is true, then if it is false.</p>
+    </div>
+
+    <div class="prompt-card">
+      <div class="want">// you want to count or add only the matching rows</div>
+      <p class="ask">"How do I count how many rows in column B say 'Yes'?"</p>
+      <div class="gives">Copilot is likely to suggest</div>
+      <div class="xl-formula"><code>=COUNTIF(B2:B100,"Yes")</code><button type="button">copy</button></div>
+      <p>And for adding instead of counting: "Add up only the amounts in column C where column B is 'Darwin'" gives <code>=SUMIF(B2:B100,"Darwin",C2:C100)</code>.</p>
+    </div>
+
+    <div class="prompt-card">
+      <div class="want">// you want part of some text, but do not know how</div>
+      <p class="ask">"Column A has email addresses. In column B I just want the part before the @ sign."</p>
+      <div class="gives">Copilot is likely to suggest</div>
+      <div class="xl-formula"><code>=TEXTBEFORE(A2,"@")</code><button type="button">copy</button></div>
+      <p>It may also suggest using <strong>Flash Fill</strong> (type one example, press Ctrl + E) instead, which is often the simplest answer of all for tidying text.</p>
+    </div>
+
+    <div class="prompt-card">
+      <div class="want">// you want a number of days, or an age, from dates</div>
+      <p class="ask">"Column B has birthdates. In column C I want each person's age in whole years, as at today."</p>
+      <div class="gives">Copilot is likely to suggest</div>
+      <div class="xl-formula"><code>=DATEDIF(B2,TODAY(),"Y")</code><button type="button">copy</button></div>
+      <p>This works because, as Session 1 showed, Excel stores dates as numbers, so it can do maths with them.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="fix">
+    <div class="section-eyebrow">// prompts: fix an error</div>
+    <h2>Prompts: Fix an Error</h2>
+    <p>When a cell shows an error code instead of an answer, paste the formula and the error into Copilot and ask what is wrong. Be specific about which cell and what you expected.</p>
+
+    <div class="prompt-card">
+      <div class="want">// a divide-by-zero error</div>
+      <p class="ask">"My formula in D2 shows #DIV/0!. Here it is: =C2/B2. How do I make it show a blank instead of the error when B2 is empty?"</p>
+      <div class="gives">Copilot is likely to suggest</div>
+      <div class="xl-formula"><code>=IFERROR(C2/B2,"")</code><button type="button">copy</button></div>
+      <p>IFERROR wraps any formula and shows your own result (here, a blank) instead of a scary code.</p>
+    </div>
+
+    <div class="prompt-card">
+      <div class="want">// you inherited a formula and do not understand it</div>
+      <p class="ask">"What does this formula do, in plain English? =VLOOKUP(A2,$D$2:$F$50,3,FALSE)"</p>
+      <div class="gives">Copilot will explain it</div>
+      <p>It will tell you, in words, that the formula looks up the value from A2 in the first column of the table D2:F50 and returns the matching value from the third column, with FALSE meaning an exact match. Explaining a formula is one of the things Copilot does most reliably.</p>
+    </div>
+
+    <div class="prompt-card">
+      <div class="want">// a copied formula went wrong</div>
+      <p class="ask">"I copied =B2*E1 down a column to work out GST, but the lower rows are wrong. What did I do wrong?"</p>
+      <div class="gives">Copilot is likely to explain and suggest</div>
+      <div class="xl-formula"><code>=B2*$E$1</code><button type="button">copy</button></div>
+      <p>It should spot that the rate reference E1 drifted as you copied, and tell you to lock it with dollar signs as an absolute reference, exactly the lesson from Session 2.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="verify">
+    <div class="section-eyebrow">// always check the answer</div>
+    <h2>Always Check the Answer</h2>
+    <p>Whatever Copilot gives you, the final check is yours. The safe habit is simple: let Copilot write the <em>formula</em>, then confirm the <em>result</em> with something you can see.</p>
+    <ul>
+      <li><strong>Sanity-check one row by hand.</strong> If Copilot's profit formula says a line made $55, do that one sum in your head and see if it matches.</li>
+      <li><strong>Use the status bar.</strong> Select a few numbers and compare their Sum on the status bar with a total Copilot produced.</li>
+      <li><strong>Read the formula it gave you.</strong> You now know enough to recognise SUM, IF, and a locked <code>$E$1</code> reference. If the formula looks reasonable and the result matches your spot-check, trust it.</li>
+    </ul>
+    <div class="pullquote">Copilot is a fast, confident assistant, not an oracle. It is brilliant for "what is the formula for this?" and "what does this mean?". For "is this number right?", the answer always comes from you.</div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this course</h4>
+        <ul>
+          <li><a href="/excel/">Excel overview</a></li>
+          <li><a href="excel-words-in-plain-english.html">Excel words in plain English</a></li>
+          <li><a href="session-2-formulas-and-functions.html">Session 2: Formulas</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.xl-formula button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var code = btn.parentElement.querySelector('code').innerText;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(function () {
+          var old = btn.textContent;
+          btn.textContent = 'copied'; btn.classList.add('copied');
+          setTimeout(function () { btn.textContent = old; btn.classList.remove('copied'); }, 1200);
+        });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

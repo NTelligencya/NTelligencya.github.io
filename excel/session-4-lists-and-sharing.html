@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working With Lists and Sharing Your Work &middot; Excel Fundamentals &middot; NTell World Ink</title>
+<meta name="description" content="Session 4 of Excel Fundamentals for Employment: sorting and filtering a list, grouping, tidy dropdown lists with data validation, printing a clean report and setting up the page, plus where to go next. Plain language, hands-on.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Excel Fundamentals, Session 4; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+  .activity-box ol, .activity-box ul { color: var(--text-2); line-height: 1.7; padding-left: 22px; margin: 0 0 10px; }
+  .activity-box li { margin-bottom: 5px; }
+
+  .point-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .point-card h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .point-card p { color: var(--text-2); font-size: 15px; line-height: 1.65; margin: 0 0 8px; }
+  .point-card p:last-child { margin: 0; }
+
+  /* ===== Excel-style worksheet grid ===== */
+  .xl-wrap { margin: 18px 0; overflow-x: auto; }
+  .xl-grid {
+    border-collapse: collapse; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: var(--text); background: var(--bg-2);
+  }
+  .xl-grid caption {
+    caption-side: top; text-align: left; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 0 0 8px;
+  }
+  .xl-grid th, .xl-grid td {
+    border: 1px solid var(--rule-2); padding: 6px 14px; text-align: left; white-space: nowrap;
+  }
+  .xl-grid thead th, .xl-grid tbody th {
+    background: #17171b; color: var(--text-3); font-weight: 500; text-align: center;
+  }
+  .xl-grid tbody th { width: 30px; }
+  .xl-grid .corner { background: #0f0f12; }
+  .xl-grid td.num { text-align: right; }
+  .xl-grid td.formula { color: var(--accent-2); }
+  .xl-grid td.head { color: var(--text); font-weight: 500; }
+
+  /* ===== Copyable formula block ===== */
+  .xl-formula {
+    display: flex; align-items: stretch; margin: 16px 0;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 8px; overflow: hidden;
+  }
+  .xl-formula code {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text);
+    padding: 12px 16px; flex: 1; overflow-x: auto; white-space: pre;
+  }
+  .xl-formula button {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-3); background: transparent;
+    border: none; border-left: 1px solid var(--rule-2); padding: 0 16px; cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .xl-formula button:hover { color: var(--accent-2); background: rgba(26,201,201,0.05); }
+  .xl-formula button.copied { color: var(--accent); }
+
+  .next-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 18px 0; }
+  .next-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--warm); border-radius: 8px; padding: 18px 20px;
+  }
+  .next-card h5 {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--accent-2);
+    margin: 0 0 8px; font-weight: 500;
+  }
+  .next-card p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0; }
+
+  .check-intro {
+    background: rgba(26,201,201,0.04); border: 1px solid var(--rule-2);
+    border-radius: 12px; padding: 18px 24px; margin: 18px 0 22px;
+  }
+  .check-intro p { margin: 0; color: var(--text-2); line-height: 1.65; }
+  details.check {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; margin: 12px 0; overflow: hidden;
+  }
+  details.check > summary {
+    cursor: pointer; list-style: none; padding: 18px 22px;
+    color: var(--text); font-weight: 600; font-size: 15.5px; line-height: 1.55;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  details.check > summary::-webkit-details-marker { display: none; }
+  details.check > summary .q {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    flex: 0 0 auto; padding-top: 2px;
+  }
+  details.check > summary .reveal {
+    margin-left: auto; flex: 0 0 auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    border: 1px solid var(--rule-2); border-radius: 4px; padding: 3px 8px; white-space: nowrap;
+  }
+  details.check[open] > summary .reveal { color: var(--accent-2); border-color: var(--accent); }
+  details.check[open] > summary .reveal::after { content: " shown"; }
+  details.check .answer {
+    padding: 0 22px 20px 22px; color: var(--text-2); line-height: 1.7; font-size: 15px;
+    border-top: 1px solid var(--rule); margin-top: 2px; padding-top: 16px;
+  }
+  details.check .answer strong { color: var(--text); }
+  details.check .answer code { font-family: 'JetBrains Mono', monospace; color: var(--accent-2); }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+  .content-section p code, .content-section li code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.92em;
+    color: var(--accent-2); background: rgba(26,201,201,0.06);
+    padding: 1px 6px; border-radius: 4px;
+  }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+    details.check > summary { flex-wrap: wrap; }
+    details.check > summary .reveal { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/excel/">Excel Fundamentals</a>
+    <span class="sep">/</span>
+    <span>Session 4</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Microsoft Excel &middot; Course 2 &middot; Session 4</div>
+  <h1>Working With Lists and Sharing Your Work</h1>
+  <p class="subtitle">Most spreadsheets are really lists: contacts, stock, hours, registrations. This final session is about handling a list well, sorting it, filtering it down to what you care about, and keeping it clean with dropdowns, then sharing it: printing a clean report that fits the page. We finish by putting the whole course together, and a short look at where to go next.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">Session &middot; <strong>04 of 04</strong></span>
+    <span class="page-meta-item">Duration &middot; <strong>~3 hours</strong></span>
+    <span class="page-meta-item">Level &middot; <strong>Foundation</strong></span>
+  </div>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/session-4-handout.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this session (Word)
+    </a>
+    <a class="btn btn-download" href="downloads/session-4-starter.xlsx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Practice workbook (starter)
+    </a>
+    <a class="btn btn-download" href="downloads/session-4-solution.xlsx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Solution workbook
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/excel/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+      <li><a href="#start-here">Start Here</a></li>
+      <li><a href="#sorting">Sorting a List</a></li>
+      <li><a href="#filtering">Filtering a List</a></li>
+      <li><a href="#grouping">Grouping Rows</a></li>
+      <li><a href="#validation">Dropdown Lists</a></li>
+      <li><a href="#printing">Printing and Page Setup</a></li>
+      <li><a href="#together">Putting It All Together</a></li>
+      <li><a href="#next">Where to Go Next</a></li>
+      <li><a href="#try-it">Try It at the Keyboard</a></li>
+      <li><a href="#check">Knowledge Check</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="start-here">
+    <div class="section-eyebrow">// start here</div>
+    <h2>Start Here</h2>
+    <p>Almost every spreadsheet you will make is really a list: a list of contacts, of stock, of hours worked, of people who registered for something. Once you can sort a list, filter it, keep it tidy, and print it cleanly, you can handle most of the everyday work a job will throw at you.</p>
+    <p>Throughout this session we will use a small registration list of people and Territory suburbs as our example, the kind of thing a community service or event might keep.</p>
+    <div class="xl-wrap">
+      <table class="xl-grid">
+        <caption>// our example list: an events register</caption>
+        <thead>
+          <tr><th class="corner"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>1</th><td class="head">First name</td><td class="head">Suburb</td><td class="head">Age</td><td class="head">Event</td><td class="head">Attended</td></tr>
+          <tr><th>2</th><td>Noah</td><td>Parap</td><td class="num">42</td><td>Smart Farming Demo</td><td>No</td></tr>
+          <tr><th>3</th><td>Mia</td><td>Nightcliff</td><td class="num">24</td><td>Mangrove Clean-Up</td><td>Yes</td></tr>
+          <tr><th>4</th><td>Jack</td><td>Casuarina</td><td class="num">37</td><td>Digital Literacy Expo</td><td>No</td></tr>
+          <tr><th>5</th><td>Grace</td><td>Karama</td><td class="num">39</td><td>Indigenous Art Market</td><td>Yes</td></tr>
+          <tr><th>6</th><td>Ethan</td><td>Stuart Park</td><td class="num">26</td><td>Youth Coding Jam</td><td>Yes</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="sorting">
+    <div class="section-eyebrow">// sorting a list</div>
+    <h2>Sorting a List</h2>
+    <p>Sorting rearranges your rows into order: alphabetically by name, smallest to largest by amount, oldest to newest by date. It is one of the fastest ways to make sense of a list.</p>
+    <p>The golden rule: <strong>Excel sorts whole rows, keeping each row's data together.</strong> As long as your list has a header row and no fully blank rows running through it, sorting moves each record as a unit, so a person's name stays attached to their suburb and age.</p>
+    <h3>Quick sort, one column</h3>
+    <ol>
+      <li>Click any single cell in the column you want to sort by. (Do not select the whole column on its own; just click one cell, or Excel may sort only that column and scramble the rows.)</li>
+      <li>On the <strong>Data</strong> tab, click <strong>A to Z</strong> (ascending) or <strong>Z to A</strong> (descending).</li>
+    </ol>
+    <h3>Multi-level sort</h3>
+    <p>To sort by more than one thing, say by Suburb, then by Age within each suburb: click a cell in the data, choose <strong>Data then Sort</strong>, set the first Sort by column and order, click <strong>Add Level</strong> for the next, and OK.</p>
+    <div class="callout callout-warning">
+      <div class="callout-title">Do not sort one column on its own</div>
+      <p>If you select just one column while the rest of the data sits beside it and sort that, you detach that column from its rows and mix up your records. Click one cell in the list and let Excel sort the whole thing, or turn the list into a Table first (Ctrl + T, from Session 3), which protects you from this.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="filtering">
+    <div class="section-eyebrow">// filtering a list</div>
+    <h2>Filtering a List</h2>
+    <p>Where sorting reorders your list, <strong>filtering hides the rows you do not currently care about</strong>, so only the matching ones show. The data is not deleted; it is just tucked out of sight until you clear the filter. It is the quickest way to answer questions like "show me only the people from Nightcliff" or "just the ones who did not attend".</p>
+    <ol>
+      <li>Click any cell in your list.</li>
+      <li>On the <strong>Data</strong> tab, click <strong>Filter</strong>. A small arrow appears on each header. (If your data is a Table, these arrows are already there.)</li>
+      <li>Click a header's arrow, then tick or untick values to choose exactly what shows, or use Text, Number or Date Filters for conditions like "greater than" or "contains".</li>
+      <li>A small funnel icon on the header shows that column is filtered.</li>
+    </ol>
+    <p>To bring everything back, open the column's filter menu and choose <strong>Clear Filter</strong>, or click Data then Clear to remove all filters at once. You can filter several columns at once and Excel combines them: filter Suburb to "Nightcliff" and Attended to "Yes" to see only the rows meeting both.</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">A short list is the filter, not lost data</div>
+      <p>A filtered list can look alarmingly short. The row numbers down the side jump (for example 2, 5, 9) when rows are hidden, which is your clue a filter is on. Clear it and everything reappears; nothing was lost.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="grouping">
+    <div class="section-eyebrow">// grouping rows</div>
+    <h2>Grouping Rows</h2>
+    <p>Grouping lets you fold a block of rows (or columns) up and down, like a drawer you can open and close. It is handy on a long sheet where you want to tuck the detail away and just see the summary, then open it again when you need it.</p>
+    <ol>
+      <li>Select the rows you want to group (click and drag down the row numbers).</li>
+      <li>On the <strong>Data</strong> tab, in the Outline group, click <strong>Group</strong>.</li>
+      <li>A small bracket and a <strong>minus button</strong> appear to the left. Click the minus to collapse the rows out of sight, and the plus to bring them back.</li>
+      <li>To undo it, select the rows and click <strong>Ungroup</strong>.</li>
+    </ol>
+    <p>It does not change or delete anything; it just hides and shows. Think of it as a neat way to keep a long list manageable.</p>
+  </section>
+
+  <section class="content-section container-content" id="validation">
+    <div class="section-eyebrow">// dropdown lists</div>
+    <h2>Dropdown Lists (Data Validation)</h2>
+    <p>It is far easier to keep data clean on the way in than to fix it later. <strong>Data validation</strong> sets rules for what a cell will accept. The star feature is the dropdown list: instead of everyone typing (and mistyping) "Complete", "complete", "Done", "Finished", they all pick the same word from a menu. Your data stays consistent, which makes sorting, filtering and counting reliable.</p>
+    <h3>Make a dropdown list</h3>
+    <ol>
+      <li>Select the cells that should have the dropdown.</li>
+      <li>Go to <strong>Data then Data Validation</strong>.</li>
+      <li>Under <strong>Allow</strong>, choose <strong>List</strong>.</li>
+      <li>In <strong>Source</strong>, type the options separated by commas, for example <code>Not started, In progress, Complete</code>, or click and select a range of cells that holds the options.</li>
+      <li>Click OK. The selected cells now show a dropdown arrow.</li>
+    </ol>
+    <p>In the same Allow dropdown you can instead require a Whole number, a Decimal, a Date, or a Text length, and set limits. Two optional tabs make it friendlier: an <strong>Input Message</strong> tooltip ("Pick a status from the list") and an <strong>Error Alert</strong> shown if someone enters something invalid.</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">Keep your list of options in one place</div>
+      <p>For a longer list of valid options, keep them on a separate sheet and point the Source at that range. Then you can update the options in one place and every dropdown follows.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="printing">
+    <div class="section-eyebrow">// printing and page setup</div>
+    <h2>Printing and Page Setup</h2>
+    <p>Printing a spreadsheet is where many people come unstuck: a tidy sheet on screen prints as fifteen pages with one lonely column on the last. The trick is to use Print Preview to see what will actually print, then a few controls to tame it.</p>
+    <h3>Always start with Print Preview</h3>
+    <p>Press <strong>Ctrl + P</strong> (or File then Print). The right-hand side shows exactly what will print, and the page count tells you instantly whether things have sprawled. Most of the controls below sit on this screen.</p>
+    <h3>The settings that solve most problems</h3>
+    <ul>
+      <li><strong>Fit it on the page:</strong> open the <strong>Scaling</strong> dropdown and choose <strong>Fit All Columns on One Page</strong> (so it stays one column wide but runs over several pages tall). This single setting stops the dreaded stray column on its own page.</li>
+      <li><strong>Orientation:</strong> switch between Portrait and Landscape. Landscape suits wide tables.</li>
+      <li><strong>Print only part of a sheet:</strong> select the range, then <strong>Page Layout then Print Area then Set Print Area</strong>.</li>
+      <li><strong>Repeat headings on every page:</strong> for a long list, use <strong>Page Layout then Print Titles then Rows to repeat at top</strong>, and pick your header row, so the column titles show on every printed page.</li>
+      <li><strong>Headers and footers:</strong> add a title, date or page numbers via Insert then Header &amp; Footer. Useful for reports you hand around.</li>
+    </ul>
+    <div class="callout callout-key">
+      <div class="callout-title">Check the page count before you print</div>
+      <p>The single most useful setting is <strong>Fit All Columns on One Page</strong>, and the fastest habit is to glance at the page count in Print Preview before you print. Together they catch a sprawling layout before it wastes paper.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="together">
+    <div class="section-eyebrow">// putting it all together</div>
+    <h2>Putting It All Together</h2>
+    <p>Look at how far you have come. In four sessions you have learned everything you need to build a real, useful workplace spreadsheet from scratch:</p>
+    <ul>
+      <li>From <strong>Session 1</strong>: open Excel, name what you are looking at, enter text, numbers and dates, AutoFill repetitive entries, and save with a clear name.</li>
+      <li>From <strong>Session 2</strong>: write a formula with <code>+ - * /</code>, total a column with SUM, and find the average, biggest and smallest.</li>
+      <li>From <strong>Session 3</strong>: format the sheet clearly, set money as Currency, and chart the numbers.</li>
+      <li>From <strong>Session 4</strong>: sort and filter the list, add a tidy dropdown, and print a clean report.</li>
+    </ul>
+    <p class="pullquote">That is a complete workflow: enter, calculate, format, chart, sort, filter, print. Every one of those skills is something a workplace asks for, and you now have all of them.</p>
+  </section>
+
+  <section class="content-section container-content" id="next">
+    <div class="section-eyebrow">// where to go next</div>
+    <h2>Where to Go Next</h2>
+    <p>One foundation course is enough to make you confident with the essentials. When the basics feel comfortable, these are the rewarding things to explore next. You do not need any of them for everyday work; they are just signposts for when you are ready.</p>
+    <div class="next-grid">
+      <div class="next-card">
+        <h5>IF, AND, OR</h5>
+        <p>Logical functions that let a formula <em>decide</em>: show "Over budget" when a number is too high, "OK" otherwise. The natural next step after the five functions.</p>
+      </div>
+      <div class="next-card">
+        <h5>XLOOKUP / VLOOKUP</h5>
+        <p>Lookup functions that fetch a matching detail from another table: give a product code, get back its price, with no retyping.</p>
+      </div>
+      <div class="next-card">
+        <h5>PivotTables</h5>
+        <p>Summarise a long list into a compact answer by dragging a couple of fields: total per month, count per suburb, in seconds.</p>
+      </div>
+      <div class="next-card">
+        <h5>Conditional formatting</h5>
+        <p>Colour cells automatically based on their value, for example highlight everything over budget in red, without doing it by hand.</p>
+      </div>
+      <div class="next-card">
+        <h5>Templates</h5>
+        <p>Save a workbook you reuse (a roster, a budget) as a template, so next month you fill in the numbers instead of rebuilding it.</p>
+      </div>
+      <div class="next-card">
+        <h5>Copilot in Excel</h5>
+        <p>On newer, online versions, Microsoft's AI assistant can explain a formula or suggest one. Useful for explaining, but always check any number it gives you against a real formula.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="try-it">
+    <div class="section-eyebrow">// try it at the keyboard</div>
+    <h2>Try It at the Keyboard</h2>
+    <p>Open the starter workbook for this session, which has the events register ready to work with.</p>
+    <div class="activity-box">
+      <span class="label">Practice</span>
+      <h4>Sort, filter, tidy and print the register</h4>
+      <ol>
+        <li>Click a cell in the <strong>Suburb</strong> column and sort A to Z. Watch every row move together, names staying with their suburb and age.</li>
+        <li>Turn on <strong>Filter</strong> (Data tab), then filter <strong>Attended</strong> to show only "No". Notice the row numbers jump. Clear the filter to bring everyone back.</li>
+        <li>Select the <strong>Attended</strong> column and add a <strong>dropdown</strong> with the options <code>Yes, No</code> via Data Validation, then try typing "Maybe" and watch Excel stop you.</li>
+        <li>Press <strong>Ctrl + P</strong> and note the page count. Set Scaling to <strong>Fit All Columns on One Page</strong> and switch to Landscape. See the preview tidy up.</li>
+        <li>Save your finished workbook with a clear name. You have just produced a clean, printable report.</li>
+      </ol>
+      <p>Compare with the solution workbook to check your sort, filter and dropdown match.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="check">
+    <div class="section-eyebrow">// knowledge check</div>
+    <h2>Knowledge Check</h2>
+    <div class="check-intro">
+      <p>A few quick questions to finish the course. Have a think first, then click "reveal". No mark, no rush.</p>
+    </div>
+
+    <details class="check">
+      <summary><span class="q">Q1</span><span>What is the golden rule that keeps each person's data together when you sort a list?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>Excel sorts <strong>whole rows</strong>, keeping each row's data together, as long as the list has a header row and no fully blank rows through it. So click just <strong>one cell</strong> in the column you want to sort by and let Excel sort the whole list. Do not select a single column on its own, or you detach it from its rows.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q2</span><span>What is the difference between sorting and filtering a list?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p><strong>Sorting</strong> reorders the rows (for example A to Z). <strong>Filtering</strong> hides the rows that do not match a condition, so only the ones you care about show. Filtering deletes nothing; clear the filter and every row reappears.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q3</span><span>Why use a dropdown list (data validation) on a status column that several people type into?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>So everyone picks the <strong>same word from a menu</strong> instead of typing slightly different versions ("Complete", "complete", "Done"). Consistent entries make sorting, filtering and counting reliable. Set it via Data then Data Validation then Allow: List.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q4</span><span>Your sheet prints as too many pages with a stray column on its own. What is the single best fix?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>In Print Preview (<strong>Ctrl + P</strong>), open the <strong>Scaling</strong> dropdown and choose <strong>Fit All Columns on One Page</strong>. That keeps it one column wide and stops the stray-column problem. Switching to Landscape often helps too. Always check the page count before printing.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q5</span><span>You have finished the course. Name one thing you could explore next, and what it does.</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>Any of: <strong>IF</strong> (let a formula decide between two answers), <strong>XLOOKUP or VLOOKUP</strong> (fetch a matching detail from another table), <strong>PivotTables</strong> (summarise a long list by dragging fields), <strong>conditional formatting</strong> (colour cells automatically by value), or <strong>templates</strong> (save a reusable workbook). None are needed for everyday work; they are signposts for when you are ready.</p></div>
+    </details>
+  </section>
+
+</main>
+
+<!-- SESSION NAV -->
+<div class="container">
+  <nav class="session-nav">
+    <a class="session-nav-item prev" href="session-3-formatting-and-charts.html">
+      <span class="session-nav-label">&larr; Previous session</span>
+      <span class="session-nav-title">Making It Clear: Formatting and Charts</span>
+    </a>
+    <a class="session-nav-item next" href="/excel/">
+      <span class="session-nav-label">Course overview &rarr;</span>
+      <span class="session-nav-title">Back to all four sessions</span>
+    </a>
+  </nav>
+</div>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this course</h4>
+        <ul>
+          <li><a href="/excel/">Excel overview</a></li>
+          <li><a href="excel-words-in-plain-english.html">Excel words in plain English</a></li>
+          <li><a href="downloads/session-4-handout.docx" download>Session 4 handout</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.xl-formula button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var code = btn.parentElement.querySelector('code').innerText;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(function () {
+          var old = btn.textContent;
+          btn.textContent = 'copied'; btn.classList.add('copied');
+          setTimeout(function () { btn.textContent = old; btn.classList.remove('copied'); }, 1200);
+        });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

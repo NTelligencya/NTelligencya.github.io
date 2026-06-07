@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Digital Footprint and the Daily Habits That Protect It &middot; Cyber Security Awareness &middot; NTell World Ink</title>
+<meta name="description" content="A grounding session on everyday cyber hygiene: where the soft spots are, strong passphrases, two-step login, staying safe on devices and public wi-fi, and what counts as personal and sensitive information. Plain language, no tech background needed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Cyber Security Awareness, Session 1; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+
+  /* Reusable "card" for the everyday tells / habits */
+  .point-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .point-card h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .point-card p { color: var(--text-2); font-size: 15px; line-height: 1.65; margin: 0 0 8px; }
+  .point-card p:last-child { margin: 0; }
+
+  /* A plain box for the "do this" checklists in-line */
+  .do-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 12px;
+    padding: 20px 24px; margin: 22px 0;
+  }
+  .do-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 21px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .do-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .do-box p:last-child { margin: 0; }
+
+  .tool-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px; margin: 18px 0;
+  }
+  .tool-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--warm); border-radius: 8px; padding: 18px 20px;
+  }
+  .tool-card h5 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .tool-card p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0 0 8px; }
+  .tool-card p:last-child { margin: 0; }
+  .tool-card a { color: var(--accent-2); }
+
+  /* Knowledge check: question with a reveal-able answer */
+  .check-intro {
+    background: rgba(26,201,201,0.04); border: 1px solid var(--rule-2);
+    border-radius: 12px; padding: 18px 24px; margin: 18px 0 22px;
+  }
+  .check-intro p { margin: 0; color: var(--text-2); line-height: 1.65; }
+  details.check {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; margin: 12px 0; overflow: hidden;
+  }
+  details.check > summary {
+    cursor: pointer; list-style: none; padding: 18px 22px;
+    color: var(--text); font-weight: 600; font-size: 15.5px; line-height: 1.55;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  details.check > summary::-webkit-details-marker { display: none; }
+  details.check > summary .q {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    flex: 0 0 auto; padding-top: 2px;
+  }
+  details.check > summary .reveal {
+    margin-left: auto; flex: 0 0 auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    border: 1px solid var(--rule-2); border-radius: 4px; padding: 3px 8px; white-space: nowrap;
+  }
+  details.check[open] > summary .reveal { color: var(--accent-2); border-color: var(--accent); }
+  details.check[open] > summary .reveal::after { content: " shown"; }
+  details.check .answer {
+    padding: 0 22px 20px 22px; color: var(--text-2); line-height: 1.7; font-size: 15px;
+    border-top: 1px solid var(--rule); margin-top: 2px; padding-top: 16px;
+  }
+  details.check .answer strong { color: var(--text); }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+    details.check > summary { flex-wrap: wrap; }
+    details.check > summary .reveal { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/cybersecurity/">Cyber Security Awareness</a>
+    <span class="sep">/</span>
+    <span>Session 1</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Cybersecurity &middot; Course 6 &middot; Session 1</div>
+  <h1>Your Digital Footprint and the Daily Habits That Protect It</h1>
+  <p class="subtitle">A grounding session on everyday cyber hygiene. We start with where the soft spots usually are, the accounts, passwords, and devices that make up a normal day, then build the small, repeatable habits that prevent most everyday trouble. The point is not to make you worried; it is to make the safe choice the easy choice.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">Session &middot; <strong>01 of 04</strong></span>
+    <span class="page-meta-item">Duration &middot; <strong>~2 hours</strong></span>
+    <span class="page-meta-item">Level &middot; <strong>Foundations</strong></span>
+  </div>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/session-1-handout.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this session (Word)
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/cybersecurity/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#start-here">Start Here</a></li>
+    <li><a href="#footprint">Your Digital Footprint</a></li>
+    <li><a href="#passwords">Passwords and Passphrases</a></li>
+    <li><a href="#two-step">Two-Step Login</a></li>
+    <li><a href="#devices">Devices and Public Wi-Fi</a></li>
+    <li><a href="#info">Personal and Sensitive Information</a></li>
+    <li><a href="#toolkit">Your Free Toolkit</a></li>
+    <li><a href="#take-away">What to Take Away</a></li>
+    <li><a href="#knowledge-check">Knowledge Check</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="start-here">
+    <div class="section-eyebrow">// start here</div>
+    <h2>Start Here</h2>
+    <p>Think about a normal working day. You log in to your computer. You check your email. Maybe you sign in to a system to look something up, send a message in Teams, take a photo on your work phone, or jump on the wi-fi at a community office. Every one of those is a small door. Most of them are fine. But each one is a place where someone could try to get in.</p>
+    <p>This session is about those doors. Not to scare you, but to show you which ones matter most and how to put a simple lock on each. None of it is hard. Most of it takes a few minutes once, and then protects you for a long time.</p>
+    <p class="pullquote">You do not need to know how a lock is made to use one. The same is true here. You only need to know which habits keep you safe, and how to switch them on.</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">You cannot break it by being careful</div>
+      <p>A worry we hear a lot is "what if I press the wrong thing?". Turning on the protections in this session does not break anything, and you cannot do harm by being cautious or by asking a question. The only real mistake in cyber safety is staying quiet when something looks wrong, and we get to that in Session 4. So have a go; you are safe to.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="footprint">
+    <div class="section-eyebrow">// your digital footprint</div>
+    <h2>Your Digital Footprint at Work and at Home</h2>
+    <p>Your digital footprint is just the trail of accounts, devices, and logins that make up your life online. Your work email. Your personal email. Online banking. MyGov. Facebook. Your phone. The apps on it. Each one holds a little piece of you, and each one is protected by a login.</p>
+    <p>Here is the part that surprises people: attackers usually do not break in. They log in. They get hold of one password, often from a completely different website that was hacked, and they try it everywhere else. If you used the same password on your work email and on some shopping site that got breached, you have handed them both.</p>
+    <p>This is why the same good habits protect your personal email and your work account at the same time. The attacker does not care which door they come through. So we lock all of them the same way.</p>
+    <div class="callout callout-key">
+      <div class="callout-title">The one idea behind this whole session</div>
+      <p>Most accounts are not stolen by clever hacking. They are opened with a password that leaked somewhere else, or one that was easy to guess. Fix that, and you have closed the most common way in.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="passwords">
+    <div class="section-eyebrow">// passwords and passphrases</div>
+    <h2>Passwords, Passphrases, and Password Managers</h2>
+    <p>Two things make a password weak: it is short, or you have used it somewhere else. Most people worry about the wrong one. A password full of symbols like <strong>P@ssw0rd!</strong> feels strong, but it is short and a computer can guess it quickly. A long, simple phrase is far harder to crack.</p>
+
+    <h3>Length beats complexity</h3>
+    <p>Instead of a password, use a <strong>passphrase</strong>: four random words strung together, like <strong>copper-emu-lantern-river</strong>. It is long, easy for you to remember, and would take a computer a very long time to guess. You do not need capital letters and symbols sprinkled through it if it is long enough, though adding one or two does no harm.</p>
+
+    <h3>Reusing a password is the real danger</h3>
+    <p>Using the same password in more than one place is the single riskiest habit. When one site is hacked, and sites are hacked all the time, that password is now on a list that criminals share and try everywhere. One leak becomes ten break-ins. Every important account should have its own, different passphrase.</p>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Never reuse the password on these</div>
+      <p>Your email above all, because whoever controls your email can reset the password on everything else. Then your banking, your MyGov, and your work login. These four deserve their own unique passphrase each, no exceptions.</p>
+    </div>
+
+    <h3>A password manager remembers them for you</h3>
+    <p>If every account needs a different long passphrase, how is anyone meant to remember them? You are not. A <strong>password manager</strong> is a free app that acts like a locked notebook. It makes a strong, different password for each site, stores them all, and fills them in for you. You remember one strong passphrase to open the manager, and it handles the rest.</p>
+    <p>It sounds like putting all your eggs in one basket, but a good password manager is far safer than the two things people do instead: reusing one password everywhere, or keeping them on a sticky note or in a phone note anyone could read.</p>
+
+    <div class="do-box">
+      <h4>Try this the same day</h4>
+      <p><strong>1.</strong> Pick your most important account, your email, and give it a brand new four-word passphrase that you use nowhere else.</p>
+      <p><strong>2.</strong> Have a look at a free password manager. Bitwarden is free, well regarded, and works on phone and computer. Your web browser also has one built in.</p>
+      <p><strong>3.</strong> Let it generate and save the password for the next new account you make. See how it feels before moving the rest across.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="two-step">
+    <div class="section-eyebrow">// two-step login</div>
+    <h2>Two-Step Login, in Plain Terms</h2>
+    <p>You will see this called <strong>multi-factor authentication</strong>, or <strong>2FA</strong>, or <strong>two-step verification</strong>. They all mean the same simple thing: as well as your password, the account asks for a second proof that it is really you. Usually that is a code from an app or a text message, or a tap on your phone.</p>
+    <p>Why it matters so much: even if someone steals or guesses your password, they still cannot get in, because they do not have your phone in their hand to approve the second step. It stops the large majority of account takeovers on its own. If you do one thing from this session, do this.</p>
+    <p>Here is the idea in one line. To prove who you are, you use two of these three things: <strong>something you know</strong> (your password), <strong>something you have</strong> (your phone, or a small security key), and <strong>something you are</strong> (your fingerprint or face). A password on its own is just one of the three. Two-step login adds a second, and that is what makes it strong.</p>
+    <p>Think of a bank card. A thief needs both the card in their hand and the PIN in their head; one without the other is useless. Two-step login does exactly that for your online accounts.</p>
+
+    <div class="point-card">
+      <h4>What the second step usually looks like</h4>
+      <p><strong>A code by text.</strong> The account sends a number to your phone, and you type it in. Easy to start with, and far better than nothing.</p>
+      <p><strong>An app that makes codes.</strong> A free app such as Google Authenticator or Microsoft Authenticator shows a fresh six-digit code every 30 seconds. A little safer than text messages.</p>
+      <p><strong>A tap to approve.</strong> The account sends a notification to your phone and you tap "yes, that's me". The simplest of all once it is set up.</p>
+      <p><strong>A security key.</strong> A small physical key, often like a USB stick, that you plug in or tap on your phone. It is the strongest option of all, and because many keys do not need internet or a texted code, they suit places with poor phone signal. See <a href="tech-words-in-plain-english.html#logins">Tech Words, in Plain English</a> for more on these.</p>
+    </div>
+
+    <div class="callout callout-key">
+      <div class="callout-title">In the session, turn it on for one account</div>
+      <p>If the connection allows, we will turn on two-step login together, on one account, during the session. Start with your email or your MyGov. Once you have done it once, the rest follow the same pattern.</p>
+    </div>
+
+    <div class="callout callout-key">
+      <div class="callout-title">Turn it on at home too; it matters even more there</div>
+      <p>Your work account has an IT team watching over it. Your personal email, your banking, your Facebook, and your MyGov mostly have only you. That is why turning on two-step login on your <strong>personal</strong> accounts is, if anything, even more important. It is the same few taps. Start with your personal email, because whoever controls your email can reset the password on everything else.</p>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">One catch worth knowing</div>
+      <p>The code is the key. No real bank, agency, or workplace will ever ring you and ask you to read out a code that was just sent to your phone. If someone does, it is a scam, every time. Hang up. We come back to this in Session 2.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="devices">
+    <div class="section-eyebrow">// devices and public wi-fi</div>
+    <h2>Devices, Public Wi-Fi, and Working Remotely</h2>
+    <p>A lot of work in the Territory happens on the move: out in communities, in the car, from home, on a phone as much as a computer. The habits that keep a device safe are the same wherever you are.</p>
+
+    <div class="point-card">
+      <h4>Lock your devices</h4>
+      <p>A PIN, fingerprint, or face unlock on your phone and laptop. A lost phone is a worry. A lost <em>unlocked</em> phone is an open door to your email, messages, and accounts. Set it to lock by itself after a minute or two.</p>
+    </div>
+    <div class="point-card">
+      <h4>Keep software updated</h4>
+      <p>Those update reminders are not just new features. Most updates quietly fix security holes that attackers already know about. Turn on automatic updates for your phone, computer, and apps, and restart when asked. Updating over wi-fi rather than mobile data saves your allowance.</p>
+    </div>
+    <div class="point-card">
+      <h4>Be careful on public and shared wi-fi</h4>
+      <p>Free wi-fi at an airport, shop, or shared venue is handy, but you cannot be sure who else is connected or who set it up. Avoid banking or logging in to important accounts on it. Your own phone's mobile data, or your phone as a hotspot, is safer for anything sensitive. If your workplace gives you a <strong>VPN</strong> (a private, protected path for your connection), use it when working remotely. More on VPNs in <a href="tech-words-in-plain-english.html#internet">Tech Words</a>.</p>
+    </div>
+    <div class="point-card">
+      <h4>Look for the padlock, but do not trust it blindly</h4>
+      <p>Before you type a password or card number into a website, check the address starts with <strong>https</strong> (with an "s") and shows a small padlock. That means your connection is private, so nobody in between can read what you send. But a padlock does <strong>not</strong> mean the site is honest; scam sites can have one too. No padlock: do not enter anything. A padlock: private, but still check who you are dealing with.</p>
+    </div>
+    <div class="point-card">
+      <h4>Log out of shared and community devices</h4>
+      <p>On any computer or tablet that other people also use, always <strong>log out</strong> when you finish, or the next person is using your account. Never let the browser "remember" or "save" your password on a shared machine; say no to that pop-up. And do not tick "keep me signed in".</p>
+    </div>
+    <div class="point-card">
+      <h4>Watch what is on the screen and who is nearby</h4>
+      <p>In a shared office or a public place, be aware of who can see your screen or hear a call. Lock your computer when you walk away from it, even for a minute. On a Windows machine, the Windows key plus L locks it instantly.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="info">
+    <div class="section-eyebrow">// personal and sensitive information</div>
+    <h2>What Counts as Personal and Sensitive Information</h2>
+    <p>A workplace, and especially a council, holds a lot of information about people: residents and staff alike. Names, addresses, dates of birth, phone numbers, payment details, health and family information. The law calls this <strong>personal information</strong>, and some of it is treated as especially <strong>sensitive</strong>.</p>
+    <p>You do not need to be a privacy expert. You only need to recognise this kind of information when it is in front of you, and handle it with a bit of care. The simple test: <em>if this got out, could it embarrass, harm, or be used against the person it belongs to?</em> If yes, treat it carefully.</p>
+
+    <div class="point-card">
+      <h4>Personal information</h4>
+      <p>Anything that identifies a person: name with address, phone number, email, date of birth, photo, or an ID number. On its own it may seem harmless, but pieced together it is exactly what a scammer needs to impersonate someone.</p>
+    </div>
+    <div class="point-card">
+      <h4>Sensitive information</h4>
+      <p>A smaller group that needs extra care: health and medical details, racial or ethnic background, religious beliefs, and financial details like bank or payment information. Getting this wrong can cause real harm, so it gets handled with extra care.</p>
+    </div>
+
+    <p>In Australia, the <strong>Privacy Act</strong> and its privacy principles set the rules for handling this information, and the Northern Territory has its own information privacy rules for public bodies on top of that. The detail is a job for your workplace's policies. What matters for you day to day is small and practical:</p>
+    <ul>
+      <li>Only look at the information you actually need for your job.</li>
+      <li>Only share it with people who are meant to have it, through approved channels.</li>
+      <li>Do not send it to your personal email or save it to a personal device to "finish at home".</li>
+      <li>If you are not sure whether something is okay to share, ask before you send it, not after.</li>
+    </ul>
+    <div class="callout callout-key">
+      <div class="callout-title">Protecting the community's data, and the mob's</div>
+      <p>There is a deeper way to think about this that often makes it click. The information a council holds is not really the council's; it belongs to the people and the community it is about. Information about Aboriginal and Torres Strait Islander people and communities is part of that community's own knowledge, and the community has a right to have it looked after and kept safe. This is the idea of <strong>Indigenous data sovereignty</strong>: the mob's data belongs with the mob.</p>
+      <p>When you handle a resident's details with care, you are not just following a rule. You are acting as a custodian of the community's information, the same way people have always looked after what is important to the community. Keeping data safe is keeping the mob safe.</p>
+    </div>
+    <p>These handling habits set up everything the rest of the series builds on. Sessions 2 and 3 are largely about people trying to trick this information out of you, or out of your workmates.</p>
+  </section>
+
+  <section class="content-section container-content" id="toolkit">
+    <div class="section-eyebrow">// your free toolkit</div>
+    <h2>Your Free Toolkit</h2>
+    <p>Three free, trusted resources worth saving today. No cost, no catch.</p>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h5>cyber.gov.au</h5>
+        <p>The Australian Government's cyber security site for everyday people and small organisations. Plain-language guides on passphrases, two-step login, updates, and what to do if something goes wrong.</p>
+        <p><a href="https://www.cyber.gov.au" target="_blank" rel="noopener">cyber.gov.au</a></p>
+      </div>
+      <div class="tool-card">
+        <h5>Have I Been Pwned</h5>
+        <p>Type in your email address and it tells you if your details have turned up in a known data breach. A free, safe way to check whether it is time to change a password. (Pwned just means "caught out".)</p>
+        <p><a href="https://haveibeenpwned.com" target="_blank" rel="noopener">haveibeenpwned.com</a></p>
+      </div>
+      <div class="tool-card">
+        <h5>A password manager</h5>
+        <p>Bitwarden has a solid free version and works on phone and computer. Your web browser also has one built in. Pick one, and let it carry your passwords so you do not have to.</p>
+        <p><a href="https://bitwarden.com" target="_blank" rel="noopener">bitwarden.com</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="take-away">
+    <div class="section-eyebrow">// what to take away</div>
+    <h2>What to Take Away</h2>
+    <p>A short cyber hygiene checklist you can work through in your own time. Tick each off as you go; click an item to mark it done.</p>
+    <ul class="checklist checklist-interactive">
+      <li>Give my email account its own brand new four-word passphrase, used nowhere else.</li>
+      <li>Turn on two-step login for my email and my MyGov.</li>
+      <li>Turn on two-step login on my personal accounts too, starting with my personal email.</li>
+      <li>Set up a password manager, even if I only move a few accounts across to start.</li>
+      <li>Check my main email on Have I Been Pwned, and change any password it flags.</li>
+      <li>Turn on automatic updates for my phone, computer, and apps.</li>
+      <li>Set my phone and laptop to lock themselves after a minute or two.</li>
+      <li>Avoid banking and important logins on public wi-fi; use my own mobile data instead.</li>
+      <li>Log out of shared or community computers, and never let the browser save my password on them.</li>
+      <li>Check for the https padlock before typing a password or card number, knowing it means private, not automatically safe.</li>
+      <li>Save cyber.gov.au somewhere I can find it again.</li>
+    </ul>
+    <p>You do not have to do all of it today. Even the first two, a unique email passphrase and two-step login, put you ahead of most break-ins.</p>
+  </section>
+
+  <section class="content-section container-content" id="knowledge-check">
+    <div class="section-eyebrow">// knowledge check</div>
+    <h2>Knowledge Check</h2>
+    <div class="check-intro">
+      <p>Five quick scenarios to see what has landed. Read each one, have a think about what you would do, then click to reveal the answer. There is no score and no wrong answer here; it is just a way to check your thinking.</p>
+    </div>
+
+    <details class="check">
+      <summary><span class="q">01</span><span>You use the same password for your work email and a shopping website. The shopping website is hacked and its passwords are leaked. Is your work email at risk?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Yes, it is at risk.</strong> Criminals take leaked passwords and try them on other accounts, especially email. Because you reused the same one, the leak from the shopping site has effectively handed over your work email too. The fix is to give your email its own unique passphrase, and never reuse it anywhere. This is why reuse, not complexity, is the real danger.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">02</span><span>Which of these is the stronger choice: <strong>Tk7$x</strong> or <strong>copper-emu-lantern-river</strong>?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>The four-word passphrase is far stronger.</strong> It looks simpler, but it is much longer, and length is what makes a password hard for a computer to guess. The short one with symbols feels secure but can be cracked quickly. Long and memorable beats short and complicated.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">03</span><span>Someone rings, says they are from your bank's fraud team, and asks you to read out the code that was just texted to your phone so they can "stop a suspicious payment". What do you do?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Do not read out the code. Hang up.</strong> That code is the second step that protects your account, and a real bank will never ring and ask you to read it back. The caller is trying to get past your two-step login. If you are worried it might be real, hang up and call the bank yourself on the number on the back of your card. We go deeper on this in Session 2.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">04</span><span>You are at a cafe with free public wi-fi and want to quickly check your bank balance. Is that a good idea?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Better to wait, or use your own mobile data.</strong> On public wi-fi you cannot be sure who else is on the network. For anything sensitive like banking or important logins, use your phone's own mobile data, or your phone as a hotspot, rather than the free wi-fi. Checking the news or a map on public wi-fi is fine; banking is the kind of thing worth keeping off it.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">05</span><span>A workmate asks you to email a resident's file to your personal Gmail so you can "finish it at home tonight". What is the problem, and what is the better option?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>That file holds personal, and probably sensitive, information, and it should stay inside approved workplace systems.</strong> Sending it to a personal email moves it somewhere with weaker protection and outside the workplace's control, which can breach privacy rules. The better option is to use your workplace's approved way to work remotely. If there is not an easy one, that is a question for your manager or IT, not a reason to use personal email. When in doubt, ask before you send.</p>
+      </div>
+    </details>
+  </section>
+
+</main>
+
+<!-- SESSION NAV -->
+<div class="container">
+  <nav class="session-nav">
+    <span class="session-nav-item prev"></span>
+    <a class="session-nav-item next" href="session-2-scams-and-phishing.html">
+      <span class="session-nav-label">Next session &rarr;</span>
+      <span class="session-nav-title">Scams, Phishing, and the Message Designed to Trick You</span>
+    </a>
+  </nav>
+</div>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/cybersecurity/">Cyber Security Awareness</a></li>
+          <li><a href="/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Interactive take-away checklist: click to tick off
+  document.querySelectorAll('.checklist-interactive li').forEach(function (li) {
+    li.addEventListener('click', function () { li.classList.toggle('done'); });
+  });
+</script>
+
+</body>
+</html>

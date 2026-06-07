@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When Something Goes Wrong: Reporting, Response, and Shared Responsibility &middot; Cyber Security Awareness &middot; NTell World Ink</title>
+<meta name="description" content="What to do in the minutes and hours after a suspected incident: what counts as an incident, how and where to report inside and outside Council, the legal clocks that make speed matter, and the shared responsibility that keeps the whole workplace secure.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Cyber Security Awareness, Session 4; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .point-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .point-card h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .point-card p { color: var(--text-2); font-size: 15px; line-height: 1.65; margin: 0 0 8px; }
+  .point-card p:last-child { margin: 0; }
+
+  .do-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 12px;
+    padding: 20px 24px; margin: 22px 0;
+  }
+  .do-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 21px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .do-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .do-box p:last-child { margin: 0; }
+
+  /* Fill-in box: the three workplace-specific details for IT to confirm */
+  .fill-in-box {
+    background: rgba(240,192,96,0.05);
+    border: 2px dashed var(--warm); border-radius: 12px;
+    padding: 22px 26px; margin: 22px 0;
+  }
+  .fill-in-box .fill-in-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.12em; color: var(--warm); margin-bottom: 10px;
+  }
+  .fill-in-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 14px; font-weight: 500;
+  }
+  .fill-in-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.6; }
+  .fill-in-box .ph {
+    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--warm);
+    background: rgba(240,192,96,0.08); border: 1px solid rgba(240,192,96,0.3);
+    border-radius: 4px; padding: 2px 8px;
+  }
+  .fill-in-box .fill-in-note { color: var(--text-3); font-size: 13px; margin-top: 12px; margin-bottom: 0; }
+
+  /* Contacts list */
+  .contacts { display: grid; gap: 12px; margin: 18px 0; }
+  .contact-item {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 10px; padding: 16px 20px;
+  }
+  .contact-item h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 4px; font-weight: 500;
+  }
+  .contact-item .detail {
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--accent-2); margin: 0 0 6px;
+  }
+  .contact-item p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0; }
+
+  /* Knowledge check */
+  .check-intro {
+    background: rgba(26,201,201,0.04); border: 1px solid var(--rule-2);
+    border-radius: 12px; padding: 18px 24px; margin: 18px 0 22px;
+  }
+  .check-intro p { margin: 0; color: var(--text-2); line-height: 1.65; }
+  details.check {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; margin: 12px 0; overflow: hidden;
+  }
+  details.check > summary {
+    cursor: pointer; list-style: none; padding: 18px 22px;
+    color: var(--text); font-weight: 600; font-size: 15.5px; line-height: 1.55;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  details.check > summary::-webkit-details-marker { display: none; }
+  details.check > summary .q {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    flex: 0 0 auto; padding-top: 2px;
+  }
+  details.check > summary .reveal {
+    margin-left: auto; flex: 0 0 auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    border: 1px solid var(--rule-2); border-radius: 4px; padding: 3px 8px; white-space: nowrap;
+  }
+  details.check[open] > summary .reveal { color: var(--accent-2); border-color: var(--accent); }
+  details.check[open] > summary .reveal::after { content: " shown"; }
+  details.check .answer {
+    padding: 0 22px 20px 22px; color: var(--text-2); line-height: 1.7; font-size: 15px;
+    border-top: 1px solid var(--rule); margin-top: 2px; padding-top: 16px;
+  }
+  details.check .answer strong { color: var(--text); }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+    details.check > summary { flex-wrap: wrap; }
+    details.check > summary .reveal { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/cybersecurity/">Cyber Security Awareness</a>
+    <span class="sep">/</span>
+    <span>Session 4</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Cybersecurity &middot; Course 6 &middot; Session 4</div>
+  <h1>When Something Goes Wrong: Reporting, Response, and Shared Responsibility</h1>
+  <p class="subtitle">The organisational session. The first three build individual skill; this one shows how those skills protect the whole workplace. What to do in the minutes and hours after a suspected incident, how and where to report, and why a workforce that reports early and often is the strongest defence there is.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">Session &middot; <strong>04 of 04</strong></span>
+    <span class="page-meta-item">Duration &middot; <strong>~2 hours</strong></span>
+    <span class="page-meta-item">Level &middot; <strong>Foundations</strong></span>
+  </div>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/session-4-handout.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this session (Word)
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/cybersecurity/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#start-here">Start Here</a></li>
+    <li><a href="#what-is-an-incident">What an Incident Looks Like</a></li>
+    <li><a href="#report-inside">Report It Inside Council</a></li>
+    <li><a href="#the-clock">Why Speed Matters: The Legal Clock</a></li>
+    <li><a href="#report-outside">Reporting Outside Council</a></li>
+    <li><a href="#shared">Your Role: Shared Responsibility</a></li>
+    <li><a href="#everyday">Building It Into the Everyday</a></li>
+    <li><a href="#take-away">What to Take Away</a></li>
+    <li><a href="#knowledge-check">Knowledge Check</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="start-here">
+    <div class="section-eyebrow">// start here</div>
+    <h2>Start Here</h2>
+    <p>Over the first three sessions you built personal skills: locking down your accounts, spotting scams, and seeing through AI-made deception. This session is about what those skills add up to. Because the truth is that no single person can keep an organisation safe; a workplace is only as secure as the habits of everyone in it, and the speed at which they speak up when something looks wrong.</p>
+    <p>So this session is practical and reassuring. We cover what to do in the first minutes after a suspected incident, exactly who to tell, and why reporting early, even when you are not sure, is the single most valuable thing any staff member can do.</p>
+    <p class="pullquote">IT can build the walls, but every staff member holds a key. Keeping the workplace safe is a shared job, and your part of it is mostly this: notice, and speak up fast.</p>
+  </section>
+
+  <section class="content-section container-content" id="what-is-an-incident">
+    <div class="section-eyebrow">// what an incident looks like</div>
+    <h2>What a Security Incident Actually Looks Like</h2>
+    <p>A security incident is rarely dramatic. It usually looks like a small, ordinary thing that does not feel quite right. The most common ones:</p>
+    <div class="point-card">
+      <h4>You clicked something you should not have</h4>
+      <p>A link in a dodgy email, a dodgy attachment, a fake login page where you typed your password. Even if nothing obvious has happened since, it is worth reporting.</p>
+    </div>
+    <div class="point-card">
+      <h4>A device is lost or stolen</h4>
+      <p>A work phone left at the shops, a laptop taken from a car. Even locked, a missing device is a security incident; the sooner it is reported, the sooner it can be locked or wiped.</p>
+    </div>
+    <div class="point-card">
+      <h4>An account is behaving strangely</h4>
+      <p>You are logged out for no reason, you see sign-ins you do not recognise, sent emails you did not write, or a password that suddenly does not work.</p>
+    </div>
+    <div class="point-card">
+      <h4>An unexpected payment or money request</h4>
+      <p>A supplier "bank change", an urgent payment from the "boss", an invoice that does not look right. Even if you did not act on it, IT should know it arrived.</p>
+    </div>
+    <div class="point-card">
+      <h4>Something is locking up or demanding money</h4>
+      <p>Files you cannot open, a strange message on screen demanding payment to unlock them. This can be ransomware, and it is the most time-critical of all. Report it immediately and do not pay anything.</p>
+    </div>
+    <div class="callout callout-key">
+      <div class="callout-title">No incident is too small to report</div>
+      <p>The most damaging mistake is deciding something is "probably nothing" and staying quiet. If in doubt, report it. A false alarm costs a few minutes; an unreported incident can cost far more. You will never be in trouble for reporting something that turns out to be fine.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="report-inside">
+    <div class="section-eyebrow">// report it inside council</div>
+    <h2>Report It Inside Council First</h2>
+    <p>For anything that touches your work account, a work device, or Council systems, your first call is always your own IT team. Not Scamwatch, not the police, not social media; your IT team. They are the ones who can act immediately to contain the problem, and they are the ones who handle any reporting Council is legally required to do (more on that next).</p>
+
+    <div class="fill-in-box">
+      <div class="fill-in-label">// to be confirmed with Council IT</div>
+      <h4>Your Council's reporting details</h4>
+      <p><strong>Phone the IT Service Desk:</strong> <span class="ph">[ phone number to be confirmed ]</span></p>
+      <p><strong>Log a ticket:</strong> <span class="ph">[ ticket system or link to be confirmed ]</span></p>
+      <p><strong>Email IT:</strong> <span class="ph">[ email address to be confirmed ]</span></p>
+      <p class="fill-in-note">These three details are specific to your workplace and are confirmed with Council IT before delivery. Everything else on this page applies everywhere.</p>
+    </div>
+    <!-- TODO: replace the three bracketed placeholders above with Council's actual IT Service Desk phone, ticket-logging method, and email address. These are the only placeholders on this page. -->
+
+    <h3>How to report well</h3>
+    <div class="do-box">
+      <h4>In the first few minutes</h4>
+      <p><strong>Report straight away.</strong> Phone for anything urgent (a live ransomware message, money about to move, a lost device). Use a ticket or email for less urgent things. When in doubt, phone.</p>
+      <p><strong>Say what happened plainly.</strong> What you saw, what you did, and when. You do not need to diagnose it or use technical words; just describe it.</p>
+      <p><strong>Do not try to fix it yourself or cover it up.</strong> Do not delete the email, forward it around, or keep using a device you think is compromised. Keep the evidence and let IT guide you.</p>
+      <p><strong>Then follow IT's instructions.</strong> They may ask you to change a password, disconnect a device, or simply sit tight. Follow their lead.</p>
+    </div>
+
+    <h3>Two small skills that help IT help you</h3>
+    <p>When you report a problem, a picture and a few details save everyone time and help IT work out what is going on. Two things worth knowing how to do:</p>
+    <div class="do-box">
+      <h4>Take a screenshot</h4>
+      <p>A screenshot is a photo of whatever is on your screen. It captures the exact error or dodgy message so IT can see it themselves, instead of you trying to describe it.</p>
+      <p><strong>On a Windows computer:</strong> press the Windows key, Shift, and S together, drag a box around what you want, then paste it into your email or ticket with Ctrl and V. (Pressing PrtScn grabs the whole screen.)</p>
+      <p><strong>On an iPhone:</strong> press the side button and the volume-up button together. On an older iPhone with a home button, press the side button and the home button together.</p>
+      <p><strong>On an Android phone:</strong> press the power button and the volume-down button together.</p>
+      <p>The picture saves to your photos; attach it to your ticket or email. If it shows personal information, send it only through approved channels.</p>
+    </div>
+    <div class="do-box">
+      <h4>Write down the error; do not just say "it's not working"</h4>
+      <p>"The computer is broken" gives IT nothing to go on. A few specifics turn a guessing game into a quick fix. Before you call, jot down:</p>
+      <p><strong>The exact words or error code on the screen.</strong> Copy them down letter for letter, or take a screenshot. Codes that look like gibberish are often exactly what tells IT what is wrong.</p>
+      <p><strong>What you were doing when it happened.</strong> Which program, what you clicked, and whether it happens every time or just once.</p>
+      <p><strong>When it started, and what changed.</strong> A new update, a new device, a different place or wi-fi. Small clues like these often point straight to the cause.</p>
+    </div>
+
+    <div class="callout callout-key">
+      <div class="callout-title">Speed beats certainty, and there is no blame</div>
+      <p>You do not need to be sure something is real before you report it. A workplace where people report early, without fear of getting into trouble, is the safest workplace there is. Reporting a mistake quickly is not a failure; it is exactly what good staff do, and it is what limits the damage.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="the-clock">
+    <div class="section-eyebrow">// why speed matters</div>
+    <h2>Why Speed Matters: The Legal Clock</h2>
+    <p>There is another reason your fast report matters so much. When a serious incident involves money paid to attackers, or people's personal information, the law puts Council on a clock, and that clock starts the moment the incident is discovered. You do not need to memorise the law; you just need to see why every hour counts.</p>
+
+    <div class="point-card">
+      <h4>Ransomware payments: 72 hours</h4>
+      <p>Under the <strong>Cyber Security Act 2024</strong>, if Council ever makes a payment to a ransomware or cyber-extortion attacker, it must report that payment to the Australian Signals Directorate within <strong>72 hours</strong>. This is handled by Council's management and IT, not by you, but it shows why a ransomware message on a screen has to be reported the instant you see it.</p>
+    </div>
+    <div class="point-card">
+      <h4>Data breaches: as soon as practicable</h4>
+      <p>Under the <strong>Notifiable Data Breaches scheme</strong> (part of the Privacy Act 1988), if people's personal information is lost or exposed in a way likely to cause them serious harm, the affected people and the Office of the Australian Information Commissioner must be notified <strong>as soon as practicable</strong>. Northern Territory public bodies also have their own obligations under the NT Information Act. Again, the formal notifying is done by Council, not by you.</p>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">What this means for you</div>
+      <p>You are never the one who reports to the Australian Signals Directorate or the Information Commissioner; that is Council's job. But Council cannot start that clock until someone tells them. Your fast internal report is what lets Council meet its legal obligations and limit the harm. Reporting in the first hour, rather than the next day, can be the difference.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="report-outside">
+    <div class="section-eyebrow">// reporting outside council</div>
+    <h2>Reporting Outside Council</h2>
+    <p>For a workplace incident, IT handles the outside reporting. But there are trusted national services that are worth knowing for your own personal protection, and for scams that have nothing to do with work. Keep this short list handy.</p>
+
+    <div class="contacts">
+      <div class="contact-item">
+        <h4>ReportCyber</h4>
+        <div class="detail">cyber.gov.au/report-and-recover/report</div>
+        <p>The national place to report cybercrime: hacking, online fraud, identity theft, and money stolen online. Goes to police.</p>
+      </div>
+      <div class="contact-item">
+        <h4>Scamwatch</h4>
+        <div class="detail">scamwatch.gov.au</div>
+        <p>Run by the ACCC. Report any scam here, whether or not you lost money. It helps authorities warn others.</p>
+      </div>
+      <div class="contact-item">
+        <h4>IDCARE</h4>
+        <div class="detail">1800 595 160 &middot; idcare.org</div>
+        <p>A free service that helps you recover if your identity or personal details (Medicare, tax file number, ID) have been stolen.</p>
+      </div>
+      <div class="contact-item">
+        <h4>eSafety Commissioner</h4>
+        <div class="detail">esafety.gov.au</div>
+        <p>For online abuse, harassment, and image-based abuse (intimate images shared without consent). They can help get content removed.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Which one, and when</div>
+      <p>Anything involving your <strong>work</strong> account, device, or Council systems: tell <strong>Council IT first</strong>, and let them guide any outside reporting. Anything that is <strong>personal</strong>, your own email, your own money, your own identity, use the services above. If a personal incident also touches a work account or device, tell IT as well.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="shared">
+    <div class="section-eyebrow">// shared responsibility</div>
+    <h2>Your Role: Shared Responsibility</h2>
+    <p>It is tempting to think of cyber security as the IT team's problem. It is not, and it cannot be. IT can put up firewalls, install updates, and set the rules, but they cannot be looking over every shoulder at every email. The single biggest factor in whether an organisation gets hurt is the everyday behaviour of its people.</p>
+    <p>That is the idea of shared responsibility: security is built by IT, but it is held up by everyone. Your part is not technical. It is the small, consistent habits from this whole series:</p>
+    <ul>
+      <li>Strong, unique passphrases and two-step login, so your account is hard to take over.</li>
+      <li>A moment's pause on every unexpected, urgent message, so scams do not get a click.</li>
+      <li>A healthy scepticism about dramatic content and too-good-to-be-true requests.</li>
+      <li>And above all, speaking up fast the moment something looks wrong.</li>
+    </ul>
+    <p class="pullquote">A workforce that reports early and often is the strongest defence an organisation has. Not the firewall; the people.</p>
+    <p>And remember what those habits are really protecting. The information Council holds belongs to the community it serves; for Aboriginal and Torres Strait Islander people, it is part of the community's own knowledge to be looked after and kept safe. Every staff member who locks an account, pauses on a scam, and reports fast is helping keep the mob's data where it belongs: safe, and with the community.</p>
+  </section>
+
+  <section class="content-section container-content" id="everyday">
+    <div class="section-eyebrow">// building it into the everyday</div>
+    <h2>Building It Into the Everyday</h2>
+    <p>The aim of this series was never to turn you into a security expert. It was to build a handful of habits that protect you and Council, and to make the safe choice the easy one. As we finish, here is the whole series in a few lines to carry forward.</p>
+    <div class="do-box">
+      <h4>The series, in one breath</h4>
+      <p><strong>Session 1.</strong> Long, unique passphrases, a password manager, and two-step login on the accounts that matter.</p>
+      <p><strong>Session 2.</strong> Slow down on unexpected, urgent messages. Verify before you click. Never share a password or a code.</p>
+      <p><strong>Session 3.</strong> Good writing proves nothing now. Check a familiar voice. Pause before you share. Keep Council information out of public AI tools.</p>
+      <p><strong>Session 4.</strong> Notice, and report fast. No incident is too small, and there is no blame for speaking up.</p>
+    </div>
+    <p>To keep learning, <a href="https://www.cyber.gov.au" target="_blank" rel="noopener">cyber.gov.au</a> has plain-language advice and a free alert service you can sign up to. And the rest of this series stays here for you to revisit any time.</p>
+  </section>
+
+  <section class="content-section container-content" id="take-away">
+    <div class="section-eyebrow">// what to take away</div>
+    <h2>What to Take Away</h2>
+    <p>Your incident-response checklist. Click an item to tick it off.</p>
+    <ul class="checklist checklist-interactive">
+      <li>Treat a clicked link, a lost device, a strange account, or an odd payment request as something to report.</li>
+      <li>Report anything touching work to Council IT first, fast, by phone if it is urgent.</li>
+      <li>Describe what happened plainly; I do not need to diagnose it.</li>
+      <li>Take a screenshot and note the exact error message or code, and what I was doing, before I call IT.</li>
+      <li>Not try to fix it myself or cover it up; keep the evidence and follow IT's lead.</li>
+      <li>Report even when I am not sure, and even if I made the mistake; speed beats certainty and there is no blame.</li>
+      <li>Remember a ransomware message on screen is the most urgent of all; report it instantly and pay nothing.</li>
+      <li>Use ReportCyber, Scamwatch, IDCARE, and eSafety for my own personal incidents.</li>
+      <li>Keep up the everyday habits from the whole series; that is my part of keeping Council secure.</li>
+    </ul>
+  </section>
+
+  <section class="content-section container-content" id="knowledge-check">
+    <div class="section-eyebrow">// knowledge check</div>
+    <h2>Knowledge Check</h2>
+    <div class="check-intro">
+      <p>Five quick scenarios to see what has landed. Read each, decide what you would do, then click to reveal the answer. No score, no wrong answers; it is just a way to check your thinking.</p>
+    </div>
+
+    <details class="check">
+      <summary><span class="q">01</span><span>This morning you clicked a link in a dodgy email and typed your password before realising. Hours have passed and everything seems normal. It feels too small to bother IT. Do you report it?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Yes, report it now.</strong> "Seems normal" does not mean it is; attackers often wait. Entering your password on a fake page is a genuine incident, and the sooner IT knows, the sooner they can reset access and watch for misuse. It is never too small, and you will not be in trouble. Reporting late is far worse than reporting something that turns out to be harmless.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">02</span><span>You left your work phone at the shops. It is locked with a PIN. Is that worth reporting?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Yes, report it straight away.</strong> A lost or stolen device is a security incident even when it is locked. Reporting it quickly lets IT lock it remotely, wipe it if needed, and keep an eye on the accounts it could reach. A locked phone buys time; it is not a guarantee. Speed is what protects the information on it.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">03</span><span>A colleague calls you over: files on their screen will not open, and there is a message demanding payment to unlock them. What is the priority?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Report it to IT immediately, by phone, and do not pay anything.</strong> This looks like ransomware, the most time-critical incident of all. Do not try to fix it, and do not keep using the machine. There is a legal clock here too: if Council ever paid such an attacker, it must report that within 72 hours under the Cyber Security Act 2024. Your instant report is what lets Council contain it and meet its obligations. The decision about payment is never yours or the colleague's to make alone.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">04</span><span>At home, you fell for a scam and your Medicare and tax file number have been stolen. This is personal, not work. Where do you go?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>Contact IDCARE (1800 595 160), and report it to ReportCyber and Scamwatch.</strong> IDCARE is a free service that helps you recover from identity theft step by step. Because it is personal, you do not report it to Council IT, unless you reused a work password, or it touches a work account or device, in which case tell IT as well so they can protect the work side.</p>
+      </div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">05</span><span>The incident was your fault: you approved a payment that turned out to be a scam. You are worried about getting into trouble. Should you stay quiet and hope it sorts itself out?</span><span class="reveal">Answer</span></summary>
+      <div class="answer">
+        <p><strong>No. Report it immediately; staying quiet is the only real mistake.</strong> The faster a fraudulent payment is flagged, the better the chance of stopping or recovering it; minutes matter. The no-blame principle exists for exactly this moment: organisations want people to report mistakes early, not hide them. You are helping everyone by speaking up, and the embarrassment passes far faster than the damage of a delay would.</p>
+      </div>
+    </details>
+  </section>
+
+</main>
+
+<!-- SESSION NAV -->
+<div class="container">
+  <nav class="session-nav">
+    <a class="session-nav-item prev" href="session-3-ai-and-deepfakes.html">
+      <span class="session-nav-label">&larr; Previous session</span>
+      <span class="session-nav-title">AI, Deepfakes, and the New Shape of Online Deception</span>
+    </a>
+    <a class="session-nav-item next" href="/cybersecurity/">
+      <span class="session-nav-label">Series complete &rarr;</span>
+      <span class="session-nav-title">Back to the course overview</span>
+    </a>
+  </nav>
+</div>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/cybersecurity/">Cyber Security Awareness</a></li>
+          <li><a href="/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Interactive take-away checklist: click to tick off
+  document.querySelectorAll('.checklist-interactive li').forEach(function (li) {
+    li.addEventListener('click', function () { li.classList.toggle('done'); });
+  });
+</script>
+
+</body>
+</html>

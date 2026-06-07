@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microsoft Excel Fundamentals for Employment &middot; NTell World Ink</title>
+<meta name="description" content="A four-session, hands-on introduction to Microsoft Excel for the workplace. Plain language, real work examples, and full take-home Word handouts plus practice workbooks, so the whole course works offline. Built for Northern Territory workplaces.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Excel Fundamentals landing; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .session-list { display: grid; gap: 14px; margin: 12px 0 24px; }
+  .session-list-item {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .session-list-item:hover { border-color: var(--accent); background: rgba(26,201,201,0.03); }
+  .session-list-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 28px;
+    color: var(--accent); font-weight: 500;
+  }
+  .session-list-body h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .session-list-body .when {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+  }
+  .session-list-body ul { margin: 6px 0 0 0; padding-left: 18px; color: var(--text-2); }
+  .session-list-body ul li { font-size: 14.5px; line-height: 1.6; margin-bottom: 3px; }
+
+  .resource-list { display: grid; gap: 12px; margin: 12px 0 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .resource-list-item {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none;
+  }
+  .resource-list-item h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .resource-list-item p { color: var(--text-2); font-size: 14px; line-height: 1.55; margin: 0; }
+  .resource-list-item .wb-links { margin-top: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-3); }
+  .resource-list-item .wb-links a { color: var(--accent-2); text-decoration: none; }
+  .resource-list-item .wb-links a:hover { text-decoration: underline; }
+  #resources h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;
+    color: var(--text); font-weight: 500; margin: 26px 0 4px;
+  }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .session-list-item { grid-template-columns: 1fr; gap: 8px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <span>Excel Fundamentals for Employment</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Microsoft Excel &middot; Course 2</div>
+  <h1>Microsoft Excel Fundamentals for Employment</h1>
+  <p class="subtitle">A spreadsheet is just a tidy grid for numbers and lists, and once you can find your way around it, a lot of everyday work gets quicker. This four-session course is a hands-on, plain-language introduction to Microsoft Excel for the workplace. You will move from naming the parts of the screen to entering data, writing simple sums, formatting it clearly, drawing a chart, and saving your work where you can find it again. No experience is assumed beyond using a mouse and keyboard.</p>
+  <div class="page-meta">
+    <span class="page-meta-item"><strong>4 &times; 3-hour sessions</strong> &middot; hands-on at the keyboard</span>
+    <span class="page-meta-item"><strong>Foundation level</strong> &middot; no experience needed</span>
+    <span class="page-meta-item">Full <strong>Word handouts</strong> &amp; practice workbooks to keep</span>
+    <span class="page-meta-item">Works <strong>offline</strong> &middot; everything downloads</span>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/#library">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to library
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#who-its-for">Who It's For</a></li>
+    <li><a href="#how-it-runs">How It Runs</a></li>
+    <li><a href="#what-youll-work-with">What You'll Work With</a></li>
+    <li><a href="#why-these-four">Why These Four Sessions</a></li>
+    <li><a href="#sessions">The Sessions</a></li>
+    <li><a href="#takeaways">What You'll Take Away</a></li>
+    <li><a href="#resources">Resources</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="overview">
+    <div class="section-eyebrow">// overview</div>
+    <h2>Overview</h2>
+    <p>Excel can look busy and a little intimidating: a giant grid and a wall of buttons. The good news is that almost everything you will ever use lives in a handful of named areas, and once you can name them, the rest starts to make sense. This course is built to get you there, gently and at the keyboard.</p>
+    <p>Over four sessions you will learn the foundations that cover most everyday spreadsheet work: entering and tidying data, writing simple formulas, making a sheet clear and readable, turning numbers into a chart, sorting and filtering a list, and saving and printing sensibly. Every example is the kind of thing a workplace actually uses, a budget, a stock list, a roster, a contact list, so the skills transfer straight to the job.</p>
+    <p class="pullquote">You cannot break Excel by having a go. Nearly everything can be undone with Ctrl + Z. The fastest way to learn a spreadsheet is to click around in one.</p>
+  </section>
+
+  <section class="content-section container-content" id="who-its-for">
+    <div class="section-eyebrow">// who its for</div>
+    <h2>Who It's For</h2>
+    <p>Beginners, and anyone who wants to tidy up skills they half-remember. No prior Excel experience is assumed beyond basic comfort with a computer: using a mouse and keyboard, and opening and saving files. It suits people heading into administration, retail, community services, and remote-community roles, where keeping a simple list, budget, or roster in a spreadsheet is part of the work.</p>
+    <p>The language is kept plain and free of jargon. Where a spreadsheet word is unavoidable, it is explained in everyday terms the first time it appears, and there is a plain-English glossary you can keep.</p>
+  </section>
+
+  <section class="content-section container-content" id="how-it-runs">
+    <div class="section-eyebrow">// how it runs</div>
+    <h2>How It Runs</h2>
+    <p>Four hands-on sessions, three hours each. You learn by doing: the trainer demonstrates a skill, then you try it on a practice workbook on your own screen. Each session builds on the one before, from finding your way around, to formulas, to formatting and charts, and finally to working with lists and sharing your work.</p>
+    <p>Everything you need comes as a download. Each session has a full Word handout that mirrors the whole session, so you can take no notes and still keep everything, plus a blank "starter" workbook to practise in and a finished "solution" workbook to check your work against. Because it all downloads, the course can be delivered and revisited completely offline, with no website needed on the day.</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">A full take-home for every session</div>
+      <p>Each session comes with a complete Word handout, a one-page quick-reference card, and two practice workbooks. Keep them on a USB stick or print them out, and you have the whole course in your hands.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="what-youll-work-with">
+    <div class="section-eyebrow">// what youll work with</div>
+    <h2>What You'll Work With</h2>
+    <p>The practice files use everyday, work-ready scenarios rather than made-up data, so every skill lands on something familiar:</p>
+    <ul>
+      <li><strong>A contact list</strong> for an office or community service, to practise data entry, sorting and filtering.</li>
+      <li><strong>Dave's T-Shirt Shoppe</strong>, a small retail stock list, to work out profit with a simple formula.</li>
+      <li><strong>A weekly budget and expense tracker</strong>, to add up totals and find the average, biggest and smallest.</li>
+      <li><strong>An attendance and work-hours roster</strong>, to record hours and total them.</li>
+      <li><strong>A stock or inventory list</strong>, to format clearly, chart, and tidy with dropdowns.</li>
+      <li><strong>An events register</strong> of Territory suburbs and people, to sort, filter and report on.</li>
+    </ul>
+  </section>
+
+  <section class="content-section container-content" id="why-these-four">
+    <div class="section-eyebrow">// why these four</div>
+    <h2>Why These Four Sessions</h2>
+    <p><strong>Session 1</strong> sets the foundation: naming the parts of the Excel window, moving around, entering text, numbers and dates, speeding up typing with AutoFill, and saving your work where you can find it.</p>
+    <p><strong>Session 2</strong> is the heart of a spreadsheet: writing simple formulas with <code>+ - * /</code>, the order Excel does the maths in, and the five everyday functions, SUM, AVERAGE, COUNT, MAX and MIN.</p>
+    <p><strong>Session 3</strong> makes a sheet clear and shareable: fonts, colours, borders, number formats like currency and percentage, and turning a table of numbers into the right kind of chart.</p>
+    <p><strong>Session 4</strong> is about working with lists and sharing your work: sorting, filtering, tidy dropdown lists, then printing a clean report, with a short look at where to go next.</p>
+  </section>
+
+  <section class="content-section container-content" id="sessions">
+    <div class="section-eyebrow">// the sessions</div>
+    <h2>The Sessions</h2>
+
+    <div class="session-list">
+      <a class="session-list-item" href="session-1-finding-your-way-around.html">
+        <div class="session-list-num">01</div>
+        <div class="session-list-body">
+          <div class="when">Foundations</div>
+          <h4>Finding Your Way Around Excel</h4>
+          <ul>
+            <li>The Excel window: ribbon, Name Box, Formula Bar, the grid, status bar</li>
+            <li>Cells, rows, columns, and how cell addresses like B5 work</li>
+            <li>Entering text, numbers and dates, and editing or deleting</li>
+            <li>AutoFill and custom lists to finish repetitive typing for you</li>
+            <li>Saving, naming files sensibly, and where your work lives</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="session-2-formulas-and-functions.html">
+        <div class="session-list-num">02</div>
+        <div class="session-list-body">
+          <div class="when">The maths</div>
+          <h4>Formulas and Functions</h4>
+          <ul>
+            <li>Starting a formula with = and using + - * / operators</li>
+            <li>The order Excel does the maths in (BODMAS) and using brackets</li>
+            <li>Cell references, and locking one with a dollar sign</li>
+            <li>SUM, AVERAGE, COUNT, MAX and MIN, and the AutoSum shortcut</li>
+            <li>The status bar as the fastest calculator in Excel</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="session-3-formatting-and-charts.html">
+        <div class="session-list-num">03</div>
+        <div class="session-list-body">
+          <div class="when">Making it clear</div>
+          <h4>Making It Clear: Formatting and Charts</h4>
+          <ul>
+            <li>Fonts, colours, borders and fill, used with a light touch</li>
+            <li>Number formats: currency, percentage and dates (look, not value)</li>
+            <li>Resizing rows and columns, and what ##### means</li>
+            <li>Choosing the right chart: column or bar, line, or pie</li>
+            <li>Creating, titling and tidying a clear, readable chart</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="session-4-lists-and-sharing.html">
+        <div class="session-list-num">04</div>
+        <div class="session-list-body">
+          <div class="when">Working with lists</div>
+          <h4>Working With Lists and Sharing Your Work</h4>
+          <ul>
+            <li>Sorting a list, and keeping every row's data together</li>
+            <li>Filtering to show only the rows you care about</li>
+            <li>Tidy dropdown lists with data validation</li>
+            <li>Printing a clean report and setting up the page</li>
+            <li>Putting it all together, and where to go next</li>
+          </ul>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="takeaways">
+    <div class="section-eyebrow">// what youll take away</div>
+    <h2>What You'll Take Away</h2>
+    <p>The confidence to open a spreadsheet, name what you are looking at, and move around without feeling lost.</p>
+    <p>The ability to enter data cleanly, write a simple formula, and use the five everyday functions to answer most questions a column of numbers will ever ask.</p>
+    <p>An eye for a clear sheet: sensible formatting, the right number format, and a chart that makes one point well.</p>
+    <p>The everyday list skills, sorting, filtering and dropdowns, plus saving, naming and printing your work so you can find it and share it.</p>
+    <p>A full set of take-home resources: a complete Word handout per session, quick-reference cards, practice workbooks, and a plain-English glossary, all yours to keep and use offline.</p>
+  </section>
+
+  <section class="content-section container-content" id="resources">
+    <div class="section-eyebrow">// resources</div>
+    <h2>Resources</h2>
+    <p>Every session has a full take-home handout and a one-page quick-reference card, both in Word so you can print them or keep them on a USB stick. There is also a plain-English glossary of Excel words, a guide to asking Copilot for help, and a single card of the keyboard shortcuts and functions worth knowing. Each session page also links its own handout and practice workbooks.</p>
+
+    <h3>References</h3>
+    <div class="resource-list">
+      <a class="resource-list-item" href="excel-words-in-plain-english.html" style="border-left-color:var(--accent);">
+        <h4>Reference &middot; Excel Words, in Plain English</h4>
+        <p>Every Excel word from the course, explained simply with an everyday example: workbook, worksheet, cell, formula, function, operator, cell reference, number format, AutoFill, sort, filter, data validation, chart types and more.</p>
+      </a>
+      <a class="resource-list-item" href="using-copilot-in-excel.html" style="border-left-color:var(--accent);">
+        <h4>Reference &middot; Using Copilot in Excel</h4>
+        <p>How to ask Microsoft Copilot to build a formula or fix an error in plain English, even when you do not know the function's name, with example prompts you can adapt. Plus the one rule that matters: always check the answer.</p>
+      </a>
+      <a class="resource-list-item" href="downloads/excel-foundations-keyboard-and-function-card.docx" download>
+        <h4>Card &middot; Shortcuts &amp; functions</h4>
+        <p>The keyboard shortcuts worth building into habits (Ctrl + S, Alt + =, F4, Ctrl + T, Ctrl + ` and friends) and the function quick reference for SUM, AVERAGE, COUNT, MAX and MIN. Word document.</p>
+      </a>
+    </div>
+
+    <h3>Quick-reference cards</h3>
+    <div class="resource-list">
+      <a class="resource-list-item" href="downloads/session-1-card.docx" download>
+        <h4>Session 1 &middot; Quick-reference card</h4>
+        <p>The Excel window named, the moving-around shortcuts, the data-entry and AutoFill steps, and how to save and name a file. Word document.</p>
+      </a>
+      <a class="resource-list-item" href="downloads/session-2-card.docx" download>
+        <h4>Session 2 &middot; Quick-reference card</h4>
+        <p>Writing a formula, the order of operations, the dollar-sign lock, and the five everyday functions with AutoSum. Word document.</p>
+      </a>
+      <a class="resource-list-item" href="downloads/session-3-card.docx" download>
+        <h4>Session 3 &middot; Quick-reference card</h4>
+        <p>Formatting in a light touch, the common number formats, fixing #####, and choosing and tidying the right chart. Word document.</p>
+      </a>
+      <a class="resource-list-item" href="downloads/session-4-card.docx" download>
+        <h4>Session 4 &middot; Quick-reference card</h4>
+        <p>Sorting, filtering, building a dropdown list, and printing a clean report on one page. Word document.</p>
+      </a>
+    </div>
+
+    <h3>Practice workbooks</h3>
+    <p>Each session comes with a blank "starter" workbook to practise in and a finished "solution" to check your work against. The starters are also linked from each session page.</p>
+    <div class="resource-list">
+      <div class="resource-list-item" style="border-left-color:var(--accent);">
+        <h4>Session 1 &middot; Practice workbook</h4>
+        <p>The contact list and AutoFill sheet (days, months, quarters, Territory communities).</p>
+        <p class="wb-links"><a href="downloads/session-1-solution.xlsx" download>Solution</a> &middot; <a href="downloads/session-1-starter.xlsx" download>Starter</a></p>
+      </div>
+      <div class="resource-list-item" style="border-left-color:var(--accent);">
+        <h4>Session 2 &middot; Practice workbook</h4>
+        <p>Dave's T-Shirt Shoppe with profit formulas, and a totalled weekly budget.</p>
+        <p class="wb-links"><a href="downloads/session-2-solution.xlsx" download>Solution</a> &middot; <a href="downloads/session-2-starter.xlsx" download>Starter</a></p>
+      </div>
+      <div class="resource-list-item" style="border-left-color:var(--accent);">
+        <h4>Session 3 &middot; Practice workbook</h4>
+        <p>A formatted stock list, plus monthly spend shown as column, line and pie charts.</p>
+        <p class="wb-links"><a href="downloads/session-3-solution.xlsx" download>Solution</a> &middot; <a href="downloads/session-3-starter.xlsx" download>Starter</a></p>
+      </div>
+      <div class="resource-list-item" style="border-left-color:var(--accent);">
+        <h4>Session 4 &middot; Practice workbook</h4>
+        <p>The events register sorted by suburb, with a Yes/No dropdown on the Attended column.</p>
+        <p class="wb-links"><a href="downloads/session-4-solution.xlsx" download>Solution</a> &middot; <a href="downloads/session-4-starter.xlsx" download>Starter</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/pandanus-reach/">Power Query</a></li>
+          <li><a href="/cybersecurity/">Cyber Security</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -135,6 +135,29 @@
   .content-section ul li, .content-section ol li { margin-bottom: 6px; }
   .content-section strong { color: var(--text); font-weight: 600; }
 
+  /* Traffic-light tier cards (green / amber / red) */
+  .tier-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin: 18px 0;
+  }
+  .tier-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--rule-2); border-radius: 8px; padding: 18px 20px;
+  }
+  .tier-card h4 {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600;
+    margin: 0 0 12px; color: var(--text-2);
+  }
+  .tier-card p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0 0 8px; }
+  .tier-card p:last-child { margin: 0; }
+  .tier-card.safe { border-top-color: #5ec98a; background: linear-gradient(135deg, rgba(94,201,138,0.06), var(--bg-2)); }
+  .tier-card.safe h4 { color: #6fd498; }
+  .tier-card.caution { border-top-color: var(--warm); background: linear-gradient(135deg, rgba(240,192,96,0.06), var(--bg-2)); }
+  .tier-card.caution h4 { color: var(--warm); }
+  .tier-card.avoid { border-top-color: #e8746b; background: linear-gradient(135deg, rgba(232,116,107,0.07), var(--bg-2)); }
+  .tier-card.avoid h4 { color: #ec8077; }
+
   table.data-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
   table.data-table th {
     text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px;
@@ -236,12 +259,9 @@
       <h2>How Honest Are These Numbers</h2>
             <p>An honesty note before the figures. None of the major AI vendors, OpenAI, Anthropic, Microsoft, Google, or Perplexity, publish official "megabytes per message" or "minimum kilobits per second" figures for their consumer chat products. What they publish is general guidance like "requires a stable internet connection".</p>
                 <p>The numbers below are <strong>engineering estimates</strong>, built from the underlying audio codec bitrates, typical text chat payload sizes, observed image and audio file sizes, and the Telstra and Ookla speed data cited in the Tennant Creek connectivity research. Treat them as ballparks for planning, not promises. Where a number comes from a published vendor limit (for example Claude's 30 MB file upload cap), it's marked as <em>published</em>. Everything else is <em>estimate</em>, with a range.</p>
-                <div class="callout warning">
-                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
-                    <div>
-                        <h4>Check the references before quoting a figure</h4>
-                        <p>If you plan to print these numbers on a handout or quote them to a funder, open the reference links at the bottom of the page and verify against the vendor's current documentation. Bitrates and limits change as the products evolve.</p>
-                    </div>
+                <div class="callout callout-warning">
+                    <div class="callout-title">Check the references before quoting a figure</div>
+                    <p>If you plan to print these numbers on a handout or quote them to a funder, open the reference links at the bottom of the page and verify against the vendor's current documentation. Bitrates and limits change as the products evolve.</p>
                 </div>
             
         </section>
@@ -350,14 +370,11 @@
             <p>Voice mode feels magical. It also quietly eats your data. Here's the maths that matters:</p>
                 <p><strong>One hour of ChatGPT, Copilot, or Gemini voice</strong>, by our estimate, moves about 60 to 120 MB in each direction, so 120 to 240 MB total. That's nothing on home broadband, but on a shared venue hotspot with five people doing it at once, you're pushing 500 MB per hour through one phone. That single phone will collapse under the load.</p>
                 <p>Voice costs roughly 10 to 20 times more data than typing the same conversation. If the job is to ask the AI to summarise a meeting or draft an email, type it. Save voice for situations where you genuinely need hands-free, or where speaking is faster than typing on a small screen.</p>
-                <div class="callout warning">
-                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg>
-                    <div>
-                        <h4>When voice mode is a bad idea</h4>
-                        <p>On a shared venue hotspot with more than five people on it.</p>
-                        <p>On a tight prepaid SIM with less than 5 GB remaining for the cycle.</p>
-                        <p>Any time the same job could be done by typing.</p>
-                    </div>
+                <div class="callout callout-warning">
+                    <div class="callout-title">When voice mode is a bad idea</div>
+                    <p>On a shared venue hotspot with more than five people on it.</p>
+                    <p>On a tight prepaid SIM with less than 5 GB remaining for the cycle.</p>
+                    <p>Any time the same job could be done by typing.</p>
                 </div>
             
         </section>
@@ -510,7 +527,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>&copy; 2026 NT World Ink. Made in the Australian outback.</span>
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
       <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
     </div>
   </div>

@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inbox Detective: Spot the Business Email Scam</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ms-blue: #0078d4;
+      --ms-blue-dark: #005a9e;
+      --ms-blue-light: #deecf9;
+      --ms-navy: #1e3a5f;
+      --ms-navy-hover: #16304f;
+      --ms-sidebar-text: #c8d8ea;
+      --ms-sidebar-active: #2b4d74;
+
+      --bg: #ffffff;
+      --list-bg: #f3f2f1;
+      --surface: #f8f9fa;
+      --border: #d0d0d0;
+      --text: #201f1e;
+      --text-secondary: #605e5c;
+      --hover: #edebe9;
+      --selected: #deecf9;
+
+      --success: #107c10;
+      --danger: #d13438;
+    }
+
+    body.dark-mode {
+      --bg: #1b1a19;
+      --list-bg: #252423;
+      --surface: #2d2c2b;
+      --border: #484644;
+      --text: #f3f2f1;
+      --text-secondary: #a19f9d;
+      --hover: #3b3a39;
+      --selected: #2b4d74;
+      --ms-blue-light: #1a3a5c;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Segoe UI Web', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    body.large-text { font-size: 18px; }
+    body.high-contrast { filter: contrast(1.4); --border: #000; }
+
+    /* ACCESSIBILITY BAR */
+    .accessibility {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 7px 16px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 13px;
+    }
+    .accessibility label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 500; }
+    .a11y-btn {
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text);
+      font-family: inherit;
+    }
+    .a11y-btn:hover { background: var(--hover); }
+
+    /* OUTLOOK-STYLE RIBBON */
+    .ribbon {
+      background: var(--ms-blue);
+      color: white;
+      padding: 0 16px;
+      display: flex;
+      align-items: stretch;
+      height: 52px;
+      flex-shrink: 0;
+    }
+    .ribbon-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-right: 24px;
+      border-right: 1px solid rgba(255,255,255,0.2);
+      margin-right: 20px;
+    }
+    .brand-icon {
+      width: 34px; height: 34px;
+      background: white;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .brand-title { font-size: 16px; font-weight: 600; }
+    .brand-sub { font-size: 11px; opacity: 0.7; }
+    .ribbon-stats {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .stat-box { text-align: center; }
+    .stat-num { font-size: 22px; font-weight: 700; line-height: 1; }
+    .stat-lbl { font-size: 10px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { flex: 1; max-width: 200px; }
+    .prog-text { font-size: 11px; opacity: 0.8; margin-bottom: 5px; }
+    .prog-track { background: rgba(255,255,255,0.25); border-radius: 3px; height: 6px; }
+    .prog-fill { background: #a9e34b; height: 6px; border-radius: 3px; transition: width 0.4s; width: 0%; }
+
+    /* LAYOUT */
+    .layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* DARK NAVY SIDEBAR */
+    .sidebar {
+      width: 200px; min-width: 200px;
+      background: var(--ms-navy);
+      display: flex; flex-direction: column;
+      padding: 10px 0;
+    }
+    .sb-heading {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: rgba(200,216,234,0.45);
+      padding: 8px 16px 4px;
+    }
+    .sb-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 16px;
+      color: var(--ms-sidebar-text);
+      font-size: 14px; cursor: pointer;
+      transition: background 0.1s;
+    }
+    .sb-item:hover { background: var(--ms-navy-hover); }
+    .sb-item.active { background: var(--ms-sidebar-active); color: white; font-weight: 600; }
+    .sb-icon { font-size: 15px; width: 20px; text-align: center; }
+    .sb-count {
+      margin-left: auto;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px; padding: 1px 7px;
+      font-size: 11px; font-weight: 700;
+    }
+    .sb-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 8px 0; }
+
+    /* EMAIL LIST */
+    .email-list {
+      width: 310px; min-width: 280px;
+      background: var(--list-bg);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .list-head {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--list-bg);
+    }
+    .list-head-title { font-size: 14px; font-weight: 700; }
+    .list-head-sub { font-size: 11px; color: var(--text-secondary); }
+    .email-scroll { overflow-y: auto; flex: 1; }
+
+    .email-item {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.1s;
+      background: var(--list-bg);
+    }
+    .email-item:hover { background: var(--hover); }
+    .email-item.is-active { background: var(--ms-blue-light); border-left: 3px solid var(--ms-blue); }
+    .email-item.done-scam { border-left: 3px solid var(--danger); }
+    .email-item.done-real { border-left: 3px solid var(--success); }
+
+    .ei-row1 { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+    .ei-sender { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
+    .ei-date { font-size: 11px; color: var(--text-secondary); flex-shrink: 0; }
+    .ei-subject { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .ei-preview { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ei-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; margin-top: 5px; }
+    .badge-scam { background: #fde7e9; color: #a4262c; }
+    .badge-real { background: #dff6dd; color: #107c10; }
+    body.dark-mode .badge-scam { background: #4a1215; color: #f9a8ab; }
+    body.dark-mode .badge-real { background: #0f2d0f; color: #92d292; }
+
+    /* READING PANE */
+    .reading-pane { flex: 1; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
+
+    .pane-toolbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 7px 18px;
+      display: flex; align-items: center; gap: 6px; min-height: 40px;
+    }
+    .pane-btn {
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 2px; cursor: pointer;
+      font-size: 12px; color: var(--text); font-family: inherit;
+    }
+    .pane-btn:hover { background: var(--hover); border-color: var(--ms-blue); }
+
+    .email-content { flex: 1; padding: 24px 32px; overflow-y: auto; }
+
+    .msg-subject { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+    .msg-meta { font-size: 13px; color: var(--text-secondary); margin-bottom: 3px; }
+    .msg-meta strong { color: var(--text); }
+    .msg-rule { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .msg-body { font-size: 14px; line-height: 1.75; white-space: pre-wrap; }
+
+    /* VERDICT BAR */
+    .verdict-bar {
+      background: #fff4ce;
+      border-top: 2px solid #f9c73c;
+      padding: 13px 22px;
+      display: none; align-items: center; gap: 18px;
+    }
+    body.dark-mode .verdict-bar { background: #2a2200; border-top-color: #7a5c00; }
+    .verdict-bar.visible { display: flex; }
+    .verdict-q { font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .verdict-btns { display: flex; gap: 10px; flex: 1; }
+    .vbtn {
+      flex: 1; max-width: 220px;
+      padding: 11px 18px;
+      border: none; border-radius: 2px;
+      font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+      transition: filter 0.1s, transform 0.1s;
+    }
+    .vbtn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .vbtn:active { transform: translateY(0); }
+    .vbtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; filter: none; }
+    .vbtn-scam { background: var(--danger); color: white; }
+    .vbtn-real { background: var(--success); color: white; }
+
+    /* EMPTY + FINAL */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; text-align: center; color: var(--text-secondary); padding: 40px;
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 14px; }
+    .empty-state h2 { font-size: 19px; color: var(--text); margin-bottom: 10px; }
+    .empty-state p { font-size: 14px; line-height: 1.6; max-width: 340px; }
+
+    .final-screen {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; text-align: center; padding: 40px;
+    }
+    .final-screen.show { display: flex; }
+    .final-icon { font-size: 56px; margin-bottom: 14px; }
+    .final-score { font-size: 54px; font-weight: 800; color: var(--ms-blue); line-height: 1; }
+    .final-lbl { font-size: 15px; color: var(--text-secondary); margin-bottom: 20px; margin-top: 6px; }
+    .final-msg { font-size: 16px; line-height: 1.65; max-width: 400px; margin-bottom: 26px; }
+    .final-replay {
+      padding: 12px 36px;
+      background: var(--ms-blue); color: white;
+      border: none; border-radius: 2px;
+      font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .final-replay:hover { background: var(--ms-blue-dark); }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55); z-index: 200;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--bg); border-radius: 3px;
+      max-width: 540px; width: 100%;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.35); overflow: hidden;
+    }
+    .modal-head { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); }
+    .modal-verdict { font-size: 21px; font-weight: 700; margin-bottom: 7px; }
+    .verdict-ok { color: var(--success); }
+    .verdict-no { color: var(--danger); }
+    .verdict-tag {
+      display: inline-block; padding: 3px 12px;
+      border-radius: 2px; font-size: 12px; font-weight: 700;
+    }
+    .vtag-scam { background: #fde7e9; color: #a4262c; }
+    .vtag-real { background: #dff6dd; color: #107c10; }
+    body.dark-mode .vtag-scam { background: #4a1215; color: #f9a8ab; }
+    body.dark-mode .vtag-real { background: #0f2d0f; color: #92d292; }
+
+    .modal-body { padding: 18px 22px; max-height: 58vh; overflow-y: auto; }
+    .modal-expl { font-size: 14px; line-height: 1.65; margin-bottom: 14px; }
+
+    .flag-block { padding: 12px 14px; margin-bottom: 14px; border-radius: 2px; }
+    .flag-block.scam-flags { background: #fde7e9; border-left: 4px solid #d13438; }
+    .flag-block.real-flags { background: #dff6dd; border-left: 4px solid #107c10; }
+    body.dark-mode .flag-block.scam-flags { background: #3a0d10; border-left-color: #f04048; }
+    body.dark-mode .flag-block.real-flags { background: #0a2010; border-left-color: #3fc73f; }
+    .flag-title {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 9px;
+    }
+    .scam-flags .flag-title { color: #a4262c; }
+    .real-flags .flag-title { color: #107c10; }
+    body.dark-mode .scam-flags .flag-title { color: #f9a8ab; }
+    body.dark-mode .real-flags .flag-title { color: #92d292; }
+    .flag-item { font-size: 13px; line-height: 1.55; padding: 3px 0; }
+
+    .safe-tip {
+      background: var(--ms-blue-light);
+      border-left: 4px solid var(--ms-blue);
+      padding: 12px 14px;
+      font-size: 13px; line-height: 1.6;
+    }
+    .safe-tip strong { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ms-blue); }
+    body.dark-mode .safe-tip { background: #1a2d40; }
+
+    .modal-foot {
+      padding: 12px 22px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end;
+    }
+    .next-btn {
+      padding: 9px 26px;
+      background: var(--ms-blue); color: white;
+      border: none; border-radius: 2px;
+      font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .next-btn:hover { background: var(--ms-blue-dark); }
+
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- ACCESSIBILITY BAR -->
+  <div class="accessibility">
+    <strong style="font-size:12px;">View:</strong>
+    <label><input type="checkbox" id="darkMode"> Dark Mode</label>
+    <label><input type="checkbox" id="largeText"> Larger Text</label>
+    <label><input type="checkbox" id="highContrast"> High Contrast</label>
+    <button class="a11y-btn" id="readBtn" style="margin-left:auto;">🔊 Read Aloud</button>
+    <button class="a11y-btn" id="resetBtn">↺ Start Over</button>
+  </div>
+
+  <!-- RIBBON -->
+  <div class="ribbon">
+    <div class="ribbon-brand">
+      <div class="brand-icon">📨</div>
+      <div>
+        <div class="brand-title">Inbox Detective</div>
+        <div class="brand-sub">Spot the business email scam</div>
+      </div>
+    </div>
+    <div class="ribbon-stats">
+      <div class="stat-box">
+        <div class="stat-num" id="scoreNum">0</div>
+        <div class="stat-lbl">Correct</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="wrongNum">0</div>
+        <div class="stat-lbl">Wrong</div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-text" id="progText">0 of 9 emails checked</div>
+        <div class="prog-track">
+          <div class="prog-fill" id="progFill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-heading">Folders</div>
+      <div class="sb-item active">
+        <span class="sb-icon">📥</span>
+        <span>Inbox</span>
+        <span class="sb-count" id="sbRemaining">9</span>
+      </div>
+      <hr class="sb-divider">
+      <div class="sb-heading">My results</div>
+      <div class="sb-item">
+        <span class="sb-icon">🚨</span>
+        <span>Scams found</span>
+        <span class="sb-count" id="sbScams">0</span>
+      </div>
+      <div class="sb-item">
+        <span class="sb-icon">✅</span>
+        <span>Real emails</span>
+        <span class="sb-count" id="sbReal">0</span>
+      </div>
+    </div>
+
+    <!-- EMAIL LIST -->
+    <div class="email-list">
+      <div class="list-head">
+        <div class="list-head-title">Inbox &middot; Accounts</div>
+        <div class="list-head-sub">Gulf Savanna Regional Council</div>
+      </div>
+      <div class="email-scroll" id="emailList"></div>
+    </div>
+
+    <!-- READING PANE -->
+    <div class="reading-pane">
+      <div class="pane-toolbar">
+        <button class="pane-btn" id="readBtn2">🔊 Read email aloud</button>
+      </div>
+
+      <div class="email-content" id="emailContent">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">🕵️</div>
+          <h2>Pick an email to investigate</h2>
+          <p>You are working in the council accounts inbox. Read each email, then decide: is it a <strong>SCAM</strong> or is it <strong>REAL</strong>?</p>
+          <br>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;max-width:360px;">Running this with a group? Read each email together, vote SCAM or REAL in the Teams chat, then reveal the answer and talk through the warning signs.</p>
+          <br>
+          <p style="font-size:12px;color:var(--text-secondary);">9 emails in your inbox &nbsp;·&nbsp; 5 are scams &nbsp;·&nbsp; 4 are real</p>
+        </div>
+        <div class="final-screen" id="finalScreen">
+          <div class="final-icon" id="finalIcon"></div>
+          <div class="final-score" id="finalScore"></div>
+          <div class="final-lbl">emails correct</div>
+          <div class="final-msg" id="finalMsg"></div>
+          <button class="final-replay" onclick="resetApp()">↺ Play again</button>
+        </div>
+      </div>
+
+      <!-- VERDICT BAR -->
+      <div class="verdict-bar" id="verdictBar">
+        <div class="verdict-q">Is this email a SCAM or REAL?</div>
+        <div class="verdict-btns">
+          <button class="vbtn vbtn-scam" id="btnScam" onclick="submitVerdict('scam')">🚨 SCAM, don't trust it</button>
+          <button class="vbtn vbtn-real" id="btnReal" onclick="submitVerdict('real')">✅ REAL, it's genuine</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-head" id="modalHead"></div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-foot">
+        <button class="next-btn" id="nextBtn"></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var EMAILS = [
+      {
+        id: 1,
+        from: `j.mbalu@gulfsavanna-council.com`,
+        fromDisplay: `Janet Mbalu`,
+        subject: `Are you at your desk?`,
+        date: `Today, 8:52am`,
+        preview: `I need you to take care of something quickly and discreetly...`,
+        body: `Hi,
+
+Are you at your desk? I need you to take care of something quickly and discreetly. I am about to go into a budget meeting and cannot take calls.
+
+I need you to purchase five $100 Google Play gift cards for a staff recognition activity. Once you have them, scratch the back and email me the codes.
+
+Please keep this between us for now, it is a surprise. I will arrange reimbursement afterwards.
+
+Thanks for your help.
+
+Janet
+Sent from my iPhone`,
+        isScam: true,
+        explanation: `This is the classic fake boss, or CEO fraud, scam. A real CEO will not email staff out of the blue asking for gift cards, demand secrecy, and say do not call. The address is a lookalike (a .com address, not the council's real .nt.gov.au), and the secrecy is there to stop you checking.`,
+        flags: [
+          `🔴 The address is j.mbalu@gulfsavanna-council.com, a lookalike; the real council domain is @gulfsavanna.nt.gov.au`,
+          `🔴 Gift cards as payment are a scam every single time`,
+          `🔴 Urgency plus secrecy (keep this between us, going into a meeting) is the fake-boss pattern`,
+          `🔴 "Do not call" exists only to stop you verifying`,
+          `🔴 No real signature, just "Sent from my iPhone"`
+        ],
+        safeAction: `Do not buy anything. Confirm with the CEO in person or on a number you already have, and report it to your IT team. No manager will mind you checking.`
+      },
+      {
+        id: 2,
+        from: `david.curtis@gulfsavanna.nt.gov.au`,
+        fromDisplay: `David Curtis`,
+        subject: `Roads report for Tuesday's council meeting`,
+        date: `Yesterday, 4:10pm`,
+        preview: `Can you add the March roads figures to the agenda pack before Tuesday...`,
+        body: `Hi,
+
+Could you add the March roads maintenance figures to the agenda pack before Tuesday's council meeting? I have attached the summary from the works team.
+
+No rush today, but I would like it finalised by Monday lunchtime so we can print.
+
+Give me a call if anything is unclear.
+
+Thanks,
+David
+
+- - -
+David Curtis
+Manager, Infrastructure & Works
+Gulf Savanna Regional Council
+Phone: (08) 8972 4100
+Mobile: 0455 220 118
+david.curtis@gulfsavanna.nt.gov.au`,
+        isScam: false,
+        isRealFlags: true,
+        explanation: `This is a normal internal email from a colleague. It comes from the council's real .nt.gov.au domain, has a full signature with phone numbers, invites you to call to check, and asks for nothing unusual; no money, no bank details, no passwords.`,
+        flags: [
+          `✅ From the real council domain @gulfsavanna.nt.gov.au`,
+          `✅ Full signature: name, title, council, landline and mobile`,
+          `✅ Invites you to call him to check; scammers avoid that`,
+          `✅ Asks for nothing sensitive; no money, details, or passwords`,
+          `✅ Calm, normal tone with a reasonable, non-panic deadline`
+        ],
+        safeAction: `Go ahead. If anything is unclear, call David on the number in his signature.`
+      },
+      {
+        id: 3,
+        from: `accounts@bns-civil-payments.com`,
+        fromDisplay: `BNS Civil - Accounts`,
+        subject: `Change of bank account for future payments`,
+        date: `Today, 10:21am`,
+        preview: `Please note our banking details have changed, update before the next payment...`,
+        body: `Dear Accounts Payable,
+
+Please be advised that BNS Civil has changed banks. Effective immediately, all future payments should be made to our new account below.
+
+New account name: BNS Civil Pty Ltd
+BSB: 067-401
+Account: 5521 9087
+
+Kindly update your records and confirm by reply so we do not experience any delay on outstanding invoices.
+
+Regards,
+Accounts Receivable
+BNS Civil`,
+        isScam: true,
+        explanation: `This is invoice, or payment, redirection: one of the most expensive scams for councils. A criminal posing as a supplier asks you to change the bank account on file. The next genuine invoice then gets paid straight to them. The address is a lookalike, and they want you to confirm by reply rather than let you call to check.`,
+        flags: [
+          `🔴 Asks to change a supplier's bank details by email; always confirm a change like this by phone first`,
+          `🔴 The address bns-civil-payments.com is not the supplier's normal address`,
+          `🔴 "Confirm by reply" keeps you inside the scammer's email instead of calling`,
+          `🔴 Mild pressure about a "delay on outstanding invoices"`,
+          `🔴 Generic "Accounts Receivable" sign-off, with no named person you can ring`
+        ],
+        safeAction: `Do not change anything. Ring BNS Civil on the number already on file (not any number in this email) and confirm the change verbally before touching the account details.`
+      },
+      {
+        id: 4,
+        from: `invoices@territoryfuel.com.au`,
+        fromDisplay: `Territory Fuel Supplies`,
+        subject: `Invoice TFS-88231 - March fuel delivery (PO 4471)`,
+        date: `2 days ago`,
+        preview: `Please find attached invoice TFS-88231 for the March fuel delivery...`,
+        body: `Hello,
+
+Please find attached invoice TFS-88231 for the March bulk fuel delivery to the council depot, against purchase order PO 4471.
+
+Amount: $6,420.00 (inc GST)
+Terms: 30 days, payable to our usual account on file
+
+There is no change to our account details. If you have any questions about this invoice, call our office on (08) 8947 2200 and ask for accounts.
+
+Thank you,
+Territory Fuel Supplies
+Accounts Team
+(08) 8947 2200`,
+        isScam: false,
+        isRealFlags: true,
+        explanation: `This looks like a genuine supplier invoice. It matches an existing purchase order, explicitly says there is no change to the account details, and gives a phone number you can call to check. Nothing here pressures you or asks you to change anything.`,
+        flags: [
+          `✅ References a real purchase order (PO 4471) and your usual account`,
+          `✅ States plainly that there is NO change to bank details`,
+          `✅ Gives a phone number to call with questions`,
+          `✅ Normal payment terms and tone; no urgency or threats`,
+          `✅ Comes from the supplier's consistent .com.au address`
+        ],
+        safeAction: `Process it through your normal accounts payable checks, matching it to PO 4471. If anything looks off, call the number on file.`
+      },
+      {
+        id: 5,
+        from: `jodie.harmon87@gmail.com`,
+        fromDisplay: `Jodie Harmon`,
+        subject: `New bank account for my pay`,
+        date: `Today, 9:30am`,
+        preview: `Hi, I have switched banks, can you update my account before Thursday's pay run...`,
+        body: `Hi,
+
+I have switched banks and need my salary paid into my new account from this week. Can you please update my details before Thursday's pay run?
+
+New bank account:
+BSB: 923-100
+Account: 4471 2098
+
+I am out on the road today so email is easiest. Appreciate you sorting this quickly.
+
+Thanks,
+Jodie Harmon`,
+        isScam: true,
+        explanation: `This is payroll diversion. A scammer, or someone who has taken over a personal email, poses as a staff member and asks to redirect their salary to a new account just before payday. The request comes from a personal Gmail, not Jodie's work address, and the time pressure is there so you skip the normal identity check.`,
+        flags: [
+          `🔴 Comes from a personal Gmail, not Jodie's @gulfsavanna.nt.gov.au work address`,
+          `🔴 Asks to redirect salary to a new account; a classic payroll scam`,
+          `🔴 Timed just before the pay run to rush you`,
+          `🔴 "I'm on the road, email is easiest" discourages you from confirming in person`,
+          `🔴 No proper HR form or payroll-change process followed`
+        ],
+        safeAction: `Do not change any payroll details from an email. Confirm with Jodie in person or by calling her on the number HR already holds, and follow the proper payroll-change process.`
+      },
+      {
+        id: 6,
+        from: `support@m365-mailadmin.com`,
+        fromDisplay: `Microsoft 365 Support`,
+        subject: `Your password expires today - action required`,
+        date: `Today, 7:05am`,
+        preview: `Your mailbox password expires in 6 hours. Re-validate to avoid losing access...`,
+        body: `Dear User,
+
+Your Microsoft 365 mailbox password expires TODAY. To keep the same password and avoid losing access to your email, you must re-validate your account within 6 hours.
+
+Re-validate here:
+https://m365-mailadmin.com/keep-password
+
+Failure to act will result in your mailbox being locked.
+
+Microsoft 365 Support Team`,
+        isScam: true,
+        explanation: `This is credential phishing. The link goes to a fake login page built to steal your council email username and password. The sender is a lookalike domain, not Microsoft and not your council, and it uses a countdown to rush you. Real password resets are not done through an email link like this.`,
+        flags: [
+          `🔴 From m365-mailadmin.com, not Microsoft and not your council's IT`,
+          `🔴 The link goes to a fake sign-in page to steal your password`,
+          `🔴 "Dear User"; it does not know your name`,
+          `🔴 A 6-hour countdown designed to panic you`,
+          `🔴 Real IT password changes are not done through an email link like this`
+        ],
+        safeAction: `Do not click the link. If you are unsure about your password, contact your council IT team directly, or change it the normal way through your usual sign-in page.`
+      },
+      {
+        id: 7,
+        from: `it.servicedesk@gulfsavanna.nt.gov.au`,
+        fromDisplay: `IT Service Desk`,
+        subject: `Planned network maintenance - Saturday 6am to 9am`,
+        date: `Yesterday, 2:15pm`,
+        preview: `The finance system will be unavailable on Saturday morning for scheduled maintenance...`,
+        body: `Hello everyone,
+
+This is a heads-up that the finance and records systems will be unavailable this Saturday between 6:00am and 9:00am while we carry out scheduled maintenance.
+
+You do not need to do anything. No login or password action is required. Please just save your work before you leave on Friday.
+
+If you have any questions, log a ticket through the usual IT Service Desk page or call us on extension 4199.
+
+Regards,
+IT Service Desk
+Gulf Savanna Regional Council
+Ext 4199`,
+        isScam: false,
+        isRealFlags: true,
+        explanation: `This is a genuine internal IT notice. It comes from the council's own .nt.gov.au domain, explicitly says no login or password action is needed, asks for nothing, and points you to the normal IT channel. Compare it with the fake password expires email: real IT does not ask you to click a link and log in.`,
+        flags: [
+          `✅ From the real council domain @gulfsavanna.nt.gov.au`,
+          `✅ Clearly states no login or password action is required`,
+          `✅ Asks for nothing and contains no outside links`,
+          `✅ Points you to the normal IT Service Desk and an internal extension`,
+          `✅ Informative, not urgent or threatening`
+        ],
+        safeAction: `Nothing to do except save your work on Friday. If unsure, contact the IT Service Desk the way you normally would.`
+      },
+      {
+        id: 8,
+        from: `director.corporate@gulfsavanna.finance-team.com`,
+        fromDisplay: `Raymond Okafor (Director Corporate Services)`,
+        subject: `Confidential - urgent payment before 2pm`,
+        date: `Today, 11:40am`,
+        preview: `I need an urgent payment processed today for a confidential matter...`,
+        body: `Hi,
+
+I need you to process an urgent payment today for a confidential council matter I cannot discuss over email yet. It must be done before 2pm.
+
+Amount: $24,850
+Beneficiary: Northern Project Advisory
+BSB: 014-220
+Account: 7790 5512
+
+Please action this now and reply once done. I am in back-to-back meetings so cannot take calls. Keep this between us until I brief the team.
+
+Raymond Okafor
+Director Corporate Services`,
+        isScam: true,
+        explanation: `This is executive fraud aimed straight at payments. It uses authority, urgency, secrecy, and cannot take calls to push a one-off payment to a new account. The address looks official at a glance, but gulfsavanna.finance-team.com is a lookalike, not the council's real @gulfsavanna.nt.gov.au domain.`,
+        flags: [
+          `🔴 The domain gulfsavanna.finance-team.com is a lookalike, not @gulfsavanna.nt.gov.au`,
+          `🔴 Authority plus urgency plus secrecy plus "cannot take calls" is the fake-boss pattern`,
+          `🔴 Pushes a large payment to a new beneficiary with a same-day deadline`,
+          `🔴 "Keep this between us" is designed to stop you checking`,
+          `🔴 A real director will not block every way of confirming the request`
+        ],
+        safeAction: `Do not make the payment. Verify directly with Raymond in person or on a known number, and follow the council's normal payment-approval process. Report the email to IT.`
+      },
+      {
+        id: 9,
+        from: `grants.acquittals@dlg.nt.gov.au`,
+        fromDisplay: `NT Grants - Acquittals`,
+        subject: `Reminder: roads grant acquittal due Friday 5pm`,
+        date: `2 days ago`,
+        preview: `Your acquittal report for the regional roads grant is due this Friday...`,
+        body: `Dear Grant Recipient,
+
+This is a reminder that the acquittal report for your Regional Roads Improvement Grant is due this Friday at 5:00pm.
+
+To submit, log in to the grants portal the way you normally do (the same site you used to apply) and upload your completed report. Please do not email the report as an attachment.
+
+If you need an extension, reply to this email or call the grants team on (08) 8924 7000 before the due date.
+
+This is a notification only. It does not ask for any payment or banking information.
+
+NT Grants - Acquittals Team`,
+        isScam: false,
+        isRealFlags: true,
+        explanation: `Urgency does not always mean scam. This is a genuine reminder with a real deadline. It comes from a .nt.gov.au government address, points you to the portal you already use rather than a new link, asks for no money or banking details, and gives a phone number for an extension. The deadline is real, not a trick to panic you.`,
+        flags: [
+          `✅ From a real government .nt.gov.au address`,
+          `✅ Tells you to use the portal you already use, not a new link`,
+          `✅ Explicitly asks for no payment or banking information`,
+          `✅ Offers a normal phone number if you need an extension`,
+          `✅ A genuine deadline; urgency on its own is not proof of a scam`
+        ],
+        safeAction: `Treat it as genuine, but still log in to the grants portal the way you normally do rather than through any link. Call the grants team if you need an extension.`
+      }
+    ];
+
+    var APP = { answered: {}, score: 0, wrong: 0, currentEmail: null };
+
+    function init() {
+      document.getElementById('darkMode').onchange = function(e) {
+        document.body.classList.toggle('dark-mode', e.target.checked);
+      };
+      document.getElementById('largeText').onchange = function(e) {
+        document.body.classList.toggle('large-text', e.target.checked);
+      };
+      document.getElementById('highContrast').onchange = function(e) {
+        document.body.classList.toggle('high-contrast', e.target.checked);
+      };
+      document.getElementById('readBtn').onclick = readAloud;
+      document.getElementById('readBtn2').onclick = readAloud;
+      document.getElementById('resetBtn').onclick = function() {
+        if (confirm('Start over? All progress will be lost.')) resetApp();
+      };
+      renderList();
+    }
+
+    function renderList() {
+      var container = document.getElementById('emailList');
+      container.innerHTML = '';
+      var scams = 0, reals = 0;
+      EMAILS.forEach(function(em) {
+        var ans = APP.answered[em.id];
+        if (ans) { if (em.isScam) scams++; else reals++; }
+
+        var div = document.createElement('div');
+        var cls = 'email-item';
+        if (APP.currentEmail && APP.currentEmail.id === em.id) cls += ' is-active';
+        if (ans) cls += em.isScam ? ' done-scam' : ' done-real';
+        div.className = cls;
+
+        var badge = '';
+        if (ans) {
+          var icon = ans.correct ? '✅' : '❌';
+          var bc = em.isScam ? 'badge-scam' : 'badge-real';
+          var bl = em.isScam ? 'SCAM' : 'REAL';
+          badge = '<div><span class="ei-badge ' + bc + '">' + icon + ' ' + bl + '</span></div>';
+        }
+
+        div.innerHTML =
+          '<div class="ei-row1">' +
+            '<div class="ei-sender">' + esc(em.fromDisplay) + '</div>' +
+            '<div class="ei-date">' + em.date + '</div>' +
+          '</div>' +
+          '<div class="ei-subject">' + esc(em.subject) + '</div>' +
+          '<div class="ei-preview">' + esc(em.preview) + '</div>' +
+          badge;
+
+        div.onclick = (function(e2) { return function() { openEmail(e2); }; })(em);
+        container.appendChild(div);
+      });
+
+      document.getElementById('sbScams').textContent = scams;
+      document.getElementById('sbReal').textContent = reals;
+      document.getElementById('sbRemaining').textContent = EMAILS.length - Object.keys(APP.answered).length;
+    }
+
+    function openEmail(em) {
+      APP.currentEmail = em;
+
+      var content = document.getElementById('emailContent');
+      // Preserve anchored elements
+      var empty = document.getElementById('emptyState');
+      var final = document.getElementById('finalScreen');
+
+      content.innerHTML =
+        '<div class="msg-subject">' + esc(em.subject) + '</div>' +
+        '<div class="msg-meta"><strong>From:</strong> ' + esc(em.fromDisplay) + ' &lt;' + esc(em.from) + '&gt;</div>' +
+        '<div class="msg-meta"><strong>Date:</strong> ' + em.date + '</div>' +
+        '<hr class="msg-rule">' +
+        '<div class="msg-body" id="msgBody">' + esc(em.body) + '</div>';
+
+      content.appendChild(empty);
+      content.appendChild(final);
+      empty.style.display = 'none';
+      final.classList.remove('show');
+
+      var ans = APP.answered[em.id];
+      var bar = document.getElementById('verdictBar');
+      bar.classList.add('visible');
+      document.getElementById('btnScam').disabled = !!ans;
+      document.getElementById('btnReal').disabled = !!ans;
+
+      renderList();
+    }
+
+    function submitVerdict(choice) {
+      var em = APP.currentEmail;
+      if (!em || APP.answered[em.id]) return;
+
+      var correct = (choice === 'scam') === em.isScam;
+      APP.answered[em.id] = { choice: choice, correct: correct };
+      if (correct) APP.score++; else APP.wrong++;
+
+      document.getElementById('scoreNum').textContent = APP.score;
+      document.getElementById('wrongNum').textContent = APP.wrong;
+      var done = Object.keys(APP.answered).length;
+      document.getElementById('progText').textContent = done + ' of ' + EMAILS.length + ' emails checked';
+      document.getElementById('progFill').style.width = Math.round((done / EMAILS.length) * 100) + '%';
+
+      document.getElementById('btnScam').disabled = true;
+      document.getElementById('btnReal').disabled = true;
+
+      showModal(em, correct);
+      renderList();
+    }
+
+    function showModal(em, correct) {
+      var head = document.getElementById('modalHead');
+      var verdictTxt = correct ? '✅ Correct!' : '❌ Wrong, here\'s why';
+      var verdictCls = correct ? 'verdict-ok' : 'verdict-no';
+      var tagCls = em.isScam ? 'vtag-scam' : 'vtag-real';
+      var tagTxt = em.isScam ? '🚨 This is a SCAM' : '✅ This is REAL';
+      head.innerHTML =
+        '<div class="modal-verdict ' + verdictCls + '">' + verdictTxt + '</div>' +
+        '<span class="verdict-tag ' + tagCls + '">' + tagTxt + '</span>';
+
+      var body = document.getElementById('modalBody');
+      var flagCls = em.isRealFlags ? 'real-flags' : 'scam-flags';
+      var flagTitle = em.isRealFlags ? 'Why it\'s genuine:' : 'The warning signs:';
+      var flagsHtml = (em.flags || []).map(function(f) {
+        return '<div class="flag-item">' + esc(f) + '</div>';
+      }).join('');
+
+      body.innerHTML =
+        '<div class="modal-expl">' + esc(em.explanation) + '</div>' +
+        '<div class="flag-block ' + flagCls + '">' +
+          '<div class="flag-title">' + flagTitle + '</div>' + flagsHtml +
+        '</div>' +
+        '<div class="safe-tip"><strong>What to do</strong>' + esc(em.safeAction) + '</div>';
+
+      var done = Object.keys(APP.answered).length;
+      var isLast = (done === EMAILS.length);
+      var btn = document.getElementById('nextBtn');
+      btn.textContent = isLast ? '🏆 See my final score' : 'Next email →';
+      btn.onclick = function() { closeModal(isLast); };
+
+      document.getElementById('modalOverlay').classList.add('show');
+    }
+
+    function closeModal(isLast) {
+      document.getElementById('modalOverlay').classList.remove('show');
+      if (isLast) { showFinalScreen(); return; }
+
+      // Auto-advance to next unanswered email
+      var next = null;
+      var pastCurrent = false;
+      for (var i = 0; i < EMAILS.length; i++) {
+        if (APP.currentEmail && EMAILS[i].id === APP.currentEmail.id) {
+          pastCurrent = true;
+          continue;
+        }
+        if (pastCurrent && !APP.answered[EMAILS[i].id]) { next = EMAILS[i]; break; }
+      }
+      // Wrap around if needed
+      if (!next) {
+        for (var i = 0; i < EMAILS.length; i++) {
+          if (!APP.answered[EMAILS[i].id]) { next = EMAILS[i]; break; }
+        }
+      }
+      if (next) openEmail(next);
+    }
+
+    function showFinalScreen() {
+      APP.currentEmail = null;
+      document.getElementById('verdictBar').classList.remove('visible');
+
+      var content = document.getElementById('emailContent');
+      var empty = document.getElementById('emptyState');
+      var final = document.getElementById('finalScreen');
+      content.innerHTML = '';
+      content.appendChild(empty);
+      content.appendChild(final);
+      empty.style.display = 'none';
+      final.classList.add('show');
+
+      var pct = Math.round((APP.score / EMAILS.length) * 100);
+      document.getElementById('finalScore').textContent = APP.score + '/' + EMAILS.length;
+
+      var icon, msg;
+      if (pct === 100) {
+        icon = '🏆'; msg = 'Perfect score. You spotted every dodgy email. You are exactly the kind of staff member who keeps a council, its money, and its information safe.';
+      } else if (pct >= 75) {
+        icon = '🌟'; msg = 'Great work. You caught most of them. Remember the golden rule: never pay, never change bank details, and never share a login based on an email alone. Check first.';
+      } else if (pct >= 50) {
+        icon = '👍'; msg = 'Good effort. These scams are convincing. The patterns to watch: a lookalike address, urgency plus secrecy, gift cards, and any request to change bank details or log in.';
+      } else {
+        icon = '💪'; msg = 'Keep practising. These emails are built to fool busy, helpful people. When an email pushes you to act fast or asks for money, a bank change, or a password, slow down and check by phone.';
+      }
+
+      document.getElementById('finalIcon').textContent = icon;
+      document.getElementById('finalMsg').textContent = msg;
+      renderList();
+    }
+
+    function resetApp() {
+      APP.answered = {}; APP.score = 0; APP.wrong = 0; APP.currentEmail = null;
+      document.getElementById('scoreNum').textContent = '0';
+      document.getElementById('wrongNum').textContent = '0';
+      document.getElementById('progText').textContent = '0 of ' + EMAILS.length + ' emails checked';
+      document.getElementById('progFill').style.width = '0%';
+      document.getElementById('verdictBar').classList.remove('visible');
+      document.getElementById('modalOverlay').classList.remove('show');
+
+      var content = document.getElementById('emailContent');
+      var empty = document.getElementById('emptyState');
+      var final = document.getElementById('finalScreen');
+      content.innerHTML = '';
+      empty.style.display = '';
+      final.classList.remove('show');
+      content.appendChild(empty);
+      content.appendChild(final);
+      renderList();
+    }
+
+    function readAloud() {
+      var el = document.getElementById('msgBody');
+      if (!el) { alert('Select an email first.'); return; }
+      if ('speechSynthesis' in window) {
+        var u = new SpeechSynthesisUtterance(el.textContent);
+        u.lang = 'en-AU'; u.rate = 0.88;
+        speechSynthesis.cancel(); speechSynthesis.speak(u);
+      } else {
+        alert(el.textContent);
+      }
+    }
+
+    function esc(s) {
+      var d = document.createElement('div');
+      d.textContent = s; return d.innerHTML;
+    }
+
+    document.readyState === 'loading'
+      ? document.addEventListener('DOMContentLoaded', init)
+      : init();
+  </script>
+</body>
+</html>

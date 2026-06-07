@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Making It Clear: Formatting and Charts &middot; Excel Fundamentals &middot; NTell World Ink</title>
+<meta name="description" content="Session 3 of Excel Fundamentals for Employment: fonts, colours, borders and fill, number formats like currency and percentage, resizing rows and columns, and choosing and tidying the right chart (column or bar, line, pie). Plain language, hands-on.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Excel Fundamentals, Session 3; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .activity-box {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm); border-radius: 12px;
+    padding: 24px 26px; margin: 22px 0;
+  }
+  .activity-box .label {
+    display: inline-block; background: var(--warm); color: #1a1a1d;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .activity-box h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 12px; font-weight: 500;
+  }
+  .activity-box p { color: var(--text-2); margin: 0 0 10px; line-height: 1.65; }
+  .activity-box p:last-child { margin: 0; }
+  .activity-box ol, .activity-box ul { color: var(--text-2); line-height: 1.7; padding-left: 22px; margin: 0 0 10px; }
+  .activity-box li { margin-bottom: 5px; }
+
+  .point-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .point-card h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .point-card p { color: var(--text-2); font-size: 15px; line-height: 1.65; margin: 0 0 8px; }
+  .point-card p:last-child { margin: 0; }
+
+  /* ===== Excel-style worksheet grid ===== */
+  .xl-wrap { margin: 18px 0; overflow-x: auto; }
+  .xl-grid {
+    border-collapse: collapse; font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; color: var(--text); background: var(--bg-2);
+  }
+  .xl-grid caption {
+    caption-side: top; text-align: left; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 0 0 8px;
+  }
+  .xl-grid th, .xl-grid td {
+    border: 1px solid var(--rule-2); padding: 6px 14px; text-align: left; white-space: nowrap;
+  }
+  .xl-grid thead th, .xl-grid tbody th {
+    background: #17171b; color: var(--text-3); font-weight: 500; text-align: center;
+  }
+  .xl-grid tbody th { width: 30px; }
+  .xl-grid .corner { background: #0f0f12; }
+  .xl-grid td.num { text-align: right; }
+  .xl-grid td.formula { color: var(--accent-2); }
+  .xl-grid td.head { color: var(--text); font-weight: 500; }
+
+  /* ===== Copyable formula block ===== */
+  .xl-formula {
+    display: flex; align-items: stretch; margin: 16px 0;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 8px; overflow: hidden;
+  }
+  .xl-formula code {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--text);
+    padding: 12px 16px; flex: 1; overflow-x: auto; white-space: pre;
+  }
+  .xl-formula button {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-3); background: transparent;
+    border: none; border-left: 1px solid var(--rule-2); padding: 0 16px; cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .xl-formula button:hover { color: var(--accent-2); background: rgba(26,201,201,0.05); }
+  .xl-formula button.copied { color: var(--accent); }
+
+  /* Chart-choice cards */
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 18px 0; }
+  .chart-card {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-top: 3px solid var(--accent); border-radius: 8px; padding: 18px 20px;
+  }
+  .chart-card h5 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 8px; font-weight: 500;
+  }
+  .chart-card .use { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .chart-card p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0; }
+
+  .check-intro {
+    background: rgba(26,201,201,0.04); border: 1px solid var(--rule-2);
+    border-radius: 12px; padding: 18px 24px; margin: 18px 0 22px;
+  }
+  .check-intro p { margin: 0; color: var(--text-2); line-height: 1.65; }
+  details.check {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; margin: 12px 0; overflow: hidden;
+  }
+  details.check > summary {
+    cursor: pointer; list-style: none; padding: 18px 22px;
+    color: var(--text); font-weight: 600; font-size: 15.5px; line-height: 1.55;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  details.check > summary::-webkit-details-marker { display: none; }
+  details.check > summary .q {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent);
+    flex: 0 0 auto; padding-top: 2px;
+  }
+  details.check > summary .reveal {
+    margin-left: auto; flex: 0 0 auto; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3);
+    border: 1px solid var(--rule-2); border-radius: 4px; padding: 3px 8px; white-space: nowrap;
+  }
+  details.check[open] > summary .reveal { color: var(--accent-2); border-color: var(--accent); }
+  details.check[open] > summary .reveal::after { content: " shown"; }
+  details.check .answer {
+    padding: 0 22px 20px 22px; color: var(--text-2); line-height: 1.7; font-size: 15px;
+    border-top: 1px solid var(--rule); margin-top: 2px; padding-top: 16px;
+  }
+  details.check .answer strong { color: var(--text); }
+  details.check .answer code { font-family: 'JetBrains Mono', monospace; color: var(--accent-2); }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+  .content-section p code, .content-section li code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.92em;
+    color: var(--accent-2); background: rgba(26,201,201,0.06);
+    padding: 1px 6px; border-radius: 4px;
+  }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+    details.check > summary { flex-wrap: wrap; }
+    details.check > summary .reveal { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/excel/">Excel Fundamentals</a>
+    <span class="sep">/</span>
+    <span>Session 3</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Microsoft Excel &middot; Course 2 &middot; Session 3</div>
+  <h1>Making It Clear: Formatting and Charts</h1>
+  <p class="subtitle">A sheet that is correct is only half the job; it also has to be readable. This session is about making your numbers clear: choosing fonts, colours and borders with a light touch, picking the right number format so a value reads as money or a percentage, sizing rows and columns to fit, and turning a table into the right kind of chart so it makes one point well.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">Session &middot; <strong>03 of 04</strong></span>
+    <span class="page-meta-item">Duration &middot; <strong>~3 hours</strong></span>
+    <span class="page-meta-item">Level &middot; <strong>Foundation</strong></span>
+  </div>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/session-3-handout.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this session (Word)
+    </a>
+    <a class="btn btn-download" href="downloads/session-3-starter.xlsx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Practice workbook (starter)
+    </a>
+    <a class="btn btn-download" href="downloads/session-3-solution.xlsx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Solution workbook
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/excel/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+      <li><a href="#start-here">Start Here</a></li>
+      <li><a href="#fonts">Fonts, Colours, Borders and Fill</a></li>
+      <li><a href="#number-formats">Number Formats</a></li>
+      <li><a href="#sizing">Resizing Rows and Columns</a></li>
+      <li><a href="#consistency">Styles and the Format Painter</a></li>
+      <li><a href="#tables">Turning a List into a Table</a></li>
+      <li><a href="#choosing-chart">Choosing the Right Chart</a></li>
+      <li><a href="#making-chart">Making and Tidying a Chart</a></li>
+      <li><a href="#try-it">Try It at the Keyboard</a></li>
+      <li><a href="#check">Knowledge Check</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="start-here">
+    <div class="section-eyebrow">// start here</div>
+    <h2>Start Here</h2>
+    <p>Formatting is what turns a plain grid of numbers into something a reader can take in at a glance. A bold heading row, the right kind of number format, a little space, and suddenly the sheet guides the eye instead of fighting it. Most of what people mean by a "professional" spreadsheet is really just this: tidy, consistent, easy to read.</p>
+    <p>The golden rule is a light touch. A single heading row in bold with one fill colour usually reads better than a riot of colours and fonts.</p>
+    <p class="pullquote">Clear and accessible are the same thing. A sheet that is easy for anyone to read is also easier for everyone to read.</p>
+  </section>
+
+  <section class="content-section container-content" id="fonts">
+    <div class="section-eyebrow">// fonts, colours, borders and fill</div>
+    <h2>Fonts, Colours, Borders and Fill</h2>
+    <p>These are the visual basics, the same controls you would recognise from a word processor, gathered in the <strong>Font group on the Home tab</strong>. First select the cell or range you want to change, then:</p>
+    <ul>
+      <li><strong>Font and size:</strong> pick a typeface and size from the two dropdowns on the left of the Font group. <strong>Bold (B)</strong>, <strong>Italic (I)</strong> and <strong>Underline (U)</strong> work as you would expect, and have the shortcuts Ctrl + B, Ctrl + I, Ctrl + U.</li>
+      <li><strong>Font colour:</strong> the <strong>A</strong> with a coloured bar under it. Click the small arrow beside it for more colours.</li>
+      <li><strong>Fill (background colour):</strong> the paint-bucket icon sets a cell's background. This is the usual way to highlight a heading row or flag a cell.</li>
+      <li><strong>Borders:</strong> the grid icon adds lines around cells. Click its arrow for a menu: Bottom Border, All Borders, Outside Borders, Thick Box Border, and more.</li>
+    </ul>
+    <div class="callout callout-tip">
+      <div class="callout-title">Less is more</div>
+      <p>Decide on a simple scheme, one heading style, one highlight colour, and reuse it. A single tidy heading row in bold with a light fill and a bottom border instantly makes a little list look organised.</p>
+    </div>
+
+    <h3>Colour and contrast: making it readable for everyone</h3>
+    <p>When you pick colours for text and fills, there is one rule that matters more than looking nice: there must be enough <strong>contrast</strong> between the writing and what is behind it. Pale grey text on a white cell, or white text on a light-yellow fill, is hard to read for everyone, and genuinely unreadable for people with low vision or colour blindness. A strong dark-on-light or light-on-dark pairing reads clearly for all.</p>
+    <p>This is not just good manners. There is an international standard for it, the <strong>Web Content Accessibility Guidelines (WCAG)</strong>, published by the World Wide Web Consortium. WCAG sets measurable contrast levels (for normal text, a contrast ratio of at least 4.5 to 1 between the text and its background) so "enough contrast" is a number you can check, not a matter of opinion. You can read the standard at <a href="https://www.w3.org/WAI/standards-guidelines/wcag/">w3.org/WAI/standards-guidelines/wcag</a>.</p>
+    <p>In Australia these guidelines have real weight. Under the <strong>Disability Discrimination Act 1992</strong>, information and services should be accessible to people with disability, and WCAG is the benchmark Australian governments and many organisations use to meet that obligation. That is why you will see the same contrast rules written into professional and organisational style guides: a workplace adopts WCAG once, in its style guide, and then every document, spreadsheet and web page that follows the guide is accessible by default. Following the house style is following the law without having to think about it each time.</p>
+    <div class="callout callout-key">
+      <div class="callout-title">That "Accessibility: Investigate" message at the bottom</div>
+      <p>Look along the status bar at the bottom of an Excel workbook and you may see <strong>"Accessibility: Investigate"</strong>. That is Excel's built-in <strong>Accessibility Checker</strong> telling you it has found something that may be hard for some people to use, such as poor colour contrast, a chart with no alt text, or a sheet with an unhelpful name. Click it (or go to Review then Check Accessibility) and Excel lists each issue with a plain-language explanation and how to fix it. Treat it like a spell-check for accessibility: run it before you share a workbook, and clear what it finds.</p>
+    </div>
+    <div class="callout callout-tip">
+      <div class="callout-title">Two habits that keep you compliant</div>
+      <p>Use strong contrast (dark text on a light fill, or the reverse), and never rely on colour alone to carry meaning. If "red" means over budget, also add a word or a symbol, so the message still reaches someone who cannot tell the colours apart. These two habits cover most of what WCAG asks of an everyday spreadsheet.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="number-formats">
+    <div class="section-eyebrow">// number formats</div>
+    <h2>Number Formats</h2>
+    <p>Here is a small idea that explains a lot of Excel's behaviour: <strong>a number format changes how a value looks, not what it is.</strong> The cell still holds the same underlying number; you are just choosing how to display it. Format <code>0.25</code> as a percentage and it shows <code>25%</code>, but it is still the value 0.25 underneath, ready to calculate with.</p>
+    <p>This is why one value can appear as <code>$1,200.00</code>, <code>1200</code>, or <code>1.2K</code> depending on the format, and why the right format makes a column instantly readable. To change it, select the cells, go to <strong>Home then the Number group</strong>, and pick a format:</p>
+    <div class="xl-wrap">
+      <table class="xl-grid">
+        <caption>// the same value, 1200, dressed in different number formats</caption>
+        <thead>
+          <tr><th class="corner"></th><th>A</th><th>B</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>1</th><td class="head">Format</td><td class="head">How 1200 looks</td></tr>
+          <tr><th>2</th><td>General</td><td class="num">1200</td></tr>
+          <tr><th>3</th><td>Number (2 decimals)</td><td class="num">1,200.00</td></tr>
+          <tr><th>4</th><td>Currency</td><td class="num">$1,200.00</td></tr>
+          <tr><th>5</th><td>Percentage</td><td class="num">120,000%</td></tr>
+          <tr><th>6</th><td>Short Date</td><td class="num">24/04/1903</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The everyday formats worth knowing: <strong>Currency or Accounting</strong> for money (Accounting lines the dollar signs and decimals up neatly), <strong>Percentage</strong> for rates, <strong>Short Date</strong> for dates, and the increase/decrease decimal buttons to show more or fewer decimal places.</p>
+    <div class="callout callout-key">
+      <div class="callout-title">Formatting never changes the maths</div>
+      <p><code>=A1+A2</code> works the same whether A1 looks like <code>1200</code> or <code>$1,200.00</code>. The format is just a costume on top of the real number, so your formulas are unaffected by how a cell is dressed.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="sizing">
+    <div class="section-eyebrow">// resizing rows and columns</div>
+    <h2>Resizing Rows and Columns</h2>
+    <p>When text is cut off, or a column shows <code>#####</code> instead of a number, it is not an error. The cell is just too narrow to show its contents. Widen it and the value reappears.</p>
+    <ul>
+      <li><strong>Drag to resize:</strong> hover over the right edge of a column letter (or the bottom edge of a row number) until the cursor becomes a double-headed arrow, then drag.</li>
+      <li><strong>Auto-fit:</strong> double-click that same edge and Excel snaps the column to fit its widest entry exactly. To tidy a whole sheet fast, select all columns (Ctrl + A) and double-click any column edge to auto-fit them all at once.</li>
+      <li><strong>Wrap text:</strong> for a long label, you do not have to widen the whole column. Select the cell and click <strong>Wrap Text</strong> (Home tab, Alignment group) so the text flows onto several lines within the cell.</li>
+    </ul>
+    <div class="callout callout-warning">
+      <div class="callout-title">##### is not an error</div>
+      <p>Seeing <code>#####</code> just means "too narrow to display this number". Widen the column, or double-click its edge to auto-fit, and the value comes back. Nothing is lost.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="consistency">
+    <div class="section-eyebrow">// styles and the format painter</div>
+    <h2>Styles and the Format Painter</h2>
+    <p>Once you have decided how something should look, you do not want to rebuild that look by hand every time. Two tools save you the effort:</p>
+    <ul>
+      <li><strong>Cell Styles</strong> are saved bundles of formatting (font, colour, borders, number format) you apply in one click. On the Home tab, click Cell Styles and pick one. Built-in styles include headings, plus handy status ones like Good, Bad and Neutral, a green "Good" for on-track, a red "Bad" for over-budget, without fiddling with colours.</li>
+      <li><strong>Format Painter</strong> copies the look of one cell and paints it onto others. Click a cell that already looks right, click the paintbrush (Home tab, Clipboard group), then drag across the cells you want to match. Double-click the paintbrush to lock it on for several separate places, and press Esc when done.</li>
+    </ul>
+    <p>Both keep a workbook looking consistent, which is most of what "professional" means in a spreadsheet. Format Painter copies the look only, including number format and borders, not the contents.</p>
+  </section>
+
+  <section class="content-section container-content" id="tables">
+    <div class="section-eyebrow">// turning a list into a table</div>
+    <h2>Turning a List into a Table</h2>
+    <p>An Excel <strong>Table</strong> is more than a nicely formatted range. When you turn your data into a Table, Excel treats it as a single smart object: it adds banded rows and filter buttons, it grows automatically when you add a row, and it makes later jobs (sorting, filtering, charts) easier. If you take one formatting habit from this session, make it this one.</p>
+    <ol>
+      <li>Click anywhere inside your data (it should have a header row).</li>
+      <li>Press <strong>Ctrl + T</strong> (or Insert then Table).</li>
+      <li>Check "My table has headers" if your top row is column titles, then OK.</li>
+    </ol>
+    <p>Your data becomes a Table: banded rows, a coloured header, and a small filter arrow on each heading, which sets you up nicely for sorting and filtering in Session 4. With a cell in the Table selected, the Table Design tab appears, where you can pick a different Table Style to recolour the whole thing in one click.</p>
+  </section>
+
+  <section class="content-section container-content" id="choosing-chart">
+    <div class="section-eyebrow">// choosing the right chart</div>
+    <h2>Choosing the Right Chart</h2>
+    <p>Excel offers dozens of chart types, but the choice is easier than it looks, because the message you want to send points to the right one. Pick the chart that matches the question your reader is asking, and the data almost explains itself. Three types cover the vast majority of everyday needs:</p>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h5>Column or Bar</h5>
+        <div class="use">// comparing amounts</div>
+        <p>Best for comparing amounts across categories: spend per department, items per month, stock per product. Columns stand up; bars lie down. Use bars when the category names are long, as they read better sideways. This is the safest, most readable default.</p>
+      </div>
+      <div class="chart-card">
+        <h5>Line</h5>
+        <div class="use">// change over time</div>
+        <p>Best for showing a trend over time: sales across the year, temperature by day, hours week by week. Put time going across the bottom and the line shows whether things are rising or falling.</p>
+      </div>
+      <div class="chart-card">
+        <h5>Pie</h5>
+        <div class="use">// parts of one whole</div>
+        <p>Best for showing how a single total splits into a few slices: how a budget divides across categories. Use sparingly: only for one whole split into a few parts, and never when you need to compare precise values.</p>
+      </div>
+    </div>
+    <div class="callout callout-tip">
+      <div class="callout-title">A simple rule of thumb</div>
+      <p>Ask "what is the message?" Comparing things? Column or bar. Change over time? Line. Slices of one total? Pie, and only then. When in doubt, start with a column chart. And a chart should make one point clearly: if you are tempted to cram several messages into one, make two charts instead.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="making-chart">
+    <div class="section-eyebrow">// making and tidying a chart</div>
+    <h2>Making and Tidying a Chart</h2>
+    <p>Making a chart is mostly a matter of selecting the right data and clicking once. The skill is in the tidying up afterwards.</p>
+    <h3>Create it</h3>
+    <ol>
+      <li>Select your data, <strong>including the row and column headings</strong> (they become the chart's labels). For most charts you want one column of categories and one or more columns of numbers.</li>
+      <li>Go to the <strong>Insert</strong> tab and pick a chart from the Charts group. Hovering over a type shows a live preview. If unsure, click <strong>Recommended Charts</strong> and Excel suggests good fits.</li>
+      <li>The chart appears on the sheet, linked to your data. Change a number and the chart redraws by itself.</li>
+    </ol>
+    <h3>Tidy it</h3>
+    <p>Click the chart and the Chart Design and Format tabs appear, with a small <strong>+</strong> button (Chart Elements) beside it:</p>
+    <ul>
+      <li><strong>Title:</strong> click the title text and rename it to something meaningful, not "Chart Title".</li>
+      <li><strong>Chart Elements (the + button):</strong> tick or untick Axis Titles, Data Labels, Legend, Gridlines. Add data labels when the exact values matter; remove the legend when there is only one series.</li>
+      <li><strong>Move and resize:</strong> drag the chart to reposition it; drag a corner handle to resize.</li>
+      <li><strong>Alt text:</strong> right-click the chart, choose Edit Alt Text, and write a sentence describing what it shows. This helps screen-reader users and is good practice for anything you share.</li>
+    </ul>
+    <div class="callout callout-key">
+      <div class="callout-title">Less clutter, clearer message</div>
+      <p>Give a chart a meaningful title and label the axes so it makes sense on its own. Remove gridlines and legends you do not need. Do not rely on colour alone to tell series apart; add labels so it reads for everyone, including people who cannot distinguish certain colours.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="try-it">
+    <div class="section-eyebrow">// try it at the keyboard</div>
+    <h2>Try It at the Keyboard</h2>
+    <p>Open the starter workbook for this session, which has an unformatted stock list and a small monthly-spend table ready to chart.</p>
+    <div class="activity-box">
+      <span class="label">Practice</span>
+      <h4>Format a stock list, then chart the spend</h4>
+      <ol>
+        <li>Make the heading row <strong>bold</strong>, give it a light fill colour, and add a bottom border. Use the Format Painter to copy that look if you have more than one heading.</li>
+        <li>Select the money column and set it to <strong>Currency</strong> from the Number group. Notice the maths underneath does not change.</li>
+        <li>If you see <code>#####</code> anywhere, double-click the column edge to auto-fit and the numbers reappear.</li>
+        <li>Select the monthly-spend table (headings included), go to <strong>Insert</strong>, and add a <strong>column chart</strong>. Rename its title to something meaningful.</li>
+        <li>Turn on Data Labels from the <strong>+</strong> button, then add alt text describing the trend. Now try the same data as a line chart and see how the message changes.</li>
+      </ol>
+      <p>Compare your sheet with the solution workbook to see one tidy way to format and chart the same data.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="check">
+    <div class="section-eyebrow">// knowledge check</div>
+    <h2>Knowledge Check</h2>
+    <div class="check-intro">
+      <p>A few quick questions to see what has landed. Have a think first, then click "reveal". No mark, no rush.</p>
+    </div>
+
+    <details class="check">
+      <summary><span class="q">Q1</span><span>You format a cell holding <code>0.25</code> as a percentage and it shows <code>25%</code>. Has the value changed?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>No. A number format changes only <strong>how a value looks, not what it is</strong>. The cell still holds 0.25 underneath and will calculate with that. The percentage is just a costume on top.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q2</span><span>A column shows <code>#####</code> instead of your numbers. What has happened, and how do you fix it?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>The column is too <strong>narrow</strong> to display the number. It is not an error and nothing is lost. Widen the column by dragging its edge, or double-click the edge to auto-fit, and the value reappears.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q3</span><span>You want to compare how much each department spent this month. Which chart type is the safe default?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>A <strong>column or bar chart</strong>. They are best for comparing amounts across categories, and the column chart is the safest, most readable default. Use a bar (lying down) if the department names are long.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q4</span><span>When is a pie chart the right choice, and when is it not?</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>A pie chart is right for showing how a <strong>single whole splits into a few slices</strong>, like how a budget divides across categories. It is the wrong choice when you have many slices, or when you need to compare precise values, because people are poor at comparing angles. Use a column chart instead.</p></div>
+    </details>
+
+    <details class="check">
+      <summary><span class="q">Q5</span><span>Name two things that make a chart both clearer and more accessible.</span><span class="reveal">reveal</span></summary>
+      <div class="answer"><p>Any two of: a <strong>meaningful title</strong> and <strong>labelled axes</strong> so it makes sense on its own; <strong>data labels</strong> when exact values matter; not relying on <strong>colour alone</strong> to tell series apart; and adding <strong>alt text</strong> describing what the chart shows. Clear and accessible are the same goal.</p></div>
+    </details>
+  </section>
+
+</main>
+
+<!-- SESSION NAV -->
+<div class="container">
+  <nav class="session-nav">
+    <a class="session-nav-item prev" href="session-2-formulas-and-functions.html">
+      <span class="session-nav-label">&larr; Previous session</span>
+      <span class="session-nav-title">Formulas and Functions</span>
+    </a>
+    <a class="session-nav-item next" href="session-4-lists-and-sharing.html">
+      <span class="session-nav-label">Next session &rarr;</span>
+      <span class="session-nav-title">Working With Lists and Sharing Your Work</span>
+    </a>
+  </nav>
+</div>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this course</h4>
+        <ul>
+          <li><a href="/excel/">Excel overview</a></li>
+          <li><a href="excel-words-in-plain-english.html">Excel words in plain English</a></li>
+          <li><a href="downloads/session-3-handout.docx" download>Session 3 handout</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.xl-formula button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var code = btn.parentElement.querySelector('code').innerText;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(function () {
+          var old = btn.textContent;
+          btn.textContent = 'copied'; btn.classList.add('copied');
+          setTimeout(function () { btn.textContent = old; btn.classList.remove('copied'); }, 1200);
+        });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

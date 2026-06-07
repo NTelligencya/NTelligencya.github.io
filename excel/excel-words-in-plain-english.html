@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel Words, in Plain English &middot; Excel Fundamentals &middot; NTell World Ink</title>
+<meta name="description" content="Every Excel word from the Fundamentals course, explained simply with an everyday example: workbook, worksheet, cell, formula, function, operator, cell reference, number format, AutoFill, sort, filter, data validation, chart types and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Excel Fundamentals, Glossary; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 28px; padding-bottom: 12px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px;
+    margin: 0 0 6px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section > p { color: var(--text-2); line-height: 1.7; margin: 0 0 8px; }
+
+  /* Glossary term card */
+  .term {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent); border-radius: 10px;
+    padding: 18px 22px; margin: 14px 0;
+  }
+  .term h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 4px; font-weight: 500;
+  }
+  .term .akas {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+  }
+  .term p { color: var(--text-2); line-height: 1.7; margin: 0 0 10px; font-size: 15px; }
+  .term p:last-child { margin: 0; }
+  .term code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.92em;
+    color: var(--accent-2); background: rgba(26,201,201,0.06);
+    padding: 1px 6px; border-radius: 4px;
+  }
+  .term .analogy {
+    background: rgba(26,201,201,0.05); border-radius: 8px;
+    padding: 10px 14px; color: var(--text-2); font-style: italic;
+  }
+  .term .analogy strong { font-style: normal; color: var(--accent-2); font-weight: 600; }
+  .term .do {
+    border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 10px;
+    font-size: 14.5px;
+  }
+  .term .do .tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-right: 8px;
+  }
+  .term strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 23px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="/excel/">Excel Fundamentals</a>
+    <span class="sep">/</span>
+    <span>Excel Words, in Plain English</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Microsoft Excel &middot; Course 2 &middot; Reference</div>
+  <h1>Excel Words, in Plain English</h1>
+  <p class="subtitle">Spreadsheets come with their own little vocabulary. None of it is complicated once someone explains it plainly, so here is every Excel word from the course, in everyday language, with a simple example. Keep this handy; you do not need to memorise any of it.</p>
+  <div class="download-strip">
+    <span class="download-strip-label">// take it with you</span>
+    <a class="btn btn-download" href="downloads/excel-words-in-plain-english.docx" download>
+      <svg class="icon icon-down" viewBox="0 0 14 14"><path d="M7 2v7m-3-3 3 3 3-3M2 12h10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download this reference (Word)
+    </a>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/excel/">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to course overview
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+      <li><a href="#the-file">The File and the Grid</a></li>
+      <li><a href="#maths">Formulas and Maths</a></li>
+      <li><a href="#look">Making It Look Right</a></li>
+      <li><a href="#lists">Lists and Pictures</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="the-file">
+    <div class="section-eyebrow">// the file and the grid</div>
+    <h2>The File and the Grid</h2>
+    <p>The words for the spreadsheet itself, and the parts of the Excel window.</p>
+
+    <div class="term">
+      <h3>Workbook</h3>
+      <div class="akas">the whole Excel file</div>
+      <p>The whole Excel file you open, save and share. One workbook can hold many worksheets.</p>
+      <p class="analogy"><strong>Like a notebook:</strong> one cover holding many pages inside.</p>
+    </div>
+
+    <div class="term">
+      <h3>Worksheet</h3>
+      <div class="akas">also: sheet, tab</div>
+      <p>A single page inside the workbook, one grid of cells. The tabs along the bottom let you move between them. You might keep January on one sheet and February on another.</p>
+    </div>
+
+    <div class="term">
+      <h3>Cell</h3>
+      <div class="akas">one box in the grid</div>
+      <p>A single box where a row and a column meet. It is the basic unit of Excel, the place where everything you type goes.</p>
+    </div>
+
+    <div class="term">
+      <h3>Row and column</h3>
+      <div class="akas">across, and up-and-down</div>
+      <p><strong>Rows</strong> run across and are numbered down the side: 1, 2, 3. <strong>Columns</strong> run up and down and are lettered across the top: A, B, C.</p>
+    </div>
+
+    <div class="term">
+      <h3>Cell reference</h3>
+      <div class="akas">a cell's address, like B5</div>
+      <p>A cell's address, written column letter first, then row number, like <code>B5</code>. This is what lets a formula point at data: <code>=B5+B6</code> means "add whatever is in B5 and B6".</p>
+      <p class="analogy"><strong>Like a seat number:</strong> row and column together tell you exactly which box you mean.</p>
+    </div>
+
+    <div class="term">
+      <h3>Range</h3>
+      <div class="akas">a block of cells, like B2:B10</div>
+      <p>A block of cells, written with a colon. <code>B2:B10</code> means "B2 through B10", the ten cells in between. You hand a range to a function like SUM.</p>
+    </div>
+
+    <div class="term">
+      <h3>The Ribbon</h3>
+      <div class="akas">the buttons across the top</div>
+      <p>The strip of buttons across the top, organised into tabs (Home, Insert, Page Layout, Formulas, Data, Review, View). Each tab holds related tools. You will spend most of your time on the <strong>Home</strong> tab.</p>
+    </div>
+
+    <div class="term">
+      <h3>Name Box</h3>
+      <div class="akas">top-left, shows the cell address</div>
+      <p>The small box on the left, just above the grid. It shows the address of the cell you have selected, and you can type an address into it to jump straight there.</p>
+    </div>
+
+    <div class="term">
+      <h3>Formula Bar</h3>
+      <div class="akas">shows what is really in a cell</div>
+      <p>The long bar above the grid. It shows what is really in the selected cell: a cell might display <code>14</code> but the Formula Bar reveals it is actually <code>=A1+A2</code>.</p>
+      <p class="analogy"><strong>Like looking under the bonnet:</strong> the grid shows the result, the Formula Bar shows the engine that made it.</p>
+    </div>
+
+    <div class="term">
+      <h3>Status bar</h3>
+      <div class="akas">the strip along the bottom</div>
+      <p>The strip along the very bottom. Select a few numbers and it instantly shows their Sum, Average and Count, with nothing typed. The fastest calculator in Excel.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="maths">
+    <div class="section-eyebrow">// formulas and maths</div>
+    <h2>Formulas and Maths</h2>
+    <p>The words for getting Excel to do the calculating for you.</p>
+
+    <div class="term">
+      <h3>Formula</h3>
+      <div class="akas">an instruction that calculates</div>
+      <p>An instruction that tells Excel to work something out. It always starts with an equals sign, <code>=</code>, for example <code>=B2+B3</code>. Change a number it uses and the answer updates by itself.</p>
+    </div>
+
+    <div class="term">
+      <h3>Function</h3>
+      <div class="akas">a ready-made formula</div>
+      <p>A ready-made formula Excel has already written, used as <code>=FUNCTION(arguments)</code>. Instead of <code>=B2+B3+B4+B5</code>, you write <code>=SUM(B2:B5)</code>.</p>
+    </div>
+
+    <div class="term">
+      <h3>Operator</h3>
+      <div class="akas">the symbol that does the maths</div>
+      <p>A symbol that says what to do in a formula: <code>+</code> add, <code>-</code> subtract, <code>*</code> multiply, <code>/</code> divide. Multiply is a star, not an x; divide is a slash.</p>
+    </div>
+
+    <div class="term">
+      <h3>BODMAS</h3>
+      <div class="akas">also: PEMDAS, order of operations</div>
+      <p>The order Excel does the maths in: Brackets, Orders (powers), Division and Multiplication, then Addition and Subtraction. So <code>=A1+A2*A3</code> multiplies first. Add brackets to control it: <code>=(A1+A2)*A3</code>.</p>
+    </div>
+
+    <div class="term">
+      <h3>Relative reference</h3>
+      <div class="akas">shifts when you copy, like B2</div>
+      <p>A reference that shifts when you copy a formula. Copy <code>=B2</code> down a row and it becomes <code>=B3</code>. Usually what you want, so each row uses its own number.</p>
+    </div>
+
+    <div class="term">
+      <h3>Absolute reference</h3>
+      <div class="akas">locked with $, like $E$1</div>
+      <p>A reference locked with dollar signs so it never moves when copied, like <code>$E$1</code>. Use it for a value every row must share, such as a single rate. Press <strong>F4</strong> while editing to add the dollar signs.</p>
+      <p class="analogy"><strong>Like a pinned note:</strong> everything around it can move, but it stays put.</p>
+    </div>
+
+    <div class="term">
+      <h3>AutoSum</h3>
+      <div class="akas">the one-key total, Alt + =</div>
+      <p>A shortcut that writes a SUM for you. Click the empty cell below a column of numbers and press <strong>Alt + =</strong>; Excel guesses the range and totals it. The dropdown also offers Average, Count, Max and Min.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="look">
+    <div class="section-eyebrow">// making it look right</div>
+    <h2>Making It Look Right</h2>
+    <p>The words for tidying a sheet so it is easy to read.</p>
+
+    <div class="term">
+      <h3>Number format</h3>
+      <div class="akas">how a value is displayed</div>
+      <p>How a value is shown (currency, percentage, date) <strong>without changing the value itself</strong>. Format <code>0.25</code> as a percentage and it shows <code>25%</code>, but it is still 0.25 underneath, ready to calculate with.</p>
+      <p class="analogy"><strong>Like a costume:</strong> the same number dressed up to read as money, a percent, or a date.</p>
+    </div>
+
+    <div class="term">
+      <h3>#####</h3>
+      <div class="akas">not an error</div>
+      <p>Not an error. It just means the column is too narrow to show the number. Widen the column, or double-click its edge to auto-fit, and the value reappears.</p>
+    </div>
+
+    <div class="term">
+      <h3>AutoFill</h3>
+      <div class="akas">finishes a pattern for you</div>
+      <p>The feature that finishes repetitive typing. Type <code>Monday</code> and drag the little square at a cell's bottom-right corner (the <strong>fill handle</strong>), and Excel writes Tuesday, Wednesday and so on.</p>
+    </div>
+
+    <div class="term">
+      <h3>Custom list</h3>
+      <div class="akas">your own AutoFill list</div>
+      <p>A list you teach Excel, such as your team's names or a set of local suburbs, so AutoFill finishes it for you. Set it up under File then Options then Advanced then Edit Custom Lists.</p>
+    </div>
+
+    <div class="term">
+      <h3>Format Painter</h3>
+      <div class="akas">copies the look, not the contents</div>
+      <p>The paintbrush on the Home tab. Click a cell that already looks right, click the paintbrush, then drag across other cells to give them the same look. Double-click it to paint several places.</p>
+    </div>
+
+    <div class="term">
+      <h3>Table</h3>
+      <div class="akas">a smart range, Ctrl + T</div>
+      <p>A range turned into a smart object with <strong>Ctrl + T</strong>. It gets filter buttons, banded rows, and grows automatically when you add a row, which makes sorting, filtering and charting easier.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="lists">
+    <div class="section-eyebrow">// lists and pictures</div>
+    <h2>Lists and Pictures</h2>
+    <p>The words for handling a list, and turning numbers into a picture.</p>
+
+    <div class="term">
+      <h3>Sort</h3>
+      <div class="akas">reorder the rows</div>
+      <p>Rearrange rows into order: A to Z, smallest to largest, oldest to newest. Excel keeps each row's data together, so a person's name stays with their details. Click one cell in the column and use Data then A to Z.</p>
+    </div>
+
+    <div class="term">
+      <h3>Filter</h3>
+      <div class="akas">hide rows that do not match</div>
+      <p>Hide the rows you do not currently care about, so only the matching ones show. Nothing is deleted; clear the filter and they all come back. A funnel icon on a header shows that column is filtered.</p>
+    </div>
+
+    <div class="term">
+      <h3>Grouping</h3>
+      <div class="akas">fold rows out of sight</div>
+      <p>Fold a block of rows up and down with a small plus and minus button, like a drawer you can open and close. Handy for tucking detail away on a long sheet. Data tab then Group.</p>
+    </div>
+
+    <div class="term">
+      <h3>Data validation</h3>
+      <div class="akas">rules for what a cell accepts</div>
+      <p>Rules that control what a cell will accept, most usefully a <strong>dropdown list</strong> so everyone picks the same word from a menu instead of typing it differently each time. Data tab then Data Validation.</p>
+    </div>
+
+    <div class="term">
+      <h3>Chart</h3>
+      <div class="akas">a picture of your data</div>
+      <p>A visual picture of numbers. The three everyday kinds: <strong>column or bar</strong> for comparing amounts, <strong>line</strong> for change over time, and <strong>pie</strong> for the slices of one whole. A chart stays linked to the data and updates when the numbers change.</p>
+    </div>
+
+    <div class="term">
+      <h3>Print area</h3>
+      <div class="akas">the part of a sheet that prints</div>
+      <p>The range you choose to print, so only that part comes out rather than the whole sheet. Select the range, then Page Layout then Print Area then Set Print Area.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this course</h4>
+        <ul>
+          <li><a href="/excel/">Excel overview</a></li>
+          <li><a href="session-1-finding-your-way-around.html">Session 1</a></li>
+          <li><a href="session-2-formulas-and-functions.html">Session 2</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
