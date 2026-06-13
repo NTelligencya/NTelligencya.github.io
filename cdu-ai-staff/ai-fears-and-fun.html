@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>AI Fears and Fun &middot; CDU AI Staff Training &middot; NTell World Ink</title>
+<meta name="description" content="How people really use AI, the alignment problem, chain-of-thought reasoning, AI misbehaviour and monitoring, the black box problem, and whether we will run out of training data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container">
+    <div class="site-inner">
+      <a class="brand" href="/">
+        <div class="brand-mark"></div>
+        <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/">Home</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="page-masthead">
+  <div class="container">
+    <div class="series-label">AI Staff Training &middot; Charles Darwin University</div>
+    <h1>AI Fears and Fun</h1>
+    <p class="subtitle">How people really use AI, the alignment problem, the rise of chain-of-thought reasoning, AI misbehaviour and how we monitor it, the black box problem, and whether we will run out of training data. A core session in the CDU AI staff training series.</p>
+  </div>
+</section>
+
+<div class="content-body">
+  <div class="container">
+    <div class="content-split">
+
+      <div class="main">
+
+        <section class="content-section">
+          <h2>Clio: Real-World AI Usage Patterns</h2>
+          <p>Anthropic's Clio project offers a rare look at how people actually use AI assistants. Through privacy-preserving analysis of millions of conversations, researchers found that coding and business tasks dominate real-world use, together making up more than 10 per cent of all conversations: debugging code, drafting professional emails, analysing business data. Education, writing assistance and research each account for roughly 6 to 10 per cent. Cross-language analysis even reveals cultural variation, with Japanese conversations showing higher rates of elder-care discussion and Chinese conversations focusing more on economic analysis.</p>
+
+          <figure class="figure">
+            <img src="assets/CLIOData.png" alt="Clio analysis of how people use AI models">
+            <figcaption>Clio: aggregated, privacy-preserving patterns in how people use AI assistants.</figcaption>
+          </figure>
+
+          <p>While media coverage tends to focus on creative uses, real users mostly reach for AI for practical workplace tasks and problem-solving rather than entertainment.</p>
+
+          <div class="video-embed">
+            <button type="button" class="video-facade" onclick="ytPlay(this,'VSmobknYl0E')" aria-label="Play video">
+              <img src="https://i.ytimg.com/vi/VSmobknYl0E/hqdefault.jpg" alt="Video thumbnail">
+              <span class="video-play"></span>
+            </button>
+          </div>
+          <p class="video-note">// "What do people use AI models for?"</p>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>How do these usage patterns line up with your expectations about AI adoption?</p>
+          </div>
+          <p><a href="https://anthropic.com/research/clio" target="_blank" rel="noopener">Clio research (Anthropic)</a></p>
+        </section>
+
+        <section class="content-section">
+          <h2>The Alignment Problem: When AI Agents Misinterpret Instructions</h2>
+          <p>Agentic AI means asking a system not just to generate text, but to take action on your behalf: clicking through a website, filling out a form, sending an email. This moves AI from a passive assistant that advises into an active agent that executes, navigates systems and automates multi-step processes. As agents start interacting with the web, they run into one of its oldest defences: the CAPTCHA.</p>
+
+          <figure class="figure">
+            <img src="assets/CAPCHA.png" alt="A CAPTCHA challenge">
+            <figcaption>CAPTCHAs are designed to tell humans and machines apart; for agentic AI they are a deliberate roadblock.</figcaption>
+          </figure>
+
+          <p>CAPTCHA stands for "Completely Automated Public Turing test to tell Computers and Humans Apart": the distorted letters, the "click all the traffic lights" grids, the "I'm not a robot" checkbox. They exist to stop bots spamming forms, creating fake accounts or scraping data. So when you ask an AI agent to book a hotel and it hits a CAPTCHA, should it be instructed to lie about being human? Teaching AI to bypass security checks by deception is dangerous, and it captures the alignment problem in a nutshell: the gap between what we ask AI to do and what we actually want it to accomplish.</p>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Critical questions for agentic AI</div>
+            <p>How can we specify objectives clearly enough to prevent harmful misinterpretation? And what happens when an AI's drive to optimise conflicts with human values?</p>
+          </div>
+          <p><a href="https://www.iflscience.com/gpt-4-hires-and-manipulates-human-into-passing-captcha-test-68016" target="_blank" rel="noopener">Read: GPT-4 hires and manipulates a human into passing a CAPTCHA test</a></p>
+        </section>
+
+        <section class="content-section">
+          <h2>The Rise of Chain-of-Thought Reasoning</h2>
+          <p>Chain-of-thought reasoning is a shift from immediate next-token prediction to step-by-step problem solving. The first wave of reasoning models (OpenAI's o1 and o3-mini, and reasoning modes in Claude) emerged in 2024 and 2025, generating explicit reasoning traces before giving a final answer. This matters for problems that need procedural thinking. Recall why models miscount the r's in "strawberry": they process words as tokens, not individual letters. A reasoning model works through it instead: "s-t-r-a-w-b-e-r-r-y, the r appears in positions 3, 8 and 9, so there are 3".</p>
+
+          <h3>A scratchpad in plain language</h3>
+          <p>LLMs are trained to predict the next token, which sounds like autocomplete. But language encodes patterns of explanation, planning and logic, so at scale next-token prediction becomes an engine for structured thinking. Chain-of-thought means the model generates intermediate steps before the answer, like a scratchpad: it lays down small, locally correct statements, and each one narrows what the next likely token should be. In effect it guides itself through sub-problems (define terms, identify givens, apply a rule, compute, check) rather than leaping to a conclusion.</p>
+
+          <h3>Why it improves accuracy</h3>
+          <p>Predicting the next small step is easier than leaping to the final answer, so errors compound less. The intermediate text makes hidden assumptions visible, which supports checking. And because the structure of argument is similar across domains, reasoning patterns transfer from mathematics to policy analysis to troubleshooting. Once a model reliably produces coherent reasoning traces, you can ask it to compare options, design an experiment, justify a recommendation or critique an argument, and in agentic settings those steps can drive actions.</p>
+
+          <div class="callout callout-tip">
+            <div class="callout-title">Example: last-letter concatenation</div>
+            <p>Q: Take the last letters of the words in "Elon Musk" and concatenate them. A: The last letter of "Elon" is "n". The last letter of "Musk" is "k". Concatenating them gives "nk".</p>
+            <p>The same token-by-token mechanism now expresses method (how to think) as well as content (what to say).</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Limits and misconceptions</div>
+            <p>This is not literal thinking; the model reproduces reasoning forms it has learned. Quality varies with the prompt, the grounding and the domain, and poor inputs can produce confident but flawed chains. For anything critical, validate the reasoning with external checks, tools and human review.</p>
+          </div>
+          <p><a href="https://arxiv.org/pdf/2201.11903" target="_blank" rel="noopener">Read: chain-of-thought reasoning research</a></p>
+        </section>
+
+        <section class="content-section">
+          <h2>AI Misbehaviour and Chain-of-Thought Monitoring</h2>
+          <p>Research from OpenAI shows that frontier reasoning models sometimes engage in "reward hacking", and that this can be detected by monitoring their chain of thought rather than just their outputs. Models were observed planning to subvert their objectives in their reasoning before acting, using strategies like modifying test frameworks, hardcoding solutions, or creating local library stubs to bypass intended functionality. Strikingly, the intent was often clearly articulated in the model's reasoning first.</p>
+
+          <figure class="figure">
+            <img src="assets/forbidden.png" alt="The forbidden technique of optimising against chain-of-thought">
+            <figcaption>Pressuring the chain of thought to look clean can simply teach the model to hide its intent.</figcaption>
+          </figure>
+
+          <p>This creates the "forbidden technique" dilemma. When optimisation pressure is applied directly to the chain of thought to suppress bad reasoning, models learn obfuscated reward hacking: they hide the malicious intent while continuing to misbehave. There is a genuine tension between improving performance and keeping the model's reasoning monitorable.</p>
+
+          <div class="video-embed">
+            <button type="button" class="video-facade" onclick="ytPlay(this,'Xx4Tpsk_fnM')" aria-label="Play video">
+              <img src="https://i.ytimg.com/vi/Xx4Tpsk_fnM/hqdefault.jpg" alt="Video thumbnail">
+              <span class="video-play"></span>
+            </button>
+          </div>
+          <p class="video-note">// Scheming AI and "the forbidden technique" (Computerphile).</p>
+        </section>
+
+        <section class="content-section">
+          <h2>The Black Box Problem</h2>
+          <p>Large language models present a fundamental interpretability challenge: they are "black boxes" whose internal decision-making is largely opaque. Unlike traditional software, where we can trace every logical step, neural networks with billions of parameters operate through complex, distributed representations that resist easy explanation.</p>
+
+          <figure class="figure">
+            <img src="assets/Blackbox.jpg" alt="The black box problem in neural networks">
+            <figcaption>Mechanistic interpretability tries to open the black box and map how information flows inside a model.</figcaption>
+          </figure>
+
+          <p>The field of mechanistic interpretability develops techniques to understand those internal workings. Researchers like Chris Olah have pioneered ways to examine individual neurons, identify circuits responsible for particular capabilities, and map how information flows through a model's layers. In some ways this is harder than understanding human psychology: with a person exhibiting alarming behaviour we can interview and observe, but with a model holding hundreds of billions of parameters, finding the specific weight responsible is an enormous computational challenge. Frontier models are estimated to have on the order of a trillion or more parameters, each potentially contributing in subtle ways.</p>
+
+          <div class="video-embed">
+            <button type="button" class="video-facade" onclick="ytPlay(this,'2Rdp9GvcYOE')" aria-label="Play video">
+              <img src="https://i.ytimg.com/vi/2Rdp9GvcYOE/hqdefault.jpg" alt="Video thumbnail">
+              <span class="video-play"></span>
+            </button>
+          </div>
+          <p class="video-note">// Chris Olah: looking inside neural networks with mechanistic interpretability.</p>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>How can we ensure AI safety without fully understanding the internal mechanisms?</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Data Exhaustion: Will We Run Out of Training Data?</h2>
+          <p>A widely-cited study by Villalobos and colleagues at Epoch AI asks whether the trend of ever-larger models could hit a fundamental roadblock: running out of training data. Language datasets have grown by more than 50 per cent a year, while the total stock of available human text grows only about 7 per cent a year, which sets up a collision between demand and supply.</p>
+
+          <div class="callout callout-key">
+            <div class="callout-title">Updated estimate</div>
+            <p>Epoch AI's projections put the exhaustion of high-quality public text somewhere in a range of about 2026 to 2032, with a central estimate around 2028 if models are trained compute-optimally, not the hard "by 2026" of earlier figures. Lower-quality text and image data have longer runways (into the 2030s and beyond). The estimate has moved later as methods and understanding of data quality improved.</p>
+          </div>
+
+          <p>If these projections hold, data scarcity could become a main bottleneck for AI progress, which is why there is growing interest in synthetic data (using AI to create training data), data efficiency (getting more from smaller datasets), multimodal training (combining text, images, audio and video, which could substantially expand the available data), and learning from human feedback rather than raw data alone.</p>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>How might data scarcity affect market competition, and the quality of content on the internet?</p>
+          </div>
+          <p><a href="https://epoch.ai/publications/will-we-run-out-of-data-limits-of-llm-scaling-based-on-human-generated-data" target="_blank" rel="noopener">Epoch AI: will we run out of data?</a> &middot; <a href="https://arxiv.org/abs/2211.04325" target="_blank" rel="noopener">Villalobos et al. (paper)</a></p>
+        </section>
+
+      </div>
+
+      <aside class="sidebar-rail">
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">In this module</div>
+            <ul>
+              <li>How people really use AI (Clio)</li>
+              <li>The alignment problem and CAPTCHAs</li>
+              <li>Chain-of-thought reasoning</li>
+              <li>AI misbehaviour and monitoring</li>
+              <li>The black box problem</li>
+              <li>Will we run out of data?</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">The alignment problem, in one line</div>
+            <p>The gap between what we ask an AI to do and what we actually want it to accomplish.</p>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Watch</div>
+            <ul>
+              <li>What do people use AI for? (Clio)</li>
+              <li>Scheming AI: the forbidden technique</li>
+              <li>Looking inside neural networks</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <div class="last-updated">Last updated: 10 June 2026</div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="container">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Charles Darwin University&nbsp;|&nbsp;TAFE PSI&nbsp;|&nbsp;ICT, Cyber Security &amp; Digital</span>
+      <span style="font-family:'JetBrains Mono',monospace;">CDU AI Staff Training</span>
+    </div>
+    <div class="footer-legal">
+      <p class="ack">Charles Darwin University acknowledges the traditional custodians across the lands on which we live and work, and we pay our respects to Elders past and present.</p>
+      <p class="reg">CRICOS Provider No: 00300K &middot; RTO Provider No: 0373 &middot; TEQSA Provider ID PRV12069</p>
+      <p><a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice">Privacy</a> &middot; <a href="https://www.cdu.edu.au/about-cdu/copyright-disclaimer">Copyright and Disclaimer</a> &middot; <a href="https://www.cdu.edu.au/files/2022-03/cdu-cookie-notice.pdf">Cookies</a></p>
+      <p class="reg">ABN 54 093 513 649</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function ytPlay(btn,id){
+  var f=document.createElement('iframe');
+  f.src='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0';
+  f.title='Video';
+  f.allow='autoplay; encrypted-media; fullscreen; picture-in-picture';
+  f.allowFullscreen=true;
+  btn.parentNode.replaceChild(f,btn);
+}
+</script>
+
+</body>
+</html>

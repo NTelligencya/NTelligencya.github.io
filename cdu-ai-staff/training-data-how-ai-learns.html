@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Training Data: How AI Learns &middot; CDU AI Staff Training &middot; NTell World Ink</title>
+<meta name="description" content="How AI models acquire and process training data, the landmark copyright cases working through the courts, why AI hallucinates, and practical steps to protect your own data when using AI tools.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container">
+    <div class="site-inner">
+      <a class="brand" href="/">
+        <div class="brand-mark"></div>
+        <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/">Home</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="page-masthead">
+  <div class="container">
+    <div class="series-label">AI Staff Training &middot; Charles Darwin University</div>
+    <h1>Training Data: How AI Learns</h1>
+    <p class="subtitle">How AI models acquire and process training data, the landmark copyright cases now working through the courts, why AI hallucinates, and the practical steps you can take to protect your own data. A core session in the CDU AI staff training series.</p>
+  </div>
+</section>
+
+<div class="content-body">
+  <div class="container">
+    <div class="content-split">
+
+      <div class="main">
+
+        <section class="content-section">
+          <h2>Training Data, Copyright and Your Privacy</h2>
+          <p>Before looking at the challenges large language models pose to copyright and privacy, it helps to understand how these systems actually learn. This page covers three connected areas: how AI models acquire and process training data, the landmark copyright cases now working through the courts, and the practical steps you can take to protect your own data.</p>
+          <p>This is not just technical knowledge. It directly informs how we evaluate student work, apply academic integrity policies, understand why AI gets things wrong, and make informed choices about which data we share with these tools. It also connects to an everyday question: why do AI systems hallucinate? One contributing factor is the way models are fine-tuned using human feedback, where raters can inadvertently reward confident-sounding answers over honest uncertainty.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Misconceptions: Hoovers and Clipboards</h2>
+          <p>Two common misconceptions about how LLMs work need addressing, because both lead to serious problems in how we evaluate student work, apply integrity policies, and use these tools ourselves.</p>
+          <div class="callout callout-tip">
+            <div class="callout-title">The two misconceptions</div>
+            <p><strong>The "hoover".</strong> That models like ChatGPT are trained on everything on the internet, the worst garbage mixed with the best peer-reviewed research, hoovered up and ingested indiscriminately.</p>
+            <p><strong>The "clipboard".</strong> That an LLM is a super-sized clipboard, storing facts as words and passages copied straight from the internet, ready to paste back on request.</p>
+          </div>
+
+          <figure class="figure">
+            <img src="assets/2hoover.png" alt="The hoover misconception of data collection">
+            <figcaption>Misconception: "hoover" data collection.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/2Clipboard.png" alt="The clipboard misconception of language models">
+            <figcaption>Misconception: LLMs as super-sized clipboards.</figcaption>
+          </figure>
+
+          <p>Both intuitions misrepresent the technology. If we assume LLMs work like search engines or copy-paste tools, we expect to find exact matches or clear duplication. But LLM-generated text is statistically unique each time it is created, which makes traditional plagiarism detection not just ineffective but fundamentally inappropriate. When an LLM generates text it is not retrieving stored passages; it performs a statistical process that generates new text from learned patterns, like a literature professor who has read thousands of novels and can write in an author's style without copying any sentence. This is also why identical prompts produce different outputs: at each word position the model makes probabilistic choices, sampling among plausible options like "excellent", "outstanding" and "remarkable".</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Where Training Data Comes From</h2>
+          <p>LLM training data comes from several curated sources. Understanding what goes in helps explain what comes out, and why copyright questions are so complicated.</p>
+          <ul>
+            <li><strong>Common Crawl.</strong> The largest component of most training datasets; a massive, ongoing web-crawling project archiving publicly accessible web pages since 2008.</li>
+            <li><strong>Published academic literature.</strong> Mainly open-access journals, pre-print servers like arXiv, and digitised historical works, not proprietary databases requiring authentication.</li>
+            <li><strong>Curated text collections.</strong> Digitised books (often out-of-copyright works), Wikipedia, news articles, and other high-quality text.</li>
+            <li><strong>Code repositories.</strong> Publicly shared repositories like GitHub, for models with coding capabilities.</li>
+          </ul>
+          <p>The key contention: authors, media outlets and publishers allege their copyrighted works were gathered from shadow libraries like Library Genesis, and are seeking compensation. Raw Common Crawl data is heavily cleaned and filtered before use, typically reducing it by 80 to 90 per cent, but the scope of that filtering is contested. The robots.txt protocol, standardised in RFC 9309 (September 2022), lets site owners signal which parts crawlers may access, but it works purely on good faith with no legal enforcement, and is often added after data has already been collected.</p>
+          <p><a href="https://commoncrawl.org/" target="_blank" rel="noopener">Common Crawl</a></p>
+        </section>
+
+        <section class="content-section">
+          <h2>Why AI Hallucinates</h2>
+          <p>An AI "hallucination" is an output that appears factually correct but is fabricated. Language models produce text by predicting statistically probable word sequences, not by retrieving verified facts. The model has no concept of truth, only patterns in language. When it hits a gap in its learned patterns, it does not stop and say "I don't know"; it generates the most plausible continuation, which may be convincing but wrong.</p>
+          <p>This is pattern completion, not fact retrieval. Asked "who won the 1987 Nobel Prize in Literature?", the model is not searching a database; it is completing a pattern, and if the correct answer was underrepresented in training it may confidently produce a plausible but wrong name. Citation fabrication is especially dangerous: models learn the format and style of academic references and can generate perfectly formatted citations that point to nothing real. Research by Zhang and colleagues also shows a snowball effect, where one hallucination makes later fabrications more likely as the model elaborates on its own error.</p>
+          <div class="callout callout-tip">
+            <div class="callout-title">Verify citations</div>
+            <p>In 2023, US lawyers filed court documents citing AI-generated cases that did not exist, with realistic names and page numbers. When checking an AI-generated reference, search the exact title in quotation marks in Google Scholar, PubMed or a library database. If you cannot find it, assume it does not exist.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>The RLHF Problem: Rewarding Confidence Over Accuracy</h2>
+          <p>One less obvious cause of hallucination is built into training itself. After pre-training, modern LLMs are fine-tuned with Reinforcement Learning from Human Feedback (RLHF): human raters rank multiple AI responses, those rankings train a "reward model", and the AI learns to maximise its reward score.</p>
+          <p>The problem is what humans actually reward. Research consistently shows raters prefer responses that are fluent, detailed and confident. "Based on the available evidence, the answer is X" tends to score higher than "I'm not certain, but it might be X, though I'd verify this." When a model expresses honest uncertainty, raters tend to score it lower, so the model learns a perverse lesson: sounding confident is rewarded regardless of accuracy. The same dynamic produces sycophancy, where a model agrees with a user even when the user is wrong, because agreeable answers historically scored well.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Practical implication</div>
+            <p>RLHF does not just fail to prevent hallucinations; it can actively incentivise them. Developers are working on calibrated uncertainty, but for now the rule of thumb is simple: the more confident an AI sounds, the more you should verify its claims independently.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Landmark US Copyright Cases</h2>
+          <p>Two US federal decisions in June 2025 gave the first judicial views on whether using copyrighted works to train generative AI is fair use.</p>
+
+          <h3>Bartz v. Anthropic (June 2025)</h3>
+          <p>In the US District Court for the Northern District of California (No. 3:24-cv-05417-WHA), Judge William Alsup held that training AI on legally obtained books was fair use because it is "transformative, spectacularly so", akin to a person reading and learning from books. However, using pirated copies to build a data library was not fair use. The distinction was how the data was acquired; the decision did not address AI outputs at all.</p>
+
+          <div class="callout callout-key">
+            <div class="callout-title">Update: the $1.5 billion settlement</div>
+            <p>After that ruling, Anthropic settled the piracy part of the case. In late August 2025 it agreed to pay about $1.5 billion (roughly $3,000 for each of around 500,000 pirated works from LibGen and similar shadow libraries), the largest copyright settlement on record. Judge Alsup granted preliminary approval in September 2025, with a final approval hearing held in May 2026 and payments expected to follow if the court signs off.</p>
+          </div>
+
+          <h3>Kadrey v. Meta (June 2025)</h3>
+          <p>In the same court (No. 3:23-cv-03417-VC), Meta won on summary judgment, but Judge Vince Chhabria stressed it was because the authors "made the wrong arguments". He wrote: "This ruling does not stand for the proposition that Meta's use of copyrighted materials to train its language models is lawful. It stands only for the proposition that these plaintiffs made the wrong arguments and failed to develop a record in support of the right one." Meta had admitted training LLaMA on the "Books3" dataset of shadow-library books, but the plaintiffs failed to prove market harm. The judge pointed to a "far more promising" theory they barely raised: that a flood of AI-generated work could dilute the market for human-authored books, even without verbatim copying.</p>
+
+          <div class="video-embed">
+            <button type="button" class="video-facade" onclick="ytPlay(this,'UE0A71JzizI')" aria-label="Play video">
+              <img src="https://i.ytimg.com/vi/UE0A71JzizI/hqdefault.jpg" alt="Video thumbnail">
+              <span class="video-play"></span>
+            </button>
+          </div>
+          <p class="video-note">// Reporting on the Meta employee chat logs raised in the case.</p>
+
+          <h3>The New York Times v. OpenAI (ongoing)</h3>
+          <p>The most high-profile case is The New York Times' suit against OpenAI and Microsoft, filed in December 2023. The NYT alleges ChatGPT was built by copying millions of articles, and provided 100 examples where the model reproduced large spans of text nearly identical to its articles, demonstrating "memorisation" of frequently-seen content. The case remains in active litigation.</p>
+          <p>Court documents: <a href="https://cases.justia.com/federal/district-courts/california/candce/3:2023cv03417/415175/598/0.pdf?ts=1751049986" target="_blank" rel="noopener">Bartz v. Anthropic fair use order</a> &middot; <a href="https://www.govinfo.gov/content/pkg/USCOURTS-cand-3_24-cv-05417/pdf/USCOURTS-cand-3_24-cv-05417-1.pdf" target="_blank" rel="noopener">Kadrey v. Meta</a></p>
+        </section>
+
+        <section class="content-section">
+          <h2>Australian Copyright Law and AI</h2>
+          <p>Australian copyright law is markedly different from the United States. There is no open-ended fair use doctrine. The Copyright Act 1968 (Cth) provides specific "fair dealing" exceptions (research or study, criticism or review, news reporting, parody or satire, and professional advice), with nothing that broadly covers transformative uses like data mining.</p>
+          <p>An AI company mirroring Anthropic's or Meta's practices would be at significant risk under Australian law. Anthropic's scanning of purchased books might come closest to "research or study", but as a commercial entity building a profitable product it likely would not qualify, and Meta's admitted use of Books3 would almost certainly infringe. As the Arts Law Centre of Australia puts it, making a digital copy of a work to train an AI generally requires permission from the copyright holder.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Update: Australia rules out a mining exception</div>
+            <p>The Productivity Commission floated a "text and data mining" exception that would let AI companies train on copyrighted Australian works without permission, estimating it could add $116 billion to the economy over ten years. Authors and the Copyright Agency strongly opposed it. In October 2025 the Australian Government ruled the exception out, with the Attorney-General convening a Copyright and AI Reference Group to design licensing pathways, transparency standards and small-claims enforcement instead. The direction is now toward paid licensing and consent, not a broad exception.</p>
+          </div>
+          <p>In early 2025, Australian authors including former Prime Ministers John Howard and Julia Gillard found their works had been included in Meta's training data without permission, a reminder that these questions affect Australian creators directly.</p>
+          <p><a href="https://www.artslaw.com.au/information-sheet/artificial-intelligence-ai-and-copyright/" target="_blank" rel="noopener">Arts Law: AI and copyright</a> &middot; <a href="https://www.legislation.gov.au/Details/C2024C00316" target="_blank" rel="noopener">Copyright Act 1968 (Cth)</a></p>
+        </section>
+
+        <section class="content-section">
+          <h2>Protecting Your Data When Using AI Tools</h2>
+          <p>When you type a prompt into an AI tool, you may be sharing personal, sensitive or confidential information with a commercial entity that could retain, review and use it in ways you might not expect. Most AI services default to using your conversations for model training unless you opt out.</p>
+          <p>When a company says it may use your conversations for training, that can mean your inputs and the AI's outputs may be reviewed by human contractors, that selected conversations may enter future training datasets, and that once incorporated your data effectively cannot be fully removed from the model. Opting out of training does not always mean opting out of retention. It helps to distinguish three things: the context window (temporary memory cleared between sessions), training data (incorporated into the model, persistent and potentially permanent), and memory features (distinct from both). Because conversations with AI tend to be unfiltered, covering health, relationships, finances and work conflicts, they form a more sensitive dataset than a typical social media profile.</p>
+          <div class="callout callout-warning">
+            <div class="callout-title">Before you type</div>
+            <p>Have you reviewed your privacy settings? Would you be comfortable if this prompt appeared in a newspaper? Can you remove identifying information first? Are you sharing information about others without their consent? Does your organisation have AI policies? Never enter passwords, financial account numbers, government ID numbers, confidential business information, or personal health information about others into AI tools.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>How to Turn Off Data Training: Platform Guide</h2>
+          <p>A quick reference for opting out of model training on the major platforms. These settings change frequently, so always verify against the current interface.</p>
+          <div class="app-grid">
+            <div class="app-card">
+              <div class="app-card-category">Default: opted in</div>
+              <h3>ChatGPT (OpenAI)</h3>
+              <p>Settings, then Data Controls, then turn off "Improve the model for everyone". Alternatively, use Temporary Chat mode.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">Default: opted in</div>
+              <h3>Claude (Anthropic)</h3>
+              <p>Settings, then Privacy, then turn off "Help improve Claude". Note that retention can run up to five years regardless of the training opt-out.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">Default: opted in</div>
+              <h3>Gemini (Google)</h3>
+              <p>Google Account, then Gemini Apps Activity, then turn off. Default retention is 18 months and adjustable; human reviewers may see conversations.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">Varies by plan</div>
+              <h3>Microsoft Copilot</h3>
+              <p>Consumer: personal identifiers are stripped. Microsoft 365 Copilot (enterprise): data stays within your tenant and is not used for public model training.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">Check settings</div>
+              <h3>Perplexity</h3>
+              <p>Settings, then the AI data retention toggle. An anonymous mode is available for non-logged-in use.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">Check settings</div>
+              <h3>Grok (xAI)</h3>
+              <p>Review both the Grok and the X privacy settings; data handling is tied to X platform policies.</p>
+            </div>
+          </div>
+          <div class="callout callout-key">
+            <div class="callout-title">Enterprise plans are different</div>
+            <p>Enterprise and API plans usually have stronger protections by default. ChatGPT Enterprise and Team, Claude for Work and Enterprise, and Microsoft 365 Copilot are excluded from model training. If your institution provides enterprise access, use it; if you are using a personal account for work, check with IT about approved tools. Remember that opting out of training does not always stop retention, safety reviews may keep flagged content, most services transfer data to United States servers, and settings can reset with policy updates, so review them periodically.</p>
+          </div>
+        </section>
+
+      </div>
+
+      <aside class="sidebar-rail">
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">In this module</div>
+            <ul>
+              <li>Hoover and clipboard misconceptions</li>
+              <li>Where training data comes from</li>
+              <li>Why AI hallucinates, and RLHF</li>
+              <li>Landmark copyright cases</li>
+              <li>Australian copyright law</li>
+              <li>Protecting your own data</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">The test</div>
+            <p>If you would not be comfortable seeing this prompt in a newspaper, do not paste it into an AI tool.</p>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <img class="rail-img" src="assets/plux-kernal-scooterplay.png" alt="Plux on a scooter">
+          <div class="rail-body">
+            <div class="rail-label">Campus cameo</div>
+            <p>Plux makes another appearance from the series.</p>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Resources</div>
+            <ul>
+              <li><a href="https://commoncrawl.org/" target="_blank" rel="noopener">Common Crawl dataset</a></li>
+              <li><a href="https://www.legislation.gov.au/Details/C2024C00316" target="_blank" rel="noopener">Copyright Act 1968 (Cth)</a></li>
+              <li><a href="https://www.artslaw.com.au/information-sheet/artificial-intelligence-ai-and-copyright/" target="_blank" rel="noopener">Arts Law: AI and copyright</a></li>
+              <li><a href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noopener">Transformer Explainer</a></li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <div class="last-updated">Last updated: 10 June 2026</div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="container">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Charles Darwin University&nbsp;|&nbsp;TAFE PSI&nbsp;|&nbsp;ICT, Cyber Security &amp; Digital</span>
+      <span style="font-family:'JetBrains Mono',monospace;">CDU AI Staff Training</span>
+    </div>
+    <div class="footer-legal">
+      <p class="ack">Charles Darwin University acknowledges the traditional custodians across the lands on which we live and work, and we pay our respects to Elders past and present.</p>
+      <p class="reg">CRICOS Provider No: 00300K &middot; RTO Provider No: 0373 &middot; TEQSA Provider ID PRV12069</p>
+      <p><a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice">Privacy</a> &middot; <a href="https://www.cdu.edu.au/about-cdu/copyright-disclaimer">Copyright and Disclaimer</a> &middot; <a href="https://www.cdu.edu.au/files/2022-03/cdu-cookie-notice.pdf">Cookies</a></p>
+      <p class="reg">ABN 54 093 513 649</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function ytPlay(btn,id){
+  var f=document.createElement('iframe');
+  f.src='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0';
+  f.title='Video';
+  f.allow='autoplay; encrypted-media; fullscreen; picture-in-picture';
+  f.allowFullscreen=true;
+  btn.parentNode.replaceChild(f,btn);
+}
+</script>
+
+</body>
+</html>

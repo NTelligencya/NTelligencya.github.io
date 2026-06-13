@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>AI Foundations: How LLMs Work &middot; CDU AI Staff Training &middot; NTell World Ink</title>
+<meta name="description" content="How large language models actually work: next-word prediction, why context changes meaning, the strawberry problem, reasoning models, context engineering, and how AI builds documents.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container">
+    <div class="site-inner">
+      <a class="brand" href="/">
+        <div class="brand-mark"></div>
+        <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/">Home</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="page-masthead">
+  <div class="container">
+    <div class="series-label">AI Staff Training &middot; Charles Darwin University</div>
+    <h1>AI Foundations: How LLMs Work</h1>
+    <p class="subtitle">What a large language model is actually doing when it writes, why context changes meaning, what "reasoning" really means, and how an AI assistant builds a Word document. A core session in the CDU AI staff training series.</p>
+  </div>
+</section>
+
+<div class="content-body">
+  <div class="container">
+    <div class="content-split">
+
+      <div class="main">
+
+        <section class="content-section">
+          <h2>Large Language Models Explained</h2>
+          <p>Large language models (LLMs) are neural network based AI systems trained on massive text datasets. They work as next-word prediction engines, generating language by statistically predicting the most likely next token given the prior context. Through training on billions of words, the model learns syntax, semantics, and some real-world facts; all of it encoded as probabilities across a network of hundreds of billions of parameters.</p>
+
+          <h3>How does a transformer work?</h3>
+          <p>The process starts by breaking text into smaller pieces called tokens (think of these as puzzle pieces). These tokens are converted into numbers a computer can work with. The system then works out which words matter most to each other and, based on those relationships, predicts what should come next.</p>
+
+          <h3>The three main components</h3>
+          <ol>
+            <li><strong>Input processing (embedding).</strong> Converts human language into computer language. "The password is" becomes the tokens ["The", "password", "is"], each turned into a list of numbers carrying positional information.</li>
+            <li><strong>The thinking process (transformer blocks).</strong> Multiple layers with attention mechanisms highlight the important words, and processing layers refine understanding based on context.</li>
+            <li><strong>Output generation.</strong> The system converts its internal, number-based understanding back into human language, predicting the most likely next word.</li>
+          </ol>
+
+          <h3>Scale and probabilistic learning</h3>
+          <p>Modern AI language models contain trillions of parameters spread across hundreds of layers. Rather than storing "Paris is the capital of France" as a fact, the network encodes the probability that "France" often appears near "Paris" and "capital". This probabilistic approach means AI does not "know" facts in the traditional sense; it predicts the most statistically likely next word based on vast networks of statistical inference.</p>
+
+          <h3>Key features of transformers</h3>
+          <ul>
+            <li><strong>Multi-head attention.</strong> Multiple attention heads focus on different types of word relationship at once, like having several analysts who each specialise in a different aspect.</li>
+            <li><strong>Parallel processing.</strong> Unlike older systems that read word by word, transformers analyse whole sentences at once using GPUs.</li>
+            <li><strong>Scalability.</strong> Transformers can be made larger by adding layers and parameters. GPT-4 has hundreds of billions of parameters compared with GPT-2's 124 million.</li>
+          </ul>
+
+          <div class="callout callout-key">
+            <div class="callout-title">Key idea</div>
+            <p>The model does not look facts up. It encodes the probability that words appear near one another, then predicts the most statistically likely next word. That single mechanism explains most of what follows on this page.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>If LLMs do not "know" facts but predict statistically likely responses, what does that mean for how we define plagiarism?</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>GPU Parallel Processing: The Engine of AI</h2>
+          <p>Graphics processing units (GPUs) are the computational powerhouses that make modern AI possible. While CPUs have a handful of powerful cores built for complex sequential tasks, GPUs contain thousands of simpler cores optimised for parallel processing. That architecture matches the mathematics of AI training and inference, which involves massive matrix multiplications that can all run at once.</p>
+
+          <h3>Why GPUs transform AI</h3>
+          <p>Neural networks are essentially giant matrices of weights. Training requires repeated matrix multiplications across millions of data points, exactly the kind of parallel computation GPUs excel at. This is why GPU access often determines who can develop and deploy advanced AI.</p>
+
+          <h3>From gaming rigs to AI labs</h3>
+          <p>If you have ever looked at high-performance gaming computers, you have already met the hardware that powers cutting-edge AI. Gaming systems render detailed graphics by handling thousands of calculations at once, and the same architecture is ideal for training AI models. Both rely on parallel processing: shading every pixel in a 3D scene, or adjusting billions of weights in a neural network. That is why NVIDIA, once focused on gamers, now sits at the heart of AI.</p>
+
+          <figure class="figure">
+            <img src="assets/1_LLMChip_4.png" alt="An AI accelerator chip">
+            <figcaption>Video game graphics depend on parallel processing, the same capability that drives AI training.</figcaption>
+          </figure>
+
+          <h3>What "AI-ready" devices actually mean</h3>
+          <p>New phones, laptops and tablets advertise an "AI Engine", "Neural Processing Unit" or "AI-ready chip". Many now include dedicated acceleration such as Apple's Neural Engine or Qualcomm's Hexagon. These speed up on-device inference, things like facial recognition, photo enhancement and real-time translation, but they are not built to train large models. AI-ready does not mean your laptop can train a frontier model; real training horsepower still means the cloud or specialised GPU hardware.</p>
+
+          <figure class="figure">
+            <img src="assets/LaptopShopping_Felt_puppets.png" alt="Shopping for an AI-ready laptop">
+            <figcaption>Choosing an AI-ready device: on-device chips speed up everyday inference, not model training.</figcaption>
+          </figure>
+
+          <h3>Taiwan and the global chip race</h3>
+          <p>Almost every high-end AI chip relies on semiconductor fabrication in Taiwan by TSMC, using advanced 5nm and 3nm processes to pack tens of billions of transistors onto a sliver of silicon. The NVIDIA H100, long the workhorse of frontier labs, has since been succeeded by the Blackwell generation (the B200 and the GB200 superchip), now the flagship data-centre AI hardware. A single such accelerator costs tens of thousands of dollars, training clusters use thousands of them, and they draw large amounts of power and remain in limited supply. Taiwan's dominance here is so strategically important that it is often called the "silicon shield".</p>
+          <p><a href="https://www.abc.net.au/news/2023-06-20/7-30-china-us-taiwan-tech-war-semiconductors/102495264" target="_blank" rel="noopener">Watch: why Taiwan dominates the semiconductor industry (ABC 7.30)</a></p>
+        </section>
+
+        <section class="content-section">
+          <h2>Labelled Datasets: How Machines Learn to Recognise Patterns</h2>
+          <p>Training datasets are the foundation of all machine learning. These carefully labelled collections of examples teach AI systems to recognise patterns, make predictions and generate appropriate responses. Datasets like MNIST (handwritten digits), Stanford Dogs (breed classification) and specialised collections such as Thai handwriting show how systems learn through pattern recognition: each example is paired with a correct label, so the machine learns the statistical relationship between input and desired output.</p>
+
+          <h3>The training process</h3>
+          <p>Machine learning means showing the system thousands of examples while adjusting internal parameters (weights) to improve accuracy. This process, run over repeated passes called epochs, gradually teaches the system to recognise patterns and make accurate predictions on new, unseen data.</p>
+
+          <figure class="figure">
+            <img src="assets/1_LLM_MNIST_5.png" alt="Examples from the MNIST handwritten digit dataset">
+            <figcaption>MNIST: handwritten digits, each paired with its correct label; a classic teaching dataset for pattern recognition.</figcaption>
+          </figure>
+
+          <h3>Real conversations: the WildChat dataset</h3>
+          <p>WildChat is a window into how people actually use AI assistants. It holds around one million real conversations between users and systems like ChatGPT, collected from genuine interactions rather than laboratory settings. For educators it offers rare insight into how students use these tools: a significant share of conversations involve assignment help, exploring academic concepts, and coding or technical problem-solving. Roughly 15 to 25 per cent involve programming, while many others focus on writing, research and academic discussion. Seeing the sophistication of real student interactions helps inform sensible policy on AI use.</p>
+
+          <figure class="figure">
+            <img src="assets/WildChatViz500.png" alt="Visualisation of WildChat conversation patterns">
+            <figcaption>WildChat: patterns drawn from a million real user and AI conversations.</figcaption>
+          </figure>
+
+          <div class="callout callout-tip">
+            <div class="callout-title">Explore the datasets</div>
+            <p><a href="https://www.tensorflow.org/datasets/catalog/mnist" target="_blank" rel="noopener">MNIST</a>, <a href="https://huggingface.co/datasets/maurice-fp/stanford-dogs" target="_blank" rel="noopener">Stanford Dogs</a>, <a href="https://huggingface.co/datasets/tanganke/stanford_cars/viewer/default/train?p=81&amp;row=8101" target="_blank" rel="noopener">Stanford Cars</a>, <a href="https://huggingface.co/datasets/iapp/thai_handwriting_dataset" target="_blank" rel="noopener">Thai handwriting</a>, <a href="https://wildvisualizer.com/?contains=essay&amp;dataset=wildchat" target="_blank" rel="noopener">WildChat visualiser</a>, <a href="https://wildchat.allen.ai/" target="_blank" rel="noopener">WildChat main site</a>.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Why Context Changes Meaning</h2>
+          <p>LLMs learn by building statistical associations between words and phrases. They do not store definitions the way a dictionary does. Instead, they learn that certain words tend to appear near other words in certain contexts, and that pattern of co-occurrence is what gives words their meaning inside the model.</p>
+
+          <h3>The "Charles Darwin" problem</h3>
+          <p>Consider the phrase "Charles Darwin". If the surrounding context includes "Northern Territory", "university", "Casuarina campus" and "TAFE", the model's associations point strongly toward Charles Darwin University, an educational institution in Darwin, Australia. If instead the context includes "natural selection", "Beagle", "Galapagos" and "evolution", those same two words point toward Charles Darwin the nineteenth-century naturalist. The words have not changed; the surrounding context has, and that context shifts which cluster of associations the model activates.</p>
+
+          <h3>Words as positions in space</h3>
+          <p>Internally, an LLM represents every word or token as a vector, a list of numbers placing that word at a specific point in a high-dimensional space. You can see this with the <a href="https://platform.openai.com/tokenizer" target="_blank" rel="noopener">OpenAI Tokenizer tool</a>, which shows how text breaks into tokens and gets assigned numerical IDs. Words with similar meanings end up near each other: "university" sits close to "campus" and "degree", while "evolution" sits close to "species" and "natural selection". When context shifts, the model adjusts these vectors through its attention mechanism.</p>
+
+          <h3>The practical implication</h3>
+          <p>This is why giving good context matters when you use AI tools. The more relevant context you provide, the more accurately the model can position its internal representations and generate an appropriate response. Asking "tell me about Charles Darwin" with no context forces the model to guess which one you mean, and it will default to whichever association is statistically strongest (usually the biologist). Adding "I work at CDU in Darwin, NT" shifts the entire response.</p>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>Think of a term you use at CDU that means something completely different in everyday language. How might an AI tool misread it without the right context?</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>The Strawberry Problem</h2>
+          <p>The strawberry problem reveals a basic limit in how LLMs read information. Asked "how many r's are in strawberry?", early models consistently answered "2" instead of the correct "3". This is not a knowledge gap; it is a consequence of how these systems process text. LLMs do not see individual letters. They process text as tokens, chunks that might be whole words, parts of words, or common letter combinations. The word "strawberry" might be tokenised as "straw" plus "berry", so the model never directly sees each letter to count it.</p>
+
+          <figure class="figure">
+            <img src="assets/countingletters.png" alt="A model's extended thinking, systematically counting individual letters in a passage of text">
+            <figcaption>Watch a model count letters: instructed to count rather than read for meaning, its chain of thought reveals a systematic counting procedure, not pattern matching.</figcaption>
+          </figure>
+
+          <h3>Chain of thought reasoning</h3>
+          <p>Modern systems address this through chain of thought reasoning, working through a problem step by step rather than jumping to a predicted answer. Instead of guessing "2", a reasoning model spells out each letter: "s-t-r-a-w-b-e-r-r-y", sees that "r" appears in positions 3, 8 and 9, and answers "3". On paid subscriptions to Claude or ChatGPT you can watch this thinking happen in real time in a dedicated panel.</p>
+
+          <p>This is the same distinction you experience yourself. If someone asks "how many computers are in Purple 12, classroom 3.18, Casuarina campus?", do you already know it is 20 because you have seen it before (prediction), or do you have to mentally walk the room and count (reasoning)?</p>
+
+          <div class="callout callout-tip">
+            <div class="callout-title">Try it yourself</div>
+            <p>Copy any paragraph of text into ChatGPT or Claude and ask: "how many times does the letter A appear in this text?" Watch the model switch from reading-for-meaning into a counting procedure, working through character by character. If you have a paid subscription, open the thinking panel to watch the chain of thought in action.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>From Prediction to Reasoning Models</h2>
+          <p>A newer generation of models changes how these systems approach problems. Rather than simply predicting the next word, reasoning models such as OpenAI's o1 and o3 and DeepSeek R1 are designed to think through a problem step by step before producing an answer.</p>
+
+          <h3>What makes reasoning models different?</h3>
+          <p>Traditional LLMs produce answers through pattern matching. Reasoning models break a problem into intermediate steps, effectively "thinking" before committing to a final answer; a process called chain-of-thought reasoning. Earlier models could be prompted to show their working, but reasoning models have the capability built in through reinforcement learning.</p>
+
+          <h3>Key innovations</h3>
+          <ul>
+            <li><strong>Test-time compute.</strong> These models can think longer on harder problems, trading speed for accuracy.</li>
+            <li><strong>Self-verification.</strong> They check their own work before committing to an answer.</li>
+            <li><strong>Transparent versus hidden reasoning.</strong> Some models (like DeepSeek R1) show their chain of thought openly; others (like OpenAI o3) reason internally and present only a final answer.</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>If AI can now reason step by step, does that change how we should design assessments? What are the implications of hidden versus transparent reasoning for trust and accountability?</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>The AI Embodiment Problem</h2>
+          <p>Modern AI systems operate entirely in "data space". They process text, images and code as digital inputs but have no physical experience or world model. This is known as the embodiment problem. LLMs are like minds that have only ever read about the world and never lived in it; they lack a model of space, cause and effect, and physical force.</p>
+          <p>This produced outputs like Google's AI Overview <a href="https://ia.acs.org.au/article/2024/google-goes-viral-after-ai-says-to-put-glue-on-pizza-eat-rocks.html" target="_blank" rel="noopener">suggesting users apply glue so pizza toppings do not fall off</a>. Without embodied experience, the model cannot tell a joke answer on Reddit from genuine cooking advice.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Context Engineering</h2>
+          <p>If you have spent time trying to get better results from AI tools, you have probably focused on how you phrase your questions. That is prompt engineering, and it matters. But a more fundamental skill is emerging: context engineering, making sure the AI has the right information before it starts thinking.</p>
+
+          <div class="callout callout-tip">
+            <div class="callout-title">Andrej Karpathy</div>
+            <p>"People associate prompts with short task descriptions you'd give an LLM in your day-to-day use. When in every industrial-strength LLM app, context engineering is the delicate art and science of filling the context window with just the right information for the next step."</p>
+          </div>
+
+          <h3>Understanding the context window</h3>
+          <p>Every AI conversation happens within a finite working space, like a whiteboard in a meeting room. That window holds the system instructions, any documents you have provided, the conversation history, and your current message. Every word consumes space, and once the whiteboard fills up, older information gets erased. The context window is completely different from training data: training data is the AI's education, baked in from the past, while the context window is what the AI can see right now, in this specific conversation. This is why AI "forgets" things between conversations, and why providing your own documents improves responses.</p>
+
+          <h3>Retrieval augmented generation (RAG)</h3>
+          <p>One of the biggest challenges with LLMs is hallucination, confidently generating incorrect information. RAG helps by supplementing the model's knowledge with relevant external content. Your documents are indexed into a vector store, broken into chunks with numerical embeddings. When you ask a question, matching chunks are retrieved and inserted into the context window, so the model grounds its response in your actual documents rather than relying solely on training data. Think of the context window as short-term memory and the model's parameters as background knowledge; RAG lets the model flip through relevant notes while it writes.</p>
+
+          <h3>Practical tips for better context</h3>
+          <ul>
+            <li><strong>Select deliberately.</strong> Choose the most pertinent information for the task; not everything relevant belongs in the window.</li>
+            <li><strong>Compress when needed.</strong> A well-written summary often beats a raw dump of full text.</li>
+            <li><strong>Isolate tasks.</strong> Complex projects benefit from separate conversations, each with focused context.</li>
+          </ul>
+
+          <h3>Context problems to avoid</h3>
+          <ul>
+            <li><strong>Context poisoning.</strong> Incorrect information, including the AI's own earlier errors, influences later responses.</li>
+            <li><strong>Context distraction.</strong> Too much irrelevant information overwhelms the signal.</li>
+            <li><strong>Context overflow.</strong> When the window fills, older information gets dropped.</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>To what extent does RAG address the hallucination problem? What are its limits?</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>AI Development Pace and Performance Benchmarks</h2>
+          <p>The pace of AI development keeps accelerating, helped along by Moore's Law. Gordon Moore, a co-founder of Intel, observed that the number of transistors on a chip tends to double roughly every two years; in everyday terms, our devices keep getting more powerful, cheaper and smaller. That steady doubling of computing power is much of what made today's AI models possible: each time chips shrink while gaining capacity, machines can handle more data and run models that were impossible a few years earlier.</p>
+
+          <figure class="figure">
+            <img src="assets/1_LLM_moores_6.png" alt="A chart of AI performance improving over time">
+            <figcaption>AI performance over time: benchmark after benchmark has been saturated as compute and methods improve.</figcaption>
+          </figure>
+
+          <h3>Why benchmarks matter</h3>
+          <p>Benchmarks give standardised ways to compare models and track progress over time, which helps institutions make informed decisions about adoption. They also carry real limitations, covered below.</p>
+
+          <h3>The benchmark landscape</h3>
+          <p>Modern evaluation spans dozens of specialised tests. A few of the key ones:</p>
+          <ul>
+            <li><strong>MMLU and MMLU-Pro.</strong> General knowledge and reasoning across dozens of academic subjects. Top models passed 90 per cent on the original MMLU long ago, which is why the harder Pro version exists.</li>
+            <li><strong>GPQA Diamond.</strong> Graduate, "Google-proof" science questions; human PhD experts score only about 65 to 74 per cent.</li>
+            <li><strong>AIME and MATH-500.</strong> Competition-level mathematics, which moved from near-impossible to largely solved within a couple of years.</li>
+            <li><strong>SWE-bench Verified and LiveCodeBench.</strong> Real software engineering, such as fixing actual GitHub issues. See the trajectory below.</li>
+            <li><strong>Humanity's Last Exam and ARC-AGI.</strong> Deliberately hard frontier tests built to resist saturation; early scores were low and have been climbing.</li>
+          </ul>
+
+          <h3>Where things stand in 2026</h3>
+          <p>By the <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report" target="_blank" rel="noopener">2026 Stanford AI Index</a>, frontier models meet or exceed human performance on PhD-level science questions, multimodal reasoning and competition mathematics, while still lagging on everyday tasks like telling the time, multi-step planning and household robotics (robots succeed at only about 12 per cent of real household chores). Agentic progress has been especially fast: the success rate of AI agents on real-world tasks rose from 20 per cent in 2025 to 77.3 per cent in the 2026 report, and agents resolving cybersecurity problems went from 15 per cent in 2024 to about 93 per cent.</p>
+          <p>On <a href="https://www.swebench.com/" target="_blank" rel="noopener">SWE-bench Verified</a>, which tests fixing real GitHub issues, models solved roughly 4 per cent of problems in 2023, around 70 per cent by 2024, and approximately 80 per cent by 2026; though the benchmark is known to carry some data contamination, so live leaderboards and harder successors give a truer picture.</p>
+
+          <h3>An increasingly close race</h3>
+          <p>According to the 2026 AI Index, the gap between the leading United States and Chinese models has nearly closed: as of March 2026 the top model led by only about 2.7 per cent on the Chatbot Arena leaderboard, down from double-digit margins in 2023. At the same time, transparency has fallen; the Foundation Model Transparency Index average dropped to 40 from 58 the year before, with the most capable models often disclosing the least about how they were trained.</p>
+
+          <h3>Benchmark saturation and its limits</h3>
+          <p>As capabilities improve, benchmarks must keep evolving to stay meaningful. Traditional tests like MMLU become "saturated" once top models score above 90 per cent, and harder successors replace them; a pattern that repeats across the field. Benchmarks also carry real caveats:</p>
+          <ul>
+            <li><strong>Data contamination.</strong> Models may have seen benchmark questions in training, inflating scores.</li>
+            <li><strong>Narrow testing.</strong> High scores do not guarantee real-world performance.</li>
+            <li><strong>Gaming.</strong> Models can be tuned specifically to a benchmark.</li>
+            <li><strong>Sampling and validity.</strong> Some benchmarks rely on convenience sampling, and it is not always clear they measure what they claim.</li>
+          </ul>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>Can frontier labs manipulate benchmark performance? Which benchmarks would be most relevant for judging AI in education? And how should benchmark gains shape a decision to adopt a new tool?</p>
+          </div>
+
+          <p>Explore the live leaderboards: <a href="https://aider.chat/docs/leaderboards/" target="_blank" rel="noopener">Aider</a>, <a href="https://lastexam.ai/" target="_blank" rel="noopener">Humanity's Last Exam</a>, <a href="https://lmarena.ai/" target="_blank" rel="noopener">Chatbot Arena</a>, <a href="https://artificialanalysis.ai/" target="_blank" rel="noopener">Artificial Analysis</a>, <a href="https://www.swebench.com/" target="_blank" rel="noopener">SWE-bench</a>, <a href="https://arcprize.org/" target="_blank" rel="noopener">ARC Prize</a>, <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report" target="_blank" rel="noopener">Stanford AI Index 2026</a>.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Interactive Tools</h2>
+          <p>Two visualisations let you experiment with how text flows through a transformer neural network and watch attention heads focus on different word relationships.</p>
+          <div class="cta-row">
+            <a class="btn btn-ghost" href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noopener">Transformer Explainer</a>
+            <a class="btn btn-ghost" href="https://bbycroft.net/llm" target="_blank" rel="noopener">3D Neural Net Visualiser</a>
+          </div>
+          <div class="callout callout-tip">
+            <div class="callout-title">Try the temperature slider</div>
+            <p>In the Transformer Explainer, try the temperature slider. Temperature controls how "creative" the model's output is. At low temperature, the model picks the most probable next word. As you raise the temperature, less likely words get a chance, which is why the same prompt can produce different outputs each time. This statistical randomness is one reason AI detection software struggles to reliably identify AI-written content.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>How AI Creates Documents</h2>
+          <p>When you ask Claude, ChatGPT or Microsoft Copilot to create a Word document, what actually happens? AI assistants do not "use" Microsoft Word the way a person does. They do not click menus or drag margins. Instead they write code that programmatically constructs the document file, the same technique used in enterprise document automation for decades.</p>
+
+          <h3>The basic mechanism</h3>
+          <p>The AI interprets your natural language request, generates the appropriate code, runs it in a sandboxed environment, and delivers the finished file. The results are not mockups: a generated .docx opens in Word with full functionality, an .xlsx has working formulas, and a .pptx presents in PowerPoint.</p>
+
+          <h3>Documents are structured data</h3>
+          <p>Modern Office documents (.docx, .xlsx, .pptx) are really ZIP archives containing XML files. The AI constructs the XML and data structures that define the document directly, with no graphical interface. This is why AI-generated documents are indistinguishable from human-created ones: they use exactly the same underlying format. The Python libraries behind this (python-docx, openpyxl, python-pptx, reportlab) have existed for over a decade in enterprise automation; AI has simply made them accessible through natural language.</p>
+
+          <h3>How different assistants handle this</h3>
+          <div class="app-grid">
+            <div class="app-card">
+              <div class="app-card-category">Anthropic</div>
+              <h3>Claude</h3>
+              <p>Writes and runs code in a sandboxed environment, then provides download links for the completed files.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">OpenAI</div>
+              <h3>ChatGPT</h3>
+              <p>Uses Code Interpreter to generate and run code. Can read and modify uploaded documents.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">Microsoft</div>
+              <h3>Copilot</h3>
+              <p>Built into Microsoft 365 as a core feature; it operates within Word and Excel directly, not as a third-party add-on.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">Google</div>
+              <h3>Gemini</h3>
+              <p>Integrated into Google Workspace. Generates and modifies Docs, Sheets and Slides through native APIs.</p>
+            </div>
+          </div>
+
+          <h3>What this means for skills</h3>
+          <p>If AI can handle mechanical tasks like formatting, formula entry and slide layout, the emphasis shifts toward verification, quality assurance, and knowing when AI output actually meets the requirement. Someone who understands what a VLOOKUP does but uses AI to write the syntax has demonstrated competency differently, and both approaches increasingly reflect real workplace practice.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Why AI-Generated Images Contain Spelling Errors</h2>
+          <p>AI image generators have long produced striking pictures with garbled or misspelled text. This happens because image models process text as visual patterns rather than linguistic symbols. To a vision network, letters and words are just arrangements of lines and curves, so the model can render convincing letter-like shapes without understanding spelling. It is why AI university signage might read "CHARPES DARWUIN UNVERSTTY" instead of "Charles Darwin University". The link between the prompt "show text saying X" and the rendered result is statistical, not rule-based.</p>
+
+          <figure class="figure">
+            <img src="assets/1_LLMUniveristy_3.png" alt="An AI-generated image misspelling the word University">
+            <figcaption>"Univiersity" versus "University": a classic AI image generation error.</figcaption>
+          </figure>
+
+          <div class="callout callout-key">
+            <div class="callout-title">What changed in 2026</div>
+            <p>This limitation is receding. Newer reasoning-based image models, notably Google's <a href="https://blog.google/innovation-and-ai/products/nano-banana-pro/" target="_blank" rel="noopener">Nano Banana Pro</a> (built on Gemini 3 Pro), now render legible text inside images reliably, even full paragraphs. The spelling tell is no longer a dependable way to spot an AI image.</p>
+          </div>
+          <p><a href="https://en.wikipedia.org/wiki/MNIST_database" target="_blank" rel="noopener">Learn more: the MNIST dataset</a>.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Generative Adversarial Networks (GANs)</h2>
+          <p>Generative adversarial networks are one of the foundational architectures behind photorealistic AI imagery. A GAN pits two neural networks against each other: a generator that creates fake images, and a discriminator that tries to tell real from fake. Through repeated rounds both improve, until the generator produces images convincing enough that the discriminator cannot reliably separate them from genuine photographs.</p>
+
+          <h3>From StyleGAN to diffusion models</h3>
+          <p>Early architectures like NVIDIA's StyleGAN could generate photorealistic faces of people who do not exist. More recent systems such as Stable Diffusion and DALL-E use a different approach called diffusion, but the core capability, creating convincing synthetic imagery, is the same.</p>
+
+          <h3>Why this is double-edged</h3>
+          <p>The same technology that powers creative work also enables misuse: identity fraud, fake social media profiles, manipulated evidence and non-consensual imagery. What once needed graphics expertise can now be done by anyone with a smartphone, which sharply lowers the barrier to convincing misinformation.</p>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>Should access to powerful image-generation tools carry licensing requirements? How do we balance creative freedom against the potential for harm?</p>
+          </div>
+          <p><a href="https://thispersondoesnotexist.com/" target="_blank" rel="noopener">Example: This Person Does Not Exist</a>.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Google Nano Banana Pro: The End of Photographic Evidence?</h2>
+          <p>In late November 2025 Google released Nano Banana Pro, its Gemini 3 Pro image model, an image generation and editing system that reignited debate about the future of photographic evidence. Unlike earlier generators that mostly made new images from scratch, Nano Banana Pro excels at editing existing photographs, adding, removing or altering elements so convincingly that even imaging experts struggle to detect the change. Because it is built on Gemini 3 reasoning and connected to Google Search, it also renders legible text and grounds images in real-world knowledge.</p>
+
+          <div class="video-embed">
+            <button type="button" class="video-facade" onclick="ytPlay(this,'US2gO7UYEfY')" aria-label="Play video">
+              <img src="https://i.ytimg.com/vi/US2gO7UYEfY/hqdefault.jpg" alt="Video thumbnail">
+              <span class="video-play"></span>
+            </button>
+          </div>
+          <p class="video-note">// NBC News report on Nano Banana Pro.</p>
+
+          <p>Content creator Jeremy Carrasco told NBC News: "It is a step in realism specifically. A lot of the things that you used to look for, such as a blurry camera image or something that just looks a little too glossy or a little too smooth, a lot of that has been straightened out."</p>
+
+          <h3>The misinformation problem</h3>
+          <p>Researchers have shown Nano Banana Pro convincingly altering images from news events and political rallies, changing crowd sizes, and even editing historical photographs. A bad actor can now alter a photo in seconds with no budget or editing skill. Google applies SynthID watermarks to its AI-generated content and lets users upload an image to Gemini to ask whether it was AI-generated, but these safeguards rely on people choosing to check, and demand was high enough that Google quickly restricted free access after launch.</p>
+
+          <div class="callout callout-tip">
+            <div class="callout-title">Expert view</div>
+            <p>Professor Sandra Wachter, Oxford Internet Institute: "I find it dystopian to claim the era of traditional photography is 'over'. It basically says 'why capture real genuine human moments if you could just generate them on your computer'? I am not sure why we should celebrate the 'death' of art and artists."</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>If photographic evidence can no longer be trusted, how should courts and journalists adapt? Should powerful image-editing AI require identity verification? What responsibility do AI companies carry to prevent misuse?</p>
+          </div>
+          <p>Read more: <a href="https://petapixel.com/2025/11/26/googles-nano-banana-pro-ai-model-further-erodes-trust-in-photos/" target="_blank" rel="noopener">PetaPixel</a>, <a href="https://www.fastcompany.com/91396655/google-nano-banana-cant-trust-photos-online" target="_blank" rel="noopener">Fast Company</a>.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>AI Video Generation and Temporal Consistency</h2>
+          <p>AI video tools like Google Veo (now Veo 3.1) and Runway can generate cinematic scenes that look close to live action. But making a coherent, believable clip, especially one with characters, narrative and emotion, is still hard. The challenge is temporal consistency: a character's face, body or clothing should not morph unpredictably from one second to the next, and a robot should keep the same design throughout a film.</p>
+
+          <figure class="figure">
+            <img src="assets/1LLM_VEO.png" alt="An AI video generation workflow diagram">
+            <figcaption>A typical AI video workflow stitches several tools together under heavy human curation.</figcaption>
+          </figure>
+
+          <h3>The AI film workflow</h3>
+          <p>Creating a coherent AI film means orchestrating several tools and a great deal of human curation: concept art in Midjourney, static character references in Runway, motion generation with Google Veo, synthetic voices from ElevenLabs, and final assembly in Adobe Premiere. The Wall Street Journal's short film experiment generated over a thousand clips to find the ones that fit, a reminder that these tools still need skilled humans to sequence prompts, manage reference assets and make editorial calls machines cannot yet replicate.</p>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Discussion</div>
+            <p>What does increasingly sophisticated AI video mean for media literacy education? How might these tools reshape the film and television industry?</p>
+          </div>
+          <p><a href="https://aistudio.google.com/prompts/new_video" target="_blank" rel="noopener">Try: Google Veo in AI Studio</a>.</p>
+        </section>
+
+      </div>
+
+      <aside class="sidebar-rail">
+        <div class="rail-card">
+          <img class="rail-img" src="assets/neuralnet.jpg" alt="Neural network diagram">
+          <div class="rail-body">
+            <div class="rail-label">In this session</div>
+            <ul>
+              <li>What an LLM does when it predicts the next word</li>
+              <li>Why context changes a word's meaning</li>
+              <li>The strawberry problem and tokenisation</li>
+              <li>Prediction versus reasoning models</li>
+              <li>The embodiment problem</li>
+              <li>GPUs, datasets and benchmarks</li>
+              <li>Context engineering and RAG</li>
+              <li>How AI builds documents</li>
+              <li>How AI generates images and video</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">The Charles Darwin test</div>
+            <p>Surround "Charles Darwin" with "Casuarina", "TAFE" and "Northern Territory" and the model points to the university. Surround it with "Beagle", "Galapagos" and "evolution" and it points to the naturalist. The words do not change; the context does.</p>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <img class="rail-img" src="assets/1_LLM_Rs_2.png" 
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Tools and resources</div>
+            <ul>
+              <li><a href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noopener">Transformer Explainer (interactive)</a></li>
+              <li><a href="https://bbycroft.net/llm" target="_blank" rel="noopener">3D Neural Net Visualiser (interactive)</a></li>
+              <li><a href="https://platform.openai.com/tokenizer" target="_blank" rel="noopener">OpenAI Tokenizer</a></li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <div class="last-updated">Last updated: 10 June 2026</div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="container">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Charles Darwin University&nbsp;|&nbsp;TAFE PSI&nbsp;|&nbsp;ICT, Cyber Security &amp; Digital</span>
+      <span style="font-family:'JetBrains Mono',monospace;">CDU AI Staff Training</span>
+    </div>
+    <div class="footer-legal">
+      <p class="ack">Charles Darwin University acknowledges the traditional custodians across the lands on which we live and work, and we pay our respects to Elders past and present.</p>
+      <p class="reg">CRICOS Provider No: 00300K &middot; RTO Provider No: 0373 &middot; TEQSA Provider ID PRV12069</p>
+      <p><a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice">Privacy</a> &middot; <a href="https://www.cdu.edu.au/about-cdu/copyright-disclaimer">Copyright and Disclaimer</a> &middot; <a href="https://www.cdu.edu.au/files/2022-03/cdu-cookie-notice.pdf">Cookies</a></p>
+      <p class="reg">ABN 54 093 513 649</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

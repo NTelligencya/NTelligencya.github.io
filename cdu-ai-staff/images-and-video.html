@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Images and Video: Multimodal AI &middot; CDU AI Staff Training &middot; NTell World Ink</title>
+<meta name="description" content="How multimodal vision-language models 'see' and analyse images: how they work, a vintage-hardware case study comparing leading models, the 2023 to 2025 vision revolution, and classroom uses.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container">
+    <div class="site-inner">
+      <a class="brand" href="/">
+        <div class="brand-mark"></div>
+        <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/">Home</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="page-masthead">
+  <div class="container">
+    <div class="series-label">AI Staff Training &middot; Charles Darwin University</div>
+    <h1>Images and Video: How AI Sees</h1>
+    <p class="subtitle">How multimodal vision-language models actually "see" and analyse images: how they work, a vintage-hardware case study comparing leading models, the 2023 to 2025 vision revolution, and what it opens up for teaching. A core session in the CDU AI staff training series.</p>
+  </div>
+</section>
+
+<div class="content-body">
+  <div class="container">
+    <div class="content-split">
+
+      <div class="main">
+
+        <section class="content-section">
+          <h2>Understanding Multimodal Vision-Language Models</h2>
+          <p>Imagine describing a painting to someone over the phone versus showing them the actual artwork. That is roughly the leap in AI capability over the past two years. Until 2023, systems like GPT-3 were brilliant with words but effectively blind; they could only "understand" an image if a human painstakingly described every detail in text. Today's leading systems (Claude, ChatGPT and Gemini) can take an image directly and analyse it, much as a person does.</p>
+          <p>This capability is called multimodal processing: understanding different types of information (images, text, potentially sound) at the same time, and seeing the connections between them. It marks a shift from systems that could only manipulate symbols to ones that perceive and interpret the world a little more like we do. This page looks at how vision-language models (VLMs) work, using a real case study: identifying and contextualising a vintage graphics card from the 1990s.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>How Vision-Language Models Work</h2>
+          <p>VLMs integrate computer vision and natural language processing. Rather than treating images and text as separate inputs, modern VLMs process them together in unified "embedding spaces" where visual and textual concepts share the same representational dimensions. When a VLM encounters the concept "memory chip", it is not stored as separate visual and linguistic entities; it is a single multimodal concept that captures both what a memory chip looks like and what it does.</p>
+          <p>The process runs in stages. First, visual feature extraction identifies shapes, colours, text and spatial relationships, with attention mechanisms that focus on specific regions while keeping the whole image in view. Next, cross-modal reasoning links that visual evidence to the model's knowledge: reading "S3 86C765" on a chip connects to stored technical knowledge about that chipset. Finally, the model generates a response that synthesises what it sees with what it knows, often inferring things not directly visible.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Visual grounding reduces hallucination</div>
+            <p>A real advantage of genuine multimodality is that visual evidence constrains what the model can say. When the AI can actually see that a chip reads "Siemens HYB514265J-50", it is far less likely to invent fictional specifications than a text-only system guessing from a description.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Case Study: Identifying Vintage Hardware</h2>
+          <p>To see how different VLMs approach visual analysis, three leading models (Claude, GPT-o3 and Gemini Pro, as they stood in 2025) were each given an identical image of an S3 Trio64V+ ISA graphics card from the mid-1990s, and asked to identify the hardware and explain how it could be used in a lesson about Moore's Law.</p>
+
+          <figure class="figure">
+            <img src="assets/graphicsCard.png" alt="An S3 Trio64V+ ISA graphics card from the mid-1990s">
+            <figcaption>An S3 Trio64V+ ISA graphics card, circa 1995 to 1996. The green PCB, gold-plated ISA edge connector and S3 chipset are visible.</figcaption>
+          </figure>
+
+          <p>The task is harder than it looks: it requires reading tiny text on multiple chips, understanding spatial relationships, recognising the significance of design choices like unpopulated memory sockets, and placing the technology in computing history. All three models correctly identified the core specifications (the S3 Trio64V+ chipset, designation 86C765; a 2MB EDO DRAM configuration across four Siemens chips; standard VGA output; and a 1995 to 1996 manufacturing window), but their approaches and added insights differed markedly.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>How Each Model Approached the Task</h2>
+          <p>Each VLM showed a distinct analytical strategy, which is useful when choosing a tool for a given job.</p>
+          <div class="app-grid">
+            <div class="app-card">
+              <div class="app-card-category">The forensic detective</div>
+              <h3>Claude</h3>
+              <p>Worked from macroscopic pattern recognition down to granular detail, using the green solder mask and gold edge connector as temporal markers. Uniquely identified DataExpert as the board maker through FCC ID analysis, and deduced the 5V system voltage from visual cues. Strength: completeness and verification, best for historical preservation and attribution.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">The practical educator</div>
+              <h3>GPT-o3</h3>
+              <p>Followed a traditional vision sequence from feature extraction to semantic analysis, keeping observation separate from interpretation. Excelled at practical, quantitative comparisons, calculating a 10,000-fold improvement in transistor density versus a modern GPU. Strength: pedagogical utility, best for clear teaching comparisons.</p>
+            </div>
+            <div class="app-card">
+              <div class="app-card-category">The holistic integrator</div>
+              <h3>Gemini Pro</h3>
+              <p>Absorbed the image as a multi-layered concept rather than a sequence, with exceptional technical depth: it calculated a memory bandwidth of 264 MB/s and explained how EDO DRAM's page mode achieved it, while weaving in period software context. Strength: integrated understanding and historical narrative.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Comparative Analysis Summary</h2>
+          <table class="spec-table">
+            <thead>
+              <tr><th>Capability</th><th>Claude</th><th>GPT-o3</th><th>Gemini Pro</th></tr>
+            </thead>
+            <tbody>
+              <tr><th>Core identification</th><td>Accurate</td><td>Accurate</td><td>Accurate</td></tr>
+              <tr><th>Manufacturing detail</th><td>Excellent (FCC ID)</td><td>Good</td><td>Good</td></tr>
+              <tr><th>Technical depth</th><td>High</td><td>Moderate</td><td>Exceptional</td></tr>
+              <tr><th>Historical context</th><td>Moderate</td><td>Technical focus</td><td>Rich narrative</td></tr>
+              <tr><th>Pedagogical utility</th><td>Good</td><td>Excellent</td><td>Very good</td></tr>
+              <tr><th>Processing approach</th><td>Sequential, forensic</td><td>Hybrid pipeline</td><td>Holistic integration</td></tr>
+            </tbody>
+          </table>
+          <p>The point is not that one model is best, but that each has a character: pick the tool that fits the task.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>The AI Vision Revolution (2023 to 2025)</h2>
+          <p>The move from text-only language models to multimodal vision-language models is one of the most significant shifts in recent AI. Before 2023, systems like GPT-3 lived in a purely symbolic world: all understanding was mediated through language. To use GPT-3 for hardware identification, a human had to translate visual information into text, losing crucial detail, and the model had no way to ground its words in physical reality, so it could generate plausible but entirely fictional specifications with no internal check.</p>
+          <ul>
+            <li><strong>Pre-2023.</strong> Text-only models (GPT-3 and similar): brilliant with words, blind to images.</li>
+            <li><strong>2023.</strong> First commercial multimodal models emerge (GPT-4V, Claude with vision).</li>
+            <li><strong>2024.</strong> Native multimodality becomes standard; unified embedding spaces enable cross-modal reasoning.</li>
+            <li><strong>2025.</strong> Chain-of-thought visual reasoning enables complex technical analysis.</li>
+          </ul>
+          <p>The breakthrough was unified embedding spaces, where visual and textual information coexist in shared dimensions, and attention mechanisms that span modalities. Modern transformers attend to image regions and text tokens at once, so linguistic context shapes visual interpretation while visual evidence constrains what is generated. Visual instruction tuning then taught models not just to caption images but to follow complex analytical instructions about them, and chain-of-thought prompting let them articulate their visual reasoning the way a human expert would.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Educational Applications</h2>
+          <p>The ability to turn a physical artefact into a rich teaching resource changes how technical history can be taught. A single vintage graphics card becomes a multifaceted tool.</p>
+          <h3>Enhanced learning materials</h3>
+          <p>Each component becomes a teaching moment and each design decision a window into the engineering of the period. For Moore's Law, a VLM can instantly place a 30-year-old card within the broader story of progress; GPT-o3's 10,000-fold transistor-density figure turns an abstract principle into something measurable.</p>
+          <h3>Accessibility</h3>
+          <p>Because different learners process information differently, a VLM can explain the same card through mathematical specifications for quantitative thinkers, historical narrative for contextual learners, or systematic decomposition for analytical minds, so technical education need not privilege one cognitive style.</p>
+          <h3>Knowledge preservation</h3>
+          <p>As the engineers who designed 1990s hardware retire and original documentation degrades, extracting and preserving technical insight from physical artefacts helps maintain technological heritage. VLMs can help museums, universities and archives unlock pedagogical value from their collections.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Try It Yourself</h2>
+          <div class="callout callout-tip">
+            <div class="callout-title">Three activities</div>
+            <p><strong>Hardware archaeology.</strong> Find an old device, photograph it clearly, and ask different models to identify it and explain its significance. Compare their approaches.</p>
+            <p><strong>Chain-of-thought exploration.</strong> After uploading an image, ask the AI to "explain your reasoning step by step" to see how it decomposes the task.</p>
+            <p><strong>Cross-model comparison.</strong> Submit the same image to Claude, ChatGPT and Gemini with identical prompts, and note the differences in detail, focus and style.</p>
+          </div>
+          <div class="callout callout-warning">
+            <div class="callout-title">AI can still make mistakes</div>
+            <p>VLMs can still misread text, misidentify components, or generate plausible but incorrect technical detail. Always verify critical information through additional sources, especially for professional or academic work.</p>
+          </div>
+          <div class="cta-row">
+            <a class="btn btn-ghost" href="https://claude.ai/" target="_blank" rel="noopener">Try Claude</a>
+            <a class="btn btn-ghost" href="https://chatgpt.com/" target="_blank" rel="noopener">Try ChatGPT</a>
+            <a class="btn btn-ghost" href="https://gemini.google.com/app" target="_blank" rel="noopener">Try Gemini</a>
+          </div>
+        </section>
+
+      </div>
+
+      <aside class="sidebar-rail">
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">In this module</div>
+            <ul>
+              <li>What multimodal AI is</li>
+              <li>How vision-language models work</li>
+              <li>A vintage-hardware case study</li>
+              <li>How three models compared</li>
+              <li>The 2023 to 2025 vision revolution</li>
+              <li>Uses in teaching</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Key terms</div>
+            <ul>
+              <li><strong>VLM.</strong> A model that processes images and text together, reasoning across both.</li>
+              <li><strong>Multimodal.</strong> Understanding images, text and sound at once.</li>
+              <li><strong>Embedding space.</strong> A shared mathematical space where concepts from different modalities meet.</li>
+              <li><strong>Chain-of-thought.</strong> Asking the model to show its reasoning step by step.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">References</div>
+            <ul>
+              <li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noopener">Language Models are Few-Shot Learners (Brown et al., 2020)</a></li>
+              <li><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">CLIP (Radford et al., 2021)</a></li>
+              <li><a href="https://arxiv.org/abs/2201.11903" target="_blank" rel="noopener">Chain-of-Thought Prompting (Wei et al., 2022)</a></li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <div class="last-updated">Last updated: 10 June 2026</div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="container">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Charles Darwin University&nbsp;|&nbsp;TAFE PSI&nbsp;|&nbsp;ICT, Cyber Security &amp; Digital</span>
+      <span style="font-family:'JetBrains Mono',monospace;">CDU AI Staff Training</span>
+    </div>
+    <div class="footer-legal">
+      <p class="ack">Charles Darwin University acknowledges the traditional custodians across the lands on which we live and work, and we pay our respects to Elders past and present.</p>
+      <p class="reg">CRICOS Provider No: 00300K &middot; RTO Provider No: 0373 &middot; TEQSA Provider ID PRV12069</p>
+      <p><a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice">Privacy</a> &middot; <a href="https://www.cdu.edu.au/about-cdu/copyright-disclaimer">Copyright and Disclaimer</a> &middot; <a href="https://www.cdu.edu.au/files/2022-03/cdu-cookie-notice.pdf">Cookies</a></p>
+      <p class="reg">ABN 54 093 513 649</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
