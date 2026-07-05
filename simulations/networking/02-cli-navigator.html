@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLI Command Navigator - Cisco IOS Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            color: #00ff00;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0, 50, 0, 0.5);
+            padding: 15px 20px;
+            border-bottom: 2px solid #00aa00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h1 {
+            color: #00ff00;
+            font-size: 1.3rem;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .scenario-select {
+            background: #111;
+            color: #0f0;
+            border: 1px solid #0a0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .help-btn {
+            background: #003300;
+            color: #0f0;
+            border: 1px solid #0a0;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .help-btn:hover {
+            background: #005500;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .terminal-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #333;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+            max-width: 350px;
+        }
+
+        .terminal {
+            flex: 1;
+            background: #0a0a0a;
+            padding: 15px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .terminal-output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .input-line {
+            display: flex;
+            background: #111;
+            border-top: 1px solid #333;
+            padding: 10px 15px;
+            align-items: center;
+        }
+
+        .prompt {
+            color: #00ff00;
+            margin-right: 5px;
+            white-space: nowrap;
+        }
+
+        .cmd-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .mode-badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .mode-user {
+            background: #004400;
+            color: #88ff88;
+        }
+
+        .mode-priv {
+            background: #444400;
+            color: #ffff88;
+        }
+
+        .mode-config {
+            background: #440044;
+            color: #ff88ff;
+        }
+
+        .mode-if {
+            background: #004444;
+            color: #88ffff;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #333;
+            padding: 15px;
+        }
+
+        .sidebar-section h3 {
+            color: #00aaff;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .cmd-list {
+            list-style: none;
+        }
+
+        .cmd-list li {
+            padding: 6px 10px;
+            margin: 3px 0;
+            background: rgba(0, 100, 0, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #aaffaa;
+            transition: all 0.2s;
+        }
+
+        .cmd-list li:hover {
+            background: rgba(0, 150, 0, 0.4);
+            transform: translateX(5px);
+        }
+
+        .cmd-list li code {
+            color: #ffff00;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1px 4px;
+            border-radius: 2px;
+        }
+
+        .hint-box {
+            background: rgba(0, 100, 100, 0.2);
+            border: 1px solid #006666;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        .hint-box h4 {
+            color: #00cccc;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+
+        .hint-box p {
+            color: #88cccc;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .progress-section {
+            background: rgba(100, 0, 100, 0.2);
+            border: 1px solid #660066;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00aa00, #00ff00);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+            font-size: 0.8rem;
+            color: #aa88aa;
+        }
+
+        .task-item.done {
+            color: #00ff00;
+        }
+
+        .task-item .check {
+            width: 16px;
+            text-align: center;
+        }
+
+        .error-text {
+            color: #ff4444;
+        }
+
+        .success-text {
+            color: #44ff44;
+        }
+
+        .info-text {
+            color: #44aaff;
+        }
+
+        @media (max-width: 800px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                max-width: none;
+                max-height: 40vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>💻 Cisco IOS CLI Navigator</h1>
+        <div class="header-controls">
+            <select class="scenario-select" id="scenarioSelect" onchange="loadScenario()">
+                <option value="explore">Free Explore</option>
+                <option value="hostname">Task: Configure Hostname</option>
+                <option value="password">Task: Set Passwords</option>
+                <option value="interface">Task: Configure Interface</option>
+            </select>
+            <span class="mode-badge mode-user" id="modeBadge">User EXEC</span>
+            <button class="help-btn" onclick="showHelp()">? Help</button>
+        </div>
+    </div>
+    <div class="main-container">
+        <div class="terminal-section">
+            <div class="terminal" id="terminal">
+                <div class="terminal-output" id="output"></div>
+            </div>
+            <div class="input-line">
+                <span class="prompt" id="prompt">Router></span>
+                <input type="text" class="cmd-input" id="cmdInput" autofocus
+                    placeholder="Type command or press Tab for hints...">
+            </div>
+        </div>
+        <div class="sidebar">
+            <div class="sidebar-section progress-section" id="taskSection" style="display:none;">
+                <h3>📋 Current Task</h3>
+                <div id="taskDesc"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="taskList"></div>
+            </div>
+            <div class="sidebar-section">
+                <h3>📖 Available Commands</h3>
+                <ul class="cmd-list" id="cmdList"></ul>
+            </div>
+            <div class="sidebar-section">
+                <div class="hint-box">
+                    <h4>💡 Quick Tips</h4>
+                    <p id="hintText">Type <code>?</code> to see available commands. Use <code>Tab</code> to
+                        auto-complete. Press <code>↑</code> for command history.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const modes = {
+            user: { prompt: 'Router>', badge: 'User EXEC', class: 'mode-user' },
+            priv: { prompt: 'Router#', badge: 'Privileged EXEC', class: 'mode-priv' },
+            config: { prompt: 'Router(config)#', badge: 'Global Config', class: 'mode-config' },
+            'if': { prompt: 'Router(config-if)#', badge: 'Interface Config', class: 'mode-if' },
+            line: { prompt: 'Router(config-line)#', badge: 'Line Config', class: 'mode-if' }
+        };
+        const commands = {
+            user: {
+                'enable': { desc: 'Enter privileged EXEC mode', action: () => changeMode('priv') },
+                'show version': { desc: 'Display IOS version info', action: () => output(showVersion) },
+                'show ip interface brief': { desc: 'Show interface summary', action: () => output(showIpIntBrief) },
+                'ping': { desc: 'Send ICMP echo', action: (args) => output(`Sending 5, 100-byte ICMP Echos to ${args || '?'}\n!!!!!`) },
+                '?': { desc: 'Show available commands', action: () => showCmdHelp('user') },
+                'exit': { desc: 'Exit terminal', action: () => output('Goodbye!') }
+            },
+            priv: {
+                'configure terminal': { desc: 'Enter global config mode', action: () => changeMode('config') },
+                'show running-config': { desc: 'Display running config', action: () => output(showRunConfig()) },
+                'show startup-config': { desc: 'Display startup config', action: () => output('startup-config is not present') },
+                'show ip interface brief': { desc: 'Show interface summary', action: () => output(showIpIntBrief) },
+                'show interfaces': { desc: 'Show interface details', action: () => output(showInterfaces) },
+                'copy running-config startup-config': { desc: 'Save configuration', action: () => { output('Building configuration...\n[OK]'); completeTask('save'); } },
+                'write memory': { desc: 'Save configuration (short)', action: () => { output('Building configuration...\n[OK]'); completeTask('save'); } },
+                'disable': { desc: 'Return to user mode', action: () => changeMode('user') },
+                'reload': { desc: 'Restart the device', action: () => output('Proceed with reload? [confirm]') },
+                '?': { desc: 'Show available commands', action: () => showCmdHelp('priv') },
+                'exit': { desc: 'Return to user mode', action: () => changeMode('user') }
+            },
+            config: {
+                'hostname': { desc: 'Set device hostname', action: (args) => setHostname(args) },
+                'enable secret': { desc: 'Set encrypted enable password', action: (args) => { output(`Enable secret set.`); completeTask('enable-secret'); } },
+                'enable password': { desc: 'Set enable password (plain)', action: (args) => output(`Enable password set.`) },
+                'banner motd': { desc: 'Set message of the day', action: (args) => { output('Enter TEXT message, end with delimiter.'); completeTask('banner'); } },
+                'service password-encryption': { desc: 'Encrypt passwords', action: () => { output('Password encryption enabled.'); completeTask('encrypt'); } },
+                'line console 0': { desc: 'Configure console line', action: () => changeMode('line') },
+                'line vty 0 4': { desc: 'Configure VTY lines', action: () => changeMode('line') },
+                'interface gigabitethernet 0/0': { desc: 'Configure GE0/0', action: () => { currentIf = 'GigabitEthernet0/0'; changeMode('if'); } },
+                'interface g0/0': { desc: 'Configure GE0/0 (short)', action: () => { currentIf = 'GigabitEthernet0/0'; changeMode('if'); } },
+                'interface g0/1': { desc: 'Configure GE0/1 (short)', action: () => { currentIf = 'GigabitEthernet0/1'; changeMode('if'); } },
+                'no ip domain-lookup': { desc: 'Disable DNS lookup', action: () => output('DNS lookup disabled.') },
+                '?': { desc: 'Show available commands', action: () => showCmdHelp('config') },
+                'exit': { desc: 'Return to privileged mode', action: () => changeMode('priv') },
+                'end': { desc: 'Return to privileged mode', action: () => changeMode('priv') }
+            },
+            'if': {
+                'ip address': { desc: 'Set IP address', action: (args) => setIpAddress(args) },
+                'no shutdown': { desc: 'Enable interface', action: () => { output(`%LINK-5-CHANGED: Interface ${currentIf}, changed state to up\n%LINEPROTO-5-UPDOWN: Line protocol on Interface ${currentIf}, changed state to up`); completeTask('no-shut'); } },
+                'shutdown': { desc: 'Disable interface', action: () => output(`%LINK-5-CHANGED: Interface ${currentIf}, changed state to administratively down`) },
+                'description': { desc: 'Set interface description', action: (args) => { output(`Description set to: ${args}`); completeTask('desc'); } },
+                'duplex auto': { desc: 'Set duplex mode', action: () => output('Duplex set to auto.') },
+                'speed auto': { desc: 'Set speed', action: () => output('Speed set to auto.') },
+                '?': { desc: 'Show available commands', action: () => showCmdHelp('if') },
+                'exit': { desc: 'Return to global config', action: () => changeMode('config') }
+            },
+            line: {
+                'password': { desc: 'Set line password', action: (args) => { output(`Password set.`); completeTask('line-pass'); } },
+                'login': { desc: 'Enable password checking', action: () => { output('Login enabled.'); completeTask('login'); } },
+                'logging synchronous': { desc: 'Sync log messages', action: () => output('Synchronous logging enabled.') },
+                '?': { desc: 'Show available commands', action: () => showCmdHelp('line') },
+                'exit': { desc: 'Return to global config', action: () => changeMode('config') }
+            }
+        };
+        const scenarios = {
+            explore: { title: 'Free Exploration', desc: 'Practice any commands freely.', tasks: [] },
+            hostname: {
+                title: 'Configure Hostname',
+                desc: 'Set the router hostname to "MyRouter"',
+                tasks: [
+                    { id: 'enable', text: 'Enter privileged mode (enable)', done: false },
+                    { id: 'config', text: 'Enter global config (configure terminal)', done: false },
+                    { id: 'hostname', text: 'Set hostname to MyRouter', done: false },
+                    { id: 'end', text: 'Exit config mode (end)', done: false }
+                ]
+            },
+            password: {
+                title: 'Secure the Router',
+                desc: 'Set console and enable passwords',
+                tasks: [
+                    { id: 'enable', text: 'Enter privileged mode', done: false },
+                    { id: 'config', text: 'Enter global config', done: false },
+                    { id: 'enable-secret', text: 'Set enable secret (enable secret class)', done: false },
+                    { id: 'line', text: 'Configure console line', done: false },
+                    { id: 'line-pass', text: 'Set console password', done: false },
+                    { id: 'login', text: 'Enable login', done: false },
+                    { id: 'encrypt', text: 'Encrypt passwords (service password-encryption)', done: false }
+                ]
+            },
+            interface: {
+                title: 'Configure Interface',
+                desc: 'Configure GigabitEthernet 0/0 with IP 192.168.1.1/24',
+                tasks: [
+                    { id: 'enable', text: 'Enter privileged mode', done: false },
+                    { id: 'config', text: 'Enter global config', done: false },
+                    { id: 'enterif', text: 'Enter interface config (interface g0/0)', done: false },
+                    { id: 'ip', text: 'Set IP address (ip address 192.168.1.1 255.255.255.0)', done: false },
+                    { id: 'no-shut', text: 'Enable interface (no shutdown)', done: false },
+                    { id: 'save', text: 'Save config (copy run start)', done: false }
+                ]
+            }
+        };
+        let currentMode = 'user';
+        let currentScenario = 'explore';
+        let hostname = 'Router';
+        let currentIf = '';
+        let history = [];
+        let historyIndex = -1;
+        const showVersion = `Cisco IOS Software, Version 15.4(3)M
+ROM: System Bootstrap, Version 15.4(3)M
+Router uptime is 2 hours, 15 minutes
+System image file is "flash:c2900-universalk9-mz.SPA.154-3.M.bin"
+
+Cisco 2911 (revision 1.0) with 491520K/32768K bytes of memory.
+3 Gigabit Ethernet interfaces
+DRAM configuration is 64 bits wide with parity disabled.
+255K bytes of non-volatile configuration memory.`;
+        const showIpIntBrief = `Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0     unassigned      YES unset  administratively down down
+GigabitEthernet0/1     unassigned      YES unset  administratively down down
+GigabitEthernet0/2     unassigned      YES unset  administratively down down`;
+        const showRunConfig = () => `Building configuration...
+
+Current configuration : 512 bytes
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+!
+hostname ${hostname}
+!
+interface GigabitEthernet0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+!
+end`;
+        const showInterfaces = `GigabitEthernet0/0 is administratively down, line protocol is down
+  Hardware is CN Gigabit Ethernet, address is 0050.0f00.0001
+  MTU 1500 bytes, BW 1000000 Kbit/sec, DLY 10 usec
+  Full-duplex, 1000Mb/s, media type is RJ45`;
+
+        function output(text) {
+            document.getElementById('output').innerHTML += `<span class="info-text">${text}</span>\n`;
+            scrollTerminal();
+        }
+        function outputError(text) {
+            document.getElementById('output').innerHTML += `<span class="error-text">${text}</span>\n`;
+            scrollTerminal();
+        }
+        function outputSuccess(text) {
+            document.getElementById('output').innerHTML += `<span class="success-text">${text}</span>\n`;
+            scrollTerminal();
+        }
+        function scrollTerminal() {
+            const term = document.getElementById('terminal');
+            term.scrollTop = term.scrollHeight;
+        }
+        function updatePrompt() {
+            const m = modes[currentMode];
+            document.getElementById('prompt').textContent = m.prompt.replace('Router', hostname);
+            document.getElementById('modeBadge').textContent = m.badge;
+            document.getElementById('modeBadge').className = 'mode-badge ' + m.class;
+            updateCmdList();
+        }
+        function changeMode(newMode) {
+            const prevMode = currentMode;
+            currentMode = newMode;
+            updatePrompt();
+            if (newMode === 'priv' && prevMode === 'user') completeTask('enable');
+            if (newMode === 'config' && prevMode === 'priv') completeTask('config');
+            if (newMode === 'if') completeTask('enterif');
+            if (newMode === 'line') completeTask('line');
+            if (newMode === 'priv' && (prevMode === 'config' || prevMode === 'if')) completeTask('end');
+        }
+        function setHostname(name) {
+            if (!name || name.trim() === '') { outputError('% Incomplete command.'); return; }
+            hostname = name.trim();
+            updatePrompt();
+            output(`Hostname set to ${hostname}`);
+            if (hostname.toLowerCase() === 'myrouter') completeTask('hostname');
+        }
+        function setIpAddress(args) {
+            if (!args) { outputError('% Incomplete command. Usage: ip address <ip> <mask>'); return; }
+            const parts = args.trim().split(/\s+/);
+            if (parts.length < 2) { outputError('% Incomplete command.'); return; }
+            output(`IP address ${parts[0]} ${parts[1]} set on ${currentIf}`);
+            if (parts[0] === '192.168.1.1' && parts[1] === '255.255.255.0') completeTask('ip');
+        }
+        function showCmdHelp(mode) {
+            let help = 'Available commands:\n';
+            for (const [cmd, info] of Object.entries(commands[mode])) {
+                help += `  ${cmd.padEnd(30)} ${info.desc}\n`;
+            }
+            output(help);
+        }
+        function updateCmdList() {
+            const list = document.getElementById('cmdList');
+            list.innerHTML = '';
+            for (const [cmd, info] of Object.entries(commands[currentMode])) {
+                if (cmd !== '?') {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<code>${cmd}</code> - ${info.desc}`;
+                    li.onclick = () => { document.getElementById('cmdInput').value = cmd; document.getElementById('cmdInput').focus(); };
+                    list.appendChild(li);
+                }
+            }
+        }
+        function processCommand(input) {
+            const trimmed = input.trim().toLowerCase();
+            const outputEl = document.getElementById('output');
+            outputEl.innerHTML += `${modes[currentMode].prompt.replace('Router', hostname)} ${input}\n`;
+            if (trimmed === '') { scrollTerminal(); return; }
+            history.push(input);
+            historyIndex = history.length;
+            // Find matching command
+            let matched = false;
+            for (const [cmd, info] of Object.entries(commands[currentMode])) {
+                if (trimmed === cmd || trimmed.startsWith(cmd + ' ')) {
+                    const args = input.trim().slice(cmd.length).trim();
+                    info.action(args);
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched) {
+                // Check for partial match
+                const partials = Object.keys(commands[currentMode]).filter(c => c.startsWith(trimmed));
+                if (partials.length === 1) {
+                    commands[currentMode][partials[0]].action();
+                } else if (partials.length > 1) {
+                    outputError(`% Ambiguous command: "${input}"`);
+                } else {
+                    outputError(`% Invalid input detected at '^' marker.\n% Unknown command "${input}"`);
+                }
+            }
+            scrollTerminal();
+        }
+        function loadScenario() {
+            currentScenario = document.getElementById('scenarioSelect').value;
+            const s = scenarios[currentScenario];
+            // Reset tasks
+            s.tasks.forEach(t => t.done = false);
+            // Reset state
+            currentMode = 'user';
+            hostname = 'Router';
+            updatePrompt();
+            document.getElementById('output').innerHTML = '';
+            output(`\n=== Scenario: ${s.title} ===\n${s.desc}\n`);
+            if (s.tasks.length > 0) {
+                document.getElementById('taskSection').style.display = 'block';
+                document.getElementById('taskDesc').innerHTML = `<p style="color:#aa88aa;font-size:0.85rem;">${s.desc}</p>`;
+                updateTaskList();
+            } else {
+                document.getElementById('taskSection').style.display = 'none';
+            }
+        }
+        function updateTaskList() {
+            const s = scenarios[currentScenario];
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            let done = 0;
+            s.tasks.forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'task-item' + (t.done ? ' done' : '');
+                div.innerHTML = `<span class="check">${t.done ? '✅' : '⬜'}</span><span>${t.text}</span>`;
+                list.appendChild(div);
+                if (t.done) done++;
+            });
+            const pct = s.tasks.length > 0 ? (done / s.tasks.length * 100) : 0;
+            document.getElementById('progressFill').style.width = pct + '%';
+            if (pct === 100) {
+                outputSuccess('\n🎉 Congratulations! Task completed successfully!\n');
+            }
+        }
+        function completeTask(taskId) {
+            const s = scenarios[currentScenario];
+            const task = s.tasks.find(t => t.id === taskId);
+            if (task && !task.done) {
+                task.done = true;
+                updateTaskList();
+            }
+        }
+        function showHelp() {
+            output(`
+╔══════════════════════════════════════════════════════════════╗
+║                    CLI NAVIGATOR HELP                        ║
+╠══════════════════════════════════════════════════════════════╣
+║  NAVIGATION:                                                 ║
+║    enable           - Enter privileged EXEC mode             ║
+║    configure terminal - Enter global config mode             ║
+║    exit / end       - Go back / exit to privileged mode      ║
+║                                                              ║
+║  TIPS:                                                       ║
+║    • Type ? to see available commands in current mode        ║
+║    • Press Tab to auto-complete commands                     ║
+║    • Use ↑↓ arrows for command history                       ║
+║    • Click commands in sidebar to insert them                ║
+║                                                              ║
+║  MODE HIERARCHY:                                             ║
+║    User EXEC (>) → Privileged EXEC (#) → Global Config       ║
+║                                        → Interface Config    ║
+╚══════════════════════════════════════════════════════════════╝`);
+        }
+        // Input handling
+        document.getElementById('cmdInput').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                processCommand(this.value);
+                this.value = '';
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                const val = this.value.toLowerCase();
+                const matches = Object.keys(commands[currentMode]).filter(c => c.startsWith(val));
+                if (matches.length === 1) this.value = matches[0];
+                else if (matches.length > 1) output(matches.join('  '));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex > 0) { historyIndex--; this.value = history[historyIndex]; }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex < history.length - 1) { historyIndex++; this.value = history[historyIndex]; }
+                else { historyIndex = history.length; this.value = ''; }
+            }
+        });
+        // Initial load
+        updatePrompt();
+        output(`
+╔════════════════════════════════════════════════════════════════╗
+║      CISCO IOS COMMAND LINE INTERFACE SIMULATOR                ║
+║      Target Courses: ICTTEN434, ICTNWK543, ICTNWK542           ║
+╠════════════════════════════════════════════════════════════════╣
+║  Welcome to the CLI Navigator!                                 ║
+║  Practice Cisco IOS commands in a safe, simulated environment. ║
+║                                                                 ║
+║  Type 'enable' to begin, or select a scenario above.           ║
+║  Type '?' for available commands. Press Tab to auto-complete.  ║
+╚════════════════════════════════════════════════════════════════╝
+`);
+    </script>
+</body>
+
+</html>

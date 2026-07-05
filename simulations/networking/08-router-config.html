@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Router Configuration Lab - Network Simulation Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Updated Design System */
+            --primary: #0f172a;
+            --primary-dark: #1e293b;
+            --secondary: #334155;
+            --accent: #3b82f6;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+            --bg-dark: #020617;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: rgba(148, 163, 184, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            min-height: 100vh;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            color: var(--text-light);
+            text-decoration: underline;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+            background: transparent;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .course-badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 280px;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar h3 {
+            color: #e94560;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .lab-list {
+            list-style: none;
+        }
+
+        .lab-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .lab-item:hover {
+            background: rgba(233, 69, 96, 0.2);
+            border-left-color: #e94560;
+        }
+
+        .lab-item.active {
+            background: rgba(233, 69, 96, 0.3);
+            border-left-color: #e94560;
+        }
+
+        .lab-item .lab-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .lab-item .lab-desc {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-top: 5px;
+        }
+
+        .difficulty.beginner {
+            background: #27ae60;
+        }
+
+        .difficulty.intermediate {
+            background: #f39c12;
+        }
+
+        .difficulty.advanced {
+            background: #e74c3c;
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .router-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .router-visual {
+            background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            border: 2px solid #34495e;
+        }
+
+        .router-model {
+            text-align: center;
+            color: #3498db;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .router-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .interface-section {
+            flex: 1;
+        }
+
+        .interface-section h4 {
+            color: #95a5a6;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .interfaces {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .interface {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .interface:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .interface.selected {
+            border-color: #e94560;
+            box-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+        }
+
+        .interface .port-name {
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .interface .port-label {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .interface .status-led {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin: 5px auto 0;
+            background: #333;
+        }
+
+        .interface .status-led.up {
+            background: #27ae60;
+            box-shadow: 0 0 5px #27ae60;
+        }
+
+        .interface .status-led.down {
+            background: #e74c3c;
+        }
+
+        .interface .status-led.admin-down {
+            background: #f39c12;
+        }
+
+        .router-leds {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #444;
+        }
+
+        .led-indicator {
+            text-align: center;
+        }
+
+        .led-indicator .led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 auto 5px;
+            background: #333;
+        }
+
+        .led-indicator .led.on {
+            background: #27ae60;
+            box-shadow: 0 0 8px #27ae60;
+        }
+
+        .led-indicator .led.warning {
+            background: #f39c12;
+            box-shadow: 0 0 8px #f39c12;
+        }
+
+        .led-indicator span {
+            font-size: 0.7rem;
+            color: #888;
+        }
+
+        .cli-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1;
+        }
+
+        .cli-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .cli-header h3 {
+            color: #e94560;
+        }
+
+        .cli-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cli-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .cli-btn.primary {
+            background: #e94560;
+            color: white;
+        }
+
+        .cli-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+        }
+
+        .cli-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .terminal {
+            background: #0a0a0a;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            height: 350px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+
+        .terminal-output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #00ff00;
+            line-height: 1.4;
+        }
+
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .terminal-prompt {
+            color: #00ff00;
+            margin-right: 5px;
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-card h4 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .task-item .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #444;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-item.completed .checkbox {
+            background: #27ae60;
+            border-color: #27ae60;
+        }
+
+        .task-item.completed .checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .routing-table {
+            width: 100%;
+            font-size: 0.75rem;
+            border-collapse: collapse;
+        }
+
+        .routing-table th,
+        .routing-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .routing-table th {
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .routing-table td {
+            color: #ccc;
+            font-family: 'Courier New', monospace;
+        }
+
+        .quick-commands {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .quick-cmd {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            color: #00ff00;
+        }
+
+        .quick-cmd:hover {
+            background: rgba(233, 69, 96, 0.2);
+            border-color: #e94560;
+        }
+
+        .interface-details {
+            font-size: 0.85rem;
+        }
+
+        .interface-details .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .interface-details .label {
+            color: #888;
+        }
+
+        .interface-details .value {
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .topology-diagram {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 120px;
+        }
+
+        .topology-simple {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px;
+        }
+
+        .topo-device {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            min-width: 80px;
+        }
+
+        .topo-device .icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .topo-device .name {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .topo-link {
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #e94560);
+            position: relative;
+        }
+
+        .topo-link::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -5px;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-left-color: #e94560;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #e94560;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 1px solid #e94560;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #e94560;
+            color: white;
+        }
+
+        .acl-builder {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .acl-row {
+            display: grid;
+            grid-template-columns: 80px 100px 120px 120px 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .acl-row select,
+        .acl-row input {
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            font-size: 0.85rem;
+        }
+
+        .acl-row button {
+            padding: 8px 15px;
+            background: #e94560;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .nat-config {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .nat-config label {
+            display: block;
+            margin-bottom: 5px;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .nat-config input,
+        .nat-config select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        .hint-box {
+            background: rgba(52, 152, 219, 0.2);
+            border: 1px solid #3498db;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .hint-box .hint-title {
+            color: #3498db;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <a href="../" class="back-link">← Back to Dashboard</a>
+        <h1>Router Configuration Lab</h1>
+        <p style="margin-bottom: 15px; color: var(--text-dim);">Master Enterprise Router Configuration with Cisco IOS
+        </p>
+        <div class="course-badges">
+            <span class="badge">ICTTEN417</span>
+            <span class="badge">ICTNWK542</span>
+            <span class="badge">Enterprise Level</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <h3>Lab Scenarios</h3>
+            <ul class="lab-list" id="labList">
+                <li class="lab-item active" data-lab="static-routing">
+                    <div class="lab-title">Static Routing</div>
+                    <div class="lab-desc">Configure static routes between networks</div>
+                    <span class="difficulty beginner">Beginner</span>
+                </li>
+                <li class="lab-item" data-lab="rip">
+                    <div class="lab-title">RIPv2 Configuration</div>
+                    <div class="lab-desc">Set up dynamic routing with RIP</div>
+                    <span class="difficulty intermediate">Intermediate</span>
+                </li>
+                <li class="lab-item" data-lab="ospf">
+                    <div class="lab-title">OSPF Single Area</div>
+                    <div class="lab-desc">Configure OSPF Area 0</div>
+                    <span class="difficulty intermediate">Intermediate</span>
+                </li>
+                <li class="lab-item" data-lab="nat">
+                    <div class="lab-title">NAT Configuration</div>
+                    <div class="lab-desc">Static NAT, Dynamic NAT, and PAT</div>
+                    <span class="difficulty advanced">Advanced</span>
+                </li>
+                <li class="lab-item" data-lab="acl">
+                    <div class="lab-title">Access Control Lists</div>
+                    <div class="lab-desc">Standard and Extended ACLs</div>
+                    <span class="difficulty advanced">Advanced</span>
+                </li>
+            </ul>
+
+            <div style="margin-top: 20px;">
+                <!-- <a href="../" class="nav-link">← Back to Tools</a> -->
+            </div>
+        </aside>
+
+        <main class="center-panel">
+            <div class="router-panel">
+                <div class="router-visual">
+                    <div class="router-model">Cisco 2911 Integrated Services Router</div>
+                    <div class="router-body">
+                        <div class="interface-section">
+                            <h4>Gigabit Ethernet</h4>
+                            <div class="interfaces" id="geInterfaces">
+                                <div class="interface" data-interface="g0/0">
+                                    <div class="port-name">GigabitEthernet</div>
+                                    <div class="port-label">G0/0</div>
+                                    <div class="status-led down"></div>
+                                </div>
+                                <div class="interface" data-interface="g0/1">
+                                    <div class="port-name">GigabitEthernet</div>
+                                    <div class="port-label">G0/1</div>
+                                    <div class="status-led down"></div>
+                                </div>
+                                <div class="interface" data-interface="g0/2">
+                                    <div class="port-name">GigabitEthernet</div>
+                                    <div class="port-label">G0/2</div>
+                                    <div class="status-led down"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="interface-section">
+                            <h4>Serial</h4>
+                            <div class="interfaces" id="serialInterfaces">
+                                <div class="interface" data-interface="s0/0/0">
+                                    <div class="port-name">Serial</div>
+                                    <div class="port-label">S0/0/0</div>
+                                    <div class="status-led down"></div>
+                                </div>
+                                <div class="interface" data-interface="s0/0/1">
+                                    <div class="port-name">Serial</div>
+                                    <div class="port-label">S0/0/1</div>
+                                    <div class="status-led down"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="interface-section">
+                            <h4>Management</h4>
+                            <div class="interfaces">
+                                <div class="interface" data-interface="console">
+                                    <div class="port-name">Console</div>
+                                    <div class="port-label">CON</div>
+                                    <div class="status-led up"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="router-leds">
+                        <div class="led-indicator">
+                            <div class="led on"></div>
+                            <span>SYS</span>
+                        </div>
+                        <div class="led-indicator">
+                            <div class="led on"></div>
+                            <span>PWR</span>
+                        </div>
+                        <div class="led-indicator">
+                            <div class="led" id="actLed"></div>
+                            <span>ACT</span>
+                        </div>
+                        <div class="led-indicator">
+                            <div class="led warning" id="linkLed"></div>
+                            <span>LINK</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cli-container">
+                <div class="cli-header">
+                    <h3>Router CLI</h3>
+                    <div class="cli-controls">
+                        <button class="cli-btn secondary" onclick="clearTerminal()">Clear</button>
+                        <button class="cli-btn secondary" onclick="showHelp()">Help (?)</button>
+                        <button class="cli-btn primary" onclick="checkTasks()">Check Progress</button>
+                    </div>
+                </div>
+                <div class="terminal" id="terminal">
+                    <div class="terminal-output" id="output"></div>
+                    <div class="terminal-input-line">
+                        <span class="terminal-prompt" id="prompt">Router></span>
+                        <input type="text" class="terminal-input" id="cliInput" autofocus>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="right-panel">
+            <div class="info-card">
+                <h4>Lab Tasks</h4>
+                <ul class="task-list" id="taskList">
+                    <!-- Tasks loaded dynamically -->
+                </ul>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4>Network Topology</h4>
+                <div class="topology-diagram" id="topologyDiagram">
+                    <!-- Topology loaded dynamically -->
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4>Routing Table</h4>
+                <div style="overflow-x: auto;">
+                    <table class="routing-table" id="routingTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Network</th>
+                                <th>Next Hop</th>
+                                <th>Interface</th>
+                            </tr>
+                        </thead>
+                        <tbody id="routingTableBody">
+                            <tr>
+                                <td>C</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4>Quick Commands</h4>
+                <div class="quick-commands" id="quickCommands">
+                    <div class="quick-cmd" onclick="insertCommand('enable')">enable</div>
+                    <div class="quick-cmd" onclick="insertCommand('configure terminal')">configure terminal</div>
+                    <div class="quick-cmd" onclick="insertCommand('show ip route')">show ip route</div>
+                    <div class="quick-cmd" onclick="insertCommand('show ip interface brief')">show ip int brief</div>
+                    <div class="quick-cmd" onclick="insertCommand('show running-config')">show run</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4>Interface Details</h4>
+                <div class="interface-details" id="interfaceDetails">
+                    <p style="color: #888; font-size: 0.85rem;">Click an interface to view details</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Router State
+        const routerState = {
+            hostname: 'Router',
+            mode: 'userExec', // userExec, privilegedExec, globalConfig, interfaceConfig, routerConfig, aclConfig
+            currentInterface: null,
+            enablePassword: 'cisco',
+            interfaces: {
+                'g0/0': { ip: '', mask: '', status: 'admin-down', description: '' },
+                'g0/1': { ip: '', mask: '', status: 'admin-down', description: '' },
+                'g0/2': { ip: '', mask: '', status: 'admin-down', description: '' },
+                's0/0/0': { ip: '', mask: '', status: 'admin-down', description: '', clockRate: '' },
+                's0/0/1': { ip: '', mask: '', status: 'admin-down', description: '', clockRate: '' }
+            },
+            routes: [],
+            rip: { enabled: false, networks: [], version: 1 },
+            ospf: { enabled: false, processId: null, routerId: '', networks: [] },
+            nat: { inside: [], outside: [], pools: [], staticMappings: [] },
+            acls: {},
+            commandHistory: [],
+            historyIndex: -1
+        };
+
+        // Lab Configurations
+        const labs = {
+            'static-routing': {
+                title: 'Static Routing Configuration',
+                description: 'Configure static routes to connect two remote networks through this router.',
+                topology: `
+                    <div class="topology-simple">
+                        <div class="topo-device">
+                            <div class="icon">LAN</div>
+                            <div class="name">LAN A</div>
+                            <div class="name">192.168.1.0/24</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device" style="background: rgba(233, 69, 96, 0.2);">
+                            <div class="icon">RTR</div>
+                            <div class="name">Router</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device">
+                            <div class="icon">LAN</div>
+                            <div class="name">LAN B</div>
+                            <div class="name">192.168.2.0/24</div>
+                        </div>
+                    </div>
+                `,
+                tasks: [
+                    { id: 1, text: 'Enter privileged EXEC mode', completed: false, check: () => routerState.mode === 'privilegedExec' || routerState.mode === 'globalConfig' || routerState.mode === 'interfaceConfig' },
+                    { id: 2, text: 'Configure G0/0 with IP 192.168.1.1/24', completed: false, check: () => routerState.interfaces['g0/0'].ip === '192.168.1.1' },
+                    { id: 3, text: 'Enable G0/0 interface (no shutdown)', completed: false, check: () => routerState.interfaces['g0/0'].status === 'up' },
+                    { id: 4, text: 'Configure G0/1 with IP 192.168.2.1/24', completed: false, check: () => routerState.interfaces['g0/1'].ip === '192.168.2.1' },
+                    { id: 5, text: 'Enable G0/1 interface (no shutdown)', completed: false, check: () => routerState.interfaces['g0/1'].status === 'up' },
+                    { id: 6, text: 'Add static route to 10.0.0.0/8 via 192.168.2.2', completed: false, check: () => routerState.routes.some(r => r.network === '10.0.0.0' && r.nextHop === '192.168.2.2') }
+                ],
+                hints: [
+                    'Use "enable" to enter privileged mode',
+                    'Use "configure terminal", then "interface g0/0", then "ip address 192.168.1.1 255.255.255.0"',
+                    'Use "no shutdown" to enable the interface',
+                    'Use "interface g0/1", then "ip address 192.168.2.1 255.255.255.0"',
+                    'Use "no shutdown" to enable the interface',
+                    'Use "ip route 10.0.0.0 255.0.0.0 192.168.2.2" for the static route'
+                ]
+            },
+            'rip': {
+                title: 'RIPv2 Dynamic Routing',
+                description: 'Configure RIP version 2 for automatic route exchange between routers.',
+                topology: `
+                    <div class="topology-simple">
+                        <div class="topo-device">
+                            <div class="icon">R1</div>
+                            <div class="name">R1</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device" style="background: rgba(233, 69, 96, 0.2);">
+                            <div class="icon">R2</div>
+                            <div class="name">This Router</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device">
+                            <div class="icon">R3</div>
+                            <div class="name">R3</div>
+                        </div>
+                    </div>
+                `,
+                tasks: [
+                    { id: 1, text: 'Configure G0/0 with IP 10.0.0.1/8', completed: false, check: () => routerState.interfaces['g0/0'].ip === '10.0.0.1' },
+                    { id: 2, text: 'Enable G0/0 interface', completed: false, check: () => routerState.interfaces['g0/0'].status === 'up' },
+                    { id: 3, text: 'Configure G0/1 with IP 172.16.0.1/16', completed: false, check: () => routerState.interfaces['g0/1'].ip === '172.16.0.1' },
+                    { id: 4, text: 'Enable G0/1 interface', completed: false, check: () => routerState.interfaces['g0/1'].status === 'up' },
+                    { id: 5, text: 'Enable RIP routing', completed: false, check: () => routerState.rip.enabled },
+                    { id: 6, text: 'Set RIP version 2', completed: false, check: () => routerState.rip.version === 2 },
+                    { id: 7, text: 'Advertise network 10.0.0.0', completed: false, check: () => routerState.rip.networks.includes('10.0.0.0') },
+                    { id: 8, text: 'Advertise network 172.16.0.0', completed: false, check: () => routerState.rip.networks.includes('172.16.0.0') }
+                ],
+                hints: [
+                    'Use "interface g0/0", then "ip address 10.0.0.1 255.0.0.0"',
+                    'Use "no shutdown" to enable the interface',
+                    'Use "interface g0/1", then "ip address 172.16.0.1 255.255.0.0"',
+                    'Use "no shutdown" to enable the interface',
+                    'Use "router rip" to enter RIP configuration',
+                    'Use "version 2" for RIPv2',
+                    'Use "network 10.0.0.0" to advertise networks',
+                    'Use "network 172.16.0.0" — RIP automatically uses classful boundaries'
+                ]
+            },
+            'ospf': {
+                title: 'OSPF Single Area Configuration',
+                description: 'Configure OSPF Area 0 (backbone area) for efficient link-state routing.',
+                topology: `
+                    <div class="topology-simple">
+                        <div class="topo-device">
+                            <div class="icon">DR</div>
+                            <div class="name">DR</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device" style="background: rgba(233, 69, 96, 0.2);">
+                            <div class="icon">RTR</div>
+                            <div class="name">This Router</div>
+                            <div class="name">Area 0</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device">
+                            <div class="icon">BDR</div>
+                            <div class="name">BDR</div>
+                        </div>
+                    </div>
+                `,
+                tasks: [
+                    { id: 1, text: 'Configure G0/0 with IP 10.1.1.1/24', completed: false, check: () => routerState.interfaces['g0/0'].ip === '10.1.1.1' },
+                    { id: 2, text: 'Enable G0/0 interface', completed: false, check: () => routerState.interfaces['g0/0'].status === 'up' },
+                    { id: 3, text: 'Enable OSPF process 1', completed: false, check: () => routerState.ospf.enabled && routerState.ospf.processId === 1 },
+                    { id: 4, text: 'Set router-id to 1.1.1.1', completed: false, check: () => routerState.ospf.routerId === '1.1.1.1' },
+                    { id: 5, text: 'Advertise 10.1.1.0/24 in Area 0', completed: false, check: () => routerState.ospf.networks.some(n => n.network === '10.1.1.0' && n.area === '0') }
+                ],
+                hints: [
+                    'Use "interface g0/0", then "ip address 10.1.1.1 255.255.255.0"',
+                    'Use "no shutdown" to enable the interface',
+                    'Use "router ospf 1" to start the OSPF process',
+                    'Use "router-id 1.1.1.1" to set the ID',
+                    'Use "network 10.1.1.0 0.0.0.255 area 0" — OSPF uses wildcard (inverse) masks'
+                ]
+            },
+            'nat': {
+                title: 'NAT Configuration',
+                description: 'Configure Network Address Translation to allow private IPs to access the internet.',
+                topology: `
+                    <div class="topology-simple">
+                        <div class="topo-device">
+                            <div class="icon">LAN</div>
+                            <div class="name">Private LAN</div>
+                            <div class="name">192.168.1.0/24</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device" style="background: rgba(233, 69, 96, 0.2);">
+                            <div class="icon">NAT</div>
+                            <div class="name">NAT Router</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device">
+                            <div class="icon">ISP</div>
+                            <div class="name">Internet</div>
+                            <div class="name">Public IP</div>
+                        </div>
+                    </div>
+                `,
+                tasks: [
+                    { id: 1, text: 'Configure G0/0 (inside) with 192.168.1.1/24', completed: false, check: () => routerState.interfaces['g0/0'].ip === '192.168.1.1' },
+                    { id: 2, text: 'Configure G0/1 (outside) with 203.0.113.1/24', completed: false, check: () => routerState.interfaces['g0/1'].ip === '203.0.113.1' },
+                    { id: 3, text: 'Enable both interfaces', completed: false, check: () => routerState.interfaces['g0/0'].status === 'up' && routerState.interfaces['g0/1'].status === 'up' },
+                    { id: 4, text: 'Mark G0/0 as NAT inside', completed: false, check: () => routerState.nat.inside.includes('g0/0') },
+                    { id: 5, text: 'Mark G0/1 as NAT outside', completed: false, check: () => routerState.nat.outside.includes('g0/1') },
+                    { id: 6, text: 'Create access-list 1 for private network', completed: false, check: () => routerState.acls['1'] && routerState.acls['1'].length > 0 },
+                    { id: 7, text: 'Configure PAT (NAT overload)', completed: false, check: () => routerState.nat.pools.some(p => p.overload) }
+                ],
+                hints: [
+                    'Use "interface g0/0", then "ip address 192.168.1.1 255.255.255.0"',
+                    'Use "interface g0/1", then "ip address 203.0.113.1 255.255.255.0"',
+                    'Use "no shutdown" on both interfaces',
+                    'Use "ip nat inside" on the inside interface (g0/0)',
+                    'Use "ip nat outside" on the outside interface (g0/1)',
+                    'Create the ACL: "access-list 1 permit 192.168.1.0 0.0.0.255"',
+                    'Configure PAT: "ip nat inside source list 1 interface g0/1 overload"'
+                ]
+            },
+            'acl': {
+                title: 'Access Control Lists',
+                description: 'Configure standard and extended ACLs to filter network traffic.',
+                topology: `
+                    <div class="topology-simple">
+                        <div class="topo-device">
+                            <div class="icon">LAN</div>
+                            <div class="name">Trusted</div>
+                            <div class="name">10.0.0.0/8</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device" style="background: rgba(233, 69, 96, 0.2);">
+                            <div class="icon">FW</div>
+                            <div class="name">Firewall</div>
+                        </div>
+                        <div class="topo-link"></div>
+                        <div class="topo-device">
+                            <div class="icon">SVR</div>
+                            <div class="name">Server</div>
+                            <div class="name">192.168.1.100</div>
+                        </div>
+                    </div>
+                `,
+                tasks: [
+                    { id: 1, text: 'Create standard ACL 10', completed: false, check: () => routerState.acls['10'] !== undefined },
+                    { id: 2, text: 'Permit 10.0.0.0/8 network', completed: false, check: () => routerState.acls['10']?.some(e => e.action === 'permit' && e.source === '10.0.0.0') },
+                    { id: 3, text: 'Deny all other traffic (implicit)', completed: false, check: () => routerState.acls['10']?.length > 0 },
+                    { id: 4, text: 'Apply ACL 10 to G0/0 inbound', completed: false, check: () => routerState.interfaces['g0/0'].aclIn === '10' },
+                    { id: 5, text: 'Create extended ACL 100', completed: false, check: () => routerState.acls['100'] !== undefined },
+                    { id: 6, text: 'Permit TCP to port 80 (HTTP)', completed: false, check: () => routerState.acls['100']?.some(e => e.protocol === 'tcp' && e.destPort === '80') }
+                ],
+                hints: [
+                    'Standard ACLs use numbers 1-99: "access-list 10 permit 10.0.0.0 0.255.255.255"',
+                    'Use "access-list 10 permit 10.0.0.0 0.255.255.255" — /8 uses wildcard 0.255.255.255',
+                    'Any entry in ACL 10 completes this — the implicit deny is automatic',
+                    'Apply with "interface g0/0", then "ip access-group 10 in"',
+                    'Extended ACLs use numbers 100-199: "access-list 100 permit tcp any any eq 80"',
+                    'Use "access-list 100 permit tcp any any eq 80"'
+                ]
+            }
+        };
+
+        let currentLab = 'static-routing';
+        let terminalOutput = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLab(currentLab);
+            initializeCLI();
+            updateInterfaceDisplay();
+        });
+
+        function loadLab(labId) {
+            currentLab = labId;
+            const lab = labs[labId];
+
+            // Update active state in sidebar
+            document.querySelectorAll('.lab-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.lab === labId);
+            });
+
+            // Load topology
+            document.getElementById('topologyDiagram').innerHTML = lab.topology;
+
+            // Load tasks
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = lab.tasks.map(task => `
+                <li class="task-item" data-task="${task.id}">
+                    <div class="checkbox"></div>
+                    <span>${task.text}</span>
+                </li>
+            `).join('');
+
+            // Reset progress
+            updateProgress();
+
+            // Add hint
+            addOutput(`\n=== ${lab.title} ===\n${lab.description}\n\nHint: ${lab.hints[0]}\n`, 'info');
+        }
+
+        function initializeCLI() {
+            const input = document.getElementById('cliInput');
+            const terminal = document.getElementById('terminal');
+
+            // Welcome message
+            addOutput(`
+Cisco IOS Software, C2900 Software
+Copyright (c) 1986-2024 by Cisco Systems, Inc.
+
+Router Configuration Lab - Educational Simulator
+Type '?' for help or 'hint' for the next task hint.
+
+`, 'system');
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const command = input.value.trim();
+                    if (command) {
+                        routerState.commandHistory.push(command);
+                        routerState.historyIndex = routerState.commandHistory.length;
+                        processCommand(command);
+                    }
+                    input.value = '';
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (routerState.historyIndex > 0) {
+                        routerState.historyIndex--;
+                        input.value = routerState.commandHistory[routerState.historyIndex];
+                    }
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (routerState.historyIndex < routerState.commandHistory.length - 1) {
+                        routerState.historyIndex++;
+                        input.value = routerState.commandHistory[routerState.historyIndex];
+                    } else {
+                        routerState.historyIndex = routerState.commandHistory.length;
+                        input.value = '';
+                    }
+                } else if (e.key === 'Tab') {
+                    e.preventDefault();
+                    autocomplete(input);
+                }
+            });
+
+            // Focus on click
+            terminal.addEventListener('click', () => input.focus());
+        }
+
+        function getPrompt() {
+            const hostname = routerState.hostname;
+            switch (routerState.mode) {
+                case 'userExec': return `${hostname}>`;
+                case 'privilegedExec': return `${hostname}#`;
+                case 'globalConfig': return `${hostname}(config)#`;
+                case 'interfaceConfig': return `${hostname}(config-if)#`;
+                case 'routerConfig': return `${hostname}(config-router)#`;
+                case 'lineConfig': return `${hostname}(config-line)#`;
+                default: return `${hostname}>`;
+            }
+        }
+
+        function updatePrompt() {
+            document.getElementById('prompt').textContent = getPrompt();
+        }
+
+        function addOutput(text, type = 'normal') {
+            const output = document.getElementById('output');
+            const prompt = getPrompt();
+
+            if (type === 'command') {
+                output.innerHTML += `<span style="color: #00ff00;">${prompt} ${text}</span>\n`;
+            } else if (type === 'error') {
+                output.innerHTML += `<span style="color: #e74c3c;">${text}</span>\n`;
+            } else if (type === 'success') {
+                output.innerHTML += `<span style="color: #27ae60;">${text}</span>\n`;
+            } else if (type === 'info') {
+                output.innerHTML += `<span style="color: #3498db;">${text}</span>\n`;
+            } else {
+                output.innerHTML += text + '\n';
+            }
+
+            // Auto-scroll
+            const terminal = document.getElementById('terminal');
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function processCommand(command) {
+            addOutput(command, 'command');
+            const cmd = command.toLowerCase().trim();
+            const parts = cmd.split(/\s+/);
+
+            // Universal commands
+            if (cmd === '?' || cmd === 'help') {
+                showHelp();
+                return;
+            }
+
+            if (cmd === 'hint') {
+                showHint();
+                return;
+            }
+
+            if (cmd === 'exit' || cmd === 'end') {
+                handleExit(cmd);
+                return;
+            }
+
+            // Mode-specific command processing
+            switch (routerState.mode) {
+                case 'userExec':
+                    processUserExec(cmd, parts);
+                    break;
+                case 'privilegedExec':
+                    processPrivilegedExec(cmd, parts);
+                    break;
+                case 'globalConfig':
+                    processGlobalConfig(cmd, parts, command);
+                    break;
+                case 'interfaceConfig':
+                    processInterfaceConfig(cmd, parts, command);
+                    break;
+                case 'routerConfig':
+                    processRouterConfig(cmd, parts);
+                    break;
+                case 'lineConfig':
+                    processLineConfig(cmd);
+                    break;
+            }
+
+            updatePrompt();
+            checkTasks();
+        }
+
+        function processUserExec(cmd, parts) {
+            if (cmd === 'enable') {
+                routerState.mode = 'privilegedExec';
+                addOutput('', 'success');
+            } else if (cmd.startsWith('show')) {
+                addOutput('% Must be in privileged exec mode', 'error');
+            } else {
+                addOutput(`% Unknown command: ${cmd}`, 'error');
+            }
+        }
+
+        function processPrivilegedExec(cmd, parts) {
+            if (cmd === 'configure terminal' || cmd === 'conf t') {
+                routerState.mode = 'globalConfig';
+                addOutput('Enter configuration commands, one per line. End with CNTL/Z.');
+            } else if (cmd === 'disable') {
+                routerState.mode = 'userExec';
+            } else if (cmd === 'show ip route' || cmd === 'show ip route') {
+                showRoutingTable();
+            } else if (cmd === 'show ip interface brief' || cmd === 'show ip int brief') {
+                showInterfaceBrief();
+            } else if (cmd === 'show running-config' || cmd === 'show run') {
+                showRunningConfig();
+            } else if (cmd === 'show ip protocols') {
+                showIPProtocols();
+            } else if (cmd === 'show ip ospf neighbor') {
+                showOSPFNeighbor();
+            } else if (cmd === 'show ip nat translations') {
+                showNATTranslations();
+            } else if (cmd === 'show access-lists' || cmd === 'show access-list') {
+                showAccessLists();
+            } else if (cmd.startsWith('debug')) {
+                addOutput('Debugging is enabled (simulated).', 'info');
+            } else {
+                addOutput(`% Unknown command: ${cmd}`, 'error');
+            }
+        }
+
+        function processGlobalConfig(cmd, parts, originalCmd) {
+            if (cmd.startsWith('hostname ')) {
+                routerState.hostname = parts[1];
+                addOutput('', 'success');
+            } else if (cmd.startsWith('interface ') || cmd.startsWith('int ')) {
+                const intName = normalizeInterface(parts.slice(1).join(''));
+                if (routerState.interfaces[intName]) {
+                    routerState.currentInterface = intName;
+                    routerState.mode = 'interfaceConfig';
+                    addOutput('', 'success');
+                } else {
+                    addOutput('% Invalid interface', 'error');
+                }
+            } else if (cmd === 'router rip') {
+                routerState.rip.enabled = true;
+                routerState.mode = 'routerConfig';
+                routerState.currentRouter = 'rip';
+                addOutput('', 'success');
+            } else if (cmd.startsWith('router ospf ')) {
+                const processId = parseInt(parts[2]);
+                if (processId) {
+                    routerState.ospf.enabled = true;
+                    routerState.ospf.processId = processId;
+                    routerState.mode = 'routerConfig';
+                    routerState.currentRouter = 'ospf';
+                    addOutput('', 'success');
+                } else {
+                    addOutput('% Incomplete command', 'error');
+                }
+            } else if (cmd.startsWith('ip route ')) {
+                // ip route network mask next-hop
+                const network = parts[2];
+                const mask = parts[3];
+                const nextHop = parts[4];
+                if (network && mask && nextHop) {
+                    routerState.routes.push({ network, mask, nextHop, type: 'S' });
+                    updateRoutingTableDisplay();
+                    addOutput('', 'success');
+                } else {
+                    addOutput('% Incomplete command', 'error');
+                }
+            } else if (cmd.startsWith('access-list ')) {
+                processAccessList(parts, originalCmd);
+            } else if (cmd.startsWith('ip nat inside source')) {
+                processNATSource(parts);
+            } else if (cmd.startsWith('line ')) {
+                routerState.mode = 'lineConfig';
+                addOutput('', 'success');
+            } else {
+                addOutput(`% Unknown command: ${cmd}`, 'error');
+            }
+        }
+
+        function processInterfaceConfig(cmd, parts, originalCmd) {
+            const iface = routerState.currentInterface;
+
+            if (cmd.startsWith('ip address ')) {
+                const ip = parts[2];
+                const mask = parts[3];
+                if (ip && mask) {
+                    routerState.interfaces[iface].ip = ip;
+                    routerState.interfaces[iface].mask = mask;
+                    updateInterfaceDisplay();
+                    updateRoutingTableDisplay();
+                    addOutput('', 'success');
+                } else {
+                    addOutput('% Incomplete command', 'error');
+                }
+            } else if (cmd === 'no shutdown') {
+                routerState.interfaces[iface].status = 'up';
+                updateInterfaceDisplay();
+                addOutput(`%LINK-3-UPDOWN: Interface ${iface}, changed state to up`, 'success');
+                addOutput(`%LINEPROTO-5-UPDOWN: Line protocol on Interface ${iface}, changed state to up`, 'success');
+                updateRoutingTableDisplay();
+            } else if (cmd === 'shutdown') {
+                routerState.interfaces[iface].status = 'admin-down';
+                updateInterfaceDisplay();
+                addOutput(`%LINK-5-CHANGED: Interface ${iface}, changed state to administratively down`, 'info');
+            } else if (cmd.startsWith('description ')) {
+                routerState.interfaces[iface].description = originalCmd.substring(12);
+                addOutput('', 'success');
+            } else if (cmd.startsWith('clock rate ')) {
+                routerState.interfaces[iface].clockRate = parts[2];
+                addOutput('', 'success');
+            } else if (cmd === 'ip nat inside') {
+                if (!routerState.nat.inside.includes(iface)) {
+                    routerState.nat.inside.push(iface);
+                }
+                addOutput('', 'success');
+            } else if (cmd === 'ip nat outside') {
+                if (!routerState.nat.outside.includes(iface)) {
+                    routerState.nat.outside.push(iface);
+                }
+                addOutput('', 'success');
+            } else if (cmd.startsWith('ip access-group ')) {
+                const aclNum = parts[2];
+                const direction = parts[3];
+                if (direction === 'in') {
+                    routerState.interfaces[iface].aclIn = aclNum;
+                } else if (direction === 'out') {
+                    routerState.interfaces[iface].aclOut = aclNum;
+                }
+                addOutput('', 'success');
+            } else {
+                addOutput(`% Unknown command: ${cmd}`, 'error');
+            }
+        }
+
+        function processRouterConfig(cmd, parts) {
+            if (routerState.currentRouter === 'rip') {
+                if (cmd === 'version 2') {
+                    routerState.rip.version = 2;
+                    addOutput('', 'success');
+                } else if (cmd.startsWith('network ')) {
+                    const network = parts[1];
+                    if (!routerState.rip.networks.includes(network)) {
+                        routerState.rip.networks.push(network);
+                    }
+                    addOutput('', 'success');
+                } else if (cmd === 'no auto-summary') {
+                    addOutput('', 'success');
+                } else {
+                    addOutput(`% Unknown command: ${cmd}`, 'error');
+                }
+            } else if (routerState.currentRouter === 'ospf') {
+                if (cmd.startsWith('router-id ')) {
+                    routerState.ospf.routerId = parts[1];
+                    addOutput('', 'success');
+                } else if (cmd.startsWith('network ')) {
+                    // network ip wildcard area X
+                    const network = parts[1];
+                    const wildcard = parts[2];
+                    const area = parts[4];
+                    if (network && wildcard && area !== undefined) {
+                        routerState.ospf.networks.push({ network, wildcard, area });
+                        addOutput('', 'success');
+                    } else {
+                        addOutput('% Incomplete command. Usage: network ADDRESS WILDCARD area AREA-ID', 'error');
+                    }
+                } else {
+                    addOutput(`% Unknown command: ${cmd}`, 'error');
+                }
+            }
+        }
+
+        function processLineConfig(cmd) {
+            if (cmd.startsWith('password ') || cmd === 'login' || cmd === 'logging synchronous') {
+                addOutput('', 'success');
+            } else {
+                addOutput(`% Unknown command: ${cmd}`, 'error');
+            }
+        }
+
+        function processAccessList(parts, originalCmd) {
+            const aclNum = parts[1];
+            const action = parts[2]; // permit/deny
+
+            if (!aclNum || (action !== 'permit' && action !== 'deny') || !parts[3]) {
+                addOutput('% Incomplete command', 'error');
+                return;
+            }
+
+            if (!routerState.acls[aclNum]) {
+                routerState.acls[aclNum] = [];
+            }
+
+            // Standard ACL (1-99)
+            if (parseInt(aclNum) < 100) {
+                const source = parts[3];
+                const wildcard = parts[4] || '0.0.0.0';
+                routerState.acls[aclNum].push({ action, source, wildcard });
+                addOutput('', 'success');
+            }
+            // Extended ACL (100-199)
+            else {
+                const protocol = parts[3];
+                const srcKeyword = parts[4];
+                const destKeyword = parts[5];
+                let destPort = null;
+
+                // Check for port specification
+                const eqIndex = parts.indexOf('eq');
+                if (eqIndex !== -1) {
+                    destPort = parts[eqIndex + 1];
+                }
+
+                routerState.acls[aclNum].push({
+                    action,
+                    protocol,
+                    source: srcKeyword,
+                    destination: destKeyword,
+                    destPort
+                });
+                addOutput('', 'success');
+            }
+        }
+
+        function processNATSource(parts) {
+            // ip nat inside source list X interface Y overload
+            const listIndex = parts.indexOf('list');
+            const intIndex = parts.indexOf('interface');
+            const overload = parts.includes('overload');
+
+            if (listIndex !== -1 && intIndex !== -1) {
+                const aclNum = parts[listIndex + 1];
+                const iface = normalizeInterface(parts[intIndex + 1]);
+
+                routerState.nat.pools.push({
+                    type: 'dynamic',
+                    acl: aclNum,
+                    interface: iface,
+                    overload
+                });
+                addOutput('', 'success');
+            } else {
+                addOutput('% Incomplete command. Usage: ip nat inside source list ACL interface INTERFACE [overload]', 'error');
+            }
+        }
+
+        function normalizeInterface(name) {
+            const normalized = name.toLowerCase()
+                .replace('gigabitethernet', 'g')
+                .replace('serial', 's')
+                .replace('gig', 'g')
+                .replace('gi', 'g')
+                .replace('se', 's');
+            return normalized;
+        }
+
+        function handleExit(cmd) {
+            if (cmd === 'end') {
+                if (routerState.mode === 'userExec') {
+                    addOutput(`% Unknown command: ${cmd}`, 'error');
+                } else {
+                    routerState.mode = 'privilegedExec';
+                    routerState.currentInterface = null;
+                    routerState.currentRouter = null;
+                }
+            } else if (cmd === 'exit') {
+                switch (routerState.mode) {
+                    case 'interfaceConfig':
+                    case 'routerConfig':
+                    case 'lineConfig':
+                        routerState.mode = 'globalConfig';
+                        routerState.currentInterface = null;
+                        routerState.currentRouter = null;
+                        break;
+                    case 'globalConfig':
+                        routerState.mode = 'privilegedExec';
+                        break;
+                    case 'privilegedExec':
+                        routerState.mode = 'userExec';
+                        break;
+                }
+            }
+            updatePrompt();
+        }
+
+        function showRoutingTable() {
+            let output = `
+Codes: C - connected, S - static, R - RIP, O - OSPF
+       * - candidate default
+
+Gateway of last resort is not set
+
+`;
+            // Connected routes
+            for (const [iface, config] of Object.entries(routerState.interfaces)) {
+                if (config.ip && config.status === 'up') {
+                    const network = calculateNetwork(config.ip, config.mask);
+                    const cidr = maskToCIDR(config.mask);
+                    output += `C    ${network}/${cidr} is directly connected, ${iface}\n`;
+                }
+            }
+
+            // Static routes
+            for (const route of routerState.routes) {
+                const cidr = maskToCIDR(route.mask);
+                output += `S    ${route.network}/${cidr} [1/0] via ${route.nextHop}\n`;
+            }
+
+            // RIP routes
+            if (routerState.rip.enabled) {
+                output += `R    10.0.0.0/8 [120/1] via simulated, 00:00:10, dynamic\n`;
+            }
+
+            // OSPF routes
+            if (routerState.ospf.enabled) {
+                output += `O    192.168.100.0/24 [110/2] via simulated OSPF\n`;
+            }
+
+            addOutput(output);
+        }
+
+        function showInterfaceBrief() {
+            let output = `
+Interface              IP-Address      OK? Method Status                Protocol
+`;
+            for (const [iface, config] of Object.entries(routerState.interfaces)) {
+                const ip = config.ip || 'unassigned';
+                const method = config.ip ? 'manual' : 'unset';
+                let status = config.status === 'up' ? 'up' : 'administratively down';
+                let protocol = config.status === 'up' ? 'up' : 'down';
+
+                const ifaceName = iface.replace('g', 'GigabitEthernet').replace('s', 'Serial');
+                output += `${ifaceName.padEnd(22)} ${ip.padEnd(15)} YES  ${method.padEnd(6)} ${status.padEnd(21)} ${protocol}\n`;
+            }
+            addOutput(output);
+        }
+
+        function showRunningConfig() {
+            let output = `
+Building configuration...
+
+Current configuration:
+!
+hostname ${routerState.hostname}
+!
+`;
+            // Interfaces
+            for (const [iface, config] of Object.entries(routerState.interfaces)) {
+                const ifaceName = iface.replace('g', 'GigabitEthernet').replace('s', 'Serial');
+                output += `interface ${ifaceName}\n`;
+                if (config.description) output += ` description ${config.description}\n`;
+                if (config.ip) output += ` ip address ${config.ip} ${config.mask}\n`;
+                if (routerState.nat.inside.includes(iface)) output += ` ip nat inside\n`;
+                if (routerState.nat.outside.includes(iface)) output += ` ip nat outside\n`;
+                if (config.aclIn) output += ` ip access-group ${config.aclIn} in\n`;
+                if (config.aclOut) output += ` ip access-group ${config.aclOut} out\n`;
+                if (config.status === 'admin-down') output += ` shutdown\n`;
+                output += `!\n`;
+            }
+
+            // Routing
+            if (routerState.rip.enabled) {
+                output += `router rip\n`;
+                output += ` version ${routerState.rip.version}\n`;
+                for (const net of routerState.rip.networks) {
+                    output += ` network ${net}\n`;
+                }
+                output += `!\n`;
+            }
+
+            if (routerState.ospf.enabled) {
+                output += `router ospf ${routerState.ospf.processId}\n`;
+                if (routerState.ospf.routerId) output += ` router-id ${routerState.ospf.routerId}\n`;
+                for (const net of routerState.ospf.networks) {
+                    output += ` network ${net.network} ${net.wildcard} area ${net.area}\n`;
+                }
+                output += `!\n`;
+            }
+
+            // Static routes
+            for (const route of routerState.routes) {
+                output += `ip route ${route.network} ${route.mask} ${route.nextHop}\n`;
+            }
+
+            // ACLs
+            for (const [num, entries] of Object.entries(routerState.acls)) {
+                for (const entry of entries) {
+                    if (parseInt(num) < 100) {
+                        output += `access-list ${num} ${entry.action} ${entry.source} ${entry.wildcard}\n`;
+                    } else {
+                        output += `access-list ${num} ${entry.action} ${entry.protocol} ${entry.source} ${entry.destination}`;
+                        if (entry.destPort) output += ` eq ${entry.destPort}`;
+                        output += `\n`;
+                    }
+                }
+            }
+
+            // NAT
+            for (const pool of routerState.nat.pools) {
+                output += `ip nat inside source list ${pool.acl} interface ${pool.interface}`;
+                if (pool.overload) output += ` overload`;
+                output += `\n`;
+            }
+
+            output += `!
+end`;
+            addOutput(output);
+        }
+
+        function showIPProtocols() {
+            let output = 'Routing Protocol is "application"\n\n';
+
+            if (routerState.rip.enabled) {
+                output += `Routing Protocol is "rip"\n`;
+                output += `  Sending updates every 30 seconds\n`;
+                output += `  Invalid after 180 seconds, hold down 180, flushed after 240\n`;
+                output += `  Version: ${routerState.rip.version}\n`;
+                output += `  Routing for Networks:\n`;
+                for (const net of routerState.rip.networks) {
+                    output += `    ${net}\n`;
+                }
+                output += `\n`;
+            }
+
+            if (routerState.ospf.enabled) {
+                output += `Routing Protocol is "ospf ${routerState.ospf.processId}"\n`;
+                output += `  Router ID: ${routerState.ospf.routerId || 'not set'}\n`;
+                output += `  Number of areas: 1\n`;
+                output += `  Routing for Networks:\n`;
+                for (const net of routerState.ospf.networks) {
+                    output += `    ${net.network} ${net.wildcard} area ${net.area}\n`;
+                }
+            }
+
+            addOutput(output);
+        }
+
+        function showOSPFNeighbor() {
+            if (!routerState.ospf.enabled) {
+                addOutput('OSPF is not enabled', 'error');
+                return;
+            }
+
+            addOutput(`
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+2.2.2.2           1   FULL/DR         00:00:38    10.1.1.2        G0/0
+3.3.3.3           1   FULL/BDR        00:00:35    10.1.1.3        G0/0
+`);
+        }
+
+        function showNATTranslations() {
+            if (routerState.nat.pools.length === 0) {
+                addOutput('NAT is not configured', 'error');
+                return;
+            }
+
+            addOutput(`
+Pro  Inside global      Inside local       Outside local      Outside global
+tcp  203.0.113.1:1025   192.168.1.10:1025  8.8.8.8:443        8.8.8.8:443
+tcp  203.0.113.1:1026   192.168.1.11:1026  142.250.80.46:80   142.250.80.46:80
+Total number of translations: 2
+`);
+        }
+
+        function showAccessLists() {
+            let output = '';
+            for (const [num, entries] of Object.entries(routerState.acls)) {
+                if (parseInt(num) < 100) {
+                    output += `Standard IP access list ${num}\n`;
+                } else {
+                    output += `Extended IP access list ${num}\n`;
+                }
+                for (const entry of entries) {
+                    if (parseInt(num) < 100) {
+                        output += `    ${entry.action} ${entry.source} ${entry.wildcard}\n`;
+                    } else {
+                        output += `    ${entry.action} ${entry.protocol} ${entry.source} ${entry.destination}`;
+                        if (entry.destPort) output += ` eq ${entry.destPort}`;
+                        output += `\n`;
+                    }
+                }
+            }
+            if (!output) output = 'No access lists configured';
+            addOutput(output);
+        }
+
+        function showHelp() {
+            const help = {
+                userExec: `
+User EXEC commands:
+  enable          Enter privileged EXEC mode
+  exit            Exit the CLI
+  ?               Display help`,
+                privilegedExec: `
+Privileged EXEC commands:
+  configure terminal    Enter configuration mode
+  show ip route         Display routing table
+  show ip int brief     Display interface summary
+  show running-config   Display current configuration
+  show ip protocols     Display routing protocols
+  show ip ospf neighbor Display OSPF neighbors
+  show ip nat translations  Display NAT translations
+  show access-lists     Display access lists
+  disable               Return to user EXEC
+  exit                  Exit`,
+                globalConfig: `
+Global Configuration commands:
+  hostname NAME         Set router hostname
+  interface TYPE        Enter interface configuration
+  router rip            Configure RIP routing
+  router ospf PROCESS   Configure OSPF routing
+  ip route NET MASK HOP Add static route
+  access-list NUM ...   Configure access list
+  ip nat inside source  Configure NAT
+  exit                  Exit to privileged EXEC
+  end                   Return to privileged EXEC`,
+                interfaceConfig: `
+Interface Configuration commands:
+  ip address IP MASK    Set IP address
+  no shutdown           Enable interface
+  shutdown              Disable interface
+  description TEXT      Set description
+  clock rate RATE       Set clock rate (serial)
+  ip nat inside         Mark as NAT inside
+  ip nat outside        Mark as NAT outside
+  ip access-group NUM   Apply access list
+  exit                  Exit to global config`,
+                routerConfig: `
+Router Configuration commands:
+  network NETWORK       Advertise network
+  version 2             Set RIP version 2
+  router-id X.X.X.X     Set OSPF router ID
+  no auto-summary       Disable auto-summary
+  exit                  Exit to global config`
+            };
+
+            addOutput(help[routerState.mode] || help.userExec, 'info');
+        }
+
+        function showHint() {
+            const lab = labs[currentLab];
+            const incompleteTasks = lab.tasks.filter(t => !t.check());
+            if (incompleteTasks.length > 0) {
+                const nextTask = incompleteTasks[0];
+                const hintIndex = lab.tasks.indexOf(nextTask);
+                const hint = lab.hints[hintIndex] || lab.hints[0];
+                addOutput(`\nHint for "${nextTask.text}":\n   ${hint}\n`, 'info');
+            } else {
+                addOutput('\nAll tasks completed! Great job!\n', 'success');
+            }
+        }
+
+        function updateInterfaceDisplay() {
+            for (const [iface, config] of Object.entries(routerState.interfaces)) {
+                const element = document.querySelector(`[data-interface="${iface}"]`);
+                if (element) {
+                    const led = element.querySelector('.status-led');
+                    led.className = 'status-led ' + config.status;
+
+                    element.classList.toggle('selected', iface === routerState.currentInterface);
+                }
+            }
+
+            // Update LED indicators
+            const hasActiveInterface = Object.values(routerState.interfaces).some(i => i.status === 'up');
+            document.getElementById('actLed').classList.toggle('on', hasActiveInterface);
+            document.getElementById('linkLed').classList.toggle('on', hasActiveInterface);
+        }
+
+        function updateRoutingTableDisplay() {
+            const tbody = document.getElementById('routingTableBody');
+            let rows = '';
+
+            // Connected routes
+            for (const [iface, config] of Object.entries(routerState.interfaces)) {
+                if (config.ip && config.status === 'up') {
+                    const network = calculateNetwork(config.ip, config.mask);
+                    rows += `<tr><td>C</td><td>${network}</td><td>-</td><td>${iface}</td></tr>`;
+                }
+            }
+
+            // Static routes
+            for (const route of routerState.routes) {
+                rows += `<tr><td>S</td><td>${route.network}</td><td>${route.nextHop}</td><td>-</td></tr>`;
+            }
+
+            // RIP routes
+            if (routerState.rip.enabled && routerState.rip.networks.length > 0) {
+                rows += `<tr><td>R</td><td>dynamic</td><td>learned</td><td>-</td></tr>`;
+            }
+
+            // OSPF routes
+            if (routerState.ospf.enabled && routerState.ospf.networks.length > 0) {
+                rows += `<tr><td>O</td><td>dynamic</td><td>learned</td><td>-</td></tr>`;
+            }
+
+            if (!rows) {
+                rows = '<tr><td>-</td><td>No routes</td><td>-</td><td>-</td></tr>';
+            }
+
+            tbody.innerHTML = rows;
+        }
+
+        function calculateNetwork(ip, mask) {
+            const ipParts = ip.split('.').map(Number);
+            const maskParts = mask.split('.').map(Number);
+            const networkParts = ipParts.map((p, i) => p & maskParts[i]);
+            return networkParts.join('.');
+        }
+
+        function maskToCIDR(mask) {
+            return mask.split('.').reduce((acc, octet) => {
+                return acc + (octet >>> 0).toString(2).split('1').length - 1;
+            }, 0);
+        }
+
+        function checkTasks() {
+            const lab = labs[currentLab];
+            let completed = 0;
+
+            let newlyCompleted = false;
+
+            lab.tasks.forEach(task => {
+                const taskElement = document.querySelector(`[data-task="${task.id}"]`);
+                const isComplete = task.check();
+
+                if (isComplete && !task.completed) {
+                    task.completed = true;
+                    newlyCompleted = true;
+                    addOutput(`Task completed: ${task.text}`, 'success');
+                }
+
+                if (taskElement) {
+                    taskElement.classList.toggle('completed', isComplete);
+                }
+
+                if (isComplete) completed++;
+            });
+
+            // Update progress bar
+            const progress = (completed / lab.tasks.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+
+            if (completed === lab.tasks.length && newlyCompleted) {
+                addOutput('\nCongratulations! All tasks completed!\n', 'success');
+            }
+        }
+
+        function updateProgress() {
+            const lab = labs[currentLab];
+            let completed = lab.tasks.filter(t => t.check()).length;
+            const progress = (completed / lab.tasks.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        function clearTerminal() {
+            document.getElementById('output').innerHTML = '';
+            addOutput('Terminal cleared.\n', 'info');
+        }
+
+        function insertCommand(cmd) {
+            const input = document.getElementById('cliInput');
+            input.value = cmd;
+            input.focus();
+        }
+
+        function autocomplete(input) {
+            const commands = {
+                userExec: ['enable', 'exit', 'help'],
+                privilegedExec: ['configure terminal', 'show ip route', 'show ip interface brief', 'show running-config', 'show ip protocols', 'show access-lists', 'disable', 'exit'],
+                globalConfig: ['hostname', 'interface', 'router rip', 'router ospf', 'ip route', 'access-list', 'ip nat inside source', 'exit', 'end'],
+                interfaceConfig: ['ip address', 'no shutdown', 'shutdown', 'description', 'clock rate', 'ip nat inside', 'ip nat outside', 'ip access-group', 'exit'],
+                routerConfig: ['network', 'version 2', 'router-id', 'no auto-summary', 'exit']
+            };
+
+            const available = commands[routerState.mode] || [];
+            const typed = input.value.toLowerCase();
+            const match = available.find(cmd => cmd.startsWith(typed) && cmd !== typed);
+
+            if (match) {
+                input.value = match;
+            }
+        }
+
+        // Interface click handler
+        document.querySelectorAll('.interface').forEach(el => {
+            el.addEventListener('click', () => {
+                const iface = el.dataset.interface;
+                const config = routerState.interfaces[iface];
+
+                if (config) {
+                    const details = document.getElementById('interfaceDetails');
+                    details.innerHTML = `
+                        <div class="detail-row">
+                            <span class="label">Interface</span>
+                            <span class="value">${iface}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">IP Address</span>
+                            <span class="value">${config.ip || 'Not set'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Subnet Mask</span>
+                            <span class="value">${config.mask || 'Not set'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Status</span>
+                            <span class="value">${config.status}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">NAT</span>
+                            <span class="value">${routerState.nat.inside.includes(iface) ? 'Inside' : routerState.nat.outside.includes(iface) ? 'Outside' : 'None'}</span>
+                        </div>
+                    `;
+
+                    // If in global config, switch to interface config
+                    if (routerState.mode === 'globalConfig') {
+                        routerState.currentInterface = iface;
+                        routerState.mode = 'interfaceConfig';
+                        updatePrompt();
+                        addOutput(`Entering interface configuration for ${iface}`, 'info');
+                    }
+                }
+            });
+        });
+
+        // Lab selection
+        document.querySelectorAll('.lab-item').forEach(item => {
+            item.addEventListener('click', () => {
+                loadLab(item.dataset.lab);
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Architect - IT Vocational Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-elev: #131826;
+    --bg-card: #1a2133;
+    --border: #2a3249;
+    --text: #e8ecf5;
+    --text-dim: #8a94ab;
+    --text-faint: #5a6480;
+    --accent: #64d2ff;
+    --success: #4ade80;
+    --info: #60a5fa;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --purple: #c084fc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(100, 210, 255, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(192, 132, 252, 0.06) 0%, transparent 40%);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 2rem; }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.6rem, 5vw, 2.5rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .subtitle { color: var(--text-dim); font-size: 1rem; max-width: 560px; margin: 0 auto; }
+
+  /* ===== Mode selector ===== */
+  .mode-panel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .mode-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .mode-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .mode-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .mode-card:hover::before { transform: scaleX(1); }
+  .mode-card.active { border-color: var(--accent); background: linear-gradient(180deg, rgba(100, 210, 255, 0.08), transparent); }
+  .mode-card.active::before { transform: scaleX(1); }
+
+  .mode-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 0.35rem;
+  }
+
+  .mode-card h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 0.25rem;
+    color: var(--text);
+  }
+
+  .mode-card p { color: var(--text-dim); font-size: 0.8rem; }
+
+  /* ===== Stats ===== */
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem 1.25rem;
+    margin-bottom: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .stats-item { display: flex; gap: 0.5rem; align-items: center; }
+  .stats-label { color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.68rem; }
+  .stats-value { color: var(--text); font-weight: 600; }
+  .stats-value.good { color: var(--success); }
+  .stats-value.bad { color: var(--danger); }
+  .stats-value.warn { color: var(--warn); }
+
+  /* ===== Panels ===== */
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .panel-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.85rem;
+  }
+
+  /* ===== Feedback ===== */
+  .feedback {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    animation: slideIn 0.3s ease;
+  }
+  .feedback.good { border-left-color: var(--success); }
+  .feedback.bad { border-left-color: var(--danger); }
+  .feedback.caution { border-left-color: var(--warn); }
+  .feedback-title {
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.92rem;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.3s ease; }
+
+  /* ===== Buttons ===== */
+  .controls { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+  .btn {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.85rem 1.4rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 140px;
+  }
+  .btn:hover:not(:disabled) { border-color: var(--accent); background: var(--bg-card); }
+  .btn:disabled { opacity: 0.45; cursor: default; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #4a9fd9);
+    border-color: transparent;
+    color: #06121c;
+    font-weight: 700;
+  }
+  .btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #7ddcff, var(--accent)); transform: translateY(-1px); }
+
+  /* ===== Brief box ===== */
+  .brief {
+    background: var(--bg-elev);
+    border-left: 3px solid var(--purple);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    margin-bottom: 1.25rem;
+  }
+  .brief ul { margin: 0.5rem 0 0 1.2rem; }
+  .brief li { margin-bottom: 0.3rem; color: var(--text-dim); }
+  .brief li strong { color: var(--text); }
+  .brief em { color: var(--warn); font-style: normal; }
+
+  /* ===== Mode 1: flat network ===== */
+  #flat-canvas {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-elev);
+    margin-bottom: 1rem;
+  }
+
+  .health-track {
+    flex: 0 0 90px;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .health-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 4px;
+    background: var(--success);
+    transition: width 0.6s ease, background 0.6s ease;
+  }
+
+  /* ===== Mode 2: workshop ===== */
+  .binary-wrap { overflow-x: auto; padding-bottom: 0.35rem; }
+
+  .binary-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.6rem;
+    min-width: 560px;
+  }
+  .binary-row-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    width: 62px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .octet-group { display: flex; flex-direction: column; gap: 0.25rem; }
+  .octet-bits { display: flex; gap: 2px; }
+  .bit {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    width: 17px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    transition: all 0.2s ease;
+  }
+  .bit.b-base { border-color: rgba(96, 165, 250, 0.45); color: var(--info); background: rgba(96, 165, 250, 0.07); }
+  .bit.b-sub  { border-color: var(--accent); color: var(--accent); background: rgba(100, 210, 255, 0.14); box-shadow: 0 0 8px rgba(100, 210, 255, 0.2); }
+  .bit.b-host { border-color: rgba(192, 132, 252, 0.5); color: var(--purple); background: rgba(192, 132, 252, 0.08); }
+  .octet-dec {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .octet-dot { color: var(--text-faint); font-family: 'JetBrains Mono', monospace; align-self: flex-start; padding-top: 3px; }
+
+  .bit-legend {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    margin: 0.4rem 0 1rem;
+  }
+  .bit-legend .lg-base { color: var(--info); }
+  .bit-legend .lg-sub { color: var(--accent); }
+  .bit-legend .lg-host { color: var(--purple); }
+
+  .boundary-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin: 0.75rem 0 1rem;
+    flex-wrap: wrap;
+  }
+  .cidr-readout {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 800;
+    font-size: 1.7rem;
+    color: var(--accent);
+    min-width: 82px;
+  }
+  .step-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 1.1rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .step-btn:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-1px); }
+  .step-btn:disabled { opacity: 0.35; cursor: default; }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    min-width: 160px;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--info), var(--accent), var(--purple));
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 10px rgba(100, 210, 255, 0.5);
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 10px rgba(100, 210, 255, 0.5);
+    cursor: pointer;
+  }
+  input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+  .ws-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .fact {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+  }
+  .fact-num {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--text);
+  }
+  .fact-num.hl { color: var(--accent); }
+  .fact-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    margin-top: 0.2rem;
+  }
+  .fact-note { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.3rem; line-height: 1.4; }
+
+  .range-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; }
+  .range-table th {
+    text-align: left;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.62rem;
+    font-weight: 600;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .range-table td { padding: 0.45rem 0.6rem; border-bottom: 1px dashed var(--border); color: var(--text-dim); }
+  .range-table td.net { color: var(--accent); font-weight: 600; }
+  .range-table td.bcast { color: var(--warn); }
+  .range-note { font-size: 0.75rem; color: var(--text-faint); margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace; }
+
+  /* ===== Mode 3: commission ===== */
+  .dept-row {
+    padding: 0.85rem 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .dept-row:last-of-type { border-bottom: none; }
+  .dept-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.55rem;
+  }
+  .dept-name {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+  }
+  .dept-swatch {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+    vertical-align: baseline;
+  }
+  .dept-need { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-dim); }
+  .dept-need em { color: var(--warn); font-style: normal; }
+  .size-opts { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .size-opt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.42rem 0.65rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-elev);
+    color: var(--text-faint);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .size-opt strong { color: var(--text-dim); font-weight: 800; }
+  .size-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--text); }
+  .size-opt.selected {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(100, 210, 255, 0.1);
+  }
+  .size-opt.selected strong { color: var(--accent); }
+  .size-opt:disabled { cursor: default; opacity: 0.7; }
+
+  .addr-bar {
+    display: flex;
+    height: 34px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: repeating-linear-gradient(45deg, var(--bg-elev), var(--bg-elev) 6px, #101524 6px, #101524 12px);
+    margin-bottom: 0.5rem;
+  }
+  .addr-seg {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: rgba(10, 14, 26, 0.9);
+    overflow: hidden;
+    white-space: nowrap;
+    transition: width 0.35s ease;
+  }
+  .addr-legend {
+    display: flex;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+  .addr-legend .lg-item { display: flex; align-items: center; gap: 0.35rem; }
+  .addr-legend .lg-item.exhausted { color: var(--danger); }
+  .lg-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+
+  /* ===== Results ===== */
+  .results { text-align: center; padding: 2.25rem 2rem; }
+  .results-score {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.4rem, 9vw, 4rem);
+    line-height: 1;
+    margin: 1rem 0;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .verdict { font-family: 'Unbounded', sans-serif; font-size: 1.2rem; font-weight: 600; margin: 0.75rem 0 0.5rem; }
+  .verdict-detail { color: var(--text-dim); font-size: 0.95rem; max-width: 480px; margin: 0 auto 1.5rem; }
+
+  .hidden { display: none !important; }
+
+  #confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem 0.75rem; }
+    .mode-panel { grid-template-columns: 1fr; }
+    .panel { padding: 1.25rem; }
+    .cidr-readout { font-size: 1.4rem; min-width: 68px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+
+<div class="container">
+  <header>
+    <div class="eyebrow">// IT Vocational Training • Module 03</div>
+    <h1>Network <span>Architect</span></h1>
+    <p class="subtitle">One flat network works fine, right up until it doesn't. Watch a network drown in its own chatter, learn where the boundary line goes, then design subnets for real clients.</p>
+  </header>
+
+  <div class="mode-panel">
+    <button class="mode-card active" data-mode="flat">
+      <div class="mode-icon">01</div>
+      <h3>The Flat Network</h3>
+      <p>Watch one network degrade as the business grows. See why subnets exist.</p>
+    </button>
+    <button class="mode-card" data-mode="workshop">
+      <div class="mode-icon">02</div>
+      <h3>The Workshop</h3>
+      <p>Slide the network/host boundary and watch the maths respond live.</p>
+    </button>
+    <button class="mode-card" data-mode="commission">
+      <div class="mode-icon">03</div>
+      <h3>The Commission</h3>
+      <p>Real client briefs. Size a subnet for every department; live with the result.</p>
+    </button>
+  </div>
+
+  <!-- ============ MODE 1: THE FLAT NETWORK ============ -->
+  <section id="flat-section">
+    <div class="stats">
+      <div class="stats-item"><span class="stats-label">Devices</span><span class="stats-value" id="fl-devices">6</span></div>
+      <div class="stats-item"><span class="stats-label">Broadcasts/min</span><span class="stats-value" id="fl-broadcasts">~90</span></div>
+      <div class="stats-item"><span class="stats-label">Network health</span><div class="health-track"><div class="health-fill" id="fl-health"></div></div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label" id="fl-canvas-label">// 192.168.10.0/24 — one broadcast domain</div>
+      <canvas id="flat-canvas" height="360"></canvas>
+      <div class="brief" id="fl-narration">Monday, 9 am. Your client has six machines in Admin, all on a single flat network: <strong>192.168.10.0/24</strong>. Every device shares one broadcast domain: when any machine shouts <em>"who has 192.168.10.7?"</em>, every other machine hears it and must stop to check. With six devices, that's nothing. Watch what happens as the business grows.</div>
+      <div id="fl-feedback"></div>
+      <div class="controls">
+        <button class="btn btn-primary" id="fl-action">A department moves in →</button>
+        <button class="btn hidden" id="fl-replay">Replay from the start</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2: THE WORKSHOP ============ -->
+  <section id="workshop-section" class="hidden">
+    <div class="stats">
+      <div class="stats-item"><span class="stats-label">Boundary</span><span class="stats-value" id="ws-stat-prefix">/26</span></div>
+      <div class="stats-item"><span class="stats-label">Subnets</span><span class="stats-value" id="ws-stat-subnets">4</span></div>
+      <div class="stats-item"><span class="stats-label">Usable hosts each</span><span class="stats-value" id="ws-stat-hosts">62</span></div>
+      <div class="stats-item"><span class="stats-label">Challenges</span><span class="stats-value good" id="ws-stat-quiz">0 / 5</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">// The boundary — 192.168.10.0, mask sliding from /24 to /30</div>
+      <div class="binary-wrap">
+        <div class="binary-row" id="ws-addr-row"></div>
+        <div class="binary-row" id="ws-mask-row"></div>
+      </div>
+      <div class="bit-legend">
+        <span class="lg-base">■ base network bits (fixed /24)</span>
+        <span class="lg-sub">■ borrowed subnet bits</span>
+        <span class="lg-host">■ host bits</span>
+      </div>
+      <div class="boundary-controls">
+        <button class="step-btn" id="ws-minus" aria-label="Move boundary left">−</button>
+        <input type="range" id="ws-slider" min="24" max="30" step="1" value="26" aria-label="Network/host boundary">
+        <button class="step-btn" id="ws-plus" aria-label="Move boundary right">+</button>
+        <div class="cidr-readout" id="ws-cidr">/26</div>
+      </div>
+      <div class="ws-facts">
+        <div class="fact"><div class="fact-num" id="ws-mask-dec">255.255.255.192</div><div class="fact-label">Subnet mask</div></div>
+        <div class="fact"><div class="fact-num hl" id="ws-subnets">4</div><div class="fact-label">Subnets created</div><div class="fact-note" id="ws-subnets-note"></div></div>
+        <div class="fact"><div class="fact-num hl" id="ws-hosts">62</div><div class="fact-label">Usable hosts / subnet</div><div class="fact-note" id="ws-hosts-note"></div></div>
+      </div>
+      <div class="panel-label" id="ws-ranges-label">// The first subnets this boundary creates</div>
+      <div style="overflow-x:auto;">
+        <table class="range-table">
+          <thead><tr><th>Network</th><th>First usable</th><th>Last usable</th><th>Broadcast</th></tr></thead>
+          <tbody id="ws-ranges"></tbody>
+        </table>
+      </div>
+      <div class="range-note" id="ws-range-note"></div>
+    </div>
+
+    <div class="panel" id="ws-quiz-panel">
+      <div class="panel-label">// Challenge <span id="ws-quiz-pos">1 / 5</span> — answer by setting the slider above</div>
+      <div class="brief" id="ws-quiz-text"></div>
+      <div id="ws-quiz-feedback"></div>
+      <div class="controls">
+        <button class="btn btn-primary" id="ws-lock">Lock in <span id="ws-lock-cidr">/26</span></button>
+        <button class="btn hidden" id="ws-quiz-next">Next Challenge →</button>
+      </div>
+    </div>
+
+    <div class="panel results hidden" id="ws-results">
+      <div class="panel-label">// Workshop complete</div>
+      <div class="results-score" id="ws-final"></div>
+      <div class="verdict" id="ws-verdict"></div>
+      <div class="verdict-detail" id="ws-detail"></div>
+      <div class="controls" style="max-width:420px;margin:0 auto;">
+        <button class="btn" id="ws-restart">Run Challenges Again</button>
+        <button class="btn btn-primary" id="ws-to-commission">Next: The Commission →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3: THE COMMISSION ============ -->
+  <section id="commission-section" class="hidden">
+    <div class="stats">
+      <div class="stats-item"><span class="stats-label">Brief</span><span class="stats-value" id="cm-position">1 / 3</span></div>
+      <div class="stats-item"><span class="stats-label">Commissioned</span><span class="stats-value good" id="cm-passed">0</span></div>
+      <div class="stats-item"><span class="stats-label">Failed designs</span><span class="stats-value bad" id="cm-fails">0</span></div>
+    </div>
+
+    <div class="panel" id="cm-design-panel">
+      <div class="panel-label" id="cm-title">// Client brief</div>
+      <div class="brief" id="cm-brief"></div>
+      <div class="panel-label">// Assign a subnet size to every department</div>
+      <div id="cm-depts"></div>
+      <div class="panel-label" style="margin-top:1.25rem;">// 192.168.10.0/24 address space — 256 addresses total</div>
+      <div class="addr-bar" id="cm-bar"></div>
+      <div class="addr-legend" id="cm-legend"></div>
+      <div id="cm-prompt"></div>
+      <div class="controls">
+        <button class="btn btn-primary" id="cm-commission">Commission the Network →</button>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="cm-results-panel">
+      <div class="panel-label">// Commissioning report</div>
+      <div id="cm-verdicts"></div>
+      <div class="controls" style="margin-top:1rem;">
+        <button class="btn" id="cm-retry">Revise the Design</button>
+        <button class="btn btn-primary hidden" id="cm-next">Next Brief →</button>
+      </div>
+    </div>
+
+    <div class="panel results hidden" id="cm-final-results">
+      <div class="panel-label">// The Commission complete</div>
+      <div class="results-score" id="cm-final"></div>
+      <div class="verdict" id="cm-final-verdict"></div>
+      <div class="verdict-detail" id="cm-final-detail"></div>
+      <div class="controls" style="max-width:300px;margin:0 auto;">
+        <button class="btn btn-primary" id="cm-restart">Run Again</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>// Module 03 of 03 • Network Architect</footer>
+</div>
+
+<script>
+// ================= CONFETTI =================
+const confettiCanvas = document.getElementById('confetti-canvas');
+const cctx = confettiCanvas.getContext('2d');
+let confettiParticles = [];
+let confettiAnimating = false;
+
+function sizeCanvas() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+sizeCanvas();
+window.addEventListener('resize', sizeCanvas);
+
+const confettiColors = ['#64d2ff', '#c084fc', '#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#ffffff'];
+
+function launchConfetti() {
+  const origins = [
+    { x: 0, y: window.innerHeight, angleBase: -60 },
+    { x: window.innerWidth, y: window.innerHeight, angleBase: -120 }
+  ];
+  origins.forEach(o => {
+    for (let i = 0; i < 55; i++) {
+      const angle = (o.angleBase + (Math.random() * 50 - 25)) * Math.PI / 180;
+      const speed = 12 + Math.random() * 14;
+      confettiParticles.push({
+        x: o.x, y: o.y,
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        size: 6 + Math.random() * 6,
+        colour: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+        rotation: Math.random() * 360,
+        spin: (Math.random() - 0.5) * 12,
+        shape: Math.random() > 0.5 ? 'rect' : 'streamer',
+        life: 1
+      });
+    }
+  });
+  if (!confettiAnimating) { confettiAnimating = true; animateConfetti(); }
+}
+
+function animateConfetti() {
+  cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiParticles.forEach(p => {
+    p.vy += 0.35; p.vx *= 0.99;
+    p.x += p.vx; p.y += p.vy;
+    p.rotation += p.spin; p.life -= 0.008;
+    cctx.save();
+    cctx.translate(p.x, p.y);
+    cctx.rotate(p.rotation * Math.PI / 180);
+    cctx.globalAlpha = Math.max(0, p.life);
+    cctx.fillStyle = p.colour;
+    if (p.shape === 'streamer') cctx.fillRect(-p.size, -p.size / 4, p.size * 2, p.size / 2);
+    else cctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+    cctx.restore();
+  });
+  confettiParticles = confettiParticles.filter(p => p.life > 0 && p.y < confettiCanvas.height + 50);
+  if (confettiParticles.length > 0) requestAnimationFrame(animateConfetti);
+  else { confettiAnimating = false; cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); }
+}
+
+const el = id => document.getElementById(id);
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// =====================================================================
+// CONTENT — edit these arrays to extend the module. Logic lives below.
+// =====================================================================
+
+// ---- Mode 1: the departments that move onto the flat network, in order.
+// Stage 0 (Admin) is preloaded. Each click on the action button adds the next.
+const flatDepartments = [
+  { name: 'Admin', machines: 6, colour: '#60a5fa', cx: 0.16, cy: 0.28,
+    narration: '' }, // preloaded; opening narration is in the HTML above
+  { name: 'Finance', machines: 8, colour: '#c084fc', cx: 0.84, cy: 0.28,
+    narration: 'Finance moves in: eight more devices, including the <strong>payroll file server</strong> and two printers. Still one flat network, so every ARP request, DHCP renewal and discovery broadcast from any of these 14 devices interrupts <em>all</em> of them.' },
+  { name: 'Sales', machines: 10, colour: '#4ade80', cx: 0.16, cy: 0.78,
+    narration: 'Sales arrives with ten laptops. Broadcast load doesn\u2019t just add up, it compounds: every new device both <strong>sends</strong> broadcasts and must <strong>process everyone else\u2019s</strong>. The network is getting noisy and nothing is even "wrong" yet.' },
+  { name: 'Warehouse', machines: 8, colour: '#64d2ff', cx: 0.84, cy: 0.78,
+    narration: 'Warehouse comes online: barcode scanners and dispatch terminals. <strong>32 devices, one broadcast domain.</strong> Every machine now burns real CPU time on chatter that has nothing to do with it, and a single faulty NIC could storm the whole building.' },
+  { name: 'Guest Wi-Fi', machines: 12, colour: '#fbbf24', cx: 0.5, cy: 0.80,
+    narration: 'Management adds <strong>Guest Wi-Fi</strong>\u2026 onto the same flat network. Visitors\u2019 personal laptops now sit in the same broadcast domain as the payroll server. There is no boundary of any kind between them.' }
+];
+
+const flatCompromiseNarration = 'A visitor\u2019s laptop is <strong style="color:var(--danger)">infected</strong>. On a flat network, discovery is free: one broadcast sweep and it has already found the Finance printers and the payroll file server. Nothing separates guest traffic from finance traffic, because to the network they <em>are</em> the same network.';
+
+const flatSegmentNarration = 'You carve the /24 into <strong>one subnet per department</strong>, joined by a router. Routers do not forward broadcasts, so each department\u2019s chatter now stays inside its own boundary. And because guest traffic must cross the router to reach Finance, you finally have a chokepoint where security policy can be enforced. <strong>This is what subnetting is for.</strong> The maths comes next.';
+
+// ---- Mode 2: quiz challenges, answered by setting the slider.
+const workshopChallenges = [
+  { text: 'The design calls for <strong>as many subnets as possible</strong>, but every subnet must still offer <strong>at least 50 usable hosts</strong>. Set the boundary.',
+    answer: 26, minHosts: 50, minSubnets: 0,
+    success: '/26 gives 62 usable hosts per subnet (2\u2076 \u2212 2) across 4 subnets. Borrow one more bit (/27) and you\u2019d double the subnets but drop to 30 usable hosts: below the requirement.' },
+  { text: 'You need <strong>at least 6 separate subnets</strong>, and each must hold <strong>at least 20 hosts</strong>.',
+    answer: 27, minHosts: 20, minSubnets: 6,
+    success: '/27 creates 8 subnets of 30 usable hosts each. /26 has plenty of hosts but only 4 subnets; /28 has plenty of subnets but only 14 usable hosts. The boundary always trades one against the other.' },
+  { text: 'One department has <strong>100 devices</strong> that must share a single subnet. Give them the <strong>smallest subnet that still fits</strong>; no wasted half-network.',
+    answer: 25, minHosts: 100, minSubnets: 0,
+    success: '/25 offers 126 usable hosts (2\u2077 \u2212 2): the tightest fit for 100 devices. /26 tops out at 62; leaving it at /24 fits too, but hands the entire network to one department.' },
+  { text: 'Router-to-router links need <strong>exactly 2 usable addresses</strong> each: one router at either end. Carve so nothing is wasted on them.',
+    answer: 30, minHosts: 2, minSubnets: 0,
+    success: '/30 leaves 2 host bits: 4 addresses, of which 2 are usable. One address per router, zero waste. This is the classic point-to-point link size.' },
+  { text: 'A CCTV rollout needs <strong>lots of small segments</strong>: at least <strong>12 subnets</strong>, each with <strong>at least 10 usable hosts</strong>.',
+    answer: 28, minHosts: 10, minSubnets: 12,
+    success: '/28 yields 16 subnets of 14 usable hosts each. /27 falls short with only 8 subnets; /29 has the subnet count but only 6 usable hosts per subnet.' }
+];
+
+// ---- Mode 3: client briefs. `growth` hosts arrive AFTER commissioning.
+// Hints about growth are stated in the brief, so failing to plan for it is a
+// (recoverable) lesson, not a trick.
+const commissionBriefs = [
+  {
+    title: 'Brief 01 \u2014 The Branch Office',
+    brief: '<strong>Client:</strong> Territory Allied Services, new branch office. You have <strong>192.168.10.0/24</strong>. Three departments are moving in:<ul><li><strong>Admin</strong> \u2014 20 devices</li><li><strong>Sales</strong> \u2014 25 devices</li><li><strong>Warehouse</strong> \u2014 10 devices (scanners and dispatch terminals)</li></ul>Give each department its own subnet, sized to what it actually needs.',
+    departments: [
+      { name: 'Admin', need: 20, growth: 0, growthNote: '' },
+      { name: 'Sales', need: 25, growth: 0, growthNote: '' },
+      { name: 'Warehouse', need: 10, growth: 0, growthNote: '' }
+    ],
+    moral: 'Several designs pass this brief; what matters is that every department fits and no block is grossly oversized. That discipline is what keeps address space in reserve for whatever the client asks for next.'
+  },
+  {
+    title: 'Brief 02 \u2014 The Clinic',
+    brief: '<strong>Client:</strong> Stuart Highway Medical Clinic. You have <strong>192.168.10.0/24</strong>. Four departments:<ul><li><strong>Reception &amp; Wards</strong> \u2014 50 devices</li><li><strong>Consulting</strong> \u2014 25 devices</li><li><strong>Radiology</strong> \u2014 12 devices, <em>and the practice manager mentions they\u2019re hiring 6 more staff next quarter</em></li><li><strong>Records</strong> \u2014 10 devices</li></ul>Design it so nothing breaks when Radiology grows.',
+    departments: [
+      { name: 'Reception & Wards', need: 50, growth: 0, growthNote: '' },
+      { name: 'Consulting', need: 25, growth: 0, growthNote: '' },
+      { name: 'Radiology', need: 12, growth: 6, growthNote: 'hiring 6 more next quarter' },
+      { name: 'Records', need: 10, growth: 0, growthNote: '' }
+    ],
+    moral: 'Departments aren\u2019t the same size, so their subnets shouldn\u2019t be either. Sizing for the number in the brief alone is how networks fail three months after handover: size for the stated need <em>plus the growth the client told you about</em>.'
+  },
+  {
+    title: 'Brief 03 \u2014 The Campus',
+    brief: '<strong>Client:</strong> Top End Training Campus. You still have only <strong>192.168.10.0/24</strong>, and five networks must fit inside it:<ul><li><strong>Teaching Labs</strong> \u2014 100 devices</li><li><strong>Staff</strong> \u2014 50 devices, <em>with 8 new hires already signed for next term</em></li><li><strong>Admin</strong> \u2014 25 devices</li><li><strong>Servers</strong> \u2014 10 devices</li><li><strong>CCTV</strong> \u2014 4 cameras</li></ul>Equal-sized subnets cannot fit this. Every block must be exactly as big as it needs to be, and no bigger.',
+    departments: [
+      { name: 'Teaching Labs', need: 100, growth: 0, growthNote: '' },
+      { name: 'Staff', need: 50, growth: 8, growthNote: '8 new hires next term' },
+      { name: 'Admin', need: 25, growth: 0, growthNote: '' },
+      { name: 'Servers', need: 10, growth: 0, growthNote: '' },
+      { name: 'CCTV', need: 4, growth: 0, growthNote: '' }
+    ],
+    moral: 'This is VLSM thinking: variable-length subnet masks. The /25 + /26 + /27 + /28 + /29 design uses 248 of 256 addresses; there was no room for a single oversized block. Real networks are designed exactly this way, largest requirement first.'
+  }
+];
+
+const commissionPalette = ['#64d2ff', '#c084fc', '#4ade80', '#fbbf24', '#60a5fa', '#f472b6'];
+
+// =====================================================================
+// SHARED SUBNET MATHS
+// =====================================================================
+function blockSize(prefix) { return Math.pow(2, 32 - prefix); }        // addresses in the block
+function usableHosts(prefix) { return blockSize(prefix) - 2; }          // minus network + broadcast
+function subnetCount(prefix) { return Math.pow(2, prefix - 24); }       // when carving a /24
+
+// =====================================================================
+// MODE 1: THE FLAT NETWORK
+// =====================================================================
+const flatCanvas = el('flat-canvas');
+const fctx = flatCanvas.getContext('2d');
+
+let flNodes = [];          // {ox, oy, cluster, colour, flash, compromised, server}
+let flRipples = [];        // {x, y, r, max, cluster}
+let flStage = 0;           // how many departments (beyond none) are loaded
+let flSegmented = false;
+let flCompromised = false;
+let flRunning = false;
+let flPhase = 'grow';      // grow -> compromised -> segmented -> done
+let flTick = 0;
+
+function flatDeviceCount() {
+  let n = 0;
+  for (let i = 0; i < flStage; i++) n += flatDepartments[i].machines;
+  return n;
+}
+
+function sizeFlatCanvas() {
+  const w = flatCanvas.parentElement.clientWidth - 2;
+  flatCanvas.width = Math.max(300, w);
+  flatCanvas.height = Math.min(420, Math.max(300, Math.round(w * 0.52)));
+}
+
+function addFlatDepartment(index) {
+  const d = flatDepartments[index];
+  for (let m = 0; m < d.machines; m++) {
+    const angle = (m / d.machines) * Math.PI * 2 + Math.random() * 0.6;
+    const r = 0.045 + Math.random() * 0.075;
+    flNodes.push({
+      ox: Math.cos(angle) * r,
+      oy: Math.sin(angle) * r * 0.85,
+      cluster: index,
+      colour: d.colour,
+      flash: 0,
+      compromised: false,
+      server: (index === 1 && m === 0) // the payroll server in Finance
+    });
+  }
+}
+
+function nodePos(n) {
+  const d = flatDepartments[n.cluster];
+  const w = flatCanvas.width, h = flatCanvas.height, s = Math.min(w, h);
+  return { x: d.cx * w + n.ox * s * 1.6, y: d.cy * h + n.oy * s * 1.6 };
+}
+
+function clusterBox(index) {
+  const d = flatDepartments[index];
+  const w = flatCanvas.width, h = flatCanvas.height, s = Math.min(w, h);
+  const rw = s * 0.16 * 1.6 + 26, rh = s * 0.14 * 1.6 + 30;
+  return { x: d.cx * w - rw, y: d.cy * h - rh, w: rw * 2, h: rh * 2 };
+}
+
+function spawnRipple() {
+  if (flNodes.length === 0) return;
+  const n = flNodes[Math.floor(Math.random() * flNodes.length)];
+  const p = nodePos(n);
+  let max;
+  if (flSegmented) {
+    const b = clusterBox(n.cluster);
+    max = Math.max(b.w, b.h) * 0.62;
+  } else {
+    max = Math.hypot(flatCanvas.width, flatCanvas.height) * 0.75;
+  }
+  flRipples.push({ x: p.x, y: p.y, r: reducedMotion ? max * 0.7 : 0, max, cluster: n.cluster, alpha: reducedMotion ? 0.5 : 1 });
+}
+
+function drawFlat() {
+  const w = flatCanvas.width, h = flatCanvas.height;
+  fctx.clearRect(0, 0, w, h);
+  flTick++;
+
+  // spawn ripples: frequency scales with device count for the drama
+  const rate = flSegmented ? 0.010 : Math.min(0.09, flNodes.length * 0.0022);
+  if (Math.random() < rate) spawnRipple();
+
+  // subnet boxes + router (segmented state)
+  if (flSegmented) {
+    for (let i = 0; i < flStage; i++) {
+      const b = clusterBox(i);
+      fctx.strokeStyle = 'rgba(100, 210, 255, 0.35)';
+      fctx.lineWidth = 1.5;
+      fctx.setLineDash([6, 5]);
+      fctx.strokeRect(b.x, b.y, b.w, b.h);
+      fctx.setLineDash([]);
+      // link cluster to router
+      const d = flatDepartments[i];
+      fctx.strokeStyle = 'rgba(138, 148, 171, 0.3)';
+      fctx.beginPath();
+      fctx.moveTo(d.cx * w, d.cy * h);
+      fctx.lineTo(w * 0.5, h * 0.46);
+      fctx.stroke();
+    }
+    // router
+    fctx.fillStyle = '#4ade80';
+    fctx.strokeStyle = 'rgba(74, 222, 128, 0.4)';
+    fctx.lineWidth = 2;
+    fctx.beginPath();
+    fctx.rect(w * 0.5 - 13, h * 0.46 - 9, 26, 18);
+    fctx.fill();
+    fctx.stroke();
+    fctx.fillStyle = '#0a0e1a';
+    fctx.font = '600 8px "JetBrains Mono", monospace';
+    fctx.textAlign = 'center';
+    fctx.fillText('RTR', w * 0.5, h * 0.46 + 3);
+    fctx.fillStyle = 'rgba(74, 222, 128, 0.85)';
+    fctx.font = '600 9px "JetBrains Mono", monospace';
+    fctx.fillText('broadcasts stop here', w * 0.5, h * 0.46 + 26);
+  }
+
+  // compromise lines (flat state only)
+  if (flCompromised && !flSegmented) {
+    const bad = flNodes.find(n => n.compromised);
+    if (bad) {
+      const bp = nodePos(bad);
+      const pulse = 0.35 + 0.3 * Math.sin(flTick / 14);
+      const targets = flNodes.filter(n => n.cluster === 1).slice(0, 3);
+      targets.forEach(t => {
+        const tp = nodePos(t);
+        fctx.strokeStyle = 'rgba(248, 113, 113, ' + pulse + ')';
+        fctx.lineWidth = 1.4;
+        fctx.setLineDash([5, 5]);
+        fctx.beginPath();
+        fctx.moveTo(bp.x, bp.y);
+        fctx.lineTo(tp.x, tp.y);
+        fctx.stroke();
+        fctx.setLineDash([]);
+      });
+    }
+  }
+
+  // ripples
+  flRipples.forEach(rp => {
+    if (flSegmented) {
+      const b = clusterBox(rp.cluster);
+      fctx.save();
+      fctx.beginPath();
+      fctx.rect(b.x, b.y, b.w, b.h);
+      fctx.clip();
+    }
+    const fade = 1 - rp.r / rp.max;
+    fctx.strokeStyle = 'rgba(100, 210, 255, ' + (0.45 * fade * rp.alpha) + ')';
+    fctx.lineWidth = 1.5;
+    fctx.beginPath();
+    fctx.arc(rp.x, rp.y, rp.r, 0, Math.PI * 2);
+    fctx.stroke();
+    if (flSegmented) fctx.restore();
+
+    // flash nodes the ripple passes (only nodes it can reach)
+    flNodes.forEach(n => {
+      if (flSegmented && n.cluster !== rp.cluster) return;
+      const p = nodePos(n);
+      if (Math.abs(Math.hypot(p.x - rp.x, p.y - rp.y) - rp.r) < 9) n.flash = 1;
+    });
+    rp.r += reducedMotion ? rp.max * 0.05 : 2.4;
+    if (reducedMotion) rp.alpha -= 0.04;
+  });
+  flRipples = flRipples.filter(rp => rp.r < rp.max && rp.alpha > 0);
+
+  // nodes
+  flNodes.forEach(n => {
+    const p = nodePos(n);
+    const base = n.compromised ? '#f87171' : n.colour;
+    fctx.fillStyle = base;
+    fctx.beginPath();
+    fctx.arc(p.x, p.y, n.server ? 6.5 : 4.5, 0, Math.PI * 2);
+    fctx.fill();
+    if (n.server) {
+      fctx.strokeStyle = 'rgba(232, 236, 245, 0.8)';
+      fctx.lineWidth = 1.4;
+      fctx.stroke();
+    }
+    if (n.flash > 0) {
+      fctx.strokeStyle = 'rgba(255, 255, 255, ' + (n.flash * 0.85) + ')';
+      fctx.lineWidth = 1.6;
+      fctx.beginPath();
+      fctx.arc(p.x, p.y, (n.server ? 6.5 : 4.5) + 3, 0, Math.PI * 2);
+      fctx.stroke();
+      n.flash -= 0.06;
+    }
+    if (n.compromised) {
+      const pulse = 5.5 + 2.5 * Math.sin(flTick / 10);
+      fctx.strokeStyle = 'rgba(248, 113, 113, 0.7)';
+      fctx.lineWidth = 1.6;
+      fctx.beginPath();
+      fctx.arc(p.x, p.y, pulse + 3, 0, Math.PI * 2);
+      fctx.stroke();
+    }
+  });
+
+  // cluster labels
+  fctx.font = '600 10px "JetBrains Mono", monospace';
+  fctx.textAlign = 'center';
+  for (let i = 0; i < flStage; i++) {
+    const d = flatDepartments[i];
+    fctx.fillStyle = 'rgba(138, 148, 171, 0.9)';
+    let label = d.name.toUpperCase();
+    if (flSegmented) label += '  \u00b7  SUBNET ' + (i + 1);
+    fctx.fillText(label, d.cx * w, d.cy * h + Math.min(w, h) * 0.16 * 1.6 + 22);
+  }
+
+  if (flRunning) requestAnimationFrame(drawFlat);
+}
+
+function updateFlatStats() {
+  const devices = flatDeviceCount();
+  el('fl-devices').textContent = devices;
+  let health, bpm;
+  if (flSegmented) {
+    const largest = Math.max(...flatDepartments.slice(0, flStage).map(d => d.machines));
+    bpm = largest * 14;
+    health = 96;
+  } else {
+    bpm = devices * 14 + Math.max(0, devices - 14) * Math.max(0, devices - 14) * 2;
+    health = Math.max(18, Math.round(100 - Math.max(0, devices - 6) * 2.1));
+    if (flCompromised) health = Math.max(10, health - 12);
+  }
+  el('fl-broadcasts').textContent = '~' + bpm + (flSegmented ? ' per subnet' : '');
+  const fill = el('fl-health');
+  fill.style.width = health + '%';
+  fill.style.background = health > 70 ? 'var(--success)' : (health > 40 ? 'var(--warn)' : 'var(--danger)');
+}
+
+function setFlatNarration(html, tone) {
+  const box = el('fl-narration');
+  box.innerHTML = html;
+  box.style.borderLeftColor = tone === 'danger' ? 'var(--danger)' : (tone === 'good' ? 'var(--success)' : 'var(--purple)');
+}
+
+function flatAction() {
+  const btn = el('fl-action');
+  if (flPhase === 'grow') {
+    flStage++;
+    addFlatDepartment(flStage - 1);
+    setFlatNarration(flatDepartments[flStage - 1].narration, 'normal');
+    updateFlatStats();
+    if (flStage === flatDepartments.length) {
+      btn.disabled = true;
+      // the compromise lands shortly after Guest Wi-Fi appears
+      setTimeout(() => {
+        flCompromised = true;
+        const guests = flNodes.filter(n => n.cluster === 4);
+        if (guests.length) guests[Math.floor(guests.length / 2)].compromised = true;
+        setFlatNarration(flatCompromiseNarration, 'danger');
+        el('fl-canvas-label').textContent = '// 192.168.10.0/24 — one broadcast domain, zero boundaries';
+        updateFlatStats();
+        flPhase = 'compromised';
+        btn.textContent = 'Segment the network \u2192';
+        btn.disabled = false;
+      }, reducedMotion ? 400 : 1800);
+    }
+  } else if (flPhase === 'compromised') {
+    flSegmented = true;
+    flRipples = [];
+    flNodes.forEach(n => { n.compromised = false; });
+    setFlatNarration(flatSegmentNarration, 'good');
+    el('fl-canvas-label').textContent = '// Five subnets, five broadcast domains, one router';
+    updateFlatStats();
+    launchConfetti();
+    flPhase = 'done';
+    el('fl-action').textContent = 'Next: The Workshop \u2192';
+    el('fl-replay').classList.remove('hidden');
+  } else if (flPhase === 'done') {
+    switchMode('workshop');
+  }
+}
+
+function resetFlat() {
+  flNodes = []; flRipples = [];
+  flStage = 1; flSegmented = false; flCompromised = false; flPhase = 'grow';
+  addFlatDepartment(0);
+  sizeFlatCanvas();
+  updateFlatStats();
+  el('fl-canvas-label').textContent = '// 192.168.10.0/24 — one broadcast domain';
+  setFlatNarration('Monday, 9 am. Your client has six machines in Admin, all on a single flat network: <strong>192.168.10.0/24</strong>. Every device shares one broadcast domain: when any machine shouts <em>"who has 192.168.10.7?"</em>, every other machine hears it and must stop to check. With six devices, that\u2019s nothing. Watch what happens as the business grows.', 'normal');
+  const btn = el('fl-action');
+  btn.textContent = 'A department moves in \u2192';
+  btn.disabled = false;
+  el('fl-replay').classList.add('hidden');
+}
+
+el('fl-action').addEventListener('click', flatAction);
+el('fl-replay').addEventListener('click', resetFlat);
+window.addEventListener('resize', () => { if (flRunning) sizeFlatCanvas(); });
+
+function startFlatLoop() {
+  if (!flRunning) {
+    flRunning = true;
+    sizeFlatCanvas();
+    requestAnimationFrame(drawFlat);
+  }
+}
+function stopFlatLoop() { flRunning = false; }
+
+// =====================================================================
+// MODE 2: THE WORKSHOP
+// =====================================================================
+const WS_ADDR_BITS = '110000001010100000001010' + '00000000'; // 192.168.10.0
+let wsPrefix = 26;
+let wsQuizIndex = 0, wsQuizSolved = 0, wsQuizDone = false;
+
+function buildBinaryRow(rowEl, label) {
+  rowEl.innerHTML = '';
+  const lab = document.createElement('div');
+  lab.className = 'binary-row-label';
+  lab.textContent = label;
+  rowEl.appendChild(lab);
+  for (let o = 0; o < 4; o++) {
+    if (o > 0) {
+      const dot = document.createElement('div');
+      dot.className = 'octet-dot';
+      dot.textContent = '.';
+      rowEl.appendChild(dot);
+    }
+    const grp = document.createElement('div');
+    grp.className = 'octet-group';
+    const bits = document.createElement('div');
+    bits.className = 'octet-bits';
+    for (let b = 0; b < 8; b++) {
+      const cell = document.createElement('div');
+      cell.className = 'bit';
+      bits.appendChild(cell);
+    }
+    const dec = document.createElement('div');
+    dec.className = 'octet-dec';
+    grp.appendChild(bits);
+    grp.appendChild(dec);
+    rowEl.appendChild(grp);
+  }
+}
+
+function maskOctets(prefix) {
+  const out = [];
+  for (let o = 0; o < 4; o++) {
+    let v = 0;
+    for (let b = 0; b < 8; b++) {
+      const idx = o * 8 + b;
+      if (idx < prefix) v += Math.pow(2, 7 - b);
+    }
+    out.push(v);
+  }
+  return out;
+}
+
+function paintBinaryRow(rowEl, bitString, prefix) {
+  const groups = rowEl.querySelectorAll('.octet-group');
+  groups.forEach((grp, o) => {
+    const cells = grp.querySelectorAll('.bit');
+    let dec = 0;
+    cells.forEach((cell, b) => {
+      const idx = o * 8 + b;
+      const bit = bitString[idx];
+      cell.textContent = bit;
+      if (bit === '1') dec += Math.pow(2, 7 - b);
+      cell.className = 'bit ' + (idx < 24 ? 'b-base' : (idx < prefix ? 'b-sub' : 'b-host'));
+    });
+    grp.querySelector('.octet-dec').textContent = dec;
+  });
+}
+
+function updateWorkshop() {
+  const p = wsPrefix;
+  const maskBits = '1'.repeat(p) + '0'.repeat(32 - p);
+  paintBinaryRow(el('ws-addr-row'), WS_ADDR_BITS, p);
+  paintBinaryRow(el('ws-mask-row'), maskBits, p);
+
+  el('ws-cidr').textContent = '/' + p;
+  el('ws-lock-cidr').textContent = '/' + p;
+  el('ws-stat-prefix').textContent = '/' + p;
+  el('ws-slider').value = p;
+  el('ws-minus').disabled = p <= 24;
+  el('ws-plus').disabled = p >= 30;
+
+  const m = maskOctets(p);
+  el('ws-mask-dec').textContent = m.join('.');
+
+  const subs = subnetCount(p);
+  const hosts = usableHosts(p);
+  const hostBits = 32 - p;
+  const borrowed = p - 24;
+  el('ws-subnets').textContent = subs;
+  el('ws-stat-subnets').textContent = subs;
+  el('ws-subnets-note').innerHTML = p === 24
+    ? 'No bits borrowed yet: this is still one network.'
+    : '2<sup>' + borrowed + '</sup> \u2014 one doubling per borrowed bit.';
+  el('ws-hosts').textContent = hosts;
+  el('ws-stat-hosts').textContent = hosts;
+  el('ws-hosts-note').innerHTML = '2<sup>' + hostBits + '</sup> \u2212 2 = ' + hosts + '. The \u22122: every subnet spends one address on its network ID and one on its broadcast address.';
+
+  // ranges table
+  const body = el('ws-ranges');
+  body.innerHTML = '';
+  const size = blockSize(p);
+  const shown = Math.min(4, subs);
+  for (let i = 0; i < shown; i++) {
+    const start = i * size;
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td class="net">192.168.10.' + start + '/' + p + '</td>' +
+      '<td>.' + (start + 1) + '</td>' +
+      '<td>.' + (start + size - 2) + '</td>' +
+      '<td class="bcast">.' + (start + size - 1) + '</td>';
+    body.appendChild(tr);
+  }
+  el('ws-range-note').textContent = subs > shown
+    ? '\u2026 and ' + (subs - shown) + ' more, continuing every ' + size + ' addresses up to .255.'
+    : (p === 24 ? 'The whole /24 as one network: 254 usable addresses between .1 and .254.' : 'That is every subnet this boundary creates.');
+}
+
+function setPrefix(p) {
+  wsPrefix = Math.min(30, Math.max(24, p));
+  updateWorkshop();
+}
+
+el('ws-slider').addEventListener('input', e => setPrefix(parseInt(e.target.value, 10)));
+el('ws-minus').addEventListener('click', () => setPrefix(wsPrefix - 1));
+el('ws-plus').addEventListener('click', () => setPrefix(wsPrefix + 1));
+
+function loadWsChallenge() {
+  const c = workshopChallenges[wsQuizIndex];
+  el('ws-quiz-pos').textContent = (wsQuizIndex + 1) + ' / ' + workshopChallenges.length;
+  el('ws-quiz-text').innerHTML = c.text;
+  el('ws-quiz-feedback').innerHTML = '';
+  el('ws-lock').classList.remove('hidden');
+  el('ws-lock').disabled = false;
+  el('ws-quiz-next').classList.add('hidden');
+}
+
+el('ws-lock').addEventListener('click', () => {
+  const c = workshopChallenges[wsQuizIndex];
+  const p = wsPrefix;
+  const hosts = usableHosts(p);
+  const subs = subnetCount(p);
+  const fbBox = el('ws-quiz-feedback');
+  fbBox.innerHTML = '';
+  const fb = document.createElement('div');
+
+  if (p === c.answer) {
+    wsQuizSolved++;
+    el('ws-stat-quiz').textContent = wsQuizSolved + ' / ' + workshopChallenges.length;
+    launchConfetti();
+    fb.className = 'feedback good';
+    fb.innerHTML = '<div class="feedback-title">\u2713 /' + p + ' is the boundary</div>' + c.success;
+    fbBox.appendChild(fb);
+    el('ws-lock').disabled = true;
+    el('ws-quiz-next').textContent = wsQuizIndex === workshopChallenges.length - 1 ? 'See Results \u2192' : 'Next Challenge \u2192';
+    el('ws-quiz-next').classList.remove('hidden');
+  } else {
+    el('ws-lock').classList.add('shake');
+    setTimeout(() => el('ws-lock').classList.remove('shake'), 350);
+    fb.className = 'feedback bad';
+    let msg;
+    if (c.minHosts && hosts < c.minHosts) {
+      msg = 'At /' + p + ' each subnet offers only <strong>' + hosts + ' usable hosts</strong>; the brief needs at least ' + c.minHosts + '. In the field this is the subnet that fills up mid-rollout. Give some bits back to the host side.';
+    } else if (c.minSubnets && subs < c.minSubnets) {
+      msg = '/' + p + ' carves only <strong>' + subs + ' subnet' + (subs === 1 ? '' : 's') + '</strong>; the brief needs at least ' + c.minSubnets + '. Borrow more bits for the network side.';
+    } else {
+      msg = '/' + p + ' meets the raw requirement, but it isn\u2019t the tightest boundary: you can move it further and still satisfy the brief. Oversized subnets are address space some other subnet never gets.';
+    }
+    fb.innerHTML = '<div class="feedback-title">\u2717 Not /' + p + '</div>' + msg;
+    fbBox.appendChild(fb);
+  }
+});
+
+el('ws-quiz-next').addEventListener('click', () => {
+  wsQuizIndex++;
+  if (wsQuizIndex >= workshopChallenges.length) {
+    wsQuizDone = true;
+    el('ws-quiz-panel').classList.add('hidden');
+    el('ws-results').classList.remove('hidden');
+    el('ws-final').textContent = wsQuizSolved + '/' + workshopChallenges.length;
+    el('ws-verdict').textContent = 'Boundary set.';
+    el('ws-detail').textContent = 'Every subnetting question is the same trade: bits given to the network side multiply subnets, bits left on the host side multiply addresses. You\u2019ve now driven that boundary in both directions. Time to design for a client.';
+    launchConfetti();
+    setTimeout(launchConfetti, 400);
+  } else {
+    loadWsChallenge();
+  }
+});
+
+el('ws-restart').addEventListener('click', () => {
+  wsQuizIndex = 0; wsQuizSolved = 0; wsQuizDone = false;
+  el('ws-stat-quiz').textContent = '0 / ' + workshopChallenges.length;
+  el('ws-results').classList.add('hidden');
+  el('ws-quiz-panel').classList.remove('hidden');
+  loadWsChallenge();
+});
+
+el('ws-to-commission').addEventListener('click', () => switchMode('commission'));
+
+// =====================================================================
+// MODE 3: THE COMMISSION
+// =====================================================================
+let cmIndex = 0, cmPassed = 0, cmFails = 0;
+let cmSelections = [];   // prefix per department, or null
+
+function loadCommission() {
+  const brief = commissionBriefs[cmIndex];
+  cmSelections = brief.departments.map(() => null);
+  el('cm-position').textContent = (cmIndex + 1) + ' / ' + commissionBriefs.length;
+  el('cm-title').textContent = '// ' + brief.title;
+  el('cm-brief').innerHTML = brief.brief;
+  el('cm-prompt').innerHTML = '';
+  el('cm-results-panel').classList.add('hidden');
+  el('cm-design-panel').classList.remove('hidden');
+
+  const wrap = el('cm-depts');
+  wrap.innerHTML = '';
+  brief.departments.forEach((d, di) => {
+    const row = document.createElement('div');
+    row.className = 'dept-row';
+    const head = document.createElement('div');
+    head.className = 'dept-head';
+    const needTotal = d.need + d.growth;
+    head.innerHTML = '<span class="dept-name"><span class="dept-swatch" style="background:' + commissionPalette[di % commissionPalette.length] + '"></span>' + d.name + '</span>' +
+      '<span class="dept-need">needs ' + d.need + ' hosts' + (d.growth ? ' <em>+ ' + d.growthNote + '</em>' : '') + '</span>';
+    row.appendChild(head);
+
+    const opts = document.createElement('div');
+    opts.className = 'size-opts';
+    for (let p = 25; p <= 30; p++) {
+      const b = document.createElement('button');
+      b.className = 'size-opt';
+      b.innerHTML = '<strong>/' + p + '</strong> \u00b7 ' + usableHosts(p) + ' usable';
+      b.dataset.dept = di;
+      b.dataset.prefix = p;
+      b.addEventListener('click', () => {
+        cmSelections[di] = p;
+        opts.querySelectorAll('.size-opt').forEach(x => x.classList.toggle('selected', parseInt(x.dataset.prefix, 10) === p));
+        renderAddrBar(false);
+      });
+      opts.appendChild(b);
+    }
+    row.appendChild(opts);
+    wrap.appendChild(row);
+  });
+  renderAddrBar(false);
+}
+
+// largest blocks first: with power-of-two sizes this keeps every block
+// aligned to its own boundary, which is also standard VLSM practice
+function allocate(brief, selections) {
+  const chosen = brief.departments
+    .map((d, i) => ({ i, prefix: selections[i] }))
+    .filter(x => x.prefix !== null)
+    .sort((a, b) => a.prefix - b.prefix);
+  let cursor = 0;
+  const allocs = {};
+  chosen.forEach(c => {
+    const size = blockSize(c.prefix);
+    if (cursor + size <= 256) {
+      allocs[c.i] = { start: cursor, size, prefix: c.prefix, exhausted: false };
+      cursor += size;
+    } else {
+      allocs[c.i] = { start: null, size, prefix: c.prefix, exhausted: true };
+    }
+  });
+  return { allocs, used: cursor };
+}
+
+function renderAddrBar(final) {
+  const brief = commissionBriefs[cmIndex];
+  const { allocs, used } = allocate(brief, cmSelections);
+  const bar = el('cm-bar');
+  const legend = el('cm-legend');
+  bar.innerHTML = '';
+  legend.innerHTML = '';
+
+  // draw in allocation order (largest first) so segments line up with reality
+  const order = Object.keys(allocs).map(Number).sort((a, b) => {
+    const A = allocs[a], B = allocs[b];
+    if (A.exhausted !== B.exhausted) return A.exhausted ? 1 : -1;
+    return (A.start ?? 999) - (B.start ?? 999);
+  });
+
+  order.forEach(di => {
+    const a = allocs[di];
+    if (a.exhausted) return;
+    const seg = document.createElement('div');
+    seg.className = 'addr-seg';
+    seg.style.width = (a.size / 256 * 100) + '%';
+    seg.style.background = commissionPalette[di % commissionPalette.length];
+    if (a.size >= 32) seg.textContent = '/' + a.prefix;
+    seg.title = brief.departments[di].name + ' \u2014 192.168.10.' + a.start + '/' + a.prefix;
+    bar.appendChild(seg);
+  });
+
+  brief.departments.forEach((d, di) => {
+    const item = document.createElement('span');
+    const a = allocs[di];
+    if (!cmSelections[di]) {
+      item.className = 'lg-item';
+      item.innerHTML = '<span class="lg-dot" style="background:var(--border)"></span>' + d.name + ': \u2014';
+    } else if (a.exhausted) {
+      item.className = 'lg-item exhausted';
+      item.innerHTML = '<span class="lg-dot" style="background:var(--danger)"></span>' + d.name + ': \u2717 no space left';
+    } else {
+      item.className = 'lg-item';
+      item.innerHTML = '<span class="lg-dot" style="background:' + commissionPalette[di % commissionPalette.length] + '"></span>' + d.name + ': .' + a.start + '\u2013.' + (a.start + a.size - 1);
+    }
+    legend.appendChild(item);
+  });
+
+  const free = document.createElement('span');
+  free.className = 'lg-item';
+  const freeAddrs = Math.max(0, 256 - used);
+  free.innerHTML = '<span class="lg-dot" style="background:repeating-linear-gradient(45deg,var(--bg-elev),var(--bg-elev) 3px,#101524 3px,#101524 6px);border:1px solid var(--border)"></span>free: ' + freeAddrs + ' addresses';
+  legend.appendChild(free);
+}
+
+el('cm-commission').addEventListener('click', () => {
+  const brief = commissionBriefs[cmIndex];
+  if (cmSelections.some(s => s === null)) {
+    el('cm-prompt').innerHTML = '<div class="feedback caution"><div class="feedback-title">Every department needs a subnet</div>Assign a size to each department before commissioning. An unconnected department is not a design choice a client will accept.</div>';
+    return;
+  }
+  el('cm-prompt').innerHTML = '';
+  runCommission(brief);
+});
+
+function runCommission(brief) {
+  const { allocs } = allocate(brief, cmSelections);
+  el('cm-design-panel').classList.add('hidden');
+  const panel = el('cm-results-panel');
+  panel.classList.remove('hidden');
+  const out = el('cm-verdicts');
+  out.innerHTML = '';
+  el('cm-next').classList.add('hidden');
+  el('cm-retry').disabled = true;
+
+  let pass = true;
+  const items = [];  // {delay, html, cls}
+  let delay = 0;
+  const step = reducedMotion ? 80 : 650;
+
+  // day one: does everyone get connected and fit?
+  brief.departments.forEach((d, di) => {
+    const a = allocs[di];
+    if (a.exhausted) {
+      pass = false;
+      items.push({ cls: 'bad', html: '<div class="feedback-title">\u2717 ' + d.name + ' \u2014 no address space</div>The /24 ran out before ' + d.name + ' was reached: a /' + a.prefix + ' needs ' + a.size + ' contiguous addresses and fewer than that remain. Their switch is patched in and nothing on it can get an address. Earlier subnets are holding more space than their departments use.' });
+      return;
+    }
+    const usable = a.size - 2;
+    const range = '192.168.10.' + a.start + '/' + a.prefix + ' (usable .' + (a.start + 1) + '\u2013.' + (a.start + a.size - 2) + ')';
+    if (usable < d.need) {
+      pass = false;
+      items.push({ cls: 'bad', html: '<div class="feedback-title">\u2717 ' + d.name + ' \u2014 doesn\u2019t fit on day one</div>' + d.name + ' has ' + d.need + ' devices but ' + range + ' offers only ' + usable + ' usable addresses. The overflow machines fail DHCP, self-assign 169.254.x.x addresses, and can reach nothing. The phone starts ringing before lunch.' });
+    } else {
+      items.push({ cls: 'good', html: '<div class="feedback-title">\u2713 ' + d.name + ' connected</div>' + range + ' \u2014 ' + usable + ' usable addresses for ' + d.need + ' devices.' });
+    }
+  });
+
+  // the growth events, three months later
+  const growthDepts = brief.departments.filter(d => d.growth > 0);
+  if (growthDepts.length && !brief.departments.some((d, di) => allocs[di].exhausted)) {
+    items.push({ cls: 'caution', html: '<div class="feedback-title">Three months later\u2026</div>The client calls back. Time to find out whether the design survives contact with the growth they warned you about.' });
+    growthDepts.forEach(d => {
+      const di = brief.departments.indexOf(d);
+      const a = allocs[di];
+      if (a.exhausted) return;
+      const usable = a.size - 2;
+      const total = d.need + d.growth;
+      if (usable < total) {
+        pass = false;
+        items.push({ cls: 'bad', html: '<div class="feedback-title">\u2717 ' + d.name + ' outgrew its subnet</div>' + d.name + ' added ' + d.growth + ' devices, taking them to ' + total + '. The /' + a.prefix + ' you allocated tops out at ' + usable + ' usable addresses; the new machines have nowhere to live, and re-addressing a live department is a weekend job nobody thanks you for. The brief did mention the hiring.' });
+      } else {
+        items.push({ cls: 'good', html: '<div class="feedback-title">\u2713 ' + d.name + ' absorbed the growth</div>' + d.growth + ' new devices arrived and slotted straight in: ' + total + ' of ' + usable + ' usable addresses now in service. This is what sizing for stated growth buys you.' });
+      }
+    });
+  }
+
+  // waste advisories (never fatal on their own)
+  if (pass) {
+    brief.departments.forEach((d, di) => {
+      const a = allocs[di];
+      if (a.exhausted) return;
+      const usable = a.size - 2;
+      const total = d.need + d.growth;
+      if (usable >= total * 4) {
+        items.push({ cls: 'caution', html: '<div class="feedback-title">Oversized: ' + d.name + '</div>A /' + a.prefix + ' gives ' + usable + ' usable addresses for ' + total + ' devices; most of the block sits idle. It works, but on a single /24 this slack is exactly what causes exhaustion on bigger jobs.' });
+      }
+    });
+  }
+
+  // final verdict
+  if (pass) {
+    items.push({ cls: 'good', html: '<div class="feedback-title">\u2713 Network commissioned</div>' + brief.moral });
+  } else {
+    cmFails++;
+    el('cm-fails').textContent = cmFails;
+    items.push({ cls: 'bad', html: '<div class="feedback-title">\u2717 Design rejected</div>Match each block to its department\u2019s need <strong>plus any growth the brief mentions</strong>, and remember the whole design must fit inside 256 addresses. Revise and commission again.' });
+  }
+
+  items.forEach(item => {
+    setTimeout(() => {
+      const fb = document.createElement('div');
+      fb.className = 'feedback ' + item.cls;
+      fb.innerHTML = item.html;
+      out.appendChild(fb);
+      fb.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'nearest' });
+    }, delay);
+    delay += step;
+  });
+
+  setTimeout(() => {
+    el('cm-retry').disabled = false;
+    if (pass) {
+      cmPassed++;
+      el('cm-passed').textContent = cmPassed;
+      launchConfetti();
+      el('cm-next').textContent = cmIndex === commissionBriefs.length - 1 ? 'See Results \u2192' : 'Next Brief \u2192';
+      el('cm-next').classList.remove('hidden');
+      el('cm-retry').textContent = 'Redesign Anyway';
+    } else {
+      el('cm-retry').textContent = 'Revise the Design';
+    }
+  }, delay + 100);
+}
+
+el('cm-retry').addEventListener('click', () => {
+  el('cm-results-panel').classList.add('hidden');
+  el('cm-design-panel').classList.remove('hidden');
+  renderAddrBar(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+el('cm-next').addEventListener('click', () => {
+  cmIndex++;
+  if (cmIndex >= commissionBriefs.length) {
+    el('cm-results-panel').classList.add('hidden');
+    el('cm-final-results').classList.remove('hidden');
+    el('cm-final').textContent = cmPassed + '/' + commissionBriefs.length;
+    if (cmFails === 0) {
+      el('cm-final-verdict').textContent = 'Clean commissions across the board.';
+      el('cm-final-detail').textContent = 'Every design fit, survived its growth events, and wasted nothing worth mentioning. This is the whole job: read the need, add the stated growth, pick the block, check it all fits. You just did VLSM design like a working network engineer.';
+    } else if (cmFails <= 2) {
+      el('cm-final-verdict').textContent = 'Solid design work.';
+      el('cm-final-detail').textContent = 'A rejected design or two is how everyone learns this: the consequences you saw (APIPA addresses, weekend re-addressing, departments with no space) are precisely what sloppy subnetting costs in production.';
+    } else {
+      el('cm-final-verdict').textContent = 'Worth another run.';
+      el('cm-final-detail').textContent = 'The reliable method: for each department take stated need plus stated growth, choose the smallest block whose usable count covers it, then confirm the blocks total 256 addresses or fewer. Run the briefs again with that checklist.';
+    }
+    launchConfetti();
+    setTimeout(launchConfetti, 400);
+  } else {
+    loadCommission();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+el('cm-restart').addEventListener('click', () => {
+  cmIndex = 0; cmPassed = 0; cmFails = 0;
+  el('cm-passed').textContent = '0';
+  el('cm-fails').textContent = '0';
+  el('cm-final-results').classList.add('hidden');
+  loadCommission();
+});
+
+// ================= MODE SWITCHING =================
+function switchMode(mode) {
+  document.querySelectorAll('.mode-card').forEach(x => x.classList.toggle('active', x.dataset.mode === mode));
+  el('flat-section').classList.toggle('hidden', mode !== 'flat');
+  el('workshop-section').classList.toggle('hidden', mode !== 'workshop');
+  el('commission-section').classList.toggle('hidden', mode !== 'commission');
+
+  if (mode === 'flat') {
+    resetFlat();
+    startFlatLoop();
+  } else {
+    stopFlatLoop();
+    if (mode === 'workshop') {
+      wsQuizIndex = 0; wsQuizSolved = 0; wsQuizDone = false;
+      el('ws-stat-quiz').textContent = '0 / ' + workshopChallenges.length;
+      el('ws-results').classList.add('hidden');
+      el('ws-quiz-panel').classList.remove('hidden');
+      setPrefix(26);
+      loadWsChallenge();
+    } else {
+      cmIndex = 0; cmPassed = 0; cmFails = 0;
+      el('cm-passed').textContent = '0';
+      el('cm-fails').textContent = '0';
+      el('cm-final-results').classList.add('hidden');
+      loadCommission();
+    }
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.mode-card').forEach(x => {
+  x.addEventListener('click', () => switchMode(x.dataset.mode));
+});
+
+// ================= INIT =================
+buildBinaryRow(el('ws-addr-row'), 'Address');
+buildBinaryRow(el('ws-mask-row'), 'Mask');
+updateWorkshop();
+loadWsChallenge();
+loadCommission();
+resetFlat();
+startFlatLoop();
+</script>
+</body>
+</html>

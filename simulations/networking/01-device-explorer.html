@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Device Explorer - Cisco Equipment Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Updated Design System */
+            --primary: #0f172a;
+            --primary-dark: #1e293b;
+            --secondary: #334155;
+            --accent: #3b82f6;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+            --bg-dark: #020617;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: rgba(148, 163, 184, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            min-height: 100vh;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            color: var(--text-light);
+            text-decoration: underline;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+            background: transparent;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .device-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover,
+        .tab-btn.active {
+            background: #00d4ff;
+            color: #1a1a2e;
+        }
+
+        .device-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .device-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .device-title h2 {
+            color: #00d4ff;
+            margin-bottom: 5px;
+        }
+
+        .device-title p {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .view-btn {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #555;
+            color: #ccc;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .view-btn:hover,
+        .view-btn.active {
+            background: #00d4ff;
+            color: #1a1a2e;
+            border-color: #00d4ff;
+        }
+
+        .device-panel {
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 8px;
+            padding: 20px;
+            border: 3px solid #333;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5), 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            min-height: 200px;
+        }
+
+        .device-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #333, #555, #333);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .ports-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .port-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .port-group-label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .port {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .port:hover {
+            transform: scale(1.1);
+        }
+
+        .port:hover .port-highlight {
+            opacity: 1;
+        }
+
+        .port-highlight {
+            position: absolute;
+            inset: -4px;
+            border: 2px solid #00d4ff;
+            border-radius: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .ethernet-port {
+            width: 45px;
+            height: 35px;
+            background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
+            border: 2px solid #444;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+
+        .ethernet-port .led-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .led {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #333;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .led.green.on {
+            background: #00ff00;
+            box-shadow: 0 0 8px #00ff00;
+        }
+
+        .led.amber.on {
+            background: #ffaa00;
+            box-shadow: 0 0 8px #ffaa00;
+        }
+
+        .port-number {
+            font-size: 0.6rem;
+            color: #666;
+        }
+
+        .console-port {
+            width: 50px;
+            height: 30px;
+            background: linear-gradient(180deg, #0066aa, #004477);
+            border: 2px solid #0088cc;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: bold;
+        }
+
+        .usb-port {
+            width: 16px;
+            height: 30px;
+            background: linear-gradient(180deg, #222, #111);
+            border: 2px solid #444;
+            border-radius: 2px;
+        }
+
+        .power-port {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(180deg, #222, #111);
+            border: 2px solid #444;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .power-socket {
+            width: 20px;
+            height: 25px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 2px;
+        }
+
+        .sfp-port {
+            width: 55px;
+            height: 20px;
+            background: linear-gradient(180deg, #333, #222);
+            border: 2px solid #555;
+            border-radius: 3px;
+        }
+
+        .serial-port {
+            width: 50px;
+            height: 25px;
+            background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
+            border: 2px solid #444;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.5rem;
+        }
+
+        .info-panel {
+            margin-top: 20px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 150px;
+        }
+
+        .info-panel h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-panel h3 .icon {
+            font-size: 1.5rem;
+        }
+
+        .info-content {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .info-content ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .info-content li {
+            margin: 5px 0;
+        }
+
+        .hint-text {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .power-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .power-switch {
+            width: 60px;
+            height: 30px;
+            background: #333;
+            border-radius: 15px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .power-switch.on {
+            background: #00aa44;
+        }
+
+        .power-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .power-switch.on::after {
+            left: 32px;
+        }
+
+        .mode-indicator {
+            background: rgba(255, 200, 0, 0.2);
+            border: 1px solid rgba(255, 200, 0, 0.5);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mode-indicator .badge {
+            background: #ffcc00;
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .quiz-section {
+            margin-top: 30px;
+            background: rgba(100, 0, 255, 0.1);
+            border: 1px solid rgba(100, 0, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .quiz-section h3 {
+            color: #aa88ff;
+            margin-bottom: 15px;
+        }
+
+        .quiz-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #6600cc, #4400aa);
+            border: none;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(100, 0, 200, 0.4);
+        }
+
+        .quiz-question {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .quiz-question p {
+            margin-bottom: 10px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .quiz-option {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #555;
+            color: #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .quiz-option.correct {
+            background: #00aa44;
+            border-color: #00ff66;
+            color: #fff;
+        }
+
+        .quiz-option.incorrect {
+            background: #aa0044;
+            border-color: #ff0066;
+            color: #fff;
+        }
+
+        .quiz-feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(0, 170, 68, 0.2);
+            border: 1px solid #00aa44;
+        }
+
+        .quiz-feedback.incorrect {
+            background: rgba(170, 0, 68, 0.2);
+            border: 1px solid #aa0044;
+        }
+
+        .brand-label {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00aaff;
+            letter-spacing: 2px;
+        }
+
+        .model-label {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .ports-row {
+                justify-content: center;
+            }
+
+            .device-panel {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <a href="../" class="back-link">← Back to Dashboard</a>
+        <h1>Network Device Explorer</h1>
+        <p>Interactive Cisco Equipment Simulator | Target Course: ICTTEN434</p>
+    </div>
+
+    <div class="container">
+        <div class="device-tabs">
+            <button class="tab-btn active" onclick="showDevice('router')">Cisco 2911 Router</button>
+            <button class="tab-btn" onclick="showDevice('switch')">Cisco 2960 Switch</button>
+            <button class="tab-btn" onclick="showDevice('wireless')">Wireless Router</button>
+        </div>
+
+        <div class="device-container">
+            <div class="power-toggle">
+                <span>Power:</span>
+                <div class="power-switch on" id="powerSwitch" onclick="togglePower()"></div>
+                <span id="powerLabel">ON</span>
+            </div>
+
+            <div id="routerDevice" class="device-view">
+                <div class="device-title">
+                    <h2>Cisco 2911 Integrated Services Router</h2>
+                    <p>Enterprise-class router for branch offices</p>
+                </div>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="showView('router', 'front')">Front Panel</button>
+                    <button class="view-btn" onclick="showView('router', 'rear')">Rear Panel</button>
+                </div>
+                <div id="routerFront" class="device-panel">
+                    <span class="brand-label">CISCO</span>
+                    <span class="model-label">2911</span>
+                    <div class="ports-row" style="margin-top: 40px;">
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('sys-led')">
+                                <div class="led green on" style="width:10px;height:10px;"></div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">SYS</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('act-led')">
+                                <div class="led amber on" style="width:10px;height:10px;"></div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">ACT</span>
+                        </div>
+                        <div style="flex:1;"></div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('usb')">
+                                <div class="usb-port"></div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">USB 0</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('usb')">
+                                <div class="usb-port"></div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">USB 1</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('console-rj45')">
+                                <div class="console-port">CON</div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">CONSOLE</span>
+                        </div>
+                    </div>
+                    <div class="ports-row">
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('gig-eth')">
+                                <div class="ethernet-port">
+                                    <div class="led-row">
+                                        <div class="led green on"></div>
+                                        <div class="led amber"></div>
+                                    </div>
+                                    <span class="port-number">G0/0</span>
+                                </div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">GE 0/0</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('gig-eth')">
+                                <div class="ethernet-port">
+                                    <div class="led-row">
+                                        <div class="led green on"></div>
+                                        <div class="led amber on"></div>
+                                    </div>
+                                    <span class="port-number">G0/1</span>
+                                </div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">GE 0/1</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('gig-eth')">
+                                <div class="ethernet-port">
+                                    <div class="led-row">
+                                        <div class="led green"></div>
+                                        <div class="led amber"></div>
+                                    </div>
+                                    <span class="port-number">G0/2</span>
+                                </div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">GE 0/2</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="routerRear" class="device-panel" style="display:none;">
+                    <span class="brand-label">CISCO</span>
+                    <span class="model-label">2911 REAR</span>
+                    <div class="ports-row" style="margin-top: 40px;">
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('power')">
+                                <div class="power-port">
+                                    <div class="power-socket"></div>
+                                </div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">POWER</span>
+                        </div>
+                        <div style="flex:1;"></div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('hwic-slot')">
+                                <div
+                                    style="width:120px;height:40px;background:#222;border:2px solid #444;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#555;font-size:0.7rem;">
+                                    HWIC SLOT 0</div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">Expansion</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('hwic-slot')">
+                                <div
+                                    style="width:120px;height:40px;background:#222;border:2px solid #444;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#555;font-size:0.7rem;">
+                                    HWIC SLOT 1</div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">Expansion</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="switchDevice" class="device-view" style="display:none;">
+                <div class="device-title">
+                    <h2>Cisco Catalyst 2960 Switch</h2>
+                    <p>24-port managed Layer 2 switch</p>
+                </div>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="showView('switch', 'front')">Front Panel</button>
+                </div>
+                <div id="switchFront" class="device-panel">
+                    <span class="brand-label">CISCO</span>
+                    <span class="model-label">Catalyst 2960</span>
+                    <div class="ports-row" style="margin-top: 40px;">
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('switch-sys-led')">
+                                <div class="led green on" style="width:10px;height:10px;"></div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">SYST</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('mode-btn')">
+                                <div
+                                    style="width:20px;height:20px;background:#444;border:2px solid #666;border-radius:50%;">
+                                </div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">MODE</span>
+                        </div>
+                    </div>
+                    <div class="ports-row">
+                        <div class="port-group">
+                            <span class="port-group-label" style="margin-bottom:5px;">FastEthernet Ports 1-12</span>
+                            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                                <div class="port" onclick="showInfo('fe-port')">
+                                    <div class="ethernet-port" style="width:35px;height:28px;">
+                                        <div class="led green on" style="width:4px;height:4px;"></div><span
+                                            class="port-number">1</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('fe-port')">
+                                    <div class="ethernet-port" style="width:35px;height:28px;">
+                                        <div class="led green on" style="width:4px;height:4px;"></div><span
+                                            class="port-number">2</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('fe-port')">
+                                    <div class="ethernet-port" style="width:35px;height:28px;">
+                                        <div class="led green" style="width:4px;height:4px;"></div><span
+                                            class="port-number">3</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('fe-port')">
+                                    <div class="ethernet-port" style="width:35px;height:28px;">
+                                        <div class="led green on" style="width:4px;height:4px;"></div><span
+                                            class="port-number">4</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('fe-port')">
+                                    <div class="ethernet-port" style="width:35px;height:28px;">
+                                        <div class="led green" style="width:4px;height:4px;"></div><span
+                                            class="port-number">5</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('fe-port')">
+                                    <div class="ethernet-port" style="width:35px;height:28px;">
+                                        <div class="led green" style="width:4px;height:4px;"></div><span
+                                            class="port-number">6</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="width:20px;"></div>
+                        <div class="port-group">
+                            <span class="port-group-label" style="margin-bottom:5px;">Console & Management</span>
+                            <div style="display:flex;gap:10px;">
+                                <div class="port" onclick="showInfo('console-rj45')">
+                                    <div class="console-port">CON</div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('mgmt-port')">
+                                    <div class="ethernet-port"
+                                        style="background:linear-gradient(180deg,#005500,#003300);border-color:#00aa00;">
+                                        <span class="port-number" style="color:#0f0;">MGMT</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ports-row">
+                        <div class="port-group">
+                            <span class="port-group-label">SFP Uplinks</span>
+                            <div style="display:flex;gap:10px;">
+                                <div class="port" onclick="showInfo('sfp-port')">
+                                    <div class="sfp-port"></div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('sfp-port')">
+                                    <div class="sfp-port"></div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="wirelessDevice" class="device-view" style="display:none;">
+                <div class="device-title">
+                    <h2>Home/SOHO Wireless Router</h2>
+                    <p>Typical consumer-grade wireless router</p>
+                </div>
+                <div class="device-panel">
+                    <span class="brand-label" style="color:#ff6600;">LINKSYS</span>
+                    <div class="ports-row" style="margin-top: 50px; justify-content: center;">
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('wifi-led')">
+                                <div class="led green on" style="width:12px;height:12px;"></div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">WiFi</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('internet-led')">
+                                <div class="led green on" style="width:12px;height:12px;"></div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">Internet</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('wps-btn')">
+                                <div
+                                    style="width:25px;height:25px;background:#444;border:2px solid #666;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#888;font-size:0.5rem;">
+                                    WPS</div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">WPS</span>
+                        </div>
+                    </div>
+                    <div class="ports-row" style="justify-content: center; margin-top: 20px;">
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('wan-port')">
+                                <div class="ethernet-port"
+                                    style="background:linear-gradient(180deg,#005555,#003333);border-color:#00aaaa;">
+                                    <div class="led green on" style="width:5px;height:5px;"></div>
+                                    <span class="port-number" style="color:#0ff;">WAN</span>
+                                </div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">Internet</span>
+                        </div>
+                        <div style="width:20px;border-left:2px solid #444;height:40px;"></div>
+                        <div class="port-group">
+                            <span class="port-group-label" style="margin-bottom:5px;">LAN Ports</span>
+                            <div style="display:flex;gap:8px;">
+                                <div class="port" onclick="showInfo('lan-port')">
+                                    <div class="ethernet-port" style="width:38px;">
+                                        <div class="led green on" style="width:5px;height:5px;"></div><span
+                                            class="port-number">1</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('lan-port')">
+                                    <div class="ethernet-port" style="width:38px;">
+                                        <div class="led green" style="width:5px;height:5px;"></div><span
+                                            class="port-number">2</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('lan-port')">
+                                    <div class="ethernet-port" style="width:38px;">
+                                        <div class="led green" style="width:5px;height:5px;"></div><span
+                                            class="port-number">3</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                                <div class="port" onclick="showInfo('lan-port')">
+                                    <div class="ethernet-port" style="width:38px;">
+                                        <div class="led green on" style="width:5px;height:5px;"></div><span
+                                            class="port-number">4</span>
+                                    </div>
+                                    <div class="port-highlight"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('reset-btn')">
+                                <div
+                                    style="width:8px;height:8px;background:#222;border:1px solid #444;border-radius:50%;">
+                                </div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">Reset</span>
+                        </div>
+                        <div class="port-group">
+                            <div class="port" onclick="showInfo('power')">
+                                <div class="power-port" style="width:30px;height:30px;">
+                                    <div class="power-socket" style="width:12px;height:18px;"></div>
+                                </div>
+                                <div class="port-highlight"></div>
+                            </div>
+                            <span class="port-group-label">Power</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div id="infoContent">
+                    <p class="hint-text">Click on any port, LED, or button to learn what it does!</p>
+                </div>
+            </div>
+
+            <div class="mode-indicator">
+                <span class="badge">HINT</span>
+                <span>Toggle the power switch to see how LED indicators change when the device is on or off.</span>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>Test Your Knowledge</h3>
+            <button class="quiz-btn" onclick="startQuiz()">Start Quiz</button>
+            <div id="quizArea"></div>
+        </div>
+    </div>
+
+    <script>
+        const portInfo = {
+            'sys-led': { title: 'System LED (SYS)', content: '<p>The System LED indicates the overall status of the router:</p><ul><li><strong>Solid Green:</strong> System is operating normally</li><li><strong>Blinking Green:</strong> System is booting up</li><li><strong>Amber:</strong> System error or POST failure</li><li><strong>Off:</strong> No power to device</li></ul><p><em>Tip: Always check this LED first when troubleshooting!</em></p>' },
+            'act-led': { title: 'Activity LED (ACT)', content: '<p>The Activity LED shows network traffic:</p><ul><li><strong>Blinking Amber:</strong> Data is being transmitted or received</li><li><strong>Off:</strong> No network activity</li></ul><p><em>If this LED never blinks, check your network connections.</em></p>' },
+            'usb': { title: 'USB Port', content: '<p>USB ports on Cisco routers are used for:</p><ul><li><strong>USB Flash Drives:</strong> Store and load IOS images, configs</li><li><strong>USB Console Cable:</strong> Alternative to RJ-45 console</li><li><strong>USB Modems:</strong> Backup WAN connection</li></ul><p><em>Useful for backing up your running-config!</em></p>' },
+            'console-rj45': { title: 'Console Port (CON)', content: '<p>The Console port provides direct CLI access to configure the device:</p><ul><li><strong>Connector:</strong> RJ-45 (uses rollover cable)</li><li><strong>Speed:</strong> 9600 baud (default)</li><li><strong>Purpose:</strong> Initial setup, password recovery, troubleshooting</li></ul><p><em>You need a console cable and terminal software (PuTTY) to connect!</em></p>' },
+            'gig-eth': { title: 'Gigabit Ethernet Port (GE)', content: '<p>Gigabit Ethernet interfaces for high-speed LAN/WAN connections:</p><ul><li><strong>Speed:</strong> 10/100/1000 Mbps auto-negotiating</li><li><strong>Green LED:</strong> Link established</li><li><strong>Amber LED:</strong> Activity (blinking = traffic)</li><li><strong>Both Off:</strong> No cable connected</li></ul><p><em>Configure with: Router(config-if)# ip address x.x.x.x mask</em></p>' },
+            'power': { title: 'Power Socket', content: '<p>AC power input for the device:</p><ul><li><strong>Input:</strong> 100-240V AC (auto-switching)</li><li><strong>Always:</strong> Use a surge protector or UPS</li><li><strong>Proper shutdown:</strong> Use "reload" command before unplugging</li></ul><p><em>Never just pull the power cable - use the CLI to save config first!</em></p>' },
+            'hwic-slot': { title: 'HWIC Expansion Slot', content: '<p>High-Speed WAN Interface Card slots for modularity:</p><ul><li><strong>Serial interfaces:</strong> For WAN connections</li><li><strong>T1/E1 cards:</strong> For telecom connections</li><li><strong>Additional Ethernet:</strong> Add more ports</li></ul><p><em>This modularity is why ISR routers are popular in enterprise!</em></p>' },
+            'switch-sys-led': { title: 'System LED (SYST)', content: '<p>Switch System Status LED:</p><ul><li><strong>Solid Green:</strong> Switch passed POST, operating normally</li><li><strong>Blinking Green:</strong> Switch is booting</li><li><strong>Amber:</strong> POST failure, hardware fault</li></ul>' },
+            'mode-btn': { title: 'Mode Button', content: '<p>The Mode button cycles through LED display modes:</p><ul><li><strong>STAT:</strong> Port status (default)</li><li><strong>UTIL:</strong> Bandwidth utilization</li><li><strong>DUPLX:</strong> Duplex mode (half/full)</li><li><strong>SPEED:</strong> Port speed</li><li><strong>PoE:</strong> Power over Ethernet status</li></ul><p><em>Press repeatedly to cycle through modes!</em></p>' },
+            'fe-port': { title: 'FastEthernet Port', content: '<p>FastEthernet access ports for end devices:</p><ul><li><strong>Speed:</strong> 10/100 Mbps</li><li><strong>Green LED:</strong> Link up, forwarding</li><li><strong>Amber LED:</strong> Port blocked (STP) or error</li><li><strong>Off:</strong> No link</li></ul><p><em>Configure VLANs: Switch(config-if)# switchport access vlan 10</em></p>' },
+            'mgmt-port': { title: 'Management Port', content: '<p>Out-of-band management interface:</p><ul><li><strong>Purpose:</strong> Configure switch without using data ports</li><li><strong>Separate network:</strong> Management traffic isolation</li><li><strong>Security:</strong> Restrict access to this port</li></ul>' },
+            'sfp-port': { title: 'SFP Uplink Port', content: '<p>Small Form-factor Pluggable ports for fiber or copper:</p><ul><li><strong>Fiber SFP:</strong> Long-distance connections</li><li><strong>Copper SFP:</strong> RJ-45 for flexibility</li><li><strong>Speed:</strong> 1 Gbps typical</li></ul><p><em>Used to connect switches together (uplinks) or to routers!</em></p>' },
+            'wifi-led': { title: 'WiFi LED', content: '<p>Wireless radio status indicator:</p><ul><li><strong>Solid:</strong> WiFi enabled, ready</li><li><strong>Blinking:</strong> Wireless traffic activity</li><li><strong>Off:</strong> WiFi disabled</li></ul>' },
+            'internet-led': { title: 'Internet LED', content: '<p>WAN connection status:</p><ul><li><strong>Solid Green:</strong> Internet connection active</li><li><strong>Blinking:</strong> Internet traffic</li><li><strong>Off/Red:</strong> No internet - check ISP!</li></ul>' },
+            'wps-btn': { title: 'WPS Button', content: '<p>WiFi Protected Setup for easy device connection:</p><ul><li><strong>Press:</strong> Enables 2-minute connection window</li><li><strong>Security note:</strong> WPS has known vulnerabilities</li><li><strong>Best practice:</strong> Disable WPS, use WPA2 password</li></ul>' },
+            'wan-port': { title: 'WAN Port (Internet)', content: '<p>Wide Area Network port - connects to your ISP:</p><ul><li><strong>Connect to:</strong> Cable/DSL modem</li><li><strong>Gets:</strong> Public IP from ISP (DHCP)</li><li><strong>Color coded:</strong> Usually different color than LAN</li></ul><p><em>Never connect a LAN device here!</em></p>' },
+            'lan-port': { title: 'LAN Ports', content: '<p>Local Area Network ports for your devices:</p><ul><li><strong>Connect:</strong> PCs, printers, switches, APs</li><li><strong>Provides:</strong> DHCP addresses to devices</li><li><strong>Built-in switch:</strong> All ports same network</li></ul><p><em>Most home routers have 4 LAN ports.</em></p>' },
+            'reset-btn': { title: 'Reset Button', content: '<p>Factory reset (use with caution!):</p><ul><li><strong>Quick press:</strong> Reboot device</li><li><strong>Hold 10+ seconds:</strong> Factory reset</li><li><strong>Warning:</strong> Erases all configuration!</li></ul><p><em>Use a paperclip to press this recessed button.</em></p>' }
+        };
+
+        const quizQuestions = [
+            { q: "Which port do you use for initial router configuration?", opts: ["GigabitEthernet", "Console Port", "USB Port", "Power Port"], correct: 1 },
+            { q: "What does a solid GREEN system LED indicate?", opts: ["Error", "Booting", "Normal Operation", "No Power"], correct: 2 },
+            { q: "What cable type connects to a Cisco console port?", opts: ["Straight-through", "Crossover", "Rollover", "Fiber"], correct: 2 },
+            { q: "What is the WAN port on a home router used for?", opts: ["Connecting PCs", "Connecting to ISP", "WiFi antenna", "USB devices"], correct: 1 },
+            { q: "SFP ports are typically used for what?", opts: ["Power", "Console access", "Fiber uplinks", "USB storage"], correct: 2 }
+        ];
+
+        let isPoweredOn = true;
+        let currentQuiz = 0;
+
+        function showDevice(device) {
+            document.querySelectorAll('.device-view').forEach(d => d.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(device + 'Device').style.display = 'block';
+            event.target.classList.add('active');
+            document.getElementById('infoContent').innerHTML = '<p class="hint-text">Click on any port, LED, or button to learn what it does!</p>';
+        }
+
+        function showView(device, view) {
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            if (device === 'router') {
+                document.getElementById('routerFront').style.display = view === 'front' ? 'block' : 'none';
+                document.getElementById('routerRear').style.display = view === 'rear' ? 'block' : 'none';
+            }
+        }
+
+        function showInfo(portType) {
+            const info = portInfo[portType];
+            if (info) {
+                document.getElementById('infoContent').innerHTML = `<h3>${info.title}</h3><div class="info-content">${info.content}</div>`;
+            }
+        }
+
+        function togglePower() {
+            isPoweredOn = !isPoweredOn;
+            const sw = document.getElementById('powerSwitch');
+            const label = document.getElementById('powerLabel');
+            sw.classList.toggle('on', isPoweredOn);
+            label.textContent = isPoweredOn ? 'ON' : 'OFF';
+            document.querySelectorAll('.led').forEach(led => {
+                if (isPoweredOn) {
+                    if (led.classList.contains('green') || led.classList.contains('amber')) {
+                        if (Math.random() > 0.3) led.classList.add('on');
+                    }
+                } else {
+                    led.classList.remove('on');
+                }
+            });
+        }
+
+        function startQuiz() {
+            currentQuiz = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuiz >= quizQuestions.length) {
+                document.getElementById('quizArea').innerHTML = '<div class="quiz-question"><p><strong>Quiz Complete!</strong> Great job learning about network devices!</p><button class="quiz-btn" onclick="startQuiz()" style="margin-top:10px;">Try Again</button></div>';
+                return;
+            }
+            const q = quizQuestions[currentQuiz];
+            let html = `<div class="quiz-question"><p><strong>Question ${currentQuiz + 1}/${quizQuestions.length}:</strong> ${q.q}</p><div class="quiz-options">`;
+            q.opts.forEach((opt, i) => {
+                html += `<button class="quiz-option" onclick="checkAnswer(${i}, ${q.correct})">${opt}</button>`;
+            });
+            html += '</div><div id="feedback" class="quiz-feedback"></div></div>';
+            document.getElementById('quizArea').innerHTML = html;
+        }
+
+        function checkAnswer(selected, correct) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach((opt, i) => {
+                opt.onclick = null;
+                if (i === correct) opt.classList.add('correct');
+                else if (i === selected) opt.classList.add('incorrect');
+            });
+            const feedback = document.getElementById('feedback');
+            if (selected === correct) {
+                feedback.className = 'quiz-feedback show correct';
+                feedback.innerHTML = 'Correct! Well done!';
+            } else {
+                feedback.className = 'quiz-feedback show incorrect';
+                feedback.innerHTML = 'Not quite. The correct answer is highlighted in green.';
+            }
+            setTimeout(() => { currentQuiz++; showQuestion(); }, 2000);
+        }
+    </script>
+</body>
+
+</html>

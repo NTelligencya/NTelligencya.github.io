@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireless Router Configuration Wizard - ICTNWK311</title>
+    <style>
+        :root {
+            /* Updated Design System */
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --darker: #111827;
+            --secondary: #334155;
+            --accent: #3b82f6;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+            --bg-dark: #020617;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: rgba(148, 163, 184, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            min-height: 100vh;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            color: var(--text-light);
+            text-decoration: underline;
+        }
+
+        /* Header */
+        .app-header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+            background: transparent;
+        }
+
+        .app-header h1 {
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .app-header p {
+            color: #a5b4fc;
+        }
+
+        .course-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        /* Router Interface Container */
+        .router-interface {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: #1f2937;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Router Header Bar */
+        .router-header {
+            background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .router-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .router-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .router-info h2 {
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .router-info p {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            background: rgba(34, 197, 94, 0.2);
+            border-radius: 20px;
+            color: var(--success);
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Navigation Tabs */
+        .router-nav {
+            display: flex;
+            background: var(--darker);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .nav-item {
+            padding: 15px 25px;
+            color: var(--gray);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 0.95rem;
+        }
+
+        .nav-item:hover {
+            color: var(--light);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Content Area */
+        .router-content {
+            padding: 25px;
+        }
+
+        .config-section {
+            display: none;
+        }
+
+        .config-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h3 {
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d1d5db;
+            font-size: 0.95rem;
+        }
+
+        .form-group .help-text {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 6px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--darker);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        input:disabled,
+        select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input {
+            padding-right: 45px;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* Toggle Switch */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: var(--darker);
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toggle-label span:first-child {
+            font-weight: 500;
+            color: var(--light);
+        }
+
+        .toggle-label span:last-child {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--border);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            background: var(--success);
+        }
+
+        .toggle-switch input:checked+.toggle-slider::before {
+            transform: translateX(24px);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: black;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--light);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Cards */
+        .info-card {
+            background: var(--darker);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .info-card h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-item label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-item span {
+            font-family: monospace;
+            color: var(--light);
+        }
+
+        /* Channel Visualization */
+        .channel-viz {
+            background: var(--darker);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .channel-bar {
+            display: flex;
+            gap: 2px;
+            margin-top: 15px;
+        }
+
+        .channel-slot {
+            flex: 1;
+            height: 60px;
+            background: var(--border);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .channel-slot.selected {
+            background: var(--primary);
+        }
+
+        .channel-slot.interference-low {
+            background: linear-gradient(to top, #22c55e 30%, transparent 30%);
+        }
+
+        .channel-slot.interference-medium {
+            background: linear-gradient(to top, #f59e0b 60%, transparent 60%);
+        }
+
+        .channel-slot.interference-high {
+            background: linear-gradient(to top, #ef4444 90%, transparent 90%);
+        }
+
+        .channel-slot.selected.interference-low,
+        .channel-slot.selected.interference-medium,
+        .channel-slot.selected.interference-high {
+            border: 2px solid var(--primary);
+        }
+
+        .channel-number {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .channel-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        /* Security Rating */
+        .security-rating {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: var(--darker);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .rating-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .rating-score.good {
+            color: var(--success);
+        }
+
+        .rating-score.medium {
+            color: var(--warning);
+        }
+
+        .rating-score.poor {
+            color: var(--danger);
+        }
+
+        .rating-details {
+            flex: 1;
+        }
+
+        .rating-details h4 {
+            margin-bottom: 10px;
+        }
+
+        .rating-bar {
+            height: 10px;
+            background: var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .rating-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .rating-fill.good {
+            background: var(--success);
+        }
+
+        .rating-fill.medium {
+            background: var(--warning);
+        }
+
+        .rating-fill.poor {
+            background: var(--danger);
+        }
+
+        /* DHCP Table */
+        .dhcp-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dhcp-table th,
+        .dhcp-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dhcp-table th {
+            background: var(--darker);
+            color: var(--gray);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .dhcp-table td {
+            font-family: monospace;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid var(--warning);
+            color: #fcd34d;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid var(--success);
+            color: #86efac;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: #fca5a5;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid var(--primary);
+            color: #93c5fd;
+        }
+
+        /* Tutorial Panel */
+        .tutorial-panel {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border: 1px solid var(--purple);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .tutorial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .tutorial-header h4 {
+            color: var(--purple);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tutorial-step {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: var(--purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content h5 {
+            color: var(--light);
+            margin-bottom: 5px;
+        }
+
+        .step-content p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* Comparison View */
+        .comparison-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .comparison-column {
+            background: var(--darker);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .comparison-column h4 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .comparison-column.before h4 {
+            color: var(--gray);
+        }
+
+        .comparison-column.after h4 {
+            color: var(--success);
+        }
+
+        .config-diff {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .config-diff .line {
+            padding: 5px 0;
+        }
+
+        .config-diff .changed {
+            color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        /* Test Panel */
+        .test-panel {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .test-panel.active {
+            display: block;
+        }
+
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-result.pass {
+            background: rgba(34, 197, 94, 0.2);
+        }
+
+        .test-result.fail {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Progress Bar */
+        .wizard-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .wizard-progress::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border);
+            z-index: 0;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .progress-step .step-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .progress-step.completed .step-icon {
+            background: var(--success);
+        }
+
+        .progress-step.active .step-icon {
+            background: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+        }
+
+        .progress-step .step-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .progress-step.completed .step-label,
+        .progress-step.active .step-label {
+            color: var(--light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .router-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .comparison-view {
+                grid-template-columns: 1fr;
+            }
+
+            .wizard-progress {
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="app-header">
+        <a href="../" class="back-link">← Back to Dashboard</a>
+        <h1>Wireless Router Configuration Wizard</h1>
+        <p>Learn to configure wireless networks in a safe, simulated environment</p>
+        <span class="course-badge">ICTNWK311 - Configure Wireless LANs</span>
+    </header>
+
+    <div class="router-interface">
+        <!-- Router Header -->
+        <div class="router-header">
+            <div class="router-brand">
+                <div class="router-logo">AP</div>
+                <div class="router-info">
+                    <h2>SimNet Wireless Router</h2>
+                    <p>Model: SN-AC1900 | Firmware: 2.0.1</p>
+                </div>
+            </div>
+            <div class="connection-status">
+                <span class="status-dot"></span>
+                Connected (192.168.1.1)
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="router-nav">
+            <div class="nav-item active" data-section="status">Status</div>
+            <div class="nav-item" data-section="wireless">Wireless</div>
+            <div class="nav-item" data-section="security">Security</div>
+            <div class="nav-item" data-section="dhcp">DHCP</div>
+            <div class="nav-item" data-section="tutorial">Tutorial</div>
+        </nav>
+
+        <!-- Content Sections -->
+        <div class="router-content">
+            <!-- Status Section -->
+            <section class="config-section active" id="status-section">
+                <div class="section-header">
+                    <h3>System Status</h3>
+                    <button class="btn btn-secondary" id="refresh-status">🔄 Refresh</button>
+                </div>
+
+                <div class="info-card">
+                    <h4>Internet Connection</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Status</label>
+                            <span style="color: var(--success);">● Connected</span>
+                        </div>
+                        <div class="info-item">
+                            <label>WAN IP Address</label>
+                            <span id="wan-ip">203.45.167.89</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Connection Type</label>
+                            <span>DHCP</span>
+                        </div>
+                        <div class="info-item">
+                            <label>DNS Servers</label>
+                            <span>8.8.8.8, 8.8.4.4</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h4>LAN Configuration</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Router IP</label>
+                            <span id="router-ip">192.168.1.1</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Subnet Mask</label>
+                            <span>255.255.255.0</span>
+                        </div>
+                        <div class="info-item">
+                            <label>DHCP Server</label>
+                            <span style="color: var(--success);">● Enabled</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Connected Devices</label>
+                            <span id="device-count">5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h4>Wireless Status</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>2.4 GHz Status</label>
+                            <span id="wifi-24-status" style="color: var(--success);">● Enabled</span>
+                        </div>
+                        <div class="info-item">
+                            <label>5 GHz Status</label>
+                            <span id="wifi-5-status" style="color: var(--success);">● Enabled</span>
+                        </div>
+                        <div class="info-item">
+                            <label>SSID (2.4 GHz)</label>
+                            <span id="ssid-display">MyNetwork</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Security</label>
+                            <span id="security-display">WPA2-Personal</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Wireless Section -->
+            <section class="config-section" id="wireless-section">
+                <div class="section-header">
+                    <h3>Wireless Settings</h3>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Tip:</strong> Choose a unique SSID name and avoid using personal information.
+                </div>
+
+                <!-- 2.4 GHz Settings -->
+                <div class="info-card">
+                    <h4>2.4 GHz Band Configuration</h4>
+
+                    <div class="toggle-group">
+                        <div class="toggle-label">
+                            <span>Enable 2.4 GHz Wireless</span>
+                            <span>Disable to turn off 2.4 GHz radio</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="enable-24ghz" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Network Name (SSID)</label>
+                        <input type="text" id="ssid-24" value="MyNetwork" maxlength="32">
+                        <p class="help-text">1-32 characters. This name will be visible to devices searching for WiFi.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Channel Selection</label>
+                        <select id="channel-24">
+                            <option value="auto">Auto</option>
+                            <option value="1">Channel 1 (2.412 GHz)</option>
+                            <option value="2">Channel 2 (2.417 GHz)</option>
+                            <option value="3">Channel 3 (2.422 GHz)</option>
+                            <option value="4">Channel 4 (2.427 GHz)</option>
+                            <option value="5">Channel 5 (2.432 GHz)</option>
+                            <option value="6" selected>Channel 6 (2.437 GHz)</option>
+                            <option value="7">Channel 7 (2.442 GHz)</option>
+                            <option value="8">Channel 8 (2.447 GHz)</option>
+                            <option value="9">Channel 9 (2.452 GHz)</option>
+                            <option value="10">Channel 10 (2.457 GHz)</option>
+                            <option value="11">Channel 11 (2.462 GHz)</option>
+                        </select>
+                        <p class="help-text">Channels 1, 6, and 11 don't overlap. Use Auto for best performance.</p>
+                    </div>
+
+                    <div class="channel-viz">
+                        <strong>Channel Interference Map (2.4 GHz)</strong>
+                        <p style="font-size: 0.85rem; color: var(--gray); margin-top: 5px;">
+                            Click a channel to select it. Bar height shows interference from neighboring networks.
+                        </p>
+                        <div class="channel-bar" id="channel-bar-24">
+                            <!-- Generated by JavaScript -->
+                        </div>
+                        <div class="channel-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--success);"></div>
+                                <span>Low interference</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--warning);"></div>
+                                <span>Medium interference</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: var(--danger);"></div>
+                                <span>High interference</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="toggle-group">
+                        <div class="toggle-label">
+                            <span>SSID Broadcast</span>
+                            <span>Hidden networks require manual connection</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="ssid-broadcast" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 5 GHz Settings -->
+                <div class="info-card">
+                    <h4>5 GHz Band Configuration</h4>
+
+                    <div class="toggle-group">
+                        <div class="toggle-label">
+                            <span>Enable 5 GHz Wireless</span>
+                            <span>5 GHz offers faster speeds but shorter range</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="enable-5ghz" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Network Name (SSID)</label>
+                        <input type="text" id="ssid-5" value="MyNetwork-5G" maxlength="32">
+                        <p class="help-text">Consider adding "-5G" suffix to distinguish from 2.4 GHz network.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Channel Selection</label>
+                        <select id="channel-5">
+                            <option value="auto" selected>Auto</option>
+                            <option value="36">Channel 36 (5.180 GHz)</option>
+                            <option value="40">Channel 40 (5.200 GHz)</option>
+                            <option value="44">Channel 44 (5.220 GHz)</option>
+                            <option value="48">Channel 48 (5.240 GHz)</option>
+                            <option value="149">Channel 149 (5.745 GHz)</option>
+                            <option value="153">Channel 153 (5.765 GHz)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="apply-wireless">Apply Changes</button>
+                    <button class="btn btn-secondary" id="reset-wireless">Reset to Defaults</button>
+                </div>
+            </section>
+
+            <!-- Security Section -->
+            <section class="config-section" id="security-section">
+                <div class="section-header">
+                    <h3>Wireless Security</h3>
+                </div>
+
+                <div class="security-rating" id="security-rating">
+                    <div class="rating-score good" id="rating-score">A</div>
+                    <div class="rating-details">
+                        <h4 id="rating-text">Excellent Security Configuration</h4>
+                        <div class="rating-bar">
+                            <div class="rating-fill good" id="rating-bar" style="width: 90%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h4>Security Settings</h4>
+
+                    <div class="form-group">
+                        <label>Security Mode</label>
+                        <select id="security-mode">
+                            <option value="none">None (Open Network) - Warning</option>
+                            <option value="wep">WEP (Not Recommended) - Warning</option>
+                            <option value="wpa">WPA-Personal</option>
+                            <option value="wpa2" selected>WPA2-Personal (Recommended)</option>
+                            <option value="wpa3">WPA3-Personal (Most Secure)</option>
+                            <option value="wpa2-enterprise">WPA2-Enterprise</option>
+                        </select>
+                        <p class="help-text">WPA2 or WPA3 is strongly recommended. WEP is easily cracked.</p>
+                    </div>
+
+                    <div class="form-group" id="password-group">
+                        <label>WiFi Password (Pre-Shared Key)</label>
+                        <div class="input-with-icon">
+                            <input type="password" id="wifi-password" value="SecurePass123!" minlength="8"
+                                maxlength="63">
+                            <span class="input-icon" id="toggle-password">Show</span>
+                        </div>
+                        <p class="help-text">8-63 characters. Use a mix of letters, numbers, and symbols.</p>
+
+                        <div id="password-strength" style="margin-top: 10px;">
+                            <!-- Generated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Encryption Type</label>
+                        <select id="encryption-type">
+                            <option value="aes" selected>AES (Recommended)</option>
+                            <option value="tkip">TKIP (Legacy)</option>
+                            <option value="both">AES + TKIP</option>
+                        </select>
+                        <p class="help-text">AES is more secure and faster than TKIP.</p>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning" id="security-warning" style="display: none;">
+                    <strong>Security Risk:</strong> <span id="warning-text"></span>
+                </div>
+
+                <div class="info-card">
+                    <h4>Additional Security Options</h4>
+
+                    <div class="toggle-group">
+                        <div class="toggle-label">
+                            <span>WPS (Wi-Fi Protected Setup)</span>
+                            <span>Allows easy device connection but has security vulnerabilities</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="wps-enabled">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-group">
+                        <div class="toggle-label">
+                            <span>MAC Address Filtering</span>
+                            <span>Only allow specific devices to connect</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="mac-filter">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-group">
+                        <div class="toggle-label">
+                            <span>Client Isolation</span>
+                            <span>Prevent wireless clients from communicating with each other</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="client-isolation">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="apply-security">Apply Security Settings</button>
+                    <button class="btn btn-success" id="test-config">Run Self-Test</button>
+                </div>
+
+                <div class="test-panel" id="test-panel">
+                    <h4>Configuration Test Results</h4>
+                    <div id="test-results"></div>
+                </div>
+            </section>
+
+            <!-- DHCP Section -->
+            <section class="config-section" id="dhcp-section">
+                <div class="section-header">
+                    <h3>DHCP Server Settings</h3>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>What is DHCP?</strong> DHCP automatically assigns IP addresses to devices on your
+                    network.
+                </div>
+
+                <div class="info-card">
+                    <h4>DHCP Configuration</h4>
+
+                    <div class="toggle-group">
+                        <div class="toggle-label">
+                            <span>Enable DHCP Server</span>
+                            <span>Automatically assign IP addresses to connected devices</span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="dhcp-enabled" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div id="dhcp-settings">
+                        <div class="form-group">
+                            <label>Starting IP Address</label>
+                            <input type="text" id="dhcp-start" value="192.168.1.100">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ending IP Address</label>
+                            <input type="text" id="dhcp-end" value="192.168.1.200">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Lease Time</label>
+                            <select id="dhcp-lease">
+                                <option value="1">1 Hour</option>
+                                <option value="12">12 Hours</option>
+                                <option value="24" selected>24 Hours (1 Day)</option>
+                                <option value="168">1 Week</option>
+                                <option value="forever">Forever</option>
+                            </select>
+                            <p class="help-text">How long devices keep their assigned IP address.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Default Gateway</label>
+                            <input type="text" id="dhcp-gateway" value="192.168.1.1" disabled>
+                            <p class="help-text">Usually the router's IP address.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h4>Connected Devices (DHCP Leases)</h4>
+                    <table class="dhcp-table">
+                        <thead>
+                            <tr>
+                                <th>Hostname</th>
+                                <th>IP Address</th>
+                                <th>MAC Address</th>
+                                <th>Lease Expires</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dhcp-leases">
+                            <!-- Generated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="apply-dhcp">Apply DHCP Settings</button>
+                </div>
+            </section>
+
+            <!-- Tutorial Section -->
+            <section class="config-section" id="tutorial-section">
+                <div class="section-header">
+                    <h3>Step-by-Step Configuration Guide</h3>
+                </div>
+
+                <div class="wizard-progress" id="wizard-progress">
+                    <div class="progress-step completed" data-step="1">
+                        <div class="step-icon">1</div>
+                        <span class="step-label">Connect</span>
+                    </div>
+                    <div class="progress-step active" data-step="2">
+                        <div class="step-icon">2</div>
+                        <span class="step-label">Configure SSID</span>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-icon">3</div>
+                        <span class="step-label">Set Security</span>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="step-icon">4</div>
+                        <span class="step-label">Channel Select</span>
+                    </div>
+                    <div class="progress-step" data-step="5">
+                        <div class="step-icon">5</div>
+                        <span class="step-label">Verify</span>
+                    </div>
+                </div>
+
+                <div class="tutorial-panel" id="tutorial-content">
+                    <!-- Step content generated by JavaScript -->
+                </div>
+
+                <div class="comparison-view" id="config-comparison">
+                    <div class="comparison-column before">
+                        <h4>Before (Default Configuration)</h4>
+                        <div class="config-diff" id="before-config">
+                            <div class="line">SSID: Router_Default_12345</div>
+                            <div class="line">Security: WPA2-Personal</div>
+                            <div class="line">Password: admin123</div>
+                            <div class="line">Channel: Auto</div>
+                            <div class="line">DHCP: 192.168.1.100-200</div>
+                        </div>
+                    </div>
+                    <div class="comparison-column after">
+                        <h4>After (Your Configuration)</h4>
+                        <div class="config-diff" id="after-config">
+                            <div class="line changed">SSID: <span id="compare-ssid">MyNetwork</span></div>
+                            <div class="line changed">Security: <span id="compare-security">WPA2-Personal</span></div>
+                            <div class="line changed">Password: <span id="compare-password">**********</span></div>
+                            <div class="line">Channel: <span id="compare-channel">6</span></div>
+                            <div class="line">DHCP: <span id="compare-dhcp">192.168.1.100-200</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="prev-step">← Previous</button>
+                    <button class="btn btn-primary" id="next-step">Next Step →</button>
+                    <button class="btn btn-success" id="complete-tutorial" style="display: none;">Complete Tutorial
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // WIRELESS ROUTER CONFIGURATION WIZARD
+        // ============================================
+
+        // State
+        let config = {
+            wireless: {
+                enabled24: true,
+                enabled5: true,
+                ssid24: 'MyNetwork',
+                ssid5: 'MyNetwork-5G',
+                channel24: '6',
+                channel5: 'auto',
+                broadcast: true
+            },
+            security: {
+                mode: 'wpa2',
+                password: 'SecurePass123!',
+                encryption: 'aes',
+                wps: false,
+                macFilter: false,
+                clientIsolation: false
+            },
+            dhcp: {
+                enabled: true,
+                start: '192.168.1.100',
+                end: '192.168.1.200',
+                lease: '24',
+                gateway: '192.168.1.1'
+            }
+        };
+
+        let tutorialStep = 2;
+        const totalSteps = 5;
+
+        // Tutorial content
+        const tutorialSteps = [
+            {
+                title: 'Connect to the Router',
+                description: 'Access the router\'s web interface by connecting to its network and navigating to 192.168.1.1 in your browser.',
+                tips: ['Default credentials are often admin/admin or admin/password', 'Always change default passwords immediately']
+            },
+            {
+                title: 'Configure Your Network Name (SSID)',
+                description: 'Choose a unique, identifiable name for your wireless network.',
+                tips: ['Avoid using personal information in the SSID', 'Keep it professional for business networks', 'Consider having different names for 2.4GHz and 5GHz bands']
+            },
+            {
+                title: 'Set Up Security',
+                description: 'Enable WPA2 or WPA3 security and create a strong password.',
+                tips: ['Use at least 12 characters for passwords', 'Mix uppercase, lowercase, numbers, and symbols', 'Never use WEP - it\'s easily cracked']
+            },
+            {
+                title: 'Select Optimal Channel',
+                description: 'Choose a channel with minimal interference for best performance.',
+                tips: ['For 2.4GHz, use channels 1, 6, or 11 (non-overlapping)', 'Auto mode usually works well', 'Use a WiFi analyzer app to check for interference']
+            },
+            {
+                title: 'Verify Configuration',
+                description: 'Test your connection and verify all settings are applied correctly.',
+                tips: ['Connect a device using the new credentials', 'Verify internet access works', 'Test from multiple locations for coverage']
+            }
+        ];
+
+        // Display names for security modes
+        const securityModeNames = {
+            'none': 'None (Open)',
+            'wep': 'WEP',
+            'wpa': 'WPA-Personal',
+            'wpa2': 'WPA2-Personal',
+            'wpa3': 'WPA3-Personal',
+            'wpa2-enterprise': 'WPA2-Enterprise'
+        };
+
+        // Channel interference data (simulated)
+        const channelInterference = {
+            1: 'low', 2: 'medium', 3: 'high', 4: 'high', 5: 'medium',
+            6: 'low', 7: 'medium', 8: 'high', 9: 'high', 10: 'medium', 11: 'low'
+        };
+
+        // Simulated DHCP leases
+        const dhcpLeases = [
+            { hostname: 'Johns-iPhone', ip: '192.168.1.101', mac: 'AA:BB:CC:11:22:33', expires: '23:45:12' },
+            { hostname: 'LivingRoom-TV', ip: '192.168.1.102', mac: 'DD:EE:FF:44:55:66', expires: '20:30:00' },
+            { hostname: 'Work-Laptop', ip: '192.168.1.105', mac: '11:22:33:AA:BB:CC', expires: '12:15:30' },
+            { hostname: 'Gaming-PC', ip: '192.168.1.110', mac: '44:55:66:DD:EE:FF', expires: '18:00:00' },
+            { hostname: 'Smart-Speaker', ip: '192.168.1.115', mac: '77:88:99:00:11:22', expires: '08:45:00' }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupNavigation();
+            setupEventListeners();
+            generateChannelBar();
+            updateDHCPTable();
+            updateTutorialContent();
+            updateSecurityRating();
+            updatePasswordStrength();
+            updateComparison();
+        });
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    document.querySelectorAll('.config-section').forEach(s => s.classList.remove('active'));
+
+                    item.classList.add('active');
+                    document.getElementById(`${item.dataset.section}-section`).classList.add('active');
+                });
+            });
+        }
+
+        function setupEventListeners() {
+            // Status
+            document.getElementById('refresh-status').addEventListener('click', () => {
+                updateStatus();
+                showNotification('Status refreshed.', 'info');
+            });
+
+            // Wireless settings
+            document.getElementById('enable-24ghz').addEventListener('change', (e) => {
+                config.wireless.enabled24 = e.target.checked;
+                updateStatus();
+            });
+
+            document.getElementById('enable-5ghz').addEventListener('change', (e) => {
+                config.wireless.enabled5 = e.target.checked;
+                updateStatus();
+            });
+
+            document.getElementById('ssid-24').addEventListener('input', (e) => {
+                config.wireless.ssid24 = e.target.value;
+                updateComparison();
+                updateStatus();
+            });
+
+            document.getElementById('ssid-5').addEventListener('input', (e) => {
+                config.wireless.ssid5 = e.target.value;
+            });
+
+            document.getElementById('channel-24').addEventListener('change', (e) => {
+                config.wireless.channel24 = e.target.value;
+                updateChannelSelection(e.target.value);
+                updateComparison();
+            });
+
+            document.getElementById('apply-wireless').addEventListener('click', applyWirelessSettings);
+            document.getElementById('reset-wireless').addEventListener('click', resetWirelessDefaults);
+
+            // Security settings
+            document.getElementById('security-mode').addEventListener('change', (e) => {
+                config.security.mode = e.target.value;
+                updateSecurityRating();
+                updateComparison();
+                togglePasswordField();
+                updateStatus();
+            });
+
+            document.getElementById('wifi-password').addEventListener('input', (e) => {
+                config.security.password = e.target.value;
+                updatePasswordStrength();
+                updateSecurityRating();
+            });
+
+            document.getElementById('toggle-password').addEventListener('click', togglePasswordVisibility);
+
+            document.getElementById('encryption-type').addEventListener('change', (e) => {
+                config.security.encryption = e.target.value;
+                updateSecurityRating();
+            });
+
+            document.getElementById('wps-enabled').addEventListener('change', (e) => {
+                config.security.wps = e.target.checked;
+                updateSecurityRating();
+            });
+
+            document.getElementById('apply-security').addEventListener('click', applySecuritySettings);
+            document.getElementById('test-config').addEventListener('click', runSelfTest);
+
+            // DHCP settings
+            document.getElementById('dhcp-enabled').addEventListener('change', (e) => {
+                config.dhcp.enabled = e.target.checked;
+                document.getElementById('dhcp-settings').style.opacity = e.target.checked ? '1' : '0.5';
+            });
+
+            document.getElementById('dhcp-start').addEventListener('input', (e) => {
+                config.dhcp.start = e.target.value;
+                updateComparison();
+            });
+
+            document.getElementById('dhcp-end').addEventListener('input', (e) => {
+                config.dhcp.end = e.target.value;
+                updateComparison();
+            });
+
+            document.getElementById('apply-dhcp').addEventListener('click', applyDHCPSettings);
+
+            // Tutorial
+            document.getElementById('prev-step').addEventListener('click', prevTutorialStep);
+            document.getElementById('next-step').addEventListener('click', nextTutorialStep);
+            document.getElementById('complete-tutorial').addEventListener('click', completeTutorial);
+        }
+
+        function generateChannelBar() {
+            const container = document.getElementById('channel-bar-24');
+            container.innerHTML = '';
+
+            for (let ch = 1; ch <= 11; ch++) {
+                const slot = document.createElement('div');
+                slot.className = `channel-slot interference-${channelInterference[ch]}`;
+                slot.dataset.channel = ch;
+
+                if (ch.toString() === config.wireless.channel24) {
+                    slot.classList.add('selected');
+                }
+
+                slot.innerHTML = `<span class="channel-number">${ch}</span>`;
+
+                slot.addEventListener('click', () => {
+                    document.querySelectorAll('.channel-slot').forEach(s => s.classList.remove('selected'));
+                    slot.classList.add('selected');
+                    config.wireless.channel24 = ch.toString();
+                    document.getElementById('channel-24').value = ch.toString();
+                    updateComparison();
+                });
+
+                container.appendChild(slot);
+            }
+        }
+
+        function updateChannelSelection(channel) {
+            document.querySelectorAll('.channel-slot').forEach(slot => {
+                slot.classList.remove('selected');
+                if (slot.dataset.channel === channel || (channel === 'auto' && slot.dataset.channel === '6')) {
+                    slot.classList.add('selected');
+                }
+            });
+        }
+
+        function updateDHCPTable() {
+            const tbody = document.getElementById('dhcp-leases');
+            tbody.innerHTML = dhcpLeases.map(lease => `
+                <tr>
+                    <td>${lease.hostname}</td>
+                    <td>${lease.ip}</td>
+                    <td>${lease.mac}</td>
+                    <td>${lease.expires}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStatus() {
+            document.getElementById('ssid-display').textContent = config.wireless.ssid24;
+            document.getElementById('security-display').textContent = securityModeNames[config.security.mode] || config.security.mode;
+            document.getElementById('wifi-24-status').innerHTML = config.wireless.enabled24
+                ? '<span style="color: var(--success);">● Enabled</span>'
+                : '<span style="color: var(--danger);">● Disabled</span>';
+            document.getElementById('wifi-5-status').innerHTML = config.wireless.enabled5
+                ? '<span style="color: var(--success);">● Enabled</span>'
+                : '<span style="color: var(--danger);">● Disabled</span>';
+        }
+
+        function updateSecurityRating() {
+            let score = 0;
+            const factors = [];
+
+            // Security mode
+            switch (config.security.mode) {
+                case 'wpa3': score += 30; break;
+                case 'wpa2': score += 25; break;
+                case 'wpa2-enterprise': score += 30; break;
+                case 'wpa': score += 15; break;
+                case 'wep': score += 5; factors.push('WEP is easily cracked'); break;
+                case 'none': score += 0; factors.push('Network is completely open'); break;
+            }
+
+            // Password strength
+            const pwd = config.security.password;
+            if (pwd.length >= 12) score += 25;
+            else if (pwd.length >= 8) score += 15;
+            else score += 5;
+
+            if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score += 10;
+            if (/[0-9]/.test(pwd)) score += 10;
+            if (/[^A-Za-z0-9]/.test(pwd)) score += 10;
+
+            // WPS
+            if (!config.security.wps) score += 10;
+            else factors.push('WPS has known vulnerabilities');
+
+            // Encryption
+            if (config.security.encryption === 'aes') score += 5;
+
+            // Calculate rating
+            let rating, ratingClass;
+            if (score >= 80) { rating = 'A'; ratingClass = 'good'; }
+            else if (score >= 60) { rating = 'B'; ratingClass = 'good'; }
+            else if (score >= 40) { rating = 'C'; ratingClass = 'medium'; }
+            else if (score >= 20) { rating = 'D'; ratingClass = 'poor'; }
+            else { rating = 'F'; ratingClass = 'poor'; }
+
+            const ratingEl = document.getElementById('rating-score');
+            ratingEl.textContent = rating;
+            ratingEl.className = `rating-score ${ratingClass}`;
+
+            const ratingBar = document.getElementById('rating-bar');
+            ratingBar.style.width = `${Math.min(score, 100)}%`;
+            ratingBar.className = `rating-fill ${ratingClass}`;
+
+            const texts = {
+                good: 'Excellent Security Configuration',
+                medium: 'Acceptable Security - Consider Improvements',
+                poor: 'Poor Security - Immediate Action Required'
+            };
+            document.getElementById('rating-text').textContent = texts[ratingClass];
+
+            // Show warnings
+            const warningEl = document.getElementById('security-warning');
+            if (factors.length > 0) {
+                document.getElementById('warning-text').textContent = factors.join('. ');
+                warningEl.style.display = 'flex';
+            } else {
+                warningEl.style.display = 'none';
+            }
+
+            updateComparison();
+        }
+
+        function updatePasswordStrength() {
+            const pwd = config.security.password;
+            const container = document.getElementById('password-strength');
+
+            let strength = 0;
+            let feedback = [];
+
+            if (pwd.length >= 8) strength++; else feedback.push('At least 8 characters');
+            if (pwd.length >= 12) strength++;
+            if (/[A-Z]/.test(pwd)) strength++; else feedback.push('Add uppercase letters');
+            if (/[a-z]/.test(pwd)) strength++; else feedback.push('Add lowercase letters');
+            if (/[0-9]/.test(pwd)) strength++; else feedback.push('Add numbers');
+            if (/[^A-Za-z0-9]/.test(pwd)) strength++; else feedback.push('Add special characters');
+
+            const colors = ['#ef4444', '#ef4444', '#f59e0b', '#f59e0b', '#22c55e', '#22c55e', '#22c55e'];
+            const labels = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong', 'Excellent'];
+
+            container.innerHTML = `
+                <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+                    ${[0, 1, 2, 3, 4, 5].map(i => `
+                        <div style="flex: 1; height: 6px; background: ${i < strength ? colors[strength] : '#374151'}; border-radius: 3px;"></div>
+                    `).join('')}
+                </div>
+                <span style="font-size: 0.85rem; color: ${colors[strength]};">${labels[strength]}</span>
+                ${feedback.length > 0 ? `<span style="font-size: 0.85rem; color: var(--gray);"> - ${feedback.join(', ')}</span>` : ''}
+            `;
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('wifi-password');
+            const icon = document.getElementById('toggle-password');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'Hide';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'Show';
+            }
+        }
+
+        function togglePasswordField() {
+            const group = document.getElementById('password-group');
+            group.style.display = config.security.mode === 'none' ? 'none' : 'block';
+        }
+
+        function updateComparison() {
+            document.getElementById('compare-ssid').textContent = config.wireless.ssid24;
+            document.getElementById('compare-security').textContent = securityModeNames[config.security.mode] || config.security.mode;
+            document.getElementById('compare-password').textContent = '●'.repeat(config.security.password.length);
+            document.getElementById('compare-channel').textContent = config.wireless.channel24 === 'auto' ? 'Auto' : config.wireless.channel24;
+            document.getElementById('compare-dhcp').textContent = `${config.dhcp.start} - ${config.dhcp.end.split('.').pop()}`;
+        }
+
+        function updateTutorialContent() {
+            const step = tutorialSteps[tutorialStep - 1];
+            const container = document.getElementById('tutorial-content');
+
+            container.innerHTML = `
+                <div class="tutorial-header">
+                    <h4>Step ${tutorialStep}: ${step.title}</h4>
+                </div>
+                <p style="margin-bottom: 20px; color: #d1d5db;">${step.description}</p>
+                <div style="background: var(--darker); padding: 15px; border-radius: 8px;">
+                    <strong style="color: var(--success);">Best Practices:</strong>
+                    <ul style="margin-top: 10px; padding-left: 20px; color: var(--gray);">
+                        ${step.tips.map(tip => `<li style="margin: 5px 0;">${tip}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            // Update progress
+            document.querySelectorAll('.progress-step').forEach((el, i) => {
+                el.classList.remove('active', 'completed');
+                if (i + 1 < tutorialStep) el.classList.add('completed');
+                else if (i + 1 === tutorialStep) el.classList.add('active');
+            });
+
+            // Update buttons
+            document.getElementById('prev-step').style.display = tutorialStep > 1 ? 'inline-flex' : 'none';
+            document.getElementById('next-step').style.display = tutorialStep < totalSteps ? 'inline-flex' : 'none';
+            document.getElementById('complete-tutorial').style.display = tutorialStep === totalSteps ? 'inline-flex' : 'none';
+        }
+
+        function prevTutorialStep() {
+            if (tutorialStep > 1) {
+                tutorialStep--;
+                updateTutorialContent();
+            }
+        }
+
+        function nextTutorialStep() {
+            if (tutorialStep < totalSteps) {
+                tutorialStep++;
+                updateTutorialContent();
+            }
+        }
+
+        function completeTutorial() {
+            showNotification('🎉 Tutorial Completed! You\'ve learned the basics of wireless router configuration.', 'success');
+            document.querySelectorAll('.progress-step').forEach(el => el.classList.add('completed'));
+        }
+
+        function applyWirelessSettings() {
+            if (config.wireless.enabled24 && config.wireless.ssid24.trim().length === 0) {
+                showNotification('⚠️ The 2.4 GHz SSID must be 1-32 characters.', 'error');
+                return;
+            }
+            if (config.wireless.enabled5 && config.wireless.ssid5.trim().length === 0) {
+                showNotification('⚠️ The 5 GHz SSID must be 1-32 characters.', 'error');
+                return;
+            }
+            showNotification('✓ Wireless settings applied successfully. The network may briefly disconnect.', 'success');
+            updateStatus();
+        }
+
+        function resetWirelessDefaults() {
+            config.wireless = {
+                enabled24: true,
+                enabled5: true,
+                ssid24: 'MyNetwork',
+                ssid5: 'MyNetwork-5G',
+                channel24: '6',
+                channel5: 'auto',
+                broadcast: true
+            };
+
+            document.getElementById('enable-24ghz').checked = true;
+            document.getElementById('enable-5ghz').checked = true;
+            document.getElementById('ssid-24').value = 'MyNetwork';
+            document.getElementById('ssid-5').value = 'MyNetwork-5G';
+            document.getElementById('channel-24').value = '6';
+            document.getElementById('channel-5').value = 'auto';
+            document.getElementById('ssid-broadcast').checked = true;
+
+            generateChannelBar();
+            updateStatus();
+            updateComparison();
+            showNotification('Wireless settings reset to defaults.', 'info');
+        }
+
+        function applySecuritySettings() {
+            showNotification('✓ Security settings applied. Devices will need to reconnect with the new password.', 'success');
+        }
+
+        function applyDHCPSettings() {
+            // Validate IP range
+            const ipToNumber = (ip) => {
+                const parts = ip.trim().split('.');
+                if (parts.length !== 4 || parts.some(p => !/^\d{1,3}$/.test(p) || Number(p) > 255)) return null;
+                return parts.reduce((acc, p) => acc * 256 + Number(p), 0);
+            };
+            const start = ipToNumber(config.dhcp.start);
+            const end = ipToNumber(config.dhcp.end);
+
+            if (start === null || end === null) {
+                showNotification('⚠️ Enter valid IPv4 addresses (e.g. 192.168.1.100).', 'error');
+                return;
+            }
+
+            if (!config.dhcp.start.trim().startsWith('192.168.1.') || !config.dhcp.end.trim().startsWith('192.168.1.')) {
+                showNotification('⚠️ The DHCP range must be on the router\'s subnet (192.168.1.x).', 'error');
+                return;
+            }
+
+            if (start >= end) {
+                showNotification('⚠️ Starting IP must be less than ending IP.', 'error');
+                return;
+            }
+
+            showNotification('✓ DHCP settings applied successfully.', 'success');
+            updateComparison();
+        }
+
+        function showNotification(message, type) {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+
+            const notif = document.createElement('div');
+            notif.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'error' : 'info'} notification`;
+            notif.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; max-width: 400px; animation: slideIn 0.3s ease;';
+            notif.textContent = message;
+
+            document.body.appendChild(notif);
+
+            setTimeout(() => notif.remove(), 4000);
+        }
+
+        function runSelfTest() {
+            const results = [];
+
+            // Test 1: Security mode
+            results.push({
+                pass: ['wpa2', 'wpa3', 'wpa2-enterprise'].includes(config.security.mode),
+                message: `Security mode: ${config.security.mode.toUpperCase()} ${['wpa2', 'wpa3', 'wpa2-enterprise'].includes(config.security.mode) ? '(Recommended)' : '(Not recommended)'}`
+            });
+
+            // Test 2: Password length
+            results.push({
+                pass: config.security.password.length >= 12,
+                message: `Password length: ${config.security.password.length} characters ${config.security.password.length >= 12 ? '(Strong)' : '(Should be 12+)'}`
+            });
+
+            // Test 3: Password complexity
+            const hasComplex = /[A-Z]/.test(config.security.password) &&
+                /[a-z]/.test(config.security.password) &&
+                /[0-9]/.test(config.security.password);
+            results.push({
+                pass: hasComplex,
+                message: `Password complexity: ${hasComplex ? 'Mixed characters' : 'Needs improvement'}`
+            });
+
+            // Test 4: WPS disabled
+            results.push({
+                pass: !config.security.wps,
+                message: `WPS: ${config.security.wps ? 'Enabled (Security risk)' : 'Disabled (Good)'}`
+            });
+
+            // Test 5: Encryption type
+            results.push({
+                pass: config.security.encryption === 'aes',
+                message: `Encryption: ${config.security.encryption.toUpperCase()} ${config.security.encryption === 'aes' ? '(Recommended)' : '(TKIP is legacy)'}`
+            });
+
+            // Test 6: SSID not default
+            const isDefaultSSID = config.wireless.ssid24.toLowerCase().includes('default') ||
+                config.wireless.ssid24.toLowerCase().includes('router');
+            results.push({
+                pass: !isDefaultSSID,
+                message: `SSID: ${isDefaultSSID ? 'Appears to be default (Change it)' : 'Customized (Good)'}`
+            });
+
+            // Test 7: Channel selection
+            const goodChannels = ['1', '6', '11', 'auto'];
+            results.push({
+                pass: goodChannels.includes(config.wireless.channel24),
+                message: `Channel: ${config.wireless.channel24} ${goodChannels.includes(config.wireless.channel24) ? '(Non-overlapping)' : '(May cause interference)'}`
+            });
+
+            // Display results
+            const panel = document.getElementById('test-panel');
+            const resultsDiv = document.getElementById('test-results');
+
+            resultsDiv.innerHTML = results.map(r => `
+                <div class="test-result ${r.pass ? 'pass' : 'fail'}">
+                    <span>${r.pass ? '✓' : '✗'}</span>
+                    <span>${r.message}</span>
+                </div>
+            `).join('');
+
+            panel.classList.add('active');
+
+            const allPass = results.every(r => r.pass);
+            const passCount = results.filter(r => r.pass).length;
+
+            resultsDiv.innerHTML += `
+                <div style="margin-top: 15px; padding: 15px; background: var(--darker); border-radius: 8px; text-align: center;">
+                    <strong style="font-size: 1.2rem; color: ${allPass ? 'var(--success)' : passCount >= 5 ? 'var(--warning)' : 'var(--danger)'};">
+                        ${passCount}/${results.length} Tests Passed
+                    </strong>
+                    <p style="color: var(--gray); margin-top: 5px;">
+                        ${allPass ? 'Excellent! Your configuration follows best practices.' : 'Review the failed tests above and make improvements.'}
+                    </p>
+                </div>
+            `;
+        }
+
+        // Add CSS for notification animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>

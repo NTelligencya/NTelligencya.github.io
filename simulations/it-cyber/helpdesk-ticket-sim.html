@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help Desk Ticket Simulator - IT Vocational Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-elev: #131826;
+    --bg-card: #1a2133;
+    --border: #2a3249;
+    --text: #e8ecf5;
+    --text-dim: #8a94ab;
+    --text-faint: #5a6480;
+    --accent: #64d2ff;
+    --success: #4ade80;
+    --info: #60a5fa;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --purple: #c084fc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(100, 210, 255, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(192, 132, 252, 0.06) 0%, transparent 40%);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    line-height: 1.5;
+  }
+
+  .container { max-width: 820px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 2rem; }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.6rem, 5vw, 2.5rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .subtitle { color: var(--text-dim); font-size: 1rem; max-width: 540px; margin: 0 auto; }
+
+  /* ===== Stats bar ===== */
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.9rem 1.25rem;
+    margin-bottom: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .stats-item { display: flex; gap: 0.5rem; align-items: center; }
+  .stats-label { color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.68rem; }
+  .stats-value { color: var(--text); font-weight: 600; }
+  .stats-value.warn { color: var(--warn); }
+  .stats-value.danger { color: var(--danger); }
+
+  /* ===== Panels ===== */
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .panel-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.85rem;
+  }
+
+  /* ===== Ticket ===== */
+  .ticket-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-faint);
+  }
+
+  .priority-chip {
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    border: 1px solid currentColor;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .priority-chip.p2 { color: var(--warn); }
+  .priority-chip.p3 { color: var(--info); }
+  .priority-chip.p1 { color: var(--danger); }
+
+  .ticket-message {
+    background: var(--bg-elev);
+    border-left: 3px solid var(--purple);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    font-size: 1.02rem;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  .ticket-from {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 0.6rem;
+    font-style: normal;
+  }
+
+  /* ===== Question list ===== */
+  .question-btn, .option-btn {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.85rem 1.1rem;
+    border-radius: 10px;
+    text-align: left;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.93rem;
+    transition: all 0.15s ease;
+    width: 100%;
+    display: block;
+    margin-bottom: 0.55rem;
+  }
+
+  .question-btn:hover:not(:disabled), .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--bg-card);
+  }
+
+  .question-btn:disabled { cursor: default; opacity: 0.9; }
+
+  .question-btn .q-cost {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    float: right;
+  }
+
+  .question-answer {
+    background: rgba(100, 210, 255, 0.05);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 0.65rem 0.9rem;
+    margin: -0.15rem 0 0.65rem 1rem;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    font-style: italic;
+    animation: slideIn 0.25s ease;
+  }
+
+  .option-btn.correct { border-color: var(--success); background: rgba(74, 222, 128, 0.1); }
+  .option-btn.incorrect { border-color: var(--danger); background: rgba(248, 113, 113, 0.1); }
+  .option-btn:disabled { cursor: default; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .shake { animation: shake 0.3s ease; }
+
+  .feedback {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    animation: slideIn 0.3s ease;
+  }
+  .feedback.good { border-left-color: var(--success); }
+  .feedback.bad { border-left-color: var(--danger); }
+  .feedback-title {
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.92rem;
+  }
+
+  /* ===== Buttons ===== */
+  .controls { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+  .btn {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.85rem 1.4rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .btn:hover { border-color: var(--accent); background: var(--bg-card); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #4a9fd9);
+    border-color: transparent;
+    color: #06121c;
+    font-weight: 700;
+  }
+  .btn-primary:hover { background: linear-gradient(135deg, #7ddcff, var(--accent)); transform: translateY(-1px); }
+
+  .btn-ghost { flex: 0; min-width: auto; font-size: 0.85rem; padding: 0.6rem 1rem; }
+
+  /* ===== SLA bar ===== */
+  .sla-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 1.25rem; }
+  .sla-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success), var(--accent));
+    border-radius: 3px;
+    transition: width 0.4s ease, background 0.4s ease;
+  }
+  .sla-fill.mid { background: linear-gradient(90deg, var(--warn), #f59e0b); }
+  .sla-fill.low { background: linear-gradient(90deg, var(--danger), #dc2626); }
+
+  .sla-breach {
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+  }
+
+  /* ===== Knowledge base drawer ===== */
+  .kb-toggle {
+    position: fixed;
+    right: 0;
+    top: 40%;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.9rem 0.55rem;
+    writing-mode: vertical-rl;
+    cursor: pointer;
+    z-index: 60;
+    transition: background 0.2s ease;
+  }
+  .kb-toggle:hover { background: var(--bg-card); }
+
+  .kb-drawer {
+    position: fixed;
+    top: 0;
+    right: -340px;
+    width: 320px;
+    height: 100vh;
+    background: var(--bg-elev);
+    border-left: 1px solid var(--border);
+    padding: 1.5rem 1.25rem;
+    overflow-y: auto;
+    z-index: 70;
+    transition: right 0.3s ease;
+  }
+  .kb-drawer.open { right: 0; }
+
+  .kb-drawer h3 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
+  }
+  .kb-cost-note {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--warn);
+    margin-bottom: 1rem;
+  }
+  .kb-entry {
+    border-bottom: 1px dashed var(--border);
+    padding: 0.6rem 0;
+    font-size: 0.84rem;
+  }
+  .kb-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .kb-close {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  /* ===== Results ===== */
+  .results { text-align: center; padding: 2.5rem 2rem; }
+  .results-score {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.6rem, 9vw, 4.5rem);
+    line-height: 1;
+    margin: 1rem 0;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .verdict { font-family: 'Unbounded', sans-serif; font-size: 1.25rem; font-weight: 600; margin: 0.75rem 0 0.5rem; }
+  .verdict-detail { color: var(--text-dim); font-size: 0.95rem; max-width: 480px; margin: 0 auto 1.5rem; }
+
+  .breakdown {
+    text-align: left;
+    max-width: 520px;
+    margin: 0 auto 1.75rem;
+  }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 0.88rem;
+  }
+  .breakdown-row .b-title { color: var(--text-dim); }
+  .breakdown-row .b-pts { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+  .breakdown-row .b-pts.good { color: var(--success); }
+  .breakdown-row .b-pts.mid { color: var(--warn); }
+  .breakdown-row .b-pts.poor { color: var(--danger); }
+
+  /* ===== Intro ===== */
+  .intro-rules { text-align: left; max-width: 560px; margin: 0 auto 1.5rem; }
+  .rule-row { display: flex; gap: 0.85rem; margin-bottom: 0.85rem; align-items: flex-start; }
+  .rule-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    padding-top: 0.1rem;
+  }
+  .rule-row p { font-size: 0.92rem; color: var(--text-dim); }
+  .rule-row p strong { color: var(--text); }
+
+  .hidden { display: none !important; }
+
+  #confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 1rem 0.75rem; }
+    .panel { padding: 1.25rem; }
+    .kb-drawer { width: 280px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+
+<button class="kb-toggle hidden" id="kb-toggle">Knowledge Base</button>
+<aside class="kb-drawer" id="kb-drawer">
+  <h3>Knowledge Base</h3>
+  <div class="kb-cost-note">// Opening this costs 3 min of ticket time. Real techs look things up; it just takes time.</div>
+  <div class="kb-entry"><span class="kb-code">400</span> Bad Request; malformed request, often corrupt cookies. Incognito test isolates it.</div>
+  <div class="kb-entry"><span class="kb-code">401</span> Unauthorised; no valid credentials. "Who are you?" Expired sessions, expired passwords.</div>
+  <div class="kb-entry"><span class="kb-code">403</span> Forbidden; authenticated but not permitted. "I know you, still no." Group and role problem.</div>
+  <div class="kb-entry"><span class="kb-code">404</span> Not Found; resource missing at that URL. Typos, moved pages, dead links.</div>
+  <div class="kb-entry"><span class="kb-code">408</span> Request Timeout; server gave up waiting for the client. Slow or flaky connections.</div>
+  <div class="kb-entry"><span class="kb-code">429</span> Too Many Requests; rate limit hit. Scripts and APIs mostly.</div>
+  <div class="kb-entry"><span class="kb-code">500</span> Internal Server Error; the application failed. Never the user's fault.</div>
+  <div class="kb-entry"><span class="kb-code">502</span> Bad Gateway; proxy or load balancer can't get a good response from the backend.</div>
+  <div class="kb-entry"><span class="kb-code">503</span> Service Unavailable; temporarily down. Check for a maintenance window first.</div>
+  <div class="kb-entry"><span class="kb-code">504</span> Gateway Timeout; proxy gave up waiting on a slow backend.</div>
+  <div class="kb-entry"><span class="kb-code">DNS</span> Name won't resolve to an IP; the browser can't even try. Test on another network.</div>
+  <button class="kb-close" id="kb-close">Close</button>
+</aside>
+
+<div class="container">
+  <header>
+    <div class="eyebrow">// IT Vocational Training • Module 01</div>
+    <h1>Help Desk <span>Ticket Simulator</span></h1>
+    <p class="subtitle">Real users don't quote error codes. They describe symptoms. Your job: diagnose, act, document.</p>
+  </header>
+
+  <!-- ===== INTRO ===== -->
+  <section id="intro-screen">
+    <div class="panel results">
+      <div class="panel-label">// How it works</div>
+      <div class="intro-rules">
+        <div class="rule-row"><span class="rule-num">01</span><p><strong>Each ticket has a 60-minute SLA clock</strong> (simulated, not real time). Everything you do consumes minutes.</p></div>
+        <div class="rule-row"><span class="rule-num">02</span><p><strong>Ask diagnostic questions</strong> (5 min each). Some are useful, some are dead ends. Efficient techs ask fewer, better questions.</p></div>
+        <div class="rule-row"><span class="rule-num">03</span><p><strong>Diagnose the error</strong>, then <strong>choose the right action</strong>. Wrong calls cost time and points.</p></div>
+        <div class="rule-row"><span class="rule-num">04</span><p><strong>Write the ticket note.</strong> The next tech has to pick up where you left off. Good notes are scored.</p></div>
+        <div class="rule-row"><span class="rule-num">05</span><p><strong>The Knowledge Base</strong> (side tab) is always available; peeking costs 3 minutes, just like real life.</p></div>
+        <div class="rule-row"><span class="rule-num">06</span><p>Leftover SLA time converts to an <strong>efficiency bonus</strong>. Breach the SLA and you lose points.</p></div>
+      </div>
+      <button class="btn btn-primary" id="btn-start" style="max-width:280px;margin:0 auto;">Start Shift →</button>
+    </div>
+  </section>
+
+  <!-- ===== GAME ===== -->
+  <section id="game-screen" class="hidden">
+    <div class="stats">
+      <div class="stats-item"><span class="stats-label">Ticket</span><span class="stats-value" id="stat-ticket">1 / 8</span></div>
+      <div class="stats-item"><span class="stats-label">SLA</span><span class="stats-value" id="stat-sla">60 min</span></div>
+      <div class="stats-item"><span class="stats-label">Score</span><span class="stats-value" id="stat-score">0</span></div>
+    </div>
+
+    <div class="sla-bar"><div class="sla-fill" id="sla-fill" style="width:100%"></div></div>
+    <div class="sla-breach hidden" id="sla-breach">⚠ SLA breached; resolution still required</div>
+
+    <!-- Ticket view -->
+    <div class="panel" id="ticket-panel">
+      <div class="panel-label" id="ticket-label">// Incoming Ticket</div>
+      <div class="ticket-meta">
+        <span class="priority-chip p3" id="ticket-priority">P3</span>
+        <span id="ticket-id">INC-0001</span>
+        <span id="ticket-channel">via phone</span>
+      </div>
+      <div class="ticket-message">
+        <div id="ticket-message-text"></div>
+        <div class="ticket-from" id="ticket-from"></div>
+      </div>
+    </div>
+
+    <!-- Phase: questions -->
+    <div class="panel" id="phase-questions">
+      <div class="panel-label">// Investigate (5 min per question)</div>
+      <div id="question-list"></div>
+      <div class="controls" style="margin-top:0.75rem;">
+        <button class="btn btn-primary" id="btn-to-diagnosis">I'm ready to diagnose →</button>
+      </div>
+    </div>
+
+    <!-- Phase: diagnosis -->
+    <div class="panel hidden" id="phase-diagnosis">
+      <div class="panel-label">// Diagnosis: what's the underlying error?</div>
+      <div id="diagnosis-options"></div>
+      <div id="diagnosis-feedback"></div>
+    </div>
+
+    <!-- Phase: action -->
+    <div class="panel hidden" id="phase-action">
+      <div class="panel-label">// Response: what do you do?</div>
+      <div id="action-options"></div>
+      <div id="action-feedback"></div>
+    </div>
+
+    <!-- Phase: note -->
+    <div class="panel hidden" id="phase-note">
+      <div class="panel-label">// Close out: pick the ticket note you'd write</div>
+      <div id="note-options"></div>
+      <div id="note-feedback"></div>
+    </div>
+
+    <!-- Phase: debrief -->
+    <div class="panel hidden" id="phase-debrief">
+      <div class="panel-label">// Ticket Debrief</div>
+      <div class="feedback good" id="debrief-content"></div>
+      <div class="breakdown" id="ticket-breakdown"></div>
+      <div class="controls">
+        <button class="btn btn-primary" id="btn-next-ticket">Next Ticket →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== RESULTS ===== -->
+  <section id="results-screen" class="hidden">
+    <div class="panel results">
+      <div class="panel-label">// Shift Complete</div>
+      <div class="results-score" id="final-score">0</div>
+      <div class="verdict" id="final-verdict"></div>
+      <div class="verdict-detail" id="final-detail"></div>
+      <div class="breakdown" id="final-breakdown"></div>
+      <div class="controls" style="max-width:400px;margin:0 auto;">
+        <button class="btn btn-primary" id="btn-restart">Run Another Shift</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>// Module 01 of 03 • Help Desk Ticket Simulator</footer>
+</div>
+
+<script>
+// ================= CONFETTI =================
+const confettiCanvas = document.getElementById('confetti-canvas');
+const cctx = confettiCanvas.getContext('2d');
+let confettiParticles = [];
+let confettiAnimating = false;
+
+function sizeCanvas() {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+sizeCanvas();
+window.addEventListener('resize', sizeCanvas);
+
+const confettiColors = ['#64d2ff', '#c084fc', '#4ade80', '#fbbf24', '#f87171', '#60a5fa', '#ffffff'];
+
+function launchConfetti() {
+  const origins = [
+    { x: 0, y: window.innerHeight, angleBase: -60 },
+    { x: window.innerWidth, y: window.innerHeight, angleBase: -120 }
+  ];
+  origins.forEach(o => {
+    for (let i = 0; i < 55; i++) {
+      const angle = (o.angleBase + (Math.random() * 50 - 25)) * Math.PI / 180;
+      const speed = 12 + Math.random() * 14;
+      confettiParticles.push({
+        x: o.x, y: o.y,
+        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+        size: 6 + Math.random() * 6,
+        colour: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+        rotation: Math.random() * 360,
+        spin: (Math.random() - 0.5) * 12,
+        shape: Math.random() > 0.5 ? 'rect' : 'streamer',
+        life: 1
+      });
+    }
+  });
+  if (!confettiAnimating) { confettiAnimating = true; animateConfetti(); }
+}
+
+function animateConfetti() {
+  cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiParticles.forEach(p => {
+    p.vy += 0.35; p.vx *= 0.99;
+    p.x += p.vx; p.y += p.vy;
+    p.rotation += p.spin; p.life -= 0.008;
+    cctx.save();
+    cctx.translate(p.x, p.y);
+    cctx.rotate(p.rotation * Math.PI / 180);
+    cctx.globalAlpha = Math.max(0, p.life);
+    cctx.fillStyle = p.colour;
+    if (p.shape === 'streamer') cctx.fillRect(-p.size, -p.size / 4, p.size * 2, p.size / 2);
+    else cctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+    cctx.restore();
+  });
+  confettiParticles = confettiParticles.filter(p => p.life > 0 && p.y < confettiCanvas.height + 50);
+  if (confettiParticles.length > 0) requestAnimationFrame(animateConfetti);
+  else { confettiAnimating = false; cctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); }
+}
+
+// ================= TICKET DATA =================
+const tickets = [
+  {
+    id: 'INC-2041', priority: 'P3', channel: 'via phone',
+    from: '— Priya, People & Culture',
+    message: "I'm trying to open the People & Culture intranet page and it just says I don't have permission to view it. My email and everything else works fine.",
+    questions: [
+      { q: "Can a teammate open the same link?", a: "Yes, my colleague opened it straight away on her machine.", relevant: true },
+      { q: "Have you recently changed teams or roles?", a: "Actually yes, I moved from Finance to People & Culture last week.", relevant: true },
+      { q: "Do you get asked to log in, or does it just refuse you?", a: "No login prompt at all. It just says forbidden.", relevant: true },
+      { q: "Have you tried resetting your password?", a: "I reset it this morning. No change.", relevant: false },
+      { q: "Are you in the office or working from home?", a: "In the office, on the normal network.", relevant: false },
+      { q: "What browser are you using?", a: "Edge, same as always.", relevant: false }
+    ],
+    diagnosis: {
+      options: ['401 Unauthorised', '403 Forbidden', '404 Not Found', '500 Internal Server Error'],
+      correct: '403 Forbidden',
+      explanation: "No login prompt plus 'forbidden' means she's authenticated but not authorised. She moved teams last week, so her account isn't in the P&C security group yet. If it were 401 she'd be bounced to a sign-in page."
+    },
+    actions: [
+      { text: "Raise an access request to add her to the P&C intranet security group", correct: true, feedback: "Right call. 403 is a permissions problem; the fix lives in group membership, not passwords." },
+      { text: "Walk her through another password reset", correct: false, feedback: "Her authentication is fine; she already told you email works and she reset the password with no change. That's 401 thinking applied to a 403 problem." },
+      { text: "Escalate to the web team as a server fault", correct: false, feedback: "Nothing here points to a server fault. Her colleague can access the same page, so the server is serving it fine." },
+      { text: "Tell her to clear cookies and try again", correct: false, feedback: "Clearing cookies targets 400-style problems. This error is consistent and permission-based, not browser state." }
+    ],
+    notes: [
+      { text: "User moved from Finance to P&C last week. Can authenticate (mail OK, no login prompt) but receives 403 on the P&C intranet. Colleague in same team has access. Raised access request to add user to P&C intranet security group; pending approval. Advised user of expected timeframe.", quality: 'best', feedback: "This is the note a senior tech writes: symptoms, evidence, action taken, current status, and the user informed." },
+      { text: "User can't open intranet page. Colleague can. Raised access request.", quality: 'ok', feedback: "The facts are there but the next tech has to re-ask half the diagnostic questions. What page? Why an access request? What's pending?" },
+      { text: "Fixed permissions issue.", quality: 'poor', feedback: "Nothing here helps anyone. If the access request stalls, the next tech starts from zero. Notes like this are why tickets bounce." }
+    ],
+    debrief: "Optimal path: three questions. 'Login prompt or refusal?' separates 401 from 403; 'Can a teammate access it?' rules out an outage; 'Changed roles recently?' finds the cause. The password question was a dead end because authentication was never in doubt."
+  },
+  {
+    id: 'INC-2044', priority: 'P3', channel: 'via chat',
+    from: '— Marcus, Finance',
+    message: "I've just come back from four weeks of leave and the finance portal keeps bouncing me back to the sign-in page. I'm sure I'm typing my password right.",
+    questions: [
+      { q: "Do you see any message when the sign-in fails?", a: "It says my credentials are invalid or expired.", relevant: true },
+      { q: "Is Outlook or anything else also prompting you?", a: "Now you mention it, Outlook keeps asking me to sign in too.", relevant: true },
+      { q: "How long were you away, exactly?", a: "Four weeks to the day.", relevant: true },
+      { q: "Can a colleague open the finance portal right now?", a: "Yes, my deskmate is in it as we speak.", relevant: true },
+      { q: "Have you tried a different browser?", a: "Same thing in Chrome and Edge.", relevant: false },
+      { q: "Is your VPN connected?", a: "I'm in the office, no VPN.", relevant: false }
+    ],
+    diagnosis: {
+      options: ['400 Bad Request', '401 Unauthorised', '403 Forbidden', '503 Service Unavailable'],
+      correct: '401 Unauthorised',
+      explanation: "Bounced to sign-in, 'invalid or expired' credentials, multiple systems prompting, and a four-week absence: his password expired while he was on leave. Classic 401. The colleague being logged in rules out an outage."
+    },
+    actions: [
+      { text: "Reset his expired password and check the account isn't locked", correct: true, feedback: "Exactly. Password expiry policies don't pause for annual leave. Reset, unlock if needed, done." },
+      { text: "Add him to the finance portal security group", correct: false, feedback: "That's the 403 fix. He isn't being refused access to a resource; he can't authenticate at all, across multiple systems." },
+      { text: "Escalate the finance portal as down", correct: false, feedback: "His deskmate is using it right now. The portal is fine; his credentials aren't." },
+      { text: "Clear his browser cache and cookies", correct: false, feedback: "Two different browsers fail the same way, and Outlook is prompting too. This isn't browser state." }
+    ],
+    notes: [
+      { text: "User returned from 4 weeks' leave; password expired during absence. 401-pattern symptoms across finance portal and Outlook ('invalid or expired credentials'). Portal confirmed up (colleague active). Password reset completed, account unlock verified, user signed in successfully. Resolved.", quality: 'best', feedback: "Cause, evidence, action, verification, outcome. Anyone auditing this ticket understands it in ten seconds." },
+      { text: "Password expired while on leave. Reset it. Working now.", quality: 'ok', feedback: "Accurate and honest but thin. No evidence trail; if the account locks again next week, the pattern is invisible." },
+      { text: "User error, sorted.", quality: 'poor', feedback: "It wasn't even user error; the expiry policy did this. Notes that blame the user erode trust and record nothing useful." }
+    ],
+    debrief: "Optimal path: two questions. The exact error message ('expired') plus 'is anything else prompting you?' nails it immediately. The four-weeks detail confirms the mechanism. Browser and VPN questions were noise once multiple systems were failing identically."
+  },
+  {
+    id: 'INC-2049', priority: 'P3', channel: 'via phone',
+    from: '— Jade, Rostering',
+    message: "One website I use for rostering shows 'Bad Request' every single time I open it. Every other site works fine. It started yesterday afternoon.",
+    questions: [
+      { q: "Does it work in a private or incognito window?", a: "Hang on... yes! It works in a private window.", relevant: true },
+      { q: "Does the site load on your phone?", a: "Works fine on my phone.", relevant: true },
+      { q: "Is there an error code shown on the page?", a: "It says HTTP 400 in small print.", relevant: true },
+      { q: "Have you restarted your computer?", a: "Twice. No difference.", relevant: false },
+      { q: "Have you run an antivirus scan?", a: "Ran one last night, all clean.", relevant: false },
+      { q: "Has your password changed recently?", a: "No, same password for months.", relevant: false }
+    ],
+    diagnosis: {
+      options: ['400 Bad Request', '403 Forbidden', '404 Not Found', '502 Bad Gateway'],
+      correct: '400 Bad Request',
+      explanation: "Works in incognito and on her phone but fails in her normal browser: the request itself is malformed, and corrupted cookies for that site are the usual culprit. Incognito starts with a clean cookie jar, which is why it works there."
+    },
+    actions: [
+      { text: "Clear cookies and site data for that specific site only", correct: true, feedback: "Surgical and correct. No need to nuke all her cookies and log her out of everything else; just the affected site." },
+      { text: "Reinstall her browser", correct: false, feedback: "Massive overkill. The incognito test already proved the browser itself is fine; it's the stored state for one site." },
+      { text: "Escalate to the rostering vendor as a site fault", correct: false, feedback: "The site works in incognito and on her phone. The vendor's server is fine; the problem is local." },
+      { text: "Reset her rostering password", correct: false, feedback: "Nothing suggested an authentication problem. 400 is about the request being malformed, not who's making it." }
+    ],
+    notes: [
+      { text: "Rostering site returning HTTP 400 in user's default browser since yesterday. Confirmed working in incognito and on mobile, isolating fault to local browser state. Cleared cookies/site data for the affected domain only; site now loads normally in default browser. Resolved. Likely cause: corrupted cookie set yesterday.", quality: 'best', feedback: "The isolation logic is recorded, which is what makes this note valuable. The next tech who sees a 400 learns the method, not just the fix." },
+      { text: "400 error on rostering site. Cleared cookies, fixed.", quality: 'ok', feedback: "Right fix recorded, but the diagnostic reasoning (incognito test, phone test) is lost. That reasoning is the reusable part." },
+      { text: "Browser problem. Resolved.", quality: 'poor', feedback: "Which browser? Which problem? Resolved how? This note is indistinguishable from a hundred other tickets." }
+    ],
+    debrief: "Optimal path: one question. The incognito test is the single highest-value move for a 'one site fails, everything else works' report; it splits local-state problems from server problems instantly. Restart, antivirus and password questions burned 15 minutes for nothing."
+  },
+  {
+    id: 'INC-2052', priority: 'P3', channel: 'via email',
+    from: '— Tom, Field Services',
+    message: "The leave application form link on our team page says 'page not found'. It definitely worked last month, the whole team uses it.",
+    questions: [
+      { q: "Is the whole team getting the same error, or just you?", a: "Everyone. Three of us tried this morning.", relevant: true },
+      { q: "Can you paste me the exact link from the team page?", a: "It points to intranet/forms/leave-2024.", relevant: true },
+      { q: "Do you know if HR changed anything recently?", a: "They sent something about a new intranet section last week, I didn't read it properly.", relevant: true },
+      { q: "Does it work in a private window?", a: "Same error in a private window.", relevant: false },
+      { q: "Have you restarted your machine?", a: "No, but Sarah restarted hers and it made no difference.", relevant: false },
+      { q: "Are you connected to the VPN?", a: "We're all in the office.", relevant: false }
+    ],
+    diagnosis: {
+      options: ['400 Bad Request', '403 Forbidden', '404 Not Found', '503 Service Unavailable'],
+      correct: '404 Not Found',
+      explanation: "Everyone gets it, the URL contains a year-stamped path, and HR announced a restructure last week. The page moved; the link didn't. That's a 404: the resource no longer exists at that address."
+    },
+    actions: [
+      { text: "Find the form's new location and update the team page link", correct: true, feedback: "Fix the cause, not the symptom. The broken link will keep generating tickets until someone updates it." },
+      { text: "Tell the team to clear their caches", correct: false, feedback: "A whole team failing identically after an announced restructure is not a caching problem. The page genuinely moved." },
+      { text: "Escalate as an intranet server outage", correct: false, feedback: "The intranet is up; one specific page is missing from one specific address. Outage thinking wastes the infrastructure team's time." },
+      { text: "Recreate the leave form from scratch", correct: false, feedback: "The form almost certainly exists at a new address. Rebuilding it creates a duplicate and a governance headache." }
+    ],
+    notes: [
+      { text: "Team page link to /forms/leave-2024 returning 404 for all users since HR intranet restructure (announced last week). Located form at its new address in the updated HR section, updated the team page link, verified with user. Resolved. Flagged to HR comms that old links may exist elsewhere.", quality: 'best', feedback: "Solves the ticket and anticipates the next five. Flagging the wider link-rot risk is the kind of thing that gets noticed." },
+      { text: "Old link was broken after HR moved things. Updated the link.", quality: 'ok', feedback: "Correct but under-documented. Where does the link point now? Verified with whom?" },
+      { text: "Link works now.", quality: 'poor', feedback: "Does it? Which link? Changed to what? Untraceable." }
+    ],
+    debrief: "Optimal path: 'Just you or everyone?' immediately rules out user-specific causes; the exact URL plus the HR restructure question reveals the cause. The incognito question was wasted; multi-user failures are never local browser state."
+  },
+  {
+    id: 'INC-2056', priority: 'P2', channel: 'via phone',
+    from: '— Leanne, Payroll',
+    message: "The HR portal is showing 'Service Unavailable, please try again later'. I need to submit the timesheet batch today or people don't get paid.",
+    questions: [
+      { q: "Check the IT change calendar for scheduled work", a: "There's a scheduled maintenance window for the HR portal, running until 2:00 pm today.", relevant: true },
+      { q: "Are other users reporting the same thing?", a: "Two more calls in the queue about the same portal.", relevant: true },
+      { q: "Does it work in a private window?", a: "Same message in a private window.", relevant: false },
+      { q: "Has she tried restarting her computer?", a: "Yes. Same message.", relevant: false },
+      { q: "Has her password changed recently?", a: "No, and the error appears before any login.", relevant: false },
+      { q: "Check the vendor's public status page", a: "Vendor status page shows planned maintenance in progress.", relevant: true }
+    ],
+    diagnosis: {
+      options: ['500 Internal Server Error', '502 Bad Gateway', '503 Service Unavailable', '504 Gateway Timeout'],
+      correct: '503 Service Unavailable',
+      explanation: "The error text says it plainly, and the change calendar confirms it: planned maintenance. A 503 during a known window is the system working as intended, not an incident."
+    },
+    actions: [
+      { text: "Advise her of the 2 pm maintenance window and note her payroll deadline in case it overruns", correct: true, feedback: "Correct, and the second half matters: capturing the business impact means if the window overruns, escalation is already justified and documented." },
+      { text: "Raise a P1 outage with infrastructure", correct: false, feedback: "It's not an outage; it's scheduled work that was announced. A false P1 costs credibility you'll want later for real ones." },
+      { text: "Tell her to keep refreshing until it comes back", correct: false, feedback: "Technically it will eventually work, but you've given her no timeframe, no confidence, and no record of her deadline. That's not support." },
+      { text: "Clear her cookies and retry", correct: false, feedback: "The service is down for everyone by design. Nothing on her machine changes that." }
+    ],
+    notes: [
+      { text: "HR portal returning 503; confirmed against change calendar as planned maintenance until 14:00 (change ref in calendar). User has a payroll batch deadline today; impact noted and user advised of the window. Will monitor; if maintenance overruns past 14:00, escalate to change owner citing payroll deadline. No fault present.", quality: 'best', feedback: "The conditional escalation plan is the professional touch. If 2 pm passes, the next step is already loaded." },
+      { text: "Planned maintenance until 2 pm. Told the user to wait.", quality: 'ok', feedback: "Correct, but the payroll deadline vanished. If maintenance overruns, nobody knows there's a payday at stake." },
+      { text: "Not an issue, portal is in maintenance.", quality: 'poor', feedback: "Dismissive. The user's business problem was real even though the system was fine, and this note buries it." }
+    ],
+    debrief: "Optimal path: check the change calendar first. Any 'service unavailable' report should hit the change calendar before anything else; it's a 5-minute check that prevents false escalations. The user-side questions were all wasted; the error appears pre-login for everyone."
+  },
+  {
+    id: 'INC-2060', priority: 'P1', channel: 'multiple tickets',
+    from: '— Claims team, all offices',
+    message: "Everyone in the claims department is getting 'Bad Gateway' on the claims system since 8 am. All three offices. Nobody can process anything.",
+    questions: [
+      { q: "Was anything deployed or changed overnight?", a: "Release 4.2 of the claims system deployed at 11 pm last night.", relevant: true },
+      { q: "Check the load balancer and backend health dashboards", a: "Load balancer is healthy; backend pool shows 0 of 4 hosts healthy.", relevant: true },
+      { q: "Confirm scope: is it every user at every site?", a: "All three offices, every claims user. Other systems unaffected.", relevant: true },
+      { q: "Ask one user to clear their browser cache", a: "Done. Same error.", relevant: false },
+      { q: "Ask one user to restart their computer", a: "Done. Same error.", relevant: false },
+      { q: "Check if the claims team's password policy changed", a: "No changes. And the error appears before login.", relevant: false }
+    ],
+    diagnosis: {
+      options: ['500 Internal Server Error', '502 Bad Gateway', '503 Service Unavailable', '504 Gateway Timeout'],
+      correct: '502 Bad Gateway',
+      explanation: "The load balancer is up but can't get a good response from any backend host; that's the definition of 502. A deployment at 11 pm followed by zero healthy hosts at 8 am points straight at the release."
+    },
+    actions: [
+      { text: "Escalate to ops with the deployment time, health dashboard evidence and scope; flag rollback as an option", correct: true, feedback: "This is a model escalation: what, when, evidence, scope, and a suggested remediation path. Ops can act on this immediately." },
+      { text: "Ask all users to clear caches and retry in 30 minutes", correct: false, feedback: "Zero healthy backend hosts is not a client problem. Every minute spent on user-side rituals extends a P1." },
+      { text: "Wait an hour to see if it self-recovers", correct: false, feedback: "A crashed backend pool after a bad deployment does not heal itself. P1s need action, not hope." },
+      { text: "Reboot the users' computers site by site", correct: false, feedback: "The users' machines are fine. The backend is down. This is the most expensive possible way to fix nothing." }
+    ],
+    notes: [
+      { text: "P1: claims system returning 502 for all users, all sites, since ~08:00. Release 4.2 deployed 23:00 last night. LB healthy; backend pool 0/4 healthy hosts. Escalated to ops at [time] with dashboard evidence; rollback flagged for consideration. Business impact: no claims processing across three offices. Awaiting ops response; will update every 30 min.", quality: 'best', feedback: "Timeline, evidence, escalation record, impact, and a communication cadence. This is P1 handling done properly." },
+      { text: "Claims system down after last night's deployment. Escalated to ops.", quality: 'ok', feedback: "The essentials survive, but the evidence (0/4 healthy hosts) and impact statement are what make ops move fast. They're missing." },
+      { text: "System broken, not our problem, sent to ops.", quality: 'poor', feedback: "It became everyone's problem at 8 am. A P1 note with no evidence, no timeline and no impact is a liability in the post-incident review." }
+    ],
+    debrief: "Optimal path: 'what changed?' then 'what does the health dashboard say?'. For any multi-user outage, change history plus infrastructure health answers 90% of it in two moves. The per-user questions (cache, restart) were pure waste at P1 scale."
+  },
+  {
+    id: 'INC-2063', priority: 'P3', channel: 'via chat',
+    from: '— Dana, Procurement',
+    message: "I can't open the new supplier portal we signed up to last week. The browser just says the site can't be reached. Google and everything else works fine.",
+    questions: [
+      { q: "What's the exact message in the browser?", a: "'Server IP address could not be found', and something like DNS_PROBE_FINISHED_NXDOMAIN.", relevant: true },
+      { q: "Does it load on your phone using mobile data, not wifi?", a: "Yes! Loads instantly on my phone off the office wifi.", relevant: true },
+      { q: "Does anyone else in the office get the same error?", a: "My deskmate just tried; exact same error.", relevant: true },
+      { q: "Have you tried a private window?", a: "Same error in a private window.", relevant: false },
+      { q: "Has your password for the portal changed?", a: "I never even get to a login page.", relevant: false },
+      { q: "Is your antivirus up to date?", a: "Updated yesterday, clean scan.", relevant: false }
+    ],
+    diagnosis: {
+      options: ['404 Not Found', '503 Service Unavailable', 'DNS resolution failure', '400 Bad Request'],
+      correct: 'DNS resolution failure',
+      explanation: "NXDOMAIN means the name won't resolve to an IP at all; the browser never even reached a server, so no HTTP code was possible. Works on mobile data but not the office network, and it affects multiple office users: the office DNS can't resolve this new domain."
+    },
+    actions: [
+      { text: "Verify with nslookup, then escalate to the network team: internal DNS isn't resolving the new supplier domain", correct: true, feedback: "Verify, then escalate with evidence. The mobile-data test already localised it to the office network; nslookup gives networks something concrete to chase." },
+      { text: "Tell the supplier their website is down", correct: false, feedback: "Their site loads fine on mobile data. The fault is inside your network's name resolution, not their hosting." },
+      { text: "Clear her cookies and browser cache", correct: false, feedback: "The browser never reached a server. There's no HTTP conversation for cookies to corrupt." },
+      { text: "Rebuild her Windows user profile", correct: false, feedback: "Multiple users on the office network fail identically. This is not one person's profile." }
+    ],
+    notes: [
+      { text: "New supplier portal domain returns NXDOMAIN for multiple users on the office network; resolves and loads normally via mobile data. nslookup from office confirms no resolution against internal DNS. Escalated to networks to add/forward the new domain. Workaround communicated to user (mobile data) pending fix.", quality: 'best', feedback: "Isolation evidence, verification, escalation and an interim workaround. The user can keep working while networks fix the cause." },
+      { text: "DNS issue with new supplier site on office network. Sent to networks.", quality: 'ok', feedback: "Right diagnosis, but the evidence that proved it (mobile data test, nslookup) is missing, so networks may repeat the work." },
+      { text: "Website not working, referred on.", quality: 'poor', feedback: "The diagnosis is gone. Networks receives a vague complaint instead of a solved puzzle, and the ticket will bounce back with questions." }
+    ],
+    debrief: "Optimal path: exact error message first (NXDOMAIN is a giveaway), then the mobile-data test to localise it to the office network, then scope with a second user. Cookie and password questions were impossible causes; the browser never reached a server."
+  },
+  {
+    id: 'INC-2067', priority: 'P3', channel: 'via chat',
+    from: '— Ravi, Integrations Developer',
+    message: "My integration script has run happily for months, but since this morning every call to the vendor API starts failing after about a minute of running. The vendor says nothing is wrong on their end.",
+    questions: [
+      { q: "What exact response is the API returning when it fails?", a: "HTTP 429, with a Retry-After: 60 header.", relevant: true },
+      { q: "Did anything change in the script recently?", a: "I bumped it from 1 call per second to 20 yesterday to speed up the sync.", relevant: true },
+      { q: "Check the vendor's API status page", a: "All green, no incidents.", relevant: true },
+      { q: "Has he restarted the server the script runs on?", a: "Twice. Fails the same way.", relevant: false },
+      { q: "Is the server's VPN tunnel up?", a: "Up and stable; the first minute of calls succeeds fine.", relevant: false },
+      { q: "Has the API key been changed or revoked?", a: "Same key, and it works for the first minute, so the key is valid.", relevant: false }
+    ],
+    diagnosis: {
+      options: ['401 Unauthorised', '403 Forbidden', '429 Too Many Requests', '503 Service Unavailable'],
+      correct: '429 Too Many Requests',
+      explanation: "429 with a Retry-After header is the API saying 'slow down'. He multiplied his call rate by twenty yesterday; the vendor's rate limiter is doing exactly what it's designed to do. The first minute succeeding rules out credentials."
+    },
+    actions: [
+      { text: "Have him throttle the script and honour the Retry-After header; check the API tier's documented rate limits", correct: true, feedback: "The fix is in his code, not anyone's infrastructure. Backoff logic that respects Retry-After is standard practice for exactly this reason." },
+      { text: "Regenerate the API key", correct: false, feedback: "The key works for the first minute of every run. Credentials aren't the problem; volume is." },
+      { text: "Escalate to the vendor as an API outage", correct: false, feedback: "Their status page is green and they've already said nothing is wrong. They're right; the limiter is behaving as designed." },
+      { text: "Move the script to a bigger server", correct: false, feedback: "More compute means it hits the rate limit even faster. The constraint is the vendor's limiter, not his hardware." }
+    ],
+    notes: [
+      { text: "Vendor API returning 429 with Retry-After: 60 after ~1 min of calls. Cause: script call rate increased 1/sec to 20/sec yesterday, exceeding the API tier's rate limit. Vendor status green; credentials valid (initial calls succeed). Advised developer to implement backoff honouring Retry-After and to confirm tier limits in vendor docs; if 20/sec is genuinely required, a tier upgrade is the path. Resolved with guidance.", quality: 'best', feedback: "Explains cause and mechanism, and gives the developer both the immediate fix and the long-term option. This note teaches." },
+      { text: "Rate limited by vendor API after script sped up. Told him to slow it down.", quality: 'ok', feedback: "Correct, but Retry-After and the tier-upgrade path are the useful specifics, and they're missing." },
+      { text: "Vendor API problem, dev to sort it out.", quality: 'poor', feedback: "It isn't a vendor problem, and 'dev to sort it out' without the diagnosis means he sorts it out slower. The note misassigns blame and withholds the answer." }
+    ],
+    debrief: "Optimal path: the exact response code first; 429 plus Retry-After tells the whole story. 'What changed?' confirms the mechanism. The infrastructure questions were dead ends the moment the first minute of calls was known to succeed."
+  }
+];
+
+// ================= GAME STATE =================
+const SLA_MINUTES = 60;
+const QUESTION_COST = 5;
+const KB_COST = 3;
+const WRONG_COST = 10;
+
+let ticketIndex = 0;
+let totalScore = 0;
+let slaRemaining = SLA_MINUTES;
+let questionsAsked = 0;
+let irrelevantAsked = 0;
+let diagnosisAttempts = 0;
+let actionAttempts = 0;
+let ticketPoints = { diagnosis: 0, action: 0, note: 0, bonus: 0, penalty: 0 };
+let ticketResults = [];
+let slaBreached = false;
+
+// ================= ELEMENTS =================
+const el = id => document.getElementById(id);
+
+// ================= FLOW =================
+el('btn-start').addEventListener('click', () => {
+  el('intro-screen').classList.add('hidden');
+  el('game-screen').classList.remove('hidden');
+  el('kb-toggle').classList.remove('hidden');
+  loadTicket();
+});
+
+function loadTicket() {
+  const t = tickets[ticketIndex];
+  slaRemaining = SLA_MINUTES;
+  questionsAsked = 0;
+  irrelevantAsked = 0;
+  diagnosisAttempts = 0;
+  actionAttempts = 0;
+  slaBreached = false;
+  ticketPoints = { diagnosis: 0, action: 0, note: 0, bonus: 0, penalty: 0 };
+
+  el('stat-ticket').textContent = (ticketIndex + 1) + ' / ' + tickets.length;
+  el('ticket-priority').textContent = t.priority;
+  el('ticket-priority').className = 'priority-chip ' + t.priority.toLowerCase();
+  el('ticket-id').textContent = t.id;
+  el('ticket-channel').textContent = t.channel;
+  el('ticket-message-text').textContent = '"' + t.message + '"';
+  el('ticket-from').textContent = t.from;
+  el('sla-breach').classList.add('hidden');
+
+  // build questions
+  const list = el('question-list');
+  list.innerHTML = '';
+  shuffle([...t.questions]).forEach(q => {
+    const btn = document.createElement('button');
+    btn.className = 'question-btn';
+    btn.innerHTML = q.q + '<span class="q-cost">5 min</span>';
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      btn.disabled = true;
+      spendTime(QUESTION_COST);
+      questionsAsked++;
+      if (!q.relevant) irrelevantAsked++;
+      const ans = document.createElement('div');
+      ans.className = 'question-answer';
+      ans.textContent = '"' + q.a + '"';
+      btn.insertAdjacentElement('afterend', ans);
+    });
+    list.appendChild(btn);
+  });
+
+  // reset phases
+  el('phase-questions').classList.remove('hidden');
+  el('phase-diagnosis').classList.add('hidden');
+  el('phase-action').classList.add('hidden');
+  el('phase-note').classList.add('hidden');
+  el('phase-debrief').classList.add('hidden');
+  el('diagnosis-feedback').innerHTML = '';
+  el('action-feedback').innerHTML = '';
+  el('note-feedback').innerHTML = '';
+
+  updateSLA();
+}
+
+el('btn-to-diagnosis').addEventListener('click', () => {
+  const t = tickets[ticketIndex];
+  el('phase-questions').classList.add('hidden');
+  el('phase-diagnosis').classList.remove('hidden');
+
+  const container = el('diagnosis-options');
+  container.innerHTML = '';
+  shuffle([...t.diagnosis.options]).forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => handleDiagnosis(btn, opt, t));
+    container.appendChild(btn);
+  });
+});
+
+function handleDiagnosis(btn, selected, t) {
+  diagnosisAttempts++;
+  if (selected === t.diagnosis.correct) {
+    btn.classList.add('correct');
+    document.querySelectorAll('#diagnosis-options .option-btn').forEach(b => b.disabled = true);
+    ticketPoints.diagnosis = diagnosisAttempts === 1 ? 40 : (diagnosisAttempts === 2 ? 15 : 5);
+    if (diagnosisAttempts === 1) launchConfetti();
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback good';
+    fb.innerHTML = '<div class="feedback-title">✓ Correct diagnosis (+' + ticketPoints.diagnosis + ' pts)</div>' + t.diagnosis.explanation;
+    el('diagnosis-feedback').appendChild(fb);
+
+    setTimeout(() => {
+      el('phase-action').classList.remove('hidden');
+      buildActions(t);
+      el('phase-action').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 600);
+  } else {
+    btn.classList.add('incorrect', 'shake');
+    btn.disabled = true;
+    spendTime(WRONG_COST);
+    ticketPoints.penalty += 5;
+    const fb = document.createElement('div');
+    fb.className = 'feedback bad';
+    fb.innerHTML = '<div class="feedback-title">✗ Not that one (-10 min)</div>Re-read the clues. What did the user actually tell you?';
+    el('diagnosis-feedback').innerHTML = '';
+    el('diagnosis-feedback').appendChild(fb);
+  }
+}
+
+function buildActions(t) {
+  const container = el('action-options');
+  container.innerHTML = '';
+  shuffle([...t.actions]).forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = a.text;
+    btn.addEventListener('click', () => handleAction(btn, a, t));
+    container.appendChild(btn);
+  });
+}
+
+function handleAction(btn, a, t) {
+  actionAttempts++;
+  if (a.correct) {
+    btn.classList.add('correct');
+    document.querySelectorAll('#action-options .option-btn').forEach(b => b.disabled = true);
+    ticketPoints.action = actionAttempts === 1 ? 30 : (actionAttempts === 2 ? 10 : 0);
+    if (actionAttempts === 1) launchConfetti();
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback good';
+    fb.innerHTML = '<div class="feedback-title">✓ Right response (+' + ticketPoints.action + ' pts)</div>' + a.feedback;
+    el('action-feedback').appendChild(fb);
+
+    setTimeout(() => {
+      el('phase-note').classList.remove('hidden');
+      buildNotes(t);
+      el('phase-note').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 600);
+  } else {
+    btn.classList.add('incorrect', 'shake');
+    btn.disabled = true;
+    spendTime(WRONG_COST);
+    ticketPoints.penalty += 5;
+    const fb = document.createElement('div');
+    fb.className = 'feedback bad';
+    fb.innerHTML = '<div class="feedback-title">✗ That won\'t fix it (-10 min)</div>' + a.feedback;
+    el('action-feedback').innerHTML = '';
+    el('action-feedback').appendChild(fb);
+  }
+}
+
+function buildNotes(t) {
+  const container = el('note-options');
+  container.innerHTML = '';
+  shuffle([...t.notes]).forEach(n => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.style.fontSize = '0.86rem';
+    btn.style.lineHeight = '1.5';
+    btn.textContent = '"' + n.text + '"';
+    btn.addEventListener('click', () => handleNote(btn, n, t));
+    container.appendChild(btn);
+  });
+}
+
+function handleNote(btn, n, t) {
+  document.querySelectorAll('#note-options .option-btn').forEach(b => b.disabled = true);
+  const pts = n.quality === 'best' ? 20 : (n.quality === 'ok' ? 10 : 0);
+  ticketPoints.note = pts;
+
+  if (n.quality === 'best') { btn.classList.add('correct'); launchConfetti(); }
+  else if (n.quality === 'ok') { btn.style.borderColor = 'var(--warn)'; }
+  else { btn.classList.add('incorrect'); }
+
+  const fb = document.createElement('div');
+  fb.className = 'feedback ' + (n.quality === 'best' ? 'good' : (n.quality === 'poor' ? 'bad' : ''));
+  fb.innerHTML = '<div class="feedback-title">' + (n.quality === 'best' ? '✓ Excellent note' : (n.quality === 'ok' ? '~ Adequate note' : '✗ Weak note')) + ' (+' + pts + ' pts)</div>' + n.feedback;
+  el('note-feedback').appendChild(fb);
+
+  setTimeout(() => finishTicket(t), 800);
+}
+
+function finishTicket(t) {
+  // efficiency bonus
+  if (!slaBreached) {
+    ticketPoints.bonus = Math.round(Math.max(0, slaRemaining) / 2);
+  } else {
+    ticketPoints.bonus = 0;
+    ticketPoints.penalty += 20;
+  }
+
+  const ticketTotal = ticketPoints.diagnosis + ticketPoints.action + ticketPoints.note + ticketPoints.bonus - ticketPoints.penalty;
+  totalScore += Math.max(0, ticketTotal);
+  el('stat-score').textContent = totalScore;
+
+  ticketResults.push({
+    id: t.id,
+    total: Math.max(0, ticketTotal),
+    irrelevant: irrelevantAsked,
+    breached: slaBreached
+  });
+
+  el('debrief-content').innerHTML = '<div class="feedback-title">How a senior tech would run it</div>' + t.debrief;
+
+  const bd = el('ticket-breakdown');
+  bd.innerHTML = '';
+  addBreakdownRow(bd, 'Diagnosis', ticketPoints.diagnosis, 40);
+  addBreakdownRow(bd, 'Response action', ticketPoints.action, 30);
+  addBreakdownRow(bd, 'Ticket note', ticketPoints.note, 20);
+  addBreakdownRow(bd, 'Efficiency bonus (' + Math.max(0, slaRemaining) + ' min left)', ticketPoints.bonus, 30);
+  if (ticketPoints.penalty > 0) addBreakdownRow(bd, 'Penalties', -ticketPoints.penalty, 0);
+  const totalRow = document.createElement('div');
+  totalRow.className = 'breakdown-row';
+  totalRow.innerHTML = '<span class="b-title" style="color:var(--text);font-weight:700;">Ticket total</span><span class="b-pts good" style="font-weight:800;">' + Math.max(0, ticketTotal) + '</span>';
+  bd.appendChild(totalRow);
+
+  el('phase-debrief').classList.remove('hidden');
+  el('btn-next-ticket').textContent = ticketIndex === tickets.length - 1 ? 'Finish Shift →' : 'Next Ticket →';
+  el('phase-debrief').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function addBreakdownRow(container, title, pts, max) {
+  const row = document.createElement('div');
+  row.className = 'breakdown-row';
+  let cls = 'good';
+  if (max > 0) {
+    const ratio = pts / max;
+    cls = ratio >= 0.8 ? 'good' : (ratio >= 0.4 ? 'mid' : 'poor');
+  } else {
+    cls = 'poor';
+  }
+  row.innerHTML = '<span class="b-title">' + title + '</span><span class="b-pts ' + cls + '">' + (pts >= 0 ? '+' : '') + pts + '</span>';
+  container.appendChild(row);
+}
+
+el('btn-next-ticket').addEventListener('click', () => {
+  ticketIndex++;
+  if (ticketIndex >= tickets.length) showResults();
+  else {
+    loadTicket();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+// ================= SLA =================
+function spendTime(mins) {
+  slaRemaining -= mins;
+  updateSLA();
+}
+
+function updateSLA() {
+  const display = el('stat-sla');
+  const fill = el('sla-fill');
+  const pct = Math.max(0, (slaRemaining / SLA_MINUTES) * 100);
+  fill.style.width = pct + '%';
+  fill.className = 'sla-fill' + (pct <= 25 ? ' low' : (pct <= 50 ? ' mid' : ''));
+
+  if (slaRemaining <= 0 && !slaBreached) {
+    slaBreached = true;
+    el('sla-breach').classList.remove('hidden');
+  }
+
+  display.textContent = Math.max(0, slaRemaining) + ' min';
+  display.className = 'stats-value' + (slaRemaining <= 15 ? (slaRemaining <= 0 ? ' danger' : ' warn') : '');
+}
+
+// ================= KNOWLEDGE BASE =================
+el('kb-toggle').addEventListener('click', () => {
+  el('kb-drawer').classList.add('open');
+  spendTime(KB_COST);
+});
+el('kb-close').addEventListener('click', () => el('kb-drawer').classList.remove('open'));
+
+// ================= RESULTS =================
+function showResults() {
+  el('game-screen').classList.add('hidden');
+  el('kb-toggle').classList.add('hidden');
+  el('kb-drawer').classList.remove('open');
+  el('results-screen').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  el('final-score').textContent = totalScore;
+
+  const maxPossible = tickets.length * 120; // 40+30+20+30 bonus
+  const pct = (totalScore / maxPossible) * 100;
+
+  let verdict, detail;
+  if (pct >= 85) {
+    verdict = "Senior tech material.";
+    detail = "Efficient questioning, accurate diagnosis, professional documentation. You're running tickets the way experienced service desk staff do. The next skill to build is handling the human side under pressure; the technical judgement is clearly there.";
+  } else if (pct >= 65) {
+    verdict = "Solid service desk instincts.";
+    detail = "Your diagnoses are landing; the gap is efficiency. Watch the debrief patterns: the best techs ask two or three high-value questions, not six. Every question should be designed to eliminate a category of cause.";
+  } else if (pct >= 45) {
+    verdict = "The foundations are forming.";
+    detail = "You're getting to right answers but burning time on dead-end questions and second guesses. Revisit the 401 vs 403 distinction and the incognito test; those two tools alone solve a surprising share of tickets.";
+  } else {
+    verdict = "Keep at it.";
+    detail = "This is all learnable, and struggling in a simulator costs nothing. Run the flashcard module again to cement the codes, then come back. Pay attention to each debrief; the optimal question paths are the real lesson here.";
+  }
+
+  el('final-verdict').textContent = verdict;
+  el('final-detail').textContent = detail;
+
+  const fb = el('final-breakdown');
+  fb.innerHTML = '';
+  ticketResults.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    const flags = (r.breached ? ' • SLA breached' : '') + (r.irrelevant > 1 ? ' • ' + r.irrelevant + ' wasted questions' : '');
+    const cls = r.total >= 90 ? 'good' : (r.total >= 55 ? 'mid' : 'poor');
+    row.innerHTML = '<span class="b-title">' + r.id + flags + '</span><span class="b-pts ' + cls + '">' + r.total + '</span>';
+    fb.appendChild(row);
+  });
+
+  if (pct >= 65) {
+    launchConfetti();
+    if (pct >= 85) { setTimeout(launchConfetti, 400); setTimeout(launchConfetti, 800); }
+  }
+}
+
+el('btn-restart').addEventListener('click', () => {
+  ticketIndex = 0;
+  totalScore = 0;
+  ticketResults = [];
+  el('stat-score').textContent = '0';
+  el('results-screen').classList.add('hidden');
+  el('game-screen').classList.remove('hidden');
+  el('kb-toggle').classList.remove('hidden');
+  loadTicket();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ================= UTILS =================
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+</script>
+</body>
+</html>

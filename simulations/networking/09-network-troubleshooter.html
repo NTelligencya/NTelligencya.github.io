@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Troubleshooting Simulator - Network Simulation Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Updated Design System */
+            --primary: #0f172a;
+            --primary-dark: #1e293b;
+            --secondary: #334155;
+            --accent: #3b82f6;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+            --bg-dark: #020617;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --cyan: #06b6d4;
+            --terminal-bg: #0d1117;
+            --terminal-green: #3fb950;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: rgba(148, 163, 184, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            min-height: 100vh;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            color: var(--text-light);
+            text-decoration: underline;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+            background: transparent;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .course-badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar h3 {
+            color: #9b59b6;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .scenario-list {
+            list-style: none;
+        }
+
+        .scenario-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .scenario-item:hover {
+            background: rgba(155, 89, 182, 0.2);
+            border-left-color: #9b59b6;
+        }
+
+        .scenario-item.active {
+            background: rgba(155, 89, 182, 0.3);
+            border-left-color: #9b59b6;
+        }
+
+        .scenario-item .scenario-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .scenario-item .scenario-level {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .level-foundation {
+            background: #27ae60;
+        }
+
+        .level-core {
+            background: #3498db;
+        }
+
+        .level-infrastructure {
+            background: #f39c12;
+        }
+
+        .level-enterprise {
+            background: #e74c3c;
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .network-diagram {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 300px;
+            position: relative;
+        }
+
+        .diagram-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .diagram-header h3 {
+            color: #9b59b6;
+        }
+
+        .timer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            color: #f39c12;
+        }
+
+        .timer.warning {
+            color: #e74c3c;
+        }
+
+        .network-canvas {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .network-device {
+            position: absolute;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+        }
+
+        .network-device:hover {
+            transform: scale(1.1);
+        }
+
+        .network-device.selected {
+            background: rgba(155, 89, 182, 0.3);
+            border-radius: 10px;
+        }
+
+        .network-device .device-icon {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+
+        .network-device .device-name {
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        .network-device .device-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 5px auto 0;
+        }
+
+        .device-status.ok {
+            background: #27ae60;
+            box-shadow: 0 0 8px #27ae60;
+        }
+
+        .device-status.warning {
+            background: #f39c12;
+            box-shadow: 0 0 8px #f39c12;
+        }
+
+        .device-status.error {
+            background: #e74c3c;
+            box-shadow: 0 0 8px #e74c3c;
+            animation: pulse 1s infinite;
+        }
+
+        .device-status.unknown {
+            background: #888;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .network-link {
+            position: absolute;
+            height: 3px;
+            background: #27ae60;
+            transform-origin: left center;
+        }
+
+        .network-link.down {
+            background: #e74c3c;
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .tools-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tools-panel h3 {
+            color: #9b59b6;
+            margin-bottom: 15px;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tool-btn {
+            padding: 15px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .tool-btn:hover {
+            background: rgba(155, 89, 182, 0.2);
+            border-color: #9b59b6;
+        }
+
+        .tool-btn.selected {
+            background: rgba(155, 89, 182, 0.3);
+            border-color: #9b59b6;
+        }
+
+        .tool-btn .tool-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .tool-btn .tool-name {
+            font-size: 0.75rem;
+            color: #ccc;
+        }
+
+        .terminal {
+            background: #0a0a0a;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+
+        .terminal-output {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .terminal-output .success {
+            color: #27ae60;
+        }
+
+        .terminal-output .error {
+            color: #e74c3c;
+        }
+
+        .terminal-output .warning {
+            color: #f39c12;
+        }
+
+        .terminal-output .info {
+            color: #3498db;
+        }
+
+        .terminal-output .command {
+            color: #9b59b6;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-card h4 {
+            color: #9b59b6;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .ticket-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .ticket-field {
+            margin-bottom: 12px;
+        }
+
+        .ticket-field label {
+            display: block;
+            color: #888;
+            font-size: 0.75rem;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+        }
+
+        .ticket-field .value {
+            font-size: 0.9rem;
+        }
+
+        .severity {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .severity.critical {
+            background: #e74c3c;
+        }
+
+        .severity.high {
+            background: #e67e22;
+        }
+
+        .severity.medium {
+            background: #f39c12;
+        }
+
+        .severity.low {
+            background: #27ae60;
+        }
+
+        .osi-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .osi-layer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .osi-layer:hover {
+            background: rgba(155, 89, 182, 0.2);
+        }
+
+        .osi-layer.checking {
+            border-color: #f39c12;
+            animation: checking 1s infinite;
+        }
+
+        .osi-layer.checked-ok {
+            border-color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        .osi-layer.checked-fail {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        @keyframes checking {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .osi-layer .layer-num {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .osi-layer .layer-name {
+            flex: 1;
+            font-size: 0.85rem;
+        }
+
+        .osi-layer .layer-status {
+            font-size: 0.9rem;
+        }
+
+        .solution-panel {
+            display: none;
+        }
+
+        .solution-panel.visible {
+            display: block;
+        }
+
+        .solution-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .solution-btn {
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            color: #e0e0e0;
+        }
+
+        .solution-btn:hover {
+            background: rgba(155, 89, 182, 0.2);
+            border-color: #9b59b6;
+        }
+
+        .solution-btn.correct {
+            background: rgba(39, 174, 96, 0.3);
+            border-color: #27ae60;
+        }
+
+        .solution-btn.incorrect {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: #e74c3c;
+        }
+
+        .escalation-panel {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .escalate-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .escalate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #9b59b6;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .progress-tracker {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-dot.complete {
+            background: #27ae60;
+        }
+
+        .progress-dot.current {
+            background: #9b59b6;
+            animation: pulse 1s infinite;
+        }
+
+        .progress-dot.failed {
+            background: #e74c3c;
+        }
+
+        .hint-btn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(52, 152, 219, 0.2);
+            border: 1px solid #3498db;
+            border-radius: 8px;
+            color: #3498db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .hint-btn:hover {
+            background: rgba(52, 152, 219, 0.3);
+        }
+
+        .hint-text {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid #3498db;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .hint-text.visible {
+            display: block;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #9b59b6;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 1px solid #9b59b6;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .results-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .results-modal.visible {
+            display: flex;
+        }
+
+        .results-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            border: 2px solid #9b59b6;
+        }
+
+        .results-content h2 {
+            color: #9b59b6;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-item {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #9b59b6;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .close-results {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-results:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <a href="../" class="back-link">← Back to Dashboard</a>
+        <h1>Network Troubleshooting Simulator</h1>
+        <p style="margin-bottom: 15px; color: var(--text-dim);">Practice Real-World Network Problem Solving</p>
+        <div class="course-badges">
+            <span class="badge">ICTNWK302</span>
+            <span class="badge">ICTNWK308</span>
+            <span class="badge">All Levels</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <h3>Scenarios</h3>
+            <ul class="scenario-list" id="scenarioList">
+                <li class="scenario-item active" data-scenario="no-internet">
+                    <div class="scenario-title">No Internet Access</div>
+                    <span class="scenario-level level-foundation">Foundation</span>
+                </li>
+                <li class="scenario-item" data-scenario="slow-network">
+                    <div class="scenario-title">Slow Network Performance</div>
+                    <span class="scenario-level level-foundation">Foundation</span>
+                </li>
+                <li class="scenario-item" data-scenario="intermittent">
+                    <div class="scenario-title">Intermittent Connectivity</div>
+                    <span class="scenario-level level-core">Core</span>
+                </li>
+                <li class="scenario-item" data-scenario="dns-failure">
+                    <div class="scenario-title">DNS Resolution Failure</div>
+                    <span class="scenario-level level-core">Core</span>
+                </li>
+                <li class="scenario-item" data-scenario="vlan-issue">
+                    <div class="scenario-title">VLAN Misconfiguration</div>
+                    <span class="scenario-level level-infrastructure">Infrastructure</span>
+                </li>
+                <li class="scenario-item" data-scenario="routing-loop">
+                    <div class="scenario-title">Routing Loop</div>
+                    <span class="scenario-level level-enterprise">Enterprise</span>
+                </li>
+            </ul>
+
+            <div style="margin-top: 20px;">
+                <!-- <a href="../" class="nav-link">← Back to Tools</a> -->
+            </div>
+        </aside>
+
+        <main class="center-panel">
+            <div class="network-diagram">
+                <div class="diagram-header">
+                    <h3>Network Topology</h3>
+                    <div class="timer" id="timer">
+                        <span>TIME</span>
+                        <span id="timerValue">05:00</span>
+                    </div>
+                </div>
+                <div class="network-canvas" id="networkCanvas">
+                    <!-- Devices rendered dynamically -->
+                </div>
+            </div>
+
+            <div class="tools-panel">
+                <h3>Diagnostic Tools</h3>
+                <div class="tool-grid">
+                    <div class="tool-btn" data-tool="ping">
+                        <div class="tool-icon">PING</div>
+                        <div class="tool-name">Ping</div>
+                    </div>
+                    <div class="tool-btn" data-tool="traceroute">
+                        <div class="tool-icon">TRAC</div>
+                        <div class="tool-name">Traceroute</div>
+                    </div>
+                    <div class="tool-btn" data-tool="ipconfig">
+                        <div class="tool-icon">IPCF</div>
+                        <div class="tool-name">ipconfig</div>
+                    </div>
+                    <div class="tool-btn" data-tool="nslookup">
+                        <div class="tool-icon">NSLK</div>
+                        <div class="tool-name">nslookup</div>
+                    </div>
+                    <div class="tool-btn" data-tool="netstat">
+                        <div class="tool-icon">NETS</div>
+                        <div class="tool-name">netstat</div>
+                    </div>
+                    <div class="tool-btn" data-tool="arp">
+                        <div class="tool-icon">ARP</div>
+                        <div class="tool-name">arp -a</div>
+                    </div>
+                    <div class="tool-btn" data-tool="cable-test">
+                        <div class="tool-icon">CABL</div>
+                        <div class="tool-name">Cable Test</div>
+                    </div>
+                    <div class="tool-btn" data-tool="show-int">
+                        <div class="tool-icon">SHOW</div>
+                        <div class="tool-name">show int</div>
+                    </div>
+                </div>
+                <div class="terminal" id="terminal">
+                    <div class="terminal-output" id="terminalOutput">
+                        Select a device and a diagnostic tool to begin troubleshooting.
+
+                        Tip: Work through the OSI layers systematically from Physical (Layer 1) up to Application (Layer
+                        7).
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="right-panel">
+            <div class="info-card">
+                <h4>Support Ticket</h4>
+                <div class="ticket-info" id="ticketInfo">
+                    <div class="ticket-field">
+                        <label>Ticket #</label>
+                        <div class="value" id="ticketNum">TKT-001</div>
+                    </div>
+                    <div class="ticket-field">
+                        <label>Reported Issue</label>
+                        <div class="value" id="ticketIssue">User cannot access the internet</div>
+                    </div>
+                    <div class="ticket-field">
+                        <label>Severity</label>
+                        <div class="value"><span class="severity high" id="ticketSeverity">HIGH</span></div>
+                    </div>
+                    <div class="ticket-field">
+                        <label>Affected</label>
+                        <div class="value" id="ticketAffected">Single User</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4>OSI Layer Check</h4>
+                <div class="osi-layers" id="osiLayers">
+                    <div class="osi-layer" data-layer="7">
+                        <div class="layer-num">7</div>
+                        <div class="layer-name">Application</div>
+                        <div class="layer-status">❓</div>
+                    </div>
+                    <div class="osi-layer" data-layer="6">
+                        <div class="layer-num">6</div>
+                        <div class="layer-name">Presentation</div>
+                        <div class="layer-status">❓</div>
+                    </div>
+                    <div class="osi-layer" data-layer="5">
+                        <div class="layer-num">5</div>
+                        <div class="layer-name">Session</div>
+                        <div class="layer-status">❓</div>
+                    </div>
+                    <div class="osi-layer" data-layer="4">
+                        <div class="layer-num">4</div>
+                        <div class="layer-name">Transport</div>
+                        <div class="layer-status">❓</div>
+                    </div>
+                    <div class="osi-layer" data-layer="3">
+                        <div class="layer-num">3</div>
+                        <div class="layer-name">Network</div>
+                        <div class="layer-status">❓</div>
+                    </div>
+                    <div class="osi-layer" data-layer="2">
+                        <div class="layer-num">2</div>
+                        <div class="layer-name">Data Link</div>
+                        <div class="layer-status">❓</div>
+                    </div>
+                    <div class="osi-layer" data-layer="1">
+                        <div class="layer-num">1</div>
+                        <div class="layer-name">Physical</div>
+                        <div class="layer-status">❓</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card solution-panel" id="solutionPanel">
+                <h4>Select Solution</h4>
+                <div class="solution-options" id="solutionOptions">
+                    <!-- Options loaded dynamically -->
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4>Score</h4>
+                <div class="score-display">
+                    <div class="score-value" id="scoreValue">0</div>
+                    <div class="score-label">Points</div>
+                    <div class="progress-tracker" id="progressTracker">
+                        <!-- Progress dots -->
+                    </div>
+                </div>
+
+                <button class="hint-btn" onclick="showHint()">Get Hint (-10 pts)</button>
+                <div class="hint-text" id="hintText"></div>
+
+                <div class="escalation-panel">
+                    <button class="escalate-btn" onclick="escalateTicket()">Escalate to Level 2</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <div class="results-modal" id="resultsModal">
+        <div class="results-content">
+            <h2 id="resultsTitle">Scenario Complete!</h2>
+            <div class="results-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="resultScore">0</div>
+                    <div class="stat-label">Points</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="resultTime">00:00</div>
+                    <div class="stat-label">Time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="resultTools">0</div>
+                    <div class="stat-label">Tools Used</div>
+                </div>
+            </div>
+            <p id="resultMessage" style="margin-bottom: 20px; color: #888;"></p>
+            <button class="close-results" onclick="closeResults()">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        // Scenarios Configuration
+        const scenarios = {
+            'no-internet': {
+                title: 'No Internet Access',
+                ticket: {
+                    num: 'TKT-001',
+                    issue: 'User reports: "I cannot access any websites or email."',
+                    severity: 'high',
+                    affected: 'Single User - Workstation PC-01'
+                },
+                topology: {
+                    devices: [
+                        { id: 'pc', name: 'PC-01', icon: 'PC', x: 50, y: 100, status: 'error' },
+                        { id: 'switch', name: 'Switch', icon: 'SW', x: 200, y: 100, status: 'ok' },
+                        { id: 'router', name: 'Router', icon: 'RTR', x: 350, y: 100, status: 'ok' },
+                        { id: 'internet', name: 'Internet', icon: 'NET', x: 500, y: 100, status: 'ok' }
+                    ],
+                    links: [
+                        { from: 'pc', to: 'switch', status: 'ok' },
+                        { from: 'switch', to: 'router', status: 'ok' },
+                        { from: 'router', to: 'internet', status: 'ok' }
+                    ]
+                },
+                problem: {
+                    layer: 3,
+                    cause: 'incorrect-gateway',
+                    description: 'PC has incorrect default gateway configured'
+                },
+                toolOutputs: {
+                    'pc': {
+                        'ping': () => ({
+                            success: false,
+                            output: `Pinging 192.168.1.1 (local router)...\nReply from 192.168.1.1: bytes=32 time<1ms TTL=64\n4 packets sent, 4 received, 0% loss\n\nPinging 8.8.8.8 (internet)...\nRequest timed out.\nRequest timed out.\n4 packets sent, 0 received, 100% loss`,
+                            layer: 3
+                        }),
+                        'ipconfig': () => ({
+                            success: true,
+                            output: `Windows IP Configuration\n\nEthernet adapter Local Area Connection:\n   IPv4 Address. . . . . . : 192.168.1.10\n   Subnet Mask . . . . . . : 255.255.255.0\n   Default Gateway . . . . : 192.168.1.254  <-- INCORRECT!\n   DNS Server. . . . . . . : 8.8.8.8`,
+                            layer: 3,
+                            failCheck: true,
+                            hint: 'Check if the gateway is correct for this network'
+                        }),
+                        'traceroute': () => ({
+                            success: false,
+                            output: `Tracing route to 8.8.8.8...\n  1  *  *  *  Request timed out.\n  2  *  *  *  Request timed out.\nTrace complete.`,
+                            layer: 3
+                        }),
+                        'nslookup': () => ({
+                            success: false,
+                            output: `Server: Unknown\nAddress: 8.8.8.8\n\n*** Can't find server name for address 8.8.8.8: Timed out`,
+                            layer: 7
+                        }),
+                        'arp': () => ({
+                            success: true,
+                            output: `Interface: 192.168.1.10\n  Internet Address      Physical Address\n  192.168.1.1           00-1a-2b-3c-4d-5e\n  192.168.1.254         <incomplete>`,
+                            layer: 2,
+                            hint: 'Notice the gateway has no ARP entry'
+                        }),
+                        'cable-test': () => ({
+                            success: true,
+                            output: `Cable test results:\n  Pair 1-2: OK\n  Pair 3-6: OK\n  Pair 4-5: OK\n  Pair 7-8: OK\n  Cable Status: PASS`,
+                            layer: 1
+                        })
+                    }
+                },
+                solutions: [
+                    { id: 'gateway', text: 'Change default gateway to 192.168.1.1', correct: true },
+                    { id: 'dns', text: 'Change DNS server address', correct: false },
+                    { id: 'cable', text: 'Replace network cable', correct: false },
+                    { id: 'dhcp', text: 'Enable DHCP on the PC', correct: false }
+                ],
+                hints: [
+                    'Start by checking Layer 1 (Physical) - is the cable connected?',
+                    'Use ipconfig to check the network configuration',
+                    'Compare the default gateway with the router\'s IP address',
+                    'The gateway should be 192.168.1.1, not 192.168.1.254'
+                ]
+            },
+            'slow-network': {
+                title: 'Slow Network Performance',
+                ticket: {
+                    num: 'TKT-002',
+                    issue: 'Multiple users report slow network speeds and high latency.',
+                    severity: 'medium',
+                    affected: 'Marketing Department (5 users)'
+                },
+                topology: {
+                    devices: [
+                        { id: 'pc1', name: 'PC-01', icon: 'PC', x: 30, y: 50, status: 'warning' },
+                        { id: 'pc2', name: 'PC-02', icon: 'PC', x: 30, y: 150, status: 'warning' },
+                        { id: 'switch', name: 'Switch', icon: 'SW', x: 180, y: 100, status: 'warning' },
+                        { id: 'router', name: 'Router', icon: 'RTR', x: 350, y: 100, status: 'ok' },
+                        { id: 'internet', name: 'Internet', icon: 'NET', x: 500, y: 100, status: 'ok' }
+                    ],
+                    links: [
+                        { from: 'pc1', to: 'switch', status: 'ok' },
+                        { from: 'pc2', to: 'switch', status: 'ok' },
+                        { from: 'switch', to: 'router', status: 'ok' },
+                        { from: 'router', to: 'internet', status: 'ok' }
+                    ]
+                },
+                problem: {
+                    layer: 2,
+                    cause: 'duplex-mismatch',
+                    description: 'Duplex mismatch between switch and router causing collisions'
+                },
+                toolOutputs: {
+                    'pc1': {
+                        'ping': () => ({
+                            success: true,
+                            output: `Pinging 8.8.8.8...\nReply from 8.8.8.8: bytes=32 time=245ms TTL=64\nReply from 8.8.8.8: bytes=32 time=389ms TTL=64\nReply from 8.8.8.8: bytes=32 time=178ms TTL=64\n4 packets sent, 4 received, 0% loss\nAverage latency: 270ms  <-- HIGH!`,
+                            layer: 3,
+                            hint: 'High latency indicates network congestion'
+                        }),
+                        'ipconfig': () => ({
+                            success: true,
+                            output: `Windows IP Configuration\n\nEthernet adapter:\n   IPv4 Address. . . . . . : 192.168.1.20\n   Subnet Mask . . . . . . : 255.255.255.0\n   Default Gateway . . . . : 192.168.1.1`
+                        })
+                    },
+                    'switch': {
+                        'show-int': () => ({
+                            success: true,
+                            output: `Interface Gi0/1 (to Router):\n  Input errors: 15234\n  Output errors: 8921\n  Collisions: 45623  <-- VERY HIGH!\n  Late collisions: 12456\n  Duplex: Half  <-- MISMATCH!\n  Speed: 100Mbps`,
+                            layer: 2,
+                            failCheck: true,
+                            hint: 'High collision count indicates duplex mismatch'
+                        })
+                    }
+                },
+                solutions: [
+                    { id: 'duplex', text: 'Set switch port to full duplex', correct: true },
+                    { id: 'cable', text: 'Replace all network cables', correct: false },
+                    { id: 'bandwidth', text: 'Upgrade internet bandwidth', correct: false },
+                    { id: 'restart', text: 'Restart the switch', correct: false }
+                ],
+                hints: [
+                    'Check interface statistics on network devices',
+                    'Look for error counters and collision counts',
+                    'Duplex mismatch is a common cause of poor performance',
+                    'The switch shows half duplex - this should be full duplex'
+                ]
+            },
+            'intermittent': {
+                title: 'Intermittent Connectivity',
+                ticket: {
+                    num: 'TKT-003',
+                    issue: 'Network connection drops randomly throughout the day.',
+                    severity: 'high',
+                    affected: 'Conference Room B'
+                },
+                topology: {
+                    devices: [
+                        { id: 'laptop', name: 'Laptop', icon: 'PC', x: 50, y: 100, status: 'warning' },
+                        { id: 'ap', name: 'AP', icon: 'AP', x: 200, y: 100, status: 'warning' },
+                        { id: 'switch', name: 'Switch', icon: 'SW', x: 350, y: 100, status: 'ok' },
+                        { id: 'router', name: 'Router', icon: 'RTR', x: 500, y: 100, status: 'ok' }
+                    ],
+                    links: [
+                        { from: 'laptop', to: 'ap', status: 'down' },
+                        { from: 'ap', to: 'switch', status: 'ok' },
+                        { from: 'switch', to: 'router', status: 'ok' }
+                    ]
+                },
+                problem: {
+                    layer: 1,
+                    cause: 'wifi-interference',
+                    description: 'Wireless interference from nearby microwave and other APs'
+                },
+                toolOutputs: {
+                    'laptop': {
+                        'ping': () => ({
+                            success: false,
+                            output: `Pinging 192.168.1.1...\nReply from 192.168.1.1: time=5ms\nRequest timed out.\nReply from 192.168.1.1: time=234ms\nRequest timed out.\n4 packets sent, 2 received, 50% loss`,
+                            layer: 1
+                        }),
+                        'ipconfig': () => ({
+                            success: true,
+                            output: `Wireless LAN adapter Wi-Fi:\n   IPv4 Address. . . . . : 192.168.1.50\n   Signal Strength. . . : 45%  <-- WEAK\n   Channel. . . . . . . : 6\n   Noise Level. . . . . : -65dBm  <-- HIGH!`
+                        })
+                    },
+                    'ap': {
+                        'show-int': () => ({
+                            success: true,
+                            output: `Wireless Interface:\n  Channel: 6 (2.437 GHz)\n  Clients connected: 12\n  Channel Utilization: 89%  <-- CONGESTED!\n  Interference detected: HIGH\n  Nearby APs on same channel: 4`,
+                            layer: 1,
+                            failCheck: true,
+                            hint: 'Channel 6 is heavily congested'
+                        })
+                    }
+                },
+                solutions: [
+                    { id: 'channel', text: 'Change AP to less congested channel (1 or 11)', correct: true },
+                    { id: 'replace', text: 'Replace the access point', correct: false },
+                    { id: 'cable', text: 'Run ethernet cable to conference room', correct: false },
+                    { id: 'power', text: 'Increase AP transmit power', correct: false }
+                ],
+                hints: [
+                    'Intermittent issues often relate to wireless connectivity',
+                    'Check wireless signal strength and channel utilization',
+                    'Multiple APs on the same channel cause interference',
+                    'Try using non-overlapping channels: 1, 6, or 11'
+                ]
+            },
+            'dns-failure': {
+                title: 'DNS Resolution Failure',
+                ticket: {
+                    num: 'TKT-004',
+                    issue: 'Cannot browse websites by name, but can ping by IP address.',
+                    severity: 'high',
+                    affected: 'Entire Office'
+                },
+                topology: {
+                    devices: [
+                        { id: 'pc', name: 'PC-01', icon: 'PC', x: 50, y: 100, status: 'warning' },
+                        { id: 'switch', name: 'Switch', icon: 'SW', x: 180, y: 100, status: 'ok' },
+                        { id: 'dns', name: 'DNS', icon: 'SVR', x: 180, y: 200, status: 'error' },
+                        { id: 'router', name: 'Router', icon: 'RTR', x: 350, y: 100, status: 'ok' },
+                        { id: 'internet', name: 'Internet', icon: 'NET', x: 500, y: 100, status: 'ok' }
+                    ],
+                    links: [
+                        { from: 'pc', to: 'switch', status: 'ok' },
+                        { from: 'switch', to: 'dns', status: 'down' },
+                        { from: 'switch', to: 'router', status: 'ok' },
+                        { from: 'router', to: 'internet', status: 'ok' }
+                    ]
+                },
+                problem: {
+                    layer: 7,
+                    cause: 'dns-server-down',
+                    description: 'Internal DNS server is not responding'
+                },
+                toolOutputs: {
+                    'pc': {
+                        'ping': () => ({
+                            success: true,
+                            output: `Pinging 8.8.8.8...\nReply from 8.8.8.8: time=25ms TTL=64\n4 packets sent, 4 received, 0% loss\n\nPinging google.com...\nPing request could not find host google.com. Please check the name and try again.`,
+                            layer: 3
+                        }),
+                        'nslookup': () => ({
+                            success: false,
+                            output: `Server: 192.168.1.5\nAddress: 192.168.1.5\n\n*** Request to 192.168.1.5 timed out.\n*** Can't find google.com: No response from server`,
+                            layer: 7,
+                            hint: 'DNS server is not responding'
+                        }),
+                        'ipconfig': () => ({
+                            success: true,
+                            output: `IPv4 Address. . . . : 192.168.1.20\nSubnet Mask . . . . : 255.255.255.0\nDefault Gateway . . : 192.168.1.1\nDNS Server. . . . . : 192.168.1.5`
+                        })
+                    },
+                    'dns': {
+                        'ping': () => ({
+                            success: false,
+                            output: `Destination host unreachable.\nDNS Server 192.168.1.5 is not responding.`,
+                            layer: 3
+                        })
+                    }
+                },
+                solutions: [
+                    { id: 'dns-server', text: 'Restart the DNS server or configure backup DNS', correct: true },
+                    { id: 'gateway', text: 'Change the default gateway', correct: false },
+                    { id: 'dhcp', text: 'Renew DHCP lease', correct: false },
+                    { id: 'firewall', text: 'Disable Windows Firewall', correct: false }
+                ],
+                hints: [
+                    'If IP pings work but names don\'t, it\'s a DNS issue',
+                    'Use nslookup to test DNS resolution',
+                    'Check if the DNS server IP is reachable',
+                    'Consider using a public DNS (8.8.8.8) as backup'
+                ]
+            },
+            'vlan-issue': {
+                title: 'VLAN Misconfiguration',
+                ticket: {
+                    num: 'TKT-005',
+                    issue: 'New employee cannot access department resources.',
+                    severity: 'medium',
+                    affected: 'Single User - New Employee'
+                },
+                topology: {
+                    devices: [
+                        { id: 'newpc', name: 'New PC', icon: 'PC', x: 50, y: 50, status: 'error' },
+                        { id: 'pc2', name: 'Dept PC', icon: 'PC', x: 50, y: 150, status: 'ok' },
+                        { id: 'switch', name: 'Switch', icon: 'SW', x: 200, y: 100, status: 'ok' },
+                        { id: 'server', name: 'Dept Server', icon: 'SVR', x: 350, y: 100, status: 'ok' }
+                    ],
+                    links: [
+                        { from: 'newpc', to: 'switch', status: 'ok' },
+                        { from: 'pc2', to: 'switch', status: 'ok' },
+                        { from: 'switch', to: 'server', status: 'ok' }
+                    ]
+                },
+                problem: {
+                    layer: 2,
+                    cause: 'wrong-vlan',
+                    description: 'New PC is on VLAN 1 (default) instead of VLAN 10 (Sales)'
+                },
+                toolOutputs: {
+                    'newpc': {
+                        'ping': () => ({
+                            success: false,
+                            output: `Pinging Dept Server (192.168.10.x)...\nDestination host unreachable.\n0 packets received, 100% loss\n\nPinging Dept PC (192.168.10.20)...\nDestination host unreachable.\n0 packets received, 100% loss`,
+                            layer: 2
+                        }),
+                        'ipconfig': () => ({
+                            success: true,
+                            output: `IPv4 Address. . . . : 192.168.1.100\nSubnet Mask . . . . : 255.255.255.0\nDefault Gateway . . : 192.168.1.1`,
+                            layer: 3,
+                            hint: 'IP is in different subnet than department resources'
+                        }),
+                        'arp': () => ({
+                            success: true,
+                            output: `Interface: 192.168.1.100\n  Internet Address      Physical Address\n  192.168.1.1           00-1a-2b-3c-4d-5e\n  (no entries for 192.168.10.x)`,
+                            layer: 2
+                        })
+                    },
+                    'switch': {
+                        'show-int': () => ({
+                            success: true,
+                            output: `Port Fa0/1 (New PC):\n  VLAN: 1 (default)  <-- WRONG VLAN!\n  Status: connected\n\nPort Fa0/2 (Dept PC):\n  VLAN: 10 (Sales)\n  Status: connected`,
+                            layer: 2,
+                            failCheck: true,
+                            hint: 'New PC port should be in VLAN 10'
+                        })
+                    },
+                    'pc2': {
+                        'ipconfig': () => ({
+                            success: true,
+                            output: `IPv4 Address. . . . : 192.168.10.20\nSubnet Mask . . . . : 255.255.255.0\nDefault Gateway . . : 192.168.10.1`
+                        })
+                    }
+                },
+                solutions: [
+                    { id: 'vlan', text: 'Configure switch port for VLAN 10 (Sales)', correct: true },
+                    { id: 'ip', text: 'Change IP address on new PC', correct: false },
+                    { id: 'cable', text: 'Move cable to different port', correct: false },
+                    { id: 'permissions', text: 'Add user to Active Directory group', correct: false }
+                ],
+                hints: [
+                    'Compare network settings between working and non-working PCs',
+                    'Check which VLAN each port is assigned to',
+                    'New ports default to VLAN 1 unless configured',
+                    'The new PC needs to be in VLAN 10 like other Sales PCs'
+                ]
+            },
+            'routing-loop': {
+                title: 'Routing Loop',
+                ticket: {
+                    num: 'TKT-006',
+                    issue: 'Packets to remote site never arrive, network appears slow.',
+                    severity: 'critical',
+                    affected: 'Branch Office - All Users'
+                },
+                topology: {
+                    devices: [
+                        { id: 'pc', name: 'HQ PC', icon: 'PC', x: 30, y: 100, status: 'warning' },
+                        { id: 'r1', name: 'R1', icon: 'RTR', x: 150, y: 100, status: 'warning' },
+                        { id: 'r2', name: 'R2', icon: 'RTR', x: 300, y: 50, status: 'warning' },
+                        { id: 'r3', name: 'R3', icon: 'RTR', x: 300, y: 150, status: 'warning' },
+                        { id: 'branch', name: 'Branch', icon: 'OFF', x: 450, y: 100, status: 'error' }
+                    ],
+                    links: [
+                        { from: 'pc', to: 'r1', status: 'ok' },
+                        { from: 'r1', to: 'r2', status: 'ok' },
+                        { from: 'r1', to: 'r3', status: 'ok' },
+                        { from: 'r2', to: 'r3', status: 'ok' },
+                        { from: 'r2', to: 'branch', status: 'down' },
+                        { from: 'r3', to: 'branch', status: 'ok' }
+                    ]
+                },
+                problem: {
+                    layer: 3,
+                    cause: 'routing-loop',
+                    description: 'Misconfigured static routes creating a loop'
+                },
+                toolOutputs: {
+                    'pc': {
+                        'traceroute': () => ({
+                            success: false,
+                            output: `Tracing route to 10.20.0.0 (Branch Office)...\n  1  192.168.1.1 (R1)    2ms\n  2  10.0.0.2 (R2)       5ms\n  3  10.0.0.3 (R3)       8ms\n  4  10.0.0.1 (R1)       11ms  <-- LOOP!\n  5  10.0.0.2 (R2)       15ms\n  6  10.0.0.3 (R3)       18ms\n  ... (continues looping)\n\nTTL expired - packets are looping!`,
+                            layer: 3,
+                            hint: 'Notice the packets returning to R1'
+                        }),
+                        'ping': () => ({
+                            success: false,
+                            output: `Pinging 10.20.0.1 (Branch)...\nTTL expired in transit.\nTTL expired in transit.\nTTL expired in transit.\n0 packets received, 100% loss`,
+                            layer: 3
+                        })
+                    },
+                    'r1': {
+                        'show-int': () => ({
+                            success: true,
+                            output: `Routing Table for R1:\n  10.20.0.0/24 via 10.0.0.2 (R2)\n\nNote: This points to R2, but R2 might point back...`,
+                            layer: 3
+                        })
+                    },
+                    'r2': {
+                        'show-int': () => ({
+                            success: true,
+                            output: `Routing Table for R2:\n  10.20.0.0/24 via 10.0.0.3 (R3)  <-- Points to R3\n\nBranch link is DOWN!`,
+                            layer: 3
+                        })
+                    },
+                    'r3': {
+                        'show-int': () => ({
+                            success: true,
+                            output: `Routing Table for R3:\n  10.20.0.0/24 via 10.0.0.1 (R1)  <-- Points back to R1!\n\nThis creates a routing loop: R1→R2→R3→R1\nNote: R3's direct link to the Branch is UP and unused!`,
+                            layer: 3,
+                            failCheck: true,
+                            hint: 'R3 should not point to R1 for branch network'
+                        })
+                    }
+                },
+                solutions: [
+                    { id: 'route', text: 'Fix R3 route to use correct next-hop or remove it', correct: true },
+                    { id: 'link', text: 'Restore the branch links', correct: false },
+                    { id: 'ttl', text: 'Increase TTL on packets', correct: false },
+                    { id: 'restart', text: 'Restart all routers', correct: false }
+                ],
+                hints: [
+                    'Use traceroute to see the path packets take',
+                    'Look for packets that visit the same router twice',
+                    'Check routing tables on each router',
+                    'R3 has a route pointing back toward R1'
+                ]
+            }
+        };
+
+        // Game State
+        let gameState = {
+            currentScenario: 'no-internet',
+            score: 0,
+            timeRemaining: 300,
+            timerInterval: null,
+            selectedDevice: null,
+            selectedTool: null,
+            toolsUsed: new Set(),
+            hintsUsed: 0,
+            osiChecked: {},
+            solved: false
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadScenario('no-internet');
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Scenario selection
+            document.querySelectorAll('.scenario-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    loadScenario(item.dataset.scenario);
+                });
+            });
+
+            // Tool selection
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectTool(btn.dataset.tool);
+                });
+            });
+        }
+
+        function loadScenario(scenarioId) {
+            const scenario = scenarios[scenarioId];
+            if (!scenario) return;
+
+            // Stop any timer from the previous scenario before the state is replaced
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+
+            // Reset game state
+            gameState = {
+                currentScenario: scenarioId,
+                score: 0,
+                timeRemaining: 300,
+                timerInterval: null,
+                selectedDevice: null,
+                selectedTool: null,
+                toolsUsed: new Set(),
+                hintsUsed: 0,
+                osiChecked: {},
+                solved: false
+            };
+
+            // Update UI
+            document.querySelectorAll('.scenario-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.scenario === scenarioId);
+            });
+
+            // Clear any tool selection left over from the previous scenario
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('selected'));
+
+            // Update ticket info
+            document.getElementById('ticketNum').textContent = scenario.ticket.num;
+            document.getElementById('ticketIssue').textContent = scenario.ticket.issue;
+            document.getElementById('ticketSeverity').textContent = scenario.ticket.severity.toUpperCase();
+            document.getElementById('ticketSeverity').className = `severity ${scenario.ticket.severity}`;
+            document.getElementById('ticketAffected').textContent = scenario.ticket.affected;
+
+            // Render network topology
+            renderTopology(scenario.topology);
+
+            // Reset OSI layers
+            resetOSILayers();
+
+            // Load solutions
+            loadSolutions(scenario.solutions);
+
+            // Reset terminal
+            document.getElementById('terminalOutput').innerHTML = `
+<span class="info">Loading scenario: ${scenario.title}</span>
+
+<span class="warning">Support Ticket: ${scenario.ticket.num}</span>
+${scenario.ticket.issue}
+
+Select a device in the topology, then use a diagnostic tool to investigate.
+Tip: Start from Layer 1 (Physical) and work up through the OSI model.
+`;
+
+            // Reset score display
+            updateScore(0);
+
+            // Hide hint
+            document.getElementById('hintText').classList.remove('visible');
+
+            // Hide solution panel initially
+            document.getElementById('solutionPanel').classList.remove('visible');
+
+            // Start timer
+            startTimer();
+        }
+
+        function renderTopology(topology) {
+            const canvas = document.getElementById('networkCanvas');
+            canvas.innerHTML = '';
+
+            // Create SVG for links
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.position = 'absolute';
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            svg.style.pointerEvents = 'none';
+
+            // Draw links
+            topology.links.forEach(link => {
+                const fromDevice = topology.devices.find(d => d.id === link.from);
+                const toDevice = topology.devices.find(d => d.id === link.to);
+
+                if (fromDevice && toDevice) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', fromDevice.x + 40);
+                    line.setAttribute('y1', fromDevice.y + 30);
+                    line.setAttribute('x2', toDevice.x + 40);
+                    line.setAttribute('y2', toDevice.y + 30);
+                    line.setAttribute('stroke', link.status === 'down' ? '#e74c3c' : '#27ae60');
+                    line.setAttribute('stroke-width', '3');
+                    if (link.status === 'down') {
+                        line.setAttribute('stroke-dasharray', '5,5');
+                    }
+                    svg.appendChild(line);
+                }
+            });
+
+            canvas.appendChild(svg);
+
+            // Create devices
+            topology.devices.forEach(device => {
+                const deviceEl = document.createElement('div');
+                deviceEl.className = 'network-device';
+                deviceEl.dataset.device = device.id;
+                deviceEl.style.left = `${device.x}px`;
+                deviceEl.style.top = `${device.y}px`;
+                deviceEl.innerHTML = `
+                    <div class="device-icon">${device.icon}</div>
+                    <div class="device-name">${device.name}</div>
+                    <div class="device-status ${device.status}"></div>
+                `;
+                deviceEl.addEventListener('click', () => selectDevice(device.id));
+                canvas.appendChild(deviceEl);
+            });
+        }
+
+        function selectDevice(deviceId) {
+            gameState.selectedDevice = deviceId;
+
+            // Update visual selection
+            document.querySelectorAll('.network-device').forEach(d => {
+                d.classList.toggle('selected', d.dataset.device === deviceId);
+            });
+
+            // If tool is already selected, run it
+            if (gameState.selectedTool) {
+                runTool(gameState.selectedTool, deviceId);
+            } else {
+                addTerminalOutput(`Selected device: ${deviceId}. Now select a diagnostic tool.`, 'info');
+            }
+        }
+
+        function selectTool(toolId) {
+            gameState.selectedTool = toolId;
+
+            // Update visual selection
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.tool === toolId);
+            });
+
+            // If device is already selected, run the tool
+            if (gameState.selectedDevice) {
+                runTool(toolId, gameState.selectedDevice);
+            } else {
+                addTerminalOutput(`Selected tool: ${toolId}. Now click a device to run the tool.`, 'info');
+            }
+        }
+
+        function runTool(tool, device) {
+            const scenario = scenarios[gameState.currentScenario];
+            const deviceOutputs = scenario.toolOutputs[device];
+
+            gameState.toolsUsed.add(tool);
+
+            addTerminalOutput(`\n> Running ${tool} on ${device}...`, 'command');
+
+            if (!deviceOutputs || !deviceOutputs[tool]) {
+                addTerminalOutput(`Tool not applicable to this device.`, 'warning');
+                return;
+            }
+
+            const result = typeof deviceOutputs[tool] === 'function'
+                ? deviceOutputs[tool](gameState.selectedDevice)
+                : deviceOutputs[tool];
+
+            setTimeout(() => {
+                addTerminalOutput(result.output, result.success ? 'success' : 'error');
+
+                // Update OSI layer check
+                if (result.layer) {
+                    updateOSILayer(result.layer, result.failCheck ? false : result.success);
+                }
+
+                // Show hint if provided
+                if (result.hint) {
+                    addTerminalOutput(`Hint: ${result.hint}`, 'warning');
+                }
+
+                // Check if enough investigation done to show solutions
+                if (gameState.toolsUsed.size >= 2) {
+                    document.getElementById('solutionPanel').classList.add('visible');
+                }
+
+                // Award points for using tools
+                if (!gameState.solved) {
+                    updateScore(5);
+                }
+            }, 500);
+        }
+
+        function addTerminalOutput(text, type = '') {
+            const output = document.getElementById('terminalOutput');
+            const span = document.createElement('span');
+            span.className = type;
+            span.textContent = text + '\n';
+            output.appendChild(span);
+            output.parentElement.scrollTop = output.parentElement.scrollHeight;
+        }
+
+        function updateOSILayer(layer, success) {
+            const layerEl = document.querySelector(`[data-layer="${layer}"]`);
+            if (layerEl) {
+                layerEl.classList.remove('checking', 'checked-ok', 'checked-fail');
+                layerEl.classList.add(success ? 'checked-ok' : 'checked-fail');
+                layerEl.querySelector('.layer-status').textContent = success ? '✅' : '❌';
+                gameState.osiChecked[layer] = success;
+            }
+        }
+
+        function resetOSILayers() {
+            document.querySelectorAll('.osi-layer').forEach(layer => {
+                layer.classList.remove('checking', 'checked-ok', 'checked-fail');
+                layer.querySelector('.layer-status').textContent = '❓';
+            });
+        }
+
+        function loadSolutions(solutions) {
+            const container = document.getElementById('solutionOptions');
+            container.innerHTML = solutions.map(sol => `
+                <button class="solution-btn" data-solution="${sol.id}" data-correct="${sol.correct}">
+                    ${sol.text}
+                </button>
+            `).join('');
+
+            container.querySelectorAll('.solution-btn').forEach(btn => {
+                btn.addEventListener('click', () => checkSolution(btn));
+            });
+        }
+
+        function checkSolution(btn) {
+            if (gameState.solved) return;
+
+            const isCorrect = btn.dataset.correct === 'true';
+
+            if (isCorrect) {
+                gameState.solved = true;
+                btn.classList.add('correct');
+                addTerminalOutput('\nCORRECT! Issue resolved!', 'success');
+
+                // Bonus points for time remaining
+                const timeBonus = Math.floor(gameState.timeRemaining / 10);
+                updateScore(50 + timeBonus);
+
+                // Stop timer
+                clearInterval(gameState.timerInterval);
+
+                // Show results
+                setTimeout(() => showResults(true), 1000);
+            } else {
+                btn.classList.add('incorrect');
+                addTerminalOutput('\nIncorrect solution. Try again.', 'error');
+                updateScore(-10);
+
+                // Remove incorrect styling after delay
+                setTimeout(() => btn.classList.remove('incorrect'), 1000);
+            }
+        }
+
+        function showHint() {
+            if (gameState.solved) return;
+
+            const scenario = scenarios[gameState.currentScenario];
+            const hintIndex = Math.min(gameState.hintsUsed, scenario.hints.length - 1);
+            const hint = scenario.hints[hintIndex];
+
+            const hintEl = document.getElementById('hintText');
+            hintEl.textContent = `Hint ${gameState.hintsUsed + 1}: ${hint}`;
+            hintEl.classList.add('visible');
+
+            gameState.hintsUsed++;
+            updateScore(-10);
+
+            addTerminalOutput(`\nHint: ${hint}`, 'info');
+        }
+
+        function escalateTicket() {
+            if (gameState.solved) return;
+
+            addTerminalOutput('\nTicket escalated to Level 2 Support.', 'warning');
+            addTerminalOutput('Note: In real scenarios, escalation should include all diagnostic information gathered.', 'info');
+
+            // Partial score for proper escalation
+            updateScore(20);
+            gameState.solved = true;
+            clearInterval(gameState.timerInterval);
+
+            setTimeout(() => showResults(false), 1000);
+        }
+
+        function startTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+
+            // Reset the timer display and warning state
+            document.getElementById('timer').classList.remove('warning');
+            document.getElementById('timerValue').textContent = '05:00';
+
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeRemaining--;
+
+                const minutes = Math.floor(gameState.timeRemaining / 60);
+                const seconds = gameState.timeRemaining % 60;
+                const timerEl = document.getElementById('timerValue');
+                timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                // Warning at 1 minute
+                if (gameState.timeRemaining <= 60) {
+                    document.getElementById('timer').classList.add('warning');
+                }
+
+                // Time's up
+                if (gameState.timeRemaining <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    if (!gameState.solved) {
+                        addTerminalOutput('\nTime expired! Ticket auto-escalated.', 'error');
+                        showResults(false);
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateScore(points) {
+            gameState.score = Math.max(0, gameState.score + points);
+            document.getElementById('scoreValue').textContent = gameState.score;
+        }
+
+        function showResults(success) {
+            const modal = document.getElementById('resultsModal');
+            const timeUsed = 300 - gameState.timeRemaining;
+            const minutes = Math.floor(timeUsed / 60);
+            const seconds = timeUsed % 60;
+
+            document.getElementById('resultsTitle').textContent = success ? 'Scenario Complete!' : 'Scenario Ended';
+            document.getElementById('resultScore').textContent = gameState.score;
+            document.getElementById('resultTime').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('resultTools').textContent = gameState.toolsUsed.size;
+
+            document.getElementById('resultMessage').textContent = success
+                ? 'Great troubleshooting! You identified and resolved the issue.'
+                : 'Review the diagnostic steps and try again to improve your score.';
+
+            modal.classList.add('visible');
+        }
+
+        function closeResults() {
+            document.getElementById('resultsModal').classList.remove('visible');
+        }
+    </script>
+</body>
+
+</html>

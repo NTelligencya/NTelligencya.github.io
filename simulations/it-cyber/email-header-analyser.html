@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Header Forensics Lab — Phishing Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #080c14;
+    --bg-panel: #0d1520;
+    --bg-card: #111d2e;
+    --bg-header: #0a1628;
+    --accent-green: #00ff9d;
+    --accent-cyan: #00d4ff;
+    --accent-red: #ff3c5a;
+    --accent-orange: #ff8c42;
+    --accent-yellow: #ffd166;
+    --text-primary: #c8ddf0;
+    --text-dim: #5a7a99;
+    --text-bright: #e8f4ff;
+    --border: #1a2f4a;
+    --border-glow: #1e3d5c;
+    --red-flag-bg: rgba(255, 60, 90, 0.12);
+    --red-flag-border: rgba(255, 60, 90, 0.5);
+    --green-ok-bg: rgba(0, 255, 157, 0.08);
+    --green-ok-border: rgba(0, 255, 157, 0.4);
+    --orange-warn-bg: rgba(255, 140, 66, 0.1);
+    --orange-warn-border: rgba(255, 140, 66, 0.45);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Share Tech Mono', monospace;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.07) 2px,
+      rgba(0,0,0,0.07) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Grid background */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── TOP BAR ─── */
+  .topbar {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: linear-gradient(90deg, #040810, #0a1628, #040810);
+    border-bottom: 1px solid var(--accent-cyan);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
+  }
+
+  .topbar-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    color: var(--accent-cyan);
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+  }
+
+  .topbar-sub {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-top: 2px;
+  }
+
+  .status-indicators {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .status-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  .dot.green { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+  .dot.red { background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); animation-delay: 0.5s; }
+  .dot.orange { background: var(--accent-orange); box-shadow: 0 0 8px var(--accent-orange); animation-delay: 1s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ─── LEGEND ─── */
+  .legend-bar {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    gap: 20px;
+    padding: 8px 24px;
+    background: rgba(13, 21, 32, 0.9);
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .legend-label {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-right: 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.62rem;
+    color: var(--text-dim);
+  }
+
+  .legend-badge {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 0.58rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+
+  .badge-red { background: var(--red-flag-bg); border: 1px solid var(--red-flag-border); color: var(--accent-red); }
+  .badge-orange { background: var(--orange-warn-bg); border: 1px solid var(--orange-warn-border); color: var(--accent-orange); }
+  .badge-green { background: var(--green-ok-bg); border: 1px solid var(--green-ok-border); color: var(--accent-green); }
+
+  .progress-section {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.62rem;
+    color: var(--text-dim);
+  }
+
+  .progress-bar {
+    width: 120px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  .main-layout {
+    position: relative;
+    z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    height: calc(100vh - 98px);
+    overflow: hidden;
+  }
+
+  /* ─── LEFT PANEL ─── */
+  .left-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+  }
+
+  .panel-header {
+    padding: 10px 20px;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .panel-header-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    color: var(--accent-cyan);
+    letter-spacing: 3px;
+    font-weight: 600;
+  }
+
+  .panel-header-icon {
+    width: 6px; height: 6px;
+    background: var(--accent-cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-cyan);
+  }
+
+  .tabs {
+    display: flex;
+    background: var(--bg-dark);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    font-size: 0.62rem;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .tab.active {
+    color: var(--accent-cyan);
+    border-bottom-color: var(--accent-cyan);
+    background: rgba(0, 212, 255, 0.05);
+  }
+
+  .tab:hover:not(.active) { color: var(--text-primary); }
+
+  .email-viewer {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  /* ─── EMAIL ENVELOPE ─── */
+  .email-meta {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .email-meta-header {
+    padding: 10px 16px;
+    background: rgba(0, 212, 255, 0.05);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    color: var(--accent-cyan);
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: baseline;
+    padding: 6px 16px;
+    border-bottom: 1px solid rgba(26, 47, 74, 0.5);
+    gap: 12px;
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+  .meta-row:last-child { border-bottom: none; }
+
+  .meta-key {
+    color: var(--text-dim);
+    min-width: 80px;
+    font-size: 0.62rem;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  .meta-val { color: var(--text-primary); }
+
+  /* ─── HEADER BLOCK ─── */
+  .header-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 0.68rem;
+    line-height: 1.8;
+  }
+
+  .header-block-title {
+    padding: 10px 16px;
+    background: rgba(0, 212, 255, 0.05);
+    border-bottom: 1px solid var(--border);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    color: var(--accent-cyan);
+    letter-spacing: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-instructions {
+    font-size: 0.58rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  .header-content {
+    padding: 16px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .header-line {
+    padding: 3px 6px;
+    border-radius: 3px;
+    margin-bottom: 2px;
+    transition: background 0.2s;
+    cursor: default;
+    display: block;
+    word-break: break-all;
+  }
+
+  /* Flagged line styles */
+  .flag-red {
+    background: var(--red-flag-bg);
+    border-left: 3px solid var(--accent-red);
+    cursor: pointer;
+    position: relative;
+  }
+
+  .flag-red:hover {
+    background: rgba(255, 60, 90, 0.2);
+    box-shadow: 0 0 12px rgba(255, 60, 90, 0.15);
+  }
+
+  .flag-orange {
+    background: var(--orange-warn-bg);
+    border-left: 3px solid var(--accent-orange);
+    cursor: pointer;
+  }
+
+  .flag-orange:hover {
+    background: rgba(255, 140, 66, 0.2);
+    box-shadow: 0 0 12px rgba(255, 140, 66, 0.15);
+  }
+
+  .flag-green {
+    background: var(--green-ok-bg);
+    border-left: 3px solid var(--accent-green);
+    cursor: pointer;
+  }
+
+  .flag-green:hover {
+    background: rgba(0, 255, 157, 0.15);
+  }
+
+  .flag-icon {
+    display: inline-block;
+    margin-right: 6px;
+    font-size: 0.7rem;
+    vertical-align: middle;
+  }
+
+  .key-name {
+    color: var(--accent-cyan);
+  }
+
+  .value-text {
+    color: var(--text-primary);
+  }
+
+  .value-suspicious {
+    color: var(--accent-red);
+    font-weight: bold;
+  }
+
+  .value-warning {
+    color: var(--accent-orange);
+  }
+
+  .value-ok {
+    color: var(--accent-green);
+  }
+
+  .value-dim {
+    color: #4a6a88;
+  }
+
+  /* ─── TOOLTIP / INFO PANEL ─── */
+  .info-panel {
+    position: fixed;
+    z-index: 1000;
+    width: 380px;
+    background: linear-gradient(135deg, #0a1628, #0f1f38);
+    border: 1px solid var(--accent-cyan);
+    border-radius: 8px;
+    box-shadow:
+      0 0 30px rgba(0, 212, 255, 0.2),
+      0 20px 60px rgba(0,0,0,0.6);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .info-panel.visible {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+
+  .info-panel-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .info-severity {
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    font-weight: bold;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .severity-critical { background: rgba(255,60,90,0.2); border: 1px solid var(--accent-red); color: var(--accent-red); }
+  .severity-warning { background: rgba(255,140,66,0.2); border: 1px solid var(--accent-orange); color: var(--accent-orange); }
+  .severity-info { background: rgba(0,255,157,0.1); border: 1px solid var(--accent-green); color: var(--accent-green); }
+
+  .info-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-bright);
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .info-close {
+    margin-left: auto;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .info-close:hover { color: var(--accent-red); }
+
+  .info-body {
+    padding: 14px 16px;
+  }
+
+  .info-field {
+    font-size: 0.65rem;
+    color: #7ab0d4;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    margin-top: 10px;
+  }
+
+  .info-value {
+    font-size: 0.72rem;
+    color: var(--text-primary);
+    background: rgba(0,0,0,0.3);
+    padding: 8px 10px;
+    border-radius: 4px;
+    border-left: 2px solid var(--border-glow);
+    line-height: 1.6;
+  }
+
+  .info-explanation {
+    font-size: 0.72rem;
+    color: var(--text-primary);
+    line-height: 1.7;
+  }
+
+  .info-what-look {
+    margin-top: 8px;
+    font-size: 0.68rem;
+    color: var(--accent-yellow);
+    line-height: 1.6;
+  }
+
+  .info-add-note {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 8px;
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: var(--accent-cyan);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .info-add-note:hover {
+    background: rgba(0, 212, 255, 0.2);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.2);
+  }
+
+  /* ─── RIGHT PANEL — NOTEPAD ─── */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
+    overflow: hidden;
+  }
+
+  .notepad-header {
+    padding: 10px 16px;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .notepad-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    color: var(--accent-yellow);
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+
+  .notepad-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-small {
+    padding: 4px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 1px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+  }
+
+  .btn-clear {
+    background: transparent;
+    border-color: rgba(255,60,90,0.4);
+    color: var(--accent-red);
+  }
+
+  .btn-clear:hover { background: rgba(255,60,90,0.1); }
+
+  .btn-export {
+    background: transparent;
+    border-color: rgba(0,212,255,0.4);
+    color: var(--accent-cyan);
+  }
+
+  .btn-export:hover { background: rgba(0,212,255,0.1); }
+
+  /* Score meter */
+  .score-meter {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+
+  .score-label {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .score-number {
+    color: var(--accent-red);
+    font-size: 0.8rem;
+  }
+
+  .threat-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .threat-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+    background: linear-gradient(90deg, #ffd166, #ff8c42, #ff3c5a);
+  }
+
+  .threat-verdict {
+    margin-top: 8px;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 3px;
+    transition: all 0.5s;
+  }
+
+  /* Flag summary */
+  .flag-summary {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .flag-summary-title {
+    font-size: 0.58rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .flag-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .flag-chip {
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.58rem;
+    letter-spacing: 0.5px;
+    opacity: 0.4;
+    transition: opacity 0.3s, box-shadow 0.3s;
+    white-space: nowrap;
+  }
+
+  .flag-chip.discovered {
+    opacity: 1;
+  }
+
+  .chip-red {
+    background: var(--red-flag-bg);
+    border: 1px solid var(--red-flag-border);
+    color: var(--accent-red);
+  }
+
+  .chip-red.discovered {
+    box-shadow: 0 0 8px rgba(255,60,90,0.3);
+  }
+
+  .chip-orange {
+    background: var(--orange-warn-bg);
+    border: 1px solid var(--orange-warn-border);
+    color: var(--accent-orange);
+  }
+
+  /* Notepad textarea */
+  .notepad-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .note-entry {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 0.65rem;
+    line-height: 1.6;
+    animation: noteIn 0.3s ease;
+    position: relative;
+  }
+
+  @keyframes noteIn {
+    from { opacity: 0; transform: translateX(10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .note-timestamp {
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  .note-flag-label {
+    font-size: 0.58rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .note-content {
+    color: var(--text-primary);
+  }
+
+  .note-delete {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: color 0.2s;
+  }
+
+  .note-delete:hover { color: var(--accent-red); }
+
+  .custom-note-area {
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+    background: rgba(0,0,0,0.2);
+  }
+
+  .custom-note-input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    padding: 8px 10px;
+    resize: none;
+    height: 60px;
+    transition: border-color 0.2s;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+  }
+
+  .custom-note-input:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0,212,255,0.1);
+  }
+
+  .custom-note-input::placeholder { color: var(--text-dim); }
+
+  .custom-note-btn {
+    margin-top: 6px;
+    width: 100%;
+    padding: 6px;
+    background: rgba(255, 209, 102, 0.1);
+    border: 1px solid rgba(255,209,102,0.3);
+    color: var(--accent-yellow);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .custom-note-btn:hover { background: rgba(255,209,102,0.2); }
+
+  .empty-notepad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-dim);
+    font-size: 0.65rem;
+    text-align: center;
+    padding: 20px;
+    gap: 10px;
+    letter-spacing: 1px;
+    line-height: 1.8;
+  }
+
+  .empty-icon {
+    font-size: 2rem;
+    opacity: 0.3;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-glow); }
+
+  /* ─── ROUTING VIZ (tab 2) ─── */
+  .routing-view {
+    padding: 20px;
+    display: none;
+  }
+
+  .routing-view.active { display: block; }
+
+  .routing-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .routing-hop {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    position: relative;
+  }
+
+  .hop-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 30px;
+    flex-shrink: 0;
+  }
+
+  .hop-node {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hop-line {
+    width: 2px;
+    flex: 1;
+    min-height: 30px;
+  }
+
+  .hop-node.origin { border-color: var(--accent-red); color: var(--accent-red); background: rgba(255,60,90,0.1); }
+  .hop-node.relay { border-color: var(--accent-orange); color: var(--accent-orange); background: rgba(255,140,66,0.1); }
+  .hop-node.legit { border-color: var(--accent-green); color: var(--accent-green); background: rgba(0,255,157,0.05); }
+  .hop-node.destination { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(0,212,255,0.08); }
+
+  .hop-line.suspicious { background: linear-gradient(var(--accent-red), var(--accent-orange)); }
+  .hop-line.normal { background: linear-gradient(var(--accent-orange), var(--accent-green)); }
+  .hop-line.ok { background: linear-gradient(var(--accent-green), var(--accent-cyan)); }
+
+  .hop-info {
+    padding: 6px 0 20px;
+  }
+
+  .hop-server {
+    font-size: 0.72rem;
+    color: var(--text-bright);
+    margin-bottom: 3px;
+  }
+
+  .hop-detail {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .hop-flag {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 0.58rem;
+    letter-spacing: 1px;
+  }
+
+  /* ─── AUTH RESULTS (tab 3) ─── */
+  .auth-view {
+    padding: 20px;
+    display: none;
+  }
+
+  .auth-view.active { display: block; }
+
+  .auth-result-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .auth-result-card:hover { border-color: var(--border-glow); box-shadow: 0 0 12px rgba(0,212,255,0.05); }
+
+  .auth-card-header {
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .auth-protocol {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+  }
+
+  .auth-result-badge {
+    margin-left: auto;
+    padding: 3px 12px;
+    border-radius: 3px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .auth-pass { background: rgba(0,255,157,0.15); border: 1px solid rgba(0,255,157,0.4); color: var(--accent-green); }
+  .auth-fail { background: rgba(255,60,90,0.15); border: 1px solid rgba(255,60,90,0.4); color: var(--accent-red); }
+  .auth-soft { background: rgba(255,209,102,0.1); border: 1px solid rgba(255,209,102,0.4); color: var(--accent-yellow); }
+  .auth-none { background: rgba(90,122,153,0.2); border: 1px solid rgba(90,122,153,0.3); color: var(--text-dim); }
+
+  .auth-card-body {
+    padding: 12px 16px;
+    font-size: 0.68rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+  }
+
+  .auth-raw {
+    background: rgba(0,0,0,0.3);
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-size: 0.63rem;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    word-break: break-all;
+    line-height: 1.6;
+    border-left: 2px solid var(--border);
+  }
+
+  .auth-explanation {
+    color: var(--text-primary);
+    line-height: 1.7;
+    font-size: 0.68rem;
+  }
+
+  .auth-implication {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    line-height: 1.6;
+  }
+
+  .impl-danger { background: rgba(255,60,90,0.1); border-left: 2px solid var(--accent-red); color: #ff8aa0; }
+  .impl-warn { background: rgba(255,209,102,0.1); border-left: 2px solid var(--accent-yellow); color: #ffd166; }
+  .impl-ok { background: rgba(0,255,157,0.08); border-left: 2px solid var(--accent-green); color: #7affc4; }
+
+  /* ─── DISCOVERY TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: linear-gradient(135deg, #0a1628, #0f1f38);
+    border: 1px solid var(--accent-green);
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 0.65rem;
+    color: var(--accent-green);
+    letter-spacing: 1px;
+    box-shadow: 0 0 20px rgba(0,255,157,0.2);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2000;
+    pointer-events: none;
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ─── HIGHLIGHT PULSE ─── */
+  @keyframes flagPulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 60, 90, 0.5); }
+    70% { box-shadow: 0 0 0 6px rgba(255, 60, 90, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 60, 90, 0); }
+  }
+
+  .just-discovered {
+    animation: flagPulse 0.8s ease;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .main-layout { grid-template-columns: 1fr; }
+    .right-panel { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title">▶ EMAIL HEADER FORENSICS LAB</div>
+    <div class="topbar-sub">CYBERSECURITY TRAINING ENVIRONMENT — SIMULATED PHISHING SPECIMEN</div>
+  </div>
+  <div class="status-indicators">
+    <div class="status-dot"><span class="dot green"></span>SANDBOX ACTIVE</div>
+    <div class="status-dot"><span class="dot red"></span>THREAT DETECTED</div>
+    <div class="status-dot"><span class="dot orange"></span>ANALYSIS MODE</div>
+  </div>
+</div>
+
+<!-- LEGEND BAR -->
+<div class="legend-bar">
+  <span class="legend-label">KEY:</span>
+  <div class="legend-item"><span class="legend-badge badge-red">● CRITICAL</span> Definite phishing indicator — click to investigate</div>
+  <div class="legend-item"><span class="legend-badge badge-orange">● WARNING</span> Suspicious — requires further analysis</div>
+  <div class="legend-item"><span class="legend-badge badge-green">● INFO</span> Notable — context-dependent</div>
+  <div class="progress-section">
+    <span>FLAGS FOUND: <span id="flagCount">0</span>/<span id="flagTotal">0</span></span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="panel-header">
+      <div class="panel-header-icon"></div>
+      <div class="panel-header-title">SPECIMEN: PHISHING EMAIL HEADER — CASE #2024-PH-0042</div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('raw')">RAW HEADER</div>
+      <div class="tab" onclick="switchTab('routing')">ROUTING CHAIN</div>
+      <div class="tab" onclick="switchTab('auth')">AUTH RESULTS</div>
+    </div>
+
+    <!-- RAW HEADER TAB -->
+    <div class="email-viewer" id="tab-raw">
+
+      <!-- Envelope summary -->
+      <div class="email-meta" style="margin-bottom:12px;">
+        <div class="email-meta-header">▸ ENVELOPE SUMMARY</div>
+        <div class="meta-row">
+          <span class="meta-key">FROM:</span>
+          <span class="meta-val" style="color:var(--accent-red)">security-alert@commbank-secure.net</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">REPLY-TO:</span>
+          <span class="meta-val" style="color:var(--accent-orange)">support.help@gmail-accts.ru</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">TO:</span>
+          <span class="meta-val">john.smith@example.com.au</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">SUBJECT:</span>
+          <span class="meta-val" style="color:var(--accent-orange)">⚠ URGENT: Your account has been suspended — Verify NOW</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">DATE:</span>
+          <span class="meta-val">Mon, 15 Apr 2024 03:17:42 +0000</span>
+        </div>
+      </div>
+
+      <!-- Raw header block -->
+      <div class="header-block">
+        <div class="header-block-title">
+          <span>▸ FULL EMAIL HEADER — CLICK HIGHLIGHTED FIELDS TO INVESTIGATE</span>
+          <span class="header-instructions">⚡ Interactive elements highlighted</span>
+        </div>
+        <div class="header-content" id="headerContent">
+
+          <span class="header-line flag-red" onclick="showInfo('received1')" data-flag="received1">
+            <span class="flag-icon">🔴</span><span class="key-name">Received:</span> <span class="value-suspicious">from mail.farmersmarket-widgets.com (195.178.110.92)</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by mx.example.com.au with ESMTP; Mon, 15 Apr 2024 03:17:49 +0000
+          </span>
+
+          <span class="header-line flag-red" onclick="showInfo('received2')" data-flag="received2">
+            <span class="flag-icon">🔴</span><span class="key-name">Received:</span> <span class="value-suspicious">from smtp.anon-relay.biz (unknown [45.142.212.77])</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by mail.farmersmarket-widgets.com with SMTP; Mon, 15 Apr 2024 03:17:44 +0000
+          </span>
+
+          <span class="header-line flag-red" onclick="showInfo('received3')" data-flag="received3">
+            <span class="flag-icon">🔴</span><span class="key-name">Received:</span> <span class="value-suspicious">from [185.220.101.55] (185.220.101.55)</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;by smtp.anon-relay.biz with ESMTP; Mon, 15 Apr 2024 03:17:41 +0000
+          </span>
+
+          <span class="header-line value-dim header-line" style="cursor:default; padding-left:9px;">
+            <span class="key-name">Return-Path:</span> <span class="value-text">&lt;bounces@commbank-secure.net&gt;</span>
+          </span>
+
+          <span class="header-line flag-red" onclick="showInfo('from')" data-flag="from">
+            <span class="flag-icon">🔴</span><span class="key-name">From:</span> <span class="value-text">"Commonwealth Bank" </span><span class="value-suspicious">&lt;security-alert@commbank-secure.net&gt;</span>
+          </span>
+
+          <span class="header-line flag-red" onclick="showInfo('replyto')" data-flag="replyto">
+            <span class="flag-icon">🔴</span><span class="key-name">Reply-To:</span> <span class="value-suspicious">support.help@gmail-accts.ru</span>
+          </span>
+
+          <span class="header-line value-dim header-line" style="cursor:default; padding-left:9px;">
+            <span class="key-name">To:</span> <span class="value-text">john.smith@example.com.au</span>
+          </span>
+
+          <span class="header-line flag-orange" onclick="showInfo('subject')" data-flag="subject">
+            <span class="flag-icon">🟠</span><span class="key-name">Subject:</span> <span class="value-warning">=?UTF-8?Q?=E2=9A=A0_URGENT:_Your_account_has_been_suspended_=E2=80=94_Verify_NOW?=</span>
+          </span>
+
+          <span class="header-line value-dim header-line" style="cursor:default; padding-left:9px;">
+            <span class="key-name">Date:</span> <span class="value-text">Mon, 15 Apr 2024 03:17:42 +0000</span>
+          </span>
+
+          <span class="header-line flag-red" onclick="showInfo('msgid')" data-flag="msgid">
+            <span class="flag-icon">🔴</span><span class="key-name">Message-ID:</span> <span class="value-suspicious">&lt;20240415031742.abc123@smtp.anon-relay.biz&gt;</span>
+          </span>
+
+          <span class="header-line flag-red" onclick="showInfo('spf')" data-flag="spf">
+            <span class="flag-icon">🔴</span><span class="key-name">Received-SPF:</span> <span class="value-suspicious">fail</span> <span class="value-text">(commbank-secure.net: domain does not designate 185.220.101.55 as permitted sender)</span>
+          </span>
+
+          <span class="header-line flag-red" onclick="showInfo('dkim')" data-flag="dkim">
+            <span class="flag-icon">🔴</span><span class="key-name">DKIM-Signature:</span> <span class="value-suspicious">v=1; a=rsa-sha256; d=commbank-secure.net;</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="value-dim">s=default; c=relaxed/relaxed; bh=Xk3pzQ...</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="value-suspicious">[SIGNATURE VERIFICATION: FAILED]</span>
+          </span>
+
+          <span class="header-line flag-red" onclick="showInfo('dmarc')" data-flag="dmarc">
+            <span class="flag-icon">🔴</span><span class="key-name">Authentication-Results:</span> <span class="value-text">mx.example.com.au;</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="value-suspicious">dmarc=fail</span> <span class="value-text">(policy=none) header.from=commbank-secure.net;</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="value-suspicious">spf=fail</span> <span class="value-text">smtp.mailfrom=commbank-secure.net;</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="value-suspicious">dkim=fail</span> <span class="value-text">header.d=commbank-secure.net</span>
+          </span>
+
+          <span class="header-line flag-orange" onclick="showInfo('xmailer')" data-flag="xmailer">
+            <span class="flag-icon">🟠</span><span class="key-name">X-Mailer:</span> <span class="value-warning">PHPMailer 6.1.4 (https://github.com/PHPMailer/PHPMailer)</span>
+          </span>
+
+          <span class="header-line flag-orange" onclick="showInfo('xorigip')" data-flag="xorigip">
+            <span class="flag-icon">🟠</span><span class="key-name">X-Originating-IP:</span> <span class="value-warning">185.220.101.55</span>
+          </span>
+
+          <span class="header-line flag-orange" onclick="showInfo('xspam')" data-flag="xspam">
+            <span class="flag-icon">🟠</span><span class="key-name">X-Spam-Status:</span> <span class="value-warning">Yes, score=7.8</span> <span class="value-text">required=5.0</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="value-dim">tests=BAYES_99,SPOOFED_DOMAIN,MISSING_MID,URIBL_BLOCKED</span>
+          </span>
+
+          <span class="header-line flag-green" onclick="showInfo('mimeversion')" data-flag="mimeversion">
+            <span class="flag-icon">🟢</span><span class="key-name">MIME-Version:</span> <span class="value-ok">1.0</span>
+          </span>
+
+          <span class="header-line flag-green" onclick="showInfo('contenttype')" data-flag="contenttype">
+            <span class="flag-icon">🟢</span><span class="key-name">Content-Type:</span> <span class="value-ok">multipart/mixed;</span> <span class="value-text">boundary="000000000000abc123def456"</span>
+          </span>
+
+          <span class="header-line value-dim" style="cursor:default; padding-left:9px;">
+            <span class="key-name">X-Google-DKIM-Signature:</span> <span class="value-dim">absent — not routed through Google</span>
+          </span>
+
+        </div>
+      </div>
+    </div><!-- end tab-raw -->
+
+    <!-- ROUTING CHAIN TAB -->
+    <div class="email-viewer routing-view" id="tab-routing">
+      <div style="margin-bottom:16px; font-size:0.68rem; color:var(--text-dim); line-height:1.8; padding:10px; background:rgba(0,0,0,0.2); border-radius:4px; border-left:2px solid var(--accent-cyan);">
+        The <span style="color:var(--accent-cyan)">Received:</span> headers tell us each server that handled this email. Read from <strong style="color:var(--text-bright)">bottom to top</strong> — the bottom entry is where the email originated. Each hop should be a known, legitimate mail server. Unexpected servers are a major red flag.
+      </div>
+      <div class="routing-chain">
+
+        <div class="routing-hop">
+          <div class="hop-connector">
+            <div class="hop-node origin">1</div>
+            <div class="hop-line suspicious"></div>
+          </div>
+          <div class="hop-info">
+            <div class="hop-server" style="color:var(--accent-red)">185.220.101.55 — Unknown Origin</div>
+            <div class="hop-detail">
+              IP belongs to a Tor exit node network (AS205100). No PTR record. No legitimate business association.<br>
+              <span class="hop-flag badge-red">🔴 TOR EXIT NODE</span>
+              <span class="hop-flag badge-red" style="margin-left:4px;">🔴 NO REVERSE DNS</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="routing-hop">
+          <div class="hop-connector">
+            <div class="hop-node relay">2</div>
+            <div class="hop-line normal"></div>
+          </div>
+          <div class="hop-info">
+            <div class="hop-server" style="color:var(--accent-orange)">smtp.anon-relay.biz — Anonymous Relay Service</div>
+            <div class="hop-detail">
+              Known bulletproof hosting provider. Frequently used by malicious actors to obscure origin. Registered 3 weeks ago.<br>
+              <span class="hop-flag badge-red">🔴 BULLETPROOF HOST</span>
+              <span class="hop-flag badge-orange" style="margin-left:4px;">🟠 NEWLY REGISTERED DOMAIN</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="routing-hop">
+          <div class="hop-connector">
+            <div class="hop-node relay">3</div>
+            <div class="hop-line normal"></div>
+          </div>
+          <div class="hop-info">
+            <div class="hop-server" style="color:var(--accent-orange)">mail.farmersmarket-widgets.com — Unrelated Third Party</div>
+            <div class="hop-detail">
+              A legitimate-looking domain for a widget company — completely unrelated to banking. Likely a compromised server used as an open relay.<br>
+              <span class="hop-flag badge-red">🔴 DOMAIN MISMATCH</span>
+              <span class="hop-flag badge-orange" style="margin-left:4px;">🟠 LIKELY COMPROMISED</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="routing-hop">
+          <div class="hop-connector">
+            <div class="hop-node destination">✓</div>
+          </div>
+          <div class="hop-info">
+            <div class="hop-server" style="color:var(--accent-cyan)">mx.example.com.au — Recipient Mail Server</div>
+            <div class="hop-detail">
+              The recipient's mail server. This is where the email finally arrived. Note that the server did detect issues (see Auth Results tab), but still delivered the message because the DMARC policy was set to <em>none</em>.<br>
+              <span class="hop-flag badge-green">🟢 LEGITIMATE MX RECORD</span>
+              <span class="hop-flag badge-orange" style="margin-left:4px;">🟠 DMARC POLICY TOO WEAK</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:20px; padding:12px; background:rgba(255,60,90,0.05); border:1px solid rgba(255,60,90,0.2); border-radius:4px; font-size:0.65rem; line-height:1.8; color:var(--text-dim);">
+        <span style="color:var(--accent-red); font-family:'Rajdhani',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:1px;">⚠ ANALYST NOTE:</span><br>
+        A legitimate Commonwealth Bank email would originate from CommBank's own mail infrastructure (e.g. <span style="color:var(--accent-cyan)">mail.commbank.com.au</span>) and would not be routed through anonymous relay services or third-party servers. The three-hop routing chain through a Tor exit node → bulletproof host → compromised relay is a textbook spoofing pattern.
+      </div>
+    </div>
+
+    <!-- AUTH RESULTS TAB -->
+    <div class="email-viewer auth-view" id="tab-auth">
+      <div style="margin-bottom:16px; font-size:0.68rem; color:var(--text-dim); line-height:1.8; padding:10px; background:rgba(0,0,0,0.2); border-radius:4px; border-left:2px solid var(--accent-cyan);">
+        Email authentication protocols — <span style="color:var(--accent-cyan)">SPF</span>, <span style="color:var(--accent-cyan)">DKIM</span>, and <span style="color:var(--accent-cyan)">DMARC</span> — form a layered defence against spoofing. In this specimen, all three have failed, providing strong evidence of a forged sender.
+      </div>
+
+      <div class="auth-result-card" onclick="toggleAuth(this)">
+        <div class="auth-card-header">
+          <span class="auth-protocol" style="color:var(--accent-red)">SPF</span>
+          <span style="font-size:0.65rem; color:var(--text-dim)">Sender Policy Framework</span>
+          <span class="auth-result-badge auth-fail">● FAIL</span>
+        </div>
+        <div class="auth-card-body">
+          <div class="auth-raw">Received-SPF: fail (commbank-secure.net: domain does not designate 185.220.101.55 as permitted sender) client-ip=185.220.101.55; envelope-from=bounces@commbank-secure.net</div>
+          <div class="auth-explanation">
+            SPF checks whether the sending server's IP address is listed as an authorised sender for the domain. The domain <strong style="color:var(--text-bright)">commbank-secure.net</strong> has an SPF record, but the IP address <strong style="color:var(--accent-red)">185.220.101.55</strong> is not listed in it — meaning this email was sent from an unauthorised server.
+          </div>
+          <div class="auth-implication impl-danger">
+            ⚠ The domain owner (if this were a real bank) never authorised this server to send email on their behalf. This is consistent with a spoofed sender address.
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-result-card" onclick="toggleAuth(this)">
+        <div class="auth-card-header">
+          <span class="auth-protocol" style="color:var(--accent-red)">DKIM</span>
+          <span style="font-size:0.65rem; color:var(--text-dim)">DomainKeys Identified Mail</span>
+          <span class="auth-result-badge auth-fail">● FAIL</span>
+        </div>
+        <div class="auth-card-body">
+          <div class="auth-raw">DKIM-Signature: v=1; a=rsa-sha256; d=commbank-secure.net; s=default; c=relaxed/relaxed; h=from:to:subject:date; bh=Xk3pzQ8...; b=FORGED_SIGNATURE_INVALID...</div>
+          <div class="auth-explanation">
+            DKIM adds a cryptographic signature to emails. The receiving server verifies this signature against a public key published in DNS. Here, a DKIM signature header is present — but it cannot be verified. This means the signature is either forged, or the email was tampered with in transit.
+          </div>
+          <div class="auth-implication impl-danger">
+            ⚠ A DKIM signature that fails verification is often worse than no signature at all — it suggests the attacker attempted to forge the header but lacks the private key to produce a valid signature.
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-result-card" onclick="toggleAuth(this)">
+        <div class="auth-card-header">
+          <span class="auth-protocol" style="color:var(--accent-yellow)">DMARC</span>
+          <span style="font-size:0.65rem; color:var(--text-dim)">Domain-based Message Authentication</span>
+          <span class="auth-result-badge auth-soft">● FAIL (policy=none)</span>
+        </div>
+        <div class="auth-card-body">
+          <div class="auth-raw">Authentication-Results: mx.example.com.au; dmarc=fail (p=none sp=none dis=none) header.from=commbank-secure.net</div>
+          <div class="auth-explanation">
+            DMARC ties SPF and DKIM together and tells receiving servers what to do when they fail. The <strong style="color:var(--accent-yellow)">p=none</strong> policy means the domain owner said: "do nothing if authentication fails — just monitor". This is a critical misconfiguration in real banking domains, but here the spoofed domain intentionally uses <em>none</em> to ensure delivery.
+          </div>
+          <div class="auth-implication impl-warn">
+            🟡 Despite all authentication failing, the email was still delivered because the DMARC policy is set to <em>none</em>. Real financial institutions should use <em>p=reject</em> to prevent exactly this attack.
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-result-card" onclick="toggleAuth(this)">
+        <div class="auth-card-header">
+          <span class="auth-protocol" style="color:var(--text-dim)">ARC</span>
+          <span style="font-size:0.65rem; color:var(--text-dim)">Authenticated Received Chain</span>
+          <span class="auth-result-badge auth-none">● ABSENT</span>
+        </div>
+        <div class="auth-card-body">
+          <div class="auth-raw">[No ARC-Authentication-Results header present]</div>
+          <div class="auth-explanation">
+            ARC preserves authentication results as email passes through intermediary servers (e.g. mailing lists or forwarding). Its absence here is not itself suspicious, but combined with the other failures, it confirms no trusted intermediary has vouched for this message.
+          </div>
+          <div class="auth-implication impl-ok">
+            🟢 Absence of ARC alone is not a red flag — most direct emails lack ARC headers.
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end tab-auth -->
+  </div><!-- end left-panel -->
+
+  <!-- RIGHT PANEL — NOTEPAD -->
+  <div class="right-panel">
+    <div class="notepad-header">
+      <div class="notepad-title">▸ ANALYST NOTEPAD</div>
+      <div class="notepad-actions">
+        <button class="btn-small btn-clear" onclick="clearNotes()">CLEAR</button>
+        <button class="btn-small btn-export" onclick="exportNotes()">EXPORT</button>
+      </div>
+    </div>
+
+    <!-- Score meter -->
+    <div class="score-meter">
+      <div class="score-label">
+        <span>THREAT CONFIDENCE SCORE</span>
+        <span class="score-number" id="scoreNumber">0%</span>
+      </div>
+      <div class="threat-bar">
+        <div class="threat-fill" id="threatFill" style="width:0%"></div>
+      </div>
+      <div class="threat-verdict" id="threatVerdict" style="color:var(--text-dim); background:rgba(90,122,153,0.1); border:1px solid rgba(90,122,153,0.2);">
+        BEGIN ANALYSIS
+      </div>
+    </div>
+
+    <!-- Flag discovery summary -->
+    <div class="flag-summary">
+      <div class="flag-summary-title">DISCOVERED INDICATORS</div>
+      <div class="flag-chips" id="flagChips">
+        <span class="flag-chip chip-red" id="chip-received1">SUSPICIOUS RELAY</span>
+        <span class="flag-chip chip-red" id="chip-received2">ANON RELAY</span>
+        <span class="flag-chip chip-red" id="chip-received3">TOR IP</span>
+        <span class="flag-chip chip-red" id="chip-from">SPOOFED DOMAIN</span>
+        <span class="flag-chip chip-red" id="chip-replyto">FOREIGN REPLY-TO</span>
+        <span class="flag-chip chip-orange" id="chip-subject">URGENCY LANGUAGE</span>
+        <span class="flag-chip chip-red" id="chip-msgid">SUSPICIOUS MSG-ID</span>
+        <span class="flag-chip chip-red" id="chip-spf">SPF FAIL</span>
+        <span class="flag-chip chip-red" id="chip-dkim">DKIM FAIL</span>
+        <span class="flag-chip chip-red" id="chip-dmarc">DMARC FAIL</span>
+        <span class="flag-chip chip-orange" id="chip-xmailer">PHP MAILER</span>
+        <span class="flag-chip chip-orange" id="chip-xorigip">SUSPICIOUS IP</span>
+        <span class="flag-chip chip-orange" id="chip-xspam">HIGH SPAM SCORE</span>
+        <span class="flag-chip chip-red" id="chip-mimeversion" style="display:none"></span>
+        <span class="flag-chip chip-red" id="chip-contenttype" style="display:none"></span>
+      </div>
+    </div>
+
+    <!-- Notes list -->
+    <div class="notepad-area" id="notepadArea">
+      <div class="empty-notepad" id="emptyNotepad">
+        <span class="empty-icon">📋</span>
+        Click any <span style="color:var(--accent-red)">highlighted field</span> in the header to reveal its significance,<br>then add it to your analyst notes.<br><br>
+        <span style="color:var(--text-dim); font-size:0.6rem;">Build a complete picture of the phishing attempt.</span>
+      </div>
+    </div>
+
+    <!-- Custom note input -->
+    <div class="custom-note-area">
+      <textarea class="custom-note-input" id="customNoteInput" placeholder="Add your own analyst observation..."></textarea>
+      <button class="custom-note-btn" onclick="addCustomNote()">+ ADD MANUAL NOTE</button>
+    </div>
+  </div>
+
+</div><!-- end main-layout -->
+
+<!-- INFO PANEL (floating) -->
+<div class="info-panel" id="infoPanel">
+  <div class="info-panel-header">
+    <span class="info-severity" id="infoSeverity">CRITICAL</span>
+    <span class="info-title" id="infoTitle">Field Name</span>
+    <span class="info-close" onclick="closeInfo()">✕</span>
+  </div>
+  <div class="info-body">
+    <div class="info-field">HEADER FIELD</div>
+    <div class="info-value" id="infoField">—</div>
+
+    <div class="info-field">WHAT THIS FIELD DOES</div>
+    <div class="info-explanation" id="infoExplain">—</div>
+
+    <div class="info-field">WHY THIS IS SUSPICIOUS</div>
+    <div class="info-what-look" id="infoWhy">—</div>
+
+    <button class="info-add-note" onclick="addNoteFromPanel()">+ ADD TO ANALYST NOTES</button>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+
+const flagData = {
+  received1: {
+    severity: 'WARNING',
+    title: 'Unexpected Receiving Server',
+    field: 'Received: from mail.farmersmarket-widgets.com (195.178.110.92)',
+    explain: 'The <strong>Received:</strong> header is added by each mail server that handles an email. This entry shows the email passed through a server belonging to a widget company — completely unrelated to banking. Legitimate bank emails would only pass through the bank\'s own mail infrastructure.',
+    why: '⚡ A bank email should never be routed through a third-party commercial website\'s mail server. This strongly suggests a compromised server being used as an open relay to disguise the email\'s true origin.',
+    chipId: 'chip-received1',
+    noteText: 'SUSPICIOUS RELAY: Email routed through unrelated server mail.farmersmarket-widgets.com (195.178.110.92). Suggests compromised server used as open relay.'
+  },
+  received2: {
+    severity: 'CRITICAL',
+    title: 'Anonymous Mail Relay Service',
+    field: 'Received: from smtp.anon-relay.biz (unknown [45.142.212.77])',
+    explain: 'This hop shows the email passed through a known anonymous relay service. The term "unknown" in brackets means the server\'s hostname couldn\'t be verified via reverse DNS — a common indicator of deliberately obscured infrastructure.',
+    why: '⚡ Bulletproof hosting providers and anonymous relay services are routinely used by phishing actors to hide the true origin of emails and evade takedowns. The domain <strong>anon-relay.biz</strong> was registered only 3 weeks before this email was sent.',
+    chipId: 'chip-received2',
+    noteText: 'ANON RELAY: smtp.anon-relay.biz (45.142.212.77) — bulletproof hosting, domain registered 3 weeks prior. No legitimate business uses such infrastructure.'
+  },
+  received3: {
+    severity: 'CRITICAL',
+    title: 'Tor Exit Node Origin IP',
+    field: 'Received: from [185.220.101.55] (185.220.101.55)',
+    explain: 'This is the first hop — the origin point of the email. The IP address <strong>185.220.101.55</strong> is a known Tor exit node (belonging to AS205100, a Tor relay network). The attacker routed their email through the Tor anonymity network before sending.',
+    why: '⚡ Tor exit nodes are used to anonymise internet traffic. Sending email via Tor is almost exclusively associated with malicious activity as it prevents attribution. This IP also has no reverse DNS (PTR) record, meaning it\'s not associated with any mail server hostname.',
+    chipId: 'chip-received3',
+    noteText: 'TOR EXIT NODE: Origin IP 185.220.101.55 is a known Tor exit node (AS205100). No PTR record. Attacker using Tor to anonymise origin.'
+  },
+  from: {
+    severity: 'CRITICAL',
+    title: 'Spoofed Sender Domain',
+    field: 'From: "Commonwealth Bank" <security-alert@commbank-secure.net>',
+    explain: 'The <strong>From:</strong> header is what your email client displays to the user. Here, the display name is set to "Commonwealth Bank" to appear legitimate, but the actual email address uses the domain <strong>commbank-secure.net</strong> — not <strong>commbank.com.au</strong>, which is the real domain.',
+    why: '⚡ This is domain spoofing. The domain commbank-secure.net is designed to look official but is completely separate from the real bank. Key pattern: adding words like "secure", "alert", "verify" to a legitimate-sounding name. Always check the actual domain after the @ symbol, not just the display name.',
+    chipId: 'chip-from',
+    noteText: 'SPOOFED DOMAIN: Display name "Commonwealth Bank" but actual domain is commbank-secure.net — not commbank.com.au. Classic lookalike domain attack.'
+  },
+  replyto: {
+    severity: 'CRITICAL',
+    title: 'Foreign Reply-To Address',
+    field: 'Reply-To: support.help@gmail-accts.ru',
+    explain: 'The <strong>Reply-To:</strong> header redirects any reply to a different address than the From address. Here, replies would go to a <strong>.ru</strong> (Russian) domain address, not to the spoofed bank domain. This allows the attacker to receive responses even if the sending domain is eventually blocked.',
+    why: '⚡ A Reply-To address on a different domain to the From address is a major red flag. A real bank would never send from commbank-secure.net and have you reply to gmail-accts.ru. The .ru TLD also points to infrastructure outside Australian jurisdiction.',
+    chipId: 'chip-replyto',
+    noteText: 'REPLY-TO MISMATCH: Replies redirected to support.help@gmail-accts.ru — .ru TLD, different domain to From address. Attacker harvesting replies via separate infrastructure.'
+  },
+  subject: {
+    severity: 'WARNING',
+    title: 'Urgency & Fear Language in Subject',
+    field: 'Subject: ⚠ URGENT: Your account has been suspended — Verify NOW',
+    explain: 'The <strong>Subject:</strong> header here uses multiple social engineering techniques: an emoji to grab attention, the word "URGENT" in caps, mention of account suspension (fear trigger), and "NOW" creating time pressure. The subject is also encoded in UTF-8 Quoted-Printable format, which can sometimes be used to obscure the content from spam filters.',
+    why: '⚡ Urgency and fear are the primary emotional levers used in phishing. Legitimate banks rarely use ALL CAPS or emoji in subject lines, and would never threaten immediate suspension without prior communication. The goal is to make you act before you think.',
+    chipId: 'chip-subject',
+    noteText: 'URGENCY LANGUAGE: Subject uses CAPS, emoji, fear (suspended), and urgency (NOW). Textbook social engineering to bypass rational decision-making.'
+  },
+  msgid: {
+    severity: 'WARNING',
+    title: 'Suspicious Message-ID Origin',
+    field: 'Message-ID: <20240415031742.abc123@smtp.anon-relay.biz>',
+    explain: 'The <strong>Message-ID:</strong> header is a unique identifier assigned by the sending mail server. It should contain the domain of the server that generated it. Here, the Message-ID shows the domain <strong>smtp.anon-relay.biz</strong> — the anonymous relay service — not the claimed sender domain.',
+    why: '⚡ If this were a legitimate CommBank email, the Message-ID would contain commbank.com.au or a related domain. The anon-relay.biz domain in the Message-ID confirms the email was generated on the relay infrastructure, not by the purported sender.',
+    chipId: 'chip-msgid',
+    noteText: 'MSG-ID MISMATCH: Message-ID domain (smtp.anon-relay.biz) does not match From domain (commbank-secure.net). Confirms email generated on relay infrastructure.'
+  },
+  spf: {
+    severity: 'CRITICAL',
+    title: 'SPF Authentication Failure',
+    field: 'Received-SPF: fail (commbank-secure.net: domain does not designate 185.220.101.55 as permitted sender)',
+    explain: '<strong>SPF (Sender Policy Framework)</strong> allows domain owners to publish a list of IP addresses authorised to send email for their domain. The receiving server checks whether the sending IP is on that list. Here, the IP <strong>185.220.101.55</strong> is not in the SPF record for commbank-secure.net.',
+    why: '⚡ SPF failure means the email was sent from an unauthorised server. Even though the spoofed domain commbank-secure.net exists, its owner did not authorise this IP to send on their behalf — pointing to the attacker using their own infrastructure to impersonate the domain.',
+    chipId: 'chip-spf',
+    noteText: 'SPF FAIL: Sending IP 185.220.101.55 not authorised in commbank-secure.net SPF record. Email dispatched from unauthorised infrastructure.'
+  },
+  dkim: {
+    severity: 'CRITICAL',
+    title: 'DKIM Signature Verification Failed',
+    field: 'DKIM-Signature: v=1; a=rsa-sha256; d=commbank-secure.net; [SIGNATURE VERIFICATION: FAILED]',
+    explain: '<strong>DKIM (DomainKeys Identified Mail)</strong> works by having the sending server sign the email with a private cryptographic key. The public key is published in DNS. The receiving server fetches the public key and verifies the signature. A failed verification means either the email content was changed after signing, or the signature was forged.',
+    why: '⚡ The attacker has included a DKIM header to appear legitimate, but lacks the actual private key for commbank-secure.net. This is a signature forgery attempt. In many spam filters, a present-but-invalid DKIM signature scores worse than no signature at all.',
+    chipId: 'chip-dkim',
+    noteText: 'DKIM FAIL: Signature present but unverifiable. Attacker forged DKIM header without access to private key. Signature forgery attempt.'
+  },
+  dmarc: {
+    severity: 'CRITICAL',
+    title: 'DMARC Failure — All Auth Checks Failed',
+    field: 'Authentication-Results: dmarc=fail (policy=none) spf=fail dkim=fail',
+    explain: '<strong>DMARC (Domain-based Message Authentication, Reporting and Conformance)</strong> ties SPF and DKIM together. It requires at least one to pass and for the From domain to align. Here, both SPF and DKIM have failed, so DMARC fails too. The critical detail is <strong>policy=none</strong> — this means the receiving server was instructed to take no action on failure, just report.',
+    why: '⚡ Three authentication systems all failed simultaneously — this is overwhelming evidence of a spoofed email. The p=none DMARC policy is the only reason this email reached the inbox at all. Real banking institutions use p=reject to ensure spoofed emails are blocked outright. This domain was likely set up by the attacker specifically for this campaign.',
+    chipId: 'chip-dmarc',
+    noteText: 'DMARC FAIL: SPF+DKIM+DMARC all failed. p=none policy allowed delivery despite total auth failure. Domain appears attacker-controlled.'
+  },
+  xmailer: {
+    severity: 'WARNING',
+    title: 'PHPMailer — Automated Sending Script',
+    field: 'X-Mailer: PHPMailer 6.1.4',
+    explain: 'The <strong>X-Mailer:</strong> header identifies the software used to compose and send the email. <strong>PHPMailer</strong> is a popular open-source PHP library used to send email programmatically from web servers and scripts. While it has legitimate uses, it is also frequently used in mass phishing campaigns.',
+    why: '⚡ A large bank would use enterprise email infrastructure (Microsoft Exchange, Salesforce Marketing Cloud, etc.) — not a PHP script. PHPMailer appearing in a bank notification email suggests automated bulk sending via a compromised web server or attacker-controlled hosting.',
+    chipId: 'chip-xmailer',
+    noteText: 'PHPMAILEER: X-Mailer shows PHPMailer 6.1.4 — scripted bulk email sender. Inconsistent with enterprise banking email infrastructure.'
+  },
+  xorigip: {
+    severity: 'WARNING',
+    title: 'Originating IP — Tor Exit Node Confirmed',
+    field: 'X-Originating-IP: 185.220.101.55',
+    explain: 'The <strong>X-Originating-IP:</strong> header is sometimes added by mail servers to record the IP of the machine that submitted the email. This confirms the origin IP as <strong>185.220.101.55</strong> — the same Tor exit node identified in the Received headers.',
+    why: '⚡ Corroboration of the Tor exit node origin across multiple header fields strengthens confidence in the attribution. Cross-reference with threat intelligence databases to confirm this IP\'s status and any associated campaigns.',
+    chipId: 'chip-xorigip',
+    noteText: 'ORIGIN IP: X-Originating-IP confirms 185.220.101.55 — Tor exit node. Corroborates Received header analysis. Check threat intel databases for campaign association.'
+  },
+  xspam: {
+    severity: 'WARNING',
+    title: 'High Spam Score — Multiple Triggers',
+    field: 'X-Spam-Status: Yes, score=7.8; tests=BAYES_99,SPOOFED_DOMAIN,MISSING_MID,URIBL_BLOCKED',
+    explain: 'The <strong>X-Spam-Status:</strong> header shows the result of SpamAssassin (or similar) analysis. A score of <strong>7.8</strong> well exceeds the 5.0 threshold. The triggered tests are particularly revealing: BAYES_99 (Bayesian filter 99% confident it\'s spam), SPOOFED_DOMAIN (domain mismatch detected), and URIBL_BLOCKED (links in the body are on URL blocklists).',
+    why: '⚡ This header tells us the receiving server\'s own automated systems flagged this as spam. However, it was still delivered — possibly to a junk folder, or if spam filtering was set to tag-only mode. The URIBL_BLOCKED trigger is particularly important: it indicates the links inside the email body are known phishing URLs.',
+    chipId: 'chip-xspam',
+    noteText: 'SPAM SCORE 7.8: BAYES_99 + SPOOFED_DOMAIN + URIBL_BLOCKED triggered. Links in body on URL blocklists — check body for phishing URLs.'
+  },
+  mimeversion: {
+    severity: 'INFO',
+    title: 'MIME Version — Standard',
+    field: 'MIME-Version: 1.0',
+    explain: '<strong>MIME (Multipurpose Internet Mail Extensions)</strong> version 1.0 is the standard that allows email to carry non-text content: HTML formatting, images, and attachments. MIME-Version: 1.0 is normal and present in virtually all modern email.',
+    why: '✅ This field alone is not suspicious. However, it tells us the email uses MIME encoding, which means it likely contains an HTML body (for visual formatting) and possibly attachments. The Content-Type field will tell us more about the structure.',
+    chipId: 'chip-mimeversion',
+    noteText: 'MIME 1.0: Standard MIME version. Email contains formatted HTML content and possibly attachments. Review body for phishing content and attachments for malware.'
+  },
+  contenttype: {
+    severity: 'INFO',
+    title: 'Content-Type — Multipart/Mixed',
+    field: 'Content-Type: multipart/mixed; boundary="000000000000abc123def456"',
+    explain: '<strong>multipart/mixed</strong> means the email contains multiple parts — typically a plain text version, an HTML version, and potentially attachments. The boundary string is used to separate these parts in the raw email data. This structure allows the email to include both a readable HTML body and file attachments.',
+    why: '⚡ multipart/mixed is common in phishing emails because it allows attackers to include: (1) a convincing HTML page impersonating a bank, (2) a malicious attachment (PDF, Office document, or ZIP), and (3) a plain text fallback. The boundary value itself looks auto-generated, consistent with PHPMailer output.',
+    chipId: 'chip-contenttype',
+    noteText: 'MULTIPART/MIXED: Email structure suggests HTML body + possible attachments. Investigate email body for spoofed bank page and attachments for malware payload.'
+  }
+};
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+
+let discoveredFlags = new Set();
+let notes = [];
+let currentFlag = null;
+const totalFlags = Object.keys(flagData).filter(k => !['mimeversion','contenttype'].includes(k)).length + 2; // include info ones
+
+function updateTotal() {
+  document.getElementById('flagTotal').textContent = Object.keys(flagData).length;
+}
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['raw','routing','auth'][i] === tab);
+  });
+  document.getElementById('tab-raw').style.display = tab === 'raw' ? 'block' : 'none';
+  document.getElementById('tab-routing').style.display = tab === 'routing' ? 'block' : 'none';
+  document.getElementById('tab-routing').classList.toggle('active', tab === 'routing');
+  document.getElementById('tab-auth').style.display = tab === 'auth' ? 'block' : 'none';
+  document.getElementById('tab-auth').classList.toggle('active', tab === 'auth');
+  closeInfo();
+}
+
+// ─── INFO PANEL ──────────────────────────────────────────────────────────────
+
+function showInfo(flagId, event) {
+  const data = flagData[flagId];
+  if (!data) return;
+  currentFlag = flagId;
+
+  // Discover the flag
+  if (!discoveredFlags.has(flagId)) {
+    discoveredFlags.add(flagId);
+    const chip = document.getElementById('chip-' + flagId);
+    if (chip) {
+      chip.classList.add('discovered');
+      chip.classList.add('just-discovered');
+      setTimeout(() => chip.classList.remove('just-discovered'), 800);
+    }
+    updateScore();
+    showToast('🔍 FLAG IDENTIFIED: ' + data.title);
+  }
+
+  // Position panel
+  const panel = document.getElementById('infoPanel');
+  const e = event || window.event;
+  let x = e ? e.clientX : window.innerWidth / 2;
+  let y = e ? e.clientY : window.innerHeight / 2;
+
+  // Prevent overflow
+  const pw = 380;
+  if (x + pw + 20 > window.innerWidth) x = window.innerWidth - pw - 20;
+  if (x < 10) x = 10;
+
+  panel.style.left = x + 'px';
+  panel.style.top = (y + 10) + 'px';
+
+  // Check if panel would overflow bottom
+  setTimeout(() => {
+    const ph = panel.offsetHeight;
+    if (y + 10 + ph > window.innerHeight - 20) {
+      panel.style.top = Math.max(10, y - ph - 10) + 'px';
+    }
+  }, 10);
+
+  // Set content
+  const severityEl = document.getElementById('infoSeverity');
+  severityEl.textContent = data.severity;
+  severityEl.className = 'info-severity';
+  if (data.severity === 'CRITICAL') severityEl.classList.add('severity-critical');
+  else if (data.severity === 'WARNING') severityEl.classList.add('severity-warning');
+  else severityEl.classList.add('severity-info');
+
+  document.getElementById('infoTitle').textContent = data.title;
+  document.getElementById('infoField').textContent = data.field;
+  document.getElementById('infoExplain').innerHTML = data.explain;
+  document.getElementById('infoWhy').innerHTML = data.why;
+
+  panel.classList.add('visible');
+}
+
+function closeInfo() {
+  document.getElementById('infoPanel').classList.remove('visible');
+  currentFlag = null;
+}
+
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('infoPanel');
+  if (panel.classList.contains('visible') &&
+      !panel.contains(e.target) &&
+      !e.target.closest('.header-line')) {
+    closeInfo();
+  }
+});
+
+// ─── NOTES ──────────────────────────────────────────────────────────────────
+
+function addNoteFromPanel() {
+  if (!currentFlag) return;
+  const data = flagData[currentFlag];
+  addNote(data.severity, data.title, data.noteText);
+  closeInfo();
+}
+
+function addNote(severity, title, content) {
+  const noteId = Date.now();
+  notes.push({ id: noteId, severity, title, content });
+  renderNotes();
+}
+
+function addCustomNote() {
+  const input = document.getElementById('customNoteInput');
+  const val = input.value.trim();
+  if (!val) return;
+  addNote('MANUAL', 'Analyst Note', val);
+  input.value = '';
+  showToast('📝 NOTE ADDED');
+}
+
+function deleteNote(id) {
+  notes = notes.filter(n => n.id !== id);
+  renderNotes();
+}
+
+function renderNotes() {
+  const area = document.getElementById('notepadArea');
+  const empty = document.getElementById('emptyNotepad');
+  if (notes.length === 0) {
+    empty.style.display = 'flex';
+    area.innerHTML = '';
+    area.appendChild(empty);
+    return;
+  }
+  empty.style.display = 'none';
+  area.innerHTML = '';
+  notes.forEach(note => {
+    const now = new Date().toLocaleTimeString('en-AU', {hour:'2-digit', minute:'2-digit'});
+    const colors = {
+      CRITICAL: 'var(--accent-red)',
+      WARNING: 'var(--accent-orange)',
+      INFO: 'var(--accent-green)',
+      MANUAL: 'var(--accent-cyan)'
+    };
+    const color = colors[note.severity] || 'var(--text-dim)';
+    const div = document.createElement('div');
+    div.className = 'note-entry';
+    div.style.borderLeft = '2px solid ' + color;
+    div.innerHTML = `
+      <div class="note-timestamp">⏱ ${now}</div>
+      <div class="note-flag-label" style="color:${color}">[${note.severity}] ${note.title}</div>
+      <div class="note-content">${note.content}</div>
+      <span class="note-delete" onclick="deleteNote(${note.id})">✕</span>
+    `;
+    area.appendChild(div);
+  });
+  area.scrollTop = area.scrollHeight;
+}
+
+function clearNotes() {
+  if (notes.length === 0) return;
+  if (confirm('Clear all analyst notes?')) {
+    notes = [];
+    renderNotes();
+  }
+}
+
+function exportNotes() {
+  if (notes.length === 0) { showToast('⚠ NO NOTES TO EXPORT'); return; }
+  let out = '=== EMAIL HEADER FORENSICS LAB ===\n';
+  out += 'Case: #2024-PH-0042\n';
+  out += 'Exported: ' + new Date().toLocaleString('en-AU') + '\n\n';
+  out += '--- ANALYST NOTES ---\n\n';
+  notes.forEach((n, i) => {
+    out += `[${i+1}] [${n.severity}] ${n.title}\n${n.content}\n\n`;
+  });
+  out += `--- FLAGS DISCOVERED: ${discoveredFlags.size}/${Object.keys(flagData).length} ---\n`;
+  out += `Threat Score: ${Math.round((discoveredFlags.size / Object.keys(flagData).length) * 100)}%\n`;
+
+  const blob = new Blob([out], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'phishing-analysis-2024-PH-0042.txt';
+  a.click();
+  showToast('📤 NOTES EXPORTED');
+}
+
+// ─── SCORE ──────────────────────────────────────────────────────────────────
+
+function updateScore() {
+  const total = Object.keys(flagData).length;
+  const found = discoveredFlags.size;
+  const pct = Math.round((found / total) * 100);
+
+  // Weight critical flags more heavily for threat score
+  const criticalFlags = ['received1','received2','received3','from','replyto','msgid','spf','dkim','dmarc'];
+  const critFound = criticalFlags.filter(f => discoveredFlags.has(f)).length;
+  const threatPct = Math.min(100, Math.round((critFound / criticalFlags.length) * 85 + (found / total) * 15));
+
+  document.getElementById('scoreNumber').textContent = threatPct + '%';
+  document.getElementById('threatFill').style.width = threatPct + '%';
+  document.getElementById('flagCount').textContent = found;
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  const verdict = document.getElementById('threatVerdict');
+  if (threatPct >= 80) {
+    verdict.textContent = '⚠ HIGH CONFIDENCE PHISHING';
+    verdict.style.color = 'var(--accent-red)';
+    verdict.style.background = 'rgba(255,60,90,0.1)';
+    verdict.style.border = '1px solid rgba(255,60,90,0.3)';
+  } else if (threatPct >= 50) {
+    verdict.textContent = '🟠 PROBABLE PHISHING';
+    verdict.style.color = 'var(--accent-orange)';
+    verdict.style.background = 'rgba(255,140,66,0.1)';
+    verdict.style.border = '1px solid rgba(255,140,66,0.3)';
+  } else if (threatPct >= 25) {
+    verdict.textContent = '🟡 SUSPICIOUS — CONTINUE ANALYSIS';
+    verdict.style.color = 'var(--accent-yellow)';
+    verdict.style.background = 'rgba(255,209,102,0.08)';
+    verdict.style.border = '1px solid rgba(255,209,102,0.3)';
+  } else if (threatPct > 0) {
+    verdict.textContent = '🔍 EARLY INDICATORS FOUND';
+    verdict.style.color = 'var(--accent-cyan)';
+    verdict.style.background = 'rgba(0,212,255,0.05)';
+    verdict.style.border = '1px solid rgba(0,212,255,0.2)';
+  }
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ─── AUTH CARD TOGGLE ─────────────────────────────────────────────────────────
+
+function toggleAuth(card) {
+  const body = card.querySelector('.auth-card-body');
+  const isOpen = body.style.display !== 'none' && body.style.display !== '';
+  // Close all
+  document.querySelectorAll('.auth-card-body').forEach(b => b.style.display = 'none');
+  // Toggle this one
+  if (!isOpen) body.style.display = 'block';
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+  updateTotal();
+  // Close all auth bodies by default, show first
+  document.querySelectorAll('.auth-card-body').forEach((b, i) => {
+    b.style.display = i === 0 ? 'block' : 'none';
+  });
+  // Tab init
+  document.getElementById('tab-routing').style.display = 'none';
+  document.getElementById('tab-auth').style.display = 'none';
+  // Enter note on Ctrl+Enter
+  document.getElementById('customNoteInput').addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') addCustomNote();
+  });
+
+  // Add click events using event delegation with correct positions
+  document.querySelectorAll('.flag-red, .flag-orange, .flag-green').forEach(el => {
+    el.addEventListener('click', function(e) {
+      const flagId = this.getAttribute('data-flag');
+      if (flagId) {
+        showInfo(flagId, e);
+        e.stopPropagation();
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

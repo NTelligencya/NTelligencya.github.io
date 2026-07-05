@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cable & Connector Identifier</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #e67e22;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #ccc;
+            transition: all 0.3s;
+        }
+
+        .tab:hover,
+        .tab.active {
+            background: #e67e22;
+            color: #fff;
+            border-color: #e67e22;
+        }
+
+        .card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #e67e22;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .cable-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .cable-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .cable-card:hover {
+            transform: translateY(-5px);
+            border-color: #e67e22;
+        }
+
+        .cable-card.selected {
+            border-color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+        }
+
+        .cable-icon {
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 3rem;
+        }
+
+        .cable-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cable-desc {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .info-panel {
+            background: rgba(230, 126, 34, 0.1);
+            border: 1px solid rgba(230, 126, 34, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .info-panel h3 {
+            color: #e67e22;
+            margin-bottom: 15px;
+        }
+
+        .info-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-item {
+            margin-bottom: 10px;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        .pinout-diagram {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+        }
+
+        .pinout-row {
+            display: flex;
+            gap: 10px;
+            margin: 5px 0;
+            align-items: center;
+        }
+
+        .pin-num {
+            width: 25px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .pin-color {
+            width: 80px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .quiz-section {
+            margin-top: 30px;
+        }
+
+        .quiz-card {
+            background: rgba(100, 0, 150, 0.2);
+            border: 1px solid rgba(150, 100, 200, 0.3);
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .quiz-option {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .quiz-option:hover {
+            border-color: #e67e22;
+        }
+
+        .quiz-option.correct {
+            background: rgba(39, 174, 96, 0.3);
+            border-color: #27ae60;
+        }
+
+        .quiz-option.wrong {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: #e74c3c;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #e67e22;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #d35400;
+        }
+
+        .score-display {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .damage-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .damage-card {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .damage-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .damage-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .damage-desc {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        @media (max-width: 600px) {
+            .info-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🔌 Cable & Connector Identifier</h1>
+        <p>Target Courses: ICTNWK302, ICTNWK308, ICTTEN434</p>
+    </div>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" onclick="showSection('cables')">Network Cables</div>
+            <div class="tab" onclick="showSection('connectors')">Connectors</div>
+            <div class="tab" onclick="showSection('pinouts')">Pinout Standards</div>
+            <div class="tab" onclick="showSection('damage')">Damage Recognition</div>
+            <div class="tab" onclick="showSection('quiz')">Quiz</div>
+        </div>
+
+        <div id="cablesSection" class="section">
+            <div class="card">
+                <h2>🔗 Network Cable Types</h2>
+                <div class="cable-grid" id="cableGrid"></div>
+            </div>
+            <div class="info-panel" id="cableInfo" style="display:none;"></div>
+        </div>
+
+        <div id="connectorsSection" class="section" style="display:none;">
+            <div class="card">
+                <h2>🔌 Connector Types</h2>
+                <div class="cable-grid" id="connectorGrid"></div>
+            </div>
+            <div class="info-panel" id="connectorInfo" style="display:none;"></div>
+        </div>
+
+        <div id="pinoutsSection" class="section" style="display:none;">
+            <div class="card">
+                <h2>📊 Ethernet Pinout Standards</h2>
+                <p style="margin-bottom:20px;color:#aaa;">Click to compare T568A vs T568B wiring standards</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div class="pinout-diagram">
+                        <h3 style="color:#3498db;margin-bottom:15px;">T568A</h3>
+                        <div id="t568a"></div>
+                    </div>
+                    <div class="pinout-diagram">
+                        <h3 style="color:#e67e22;margin-bottom:15px;">T568B</h3>
+                        <div id="t568b"></div>
+                    </div>
+                </div>
+                <div style="margin-top:20px;padding:15px;background:rgba(0,0,0,0.3);border-radius:8px;">
+                    <h4 style="color:#e67e22;margin-bottom:10px;">Cable Types:</h4>
+                    <p><strong>Straight-through:</strong> Same standard on both ends (T568B-T568B). Used: PC to Switch,
+                        Router to Switch</p>
+                    <p style="margin-top:10px;"><strong>Crossover:</strong> Different standards (T568A-T568B). Used: PC
+                        to PC, Switch to Switch</p>
+                    <p style="margin-top:10px;"><strong>Rollover/Console:</strong> Pin 1 to Pin 8, reversed. Used: PC to
+                        Router/Switch console port</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="damageSection" class="section" style="display:none;">
+            <div class="card">
+                <h2>⚠️ Cable Damage Recognition</h2>
+                <p style="margin-bottom:20px;color:#aaa;">Identify common cable faults during troubleshooting</p>
+                <div class="damage-gallery" id="damageGallery"></div>
+            </div>
+        </div>
+
+        <div id="quizSection" class="section" style="display:none;">
+            <div class="card quiz-card">
+                <h2>🎯 Cable Knowledge Quiz</h2>
+                <div class="score-display">Score: <span id="score">0</span> / <span id="total">0</span></div>
+                <button class="btn" onclick="newQuestion()">New Question</button>
+                <div id="quizArea" style="margin-top:20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cables = [
+            { name: 'Cat5e', icon: '🔵', desc: 'Enhanced Category 5', speed: '1 Gbps', distance: '100m', use: 'Basic LAN networks', freq: '100 MHz' },
+            { name: 'Cat6', icon: '🟢', desc: 'Category 6', speed: '10 Gbps (55m)', distance: '100m', use: 'High-speed LAN', freq: '250 MHz' },
+            { name: 'Cat6a', icon: '🟡', desc: 'Augmented Category 6', speed: '10 Gbps', distance: '100m', use: 'Data centers', freq: '500 MHz' },
+            { name: 'Fiber Optic', icon: '🔴', desc: 'Glass/plastic core', speed: '100+ Gbps', distance: '100km+', use: 'Long distance, backbone', freq: 'Light' },
+            { name: 'Coaxial', icon: '⚫', desc: 'Shielded copper core', speed: '10 Mbps', distance: '500m', use: 'Cable TV, old networks', freq: 'Varies' },
+            { name: 'Serial/Console', icon: '🔷', desc: 'RS-232 rollover cable', speed: '115.2 Kbps', distance: '15m', use: 'Device management', freq: 'N/A' }
+        ];
+
+        const connectors = [
+            { name: 'RJ-45', icon: '🔌', desc: '8-pin Ethernet connector', use: 'UTP/STP Ethernet cables', pins: '8' },
+            { name: 'RJ-11', icon: '📞', desc: '6-pin telephone connector', use: 'Phone lines, DSL', pins: '6' },
+            { name: 'LC Fiber', icon: '💎', desc: 'Lucent Connector', use: 'Single/multimode fiber', pins: 'Optical' },
+            { name: 'SC Fiber', icon: '🔷', desc: 'Subscriber Connector', use: 'Fiber networks', pins: 'Optical' },
+            { name: 'ST Fiber', icon: '⭕', desc: 'Straight Tip', use: 'Multimode fiber', pins: 'Optical' },
+            { name: 'USB Console', icon: '🔗', desc: 'USB to Serial', use: 'Modern device management', pins: 'USB-A' }
+        ];
+
+        const t568a = [
+            { pin: 1, color: 'White/Green', bg: '#a8e6cf' },
+            { pin: 2, color: 'Green', bg: '#27ae60' },
+            { pin: 3, color: 'White/Orange', bg: '#ffeaa7' },
+            { pin: 4, color: 'Blue', bg: '#3498db' },
+            { pin: 5, color: 'White/Blue', bg: '#85c1e9' },
+            { pin: 6, color: 'Orange', bg: '#e67e22' },
+            { pin: 7, color: 'White/Brown', bg: '#d7ccc8' },
+            { pin: 8, color: 'Brown', bg: '#795548' }
+        ];
+
+        const t568b = [
+            { pin: 1, color: 'White/Orange', bg: '#ffeaa7' },
+            { pin: 2, color: 'Orange', bg: '#e67e22' },
+            { pin: 3, color: 'White/Green', bg: '#a8e6cf' },
+            { pin: 4, color: 'Blue', bg: '#3498db' },
+            { pin: 5, color: 'White/Blue', bg: '#85c1e9' },
+            { pin: 6, color: 'Green', bg: '#27ae60' },
+            { pin: 7, color: 'White/Brown', bg: '#d7ccc8' },
+            { pin: 8, color: 'Brown', bg: '#795548' }
+        ];
+
+        const damages = [
+            { icon: '✂️', title: 'Cut/Severed', desc: 'Complete break in cable - no connectivity' },
+            { icon: '🔥', title: 'Heat Damage', desc: 'Melted insulation - replace immediately' },
+            { icon: '💧', title: 'Water Damage', desc: 'Corrosion, signal loss - check crimps' },
+            { icon: '🐭', title: 'Rodent Damage', desc: 'Chewed cables - common in ceilings' },
+            { icon: '📐', title: 'Kink/Bend', desc: 'Tight bends damage conductors' },
+            { icon: '🔧', title: 'Bad Crimp', desc: 'Loose RJ-45 - intermittent connection' }
+        ];
+
+        const quizQuestions = [
+            { q: 'What connector type is used for standard Ethernet cables?', opts: ['RJ-11', 'RJ-45', 'LC', 'BNC'], correct: 1 },
+            { q: 'Which cable type supports 10 Gbps at 100 meters?', opts: ['Cat5e', 'Cat5', 'Cat6a', 'Coax'], correct: 2 },
+            { q: 'What cable connects a PC to a Cisco console port?', opts: ['Straight-through', 'Crossover', 'Rollover', 'Fiber'], correct: 2 },
+            { q: 'Which pinout standard has Orange on pins 1-2?', opts: ['T568A', 'T568B', 'Rollover', 'Crossover'], correct: 1 },
+            { q: 'A straight-through cable uses:', opts: ['Different standards each end', 'Same standard both ends', 'Reversed pins', 'No standard'], correct: 1 },
+            { q: 'Which cable is best for connecting buildings 500m apart?', opts: ['Cat5e', 'Cat6', 'Fiber Optic', 'Coaxial'], correct: 2 },
+            { q: 'RJ-11 connectors are typically used for:', opts: ['Ethernet', 'Phone/DSL', 'Fiber', 'Serial'], correct: 1 },
+            { q: 'What is the maximum distance for Cat6 at 10Gbps?', opts: ['100m', '55m', '500m', '1km'], correct: 1 }
+        ];
+
+        let score = 0, total = 0;
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(section + 'Section').style.display = 'block';
+            event.target.classList.add('active');
+        }
+
+        function renderCables() {
+            const grid = document.getElementById('cableGrid');
+            grid.innerHTML = '';
+            cables.forEach((c, i) => {
+                grid.innerHTML += `<div class="cable-card" onclick="showCableInfo(${i})">
+                    <div class="cable-icon">${c.icon}</div>
+                    <div class="cable-name">${c.name}</div>
+                    <div class="cable-desc">${c.desc}</div>
+                </div>`;
+            });
+        }
+
+        function showCableInfo(idx) {
+            const c = cables[idx];
+            document.querySelectorAll('.cable-card').forEach(card => card.classList.remove('selected'));
+            document.querySelectorAll('.cable-card')[idx].classList.add('selected');
+            document.getElementById('cableInfo').style.display = 'block';
+            document.getElementById('cableInfo').innerHTML = `
+                <h3>${c.icon} ${c.name} Details</h3>
+                <div class="info-content">
+                    <div>
+                        <div class="info-item"><div class="info-label">Speed</div><div class="info-value">${c.speed}</div></div>
+                        <div class="info-item"><div class="info-label">Max Distance</div><div class="info-value">${c.distance}</div></div>
+                    </div>
+                    <div>
+                        <div class="info-item"><div class="info-label">Frequency</div><div class="info-value">${c.freq}</div></div>
+                        <div class="info-item"><div class="info-label">Common Use</div><div class="info-value">${c.use}</div></div>
+                    </div>
+                </div>`;
+        }
+
+        function renderConnectors() {
+            const grid = document.getElementById('connectorGrid');
+            grid.innerHTML = '';
+            connectors.forEach((c, i) => {
+                grid.innerHTML += `<div class="cable-card" onclick="showConnectorInfo(${i})">
+                    <div class="cable-icon">${c.icon}</div>
+                    <div class="cable-name">${c.name}</div>
+                    <div class="cable-desc">${c.desc}</div>
+                </div>`;
+            });
+        }
+
+        function showConnectorInfo(idx) {
+            const c = connectors[idx];
+            document.getElementById('connectorInfo').style.display = 'block';
+            document.getElementById('connectorInfo').innerHTML = `
+                <h3>${c.icon} ${c.name} Connector</h3>
+                <div class="info-content">
+                    <div>
+                        <div class="info-item"><div class="info-label">Description</div><div class="info-value">${c.desc}</div></div>
+                    </div>
+                    <div>
+                        <div class="info-item"><div class="info-label">Common Use</div><div class="info-value">${c.use}</div></div>
+                    </div>
+                </div>`;
+        }
+
+        function renderPinouts() {
+            document.getElementById('t568a').innerHTML = t568a.map(p =>
+                `<div class="pinout-row"><span class="pin-num">${p.pin}</span><span class="pin-color" style="background:${p.bg};color:#000;">${p.color}</span></div>`
+            ).join('');
+            document.getElementById('t568b').innerHTML = t568b.map(p =>
+                `<div class="pinout-row"><span class="pin-num">${p.pin}</span><span class="pin-color" style="background:${p.bg};color:#000;">${p.color}</span></div>`
+            ).join('');
+        }
+
+        function renderDamage() {
+            document.getElementById('damageGallery').innerHTML = damages.map(d =>
+                `<div class="damage-card"><div class="damage-icon">${d.icon}</div><div class="damage-title">${d.title}</div><div class="damage-desc">${d.desc}</div></div>`
+            ).join('');
+        }
+
+        function newQuestion() {
+            const q = quizQuestions[Math.floor(Math.random() * quizQuestions.length)];
+            let html = `<div class="quiz-question">${q.q}</div><div class="quiz-options">`;
+            q.opts.forEach((opt, i) => {
+                html += `<div class="quiz-option" onclick="checkQuiz(this,${i},${q.correct})">${opt}</div>`;
+            });
+            html += '</div>';
+            document.getElementById('quizArea').innerHTML = html;
+        }
+
+        function checkQuiz(el, selected, correct) {
+            document.querySelectorAll('.quiz-option').forEach((o, i) => {
+                o.onclick = null;
+                if (i === correct) o.classList.add('correct');
+                else if (i === selected) o.classList.add('wrong');
+            });
+            total++;
+            if (selected === correct) score++;
+            document.getElementById('score').textContent = score;
+            document.getElementById('total').textContent = total;
+        }
+
+        renderCables();
+        renderConnectors();
+        renderPinouts();
+        renderDamage();
+    </script>
+</body>
+
+</html>
