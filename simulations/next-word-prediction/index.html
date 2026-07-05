@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How AI Predicts the Next Word</title>
+<style>
+  :root {
+    --ink: #000000; --panel: #0a0a0a;
+    --white: #f4f4f2; --body: #d5d8d9; --grey: #b9bcbd;
+    --grey-dim: #7d8183; --line: #35383a;
+    --glow: rgba(230, 235, 238, 0.35);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--ink); color: var(--white);
+    font-family: Baskerville, "Baskerville Old Face", "Libre Baskerville", "Times New Roman", serif;
+    font-weight: 400; overflow: hidden;
+  }
+  #stage { height: 100vh; display: flex; flex-direction: column; }
+
+  /* Chrome */
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 28px; flex-wrap: wrap;
+    padding: 20px 36px; font-size: 14px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--grey-dim); flex-shrink: 0;
+  }
+  header .mod-tag { color: var(--white); }
+  footer {
+    flex-shrink: 0; display: flex; justify-content: center; align-items: center;
+    gap: 10px; padding: 22px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background .3s, box-shadow .3s; }
+  .dot.on { background: var(--white); box-shadow: 0 0 10px var(--glow); }
+  main { flex: 1; display: flex; padding: 14px 60px; overflow: auto; }
+  .beat { display: none; max-width: 1100px; width: 100%; margin: auto; animation: rise .45s ease; }
+  .beat.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* Shared elements */
+  .eyebrow { color: var(--grey-dim); font-size: 15px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 14px; }
+  h1 { font-weight: 400; font-size: 56px; line-height: 1.1; letter-spacing: 0.04em; }
+  h2 { font-weight: 400; font-size: 40px; line-height: 1.15; margin-bottom: 28px; letter-spacing: 0.04em; }
+  .lede { font-size: 22px; color: var(--grey); margin-top: 18px; max-width: 760px; }
+  .myth {
+    display: inline-block; margin-top: 26px; padding: 9px 20px;
+    border: 1px solid var(--white); border-radius: 24px;
+    color: var(--white); font-size: 18px;
+    box-shadow: 0 0 16px -4px var(--glow);
+  }
+  .callout {
+    border-left: 3px solid var(--white); background: var(--panel);
+    padding: 26px 32px; border-radius: 0 10px 10px 0;
+    font-size: 26px; line-height: 1.45; max-width: 860px; color: var(--body);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.8), 0 0 0 1px rgba(230,235,238,0.04);
+  }
+  .callout strong { font-weight: 400; color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  .caption { color: var(--grey-dim); font-size: 14px; margin-top: 22px; }
+  .cite { color: var(--grey-dim); font-size: 13px; margin-top: 14px; line-height: 1.6; }
+  .btn {
+    display: inline-block; margin-top: 30px; padding: 13px 32px;
+    background: var(--white); color: var(--ink); border: none; border-radius: 7px;
+    font-size: 18px; font-weight: 400; font-family: inherit; cursor: pointer;
+    transition: box-shadow .2s;
+  }
+  .btn:hover { box-shadow: 0 0 20px -2px var(--glow); }
+  .btn.ghost { background: transparent; color: var(--grey); border: 1px solid var(--line); }
+  .btn.ghost:hover { color: var(--white); border-color: var(--grey-dim); }
+  .btn:focus-visible, .menu-item:focus-visible, .prob-row:focus-visible, .temp-pill:focus-visible, .mix-item:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
+  .navhint { position: fixed; right: 30px; bottom: 20px; color: var(--grey-dim); font-size: 13px; letter-spacing: 1px; }
+
+  /* Menu */
+  .menu-item {
+    display: flex; align-items: baseline; gap: 24px; width: 100%;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 24px 30px; margin-bottom: 14px; cursor: pointer; text-align: left;
+    color: var(--white); font-family: inherit; font-weight: 400;
+    transition: border-color .2s, box-shadow .25s;
+  }
+  .menu-item:hover:not(:disabled) { border-color: var(--grey-dim); box-shadow: 0 0 26px -6px var(--glow); }
+  .menu-item:disabled { opacity: .45; cursor: default; }
+  .menu-item .num { color: var(--grey-dim); font-size: 15px; letter-spacing: 3px; }
+  .menu-item .name { font-size: 26px; flex: 1; }
+  .menu-item .state { color: var(--grey-dim); font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* Beat 1.1 two Darwins */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 10px; }
+  .pair .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 34px; font-size: 26px; line-height: 1.5; color: var(--body); }
+  .pair .card em { font-style: normal; color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  .qline { margin-top: 34px; font-size: 24px; color: var(--grey); }
+
+  /* Beat 1.2 tokenise */
+  .tokenflow { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; margin-top: 10px; }
+  .stagebox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; font-size: 26px; min-width: 170px; text-align: center; }
+  .arrow { color: var(--white); font-size: 30px; }
+  .vec { font-family: Consolas, monospace; color: var(--white); font-size: 22px; }
+  .hidden-step { opacity: 0; transition: opacity .6s; }
+  .hidden-step.shown { opacity: 1; }
+
+  /* Beat 1.3 training steps */
+  .train-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 6px; }
+  .train-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; }
+  .train-card .lbl { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-bottom: 14px; }
+  .guess-sentence { font-size: 25px; line-height: 1.5; color: var(--body); }
+  .guess-word { color: var(--white); border-bottom: 2px solid var(--white); padding: 0 4px; transition: opacity .3s; text-shadow: 0 0 14px rgba(255,255,255,0.45); }
+  .guess-word.wrong { color: var(--grey-dim); border-bottom: 2px dashed var(--grey-dim); text-shadow: none; }
+  .err-track { height: 26px; background: var(--line); border-radius: 5px; overflow: hidden; margin-top: 12px; }
+  .err-fill { height: 100%; background: var(--grey-dim); outline: 1px dashed var(--grey); outline-offset: -3px; border-radius: 5px; transition: width .8s cubic-bezier(.4,0,.2,1), background .4s; }
+  .err-fill.good { background: linear-gradient(90deg, var(--grey), var(--white)); outline: none; box-shadow: 0 0 14px var(--glow); }
+  #dialVec { font-family: Consolas, monospace; font-size: 21px; color: var(--white); line-height: 1.7; transition: opacity .25s; }
+  .step-count { font-family: Consolas, monospace; color: var(--grey-dim); font-size: 15px; margin-top: 14px; }
+
+  /* Beats 1.4 map */
+  .maprow { display: flex; gap: 40px; align-items: flex-start; }
+  .mapbox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  svg text { font-family: Baskerville, "Baskerville Old Face", "Libre Baskerville", "Times New Roman", serif; font-weight: 400; }
+  .ctx-buttons { display: flex; flex-direction: column; gap: 14px; min-width: 260px; }
+  .ctx-buttons .btn { margin-top: 0; width: 100%; }
+  #darwinDot { transition: cx 1.1s cubic-bezier(.4,0,.2,1), cy 1.1s cubic-bezier(.4,0,.2,1); filter: drop-shadow(0 0 7px rgba(230,235,238,0.65)); }
+  #ctxLabel { transition: x 1.1s cubic-bezier(.4,0,.2,1), y 1.1s cubic-bezier(.4,0,.2,1); }
+
+  /* Beat 2.1 one book */
+  .bookrow { display: flex; align-items: center; gap: 44px; flex-wrap: wrap; margin-top: 10px; }
+  .bookcard {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 40px 48px; text-align: center;
+  }
+  .bookcard .bigstat { font-size: 54px; color: var(--white); line-height: 1.15; text-shadow: 0 0 22px rgba(255,255,255,0.3); }
+  .bookcard .unitlbl { font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-top: 14px; }
+  .bookline { font-size: 24px; color: var(--grey); max-width: 460px; line-height: 1.5; }
+  .bookline strong { font-weight: 400; color: var(--white); }
+
+  /* Beat 2.2 ladder */
+  .ladder { margin-top: 6px; }
+  .rung {
+    display: grid; grid-template-columns: 320px 1fr 170px; align-items: center; gap: 24px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 26px; margin-bottom: 14px;
+    opacity: 0; transform: translateY(8px); transition: opacity .5s, transform .5s;
+  }
+  .rung.shown { opacity: 1; transform: none; }
+  .rung .rname { font-size: 23px; }
+  .rung .rsub { color: var(--grey-dim); font-size: 15px; margin-top: 5px; line-height: 1.45; }
+  .rung .track { height: 28px; background: var(--line); border-radius: 6px; overflow: hidden; }
+  .rung .fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--grey), var(--white)); border-radius: 6px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+  .rung .rvalue { font-family: Consolas, monospace; color: var(--grey); font-size: 19px; text-align: right; line-height: 1.5; }
+
+  /* Beat 2.3 what goes in */
+  .mixrow { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 6px; }
+  .mix-group { border-bottom: 1px solid var(--line); }
+  .mix-group:last-of-type { border-bottom: none; }
+  .mix-item {
+    display: flex; align-items: baseline; gap: 14px; width: 100%;
+    padding: 11px 0; font-size: 21px; background: transparent; border: none;
+    color: var(--white); font-family: inherit; font-weight: 400;
+    text-align: left; cursor: pointer; transition: color .2s, text-shadow .2s;
+  }
+  .mix-item:hover { text-shadow: 0 0 14px rgba(255,255,255,0.55); }
+  .mix-detail { display: none; color: var(--grey-dim); font-size: 15px; line-height: 1.5; padding: 0 14px 13px 0; }
+  .mix-detail.shown { display: block; }
+  .mix-item .share { margin-left: auto; font-family: Consolas, monospace; color: var(--grey); font-size: 17px; white-space: nowrap; }
+  .funnel-stage {
+    background: var(--line); border-radius: 8px; padding: 16px 22px; margin: 0 auto 12px;
+    font-size: 19px; line-height: 1.45; color: var(--body);
+    opacity: 0; transition: opacity .5s;
+  }
+  .funnel-stage.shown { opacity: 1; }
+  .funnel-stage .fnum { font-family: Consolas, monospace; color: var(--white); }
+  .funnel-arrow { text-align: center; color: var(--white); font-size: 22px; margin-bottom: 12px; opacity: 0; transition: opacity .5s; }
+  .funnel-arrow.shown { opacity: 1; }
+
+  /* Beat 2.4 reading time */
+  .calcline {
+    font-family: Consolas, monospace; font-size: 30px; color: var(--body);
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+    opacity: 0; transition: opacity .5s;
+  }
+  .calcline.shown { opacity: 1; }
+  .calcline:last-of-type { border-bottom: none; }
+  .calcline .op { color: var(--grey-dim); font-size: 20px; }
+  .calcline.result { color: var(--white); font-size: 38px; text-shadow: 0 0 22px rgba(255,255,255,0.35); }
+
+  /* Beat 2.6 training vs inference */
+  .tvi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 6px; }
+  .tvi-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 28px 32px; }
+  .tvi-card.now { border-color: var(--grey); box-shadow: 0 0 26px -6px var(--glow); }
+  .tvi-card .lbl { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-bottom: 6px; }
+  .tvi-card .when { font-size: 27px; color: var(--white); margin-bottom: 18px; }
+  .tvi-card ul { list-style: none; }
+  .tvi-card li { font-size: 19px; line-height: 1.5; padding: 9px 0 9px 22px; position: relative; color: var(--body); }
+  .tvi-card li::before { content: ''; position: absolute; left: 0; top: 19px; width: 8px; height: 8px; border-radius: 50%; background: var(--grey); }
+
+  /* Beat 3.1 stem builder */
+  .stem-box {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 28px 34px; font-size: 29px; line-height: 1.5; color: var(--body);
+  }
+  .stem-box .chosen { color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.4); }
+  .stem-box .slot { color: var(--grey); border-bottom: 2px solid var(--white); padding: 0 8px; }
+  .prob-list { margin-top: 24px; max-width: 740px; }
+  .prob-row {
+    display: grid; grid-template-columns: 170px 1fr 90px; align-items: center; gap: 18px;
+    width: 100%; padding: 9px 12px; background: transparent; border: none; border-radius: 8px;
+    cursor: pointer; color: var(--white); font-family: inherit; font-weight: 400;
+    text-align: left; transition: background .2s;
+  }
+  .prob-row:hover { background: var(--panel); }
+  .prob-row .pword { font-size: 22px; }
+  .prob-row .ptrack { display: block; height: 24px; background: var(--line); border-radius: 6px; overflow: hidden; }
+  .prob-row .pfill { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--grey), var(--white)); border-radius: 6px; transition: width .7s cubic-bezier(.4,0,.2,1); }
+  .prob-row .ppct { font-family: Consolas, monospace; color: var(--grey); font-size: 18px; text-align: right; }
+  .prob-row.other .pword, .prob-row.other .ppct { color: var(--grey-dim); }
+  .prob-row.other .pfill { background: var(--grey-dim); }
+  .prob-row.static { cursor: default; }
+  .prob-row.static:hover { background: transparent; }
+  .longtail { display: none; margin-top: 10px; padding: 0 12px; }
+  .longtail.shown { display: block; }
+  .prob-row.wide { grid-template-columns: 420px 1fr 90px; }
+
+  /* Beat 3.2 temperature */
+  .temp-pills { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; }
+  .temp-pill {
+    padding: 10px 24px; border-radius: 24px; border: 1px solid var(--line);
+    background: transparent; color: var(--grey-dim); font-family: inherit;
+    font-weight: 400; font-size: 17px; cursor: pointer; transition: border-color .2s, color .2s, box-shadow .25s;
+  }
+  .temp-pill:hover { border-color: var(--grey-dim); }
+  .temp-pill.sel { border-color: var(--white); color: var(--white); box-shadow: 0 0 16px -4px var(--glow); }
+  .promptline { color: var(--grey-dim); font-size: 18px; margin-top: 22px; }
+  .promptline .ptext { color: var(--body); }
+  .runline {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px 24px; font-size: 21px; line-height: 1.45; margin-top: 14px; color: var(--body);
+    animation: rise .4s ease;
+  }
+  .runline .runlbl { font-family: Consolas, monospace; color: var(--grey-dim); font-size: 13px; letter-spacing: 2px; margin-right: 14px; }
+  .runline .runnote { display: block; color: var(--grey-dim); font-size: 15px; margin-top: 8px; }
+
+  /* Beat 3.4 chain */
+  .chain { display: grid; grid-template-columns: 1fr 42px 1fr 42px 1fr; gap: 10px; align-items: center; margin-top: 6px; }
+  .chain .ccard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 24px 26px; font-size: 19px; line-height: 1.5; color: var(--body); }
+  .chain .ccard.now { border-color: var(--grey); box-shadow: 0 0 26px -6px var(--glow); }
+  .chain .ccard .lbl { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-bottom: 10px; }
+  .chain .charrow { color: var(--white); font-size: 26px; text-align: center; }
+
+  /* Beat 4.1 citation builder */
+  .stamp {
+    display: none; margin: 34px 0 30px 14px; padding: 12px 28px;
+    border: 3px double var(--white); border-radius: 4px;
+    transform: rotate(-6deg); transform-origin: center;
+    font-size: 28px; letter-spacing: 5px; text-transform: uppercase; color: var(--white);
+    text-shadow: 0 0 18px rgba(255,255,255,0.5);
+    box-shadow: 0 0 26px -6px var(--glow), inset 0 0 14px -6px var(--glow);
+  }
+  .stamp.shown { display: inline-block; animation: stampIn .35s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes stampIn { from { opacity: 0; transform: rotate(-6deg) scale(1.7); } to { opacity: 1; transform: rotate(-6deg) scale(1); } }
+
+  /* Beat 4.4 what helps */
+  .helps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 6px; }
+  .helps .hcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; }
+  .helps .hcard h3 { font-weight: 400; font-size: 23px; color: var(--white); margin-bottom: 10px; }
+  .helps .hcard p { font-size: 17px; line-height: 1.55; color: var(--grey); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beat, .runline, .stamp.shown { animation: none; }
+    #darwinDot, #ctxLabel, .rung, .rung .fill, .prob-row .pfill { transition: none; }
+  }
+  @media (max-width: 900px) {
+    h1 { font-size: 38px; } h2 { font-size: 30px; }
+    .pair, .mixrow, .tvi-grid, .helps { grid-template-columns: 1fr; }
+    .maprow { flex-direction: column; }
+    .rung { grid-template-columns: 1fr; gap: 10px; }
+    .rung .rvalue { text-align: left; }
+    .chain { grid-template-columns: 1fr; }
+    .prob-row { grid-template-columns: 110px 1fr 70px; gap: 10px; }
+    .prob-row.wide { grid-template-columns: 1fr 70px; }
+    .prob-row.wide .ptrack { display: none; }
+    main { padding: 0 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <header>
+    <span class="mod-tag" id="hdrLeft">How AI predicts the next word</span>
+    <span id="hdrRight">Press M for menu</span>
+  </header>
+  <main id="main">
+
+    <!-- ============ MENU ============ -->
+    <section class="beat" data-scene="menu">
+      <div class="eyebrow">An interactive walkthrough</div>
+      <h1>How AI predicts the next word</h1>
+      <p class="lede">Five short modules. No maths required; bring your scepticism.</p>
+      <div style="margin-top:44px">
+        <button class="menu-item" onclick="goModule(1)">
+          <span class="num">01</span><span class="name">Words become numbers</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(2)">
+          <span class="num">02</span><span class="name">The scale of it</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(3)">
+          <span class="num">03</span><span class="name">Rolling weighted dice</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(4)">
+          <span class="num">04</span><span class="name">The confident machine</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(5)">
+          <span class="num">05</span><span class="name">The black box</span><span class="state">Start</span>
+        </button>
+      </div>
+      <a class="btn ghost" href="../" style="margin-top:24px; text-decoration:none">&larr; Back to catalogue</a>
+    </section>
+
+    <!-- ============ MODULE 1 ============ -->
+
+    <!-- 1.0 Title -->
+    <section class="beat" data-scene="m1">
+      <div class="eyebrow">Module 01</div>
+      <h1>Words become numbers</h1>
+      <div class="myth">Myth we'll unpick: "There's a dictionary inside"</div>
+    </section>
+
+    <!-- 1.1 Two Darwins -->
+    <section class="beat" data-scene="m1">
+      <h2>Two Darwins</h2>
+      <div class="pair">
+        <div class="card"><em>Charles Darwin</em> proposed that species evolve by natural selection.</div>
+        <div class="card"><em>Charles Darwin</em> University opens semester two enrolments.</div>
+      </div>
+      <p class="qline">Same two words. How does a machine, which has never met either Darwin, tell them apart?</p>
+    </section>
+
+    <!-- 1.2 Tokenise -->
+    <section class="beat" data-scene="m1">
+      <h2>Computers only speak numbers</h2>
+      <div class="tokenflow">
+        <div class="stagebox">Darwin</div>
+        <div class="arrow hidden-step" id="s2a">&rarr;</div>
+        <div class="stagebox hidden-step" id="s2b">token<br><span class="vec">#20482</span></div>
+        <div class="arrow hidden-step" id="s2c">&rarr;</div>
+        <div class="stagebox hidden-step" id="s2d"><span class="vec">[0.42, -0.17, 0.88,<br>0.03, -0.56, 0.71]</span></div>
+      </div>
+      <button class="btn" id="tokBtn" onclick="tokeniseStep()">Convert it</button>
+      <p class="caption">Real models use thousands of numbers per word; we're showing six. These values are illustrative, not real model outputs.</p>
+    </section>
+
+    <!-- 1.3 Where do the numbers come from -->
+    <section class="beat" data-scene="m1" data-onenter="resetTrain">
+      <h2>Where do those numbers come from?</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:24px">Nobody typed them in. They are <span style="color:var(--white)">weights</span>: adjustable dials inside the model, and they start out random. Training is trial and error at colossal scale.</p>
+      <div class="train-grid">
+        <div class="train-card">
+          <div class="lbl">The model practises on a sentence</div>
+          <div class="guess-sentence">The finch pecked at the <span class="guess-word wrong" id="guessWord">photocopier</span></div>
+          <div class="lbl" style="margin-top:22px">How wrong was that guess? (the error)</div>
+          <div class="err-track"><div class="err-fill" id="errFill" style="width:92%"></div></div>
+        </div>
+        <div class="train-card">
+          <div class="lbl">The dials for "finch" (our six numbers)</div>
+          <div id="dialVec">[0.91, 0.05, -0.62,<br>-0.44, 0.13, -0.09]</div>
+          <div class="step-count" id="stepCount">training steps: 0 (dials random)</div>
+        </div>
+      </div>
+      <button class="btn" id="trainBtn" onclick="trainStep()">Run a training step</button>
+      <p class="caption">Guess; measure the miss; nudge every dial a tiny bit in the direction that reduces the miss; repeat, billions of times across the whole training corpus. You already know this idea from Excel: a trendline is two numbers fitted to data by minimising error. This is the same idea with billions of numbers. The probabilities you'll meet in Module 3 are calculated from these same trained dials. Values illustrative.</p>
+    </section>
+
+    <!-- 1.4 Map -->
+    <section class="beat" data-scene="m1" data-onenter="resetMap">
+      <h2>The map of meaning</h2>
+      <div class="maprow">
+        <div class="mapbox">
+          <svg id="map" width="640" height="440" viewBox="0 0 640 440" role="img" aria-label="Two clusters of words with Darwin between them">
+            <!-- biology cluster, lower left -->
+            <g fill="#7d8183" font-size="17">
+              <circle cx="120" cy="330" r="5" fill="#b9bcbd"/><text x="132" y="335">species</text>
+              <circle cx="185" cy="370" r="5" fill="#b9bcbd"/><text x="197" y="375">finches</text>
+              <circle cx="90"  cy="380" r="5" fill="#b9bcbd"/><text x="102" y="385">evolution</text>
+              <circle cx="200" cy="305" r="5" fill="#b9bcbd"/><text x="212" y="310">Galapagos</text>
+              <circle cx="140" cy="270" r="5" fill="#b9bcbd"/><text x="152" y="275">naturalist</text>
+              <text x="95" y="425" fill="#7d8183" font-size="14" letter-spacing="2">BIOLOGY NEIGHBOURHOOD</text>
+            </g>
+            <!-- education cluster, upper right -->
+            <g fill="#7d8183" font-size="17">
+              <circle cx="500" cy="95"  r="5" fill="#b9bcbd"/><text x="512" y="100">university</text>
+              <circle cx="445" cy="140" r="5" fill="#b9bcbd"/><text x="457" y="145">enrolment</text>
+              <circle cx="545" cy="150" r="5" fill="#b9bcbd"/><text x="557" y="155">TAFE</text>
+              <circle cx="470" cy="60"  r="5" fill="#b9bcbd"/><text x="482" y="65">campus</text>
+              <circle cx="530" cy="200" r="5" fill="#b9bcbd"/><text x="542" y="205">semester</text>
+              <text x="628" y="30" text-anchor="end" fill="#7d8183" font-size="14" letter-spacing="2">EDUCATION NEIGHBOURHOOD</text>
+            </g>
+            <!-- Darwin -->
+            <circle id="darwinDot" cx="330" cy="225" r="11" fill="#f4f4f2"/>
+            <text id="ctxLabel" x="348" y="231" fill="#f4f4f2" font-size="20">Darwin</text>
+          </svg>
+        </div>
+        <div class="ctx-buttons">
+          <p style="font-size:19px; color:var(--grey); margin-bottom:6px">Add context and watch the same word move:</p>
+          <button class="btn" onclick="moveDarwin('bio')">+ "species, finches"</button>
+          <button class="btn" onclick="moveDarwin('edu')">+ "enrolment, TAFE"</button>
+          <button class="btn ghost" onclick="moveDarwin('reset')">Reset</button>
+          <p class="caption">The word never changes. Its position does; and position is meaning.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1.5 Key point -->
+    <section class="beat" data-scene="m1">
+      <div class="callout">Meaning is <strong>position</strong>. Nearby words behave alike. The model stores no definitions and no dictionary; it stores <strong>geometry</strong>, learned from patterns in text.</div>
+    </section>
+
+    <!-- 1.6 Black box seed -->
+    <section class="beat" data-scene="m1">
+      <h2>One honest admission</h2>
+      <div class="callout">We can read every number inside the model. We still cannot fully explain <strong>why</strong> those numbers work. Working that out is a live research field called <strong>interpretability</strong>; we'll come back to it in Module 5.</div>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+    <!-- ============ MODULE 2 ============ -->
+
+    <!-- 2.0 Title -->
+    <section class="beat" data-scene="m2">
+      <div class="eyebrow">Module 02</div>
+      <h1>The scale of it</h1>
+      <div class="myth">Myth we'll bust: "It's a database that looks things up"</div>
+    </section>
+
+    <!-- 2.1 One book -->
+    <section class="beat" data-scene="m2">
+      <h2>Start with one book</h2>
+      <div class="bookrow">
+        <div class="bookcard">
+          <div class="bigstat">0.5&ndash;1 MB</div>
+          <div class="unitlbl">One paperback, as plain text</div>
+        </div>
+        <p class="bookline">Text is remarkably compact. Every word in a full novel weighs <strong>less than one photo</strong> on your phone. Hold onto that unit; we're about to stack it.</p>
+      </div>
+      <p class="caption">Book and library sizes in this module are illustrative estimates for teaching; the web-scale and GPT-3 figures are cited on screen.</p>
+    </section>
+
+    <!-- 2.2 The ladder -->
+    <section class="beat" data-scene="m2" data-onenter="resetLadder">
+      <h2>Climbing the ladder</h2>
+      <div class="ladder">
+        <div class="rung" id="rung0">
+          <div><div class="rname">Your phone</div><div class="rsub">the whole thing, in your pocket</div></div>
+          <div class="track"><div class="fill" data-w="30"></div></div>
+          <div class="rvalue">128 GB</div>
+        </div>
+        <div class="rung" id="rung1">
+          <div><div class="rname">A suburban library</div><div class="rsub">about 50,000 books; as text, it fits on your phone twice over</div></div>
+          <div class="track"><div class="fill" data-w="24"></div></div>
+          <div class="rvalue">&asymp; 50 GB of text</div>
+        </div>
+        <div class="rung" id="rung2">
+          <div><div class="rname">National Library of Australia</div><div class="rsub">every print book it holds, as plain text (illustrative)</div></div>
+          <div class="track"><div class="fill" data-w="52"></div></div>
+          <div class="rvalue">a few TB</div>
+        </div>
+        <div class="rung" id="rung3">
+          <div><div class="rname">Common Crawl</div><div class="rsub">the open web-crawl corpus, collected since 2008; one monthly snapshot alone is roughly 2&ndash;2.5 billion pages, 350&ndash;400 TiB</div></div>
+          <div class="track"><div class="fill" data-w="100"></div></div>
+          <div class="rvalue">9.5+ PB</div>
+        </div>
+      </div>
+      <button class="btn" id="ladderBtn" onclick="ladderStep()">First rung: your phone</button>
+      <p class="caption" id="ladderNote">The bars are on a logarithmic scale. Drawn honestly, with your phone at one centimetre, the Common Crawl bar would run about 740 metres.</p>
+      <p class="cite">Common Crawl figures: Baack, S. (2024) "Training Data for the Price of a Sandwich", Mozilla Foundation, mozillafoundation.org/en/research/library/generative-ai-training-data/common-crawl/ ; Ilyankou et al. (2024) arXiv:2405.11039.</p>
+    </section>
+
+    <!-- 2.3 What goes in -->
+    <section class="beat" data-scene="m2" data-onenter="resetFunnel">
+      <h2>What goes in</h2>
+      <div class="mixrow">
+        <div class="train-card">
+          <div class="lbl">The ingredients; click one for detail</div>
+          <div class="mix-group">
+            <button class="mix-item" onclick="toggleMix(0)">Common Crawl web data <span class="share">over 80% of tokens</span></button>
+            <div class="mix-detail" id="mixd0">The filtered web crawl from the last screen: news, forums, blogs, documentation; the everyday written internet.</div>
+          </div>
+          <div class="mix-group">
+            <button class="mix-item" onclick="toggleMix(1)">Books</button>
+            <div class="mix-detail" id="mixd1">Large collections of digitised books, fiction and non-fiction. For GPT-3, OpenAI never disclosed exactly which books were included.</div>
+          </div>
+          <div class="mix-group">
+            <button class="mix-item" onclick="toggleMix(2)">Academic articles</button>
+            <div class="mix-detail" id="mixd2">Research papers and preprints; the source of the formal, cited register it can imitate.</div>
+          </div>
+          <div class="mix-group">
+            <button class="mix-item" onclick="toggleMix(3)">Code</button>
+            <div class="mix-detail" id="mixd3">Public code repositories; this is where its programming languages come from.</div>
+          </div>
+          <div class="mix-group">
+            <button class="mix-item" onclick="toggleMix(4)">Reference works</button>
+            <div class="mix-detail" id="mixd4">Wikipedia and other encyclopaedias; tiny next to the web crawl but high quality, so trainers weight them up and the model sees them more often.</div>
+          </div>
+        </div>
+        <div class="train-card">
+          <div class="lbl">The quality filter; worked example, GPT-3</div>
+          <div class="funnel-stage" id="fun0" style="width:100%">Raw web crawl: <span class="fnum">~45 TB</span> of compressed text</div>
+          <div class="funnel-arrow" id="funA0">&darr;</div>
+          <div class="funnel-stage" id="fun1" style="width:72%">Filtering: deduplication, quality screens, cleanup</div>
+          <div class="funnel-arrow" id="funA1">&darr;</div>
+          <div class="funnel-stage" id="fun2" style="width:44%">Kept: <span class="fnum">570 GB</span> &asymp; <span class="fnum">500 billion tokens</span>; about 1% of the raw crawl</div>
+        </div>
+      </div>
+      <button class="btn" id="funnelBtn" onclick="funnelStep()">Run the filter</button>
+      <p class="cite">Brown et al. (2020) "Language Models are Few-Shot Learners", arXiv:2005.14165; Baack, S. (2024), Mozilla Foundation, as previous screen.</p>
+    </section>
+
+    <!-- 2.4 Reading-time anchor -->
+    <section class="beat" data-scene="m2" data-onenter="resetReading">
+      <h2>How much reading is that?</h2>
+      <div class="calcline" id="calc0">500 billion tokens <span class="op">&asymp;</span> 375 billion words</div>
+      <div class="calcline" id="calc1"><span class="op">&divide;</span> 250 words a minute <span class="op">, 24 hours a day, no breaks</span></div>
+      <div class="calcline result" id="calc2">&asymp; 2,800 years of non-stop reading</div>
+      <button class="btn" id="readBtn" onclick="readingStep()">Do the sums</button>
+      <p class="caption">Calculated from the GPT-3 token count; illustrative. To finish this morning, you would have needed to start around 800 BC, before Rome was founded.</p>
+    </section>
+
+    <!-- 2.5 The punchline -->
+    <section class="beat" data-scene="m2">
+      <h2>Where did the pages go?</h2>
+      <div class="callout">That 570 GB of training text <strong>is not inside the model</strong>. The model kept the <strong>patterns</strong>, not the pages; like you after a thousand books: educated, not a photocopier.</div>
+    </section>
+
+    <!-- 2.6 Training vs inference -->
+    <section class="beat" data-scene="m2">
+      <h2>"So is it training on me right now?"</h2>
+      <div class="tvi-grid">
+        <div class="tvi-card">
+          <div class="lbl">Training</div>
+          <div class="when">Already happened</div>
+          <ul>
+            <li>Done in the past, once, at vast expense</li>
+            <li>Read the enormous corpus you just climbed</li>
+            <li>Produced the frozen model: billions of fixed weights</li>
+            <li>Those weights do not change when you chat</li>
+          </ul>
+        </div>
+        <div class="tvi-card now">
+          <div class="lbl">Inference</div>
+          <div class="when">Your conversation, now</div>
+          <ul>
+            <li>Your prompt goes in; the model predicts the next words</li>
+            <li>Every reply is generated fresh, on the spot</li>
+            <li>Afterwards, the model is exactly as it was</li>
+            <li>Nothing you typed is woven into its weights</li>
+          </ul>
+        </div>
+      </div>
+      <p class="caption">Whether a provider separately stores or reuses your prompts is a product and policy question; it is set by terms of service and settings, not by anything the model does on its own.</p>
+    </section>
+
+    <!-- 2.7 Key point -->
+    <section class="beat" data-scene="m2">
+      <div class="callout">There is <strong>no database inside</strong> and nothing to "look up". Everything it says is <strong>generated fresh</strong> from patterns learned during training.</div>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+    <!-- ============ MODULE 3 ============ -->
+
+    <!-- 3.0 Title -->
+    <section class="beat" data-scene="m3">
+      <div class="eyebrow">Module 03</div>
+      <h1>Rolling weighted dice</h1>
+      <div class="myth">Myth we'll bust: "It just copies and pastes"</div>
+      <p class="caption">Probabilities in this module are illustrative, hand-crafted for teaching; they are not real model outputs.</p>
+    </section>
+
+    <!-- 3.1 The stem -->
+    <section class="beat" data-scene="m3" data-onenter="resetStem">
+      <h2>Build a sentence, one draw at a time</h2>
+      <div class="stem-box" id="stemBox"></div>
+      <div class="prob-list" id="probList"></div>
+      <p class="caption">Click a word to place it. We skip the small connecting words to save time; in the real model every word, even "the", gets its own weighted draw.</p>
+    </section>
+
+    <!-- 3.2 Temperature -->
+    <section class="beat" data-scene="m3" data-onenter="resetTemp">
+      <h2>The temperature dial</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:22px">One setting controls how the dice are rolled: play it safe, or give unlikely words a chance.</p>
+      <div class="temp-pills">
+        <button class="temp-pill sel" id="pill-low" onclick="setTemp('low')">Low</button>
+        <button class="temp-pill" id="pill-med" onclick="setTemp('med')">Medium</button>
+        <button class="temp-pill" id="pill-high" onclick="setTemp('high')">High</button>
+      </div>
+      <p class="caption" id="tempCaption" style="margin-top:16px"></p>
+      <p class="promptline">Prompt: <span class="ptext">"The crocodile lurked in the &hellip;"</span></p>
+      <div id="tempRuns"></div>
+      <button class="btn" id="tempRunBtn" onclick="tempRun()">Run the prompt</button>
+    </section>
+
+    <!-- 3.3 Same prompt, three outputs -->
+    <section class="beat" data-scene="m3" data-onenter="resetGen">
+      <h2>Same prompt, three outputs</h2>
+      <p class="promptline" style="margin-top:0">Prompt: <span class="ptext">"The crocodile lurked in the &hellip;"</span>, medium temperature, three separate runs</p>
+      <div id="genRuns"></div>
+      <button class="btn" id="genBtn" onclick="genStep()">Generate</button>
+      <p class="caption">It cannot copy and paste an answer it does not store; each sentence is a fresh weighted draw over the whole vocabulary.</p>
+    </section>
+
+    <!-- 3.4 Where the percentages come from -->
+    <section class="beat" data-scene="m3">
+      <h2>Where do the percentages come from?</h2>
+      <div class="chain">
+        <div class="ccard">
+          <div class="lbl">Module 1</div>
+          Position on the map of meaning: "crocodile" lives near water, mangroves and the wet season.
+        </div>
+        <div class="charrow">&rarr;</div>
+        <div class="ccard">
+          <div class="lbl">Module 2</div>
+          Patterns from the training text: how sentences like this one tended to continue, across billions of examples.
+        </div>
+        <div class="charrow">&rarr;</div>
+        <div class="ccard now">
+          <div class="lbl">This module</div>
+          The bars you just clicked: geometry plus patterns, run through the trained dials, set every percentage.
+        </div>
+      </div>
+      <p class="caption">No lookup happens anywhere in this chain; there is no table of facts to consult.</p>
+    </section>
+
+    <!-- 3.5 Key point -->
+    <section class="beat" data-scene="m3">
+      <div class="callout">Generation is <strong>weighted dice</strong> rolled over learned patterns. Uniqueness is built in; the same prompt produces <strong>different phrasings</strong> by design, which is why it cannot simply copy and paste.</div>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+    <!-- ============ MODULE 4 ============ -->
+
+    <!-- 4.0 Title -->
+    <section class="beat" data-scene="m4">
+      <div class="eyebrow">Module 04</div>
+      <h1>The confident machine</h1>
+      <div class="myth">Myth we'll bust: "It knows when it's wrong"</div>
+      <p class="caption">Probabilities in this module are illustrative, hand-crafted for teaching; they are not real model outputs.</p>
+    </section>
+
+    <!-- 4.1 Same machine, harder question -->
+    <section class="beat" data-scene="m4" data-onenter="resetCite">
+      <h2>Same machine, harder question</h2>
+      <p class="promptline" style="margin-top:0">Prompt: <span class="ptext">"Give me a journal citation on buffalo management in the Northern Territory."</span></p>
+      <div class="stem-box" id="citeBox" style="margin-top:18px; font-size:24px"></div>
+      <div class="prob-list" id="citeList"></div>
+      <div><span class="stamp" id="stamp">This paper does not exist</span></div>
+      <p class="caption">Every fragment above is plausible on its own: the name, the journal, the volume, the DOI. The whole is fiction. The dice never checked a shelf, because there is no shelf.</p>
+    </section>
+
+    <!-- 4.2 Why it happened -->
+    <section class="beat" data-scene="m4">
+      <h2>Why did that happen?</h2>
+      <div class="tvi-grid">
+        <div class="tvi-card">
+          <div class="lbl">Module 3</div>
+          <div class="when">A right answer</div>
+          <ul>
+            <li>Position on the map of meaning</li>
+            <li>Patterns from the training text</li>
+            <li>Weighted draw, one word at a time</li>
+            <li>Fluent output</li>
+          </ul>
+        </div>
+        <div class="tvi-card">
+          <div class="lbl">This module</div>
+          <div class="when">A fake citation</div>
+          <ul>
+            <li>Position on the map of meaning</li>
+            <li>Patterns from the training text</li>
+            <li>Weighted draw, one word at a time</li>
+            <li>Fluent output</li>
+          </ul>
+        </div>
+      </div>
+      <p class="caption" style="font-size:18px; color:var(--grey)">Read the two lists again; they are identical. The process that produced a correct answer and the process that produced the fake are the <span style="color:var(--white)">same process</span>. There is no separate fact-checking step, and no slot anywhere in the machine that holds "true".</p>
+    </section>
+
+    <!-- 4.3 No "I don't know" by default -->
+    <section class="beat" data-scene="m4">
+      <h2>Why not just say "I don't know"?</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:24px">The distribution always offers a next word. Watch how the honest answer competes:</p>
+      <div class="prob-list" style="max-width:860px">
+        <div class="prob-row wide static"><span class="pword">"Certainly. One relevant paper is&hellip;"</span><span class="ptrack"><span class="pfill" style="width:41%"></span></span><span class="ppct">41%</span></div>
+        <div class="prob-row wide static"><span class="pword">"A useful reference on this topic&hellip;"</span><span class="ptrack"><span class="pfill" style="width:33%"></span></span><span class="ppct">33%</span></div>
+        <div class="prob-row wide static"><span class="pword">"Research in this area includes&hellip;"</span><span class="ptrack"><span class="pfill" style="width:21%"></span></span><span class="ppct">21%</span></div>
+        <div class="prob-row wide static other"><span class="pword">"I cannot find a verified source."</span><span class="ptrack"><span class="pfill" style="width:5%"></span></span><span class="ppct">5%</span></div>
+      </div>
+      <p class="caption" style="font-size:17px">Declining to answer is itself just a pattern, and it must be trained in; it competes with fluency and usually loses. Helpfulness training amplifies confident continuation; it is the amplifier, not the root cause. Values illustrative.</p>
+    </section>
+
+    <!-- 4.4 What helps -->
+    <section class="beat" data-scene="m4">
+      <h2>What helps</h2>
+      <div class="helps">
+        <div class="hcard">
+          <h3>Ask for sources; then check them</h3>
+          <p>A citation is a claim, not evidence. Search for the paper; if it does not exist, you have learned something important about the answer.</p>
+        </div>
+        <div class="hcard">
+          <h3>Prefer grounded modes</h3>
+          <p>Tools that search or retrieve real documents before answering give the dice something solid to land on.</p>
+        </div>
+        <div class="hcard">
+          <h3>Fluency is not accuracy</h3>
+          <p>Confidence and polish are properties of the writing, not the facts. The fake citation read beautifully.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4.5 Key point -->
+    <section class="beat" data-scene="m4">
+      <div class="callout">Right answers and wrong answers come off the <strong>same production line</strong>. Checking is the human's job and the tooling's job; it is not the model's instinct.</div>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+    <!-- ============ MODULE 5 ============ -->
+
+    <!-- 5.0 Title -->
+    <section class="beat" data-scene="m5">
+      <div class="eyebrow">Module 05</div>
+      <h1>The black box</h1>
+      <p class="lede">We built it; we can measure it; we cannot fully explain it.</p>
+    </section>
+
+    <!-- 5.1 What we can and can't see -->
+    <section class="beat" data-scene="m5">
+      <h2>What we can and cannot see</h2>
+      <div class="tvi-grid">
+        <div class="tvi-card">
+          <div class="lbl">Measurable</div>
+          <div class="when">Everything</div>
+          <ul>
+            <li>Every weight; all billions of dials are readable</li>
+            <li>Every probability on every draw</li>
+            <li>Every input and every output</li>
+          </ul>
+        </div>
+        <div class="tvi-card now">
+          <div class="lbl">Still hard</div>
+          <div class="when">The why</div>
+          <ul>
+            <li>Why these particular numbers produce that behaviour</li>
+            <li>Which internal patterns carry which ideas</li>
+            <li>What the model will do on inputs nobody has tried</li>
+          </ul>
+        </div>
+      </div>
+      <p class="caption" style="font-size:17px">Working on the right-hand column is called <span style="color:var(--white)">interpretability research</span>: reverse-engineering the features and circuits inside trained models. It is real, it is progressing, and it is early.</p>
+    </section>
+
+    <!-- 5.2 Close -->
+    <section class="beat" data-scene="m5">
+      <h2>Why this matters</h2>
+      <div class="callout">A tool this capable, and this incompletely understood, keeps <strong>human judgement in the loop</strong> by necessity, not by courtesy. You have seen the machine: no dictionary, no database, no fact-checker, no self-doubt. What it does have is patterns, at a scale no person can match. Use it accordingly.</div>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+  </main>
+  <footer id="dots"></footer>
+</div>
+<div class="navhint">&larr; &rarr; or space &nbsp;|&nbsp; M menu</div>
+
+<script>
+  const beats = Array.from(document.querySelectorAll('.beat'));
+  let idx = 0;
+
+  const sceneTitles = {
+    m1: 'Module 01 · Words become numbers',
+    m2: 'Module 02 · The scale of it',
+    m3: 'Module 03 · Rolling weighted dice',
+    m4: 'Module 04 · The confident machine',
+    m5: 'Module 05 · The black box'
+  };
+  const onEnterHooks = {
+    resetTrain: resetTrainState,
+    resetMap: resetMapState,
+    resetLadder: resetLadderState,
+    resetFunnel: resetFunnelState,
+    resetReading: resetReadingState,
+    resetStem: resetStemState,
+    resetTemp: resetTempState,
+    resetGen: resetGenState,
+    resetCite: resetCiteState
+  };
+
+  function show(i) {
+    idx = Math.max(0, Math.min(i, beats.length - 1));
+    beats.forEach((b, n) => b.classList.toggle('active', n === idx));
+    const scene = beats[idx].dataset.scene;
+    // header
+    document.getElementById('hdrLeft').textContent =
+      scene === 'menu' ? 'How AI predicts the next word' : sceneTitles[scene];
+    // dots: only within current module
+    const dots = document.getElementById('dots');
+    dots.innerHTML = '';
+    if (scene !== 'menu') {
+      const moduleBeats = beats.filter(b => b.dataset.scene === scene);
+      const pos = moduleBeats.indexOf(beats[idx]);
+      moduleBeats.forEach((_, n) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (n === pos ? ' on' : '');
+        dots.appendChild(d);
+      });
+    }
+    // per-beat setup hook
+    const hook = beats[idx].dataset.onenter;
+    if (hook && onEnterHooks[hook]) onEnterHooks[hook]();
+  }
+
+  function goMenu() { show(0); }
+  function goModule(n) {
+    const i = beats.findIndex(b => b.dataset.scene === 'm' + n);
+    if (i > -1) show(i);
+  }
+  function next() { if (idx < beats.length - 1) show(idx + 1); }
+  function prev() { if (idx > 0) show(idx - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') prev();
+    else if (e.key === 'm' || e.key === 'M') goMenu();
+    else if (e.key >= '1' && e.key <= '5') goModule(Number(e.key));
+  });
+  // click anywhere non-interactive advances (presenter convenience)
+  document.getElementById('main').addEventListener('click', e => {
+    if (e.target.closest('button, svg, a')) return;
+    next();
+  });
+
+  // Beat 1.2 tokenise animation
+  let tokStep = 0;
+  function tokeniseStep() {
+    const steps = [['s2a','s2b'], ['s2c','s2d']];
+    if (tokStep < steps.length) {
+      steps[tokStep].forEach(id => document.getElementById(id).classList.add('shown'));
+      tokStep++;
+      document.getElementById('tokBtn').textContent =
+        tokStep === 1 ? 'Now make it maths' : 'Done: numbers a computer can work with';
+    }
+  }
+
+  // Beat 1.3 training steps
+  const trainStates = [
+    { word: 'photocopier', wrong: true,  err: 92, vec: '[0.91, 0.05, -0.62,<br>-0.44, 0.13, -0.09]', note: 'training steps: 0 (dials random)' },
+    { word: 'water',       wrong: true,  err: 55, vec: '[0.67, -0.08, 0.31,<br>-0.12, -0.30, 0.28]', note: 'training steps: 1 million' },
+    { word: 'branch',      wrong: true,  err: 24, vec: '[0.51, -0.14, 0.69,<br>-0.02, -0.49, 0.55]', note: 'training steps: 1 billion' },
+    { word: 'seed',        wrong: false, err: 6,  vec: '[0.42, -0.17, 0.88,<br>0.03, -0.56, 0.71]',  note: 'training steps: many billions (dials settled)' }
+  ];
+  let trainIdx = 0;
+  function renderTrain() {
+    const s = trainStates[trainIdx];
+    const gw = document.getElementById('guessWord');
+    gw.textContent = s.word;
+    gw.classList.toggle('wrong', s.wrong);
+    const ef = document.getElementById('errFill');
+    ef.style.width = s.err + '%';
+    ef.classList.toggle('good', !s.wrong);
+    document.getElementById('dialVec').innerHTML = s.vec;
+    document.getElementById('stepCount').textContent = s.note;
+    document.getElementById('trainBtn').textContent =
+      trainIdx === 0 ? 'Run a training step'
+      : trainIdx < trainStates.length - 1 ? 'Keep nudging the dials'
+      : 'Done: these are the numbers from the last screen';
+  }
+  function trainStep() {
+    if (trainIdx < trainStates.length - 1) { trainIdx++; renderTrain(); }
+  }
+  function resetTrainState() { trainIdx = 0; renderTrain(); }
+
+  // Beat 1.4 map
+  const spots = { start: [330, 225], bio: [160, 330], edu: [490, 130] };
+  function moveDarwin(where) {
+    const [x, y] = spots[where === 'reset' ? 'start' : where];
+    const dot = document.getElementById('darwinDot');
+    const lbl = document.getElementById('ctxLabel');
+    dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+    lbl.setAttribute('x', x + 18); lbl.setAttribute('y', y + 6);
+    lbl.textContent = where === 'bio' ? 'Darwin (the naturalist)'
+                    : where === 'edu' ? 'Darwin (the university)'
+                    : 'Darwin';
+  }
+  function resetMapState() {
+    moveDarwin('reset');
+    tokStep = 0; // also reset tokeniser if presenter loops back
+    ['s2a','s2b','s2c','s2d'].forEach(id => document.getElementById(id).classList.remove('shown'));
+    const tb = document.getElementById('tokBtn'); if (tb) tb.textContent = 'Convert it';
+  }
+
+  // Beat 2.2 ladder
+  const ladderLabels = [
+    'First rung: your phone',
+    'Next rung: a suburban library',
+    'Next rung: the National Library of Australia',
+    'Last rung: the open web',
+    'Top of the ladder; and this is just the raw material'
+  ];
+  let ladderIdx = 0;
+  function ladderStep() {
+    if (ladderIdx >= 4) return;
+    const rung = document.getElementById('rung' + ladderIdx);
+    rung.classList.add('shown');
+    const fill = rung.querySelector('.fill');
+    requestAnimationFrame(() => { fill.style.width = fill.dataset.w + '%'; });
+    ladderIdx++;
+    document.getElementById('ladderBtn').textContent = ladderLabels[ladderIdx];
+  }
+  function resetLadderState() {
+    ladderIdx = 0;
+    for (let n = 0; n < 4; n++) {
+      const rung = document.getElementById('rung' + n);
+      rung.classList.remove('shown');
+      rung.querySelector('.fill').style.width = '0';
+    }
+    document.getElementById('ladderBtn').textContent = ladderLabels[0];
+  }
+
+  // Beat 2.3 funnel
+  const funnelSteps = [['fun0'], ['funA0','fun1'], ['funA1','fun2']];
+  const funnelLabels = [
+    'Run the filter',
+    'What survives?',
+    'Keep filtering',
+    'Done: about 1% makes the cut'
+  ];
+  let funnelIdx = 0;
+  function funnelStep() {
+    if (funnelIdx >= funnelSteps.length) return;
+    funnelSteps[funnelIdx].forEach(id => document.getElementById(id).classList.add('shown'));
+    funnelIdx++;
+    document.getElementById('funnelBtn').textContent = funnelLabels[funnelIdx];
+  }
+  function resetFunnelState() {
+    funnelIdx = 0;
+    ['fun0','funA0','fun1','funA1','fun2'].forEach(id => document.getElementById(id).classList.remove('shown'));
+    for (let n = 0; n < 5; n++) document.getElementById('mixd' + n).classList.remove('shown');
+    document.getElementById('funnelBtn').textContent = funnelLabels[0];
+  }
+  function toggleMix(n) { document.getElementById('mixd' + n).classList.toggle('shown'); }
+
+  // Beat 2.4 reading time
+  const readingLabels = [
+    'Do the sums',
+    'Set a reading pace',
+    'How long does it take?',
+    'Done: patterns, not memorisation, are the only way through'
+  ];
+  let readIdx = 0;
+  function readingStep() {
+    if (readIdx >= 3) return;
+    document.getElementById('calc' + readIdx).classList.add('shown');
+    readIdx++;
+    document.getElementById('readBtn').textContent = readingLabels[readIdx];
+  }
+  function resetReadingState() {
+    readIdx = 0;
+    ['calc0','calc1','calc2'].forEach(id => document.getElementById(id).classList.remove('shown'));
+    document.getElementById('readBtn').textContent = readingLabels[0];
+  }
+
+  // Beat 3.1 stem builder
+  const stemSteps = [
+    { options: [['water',38],['shallows',22],['mangroves',14],['billabong',9],['dark',6]], other: 11 },
+    { options: [['waiting',34],['watching',26],['ready',12],['hunting',9],['hoping',6]], other: 13 },
+    { options: [['buffalo',27],['fisherman',21],['tide',17],['barramundi',12],['night',9]], other: 14 }
+  ];
+  let stemChosen = [];
+  function renderStem() {
+    const c = stemChosen;
+    let s = 'The crocodile lurked in the ';
+    s += c[0] ? '<span class="chosen">' + c[0] + '</span>' : '<span class="slot">___</span>';
+    if (c[0]) { s += ', ' + (c[1] ? '<span class="chosen">' + c[1] + '</span>' : '<span class="slot">___</span>'); }
+    if (c[1]) { s += ' for the ' + (c[2] ? '<span class="chosen">' + c[2] + '</span>.' : '<span class="slot">___</span>'); }
+    document.getElementById('stemBox').innerHTML = s;
+
+    const list = document.getElementById('probList');
+    if (c.length >= stemSteps.length) {
+      list.innerHTML = '<p class="caption" style="font-size:18px; margin-top:14px">Three weighted draws made a sentence. The machine does this for every single word it writes; your clicks just rolled the dice by hand.</p>';
+      return;
+    }
+    const step = stemSteps[c.length];
+    let html = step.options.map(([w, p]) =>
+      '<button class="prob-row" onclick="pickWord(\'' + w + '\')">' +
+      '<span class="pword">' + w + '</span>' +
+      '<span class="ptrack"><span class="pfill" data-w="' + p + '"></span></span>' +
+      '<span class="ppct">' + p + '%</span></button>'
+    ).join('');
+    html += '<button class="prob-row other" onclick="showLongtail()">' +
+      '<span class="pword">everything else</span>' +
+      '<span class="ptrack"><span class="pfill" data-w="' + step.other + '"></span></span>' +
+      '<span class="ppct">' + step.other + '%</span></button>';
+    html += '<p class="caption longtail" id="longtail">Thousands more words share that last slice, each with a tiny chance; "photocopier" is in there at about 0.0001%.</p>';
+    list.innerHTML = html;
+    requestAnimationFrame(() => {
+      list.querySelectorAll('.pfill').forEach(f => { f.style.width = f.dataset.w + '%'; });
+    });
+  }
+  function pickWord(w) { stemChosen.push(w); renderStem(); }
+  function showLongtail() { document.getElementById('longtail').classList.add('shown'); }
+  function resetStemState() { stemChosen = []; renderStem(); }
+
+  // Beat 3.2 temperature
+  const tempData = {
+    low: {
+      caption: 'Low: the dice are loaded to land on the single most likely word, every time. Safe, predictable, repetitive.',
+      runs: ['water, waiting for the tide to turn.', 'water, waiting for the tide to turn.'],
+      notes: ['', 'Identical, word for word. It would be identical on the hundredth run too.']
+    },
+    med: {
+      caption: 'Medium: weighted sampling. Likely words usually win; sometimes a less likely one gets its turn.',
+      runs: ['water, waiting for the tide to turn.', 'shallows, watching the bank where the wallabies came to drink.'],
+      notes: ['', 'Same prompt, same setting; a slightly different path through the dice.']
+    },
+    high: {
+      caption: 'High: the long tail gets real chances. Inventive at first; push further and it falls apart.',
+      runs: ['moonlight, tasting the rumour of rain on the wind.', 'cupboard, seventeen and enrolment whispering the of.'],
+      notes: ['Striking; almost poetry.', 'And now it has come apart; the dice landed on words that never belonged together.']
+    }
+  };
+  let tempSel = 'low', tempRunCount = 0;
+  function setTemp(t) {
+    tempSel = t; tempRunCount = 0;
+    ['low','med','high'].forEach(k =>
+      document.getElementById('pill-' + k).classList.toggle('sel', k === t));
+    document.getElementById('tempCaption').textContent = tempData[t].caption;
+    document.getElementById('tempRuns').innerHTML = '';
+    document.getElementById('tempRunBtn').textContent = 'Run the prompt';
+  }
+  function tempRun() {
+    const d = tempData[tempSel];
+    if (tempRunCount >= d.runs.length) return;
+    const div = document.createElement('div');
+    div.className = 'runline';
+    div.innerHTML = '<span class="runlbl">RUN ' + (tempRunCount + 1) + '</span>' +
+      'The crocodile lurked in the ' + d.runs[tempRunCount] +
+      (d.notes[tempRunCount] ? '<span class="runnote">' + d.notes[tempRunCount] + '</span>' : '');
+    document.getElementById('tempRuns').appendChild(div);
+    tempRunCount++;
+    document.getElementById('tempRunBtn').textContent =
+      tempRunCount < d.runs.length ? 'Run it again' : 'Try another setting above';
+  }
+  function resetTempState() { setTemp('low'); }
+
+  // Beat 3.3 same prompt, three outputs
+  const genOutputs = [
+    'The crocodile lurked in the water, waiting for the tide to turn.',
+    'The crocodile lurked in the shallows, still as driftwood, watching the bank.',
+    'The crocodile lurked in the mangroves, patient as the wet season itself.'
+  ];
+  const genLabels = ['Generate', 'Generate again', 'Once more', 'Done: three fresh sentences, none stored anywhere'];
+  let genIdx = 0;
+  function genStep() {
+    if (genIdx >= genOutputs.length) return;
+    const div = document.createElement('div');
+    div.className = 'runline';
+    div.innerHTML = '<span class="runlbl">RUN ' + (genIdx + 1) + '</span>' + genOutputs[genIdx];
+    document.getElementById('genRuns').appendChild(div);
+    genIdx++;
+    document.getElementById('genBtn').textContent = genLabels[genIdx];
+  }
+  function resetGenState() {
+    genIdx = 0;
+    document.getElementById('genRuns').innerHTML = '';
+    document.getElementById('genBtn').textContent = genLabels[0];
+  }
+
+  // Beat 4.1 citation builder
+  const citeSteps = [
+    { lbl: 'Draw 1 of 4: an author and a year', options: [
+      ['Harrison, J. &amp; Nguyen, T. (2019)', 29],
+      ['McAllister, R. P. (2021)', 23],
+      ['Petrov, S. &amp; White, K. (2017)', 16],
+      ['Dawson, L. M. (2020)', 12]], other: 20 },
+    { lbl: 'Draw 2 of 4: a title', options: [
+      ['‘Adaptive management of feral water buffalo on Top End floodplains’,', 33],
+      ['‘Population control of feral buffalo in northern savannas’,', 21],
+      ['‘Buffalo exclusion fencing and wetland recovery’,', 15],
+      ['‘Aerial survey methods for large feral herbivores’,', 11]], other: 20 },
+    { lbl: 'Draw 3 of 4: a journal', options: [
+      ['Australian Journal of Rangeland Ecology,', 36],
+      ['Tropical Savanna Management Review,', 22],
+      ['Northern Australian Wetlands Journal,', 17],
+      ['Journal of Feral Herbivore Studies,', 9]], other: 16 },
+    { lbl: 'Draw 4 of 4: volume, pages, DOI', options: [
+      ['41(3), pp. 212&ndash;228. doi:10.1071/rje19042', 34],
+      ['38(2), pp. 145&ndash;160. doi:10.1071/rje17103', 24],
+      ['44(1), pp. 55&ndash;71. doi:10.1071/rje21008', 15],
+      ['39(4), pp. 301&ndash;318. doi:10.1071/rje20115', 10]], other: 17 }
+  ];
+  let citeChosen = [];
+  function renderCite() {
+    const box = document.getElementById('citeBox');
+    box.innerHTML = citeChosen.length
+      ? '<span class="chosen">' + citeChosen.join(' ') + '</span>'
+      : '<span class="slot">___</span> <span style="color:var(--grey-dim)">the citation will assemble here, one weighted draw at a time</span>';
+
+    const list = document.getElementById('citeList');
+    if (citeChosen.length >= citeSteps.length) {
+      list.innerHTML = '<button class="btn" id="stampBtn" onclick="revealStamp()">Now search the library for this paper</button>';
+      return;
+    }
+    const step = citeSteps[citeChosen.length];
+    let html = '<div class="lbl" style="font-size:13px; letter-spacing:2px; text-transform:uppercase; color:var(--grey-dim); margin:6px 0 10px">' + step.lbl + '</div>';
+    html += step.options.map(([frag, p], i) =>
+      '<button class="prob-row wide" onclick="pickCite(' + i + ')">' +
+      '<span class="pword" style="font-size:19px">' + frag + '</span>' +
+      '<span class="ptrack"><span class="pfill" data-w="' + p + '"></span></span>' +
+      '<span class="ppct">' + p + '%</span></button>'
+    ).join('');
+    html += '<div class="prob-row wide static other">' +
+      '<span class="pword" style="font-size:19px">everything else</span>' +
+      '<span class="ptrack"><span class="pfill" data-w="' + step.other + '"></span></span>' +
+      '<span class="ppct">' + step.other + '%</span></div>';
+    list.innerHTML = html;
+    requestAnimationFrame(() => {
+      list.querySelectorAll('.pfill').forEach(f => { f.style.width = f.dataset.w + '%'; });
+    });
+  }
+  function pickCite(i) {
+    const step = citeSteps[citeChosen.length];
+    citeChosen.push(step.options[i][0]);
+    renderCite();
+  }
+  function revealStamp() {
+    document.getElementById('stamp').classList.add('shown');
+    const b = document.getElementById('stampBtn');
+    if (b) { b.disabled = true; b.textContent = 'No results found'; b.classList.add('ghost'); }
+  }
+  function resetCiteState() {
+    citeChosen = [];
+    document.getElementById('stamp').classList.remove('shown');
+    renderCite();
+  }
+
+  show(0);
+</script>
+</body>
+</html>
