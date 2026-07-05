@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Wi-Fi Settings Practice (Offline)</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#000000; --muted:#333; --outline:#c8c8c8; --accent:#0067c0; --ok:#107c10; --warn:#b65d00; --bad:#a80000;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
+  .app{max-width:1080px;margin:0 auto;padding:16px 20px}
+  .heading{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .heading h1{font-size:20px;margin:0}
+  .goal{background:#f5f5f5;border:1px solid var(--outline);padding:10px 12px;border-radius:8px;margin-bottom:12px}
+  .goal strong{font-weight:700}
+  .panel{display:grid;grid-template-columns:360px 1fr;gap:16px;align-items:start}
+  @media (max-width: 860px){ .panel{grid-template-columns:1fr} }
+  .card{border:1px solid var(--outline);border-radius:10px;background:#fff}
+  .left .card{overflow:hidden}
+  .titlebar{padding:10px 12px;border-bottom:1px solid var(--outline);display:flex;align-items:center;gap:10px;justify-content:space-between}
+  .titlebar h2{font-size:16px;margin:0}
+  .toggle{display:inline-flex;align-items:center;gap:10px;font-size:14px}
+  .toggle input{width:44px;height:22px;appearance:none;background:#ddd;border-radius:999px;position:relative;outline:2px solid transparent;cursor:pointer}
+  .toggle input:checked{background:#3bb273}
+  .toggle input::after{content:"";position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:all .2s ease}
+  .toggle input:checked::after{left:24px}
+  .list{max-height:520px;overflow:auto}
+  .net{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--outline);cursor:pointer}
+  .net:hover{background:#f8f8f8}
+  .net.active{outline:2px solid var(--accent);outline-offset:-2px;background:#f0f7ff}
+  .net .meta{font-size:12px;color:#111}
+  .badge{font-size:11px;border:1px solid var(--outline);border-radius:999px;padding:2px 8px;background:#fafafa}
+  .right .content{padding:14px 16px}
+  .row{display:grid;grid-template-columns:120px 1fr;gap:10px;margin:8px 0;align-items:center}
+  .row input{width:100%;padding:8px 10px;border:1px solid var(--outline);border-radius:8px;background:#fff;color:#000}
+  .row input[disabled]{background:#f7f7f7;color:#000}
+  .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+  button{appearance:none;border:1px solid var(--outline);background:#fff;color:#000;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:14px}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .status{margin-top:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--outline);background:#f7f7f7}
+  .status.good{border-color:#b7dfb7;background:#eef8ee}
+  .status.warn{border-color:#ffe2b3;background:#fff8e6}
+  .status.bad{border-color:#f1b3b3;background:#fff0f0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .subtle{color:#000}
+  .signal{display:inline-flex;gap:2px}
+  .bar{width:4px;background:#bbb;display:inline-block}
+  .bar:nth-child(1){height:6px}
+  .bar:nth-child(2){height:10px}
+  .bar:nth-child(3){height:14px}
+  .bar:nth-child(4){height:18px}
+  .net.connected{background:#eef8ee}
+  .net.connected .badge{border-color:#9ad39a;background:#e9f6e9}
+  .help{font-size:13px;color:#111;margin-top:8px}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="Wi-Fi settings training">
+  <div class="heading">
+    <h1>Wi-Fi Settings Practice</h1>
+  </div>
+  <div class="goal" aria-live="polite">
+    <strong>Learning goal:</strong> Connect to Wi-Fi internet
+  </div>
+
+  <div class="panel">
+    <div class="left">
+      <div class="card">
+        <div class="titlebar">
+          <h2>Wi-Fi</h2>
+          <label class="toggle" title="Turn Wi-Fi on or off"><span>Wi-Fi</span>
+            <input id="wifiToggle" type="checkbox" checked aria-label="Wi-Fi on/off">
+          </label>
+        </div>
+        <div id="list" class="list" role="listbox" aria-label="Available networks"></div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="card">
+        <div class="titlebar">
+          <h2 id="panelTitle">Network details</h2>
+          <span class="badge" id="connState">Not connected</span>
+        </div>
+        <div class="content" id="details">
+          <p class="help">Select a network on the left. If it’s secured, type the password shown and press <strong>Connect</strong>.</p>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="titlebar"><h2>Tips</h2></div>
+        <div class="content">
+          <ul>
+            <li><strong>Open</strong> networks don’t need a password (be careful with sensitive info).</li>
+            <li><strong>Secured</strong> networks show their password here for practice.</li>
+            <li>After connecting, you’ll see <em>Connected</em> and the network moves to the top of the list.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = (q,root=document)=>root.querySelector(q);
+  const $$ = (q,root=document)=>Array.from(root.querySelectorAll(q));
+
+  const networks = [
+    {ssid:"CDU-Staff", security:"WPA2", password:"TopEnd2025!", strength:4, connected:false},
+    {ssid:"Free Public Wi-Fi", security:"Open", password:"None", strength:3, connected:false},
+    {ssid:"Community Hub", security:"WPA2", password:"Welcome123", strength:2, connected:false},
+    {ssid:"Guest-Training", security:"WPA3", password:"TrainMe-NT", strength:4, connected:false},
+    {ssid:"Personal Hotspot", security:"WPA2", password:"555-Password", strength:1, connected:false}
+  ];
+
+  const state = { on:true, selected:null, connecting:false, connectedSsid:null };
+
+  const els = {
+    list: $('#list'),
+    toggle: $('#wifiToggle'),
+    details: $('#details'),
+    title: $('#panelTitle'),
+    connState: $('#connState')
+  };
+
+  els.toggle.addEventListener('change', ()=>{
+    state.on = els.toggle.checked;
+    renderList();
+    renderDetails();
+  });
+
+  function renderBars(n){
+    const bars = [1,2,3,4].map(i => `<span class="bar" style="background:${i<=n?'#111':'#bbb'}"></span>`).join('');
+    return `<span class="signal" aria-hidden="true">${bars}</span>`;
+  }
+
+  function renderList(){
+    els.list.innerHTML = "";
+    if(!state.on){
+      const div = document.createElement('div');
+      div.style.padding="14px 16px";
+      div.innerHTML = "<strong>Wi-Fi is turned off.</strong><div class='help'>Toggle Wi-Fi on to view available networks.</div>";
+      els.list.appendChild(div);
+      return;
+    }
+    // sort: connected first, then by strength
+    const sorted = networks.slice().sort((a,b)=> (b.connected - a.connected) || (b.strength - a.strength));
+    sorted.forEach(net=>{
+      const item = document.createElement('div');
+      item.className = 'net' + (state.selected && state.selected.ssid===net.ssid ? ' active':'' ) + (net.connected? ' connected':'');
+      item.setAttribute('role','option');
+      item.tabIndex = 0;
+      item.innerHTML = `
+        <div>
+          <div><strong>${escapeHtml(net.ssid)}</strong></div>
+          <div class="meta">
+            ${renderBars(net.strength)} &nbsp; 
+            <span>${net.security==='Open'?'Open network':'Secured ('+net.security+')'}</span>
+          </div>
+        </div>
+        <div class="grid2" style="min-width:200px">
+          <span class="badge">Password: <span class="mono">${net.password}</span></span>
+          <span class="badge">${net.connected?'Connected':'Available'}</span>
+        </div>`;
+      item.addEventListener('click', ()=>{ state.selected = net; renderList(); renderDetails(); });
+      item.addEventListener('keydown', (e)=>{ if(e.key==='Enter') { state.selected = net; renderList(); renderDetails(); } });
+      els.list.appendChild(item);
+    });
+  }
+
+  function renderDetails(){
+    els.details.innerHTML = "";
+    if(!state.on){
+      els.title.textContent = "Network details";
+      els.connState.textContent = "Wi-Fi off";
+      const p = document.createElement('p');
+      p.className='help';
+      p.textContent = "Switch Wi-Fi on to view and connect to networks.";
+      els.details.appendChild(p);
+      return;
+    }
+    if(!state.selected){
+      els.title.textContent = "Network details";
+      els.connState.textContent = "Not connected";
+      const p = document.createElement('p');
+      p.className='help';
+      p.textContent = "Select a network on the left to view details.";
+      els.details.appendChild(p);
+      return;
+    }
+    const n = state.selected;
+    els.title.textContent = n.ssid;
+    els.connState.textContent = n.connected? "Connected":"Not connected";
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `
+      <div class="row"><label>Network name</label><input value="${escapeHtml(n.ssid)}" disabled></div>
+      <div class="row"><label>Security</label><input value="${n.security}" disabled></div>
+      <div class="row"><label>Password</label><input id="pwd" value="${n.security==='Open'?'(not required)':n.password}" ${n.security==='Open'?'disabled':''}></div>
+      <div class="row"><label>Signal</label><div>${renderBars(n.strength)}</div></div>
+      <div class="actions">
+        <button id="forgetBtn" ${n.connected? "":"disabled"}>Forget</button>
+        <button class="primary" id="connectBtn">${n.connected? "Disconnect":"Connect"}</button>
+      </div>
+      <div id="status" class="status" aria-live="polite">Ready.</div>
+      <div class="help">Practice task: Connect to <strong>Free Public Wi-Fi</strong> (no password) or a secured network using the password shown.</div>
+    `;
+    els.details.appendChild(wrap);
+
+    const status = $('#status', wrap);
+    const connectBtn = $('#connectBtn', wrap);
+    const forgetBtn = $('#forgetBtn', wrap);
+    const pwd = $('#pwd', wrap);
+
+    forgetBtn?.addEventListener('click', ()=>{
+      n.connected = false;
+      state.connectedSsid = null;
+      status.className = "status";
+      status.textContent = "This network has been forgotten.";
+      renderList();
+      renderDetails();
+    });
+
+    connectBtn.addEventListener('click', ()=>{
+      if(n.connected){
+        // disconnect
+        n.connected = false;
+        state.connectedSsid = null;
+        status.className = "status";
+        status.textContent = "Disconnected.";
+        renderList();
+        renderDetails();
+        return;
+      }
+      if(n.security !== 'Open'){
+        if(pwd.value !== n.password){
+          status.className = "status bad";
+          status.textContent = "Incorrect password. Use the password shown in the list.";
+          return;
+        }
+      }
+      status.className = "status warn";
+      status.textContent = "Connecting…";
+      connectBtn.disabled = true;
+      setTimeout(()=>{
+        // mark all others disconnected
+        networks.forEach(x=>x.connected=false);
+        n.connected = true;
+        state.connectedSsid = n.ssid;
+        status.className = "status good";
+        status.textContent = `Connected to ${n.ssid}.`;
+        renderList();
+        renderDetails();
+      }, 800);
+    });
+  }
+
+  function escapeHtml(s){return (s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;"," >":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+
+  // init
+  renderList();
+  renderDetails();
+})();
+</script>
+</body>
+</html>

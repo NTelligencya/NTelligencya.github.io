@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Simulator</title>
+<style>
+/* ============ Theme variables (suite standard) ============ */
+:root{
+  --font: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --fs: 15px; --fs-sm: 13px; --fs-xs: 12px; --fs-lg: 17px; --fs-xl: 22px;
+
+  --surface: #FFFFFF;
+  --border: #D0D7DE;
+  --text: #1B1B1B;
+  --text-muted: #555555;
+  --blue: #0078D4;
+  --blue-dark: #005A9E;
+  --blue-light: #E8F4FD;
+  --green: #107C10;
+  --green-light: #DFF6DD;
+  --highlight: #FFD34D;
+
+  --lock-grad-1: #0A4D8C;
+  --lock-grad-2: #0078D4;
+  --lock-grad-3: #4DA9E8;
+  --card-text: #FFFFFF;
+  --field-bg: #FFFFFF;
+  --field-text: #1B1B1B;
+
+  --board-bg: #FDFDF4;
+  --board-text: #17324D;
+  --board-border: #B9C4CE;
+
+  --strip-bg: #FFFFFF;
+
+  --desk-grad-1: #0B556E;
+  --desk-grad-2: #1287B5;
+  --desk-grad-3: #62C4E8;
+  --taskbar-bg: #16202B;
+  --taskbar-text: #FFFFFF;
+  --toast-bg: #FFFFFF;
+  --toast-text: #0E5C0E;
+  --cue-bg: #FFF6CF;
+  --cue-text: #5B4300;
+  --key-bg: #FFFFFF;
+  --key-text: #17324D;
+  --key-border: #9FB2C2;
+}
+
+/* Accessibility */
+body.larger-text { --fs: 18px; --fs-sm: 16px; --fs-xs: 14px; --fs-lg: 20px; --fs-xl: 26px; }
+body.high-contrast{
+  --surface: #000000; --border: #FFFFFF; --text: #FFFFFF; --text-muted: #DDDDDD;
+  --blue: #4FC3F7; --blue-dark: #4FC3F7; --blue-light: #0D2137;
+  --green: #7CFC7C; --green-light: #0A1F0A; --highlight: #FFD400;
+  --lock-grad-1: #000000; --lock-grad-2: #05050F; --lock-grad-3: #10102A;
+  --card-text: #FFFFFF; --field-bg: #000000; --field-text: #FFFFFF;
+  --board-bg: #000000; --board-text: #FFD400; --board-border: #FFD400;
+  --strip-bg: #000000;
+  --desk-grad-1: #000000; --desk-grad-2: #05050F; --desk-grad-3: #10102A;
+  --taskbar-bg: #000000; --taskbar-text: #FFFFFF;
+  --toast-bg: #000000; --toast-text: #7CFC7C;
+  --cue-bg: #000000; --cue-text: #FFD400;
+  --key-bg: #000000; --key-text: #FFD400; --key-border: #FFD400;
+}
+body.high-contrast .signin-card,
+body.high-contrast .whiteboard,
+body.high-contrast .coach-strip,
+body.high-contrast .toast,
+body.high-contrast .cue,
+body.high-contrast .taskbar { border: 2px solid #FFFFFF; }
+body.high-contrast .field input { border: 2px solid #FFFFFF; }
+
+html { font-size: var(--fs); }
+body{
+  font-family: var(--font); color: var(--text); background: #E8E8E8;
+  margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* ============ A11y bar (matches suite) ============ */
+.a11y-bar{
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 6px 16px; display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+}
+.a11y-bar label{ font-size: var(--fs-xs); color: var(--text-muted); display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.a11y-bar input[type="checkbox"]{ width: 16px; height: 16px; }
+.a11y-title{ font-weight: 600; font-size: var(--fs-xs); margin-right: 6px; color: var(--text); }
+
+/* ============ Coach strip (instructions + step counter) ============ */
+.coach-strip{
+  background: var(--strip-bg); border-bottom: 1px solid var(--border);
+  padding: 10px 16px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; flex-wrap: wrap;
+}
+.step-badge{
+  background: var(--blue); color: #FFF; font-weight: 700; font-size: var(--fs-sm);
+  padding: 6px 14px; border-radius: 999px; white-space: nowrap;
+}
+body.high-contrast .step-badge{ background: var(--highlight); color: #000; }
+.instruction{ font-size: var(--fs-lg); font-weight: 600; flex: 1; min-width: 220px; }
+.key-chip{
+  display: inline-block; background: var(--key-bg); color: var(--key-text);
+  border: 2px solid var(--key-border); border-bottom-width: 4px; border-radius: 6px;
+  padding: 1px 10px; font-weight: 700; font-family: var(--font);
+}
+.hint{ font-size: var(--fs-sm); color: var(--blue-dark); font-weight: 600; width: 100%; min-height: 1.2em; }
+.reset-btn{
+  font-size: var(--fs-sm); font-family: var(--font); font-weight: 600;
+  padding: 10px 18px; border: 2px solid var(--blue); border-radius: 6px;
+  background: var(--blue-light); color: var(--blue-dark); cursor: pointer; min-height: 44px;
+}
+.reset-btn:hover{ background: var(--blue); color: #FFF; }
+
+/* ============ Stage ============ */
+.stage{ flex: 1; position: relative; overflow: hidden; }
+.screen{ position: absolute; inset: 0; display: none; }
+.screen.active{ display: flex; }
+
+/* ---- Lock / sign-in screen ---- */
+#lockScreen{
+  background: linear-gradient(135deg, var(--lock-grad-1), var(--lock-grad-2) 55%, var(--lock-grad-3));
+  align-items: center; justify-content: center; flex-direction: column; gap: 18px; padding: 16px;
+}
+.signin-card{
+  background: rgba(255,255,255,0.14); border-radius: 14px; padding: 28px 34px;
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  width: min(420px, 92%); box-sizing: border-box;
+}
+body.high-contrast .signin-card{ background: #101018; }
+.avatar{
+  width: 96px; height: 96px; border-radius: 50%; background: rgba(255,255,255,0.9);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.avatar svg{ width: 72px; height: 72px; }
+.card-title{ color: var(--card-text); font-size: var(--fs-xl); font-weight: 600; }
+.field{ width: 100%; position: relative; display: flex; }
+.field input{
+  flex: 1; font-size: var(--fs-lg); font-family: var(--font); padding: 14px 16px;
+  border: 2px solid transparent; border-radius: 6px; background: var(--field-bg);
+  color: var(--field-text); min-height: 48px; box-sizing: border-box; outline: none;
+}
+.field input:focus{ border-color: var(--blue-dark); box-shadow: 0 0 0 3px var(--highlight); }
+#passwordField input{ padding-right: 64px; }
+.signin-arrow{
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 48px; height: 40px; border: none; border-radius: 5px;
+  background: var(--blue); color: #FFF; font-size: 22px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.signin-arrow:hover{ background: var(--blue-dark); }
+body.high-contrast .signin-arrow{ background: var(--highlight); color: #000; }
+.glow{ animation: pulse 1.2s ease-in-out infinite; border-radius: 8px; }
+@keyframes pulse{
+  0%, 100%{ box-shadow: 0 0 0 3px var(--highlight); }
+  50%{ box-shadow: 0 0 0 9px rgba(255, 211, 77, 0.35); }
+}
+body.high-contrast .glow{ animation: none; box-shadow: 0 0 0 5px var(--highlight); }
+
+/* ---- Whiteboard sample ---- */
+.whiteboard{
+  background: var(--board-bg); color: var(--board-text);
+  border: 2px solid var(--board-border); border-radius: 10px;
+  padding: 12px 20px; width: min(420px, 92%); box-sizing: border-box;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+.whiteboard h2{ margin: 0 0 6px; font-size: var(--fs-sm); font-weight: 700; letter-spacing: 0.4px; }
+.whiteboard .cred{ font-size: var(--fs-lg); font-weight: 600; margin: 2px 0; }
+.whiteboard .cred code{
+  font-family: "Consolas", "Courier New", monospace; background: rgba(0,0,0,0.06);
+  padding: 1px 8px; border-radius: 4px; user-select: all;
+}
+body.high-contrast .whiteboard .cred code{ background: #1A1A00; }
+.whiteboard .note{ font-size: var(--fs-xs); margin: 6px 0 0; color: inherit; opacity: 0.85; }
+
+/* ---- Signing in screen ---- */
+#spinnerScreen{
+  background: linear-gradient(135deg, var(--lock-grad-1), var(--lock-grad-2) 55%, var(--lock-grad-3));
+  align-items: center; justify-content: center; flex-direction: column; gap: 22px;
+}
+.spinner{
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 6px solid rgba(255,255,255,0.25); border-top-color: #FFFFFF;
+  animation: spin 0.9s linear infinite;
+}
+body.high-contrast .spinner{ border-color: #333; border-top-color: var(--highlight); }
+@keyframes spin{ to{ transform: rotate(360deg); } }
+.signing-text{ color: var(--card-text); font-size: var(--fs-xl); font-weight: 600; }
+
+/* ---- Desktop success screen ---- */
+#desktopScreen{
+  background: linear-gradient(160deg, var(--desk-grad-1), var(--desk-grad-2) 55%, var(--desk-grad-3));
+  flex-direction: column;
+}
+.desk-body{ flex: 1; position: relative; padding: 18px; }
+.icons{ display: flex; flex-direction: column; gap: 18px; width: 92px; }
+.icon{ display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.icon .glyph{
+  font-size: 34px; width: 56px; height: 56px; display: flex; align-items: center;
+  justify-content: center; background: rgba(255,255,255,0.12); border-radius: 8px;
+}
+.icon .label{
+  color: #FFF; font-size: var(--fs-xs); text-align: center;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+}
+.success-panel{
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  width: min(460px, 90%);
+}
+.toast{
+  background: var(--toast-bg); color: var(--toast-text);
+  border: 2px solid var(--green); border-radius: 10px;
+  padding: 16px 24px; font-size: var(--fs-xl); font-weight: 700; text-align: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3); width: 100%; box-sizing: border-box;
+}
+.cue{
+  background: var(--cue-bg); color: var(--cue-text);
+  border: 2px solid var(--cue-text); border-radius: 10px;
+  padding: 12px 20px; font-size: var(--fs-lg); font-weight: 600; text-align: center;
+  width: 100%; box-sizing: border-box;
+}
+.again-btn{
+  font-size: var(--fs); font-family: var(--font); font-weight: 600;
+  padding: 12px 22px; border: 2px solid #FFF; border-radius: 8px;
+  background: rgba(0,0,0,0.35); color: #FFF; cursor: pointer; min-height: 48px;
+}
+.again-btn:hover{ background: rgba(0,0,0,0.55); }
+.taskbar{
+  height: 52px; background: var(--taskbar-bg); color: var(--taskbar-text);
+  display: flex; align-items: center; padding: 0 14px; gap: 16px; flex-shrink: 0;
+}
+.tb-icon{ font-size: 22px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+.tb-start svg{ width: 24px; height: 24px; }
+.tb-clock{ margin-left: auto; text-align: right; font-size: var(--fs-xs); line-height: 1.3; }
+</style>
+</head>
+<body>
+
+<!-- A11y bar -->
+<div class="a11y-bar">
+  <span class="a11y-title">Accessibility:</span>
+  <label><input type="checkbox" id="toggleLargeText"> Larger Text</label>
+  <label><input type="checkbox" id="toggleHighContrast"> High Contrast</label>
+</div>
+
+<!-- Coach strip: step counter, instruction, reset -->
+<div class="coach-strip">
+  <span class="step-badge" id="stepBadge">Step 1 of 5</span>
+  <span class="instruction" id="instruction" role="status" aria-live="polite">Click in the box that says Username.</span>
+  <button class="reset-btn" id="resetBtn" type="button">↺ Start again</button>
+  <span class="hint" id="hint" aria-live="polite"></span>
+</div>
+
+<!-- Stage -->
+<div class="stage">
+
+  <!-- Windows-style sign-in screen -->
+  <div class="screen active" id="lockScreen">
+    <div class="whiteboard" id="whiteboard">
+      <h2>🖊 WHITEBOARD, sample sign-in details</h2>
+      <p class="cred">Username: <code>student1</code></p>
+      <p class="cred">Password: <code>Darwin2026</code></p>
+      <p class="note">This is only an example. Any username and password will work in this practice.</p>
+    </div>
+
+    <div class="signin-card">
+      <div class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="4" fill="#0A4D8C"/>
+          <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="#0A4D8C"/>
+        </svg>
+      </div>
+      <div class="card-title">Sign in</div>
+      <div class="field" id="usernameField">
+        <input type="text" id="usernameInput" placeholder="Username" aria-label="Username" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="field" id="passwordField">
+        <input type="password" id="passwordInput" placeholder="Password" aria-label="Password" autocomplete="off">
+        <button class="signin-arrow" id="signinBtn" type="button" title="Sign in" aria-label="Sign in">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Signing in spinner -->
+  <div class="screen" id="spinnerScreen">
+    <div class="spinner" aria-hidden="true"></div>
+    <div class="signing-text">Signing in…</div>
+  </div>
+
+  <!-- Desktop success screen -->
+  <div class="screen" id="desktopScreen">
+    <div class="desk-body">
+      <div class="icons" aria-hidden="true">
+        <div class="icon"><div class="glyph">🗑</div><div class="label">Recycle Bin</div></div>
+        <div class="icon"><div class="glyph">💻</div><div class="label">This PC</div></div>
+        <div class="icon"><div class="glyph">🌐</div><div class="label">Browser</div></div>
+        <div class="icon"><div class="glyph">📁</div><div class="label">My Files</div></div>
+      </div>
+      <div class="success-panel">
+        <div class="toast" role="status">✓ You're logged in — welcome!</div>
+        <div class="cue">📷 Take your screenshot of this screen now.</div>
+        <button class="again-btn" id="againBtn" type="button">↺ Start again</button>
+      </div>
+    </div>
+    <div class="taskbar">
+      <div class="tb-icon tb-start" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="9" height="9" fill="#4FC3F7"/>
+          <rect x="13" y="2" width="9" height="9" fill="#4FC3F7"/>
+          <rect x="2" y="13" width="9" height="9" fill="#4FC3F7"/>
+          <rect x="13" y="13" width="9" height="9" fill="#4FC3F7"/>
+        </svg>
+      </div>
+      <div class="tb-icon" aria-hidden="true">🔍</div>
+      <div class="tb-icon" aria-hidden="true">📁</div>
+      <div class="tb-icon" aria-hidden="true">🌐</div>
+      <div class="tb-icon" aria-hidden="true">✉️</div>
+      <div class="tb-clock" id="tbClock">9:00 am<br>Mon 6 July 2026</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+/* ===== Accessibility toggles (suite standard) ===== */
+document.getElementById('toggleLargeText').addEventListener('change', function(){
+  document.body.classList.toggle('larger-text', this.checked);
+});
+document.getElementById('toggleHighContrast').addEventListener('change', function(){
+  document.body.classList.toggle('high-contrast', this.checked);
+});
+
+/* ===== Elements ===== */
+var usernameInput = document.getElementById('usernameInput');
+var passwordInput = document.getElementById('passwordInput');
+var usernameField = document.getElementById('usernameField');
+var passwordField = document.getElementById('passwordField');
+var signinBtn     = document.getElementById('signinBtn');
+var stepBadge     = document.getElementById('stepBadge');
+var instruction   = document.getElementById('instruction');
+var hint          = document.getElementById('hint');
+var lockScreen    = document.getElementById('lockScreen');
+var spinnerScreen = document.getElementById('spinnerScreen');
+var desktopScreen = document.getElementById('desktopScreen');
+
+/* ===== Step state ===== */
+var step = 1;            // 1..5, then 6 = signed in
+var spinnerTimer = null;
+
+var INSTRUCTIONS = {
+  1: 'Click in the box that says Username.',
+  2: 'Type the username. In class, copy it from the whiteboard.',
+  3: 'Press the Tab key on your keyboard. It moves you to the Password box.',
+  4: 'Type the password. It shows as dots to keep it private.',
+  5: 'Press the Enter key, or click the blue arrow, to sign in.'
+};
+
+function setStep(n){
+  step = n;
+  if (n >= 1 && n <= 5){
+    stepBadge.textContent = 'Step ' + n + ' of 5';
+    instruction.textContent = INSTRUCTIONS[n];
+  }
+  updateHighlight();
+}
+
+function updateHighlight(){
+  usernameField.classList.remove('glow');
+  passwordField.classList.remove('glow');
+  signinBtn.classList.remove('glow');
+  if (step === 1 || step === 2 || step === 3){
+    usernameField.classList.add('glow');
+  } else if (step === 4){
+    passwordField.classList.add('glow');
+  } else if (step === 5){
+    signinBtn.classList.add('glow');
+  }
+}
+
+function setHint(msg){
+  hint.textContent = msg || '';
+}
+
+function showScreen(el){
+  lockScreen.classList.remove('active');
+  spinnerScreen.classList.remove('active');
+  desktopScreen.classList.remove('active');
+  el.classList.add('active');
+}
+
+/* ===== Step 1: click the Username box ===== */
+usernameInput.addEventListener('focus', function(){
+  if (step === 1){
+    setStep(2);
+    setHint('Good, the Username box is ready.');
+  }
+});
+
+/* ===== Step 2: type a username (any non-empty text) ===== */
+usernameInput.addEventListener('input', function(){
+  if (usernameInput.value.trim() !== ''){
+    if (step <= 2){
+      setStep(3);
+      setHint('Nice typing. Now find the Tab key, on the left of your keyboard.');
+    }
+  } else if (step === 3){
+    setStep(2);
+    setHint('');
+  }
+});
+
+/* ===== Step 3: press Tab (the taught skill); Enter here is forgiven ===== */
+usernameInput.addEventListener('keydown', function(e){
+  if (e.key === 'Tab' && !e.shiftKey){
+    e.preventDefault();
+    if (usernameInput.value.trim() === ''){
+      setHint('First, type a username in this box. Then press Tab.');
+      return;
+    }
+    passwordInput.focus();
+    if (step <= 3){
+      setStep(4);
+      setHint('Well done, Tab moved you to the Password box.');
+    }
+  } else if (e.key === 'Enter'){
+    e.preventDefault();
+    attemptSignIn();
+  }
+});
+
+/* ===== Fallback: clicking the Password box also works ===== */
+passwordInput.addEventListener('focus', function(){
+  if (step === 3 && usernameInput.value.trim() !== ''){
+    setStep(4);
+    setHint('That works too. Now type the password.');
+  }
+});
+
+/* ===== Step 4: type a password (any non-empty entry, shown as dots) ===== */
+passwordInput.addEventListener('input', function(){
+  if (passwordInput.value !== ''){
+    if (step <= 4 && usernameInput.value.trim() !== ''){
+      setStep(5);
+      setHint('Almost there. The dots keep your password private.');
+    }
+  } else if (step === 5){
+    setStep(4);
+    setHint('');
+  }
+});
+
+/* ===== Step 5: press Enter, or click the sign-in arrow ===== */
+passwordInput.addEventListener('keydown', function(e){
+  if (e.key === 'Enter'){
+    e.preventDefault();
+    attemptSignIn();
+  }
+});
+signinBtn.addEventListener('click', attemptSignIn);
+
+/* ===== Sign in: any non-empty username and password succeeds ===== */
+function attemptSignIn(){
+  if (usernameInput.value.trim() === ''){
+    setStep(step <= 2 ? step : 2);
+    usernameInput.focus();
+    setHint('Nearly there. Type a username first, any name is fine.');
+    return;
+  }
+  if (passwordInput.value === ''){
+    if (step < 4){ setStep(4); }
+    passwordInput.focus();
+    setHint('Nearly there. Type a password first, any word is fine.');
+    return;
+  }
+  step = 6;
+  setHint('');
+  stepBadge.textContent = 'Done!';
+  instruction.textContent = 'Signing you in now…';
+  updateHighlight();
+  showScreen(spinnerScreen);
+  spinnerTimer = setTimeout(showDesktop, 1800);
+}
+
+function showDesktop(){
+  setDesktopClock();
+  showScreen(desktopScreen);
+  stepBadge.textContent = 'Done!';
+  instruction.textContent = 'You did it. This desktop will stay on screen until you click Start again.';
+}
+
+/* Clock is set once at sign-in, then holds still for the screenshot */
+function setDesktopClock(){
+  var now = new Date();
+  var time = now.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' });
+  var date = now.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('tbClock').innerHTML = time + '<br>' + date;
+}
+
+/* ===== Reset / Start again ===== */
+function resetSim(){
+  if (spinnerTimer){ clearTimeout(spinnerTimer); spinnerTimer = null; }
+  usernameInput.value = '';
+  passwordInput.value = '';
+  setHint('');
+  showScreen(lockScreen);
+  setStep(1);
+}
+document.getElementById('resetBtn').addEventListener('click', resetSim);
+document.getElementById('againBtn').addEventListener('click', resetSim);
+
+/* Initial state */
+setStep(1);
+</script>
+</body>
+</html>

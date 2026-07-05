@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shutdown Simulator</title>
+<style>
+/* ============ Theme variables ============ */
+:root {
+  --font: "Segoe UI", Tahoma, Arial, sans-serif;
+  --fs: 16px;
+  --fs-sm: 14px;
+  --fs-xs: 13px;
+  --fs-lg: 18px;
+  --fs-xl: 30px;
+
+  --surface: #FFFFFF;
+  --text: #1A1A1A;
+  --text-muted: #666;
+  --border: #E5E5E5;
+  --blue: #0078D4;
+  --blue-dark: #005A9E;
+  --green: #107C10;
+  --green-light: #DFF6DD;
+  --warn-bg: #FFF4CE;
+  --warn-border: #F2C811;
+  --warn-text: #6B5900;
+  --red: #E81123;
+
+  --wallpaper: linear-gradient(135deg, #0B3D78 0%, #1565B3 45%, #3F97DD 80%, #7CC0F0 100%);
+  --win-bg: #FFFFFF;
+  --win-border: #9DB2C8;
+  --win-title-bg: #F0F3F7;
+  --win-text: #333;
+  --taskbar-bg: #1F2A38;
+  --taskbar-text: #FFFFFF;
+  --menu-bg: #F3F6FA;
+  --menu-border: #B9C6D4;
+  --menu-text: #1A1A1A;
+  --hint: #FFB900;
+  --tick: #39D353;
+}
+
+body.larger-text { --fs: 19px; --fs-sm: 17px; --fs-xs: 15px; --fs-lg: 22px; --fs-xl: 36px; }
+body.high-contrast {
+  --surface: #1A1A1A; --text: #FFF; --text-muted: #CCC; --border: #555;
+  --blue: #4FC3F7; --blue-dark: #4FC3F7;
+  --green: #7CE87C; --green-light: #0A1F0A;
+  --warn-bg: #2A2200; --warn-border: #F2C811; --warn-text: #FFE082;
+  --wallpaper: #000000;
+  --win-bg: #111; --win-border: #FFF; --win-title-bg: #222; --win-text: #FFF;
+  --taskbar-bg: #000; --taskbar-text: #FFF;
+  --menu-bg: #111; --menu-border: #FFF; --menu-text: #FFF;
+  --hint: #FFD54F;
+}
+
+* { box-sizing: border-box; }
+html { font-size: var(--fs); }
+body {
+  font-family: var(--font); color: var(--text); background: var(--surface);
+  margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* ============ Accessibility bar ============ */
+.a11y-bar {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 6px 16px; display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+}
+.a11y-bar label { font-size: var(--fs-xs); color: var(--text-muted); display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.a11y-bar input[type="checkbox"] { width: 16px; height: 16px; }
+.a11y-title { font-weight: 600; font-size: var(--fs-xs); margin-right: 6px; color: var(--text); }
+
+/* ============ Guide strip ============ */
+.guide-strip {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; flex-wrap: wrap;
+}
+.step-badge {
+  background: var(--blue); color: #FFF; font-weight: 700; font-size: var(--fs-sm);
+  padding: 6px 14px; border-radius: 16px; white-space: nowrap;
+}
+body.high-contrast .step-badge { background: #003A6B; border: 1px solid var(--blue); }
+.guide-msg { font-size: var(--fs); flex: 1; min-width: 200px; padding: 4px 8px; border-radius: 6px; }
+.guide-msg.msg-good { color: var(--green); font-weight: 600; }
+.guide-msg.msg-warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text); font-weight: 600; }
+.reset-btn {
+  font-family: var(--font); font-size: var(--fs-sm); font-weight: 600;
+  background: var(--surface); color: var(--text); border: 2px solid var(--border);
+  border-radius: 8px; padding: 8px 16px; cursor: pointer; min-height: 40px;
+}
+.reset-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ============ Desktop stage ============ */
+.desktop {
+  position: relative; flex: 1; background: var(--wallpaper); overflow: hidden; min-height: 0;
+}
+.desk-icons { position: absolute; top: 14px; left: 14px; display: flex; flex-direction: column; gap: 16px; pointer-events: none; }
+.desk-icon { text-align: center; color: #FFF; font-size: var(--fs-xs); width: 76px; text-shadow: 0 1px 3px rgba(0,0,0,.7); }
+.desk-icon .di-glyph { font-size: 34px; display: block; }
+body.high-contrast .desk-icon { color: #FFF; }
+
+/* ============ Program windows ============ */
+.app-window {
+  position: absolute; background: var(--win-bg); border: 1px solid var(--win-border);
+  border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.35); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.win-titlebar {
+  display: flex; align-items: center; gap: 8px; background: var(--win-title-bg);
+  border-bottom: 1px solid var(--win-border); padding: 0 0 0 12px; min-height: 40px;
+}
+.win-title { font-size: var(--fs-sm); font-weight: 600; color: var(--win-text); flex: 1; }
+.win-close {
+  font-family: var(--font); font-size: 20px; line-height: 1; font-weight: 400;
+  width: 52px; min-height: 40px; align-self: stretch; border: none; cursor: pointer;
+  background: transparent; color: var(--win-text); border-radius: 0 7px 0 0;
+}
+.win-close:hover, .win-close:focus-visible { background: var(--red); color: #FFF; }
+.win-body { padding: 12px 14px; font-size: var(--fs-sm); color: var(--win-text); flex: 1; }
+#winNotepad { left: 12%; top: 8%; width: 340px; max-width: 46vw; height: 240px; }
+#winCalc { right: 10%; top: 20%; width: 250px; }
+#winNotepad .win-body { font-family: Consolas, "Courier New", monospace; white-space: pre-line; }
+
+.calc-display {
+  background: var(--win-title-bg); border: 1px solid var(--win-border); border-radius: 6px;
+  text-align: right; font-size: 26px; font-weight: 600; padding: 8px 12px; margin-bottom: 10px; color: var(--win-text);
+}
+.calc-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.calc-key {
+  background: var(--win-title-bg); border: 1px solid var(--win-border); border-radius: 6px;
+  text-align: center; padding: 8px 0; font-size: var(--fs-sm); color: var(--win-text); user-select: none;
+}
+
+/* Nudge wobble */
+@keyframes wobble {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); } 40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); } 80% { transform: translateX(5px); }
+}
+.wobble { animation: wobble .5s ease; }
+
+/* Hint pulse on the next thing to click */
+@keyframes hintPulse {
+  0%,100% { box-shadow: 0 0 0 3px var(--hint), 0 0 14px 4px var(--hint); }
+  50% { box-shadow: 0 0 0 6px var(--hint), 0 0 22px 8px var(--hint); }
+}
+.hint-pulse { animation: hintPulse 1.4s ease-in-out infinite; position: relative; z-index: 5; }
+
+/* ============ Taskbar ============ */
+.taskbar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 56px;
+  background: var(--taskbar-bg); display: flex; align-items: stretch; gap: 6px;
+  padding: 0 10px 0 0; z-index: 50;
+}
+body.high-contrast .taskbar { border-top: 2px solid #FFF; }
+.start-btn {
+  font-family: var(--font); font-size: var(--fs-sm); font-weight: 600;
+  display: flex; align-items: center; gap: 8px; padding: 0 18px;
+  background: transparent; color: var(--taskbar-text); border: none; cursor: pointer;
+}
+.start-btn:hover, .start-btn:focus-visible { background: rgba(255,255,255,.15); }
+.start-btn svg { width: 22px; height: 22px; }
+.task-app {
+  font-family: var(--font); font-size: var(--fs-xs); color: var(--taskbar-text);
+  display: flex; align-items: center; gap: 6px; padding: 0 14px; margin: 6px 0;
+  background: rgba(255,255,255,.12); border: none; border-bottom: 3px solid #7CC0F0;
+  border-radius: 4px; cursor: pointer;
+}
+.task-app:hover { background: rgba(255,255,255,.22); }
+.task-clock { margin-left: auto; color: var(--taskbar-text); font-size: var(--fs-xs); display: flex; align-items: center; padding: 0 8px; }
+
+/* ============ Start menu ============ */
+.start-menu {
+  display: none; position: absolute; left: 8px; bottom: 62px; width: 300px; max-width: 80vw;
+  background: var(--menu-bg); border: 1px solid var(--menu-border); border-radius: 10px;
+  box-shadow: 0 12px 34px rgba(0,0,0,.4); z-index: 60; overflow: hidden;
+}
+.start-menu.show { display: block; }
+.sm-user { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--menu-border); color: var(--menu-text); font-size: var(--fs-sm); font-weight: 600; }
+.sm-user .sm-avatar { font-size: 24px; }
+.sm-apps { padding: 8px; }
+.sm-app { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; color: var(--menu-text); font-size: var(--fs-sm); }
+.sm-app:hover { background: rgba(0,120,212,.12); }
+body.high-contrast .sm-app:hover { background: #222; }
+.sm-footer { border-top: 1px solid var(--menu-border); padding: 8px; }
+.power-btn {
+  font-family: var(--font); font-size: var(--fs); font-weight: 600;
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px;
+  background: transparent; color: var(--menu-text); border: none; border-radius: 8px;
+  padding: 8px 12px; cursor: pointer; text-align: left;
+}
+.power-btn:hover, .power-btn:focus-visible { background: rgba(0,120,212,.15); }
+body.high-contrast .power-btn:hover, body.high-contrast .power-btn:focus-visible { background: #222; }
+.power-glyph { font-size: 22px; line-height: 1; }
+
+/* ============ Power options ============ */
+.power-menu {
+  display: none; position: absolute; left: 8px; bottom: 62px; width: 280px; max-width: 80vw;
+  background: var(--menu-bg); border: 1px solid var(--menu-border); border-radius: 10px;
+  box-shadow: 0 12px 34px rgba(0,0,0,.4); z-index: 60; padding: 10px; flex-direction: column; gap: 8px;
+}
+.power-menu.show { display: flex; }
+.pm-heading { font-size: var(--fs-xs); font-weight: 700; color: var(--menu-text); padding: 2px 6px 6px; }
+.power-opt {
+  font-family: var(--font); font-size: var(--fs); font-weight: 600;
+  display: flex; align-items: center; gap: 12px; min-height: 56px;
+  background: var(--surface); color: var(--menu-text); border: 1px solid var(--menu-border);
+  border-radius: 8px; padding: 8px 14px; cursor: pointer; text-align: left;
+}
+.power-opt:hover, .power-opt:focus-visible { border-color: var(--blue); background: rgba(0,120,212,.1); }
+body.high-contrast .power-opt { background: #111; }
+body.high-contrast .power-opt:hover, body.high-contrast .power-opt:focus-visible { background: #222; }
+.power-opt .po-glyph { font-size: 22px; width: 28px; text-align: center; }
+
+/* ============ Shutting down and completion screens ============ */
+.shutting {
+  display: none; position: absolute; inset: 0; z-index: 100;
+  background: #0B1220; color: #FFF; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+}
+.shutting.show { display: flex; }
+.spinner {
+  width: 46px; height: 46px; border: 5px solid rgba(255,255,255,.25); border-top-color: #FFF;
+  border-radius: 50%; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.shutting p { font-size: var(--fs-lg); margin: 0; }
+
+.complete {
+  display: none; position: absolute; inset: 0; z-index: 110;
+  background: #05060A; color: #FFF; flex-direction: column; align-items: center; justify-content: center;
+  gap: 18px; text-align: center; padding: 24px;
+}
+.complete.show { display: flex; }
+.tick-circle {
+  width: 110px; height: 110px; border: 5px solid var(--tick); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 62px; color: var(--tick); line-height: 1;
+}
+.complete h1 { font-size: var(--fs-xl); font-weight: 700; margin: 0; color: #FFF; }
+.screenshot-cue {
+  font-size: var(--fs-lg); font-weight: 700; color: #FFD54F;
+  background: rgba(255,213,79,.12); border: 2px solid #FFD54F; border-radius: 10px; padding: 12px 20px;
+}
+.complete .id-line { font-size: var(--fs-sm); color: #9AA7B8; margin: 0; }
+.complete .again-btn {
+  font-family: var(--font); font-size: var(--fs-sm); margin-top: 14px;
+  background: transparent; color: #9AA7B8; border: 1px solid #3A4656; border-radius: 8px;
+  padding: 10px 18px; cursor: pointer; min-height: 44px;
+}
+.complete .again-btn:hover { color: #FFF; border-color: #FFF; }
+</style>
+</head>
+<body>
+
+<!-- A11y bar -->
+<div class="a11y-bar">
+  <span class="a11y-title">Accessibility:</span>
+  <label><input type="checkbox" id="toggleLargeText"> Larger Text</label>
+  <label><input type="checkbox" id="toggleHighContrast"> High Contrast</label>
+</div>
+
+<!-- Guide strip -->
+<div class="guide-strip">
+  <span class="step-badge" id="stepBadge">Step 1 of 5</span>
+  <span class="guide-msg" id="guideMsg" aria-live="polite"></span>
+  <button class="reset-btn" id="resetBtn" type="button" onclick="resetSim()">&#8635; Start again</button>
+</div>
+
+<!-- Desktop -->
+<div class="desktop" id="desktop">
+
+  <div class="desk-icons" aria-hidden="true">
+    <div class="desk-icon"><span class="di-glyph">&#128421;&#65039;</span>This PC</div>
+    <div class="desk-icon"><span class="di-glyph">&#128465;&#65039;</span>Recycle Bin</div>
+  </div>
+
+  <!-- Notepad window -->
+  <div class="app-window" id="winNotepad" role="dialog" aria-label="Notepad window">
+    <div class="win-titlebar">
+      <span aria-hidden="true">&#128221;</span>
+      <span class="win-title">Notepad</span>
+      <button class="win-close" type="button" data-win="notepad" aria-label="Close Notepad">&#10005;</button>
+    </div>
+    <div class="win-body">Shopping list
+- bread
+- milk
+- tea bags</div>
+  </div>
+
+  <!-- Calculator window -->
+  <div class="app-window" id="winCalc" role="dialog" aria-label="Calculator window">
+    <div class="win-titlebar">
+      <span aria-hidden="true">&#128425;&#65039;</span>
+      <span class="win-title">Calculator</span>
+      <button class="win-close" type="button" data-win="calc" aria-label="Close Calculator">&#10005;</button>
+    </div>
+    <div class="win-body">
+      <div class="calc-display">128</div>
+      <div class="calc-keys" aria-hidden="true">
+        <div class="calc-key">7</div><div class="calc-key">8</div><div class="calc-key">9</div><div class="calc-key">&#247;</div>
+        <div class="calc-key">4</div><div class="calc-key">5</div><div class="calc-key">6</div><div class="calc-key">&#215;</div>
+        <div class="calc-key">1</div><div class="calc-key">2</div><div class="calc-key">3</div><div class="calc-key">&#8722;</div>
+        <div class="calc-key">0</div><div class="calc-key">.</div><div class="calc-key">=</div><div class="calc-key">+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start menu -->
+  <div class="start-menu" id="startMenu" role="menu" aria-label="Start menu">
+    <div class="sm-user"><span class="sm-avatar" aria-hidden="true">&#128100;</span> Training User</div>
+    <div class="sm-apps" aria-hidden="true">
+      <div class="sm-app"><span>&#128221;</span> Notepad</div>
+      <div class="sm-app"><span>&#128425;&#65039;</span> Calculator</div>
+      <div class="sm-app"><span>&#9993;&#65039;</span> Mail</div>
+      <div class="sm-app"><span>&#127912;</span> Paint</div>
+    </div>
+    <div class="sm-footer">
+      <button class="power-btn" type="button" id="powerBtn" aria-label="Power">
+        <span class="power-glyph" aria-hidden="true">&#9211;</span> Power
+      </button>
+    </div>
+  </div>
+
+  <!-- Power options -->
+  <div class="power-menu" id="powerMenu" role="menu" aria-label="Power options">
+    <div class="pm-heading">Power options</div>
+    <button class="power-opt" type="button" data-choice="sleep"><span class="po-glyph" aria-hidden="true">&#127769;</span> Sleep</button>
+    <button class="power-opt" type="button" data-choice="restart"><span class="po-glyph" aria-hidden="true">&#128260;</span> Restart</button>
+    <button class="power-opt" type="button" id="shutdownBtn" data-choice="shutdown"><span class="po-glyph" aria-hidden="true">&#9211;</span> Shut Down</button>
+  </div>
+
+  <!-- Taskbar -->
+  <div class="taskbar">
+    <button class="start-btn" type="button" id="startBtn" aria-label="Start">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="2" y="2" width="9" height="9" fill="#7CC0F0"/>
+        <rect x="13" y="2" width="9" height="9" fill="#7CC0F0"/>
+        <rect x="2" y="13" width="9" height="9" fill="#7CC0F0"/>
+        <rect x="13" y="13" width="9" height="9" fill="#7CC0F0"/>
+      </svg>
+      Start
+    </button>
+    <button class="task-app" type="button" id="taskNotepad" data-win="notepad"><span aria-hidden="true">&#128221;</span> Notepad</button>
+    <button class="task-app" type="button" id="taskCalc" data-win="calc"><span aria-hidden="true">&#128425;&#65039;</span> Calculator</button>
+    <div class="task-clock" id="taskClock"></div>
+  </div>
+
+  <!-- Shutting down -->
+  <div class="shutting" id="shuttingScreen" role="status">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Shutting down&#8230;</p>
+  </div>
+
+  <!-- Completion screen (the screenshot) -->
+  <div class="complete" id="completeScreen" role="status">
+    <div class="tick-circle" aria-hidden="true">&#10003;</div>
+    <h1>&#10003; Shutdown complete &#8212; the computer is now off.</h1>
+    <div class="screenshot-cue">&#128247; Take your screenshot of this screen now.</div>
+    <p class="id-line">Safe shutdown &#8212; Session Shutdown activity</p>
+    <button class="again-btn" type="button" onclick="resetSim()">&#8635; Start again</button>
+  </div>
+
+</div>
+
+<script>
+// ===== ACCESSIBILITY =====
+document.getElementById('toggleLargeText').addEventListener('change', function(){ document.body.classList.toggle('larger-text', this.checked); });
+document.getElementById('toggleHighContrast').addEventListener('change', function(){ document.body.classList.toggle('high-contrast', this.checked); });
+
+// ===== STATE =====
+var WINDOWS = {
+  notepad: { name: 'Notepad', win: 'winNotepad', task: 'taskNotepad' },
+  calc:    { name: 'Calculator', win: 'winCalc', task: 'taskCalc' }
+};
+var state = { open: { notepad: true, calc: true }, startOpen: false, powerOpen: false, phase: 'desktop' };
+var shutTimer = null;
+
+function el(id) { return document.getElementById(id); }
+function openKeys() {
+  var keys = [];
+  for (var k in WINDOWS) { if (state.open[k]) { keys.push(k); } }
+  return keys;
+}
+
+// ===== GUIDE STRIP =====
+function setGuide(step, msg, tone) {
+  el('stepBadge').textContent = 'Step ' + step + ' of 5';
+  var m = el('guideMsg');
+  m.textContent = msg;
+  m.className = 'guide-msg' + (tone ? ' msg-' + tone : '');
+}
+
+function clearHints() {
+  var hinted = document.querySelectorAll('.hint-pulse');
+  for (var i = 0; i < hinted.length; i++) { hinted[i].classList.remove('hint-pulse'); }
+}
+function addHint(elm) { if (elm) { elm.classList.add('hint-pulse'); } }
+
+// Recompute the current step, hints and (optionally) show a custom message.
+function refresh(msg, tone) {
+  clearHints();
+  if (state.phase === 'shutting' || state.phase === 'done') {
+    setGuide(5, msg || 'Wait for the screen to go black. The computer is now off.', tone);
+    return;
+  }
+  var open = openKeys();
+  if (open.length > 0) {
+    for (var i = 0; i < open.length; i++) {
+      addHint(el(WINDOWS[open[i]].win).querySelector('.win-close'));
+    }
+    setGuide(1, msg || 'Close all open programs. Click the X in the top right corner of each one.', tone);
+  } else if (state.powerOpen) {
+    addHint(el('shutdownBtn'));
+    setGuide(4, msg || 'Click Shut Down.', tone);
+  } else if (state.startOpen) {
+    addHint(el('powerBtn'));
+    setGuide(3, msg || 'Click the power symbol (⏻) in the Start menu.', tone);
+  } else {
+    addHint(el('startBtn'));
+    setGuide(2, msg || 'Click the Start button in the bottom left corner.', tone);
+  }
+}
+
+// ===== CLOSING WINDOWS =====
+function closeWindow(key) {
+  state.open[key] = false;
+  el(WINDOWS[key].win).style.display = 'none';
+  el(WINDOWS[key].task).style.display = 'none';
+  var left = openKeys();
+  if (left.length > 0) {
+    refresh('Well done, ' + WINDOWS[key].name + ' is closed. Now close ' + WINDOWS[left[0]].name + ' with its X.', 'good');
+  } else {
+    refresh('Great work, all programs are closed. Now click the Start button in the bottom left corner.', 'good');
+  }
+}
+
+function wobbleWindow(key) {
+  var w = el(WINDOWS[key].win);
+  w.classList.remove('wobble');
+  void w.offsetWidth; // restart the animation
+  w.classList.add('wobble');
+}
+
+var closeBtns = document.querySelectorAll('.win-close');
+for (var i = 0; i < closeBtns.length; i++) {
+  closeBtns[i].addEventListener('click', function (e) {
+    e.stopPropagation();
+    closeWindow(this.getAttribute('data-win'));
+  });
+}
+
+// Taskbar app buttons gently point back to the window.
+var taskBtns = document.querySelectorAll('.task-app');
+for (var t = 0; t < taskBtns.length; t++) {
+  taskBtns[t].addEventListener('click', function (e) {
+    e.stopPropagation();
+    var key = this.getAttribute('data-win');
+    if (state.open[key]) {
+      wobbleWindow(key);
+      refresh('That is ' + WINDOWS[key].name + '. Click the X in its top right corner to close it.', 'warn');
+    }
+  });
+}
+
+// ===== START BUTTON =====
+el('startBtn').addEventListener('click', function (e) {
+  e.stopPropagation();
+  if (state.phase !== 'desktop') { return; }
+  var open = openKeys();
+  if (open.length > 0) {
+    // Gentle nudge towards the remaining window(s); guide, do not scold.
+    for (var i = 0; i < open.length; i++) { wobbleWindow(open[i]); }
+    var names = open.map(function (k) { return WINDOWS[k].name; }).join(' and ');
+    refresh('Nearly there. First close ' + names + '; click the X in the top right corner.', 'warn');
+    return;
+  }
+  if (state.startOpen || state.powerOpen) {
+    state.startOpen = false; state.powerOpen = false;
+  } else {
+    state.startOpen = true; state.powerOpen = false;
+  }
+  el('startMenu').classList.toggle('show', state.startOpen);
+  el('powerMenu').classList.toggle('show', state.powerOpen);
+  refresh();
+});
+
+// ===== POWER SYMBOL =====
+el('powerBtn').addEventListener('click', function (e) {
+  e.stopPropagation();
+  state.startOpen = false;
+  state.powerOpen = true;
+  el('startMenu').classList.remove('show');
+  el('powerMenu').classList.add('show');
+  refresh('Good. Now click Shut Down for a safe shutdown.', 'good');
+});
+
+// Decorative Start menu apps: keep the student on track.
+var smApps = document.querySelectorAll('.sm-app');
+for (var s = 0; s < smApps.length; s++) {
+  smApps[s].addEventListener('click', function (e) {
+    e.stopPropagation();
+    refresh('Not this one. Click the power symbol (⏻) at the bottom of the Start menu.', 'warn');
+  });
+}
+
+// ===== POWER OPTIONS =====
+var powerOpts = document.querySelectorAll('.power-opt');
+for (var p = 0; p < powerOpts.length; p++) {
+  powerOpts[p].addEventListener('click', function (e) {
+    e.stopPropagation();
+    var choice = this.getAttribute('data-choice');
+    if (choice === 'shutdown') {
+      startShutdown();
+    } else {
+      refresh('For a safe shutdown, choose Shut Down.', 'warn');
+    }
+  });
+}
+
+function startShutdown() {
+  state.powerOpen = false;
+  state.startOpen = false;
+  state.phase = 'shutting';
+  el('startMenu').classList.remove('show');
+  el('powerMenu').classList.remove('show');
+  el('shuttingScreen').classList.add('show');
+  refresh('Wait for the screen to go black. The computer is now off.');
+  shutTimer = setTimeout(function () {
+    state.phase = 'done';
+    el('shuttingScreen').classList.remove('show');
+    el('completeScreen').classList.add('show');
+    refresh('The computer is now off. Take your screenshot, then click Start again when you are ready.', 'good');
+  }, 2600);
+}
+
+// ===== DESKTOP CLICKS CLOSE THE MENUS =====
+el('desktop').addEventListener('click', function (e) {
+  if (state.phase !== 'desktop') { return; }
+  if (e.target.closest('.app-window, .start-menu, .power-menu, .taskbar')) { return; }
+  if (state.startOpen || state.powerOpen) {
+    state.startOpen = false; state.powerOpen = false;
+    el('startMenu').classList.remove('show');
+    el('powerMenu').classList.remove('show');
+    refresh();
+  }
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && state.phase === 'desktop' && (state.startOpen || state.powerOpen)) {
+    state.startOpen = false; state.powerOpen = false;
+    el('startMenu').classList.remove('show');
+    el('powerMenu').classList.remove('show');
+    refresh();
+  }
+});
+
+// ===== RESET =====
+function resetSim() {
+  if (shutTimer) { clearTimeout(shutTimer); shutTimer = null; }
+  state.phase = 'desktop';
+  state.startOpen = false;
+  state.powerOpen = false;
+  for (var k in WINDOWS) {
+    state.open[k] = true;
+    el(WINDOWS[k].win).style.display = '';
+    el(WINDOWS[k].task).style.display = '';
+  }
+  el('startMenu').classList.remove('show');
+  el('powerMenu').classList.remove('show');
+  el('shuttingScreen').classList.remove('show');
+  el('completeScreen').classList.remove('show');
+  refresh('Let’s practise a safe shutdown. Close all open programs first; click the X in the top right corner of each one.');
+}
+
+// ===== CLOCK =====
+function updateClock() {
+  var now = new Date();
+  el('taskClock').textContent = now.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' });
+}
+updateClock();
+setInterval(updateClock, 30000);
+
+// ===== INITIAL STATE =====
+refresh('Let’s practise a safe shutdown. Close all open programs first; click the X in the top right corner of each one.');
+</script>
+</body>
+</html>

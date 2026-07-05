@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outlook Calendar Simulation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --outlook-blue: #0078d4;
+            --outlook-blue-dark: #005a9e;
+            --outlook-blue-light: #deecf9;
+            --outlook-hover: #c7e0f4;
+            --sidebar-bg: #f3f2f1;
+            --border-color: #edebe9;
+            --text-primary: #323130;
+            --text-secondary: #605e5c;
+            --white: #ffffff;
+            --today-highlight: #0078d4;
+            --event-blue: #0078d4;
+            --event-green: #107c10;
+            --event-purple: #8764b8;
+            --event-orange: #ca5010;
+            --event-teal: #038387;
+            --font-size-base: 14px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+            min-height: 100vh;
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+        }
+
+        body.large-text {
+            --font-size-base: 18px;
+        }
+
+        body.high-contrast {
+            --outlook-blue: #1aebff;
+            --outlook-blue-dark: #000000;
+            --outlook-blue-light: #1a1a2e;
+            --outlook-hover: #2a2a4a;
+            --sidebar-bg: #0a0a1a;
+            --border-color: #ffffff;
+            --text-primary: #ffffff;
+            --text-secondary: #ffff00;
+            --white: #000000;
+            --today-highlight: #1aebff;
+            --event-blue: #1aebff;
+            --event-green: #3cff3c;
+            --event-purple: #c8a8ff;
+            --event-orange: #ff8c00;
+            --event-teal: #00e5e8;
+        }
+
+        /* ===== TOP HEADER ===== */
+        .outlook-header {
+            background: var(--outlook-blue);
+            color: white;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 48px;
+        }
+
+        .outlook-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .outlook-logo {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .outlook-logo svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .header-search {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            padding: 6px 12px;
+            color: white;
+            font-size: 13px;
+            width: 280px;
+        }
+
+        .header-search::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* ===== RIBBON ===== */
+        .ribbon {
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 6px 16px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .ribbon-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border: none;
+            background: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+
+        .ribbon-btn:hover {
+            background: var(--outlook-hover);
+        }
+
+        .ribbon-btn.primary {
+            background: var(--outlook-blue);
+            color: white;
+            font-weight: 600;
+        }
+
+        .ribbon-btn.primary:hover {
+            background: var(--outlook-blue-dark);
+        }
+
+        .ribbon-sep {
+            width: 1px;
+            height: 28px;
+            background: var(--border-color);
+            margin: 0 6px;
+        }
+
+        .ribbon-btn svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-layout {
+            display: flex;
+            height: calc(100vh - 48px - 46px);
+        }
+
+        /* ===== LEFT SIDEBAR ===== */
+        .sidebar {
+            width: 220px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 12px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .mini-cal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0 8px;
+            font-weight: 600;
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+        }
+
+        .mini-cal-nav {
+            display: flex;
+            gap: 4px;
+        }
+
+        .mini-cal-nav button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .mini-cal-nav button:hover {
+            background: var(--outlook-hover);
+        }
+
+        .mini-cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .mini-cal-grid .day-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            font-weight: 600;
+        }
+
+        .mini-cal-grid .day-cell {
+            font-size: 12px;
+            padding: 4px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1px auto;
+            transition: background 0.15s;
+        }
+
+        .mini-cal-grid .day-cell:hover {
+            background: var(--outlook-hover);
+        }
+
+        .mini-cal-grid .day-cell.today {
+            background: var(--today-highlight);
+            color: white;
+            font-weight: 700;
+        }
+
+        .mini-cal-grid .day-cell.other-month {
+            color: #c8c6c4;
+        }
+
+        .mini-cal-grid .day-cell.has-event {
+            font-weight: 700;
+        }
+
+        /* Sidebar nav */
+        .sidebar-nav {
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+        }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-primary);
+            transition: background 0.15s;
+        }
+
+        .sidebar-nav-item:hover {
+            background: var(--outlook-hover);
+        }
+
+        .sidebar-nav-item.active {
+            background: var(--outlook-blue-light);
+            font-weight: 600;
+        }
+
+        .sidebar-nav-item.disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .sidebar-nav-item svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== CALENDAR MAIN VIEW ===== */
+        .calendar-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--white);
+            overflow: hidden;
+        }
+
+        .cal-view-header {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cal-month-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .cal-view-toggle {
+            display: flex;
+            gap: 2px;
+            background: var(--sidebar-bg);
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        .view-toggle-btn {
+            padding: 5px 14px;
+            border: none;
+            background: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .view-toggle-btn.active {
+            background: var(--white);
+            color: var(--text-primary);
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Month grid */
+        .month-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: auto;
+            overflow-y: auto;
+        }
+
+        .month-grid .col-header {
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .month-grid .date-cell {
+            border: 1px solid var(--border-color);
+            min-height: 90px;
+            padding: 4px;
+            cursor: pointer;
+            transition: background 0.15s;
+            position: relative;
+        }
+
+        .month-grid .date-cell:hover {
+            background: #f5f5f5;
+        }
+
+        body.high-contrast .month-grid .date-cell:hover {
+            background: #1a1a3a;
+        }
+
+        .month-grid .date-cell .date-num {
+            font-size: 13px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            display: inline-block;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .month-grid .date-cell.today .date-num {
+            background: var(--today-highlight);
+            color: white;
+            font-weight: 700;
+        }
+
+        .month-grid .date-cell.other-month {
+            background: #fafafa;
+        }
+
+        body.high-contrast .month-grid .date-cell.other-month {
+            background: #050510;
+        }
+
+        .month-grid .date-cell.other-month .date-num {
+            color: #c8c6c4;
+        }
+
+        .event-bar {
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .event-bar:hover {
+            filter: brightness(1.15);
+        }
+
+        .event-bar.blue { background: var(--event-blue); }
+        .event-bar.green { background: var(--event-green); }
+        .event-bar.purple { background: var(--event-purple); }
+        .event-bar.orange { background: var(--event-orange); }
+        .event-bar.teal { background: var(--event-teal); }
+
+        /* ===== PEOPLE VIEW (Week schedule) ===== */
+        .people-view {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            background: var(--white);
+            overflow: hidden;
+        }
+
+        .people-view.active {
+            display: flex;
+        }
+
+        .calendar-main.hidden {
+            display: none;
+        }
+
+        .people-header {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .people-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .people-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--event-purple);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .people-name-block h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .people-name-block p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .people-week-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .people-week-nav button {
+            padding: 5px 10px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .people-week-nav button:hover {
+            background: var(--sidebar-bg);
+        }
+
+        .people-week-label {
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        /* Week grid */
+        .week-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 70px repeat(5, 1fr);
+            overflow-y: auto;
+        }
+
+        .week-grid .wg-header {
+            padding: 10px 6px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        .week-grid .wg-header.today-col {
+            color: var(--outlook-blue);
+        }
+
+        .week-grid .wg-header .wg-date-num {
+            display: block;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        .week-grid .wg-header.today-col .wg-date-num {
+            background: var(--today-highlight);
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .week-grid .wg-time-label {
+            padding: 4px 8px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: right;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            height: 60px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+        }
+
+        .week-grid .wg-slot {
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            height: 60px;
+            position: relative;
+            padding: 2px;
+        }
+
+        .week-grid .wg-slot:hover {
+            background: #f5f5f5;
+        }
+
+        body.high-contrast .week-grid .wg-slot:hover {
+            background: #1a1a3a;
+        }
+
+        .wg-event {
+            position: absolute;
+            left: 3px;
+            right: 3px;
+            border-radius: 4px;
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            z-index: 5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+
+        .wg-event:hover {
+            filter: brightness(1.1);
+            z-index: 10;
+        }
+
+        .wg-event .wg-ev-title {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .wg-event .wg-ev-detail {
+            font-size: 11px;
+            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .wg-event.blue { background: var(--event-blue); }
+        .wg-event.green { background: var(--event-green); }
+        .wg-event.purple { background: var(--event-purple); }
+        .wg-event.orange { background: var(--event-orange); }
+        .wg-event.teal { background: var(--event-teal); }
+
+        /* Overlay label showing both calendars */
+        .calendar-overlay-label {
+            display: flex;
+            gap: 16px;
+            padding: 8px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--sidebar-bg);
+            font-size: 13px;
+        }
+
+        .cal-label-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cal-label-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        /* ===== TASK PANEL ===== */
+        .task-panel {
+            width: 320px;
+            background: var(--white);
+            border-left: 1px solid var(--border-color);
+            padding: 16px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .task-panel h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--outlook-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .task-panel h3 svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .task-instruction {
+            background: #fff8e6;
+            border: 1px solid #ffd966;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        body.high-contrast .task-instruction {
+            background: #1a1a00;
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .task-instruction strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .task-scenario {
+            background: #f0f7ff;
+            border: 1px solid #a8d1f0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        body.high-contrast .task-scenario {
+            background: #001a33;
+            border-color: #1aebff;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 6px 0;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .checklist li .check-icon {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #c8c6c4;
+            border-radius: 3px;
+            flex-shrink: 0;
+            margin-top: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .checklist li.done .check-icon {
+            background: #107c10;
+            border-color: #107c10;
+            color: white;
+        }
+
+        .score-display {
+            background: var(--sidebar-bg);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .score-display .score-num {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--outlook-blue);
+        }
+
+        /* ===== MODALS ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 60px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .event-form {
+            background: var(--white);
+            width: 620px;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .event-form-header {
+            background: var(--outlook-blue);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .event-form-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+        }
+
+        .form-ribbon {
+            display: flex;
+            gap: 4px;
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--sidebar-bg);
+        }
+
+        .form-ribbon-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: none;
+            color: var(--text-primary);
+        }
+
+        .form-ribbon-btn:hover {
+            background: var(--outlook-hover);
+        }
+
+        .form-ribbon-btn.send-btn {
+            background: var(--outlook-blue);
+            color: white;
+            font-weight: 600;
+        }
+
+        .form-ribbon-btn.send-btn:hover {
+            background: var(--outlook-blue-dark);
+        }
+
+        .form-ribbon-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .form-body {
+            padding: 16px 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .form-row label {
+            width: 90px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding-top: 8px;
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        .form-row input,
+        .form-row textarea,
+        .form-row select {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid #c8c6c4;
+            border-radius: 4px;
+            font-size: var(--font-size-base);
+            font-family: inherit;
+            color: var(--text-primary);
+            background: var(--white);
+            transition: border-color 0.2s;
+        }
+
+        .form-row input:focus,
+        .form-row textarea:focus,
+        .form-row select:focus {
+            outline: none;
+            border-color: var(--outlook-blue);
+            box-shadow: 0 0 0 1px var(--outlook-blue);
+        }
+
+        .form-row textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-row .time-group {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .form-row .time-group select {
+            width: auto;
+        }
+
+        .form-row .time-group span {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .form-error {
+            color: #a4262c;
+            font-size: 12px;
+            margin-top: 2px;
+            display: none;
+        }
+
+        .form-row.has-error input,
+        .form-row.has-error textarea {
+            border-color: #a4262c;
+        }
+
+        .form-row.has-error .form-error {
+            display: block;
+        }
+
+        .form-field-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Event detail popup */
+        .event-detail {
+            background: var(--white);
+            width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        .event-detail-header {
+            color: white;
+            padding: 14px 20px;
+        }
+
+        .event-detail-header h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: white;
+        }
+
+        .event-detail-header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .event-detail-body {
+            padding: 16px 20px;
+        }
+
+        .event-detail-row {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .event-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .event-detail-row .detail-label {
+            width: 80px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .event-detail-row .detail-value {
+            flex: 1;
+            color: var(--text-primary);
+        }
+
+        .event-detail-actions {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .detail-btn {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            color: var(--text-primary);
+        }
+
+        .detail-btn:hover {
+            background: var(--sidebar-bg);
+        }
+
+        .detail-btn.danger {
+            color: #a4262c;
+            border-color: #a4262c;
+        }
+
+        .detail-btn.danger:hover {
+            background: #fde7e9;
+        }
+
+        /* Toast */
+        .success-toast {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #107c10;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .success-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .task-panel { display: none; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .header-search { display: none; }
+        }
+        @media print {
+            .task-panel, .header-controls { display: none; }
+            .main-layout { height: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="success-toast" id="successToast">
+    <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+    <span id="toastMessage"></span>
+</div>
+
+<!-- ===== HEADER ===== -->
+<div class="outlook-header">
+    <div class="outlook-header-left">
+        <div class="outlook-logo">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            Outlook
+        </div>
+        <input type="text" class="header-search" placeholder="Search calendar" disabled>
+    </div>
+    <div class="header-controls">
+        <button class="header-btn" onclick="toggleLargeText()">Larger Text</button>
+        <button class="header-btn" onclick="toggleHighContrast()">High Contrast</button>
+        <button class="header-btn" onclick="showHelp()">? Help</button>
+    </div>
+</div>
+
+<!-- ===== RIBBON ===== -->
+<div class="ribbon">
+    <button class="ribbon-btn primary" onclick="openNewEvent()">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>
+        New Event
+    </button>
+    <div class="ribbon-sep"></div>
+    <button class="ribbon-btn" onclick="goToToday()">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg>
+        Today
+    </button>
+    <button class="ribbon-btn" onclick="changeMonth(-1)">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/></svg>
+    </button>
+    <button class="ribbon-btn" onclick="changeMonth(1)">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+    </button>
+    <div class="ribbon-sep"></div>
+    <button class="ribbon-btn" onclick="resetAll()">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"/></svg>
+        Reset
+    </button>
+</div>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div class="main-layout">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+        <div class="mini-cal-header">
+            <span id="miniCalTitle"></span>
+            <div class="mini-cal-nav">
+                <button onclick="changeMiniMonth(-1)">&lt;</button>
+                <button onclick="changeMiniMonth(1)">&gt;</button>
+            </div>
+        </div>
+        <div class="mini-cal-grid" id="miniCalGrid"></div>
+
+        <div class="sidebar-nav">
+            <div class="sidebar-nav-item active" id="navCalendar" onclick="switchView('calendar')">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg>
+                Calendar
+            </div>
+            <div class="sidebar-nav-item disabled" style="cursor:default">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                Mail
+            </div>
+            <div class="sidebar-nav-item" id="navPeople" onclick="switchView('people')">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+                People
+            </div>
+        </div>
+    </div>
+
+    <!-- MY CALENDAR (month view) -->
+    <div class="calendar-main" id="calendarView">
+        <div class="cal-view-header">
+            <div class="cal-month-title" id="calMonthTitle"></div>
+            <div class="cal-view-toggle">
+                <button class="view-toggle-btn active">Month</button>
+            </div>
+        </div>
+        <div class="month-grid" id="monthGrid"></div>
+    </div>
+
+    <!-- PEOPLE VIEW (Karen's week view) -->
+    <div class="people-view" id="peopleView">
+        <div class="people-header">
+            <div class="people-header-left">
+                <div class="people-avatar">KM</div>
+                <div class="people-name-block">
+                    <h2>Karen Mitchell</h2>
+                    <p>Your Supervisor &mdash; supervisor@ntcommunityservices.com.au</p>
+                </div>
+            </div>
+            <div class="people-week-nav">
+                <button onclick="changePeopleWeek(-1)">&laquo; Previous</button>
+                <span class="people-week-label" id="peopleWeekLabel"></span>
+                <button onclick="changePeopleWeek(1)">Next &raquo;</button>
+            </div>
+        </div>
+        <div class="calendar-overlay-label">
+            <div class="cal-label-chip">
+                <div class="cal-label-dot" style="background:var(--event-purple)"></div>
+                Karen's calendar
+            </div>
+            <div class="cal-label-chip">
+                <div class="cal-label-dot" style="background:var(--event-blue)"></div>
+                Your events with Karen
+            </div>
+        </div>
+        <div class="week-grid" id="weekGrid"></div>
+    </div>
+
+    <!-- TASK PANEL -->
+    <div class="task-panel">
+        <h3>
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/></svg>
+            Your Task
+        </h3>
+
+        <div class="task-scenario">
+            <strong>Your supervisor Karen Mitchell sent you this email:</strong><br><br>
+            "Happy to meet next Wednesday at 11am to discuss this matter. Please send me a calendar invitation."
+        </div>
+
+        <div class="task-instruction">
+            <strong>What you need to do:</strong>
+            Click on next Wednesday's date on the calendar, then fill in a meeting invitation with all the details. Once you send it, click <strong>People</strong> on the left to see your meeting in Karen's calendar too.
+        </div>
+
+        <ul class="checklist" id="checklist">
+            <li id="check-open"><span class="check-icon"></span> Open a new calendar event</li>
+            <li id="check-to"><span class="check-icon"></span> Add recipient (To field)</li>
+            <li id="check-subject"><span class="check-icon"></span> Add a subject</li>
+            <li id="check-date"><span class="check-icon"></span> Set the date</li>
+            <li id="check-time"><span class="check-icon"></span> Set time to 11:00 AM</li>
+            <li id="check-location"><span class="check-icon"></span> Add a location</li>
+            <li id="check-description"><span class="check-icon"></span> Write a description</li>
+            <li id="check-send"><span class="check-icon"></span> Send the invitation</li>
+            <li id="check-people"><span class="check-icon"></span> View it in Karen's calendar</li>
+        </ul>
+
+        <div class="score-display">
+            <div>Tasks completed</div>
+            <div class="score-num" id="scoreNum">0 / 9</div>
+        </div>
+
+        <div style="margin-top: 16px;">
+            <button class="ribbon-btn primary" onclick="openNewEvent()" style="width:100%;justify-content:center;">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>
+                Create New Event
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== NEW EVENT MODAL ===== -->
+<div class="modal-overlay" id="eventModal">
+    <div class="event-form">
+        <div class="event-form-header">
+            <h2>New Meeting</h2>
+            <button class="close-btn" onclick="closeModal('eventModal')">&times;</button>
+        </div>
+        <div class="form-ribbon">
+            <button class="form-ribbon-btn send-btn" onclick="sendEvent()">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
+                Send
+            </button>
+            <button class="form-ribbon-btn" onclick="closeModal('eventModal')">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/></svg>
+                Discard
+            </button>
+        </div>
+        <div class="form-body">
+            <div class="form-row" id="row-to">
+                <label for="eventTo">To</label>
+                <div class="form-field-wrap">
+                    <input type="text" id="eventTo" placeholder="e.g. supervisor@ntcommunityservices.com.au" oninput="validateField('to')">
+                    <div class="form-error">Add at least one person to invite</div>
+                </div>
+            </div>
+            <div class="form-row" id="row-subject">
+                <label for="eventSubject">Subject</label>
+                <div class="form-field-wrap">
+                    <input type="text" id="eventSubject" placeholder="e.g. Performance Catch-up Meeting" oninput="validateField('subject')">
+                    <div class="form-error">Add a subject for your meeting</div>
+                </div>
+            </div>
+            <div class="form-row" id="row-date">
+                <label for="eventDate">Date</label>
+                <div class="form-field-wrap">
+                    <input type="date" id="eventDate" oninput="validateField('date')">
+                    <div class="form-error">Choose a date for the meeting</div>
+                </div>
+            </div>
+            <div class="form-row" id="row-time">
+                <label>Time</label>
+                <div class="form-field-wrap">
+                    <div class="time-group">
+                        <select id="eventStartHour" onchange="validateField('time')">
+                            <option value="">Hour</option>
+                        </select>
+                        <span>:</span>
+                        <select id="eventStartMin" onchange="validateField('time')">
+                            <option value="00">00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                        </select>
+                        <select id="eventStartAmPm" onchange="validateField('time')">
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                        <span style="margin: 0 8px;">to</span>
+                        <select id="eventEndHour">
+                            <option value="">Hour</option>
+                        </select>
+                        <span>:</span>
+                        <select id="eventEndMin">
+                            <option value="00">00</option>
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                            <option value="45">45</option>
+                        </select>
+                        <select id="eventEndAmPm">
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    </div>
+                    <div class="form-error">Set a start time for the meeting</div>
+                </div>
+            </div>
+            <div class="form-row" id="row-location">
+                <label for="eventLocation">Location</label>
+                <div class="form-field-wrap">
+                    <input type="text" id="eventLocation" placeholder="e.g. Meeting Room 1, NT Community Services" oninput="validateField('location')">
+                    <div class="form-error">Add a location for the meeting</div>
+                </div>
+            </div>
+            <div class="form-row" id="row-description">
+                <label for="eventDesc">Description</label>
+                <div class="form-field-wrap">
+                    <textarea id="eventDesc" placeholder="e.g. Catch up to discuss work performance and possible promotion" oninput="validateField('description')"></textarea>
+                    <div class="form-error">Add a short description</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== EVENT DETAIL MODAL ===== -->
+<div class="modal-overlay" id="detailModal">
+    <div class="event-detail" id="detailCard">
+        <div class="event-detail-header" id="detailHeader">
+            <h3 id="detailTitle"></h3>
+            <p id="detailTime"></p>
+        </div>
+        <div class="event-detail-body" id="detailBody"></div>
+        <div class="event-detail-actions" id="detailActions">
+            <button class="detail-btn" onclick="closeModal('detailModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== HELP MODAL ===== -->
+<div class="modal-overlay" id="helpModal">
+    <div class="event-form" style="width:520px;">
+        <div class="event-form-header">
+            <h2>How to Use This Calendar</h2>
+            <button class="close-btn" onclick="closeModal('helpModal')">&times;</button>
+        </div>
+        <div class="form-body" style="line-height:1.8; font-size: 14px;">
+            <p style="margin-bottom:12px;"><strong>This is a practice Outlook Calendar.</strong> It works like the real thing but is just for learning.</p>
+
+            <p style="margin-bottom:8px;"><strong>To create a meeting invitation:</strong></p>
+            <p style="margin-bottom:4px;">1. Click the blue <strong>"New Event"</strong> button, OR click on any date</p>
+            <p style="margin-bottom:4px;">2. Fill in who you want to invite, what the meeting is about, when and where</p>
+            <p style="margin-bottom:4px;">3. Click <strong>"Send"</strong> to send the invitation</p>
+            <p style="margin-bottom:12px;">4. Your meeting shows up on the calendar</p>
+
+            <p style="margin-bottom:8px;"><strong>To see your manager Karen's calendar:</strong></p>
+            <p style="margin-bottom:4px;">1. Click <strong>"People"</strong> on the left side</p>
+            <p style="margin-bottom:4px;">2. You can see Karen's meetings for the week</p>
+            <p style="margin-bottom:12px;">3. After you send your invitation, it shows up in her calendar too</p>
+
+            <p style="margin-bottom:8px;"><strong>To look at a meeting:</strong></p>
+            <p style="margin-bottom:12px;">Click on any coloured bar to see the details</p>
+
+            <p style="margin-bottom:8px;"><strong>Buttons at the top right:</strong></p>
+            <p style="margin-bottom:4px;"><strong>Larger Text</strong> &mdash; makes text bigger</p>
+            <p style="margin-bottom:4px;"><strong>High Contrast</strong> &mdash; stronger colours, easier to see</p>
+            <p><strong>Reset</strong> &mdash; clears your events so you can start again</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ===== STATE =====
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
+    let miniYear = today.getFullYear();
+    let miniMonth = today.getMonth();
+    let selectedDate = null;
+    let userEvents = [];
+    let viewingEventId = null;
+    let completedChecks = new Set();
+    let currentView = 'calendar'; // 'calendar' or 'people'
+    let peopleWeekOffset = 0;
+
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DAYS_SHORT = ['S','M','T','W','T','F','S'];
+    const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const TOTAL_CHECKS = 9;
+
+    // ===== KAREN'S PRE-POPULATED EVENTS =====
+    // These are generated relative to "today" so they always look current
+    function getKarenEvents() {
+        const events = [];
+        // Helper: get date for this week's day (0=Sun,1=Mon,...6=Sat)
+        function thisWeekDay(dayOfWeek, weekOffset) {
+            const d = new Date(today);
+            const diff = dayOfWeek - d.getDay();
+            d.setDate(d.getDate() + diff + (weekOffset * 7));
+            return formatDate(d);
+        }
+
+        // Current week events
+        events.push({
+            id: 'k1', subject: 'Morning Tea - All Staff', date: thisWeekDay(1, 0),
+            startHour: 10, startMin: 0, endHour: 10, endMin: 30,
+            location: 'Kitchen / Break Room', color: 'green',
+            description: 'Weekly team morning tea. Everyone welcome. Bring a plate if you can.',
+            organiser: 'Karen Mitchell', to: 'All Staff'
+        });
+        events.push({
+            id: 'k2', subject: 'Team Standup', date: thisWeekDay(1, 0),
+            startHour: 9, startMin: 0, endHour: 9, endMin: 30,
+            location: 'Meeting Room 2', color: 'purple',
+            description: 'Weekly team check-in. Bring updates on your current tasks.',
+            organiser: 'Karen Mitchell', to: 'Team'
+        });
+        events.push({
+            id: 'k3', subject: 'Budget Review', date: thisWeekDay(2, 0),
+            startHour: 14, startMin: 0, endHour: 15, endMin: 0,
+            location: 'Board Room', color: 'orange',
+            description: 'Quarterly budget review with finance team.',
+            organiser: 'Finance Dept', to: 'Karen Mitchell, Finance Team'
+        });
+        events.push({
+            id: 'k4', subject: 'WHS Training', date: thisWeekDay(4, 0),
+            startHour: 9, startMin: 0, endHour: 11, endMin: 0,
+            location: 'Training Room A', color: 'teal',
+            description: 'Mandatory workplace health and safety refresher training.',
+            organiser: 'HR Department', to: 'All Managers'
+        });
+        events.push({
+            id: 'k5', subject: 'Lunch with Regional Manager', date: thisWeekDay(3, 0),
+            startHour: 12, startMin: 0, endHour: 13, endMin: 0,
+            location: 'Cafe on the Esplanade', color: 'purple',
+            description: 'Informal catch up with David about regional updates.',
+            organiser: 'Karen Mitchell', to: 'David Chen'
+        });
+
+        // Next week events
+        events.push({
+            id: 'k6', subject: 'Morning Tea - All Staff', date: thisWeekDay(1, 1),
+            startHour: 10, startMin: 0, endHour: 10, endMin: 30,
+            location: 'Kitchen / Break Room', color: 'green',
+            description: 'Weekly team morning tea. Everyone welcome.',
+            organiser: 'Karen Mitchell', to: 'All Staff'
+        });
+        events.push({
+            id: 'k7', subject: 'Team Standup', date: thisWeekDay(1, 1),
+            startHour: 9, startMin: 0, endHour: 9, endMin: 30,
+            location: 'Meeting Room 2', color: 'purple',
+            description: 'Weekly team check-in.',
+            organiser: 'Karen Mitchell', to: 'Team'
+        });
+        events.push({
+            id: 'k8', subject: 'Project Planning', date: thisWeekDay(2, 1),
+            startHour: 10, startMin: 0, endHour: 11, endMin: 30,
+            location: 'Board Room', color: 'orange',
+            description: 'Planning session for the new community garden project.',
+            organiser: 'Karen Mitchell', to: 'Project Team'
+        });
+        events.push({
+            id: 'k9', subject: 'Staff 1:1 - Jamie', date: thisWeekDay(4, 1),
+            startHour: 14, startMin: 0, endHour: 14, endMin: 30,
+            location: "Karen's Office", color: 'purple',
+            description: 'Monthly performance check-in with Jamie.',
+            organiser: 'Karen Mitchell', to: 'Jamie Wilson'
+        });
+        events.push({
+            id: 'k10', subject: 'Friday Wrap-Up', date: thisWeekDay(5, 1),
+            startHour: 15, startMin: 0, endHour: 15, endMin: 30,
+            location: 'Meeting Room 2', color: 'teal',
+            description: 'End of week debrief and planning for next week.',
+            organiser: 'Karen Mitchell', to: 'All Staff'
+        });
+
+        // Previous week
+        events.push({
+            id: 'k11', subject: 'Morning Tea - All Staff', date: thisWeekDay(1, -1),
+            startHour: 10, startMin: 0, endHour: 10, endMin: 30,
+            location: 'Kitchen / Break Room', color: 'green',
+            description: 'Weekly team morning tea.',
+            organiser: 'Karen Mitchell', to: 'All Staff'
+        });
+        events.push({
+            id: 'k12', subject: 'Team Standup', date: thisWeekDay(1, -1),
+            startHour: 9, startMin: 0, endHour: 9, endMin: 30,
+            location: 'Meeting Room 2', color: 'purple',
+            description: 'Weekly team check-in.',
+            organiser: 'Karen Mitchell', to: 'Team'
+        });
+
+        return events;
+    }
+
+    const karenEvents = getKarenEvents();
+
+    // ===== INIT =====
+    function init() {
+        populateTimeSelects();
+        renderMiniCal();
+        renderMonthGrid();
+        updateScore();
+    }
+
+    function populateTimeSelects() {
+        ['eventStartHour','eventEndHour'].forEach(id => {
+            const sel = document.getElementById(id);
+            sel.innerHTML = '<option value="">Hour</option>';
+            for (let h = 1; h <= 12; h++) {
+                sel.innerHTML += `<option value="${h}">${h}</option>`;
+            }
+        });
+    }
+
+    // ===== VIEW SWITCHING =====
+    function switchView(view) {
+        currentView = view;
+        document.getElementById('navCalendar').classList.toggle('active', view === 'calendar');
+        document.getElementById('navPeople').classList.toggle('active', view === 'people');
+        document.getElementById('calendarView').classList.toggle('hidden', view !== 'calendar');
+        document.getElementById('peopleView').classList.toggle('active', view === 'people');
+
+        if (view === 'people') {
+            markCheck('people');
+            renderPeopleWeek();
+        }
+    }
+
+    // ===== MINI CALENDAR =====
+    function renderMiniCal() {
+        document.getElementById('miniCalTitle').textContent = `${MONTHS[miniMonth]} ${miniYear}`;
+        const grid = document.getElementById('miniCalGrid');
+        grid.innerHTML = '';
+
+        DAYS_SHORT.forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.textContent = d;
+            grid.appendChild(el);
+        });
+
+        const firstDay = new Date(miniYear, miniMonth, 1).getDay();
+        const daysInMonth = new Date(miniYear, miniMonth + 1, 0).getDate();
+        const prevMonthDays = new Date(miniYear, miniMonth, 0).getDate();
+
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const el = document.createElement('div');
+            el.className = 'day-cell other-month';
+            el.textContent = prevMonthDays - i;
+            grid.appendChild(el);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const el = document.createElement('div');
+            el.className = 'day-cell';
+            el.textContent = d;
+            const dateObj = new Date(miniYear, miniMonth, d);
+            if (d === today.getDate() && miniMonth === today.getMonth() && miniYear === today.getFullYear()) {
+                el.classList.add('today');
+            }
+            if (getAllEventsForDate(formatDate(dateObj)).length > 0) {
+                el.classList.add('has-event');
+            }
+            el.onclick = () => {
+                currentYear = miniYear;
+                currentMonth = miniMonth;
+                selectedDate = formatDate(dateObj);
+                if (currentView === 'calendar') renderMonthGrid();
+                renderMiniCal();
+            };
+            grid.appendChild(el);
+        }
+
+        const totalCells = grid.children.length;
+        for (let d = 1; d <= 42 - totalCells; d++) {
+            const el = document.createElement('div');
+            el.className = 'day-cell other-month';
+            el.textContent = d;
+            grid.appendChild(el);
+        }
+    }
+
+    function changeMiniMonth(dir) {
+        miniMonth += dir;
+        if (miniMonth > 11) { miniMonth = 0; miniYear++; }
+        if (miniMonth < 0) { miniMonth = 11; miniYear--; }
+        renderMiniCal();
+    }
+
+    // ===== MONTH GRID =====
+    function renderMonthGrid() {
+        document.getElementById('calMonthTitle').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+        const grid = document.getElementById('monthGrid');
+        grid.innerHTML = '';
+
+        ['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'col-header';
+            el.textContent = d;
+            grid.appendChild(el);
+        });
+
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+        const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+
+        grid.style.gridTemplateRows = `auto repeat(${totalCells / 7}, 1fr)`;
+
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const d = prevMonthDays - i;
+            const pm = currentMonth === 0 ? 11 : currentMonth - 1;
+            const py = currentMonth === 0 ? currentYear - 1 : currentYear;
+            grid.appendChild(createDateCell(d, py, pm, true));
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            grid.appendChild(createDateCell(d, currentYear, currentMonth, false));
+        }
+
+        const filled = firstDay + daysInMonth;
+        for (let d = 1; d <= totalCells - filled; d++) {
+            const nm = currentMonth === 11 ? 0 : currentMonth + 1;
+            const ny = currentMonth === 11 ? currentYear + 1 : currentYear;
+            grid.appendChild(createDateCell(d, ny, nm, true));
+        }
+    }
+
+    function createDateCell(day, year, month, isOther) {
+        const cell = document.createElement('div');
+        cell.className = 'date-cell';
+        if (isOther) cell.classList.add('other-month');
+
+        const dateObj = new Date(year, month, day);
+        const dateStr = formatDate(dateObj);
+
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+            cell.classList.add('today');
+        }
+
+        const numEl = document.createElement('div');
+        numEl.className = 'date-num';
+        numEl.textContent = day;
+        cell.appendChild(numEl);
+
+        // Show user events on month grid
+        userEvents.filter(e => e.date === dateStr).forEach(ev => {
+            const bar = document.createElement('div');
+            bar.className = 'event-bar blue';
+            bar.textContent = `${ev.startTime} ${ev.subject}`;
+            bar.onclick = (e) => { e.stopPropagation(); showEventDetail(ev, 'user'); };
+            cell.appendChild(bar);
+        });
+
+        cell.onclick = () => {
+            selectedDate = dateStr;
+            openNewEvent(dateStr);
+        };
+
+        return cell;
+    }
+
+    // ===== PEOPLE WEEK VIEW =====
+    function renderPeopleWeek() {
+        const grid = document.getElementById('weekGrid');
+        grid.innerHTML = '';
+
+        // Calculate the Monday of the target week
+        const refDate = new Date(today);
+        const dayOfWeek = refDate.getDay();
+        const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        const monday = new Date(refDate);
+        monday.setDate(refDate.getDate() + mondayOffset + (peopleWeekOffset * 7));
+
+        const weekDates = [];
+        for (let i = 0; i < 5; i++) {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            weekDates.push(d);
+        }
+
+        // Week label
+        const startLabel = `${weekDates[0].getDate()} ${MONTHS[weekDates[0].getMonth()]}`;
+        const endLabel = `${weekDates[4].getDate()} ${MONTHS[weekDates[4].getMonth()]} ${weekDates[4].getFullYear()}`;
+        document.getElementById('peopleWeekLabel').textContent = `${startLabel} – ${endLabel}`;
+
+        // Headers: time column + 5 day columns
+        const timeHeader = document.createElement('div');
+        timeHeader.className = 'wg-header';
+        timeHeader.innerHTML = '&nbsp;';
+        grid.appendChild(timeHeader);
+
+        weekDates.forEach(d => {
+            const hdr = document.createElement('div');
+            hdr.className = 'wg-header';
+            const dayName = DAYS_FULL[d.getDay()].substring(0, 3).toUpperCase();
+            const isToday = d.toDateString() === today.toDateString();
+            if (isToday) hdr.classList.add('today-col');
+            hdr.innerHTML = `${dayName}<span class="wg-date-num">${d.getDate()}</span>`;
+            grid.appendChild(hdr);
+        });
+
+        // Time slots: 8am to 5pm
+        const startHourGrid = 8;
+        const endHourGrid = 17;
+
+        for (let h = startHourGrid; h <= endHourGrid; h++) {
+            // Time label
+            const timeLabel = document.createElement('div');
+            timeLabel.className = 'wg-time-label';
+            const displayHour = h > 12 ? h - 12 : h;
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            timeLabel.textContent = `${displayHour} ${ampm}`;
+            grid.appendChild(timeLabel);
+
+            // 5 day slots
+            weekDates.forEach(d => {
+                const slot = document.createElement('div');
+                slot.className = 'wg-slot';
+                slot.dataset.date = formatDate(d);
+                slot.dataset.hour = h;
+                grid.appendChild(slot);
+            });
+        }
+
+        // Place Karen's events
+        const weekDateStrs = weekDates.map(d => formatDate(d));
+        karenEvents.filter(e => weekDateStrs.includes(e.date)).forEach(ev => {
+            placeWeekEvent(ev, weekDates, startHourGrid, endHourGrid);
+        });
+
+        // Place user's events that are in this week (shown in blue)
+        userEvents.filter(e => weekDateStrs.includes(e.date)).forEach(ev => {
+            const parsed = parseUserEventTime(ev);
+            if (parsed) {
+                placeWeekEvent({
+                    ...parsed,
+                    id: ev.id,
+                    subject: ev.subject,
+                    location: ev.location,
+                    description: ev.description,
+                    to: ev.to,
+                    color: 'blue',
+                    organiser: 'You'
+                }, weekDates, startHourGrid, endHourGrid);
+            }
+        });
+    }
+
+    function parseUserEventTime(ev) {
+        // Parse "11:00 AM" format
+        const match = ev.startTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (!match) return null;
+        let hour = parseInt(match[1]);
+        const min = parseInt(match[2]);
+        const ampm = match[3].toUpperCase();
+        if (ampm === 'PM' && hour !== 12) hour += 12;
+        if (ampm === 'AM' && hour === 12) hour = 0;
+
+        let endHour = hour + 1;
+        let endMin = min;
+        const endMatch = ev.endTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (endMatch) {
+            endHour = parseInt(endMatch[1]);
+            if (endMatch[3].toUpperCase() === 'PM' && endHour !== 12) endHour += 12;
+            if (endMatch[3].toUpperCase() === 'AM' && endHour === 12) endHour = 0;
+            endMin = parseInt(endMatch[2]);
+        }
+
+        return { date: ev.date, startHour: hour, startMin: min, endHour: endHour, endMin: endMin };
+    }
+
+    function placeWeekEvent(ev, weekDates, gridStart, gridEnd) {
+        const dayIndex = weekDates.findIndex(d => formatDate(d) === ev.date);
+        if (dayIndex === -1) return;
+        if (ev.startHour < gridStart || ev.startHour > gridEnd) return;
+
+        // Find the slot element
+        const rowIndex = ev.startHour - gridStart;
+        const slotIndex = 6 + (rowIndex * 6) + 1 + dayIndex; // headers(6) + rows * 6cols + 1(time label) + dayIndex
+        const grid = document.getElementById('weekGrid');
+        const slots = grid.children;
+        if (slotIndex >= slots.length) return;
+        const slot = slots[slotIndex];
+
+        const evEl = document.createElement('div');
+        evEl.className = `wg-event ${ev.color || 'purple'}`;
+
+        // Calculate height based on duration
+        const durationMins = (ev.endHour * 60 + ev.endMin) - (ev.startHour * 60 + ev.startMin);
+        const heightPx = Math.max(28, (durationMins / 60) * 60 - 4);
+        const topOffset = (ev.startMin / 60) * 60;
+
+        evEl.style.top = topOffset + 'px';
+        evEl.style.height = heightPx + 'px';
+
+        const timeStr = formatTime24to12(ev.startHour, ev.startMin);
+        evEl.innerHTML = `<div class="wg-ev-title">${escapeHtml(ev.subject)}</div><div class="wg-ev-detail">${timeStr} · ${escapeHtml(ev.location || '')}</div>`;
+
+        evEl.onclick = (e) => {
+            e.stopPropagation();
+            if (ev.id && typeof ev.id === 'string' && ev.id.startsWith('k')) {
+                showEventDetail(ev, 'karen');
+            } else {
+                const userEv = userEvents.find(ue => ue.id === ev.id);
+                if (userEv) showEventDetail(userEv, 'user');
+            }
+        };
+
+        slot.appendChild(evEl);
+    }
+
+    function formatTime24to12(h, m) {
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const h12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+        return `${h12}:${String(m).padStart(2,'0')} ${ampm}`;
+    }
+
+    function changePeopleWeek(dir) {
+        peopleWeekOffset += dir;
+        renderPeopleWeek();
+    }
+
+    // ===== EVENT DETAIL =====
+    function showEventDetail(ev, type) {
+        const isKaren = type === 'karen';
+        const header = document.getElementById('detailHeader');
+        const colorMap = { blue: 'var(--event-blue)', green: 'var(--event-green)', purple: 'var(--event-purple)', orange: 'var(--event-orange)', teal: 'var(--event-teal)' };
+
+        header.style.background = isKaren ? (colorMap[ev.color] || 'var(--event-purple)') : 'var(--event-blue)';
+        document.getElementById('detailTitle').textContent = ev.subject;
+
+        if (isKaren) {
+            const timeStr = `${formatTime24to12(ev.startHour, ev.startMin)} – ${formatTime24to12(ev.endHour, ev.endMin)}`;
+            document.getElementById('detailTime').textContent = `${formatDateDisplay(ev.date)} | ${timeStr}`;
+        } else {
+            document.getElementById('detailTime').textContent = `${formatDateDisplay(ev.date)} | ${ev.startTime} - ${ev.endTime}`;
+        }
+
+        const body = document.getElementById('detailBody');
+        body.innerHTML = `
+            <div class="event-detail-row">
+                <div class="detail-label">Organiser</div>
+                <div class="detail-value">${escapeHtml(isKaren ? (ev.organiser || 'Karen Mitchell') : 'You')}</div>
+            </div>
+            <div class="event-detail-row">
+                <div class="detail-label">To</div>
+                <div class="detail-value">${escapeHtml(ev.to || '')}</div>
+            </div>
+            <div class="event-detail-row">
+                <div class="detail-label">Location</div>
+                <div class="detail-value">${escapeHtml(ev.location || '')}</div>
+            </div>
+            <div class="event-detail-row">
+                <div class="detail-label">Details</div>
+                <div class="detail-value">${escapeHtml(ev.description || '')}</div>
+            </div>
+        `;
+
+        const actions = document.getElementById('detailActions');
+        if (!isKaren) {
+            viewingEventId = ev.id;
+            actions.innerHTML = `
+                <button class="detail-btn danger" onclick="deleteEvent()">Delete</button>
+                <button class="detail-btn" onclick="closeModal('detailModal')">Close</button>
+            `;
+        } else {
+            viewingEventId = null;
+            actions.innerHTML = `<button class="detail-btn" onclick="closeModal('detailModal')">Close</button>`;
+        }
+
+        document.getElementById('detailModal').classList.add('open');
+    }
+
+    function deleteEvent() {
+        userEvents = userEvents.filter(e => e.id !== viewingEventId);
+        closeModal('detailModal');
+        renderMonthGrid();
+        renderMiniCal();
+        if (currentView === 'people') renderPeopleWeek();
+        showToast('Event deleted');
+    }
+
+    // ===== HELPERS =====
+    function getAllEventsForDate(dateStr) {
+        const fromUser = userEvents.filter(e => e.date === dateStr);
+        const fromKaren = karenEvents.filter(e => e.date === dateStr);
+        return [...fromUser, ...fromKaren];
+    }
+
+    function formatDate(d) {
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function formatDateDisplay(dateStr) {
+        const d = new Date(dateStr + 'T12:00:00');
+        return `${DAYS_FULL[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ===== MONTH NAV =====
+    function changeMonth(dir) {
+        currentMonth += dir;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        miniMonth = currentMonth;
+        miniYear = currentYear;
+        renderMonthGrid();
+        renderMiniCal();
+    }
+
+    function goToToday() {
+        currentYear = today.getFullYear();
+        currentMonth = today.getMonth();
+        miniYear = today.getFullYear();
+        miniMonth = today.getMonth();
+        peopleWeekOffset = 0;
+        renderMonthGrid();
+        renderMiniCal();
+        if (currentView === 'people') renderPeopleWeek();
+    }
+
+    // ===== NEW EVENT =====
+    function openNewEvent(presetDate) {
+        document.getElementById('eventTo').value = '';
+        document.getElementById('eventSubject').value = '';
+        document.getElementById('eventLocation').value = '';
+        document.getElementById('eventDesc').value = '';
+        document.getElementById('eventStartHour').value = '';
+        document.getElementById('eventStartMin').value = '00';
+        document.getElementById('eventStartAmPm').value = 'AM';
+        document.getElementById('eventEndHour').value = '';
+        document.getElementById('eventEndMin').value = '00';
+        document.getElementById('eventEndAmPm').value = 'AM';
+        document.querySelectorAll('.form-row').forEach(r => r.classList.remove('has-error'));
+
+        document.getElementById('eventDate').value = presetDate || '';
+        markCheck('open');
+        document.getElementById('eventModal').classList.add('open');
+        setTimeout(() => document.getElementById('eventTo').focus(), 100);
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+    }
+
+    function validateField(field) {
+        const checks = {
+            to: () => document.getElementById('eventTo').value.trim(),
+            subject: () => document.getElementById('eventSubject').value.trim(),
+            date: () => document.getElementById('eventDate').value,
+            time: () => document.getElementById('eventStartHour').value,
+            location: () => document.getElementById('eventLocation').value.trim(),
+            description: () => document.getElementById('eventDesc').value.trim(),
+        };
+        if (checks[field] && checks[field]()) markCheck(field);
+    }
+
+    function sendEvent() {
+        let valid = true;
+        const fields = [
+            { id: 'row-to', check: () => document.getElementById('eventTo').value.trim() },
+            { id: 'row-subject', check: () => document.getElementById('eventSubject').value.trim() },
+            { id: 'row-date', check: () => document.getElementById('eventDate').value },
+            { id: 'row-time', check: () => document.getElementById('eventStartHour').value },
+            { id: 'row-location', check: () => document.getElementById('eventLocation').value.trim() },
+            { id: 'row-description', check: () => document.getElementById('eventDesc').value.trim() },
+        ];
+
+        fields.forEach(f => {
+            const row = document.getElementById(f.id);
+            if (!f.check()) { row.classList.add('has-error'); valid = false; }
+            else { row.classList.remove('has-error'); }
+        });
+
+        if (!valid) return;
+
+        const startHour = document.getElementById('eventStartHour').value;
+        const startMin = document.getElementById('eventStartMin').value;
+        const startAmPm = document.getElementById('eventStartAmPm').value;
+        const endHour = document.getElementById('eventEndHour').value || (parseInt(startHour) === 12 ? '1' : String(parseInt(startHour) + 1));
+        const endMin = document.getElementById('eventEndMin').value || startMin;
+        const endAmPm = document.getElementById('eventEndAmPm').value || startAmPm;
+
+        const newEvent = {
+            id: Date.now(),
+            to: document.getElementById('eventTo').value.trim(),
+            subject: document.getElementById('eventSubject').value.trim(),
+            date: document.getElementById('eventDate').value,
+            startTime: `${startHour}:${startMin} ${startAmPm}`,
+            endTime: `${endHour}:${endMin} ${endAmPm}`,
+            location: document.getElementById('eventLocation').value.trim(),
+            description: document.getElementById('eventDesc').value.trim()
+        };
+
+        userEvents.push(newEvent);
+        ['to','subject','date','time','location','description','send'].forEach(c => markCheck(c));
+
+        closeModal('eventModal');
+
+        const evDate = new Date(newEvent.date + 'T12:00:00');
+        currentMonth = evDate.getMonth();
+        currentYear = evDate.getFullYear();
+        miniMonth = currentMonth;
+        miniYear = currentYear;
+        renderMonthGrid();
+        renderMiniCal();
+        if (currentView === 'people') renderPeopleWeek();
+
+        showToast('Calendar invitation sent to ' + newEvent.to + '!');
+
+        // Show the confirmation card with all the details so it can be
+        // screenshotted. It stays open until the student clicks Close.
+        showEventDetail(newEvent, 'user');
+    }
+
+    // ===== CHECKLIST =====
+    function markCheck(name) {
+        if (completedChecks.has(name)) return;
+        completedChecks.add(name);
+        const el = document.getElementById('check-' + name);
+        if (el) {
+            el.classList.add('done');
+            el.querySelector('.check-icon').innerHTML = '&#10003;';
+        }
+        updateScore();
+    }
+
+    function updateScore() {
+        document.getElementById('scoreNum').textContent = `${completedChecks.size} / ${TOTAL_CHECKS}`;
+    }
+
+    // ===== ACCESSIBILITY =====
+    function toggleLargeText() { document.body.classList.toggle('large-text'); }
+    function toggleHighContrast() { document.body.classList.toggle('high-contrast'); }
+
+    function showHelp() { document.getElementById('helpModal').classList.add('open'); }
+
+    function showToast(msg) {
+        const toast = document.getElementById('successToast');
+        document.getElementById('toastMessage').textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function resetAll() {
+        userEvents = [];
+        completedChecks = new Set();
+        peopleWeekOffset = 0;
+        document.querySelectorAll('.checklist li').forEach(li => {
+            li.classList.remove('done');
+            li.querySelector('.check-icon').innerHTML = '';
+        });
+        switchView('calendar');
+        goToToday();
+        updateScore();
+        showToast('Calendar reset — start again!');
+    }
+
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) overlay.classList.remove('open');
+        });
+    });
+
+    init();
+</script>
+</body>
+</html>

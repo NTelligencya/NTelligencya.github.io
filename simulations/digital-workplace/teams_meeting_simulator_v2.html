@@ -1,0 +1,2457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MS Teams Simulator - Create a Meeting Invitation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Activity Header */
+        .activity-header {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            background: linear-gradient(135deg, #5b5fc7 0%, #7b2cbf 100%);
+            border-radius: 12px;
+            padding: 20px 24px;
+            color: white;
+            box-shadow: 0 4px 20px rgba(91, 95, 199, 0.4);
+        }
+
+        .activity-header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .activity-header p {
+            font-size: 15px;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+
+        .task-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Progress Steps */
+        .progress-container {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            background: #252542;
+            border-radius: 12px;
+            padding: 16px 24px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            right: 40px;
+            height: 3px;
+            background: #3d3d5c;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3d3d5c;
+            color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active .step-number {
+            background: #5b5fc7;
+            color: white;
+            box-shadow: 0 0 20px rgba(91, 95, 199, 0.5);
+        }
+
+        .progress-step.completed .step-number {
+            background: #10b981;
+            color: white;
+        }
+
+        .step-label {
+            color: #888;
+            font-size: 11px;
+            text-align: center;
+            max-width: 80px;
+        }
+
+        .progress-step.active .step-label,
+        .progress-step.completed .step-label {
+            color: white;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Instruction Panel */
+        .instruction-panel {
+            width: 300px;
+            background: #252542;
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .instruction-step {
+            display: none;
+        }
+
+        .instruction-step.active {
+            display: block;
+        }
+
+        .instruction-step h3 {
+            color: #5b5fc7;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .instruction-step h2 {
+            font-size: 18px;
+            margin-bottom: 14px;
+        }
+
+        .instruction-step p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #b8b8d1;
+            margin-bottom: 14px;
+        }
+
+        .instruction-highlight {
+            background: rgba(91, 95, 199, 0.2);
+            border-left: 4px solid #5b5fc7;
+            padding: 12px 14px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0;
+        }
+
+        .instruction-highlight p {
+            color: white;
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #5b5fc7;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4a4eb5;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #3d3d5c;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4d4d6c;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* Teams Window */
+        .teams-window {
+            flex: 1;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 620px;
+        }
+
+        /* Title Bar */
+        .title-bar {
+            background: #5b5fc7;
+            color: white;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .title-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .teams-logo {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5b5fc7;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .window-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .window-btn.red { background: #ff5f57; }
+        .window-btn.yellow { background: #ffbd2e; }
+        .window-btn.green { background: #28ca42; }
+
+        /* Main Layout */
+        .teams-content {
+            display: flex;
+            flex: 1;
+        }
+
+        /* App Rail */
+        .app-rail {
+            width: 68px;
+            background: #292929;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 0;
+            gap: 4px;
+        }
+
+        .rail-item {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            gap: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .rail-item.active {
+            background: #5b5fc7;
+            color: white;
+        }
+
+        .rail-item:hover:not(.active) {
+            background: #3d3d3d;
+            color: #ccc;
+        }
+
+        .rail-item.highlight {
+            animation: pulse-highlight 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-highlight {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(91, 95, 199, 0.7); }
+            50% { box-shadow: 0 0 0 8px rgba(91, 95, 199, 0); }
+        }
+
+        .rail-icon {
+            font-size: 22px;
+        }
+
+        /* Chat Panel */
+        .chat-panel {
+            width: 260px;
+            background: #f5f5f5;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #242424;
+        }
+
+        .new-chat-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: transparent;
+            border: none;
+            color: #5b5fc7;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .search-box {
+            margin: 10px 14px;
+            padding: 10px 14px;
+            background: white;
+            border: 1px solid #d1d1d1;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            display: flex;
+            padding: 12px 14px;
+            gap: 10px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .chat-item:hover {
+            background: #e8e8e8;
+        }
+
+        .chat-item.active {
+            background: #e0e0e0;
+            border-left-color: #5b5fc7;
+        }
+
+        .chat-item.unread {
+            background: #e8f4fd;
+        }
+
+        .chat-item.highlight {
+            animation: item-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes item-pulse {
+            0%, 100% { background: #e8f4fd; }
+            50% { background: #d0e8fa; }
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: #242424;
+            margin-bottom: 2px;
+        }
+
+        .chat-preview {
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-meta {
+            text-align: right;
+        }
+
+        .chat-time {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .unread-badge {
+            background: #5b5fc7;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .supervisor-tag {
+            background: #0078d4;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+
+        /* Main Content Area */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        /* Chat View */
+        .chat-view {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+        }
+
+        .chat-view.active {
+            display: flex;
+        }
+
+        .chat-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #242424;
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: #f5f5f5;
+            border: none;
+            color: #444;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-btn:hover {
+            background: #e8e8e8;
+        }
+
+        .messages-area {
+            flex: 1;
+            padding: 16px 20px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 13px;
+            color: #242424;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .message-bubble {
+            background: white;
+            padding: 10px 14px;
+            border-radius: 4px 12px 12px 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            max-width: 480px;
+        }
+
+        .message-bubble.supervisor {
+            background: #e8f4fd;
+            border: 1px solid #b8daef;
+        }
+
+        .message-bubble.important {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+        }
+
+        .message-bubble.user-sent {
+            background: #e8e0f0;
+            border: 1px solid #d0c0e0;
+        }
+
+        /* Message Input */
+        .message-input-area {
+            padding: 14px 20px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .input-container {
+            border: 2px solid #d1d1d1;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .input-container:focus-within {
+            border-color: #5b5fc7;
+        }
+
+        .input-container.highlight {
+            border-color: #5b5fc7;
+            animation: input-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes input-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(91, 95, 199, 0.4); }
+            50% { box-shadow: 0 0 0 4px rgba(91, 95, 199, 0.2); }
+        }
+
+        .input-toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            background: #fafafa;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .toolbar-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .toolbar-btn:hover {
+            background: #e8e8e8;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 12px 14px;
+            border: none;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            min-height: 50px;
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #fafafa;
+        }
+
+        .char-count {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .send-btn {
+            background: #5b5fc7;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .send-btn:hover {
+            background: #4a4eb5;
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Calendar View */
+        .calendar-view {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+        }
+
+        .calendar-view.active {
+            display: flex;
+        }
+
+        .calendar-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-header h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #242424;
+        }
+
+        .new-meeting-btn {
+            background: #5b5fc7;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .new-meeting-btn:hover {
+            background: #4a4eb5;
+        }
+
+        .new-meeting-btn.highlight {
+            animation: pulse-highlight 1.5s ease-in-out infinite;
+        }
+
+        .calendar-content {
+            flex: 1;
+            display: flex;
+            padding: 16px;
+            gap: 16px;
+            overflow-y: auto;
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            flex: 1;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .calendar-nav h4 {
+            font-size: 15px;
+            color: #333;
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .nav-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .day-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 3px;
+            text-align: center;
+        }
+
+        .day-header {
+            padding: 8px;
+            font-size: 11px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .day-cell {
+            padding: 10px 6px;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .day-cell:hover {
+            background: #e8e8e8;
+        }
+
+        .day-cell.today {
+            background: #5b5fc7;
+            color: white;
+        }
+
+        .day-cell.has-meeting {
+            background: #e8f4fd;
+            font-weight: 600;
+        }
+
+        .day-cell.other-month {
+            color: #ccc;
+        }
+
+        /* Meeting scheduled indicator */
+        .meeting-scheduled-banner {
+            display: none;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            color: #155724;
+            font-size: 13px;
+        }
+
+        .meeting-scheduled-banner.visible {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Meeting Form Modal */
+        .meeting-form-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .meeting-form-container.active {
+            display: flex;
+        }
+
+        .meeting-form {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .form-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-header h3 {
+            font-size: 18px;
+            color: #242424;
+        }
+
+        .close-form-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .close-form-btn:hover {
+            background: #e8e8e8;
+        }
+
+        .form-body {
+            padding: 20px 24px;
+        }
+
+        .form-step-indicator {
+            background: #e8f4fd;
+            border: 1px solid #b8daef;
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-indicator-number {
+            width: 26px;
+            height: 26px;
+            background: #0078d4;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .step-indicator-text {
+            font-size: 13px;
+            color: #0078d4;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .form-group .hint {
+            font-size: 11px;
+            color: #888;
+            font-weight: normal;
+            margin-left: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d1d1;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #5b5fc7;
+            box-shadow: 0 0 0 3px rgba(91, 95, 199, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .datetime-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .datetime-row .form-group {
+            flex: 1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .form-footer {
+            padding: 14px 24px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .form-submit-btn {
+            background: #5b5fc7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-submit-btn:hover {
+            background: #4a4eb5;
+        }
+
+        .form-cancel-btn {
+            background: transparent;
+            border: 1px solid #d1d1d1;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-cancel-btn:hover {
+            background: #f5f5f5;
+        }
+
+        /* Success Modal */
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .success-modal.active {
+            display: flex;
+        }
+
+        .success-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            max-width: 480px;
+            animation: scaleIn 0.3s ease;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .success-icon {
+            width: 70px;
+            height: 70px;
+            background: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 16px auto;
+            color: white;
+        }
+
+        .success-content h2 {
+            font-size: 22px;
+            color: #242424;
+            margin-bottom: 10px;
+        }
+
+        .success-content p {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .meeting-summary {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 14px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .meeting-summary h4 {
+            font-size: 13px;
+            color: #5b5fc7;
+            margin-bottom: 10px;
+        }
+
+        .summary-item {
+            display: flex;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .summary-label {
+            width: 90px;
+            color: #888;
+        }
+
+        .summary-value {
+            flex: 1;
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* Final Complete Modal */
+        .complete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .complete-modal.active {
+            display: flex;
+        }
+
+        .complete-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            animation: scaleIn 0.3s ease;
+        }
+
+        .complete-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .complete-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 16px auto;
+            color: white;
+        }
+
+        .complete-header h2 {
+            font-size: 24px;
+            color: #242424;
+            margin-bottom: 8px;
+        }
+
+        .complete-header p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .evidence-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .evidence-section h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .evidence-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .evidence-table th,
+        .evidence-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .evidence-table th {
+            background: #e9ecef;
+            font-weight: 600;
+            color: #495057;
+            width: 140px;
+        }
+
+        .evidence-table td {
+            background: white;
+            color: #333;
+        }
+
+        .steps-list {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .steps-list h4 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .steps-list ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .steps-list li {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .complete-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Copy feedback */
+        .copy-feedback {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 3000;
+            display: none;
+        }
+
+        .copy-feedback.visible {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translate(-50%, 10px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        /* Print styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-area, .print-area * {
+                visibility: visible;
+            }
+            .print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+            }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Accessibility bar (matches the other tools in the suite) */
+        .a11y-bar {
+            max-width: 1200px;
+            margin: 0 auto 16px auto;
+            background: #252542;
+            border-radius: 8px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .a11y-bar label {
+            font-size: 13px;
+            color: #b8b8d1;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .a11y-bar input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .a11y-title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-right: 6px;
+            color: white;
+        }
+
+        .chat-header-email {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Larger Text mode */
+        body.larger-text {
+            zoom: 1.15;
+        }
+
+        body.larger-text .step-label {
+            font-size: 13px;
+            max-width: 96px;
+        }
+
+        body.larger-text .chat-name,
+        body.larger-text .chat-preview {
+            font-size: 14px;
+        }
+
+        body.larger-text .message-bubble {
+            font-size: 15px;
+        }
+
+        /* High Contrast mode: black chrome, white text, stronger borders.
+           The Teams purple shell and the white Teams window are kept readable. */
+        body.high-contrast {
+            background: #000;
+        }
+
+        body.high-contrast .a11y-bar,
+        body.high-contrast .progress-container,
+        body.high-contrast .instruction-panel {
+            background: #000;
+            border: 1px solid #fff;
+        }
+
+        body.high-contrast .activity-header {
+            background: #34367e;
+            border: 1px solid #fff;
+            box-shadow: none;
+        }
+
+        body.high-contrast .a11y-bar label,
+        body.high-contrast .instruction-step p,
+        body.high-contrast .step-label {
+            color: #fff;
+        }
+
+        body.high-contrast .instruction-step h3 {
+            color: #b3b6ff;
+        }
+
+        body.high-contrast .instruction-highlight {
+            background: #1a1c4a;
+            border-left-color: #b3b6ff;
+        }
+
+        body.high-contrast .step-number {
+            background: #000;
+            color: #fff;
+            border: 2px solid #888;
+        }
+
+        body.high-contrast .progress-steps::before {
+            background: #888;
+        }
+
+        body.high-contrast .btn-secondary {
+            background: #000;
+            border: 1px solid #fff;
+        }
+
+        body.high-contrast .app-rail {
+            background: #000;
+        }
+
+        body.high-contrast .rail-item {
+            color: #ddd;
+        }
+
+        body.high-contrast .chat-preview,
+        body.high-contrast .search-box {
+            color: #333;
+        }
+
+        body.high-contrast .chat-time,
+        body.high-contrast .message-time,
+        body.high-contrast .char-count,
+        body.high-contrast .chat-header-email,
+        body.high-contrast .summary-label {
+            color: #444;
+        }
+
+        body.high-contrast .form-group .hint {
+            color: #555;
+        }
+
+        body.high-contrast .form-control {
+            border-color: #666;
+        }
+
+        body.high-contrast .header-btn {
+            border: 1px solid #666;
+            color: #000;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Accessibility bar -->
+    <div class="a11y-bar">
+        <span class="a11y-title">Accessibility:</span>
+        <label><input type="checkbox" id="toggleLargeText"> Larger Text</label>
+        <label><input type="checkbox" id="toggleHighContrast"> High Contrast</label>
+    </div>
+
+    <!-- Activity Header -->
+    <div class="activity-header">
+        <h1>
+            <span class="task-badge">Session 10 Activity 10(c)</span>
+            Create a Teams Meeting Invitation
+        </h1>
+        <p>Your supervisor has sent you a message asking you to organise a team meeting about a garden improvement project. Follow the steps to create and send a meeting invitation, then reply to confirm.</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="progress-container">
+        <div class="progress-steps">
+            <div class="progress-step active" id="progress-1">
+                <div class="step-number">1</div>
+                <div class="step-label">Read Message</div>
+            </div>
+            <div class="progress-step" id="progress-2">
+                <div class="step-number">2</div>
+                <div class="step-label">Go to Calendar</div>
+            </div>
+            <div class="progress-step" id="progress-3">
+                <div class="step-number">3</div>
+                <div class="step-label">New Meeting</div>
+            </div>
+            <div class="progress-step" id="progress-4">
+                <div class="step-number">4</div>
+                <div class="step-label">Fill Details</div>
+            </div>
+            <div class="progress-step" id="progress-5">
+                <div class="step-number">5</div>
+                <div class="step-label">Send Invite</div>
+            </div>
+            <div class="progress-step" id="progress-6">
+                <div class="step-number">6</div>
+                <div class="step-label">Reply to Karen</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Instruction Panel -->
+        <div class="instruction-panel">
+            <!-- Step 1: Read Message -->
+            <div class="instruction-step active" id="instruction-1">
+                <h3>Step 1 of 6</h3>
+                <h2>Read Your Supervisor's Message</h2>
+                <p>Look at the Teams window. Your supervisor <strong>Karen Mitchell</strong> has sent you a message.</p>
+                <div class="instruction-highlight">
+                    <p><strong>Click on Karen Mitchell's chat</strong> in the chat list to read her message.</p>
+                </div>
+                <p>The blue dot shows it's unread. Read carefully - she's giving you a task to complete.</p>
+            </div>
+
+            <!-- Step 2: Go to Calendar -->
+            <div class="instruction-step" id="instruction-2">
+                <h3>Step 2 of 6</h3>
+                <h2>Navigate to Calendar</h2>
+                <p>To create a meeting invitation, you need to go to the <strong>Calendar</strong> section.</p>
+                <div class="instruction-highlight">
+                    <p><strong>Click on the Calendar icon</strong> (📅) in the left sidebar.</p>
+                </div>
+                <p>The Calendar is where you schedule meetings and appointments in Teams.</p>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Create Meeting -->
+            <div class="instruction-step" id="instruction-3">
+                <h3>Step 3 of 6</h3>
+                <h2>Start a New Meeting</h2>
+                <p>Now you're in Calendar view. Create a new meeting invitation.</p>
+                <div class="instruction-highlight">
+                    <p><strong>Click the "New Meeting" button</strong> in the top right corner.</p>
+                </div>
+                <p>This opens a form to enter the meeting details.</p>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Fill Details -->
+            <div class="instruction-step" id="instruction-4">
+                <h3>Step 4 of 6</h3>
+                <h2>Fill in Meeting Details</h2>
+                <p>Complete the meeting form. Remember Karen asked about <strong>improving the garden space</strong>.</p>
+                <div class="instruction-highlight">
+                    <p>Fill in all fields:
+                    <br>• <strong>Title</strong> - What the meeting is about
+                    <br>• <strong>Attendees</strong> - Who to invite
+                    <br>• <strong>Location</strong> - Where to meet
+                    <br>• <strong>Agenda</strong> - What you'll discuss
+                    <br>• <strong>Options</strong> - Meeting settings</p>
+                </div>
+                <p>Keep it professional and business-like.</p>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="closeForm(); goToStep(3)">← Back</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Send -->
+            <div class="instruction-step" id="instruction-5">
+                <h3>Step 5 of 6</h3>
+                <h2>Send the Invitation</h2>
+                <p>Check your details are correct, then send.</p>
+                <div class="instruction-highlight">
+                    <p><strong>Click "Send Invitation"</strong> to send your meeting request.</p>
+                </div>
+                <p>Your colleagues will receive it in their calendars.</p>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="goToStep(4)">← Back</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Reply to Karen -->
+            <div class="instruction-step" id="instruction-6">
+                <h3>Step 6 of 6</h3>
+                <h2>Reply to Your Supervisor</h2>
+                <p>Karen asked you to let her know when you've sent the invitation. Time to reply!</p>
+                <div class="instruction-highlight">
+                    <p><strong>Type a professional reply</strong> in the message box and click <strong>Send</strong>.</p>
+                </div>
+                <p>Let her know the invitation has been sent and include relevant details like when the meeting is scheduled.</p>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="goToStep(5)">← Back</button>
+                </div>
+            </div>
+
+            <!-- Completion -->
+            <div class="instruction-step" id="instruction-complete">
+                <h3>Activity Complete!</h3>
+                <h2>Excellent Work! 🎉</h2>
+                <p>You have successfully:</p>
+                <div class="instruction-highlight">
+                    <p>✓ Read your supervisor's request<br>
+                    ✓ Created a meeting invitation<br>
+                    ✓ Filled in professional details<br>
+                    ✓ Sent the invitation<br>
+                    ✓ Replied to confirm completion</p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="showEvidenceModal()">📋 View Evidence</button>
+                    <button class="btn btn-secondary" onclick="resetActivity()">Start Again</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teams Window -->
+        <div class="teams-window">
+            <!-- Title Bar -->
+            <div class="title-bar">
+                <div class="title-bar-left">
+                    <div class="teams-logo">T</div>
+                    <span>Microsoft Teams - NT Community Services</span>
+                </div>
+                <div class="window-controls">
+                    <div class="window-btn red"></div>
+                    <div class="window-btn yellow"></div>
+                    <div class="window-btn green"></div>
+                </div>
+            </div>
+
+            <!-- Teams Content -->
+            <div class="teams-content">
+                <!-- App Rail -->
+                <div class="app-rail">
+                    <div class="rail-item" id="rail-activity">
+                        <span class="rail-icon">🔔</span>
+                        <span>Activity</span>
+                    </div>
+                    <div class="rail-item active" id="rail-chat" onclick="switchView('chat')">
+                        <span class="rail-icon">💬</span>
+                        <span>Chat</span>
+                    </div>
+                    <div class="rail-item" id="rail-teams">
+                        <span class="rail-icon">👥</span>
+                        <span>Teams</span>
+                    </div>
+                    <div class="rail-item" id="rail-calendar" onclick="switchView('calendar')">
+                        <span class="rail-icon">📅</span>
+                        <span>Calendar</span>
+                    </div>
+                    <div class="rail-item" id="rail-calls">
+                        <span class="rail-icon">📞</span>
+                        <span>Calls</span>
+                    </div>
+                    <div class="rail-item" id="rail-files">
+                        <span class="rail-icon">📁</span>
+                        <span>Files</span>
+                    </div>
+                </div>
+
+                <!-- Chat Panel -->
+                <div class="chat-panel" id="chat-panel">
+                    <div class="panel-header">
+                        <h2>Chat</h2>
+                        <button class="new-chat-btn">✏️</button>
+                    </div>
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <span>Search</span>
+                    </div>
+                    <div class="chat-list">
+                        <div class="chat-item unread highlight" id="chat-supervisor" onclick="selectChat('supervisor')">
+                            <div class="chat-avatar" style="background: #0078d4;">KM</div>
+                            <div class="chat-info">
+                                <div class="chat-name">Karen Mitchell <span class="supervisor-tag">Supervisor</span></div>
+                                <div class="chat-preview">I need you to get a crew together...</div>
+                            </div>
+                            <div class="chat-meta">
+                                <div class="chat-time">9:15 AM</div>
+                                <div class="unread-badge">1</div>
+                            </div>
+                        </div>
+                        <div class="chat-item">
+                            <div class="chat-avatar" style="background: #107c10;">WS</div>
+                            <div class="chat-info">
+                                <div class="chat-name">Workplace Safety Team</div>
+                                <div class="chat-preview">Reminder: Safety meeting at 2pm</div>
+                            </div>
+                            <div class="chat-meta">
+                                <div class="chat-time">Yesterday</div>
+                            </div>
+                        </div>
+                        <div class="chat-item">
+                            <div class="chat-avatar" style="background: #c239b3;">JT</div>
+                            <div class="chat-info">
+                                <div class="chat-name">Job Training Group</div>
+                                <div class="chat-preview">New roster posted for next week</div>
+                            </div>
+                            <div class="chat-meta">
+                                <div class="chat-time">Mon</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Area -->
+                <div class="main-area">
+                    <!-- Chat View -->
+                    <div class="chat-view active" id="chat-view">
+                        <div class="chat-header">
+                            <div class="chat-header-info">
+                                <div class="chat-avatar" style="background: #0078d4; width: 34px; height: 34px; font-size: 12px;">KM</div>
+                                <div>
+                                    <h3>Karen Mitchell <span class="supervisor-tag">Supervisor</span></h3>
+                                    <div class="chat-header-email">karen.mitchell@ntcommunityservices.com.au</div>
+                                </div>
+                            </div>
+                            <div class="chat-header-actions">
+                                <button class="header-btn">📹 Video</button>
+                                <button class="header-btn">📞 Call</button>
+                            </div>
+                        </div>
+
+                        <div class="messages-area" id="messages-area">
+                            <div class="message">
+                                <div class="message-avatar" style="background: #0078d4;">KM</div>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <span class="message-sender">Karen Mitchell</span>
+                                        <span class="message-time">9:15 AM</span>
+                                    </div>
+                                    <div class="message-bubble supervisor">
+                                        Good morning! I've got a task for you.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="message">
+                                <div class="message-avatar" style="background: #0078d4;">KM</div>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <span class="message-sender">Karen Mitchell</span>
+                                        <span class="message-time">9:16 AM</span>
+                                    </div>
+                                    <div class="message-bubble supervisor important">
+                                        <strong>I need you to get a crew together to improve the garden space in your workplace.</strong>
+                                        <br><br>
+                                        Can you set up a Teams meeting with some colleagues to discuss this? We're thinking about building a new garden in the organisation's recreation area.
+                                        <br><br>
+                                        Make sure the meeting invitation is professional and includes all the key details.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="message">
+                                <div class="message-avatar" style="background: #0078d4;">KM</div>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <span class="message-sender">Karen Mitchell</span>
+                                        <span class="message-time">9:17 AM</span>
+                                    </div>
+                                    <div class="message-bubble supervisor">
+                                        Let me know once you've sent out the invitation. Thanks!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="message-input-area">
+                            <div class="input-container" id="reply-container">
+                                <div class="input-toolbar">
+                                    <button class="toolbar-btn">📎</button>
+                                    <button class="toolbar-btn">😊</button>
+                                    <button class="toolbar-btn">🎤</button>
+                                </div>
+                                <textarea class="message-input" placeholder="Type a message to Karen..." id="reply-input" oninput="updateCharCount()"></textarea>
+                                <div class="input-footer">
+                                    <span class="char-count" id="char-count">0 characters</span>
+                                    <button class="send-btn" id="reply-btn" onclick="sendReply()">Send ➤</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calendar View -->
+                    <div class="calendar-view" id="calendar-view">
+                        <div class="calendar-header">
+                            <h3>📅 Calendar</h3>
+                            <button class="new-meeting-btn" id="new-meeting-btn" onclick="openMeetingForm()">
+                                ➕ New Meeting
+                            </button>
+                        </div>
+                        <div class="calendar-content">
+                            <div class="calendar-grid">
+                                <div class="meeting-scheduled-banner" id="meeting-banner">
+                                    <span>✓</span>
+                                    <span><strong>Meeting scheduled:</strong> <span id="banner-title"></span></span>
+                                </div>
+                                <div class="calendar-nav">
+                                    <button class="nav-btn">◀</button>
+                                    <h4>February 2026</h4>
+                                    <button class="nav-btn">▶</button>
+                                </div>
+                                <div class="day-grid">
+                                    <div class="day-header">Sun</div>
+                                    <div class="day-header">Mon</div>
+                                    <div class="day-header">Tue</div>
+                                    <div class="day-header">Wed</div>
+                                    <div class="day-header">Thu</div>
+                                    <div class="day-header">Fri</div>
+                                    <div class="day-header">Sat</div>
+                                    
+                                    <div class="day-cell today">1</div>
+                                    <div class="day-cell">2</div>
+                                    <div class="day-cell">3</div>
+                                    <div class="day-cell">4</div>
+                                    <div class="day-cell" id="day-5">5</div>
+                                    <div class="day-cell">6</div>
+                                    <div class="day-cell">7</div>
+                                    
+                                    <div class="day-cell">8</div>
+                                    <div class="day-cell">9</div>
+                                    <div class="day-cell">10</div>
+                                    <div class="day-cell">11</div>
+                                    <div class="day-cell">12</div>
+                                    <div class="day-cell">13</div>
+                                    <div class="day-cell">14</div>
+                                    
+                                    <div class="day-cell">15</div>
+                                    <div class="day-cell">16</div>
+                                    <div class="day-cell">17</div>
+                                    <div class="day-cell">18</div>
+                                    <div class="day-cell">19</div>
+                                    <div class="day-cell">20</div>
+                                    <div class="day-cell">21</div>
+                                    
+                                    <div class="day-cell">22</div>
+                                    <div class="day-cell">23</div>
+                                    <div class="day-cell">24</div>
+                                    <div class="day-cell">25</div>
+                                    <div class="day-cell">26</div>
+                                    <div class="day-cell">27</div>
+                                    <div class="day-cell">28</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Meeting Form Modal -->
+    <div class="meeting-form-container" id="meeting-form-container">
+        <div class="meeting-form">
+            <div class="form-header">
+                <h3>📅 New Meeting</h3>
+                <button class="close-form-btn" onclick="closeForm()">✕</button>
+            </div>
+            <div class="form-body">
+                <div class="form-step-indicator">
+                    <div class="step-indicator-number">4</div>
+                    <div class="step-indicator-text">Fill in each field below to create your meeting invitation</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="meeting-title">Meeting Title <span class="hint">(What is this meeting about?)</span></label>
+                    <input type="text" class="form-control" id="meeting-title" placeholder="e.g., Garden Project Planning Meeting">
+                </div>
+
+                <div class="form-group">
+                    <label for="meeting-attendees">Invite Attendees <span class="hint">(Who should come?)</span></label>
+                    <input type="text" class="form-control" id="meeting-attendees" placeholder="e.g., David Wilson; Sarah Jones; Michael Nguyen">
+                </div>
+
+                <div class="datetime-row">
+                    <div class="form-group">
+                        <label for="meeting-date">Date</label>
+                        <input type="date" class="form-control" id="meeting-date" value="2026-02-05">
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting-time">Time</label>
+                        <input type="time" class="form-control" id="meeting-time" value="10:00">
+                    </div>
+                    <div class="form-group">
+                        <label for="meeting-duration">Duration</label>
+                        <select class="form-control" id="meeting-duration">
+                            <option value="30">30 mins</option>
+                            <option value="60" selected>1 hour</option>
+                            <option value="90">1.5 hours</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="meeting-location">Room or Location <span class="hint">(Where will you meet?)</span></label>
+                    <input type="text" class="form-control" id="meeting-location" placeholder="e.g., Meeting Room A / Recreation Area / Online">
+                </div>
+
+                <div class="form-group">
+                    <label for="meeting-agenda">Agenda / Details / Notes <span class="hint">(What will you discuss?)</span></label>
+                    <textarea class="form-control" id="meeting-agenda" placeholder="Describe what the meeting is about..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Meeting Options</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="option-video" checked>
+                            <label for="option-video">Allow video for attendees</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="option-mic" checked>
+                            <label for="option-mic">Allow microphone for attendees</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="option-record">
+                            <label for="option-record">Record this meeting</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="option-guests">
+                            <label for="option-guests">Allow external guests</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="option-reminder" checked>
+                            <label for="option-reminder">Send reminder before meeting</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-footer">
+                <button class="form-cancel-btn" onclick="closeForm()">Cancel</button>
+                <button class="form-submit-btn" onclick="sendInvitation()">📧 Send Invitation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal (after sending invitation) -->
+    <div class="success-modal" id="success-modal">
+        <div class="success-content">
+            <div class="success-icon">✓</div>
+            <h2>Meeting Invitation Sent!</h2>
+            <p>Your invitation has been sent to all attendees.</p>
+            
+            <div class="meeting-summary" id="meeting-summary">
+                <h4>Your Meeting:</h4>
+                <div class="summary-item">
+                    <span class="summary-label">Title:</span>
+                    <span class="summary-value" id="summary-title"></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Attendees:</span>
+                    <span class="summary-value" id="summary-attendees"></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">When:</span>
+                    <span class="summary-value" id="summary-datetime"></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Location:</span>
+                    <span class="summary-value" id="summary-location"></span>
+                </div>
+            </div>
+
+            <p><strong>Now reply to Karen</strong> to let her know you've sent the invitation.</p>
+            <button class="btn btn-success" onclick="proceedToReply()">Continue to Reply →</button>
+        </div>
+    </div>
+
+    <!-- Complete Modal with Evidence -->
+    <div class="complete-modal" id="complete-modal">
+        <div class="complete-content">
+            <div class="complete-header">
+                <div class="complete-icon">🎉</div>
+                <h2>Activity Complete!</h2>
+                <p>You've successfully completed the Teams Meeting Invitation activity</p>
+            </div>
+
+            <div class="evidence-section">
+                <h3>📋 Your Evidence for the Workbook</h3>
+                
+                <table class="evidence-table">
+                    <tr>
+                        <th>Title:</th>
+                        <td id="evidence-title"></td>
+                    </tr>
+                    <tr>
+                        <th>Invite Attendees:</th>
+                        <td id="evidence-attendees"></td>
+                    </tr>
+                    <tr>
+                        <th>Room or Location:</th>
+                        <td id="evidence-location"></td>
+                    </tr>
+                    <tr>
+                        <th>Agenda/Details:</th>
+                        <td id="evidence-agenda"></td>
+                    </tr>
+                    <tr>
+                        <th>Options Selected:</th>
+                        <td id="evidence-options"></td>
+                    </tr>
+                </table>
+
+                <div class="steps-list">
+                    <h4>Steps taken to send the message (for part c):</h4>
+                    <ol>
+                        <li>Read the Teams message from my supervisor Karen Mitchell</li>
+                        <li>Clicked on Calendar in the left sidebar</li>
+                        <li>Clicked "New Meeting" button to create a meeting invitation</li>
+                        <li>Filled in the meeting title, attendees, date/time, location, and agenda</li>
+                        <li>Selected meeting options (for example video, recording, allow external guests)</li>
+                        <li>Clicked "Send Invitation" to send to all attendees</li>
+                        <li>Replied to my supervisor to confirm the invitation was sent</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="complete-actions">
+                <button class="btn btn-primary" onclick="copyEvidence()">📋 Copy Evidence to Clipboard</button>
+                <button class="btn btn-secondary" onclick="printEvidence()">🖨️ Print Evidence</button>
+                <button class="btn btn-secondary" onclick="closeCompleteModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Feedback Toast -->
+    <div class="copy-feedback" id="copy-feedback">✓ Evidence copied to clipboard!</div>
+
+    <!-- Hidden Print Area -->
+    <div class="print-area" id="print-area" style="display: none;">
+        <h1>Teams Meeting Invitation Evidence</h1>
+        <h2>Meeting Details Created:</h2>
+        <table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
+            <tr><th style="text-align: left; width: 150px;">Title:</th><td id="print-title"></td></tr>
+            <tr><th style="text-align: left;">Invite Attendees:</th><td id="print-attendees"></td></tr>
+            <tr><th style="text-align: left;">Room or Location:</th><td id="print-location"></td></tr>
+            <tr><th style="text-align: left;">Agenda/Details:</th><td id="print-agenda"></td></tr>
+            <tr><th style="text-align: left;">Options Selected:</th><td id="print-options"></td></tr>
+        </table>
+        <h2>Steps taken to send the message:</h2>
+        <ol>
+            <li>Read the Teams message from my supervisor Karen Mitchell</li>
+            <li>Clicked on Calendar in the left sidebar</li>
+            <li>Clicked "New Meeting" button to create a meeting invitation</li>
+            <li>Filled in the meeting title, attendees, date/time, location, and agenda</li>
+            <li>Selected meeting options (for example video, recording, allow external guests)</li>
+            <li>Clicked "Send Invitation" to send to all attendees</li>
+            <li>Replied to my supervisor to confirm the invitation was sent</li>
+        </ol>
+        <p><em>Reply sent to supervisor:</em></p>
+        <p id="print-reply" style="background: #f0f0f0; padding: 10px; border-radius: 4px;"></p>
+    </div>
+
+    <script>
+        // State
+        let currentStep = 1;
+        let meetingData = {};
+        let replyMessage = '';
+        let invitationSent = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightCurrentStep();
+        });
+
+        // Accessibility toggles (same behaviour as the other tools in the suite)
+        document.getElementById('toggleLargeText').addEventListener('change', function() {
+            document.body.classList.toggle('larger-text', this.checked);
+        });
+        document.getElementById('toggleHighContrast').addEventListener('change', function() {
+            document.body.classList.toggle('high-contrast', this.checked);
+        });
+
+        // Step management
+        function goToStep(step) {
+            currentStep = step;
+            updateUI();
+        }
+
+        function updateUI() {
+            // Update progress indicators
+            for (let i = 1; i <= 6; i++) {
+                const progressEl = document.getElementById(`progress-${i}`);
+                const instructionEl = document.getElementById(`instruction-${i}`);
+                
+                if (progressEl) {
+                    progressEl.classList.remove('active', 'completed');
+                    if (i < currentStep) {
+                        progressEl.classList.add('completed');
+                    } else if (i === currentStep) {
+                        progressEl.classList.add('active');
+                    }
+                }
+                
+                if (instructionEl) {
+                    instructionEl.classList.remove('active');
+                    if (i === currentStep) {
+                        instructionEl.classList.add('active');
+                    }
+                }
+            }
+
+            highlightCurrentStep();
+        }
+
+        function highlightCurrentStep() {
+            // Clear all highlights
+            document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+
+            switch(currentStep) {
+                case 1:
+                    document.getElementById('chat-supervisor').classList.add('highlight');
+                    break;
+                case 2:
+                    document.getElementById('rail-calendar').classList.add('highlight');
+                    break;
+                case 3:
+                    document.getElementById('new-meeting-btn').classList.add('highlight');
+                    break;
+                case 6:
+                    document.getElementById('reply-container').classList.add('highlight');
+                    break;
+            }
+        }
+
+        // Chat selection
+        function selectChat(chatId) {
+            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+
+            if (chatId === 'supervisor') {
+                const chatEl = document.getElementById('chat-supervisor');
+                chatEl.classList.add('active');
+                chatEl.classList.remove('unread', 'highlight');
+                const badge = chatEl.querySelector('.unread-badge');
+                if (badge) badge.style.display = 'none';
+
+                setTimeout(() => {
+                    if (currentStep === 1) goToStep(2);
+                }, 1000);
+            }
+        }
+
+        // View switching
+        function switchView(view) {
+            document.querySelectorAll('.rail-item').forEach(item => item.classList.remove('active'));
+            document.getElementById(`rail-${view}`).classList.add('active');
+
+            document.getElementById('chat-view').classList.remove('active');
+            document.getElementById('calendar-view').classList.remove('active');
+            document.getElementById('chat-panel').style.display = 'none';
+
+            if (view === 'chat') {
+                document.getElementById('chat-view').classList.add('active');
+                document.getElementById('chat-panel').style.display = 'flex';
+            } else if (view === 'calendar') {
+                document.getElementById('calendar-view').classList.add('active');
+                if (currentStep === 2) goToStep(3);
+            }
+        }
+
+        // Meeting form
+        function openMeetingForm() {
+            document.getElementById('meeting-form-container').classList.add('active');
+            if (currentStep === 3) goToStep(4);
+        }
+
+        function closeForm() {
+            document.getElementById('meeting-form-container').classList.remove('active');
+        }
+
+        function validateForm() {
+            const title = document.getElementById('meeting-title').value.trim();
+            const attendees = document.getElementById('meeting-attendees').value.trim();
+            const location = document.getElementById('meeting-location').value.trim();
+            const agenda = document.getElementById('meeting-agenda').value.trim();
+            return title && attendees && location && agenda;
+        }
+
+        function sendInvitation() {
+            if (!validateForm()) {
+                alert('Please fill in all required fields:\n• Meeting Title\n• Attendees\n• Location\n• Agenda/Details');
+                return;
+            }
+
+            // Store data
+            meetingData = {
+                title: document.getElementById('meeting-title').value.trim(),
+                attendees: document.getElementById('meeting-attendees').value.trim(),
+                date: document.getElementById('meeting-date').value,
+                time: document.getElementById('meeting-time').value,
+                duration: document.getElementById('meeting-duration').value,
+                location: document.getElementById('meeting-location').value.trim(),
+                agenda: document.getElementById('meeting-agenda').value.trim(),
+                options: []
+            };
+
+            if (document.getElementById('option-video').checked) meetingData.options.push('Video allowed');
+            if (document.getElementById('option-mic').checked) meetingData.options.push('Microphone allowed');
+            if (document.getElementById('option-record').checked) meetingData.options.push('Recording enabled');
+            if (document.getElementById('option-guests').checked) meetingData.options.push('External guests allowed');
+            if (document.getElementById('option-reminder').checked) meetingData.options.push('Reminder enabled');
+
+            // Update summary
+            document.getElementById('summary-title').textContent = meetingData.title;
+            document.getElementById('summary-attendees').textContent = meetingData.attendees;
+            document.getElementById('summary-datetime').textContent = formatDateTime(meetingData.date, meetingData.time);
+            document.getElementById('summary-location').textContent = meetingData.location;
+
+            // Show meeting on calendar
+            document.getElementById('day-5').classList.add('has-meeting');
+            document.getElementById('meeting-banner').classList.add('visible');
+            document.getElementById('banner-title').textContent = meetingData.title;
+
+            invitationSent = true;
+            closeForm();
+            goToStep(5);
+            document.getElementById('success-modal').classList.add('active');
+        }
+
+        function formatDateTime(date, time) {
+            const dateObj = new Date(date + 'T' + time);
+            return dateObj.toLocaleDateString('en-AU', { 
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
+            }) + ' at ' + dateObj.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function proceedToReply() {
+            document.getElementById('success-modal').classList.remove('active');
+            goToStep(6);
+            switchView('chat');
+            
+            // Scroll to bottom of messages
+            const messagesArea = document.getElementById('messages-area');
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        // Reply handling
+        function updateCharCount() {
+            const input = document.getElementById('reply-input');
+            document.getElementById('char-count').textContent = input.value.length + ' characters';
+        }
+
+        function sendReply() {
+            const input = document.getElementById('reply-input');
+            const message = input.value.trim();
+
+            if (!message) {
+                alert('Please type a reply to Karen letting her know you\'ve sent the invitation.');
+                return;
+            }
+
+            if (message.length < 20) {
+                alert('Your reply seems a bit short. Include details like confirming the invitation was sent and when the meeting is scheduled.');
+                return;
+            }
+
+            replyMessage = message;
+
+            // Add message to chat
+            const messagesArea = document.getElementById('messages-area');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <div class="message-avatar" style="background: #5b5fc7;">You</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-sender">You</span>
+                        <span class="message-time">Just now</span>
+                    </div>
+                    <div class="message-bubble user-sent">${escapeHtml(message)}</div>
+                </div>
+            `;
+            messagesArea.appendChild(messageDiv);
+            input.value = '';
+            updateCharCount();
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+
+            // Add Karen's response after a delay
+            setTimeout(() => {
+                const responseDiv = document.createElement('div');
+                responseDiv.className = 'message';
+                responseDiv.innerHTML = `
+                    <div class="message-avatar" style="background: #0078d4;">KM</div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">Karen Mitchell</span>
+                            <span class="message-time">Just now</span>
+                        </div>
+                        <div class="message-bubble supervisor">Thanks for letting me know! Great work organising that so quickly. 👍</div>
+                    </div>
+                `;
+                messagesArea.appendChild(responseDiv);
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+
+                // Complete the activity
+                completeActivity();
+            }, 1500);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function completeActivity() {
+            // Mark all steps complete
+            for (let i = 1; i <= 6; i++) {
+                const el = document.getElementById(`progress-${i}`);
+                if (el) {
+                    el.classList.remove('active');
+                    el.classList.add('completed');
+                }
+            }
+
+            // Show completion instruction
+            document.querySelectorAll('.instruction-step').forEach(el => el.classList.remove('active'));
+            document.getElementById('instruction-complete').classList.add('active');
+            document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+        }
+
+        // Evidence modal
+        function showEvidenceModal() {
+            // Populate evidence
+            document.getElementById('evidence-title').textContent = meetingData.title || '';
+            document.getElementById('evidence-attendees').textContent = meetingData.attendees || '';
+            document.getElementById('evidence-location').textContent = meetingData.location || '';
+            document.getElementById('evidence-agenda').textContent = meetingData.agenda || '';
+            document.getElementById('evidence-options').textContent = meetingData.options?.join(', ') || 'Default settings';
+
+            document.getElementById('complete-modal').classList.add('active');
+        }
+
+        function closeCompleteModal() {
+            document.getElementById('complete-modal').classList.remove('active');
+        }
+
+        function copyEvidence() {
+            const text = `Teams Meeting Invitation
+
+MEETING DETAILS:
+Title: ${meetingData.title}
+Invite Attendees: ${meetingData.attendees}
+Room or Location: ${meetingData.location}
+Agenda/Details/Notes: ${meetingData.agenda}
+Options Selected: ${meetingData.options?.join(', ') || 'Default settings'}
+
+STEPS TAKEN TO SEND THE MESSAGE:
+1. Read the Teams message from my supervisor Karen Mitchell
+2. Clicked on Calendar in the left sidebar
+3. Clicked "New Meeting" button to create a meeting invitation
+4. Filled in the meeting title, attendees, date/time, location, and agenda
+5. Selected meeting options (for example video, recording, allow external guests)
+6. Clicked "Send Invitation" to send to all attendees
+7. Replied to my supervisor to confirm the invitation was sent
+
+REPLY SENT TO SUPERVISOR:
+${replyMessage}`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const feedback = document.getElementById('copy-feedback');
+                feedback.classList.add('visible');
+                setTimeout(() => feedback.classList.remove('visible'), 2500);
+            });
+        }
+
+        function printEvidence() {
+            // Populate print area
+            document.getElementById('print-title').textContent = meetingData.title || '';
+            document.getElementById('print-attendees').textContent = meetingData.attendees || '';
+            document.getElementById('print-location').textContent = meetingData.location || '';
+            document.getElementById('print-agenda').textContent = meetingData.agenda || '';
+            document.getElementById('print-options').textContent = meetingData.options?.join(', ') || 'Default settings';
+            document.getElementById('print-reply').textContent = replyMessage || '';
+
+            document.getElementById('print-area').style.display = 'block';
+            window.print();
+            document.getElementById('print-area').style.display = 'none';
+        }
+
+        function resetActivity() {
+            currentStep = 1;
+            meetingData = {};
+            replyMessage = '';
+            invitationSent = false;
+
+            // Reset form
+            document.getElementById('meeting-title').value = '';
+            document.getElementById('meeting-attendees').value = '';
+            document.getElementById('meeting-location').value = '';
+            document.getElementById('meeting-agenda').value = '';
+            document.getElementById('meeting-date').value = '2026-02-05';
+            document.getElementById('meeting-time').value = '10:00';
+            document.getElementById('reply-input').value = '';
+
+            // Reset chat
+            const supervisor = document.getElementById('chat-supervisor');
+            supervisor.classList.add('unread');
+            supervisor.classList.remove('active');
+            supervisor.querySelector('.unread-badge').style.display = 'inline-block';
+
+            // Reset calendar
+            document.getElementById('day-5').classList.remove('has-meeting');
+            document.getElementById('meeting-banner').classList.remove('visible');
+
+            // Reset messages - remove added messages
+            const messages = document.getElementById('messages-area');
+            while (messages.children.length > 3) {
+                messages.removeChild(messages.lastChild);
+            }
+
+            // Reset view
+            switchView('chat');
+            document.getElementById('instruction-complete').classList.remove('active');
+
+            updateUI();
+        }
+    </script>
+</body>
+</html>

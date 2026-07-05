@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Practice - Digital Literacy Trainer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #fff;
+            color: #202124;
+            min-height: 100vh;
+        }
+
+        /* ===== TOP HEADER BAR ===== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e8eaed;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 100;
+            gap: 16px;
+        }
+
+        .top-bar .logo {
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .g { color: #4285f4; }
+        .o1 { color: #ea4335; }
+        .o2 { color: #fbbc04; }
+        .g2 { color: #4285f4; }
+        .l { color: #34a853; }
+        .e { color: #ea4335; }
+
+        .top-bar .search-bar-wrap {
+            flex: 1;
+            max-width: 680px;
+            position: relative;
+        }
+
+        .top-bar .search-bar {
+            width: 100%;
+            padding: 10px 16px 10px 44px;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            font-size: 15px;
+            outline: none;
+            background: #fff;
+        }
+
+        .top-bar .search-bar:focus {
+            box-shadow: 0 1px 6px rgba(32,33,36,.28);
+            border-color: transparent;
+        }
+
+        .top-bar .search-icon-inline {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9aa0a6;
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .top-bar .search-btn-inline {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4285f4;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .top-bar .search-btn-inline:hover {
+            background: #3367d6;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .practice-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .ai-mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #e8f0fe;
+            padding: 5px 14px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a73e8;
+            cursor: pointer;
+            user-select: none;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .ai-mode-toggle:hover {
+            background: #d2e3fc;
+        }
+
+        .ai-mode-toggle.active {
+            background: linear-gradient(135deg, #7b61ff 0%, #4285f4 100%);
+            color: #fff;
+        }
+
+        .toggle-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #1a73e8;
+            transition: background 0.2s;
+        }
+
+        .ai-mode-toggle.active .toggle-dot {
+            background: #fff;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4285f4;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* ===== SEARCH TABS ===== */
+        .search-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 0 160px;
+            border-bottom: 1px solid #e8eaed;
+            background: #fff;
+        }
+
+        .search-tab {
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #5f6368;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+
+        .search-tab:hover {
+            color: #1a73e8;
+        }
+
+        .search-tab.active {
+            color: #1a73e8;
+            border-bottom-color: #1a73e8;
+        }
+
+        .tab-icon {
+            font-size: 14px;
+        }
+
+        /* ===== LANDING PAGE ===== */
+        .landing-page {
+            text-align: center;
+            padding: 80px 20px 40px;
+        }
+
+        .landing-logo {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .landing-search-wrap {
+            max-width: 580px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .landing-search {
+            width: 100%;
+            padding: 14px 50px 14px 50px;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .landing-search:hover,
+        .landing-search:focus {
+            box-shadow: 0 1px 6px rgba(32,33,36,.28);
+            border-color: transparent;
+        }
+
+        .landing-search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9aa0a6;
+            font-size: 20px;
+        }
+
+        .landing-buttons {
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .landing-btn {
+            background: #f8f9fa;
+            border: 1px solid #f8f9fa;
+            border-radius: 4px;
+            color: #3c4043;
+            font-size: 14px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .landing-btn:hover {
+            box-shadow: 0 1px 1px rgba(0,0,0,.1);
+            border-color: #dadce0;
+        }
+
+        /* ===== TEACHING PANELS ON LANDING ===== */
+        .teaching-section {
+            max-width: 900px;
+            margin: 40px auto 0;
+            text-align: left;
+        }
+
+        .teaching-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .teach-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #4285f4;
+        }
+
+        .teach-card.ai-card {
+            border-left-color: #7b61ff;
+            background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 100%);
+        }
+
+        .teach-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .teach-card p, .teach-card li {
+            font-size: 14px;
+            color: #5f6368;
+            line-height: 1.7;
+        }
+
+        .teach-card ul {
+            margin-left: 16px;
+            margin-top: 6px;
+        }
+
+        .teach-card code {
+            background: #e8eaed;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+            color: #d93025;
+        }
+
+        .teach-card .example-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            padding: 6px 10px;
+            background: #fff;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .teach-card .example-row .label {
+            color: #5f6368;
+            min-width: 80px;
+        }
+
+        .teach-card .example-row .val {
+            color: #1a73e8;
+            font-weight: 500;
+        }
+
+        /* ===== EXAMPLE TAGS ===== */
+        .examples-section {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .examples-section h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+            color: #202124;
+        }
+
+        .example-group-label {
+            font-size: 12px;
+            color: #5f6368;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .example-group-label:first-child {
+            margin-top: 0;
+        }
+
+        .example-tag {
+            display: inline-block;
+            padding: 7px 14px;
+            margin: 3px;
+            background: #fff;
+            border: 1px solid #dadce0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.15s;
+        }
+
+        .example-tag:hover {
+            background: #e8f0fe;
+            border-color: #4285f4;
+        }
+
+        .example-tag.ai-tag {
+            border-color: #c4b5fd;
+        }
+
+        .example-tag.ai-tag:hover {
+            background: #f5f3ff;
+            border-color: #7b61ff;
+        }
+
+        .example-tag.bool-tag {
+            border-color: #fbbf24;
+        }
+
+        .example-tag.bool-tag:hover {
+            background: #fffbeb;
+            border-color: #d97706;
+        }
+
+        /* ===== RESULTS PAGE ===== */
+        .results-page {
+            display: none;
+            padding: 20px 160px;
+            max-width: 1200px;
+        }
+
+        .results-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 30px;
+        }
+
+        .results-main {
+            min-width: 0;
+        }
+
+        .results-sidebar {
+            min-width: 0;
+        }
+
+        .results-stats {
+            color: #70757a;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== FEEDBACK BOX ===== */
+        .feedback-box {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .feedback-good {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .feedback-improve {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .feedback-bool {
+            background: #e8f0fe;
+            border-left: 4px solid #4285f4;
+            color: #1a56c4;
+        }
+
+        .suggestion-box {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* ===== AI OVERVIEW PANEL ===== */
+        .ai-overview {
+            background: linear-gradient(180deg, #f5f3ff 0%, #eef6ff 40%, #fafafa 100%);
+            border: 1px solid #e0daf5;
+            border-radius: 16px;
+            padding: 22px 24px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-overview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #7b61ff, #4285f4, #34a853, #fbbc04);
+        }
+
+        .ai-overview-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .ai-sparkle {
+            width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #7b61ff, #4285f4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .ai-overview-header span {
+            font-size: 15px;
+            font-weight: 600;
+            color: #202124;
+        }
+
+        .ai-overview-body {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #3c4043;
+        }
+
+        .ai-overview-body strong {
+            color: #202124;
+        }
+
+        .ai-overview-body ul {
+            margin: 10px 0 10px 18px;
+        }
+
+        .ai-overview-body li {
+            margin-bottom: 6px;
+        }
+
+        .ai-overview-footer {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #e0daf5;
+            font-size: 13px;
+            color: #5f6368;
+        }
+
+        .ai-source-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .ai-source-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            background: #fff;
+            border: 1px solid #e0daf5;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #1a73e8;
+        }
+
+        .ai-show-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 12px;
+            background: none;
+            border: none;
+            color: #1a73e8;
+            font-size: 12px;
+            cursor: pointer;
+            float: right;
+            margin-top: 6px;
+        }
+
+        /* ===== AI TEACHING CALLOUT ===== */
+        .ai-teach-callout {
+            background: #ede9fe;
+            border: 1px dashed #a78bfa;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #4c1d95;
+        }
+
+        .ai-teach-callout strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        /* ===== REGULAR SEARCH RESULTS ===== */
+        .result-item {
+            margin-bottom: 26px;
+        }
+
+        .result-site-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .result-favicon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #f1f3f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #5f6368;
+            flex-shrink: 0;
+        }
+
+        .result-site-text {
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .result-site-name {
+            color: #202124;
+            font-weight: 500;
+        }
+
+        .result-url {
+            color: #4d5156;
+            font-size: 12px;
+        }
+
+        .result-title {
+            color: #1a0dab;
+            font-size: 19px;
+            line-height: 1.3;
+            margin: 2px 0 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .result-title:hover {
+            text-decoration: underline;
+        }
+
+        .result-description {
+            color: #4d5156;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        /* ===== KNOWLEDGE PANEL ===== */
+        .knowledge-panel {
+            border: 1px solid #e8eaed;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .kp-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 4px;
+        }
+
+        .kp-subtitle {
+            font-size: 13px;
+            color: #70757a;
+            margin-bottom: 14px;
+        }
+
+        .kp-body {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #4d5156;
+            margin-bottom: 14px;
+        }
+
+        .kp-link {
+            color: #1a73e8;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .kp-link:hover {
+            text-decoration: underline;
+        }
+
+        .kp-divider {
+            border: none;
+            border-top: 1px solid #e8eaed;
+            margin: 14px 0;
+        }
+
+        .kp-info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 4px 0;
+        }
+
+        .kp-info-label {
+            color: #70757a;
+        }
+
+        .kp-info-value {
+            color: #202124;
+        }
+
+        /* ===== BOOLEAN RESULTS HIGHLIGHT ===== */
+        .bool-highlight {
+            background: #fef3c7;
+            padding: 1px 3px;
+            border-radius: 2px;
+        }
+
+        .bool-excluded {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        /* ===== BACK BUTTON ===== */
+        .back-bar {
+            display: none;
+            padding: 8px 160px;
+            border-bottom: 1px solid #e8eaed;
+        }
+
+        .back-btn {
+            background: #f1f3f4;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #3c4043;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-btn:hover {
+            background: #e8eaed;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 960px) {
+            .results-page { padding: 20px; }
+            .results-layout { grid-template-columns: 1fr; }
+            .search-tabs { padding: 0 20px; }
+            .back-bar { padding: 8px 20px; }
+            .teaching-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ===== VISUALLY HIDDEN FOR SCREEN READERS ===== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOP BAR (shown on results page) ===== -->
+    <div class="top-bar" id="topBar" style="display:none;">
+        <div class="logo" onclick="goHome()">
+            <span class="g">G</span><span class="o1">o</span><span class="o2">o</span><span class="g2">g</span><span class="l">l</span><span class="e">e</span>
+        </div>
+        <div class="search-bar-wrap">
+            <span class="search-icon-inline">&#128269;</span>
+            <input type="text" class="search-bar" id="topSearchInput" placeholder="Search..." aria-label="Search">
+            <button class="search-btn-inline" onclick="performSearch('top')">Search</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="practice-badge">PRACTICE MODE</div>
+            <button class="ai-mode-toggle" id="aiToggleTop" onclick="toggleAIMode()" title="Toggle AI Overview on or off">
+                <span class="toggle-dot"></span>
+                <span>AI Overview</span>
+            </button>
+            <div class="user-avatar">U</div>
+        </div>
+    </div>
+
+    <!-- ===== SEARCH TABS ===== -->
+    <div class="search-tabs" id="searchTabs" style="display:none;">
+        <div class="search-tab active"><span class="tab-icon">&#128270;</span> All</div>
+        <div class="search-tab"><span class="tab-icon">&#128240;</span> News</div>
+        <div class="search-tab"><span class="tab-icon">&#128444;</span> Images</div>
+        <div class="search-tab"><span class="tab-icon">&#127909;</span> Videos</div>
+        <div class="search-tab"><span class="tab-icon">&#128506;</span> Maps</div>
+        <div class="search-tab"><span class="tab-icon">&#8230;</span> More</div>
+    </div>
+
+    <!-- ===== LANDING PAGE ===== -->
+    <div class="landing-page" id="landingPage">
+        <div class="landing-logo">
+            <span class="g">G</span><span class="o1">o</span><span class="o2">o</span><span class="g2">g</span><span class="l">l</span><span class="e">e</span>
+        </div>
+
+        <div class="landing-search-wrap">
+            <span class="landing-search-icon">&#128269;</span>
+            <input type="text" class="landing-search" id="landingSearchInput" placeholder="Search or type a question..." aria-label="Search">
+        </div>
+
+        <div class="landing-buttons">
+            <button class="landing-btn" onclick="performSearch('landing')">Google Search</button>
+            <button class="landing-btn" onclick="feelingLucky()">I'm Feeling Lucky</button>
+        </div>
+
+        <!-- AI mode toggle on landing -->
+        <div style="margin-top:20px;">
+            <button class="ai-mode-toggle" id="aiToggleLanding" onclick="toggleAIMode()" title="Toggle AI Overview on or off">
+                <span class="toggle-dot"></span>
+                <span>AI Overview: OFF</span>
+            </button>
+        </div>
+
+        <!-- ===== TEACHING SECTION ===== -->
+        <div class="teaching-section">
+            <div class="teaching-grid">
+                <div class="teach-card">
+                    <h3>&#128269; Search Tips</h3>
+                    <p>The words you type change what results you get. Be specific to find what you need.</p>
+                    <div class="example-row">
+                        <span class="label">Too broad:</span>
+                        <span class="val">jobs</span>
+                    </div>
+                    <div class="example-row">
+                        <span class="label">Better:</span>
+                        <span class="val">warehouse jobs Darwin</span>
+                    </div>
+                    <div class="example-row">
+                        <span class="label">Ask a question:</span>
+                        <span class="val">how to write a resume</span>
+                    </div>
+                </div>
+
+                <div class="teach-card">
+                    <h3>&#128295; Boolean Operators</h3>
+                    <p>Special tricks to control your search:</p>
+                    <ul>
+                        <li><code>"exact phrase"</code> &mdash; find these exact words together</li>
+                        <li><code>-word</code> &mdash; remove results with that word</li>
+                        <li><code>site:seek.com.au</code> &mdash; only search one website</li>
+                        <li><code>OR</code> &mdash; search for either word</li>
+                    </ul>
+                </div>
+
+                <div class="teach-card ai-card">
+                    <h3><span style="display:inline-flex;width:18px;height:18px;background:linear-gradient(135deg,#7b61ff,#4285f4);border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:10px;">&#10024;</span> AI Overview (New)</h3>
+                    <p>Google now shows an <strong>AI-generated summary</strong> at the top of some searches. It reads websites and writes an answer for you.</p>
+                    <ul>
+                        <li>Appears for questions and complex searches</li>
+                        <li>Written by AI &mdash; not copied from one website</li>
+                        <li>Always check the sources listed below it</li>
+                        <li>AI can sometimes make mistakes</li>
+                    </ul>
+                </div>
+
+                <div class="teach-card ai-card">
+                    <h3>&#9888;&#65039; Be a Smart Reader</h3>
+                    <p>When you see an AI Overview:</p>
+                    <ul>
+                        <li><strong>Don't just trust it</strong> &mdash; check if the sources are real organisations</li>
+                        <li><strong>Look for .gov.au</strong> &mdash; government sites are usually reliable</li>
+                        <li><strong>Compare with results below</strong> &mdash; do they say the same thing?</li>
+                        <li><strong>For health or money</strong> &mdash; always check with a real person too</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== EXAMPLE SEARCHES ===== -->
+        <div class="examples-section">
+            <h3>Try These Example Searches:</h3>
+
+            <div class="example-group-label">Basic Searches (Job Ready)</div>
+            <div class="example-tag" onclick="setSearch('mechanic jobs Darwin')">mechanic jobs Darwin</div>
+            <div class="example-tag" onclick="setSearch('how to write a resume')">how to write a resume</div>
+            <div class="example-tag" onclick="setSearch('Centrelink Alice Springs')">Centrelink Alice Springs</div>
+            <div class="example-tag" onclick="setSearch('free TAFE courses NT')">free TAFE courses NT</div>
+            <div class="example-tag" onclick="setSearch('health clinic Darwin')">health clinic Darwin</div>
+            <div class="example-tag" onclick="setSearch('warehouse jobs Darwin')">warehouse jobs Darwin</div>
+            <div class="example-tag" onclick="setSearch('driver license Northern Territory')">driver license Northern Territory</div>
+
+            <div class="example-group-label">Boolean Operator Practice</div>
+            <div class="example-tag bool-tag" onclick="setSearch('&quot;forklift license&quot; Darwin')"><code>"forklift license"</code> Darwin</div>
+            <div class="example-tag bool-tag" onclick="setSearch('jobs Darwin -mining')">jobs Darwin <code>-mining</code></div>
+            <div class="example-tag bool-tag" onclick="setSearch('training site:cdu.edu.au')">training <code>site:cdu.edu.au</code></div>
+            <div class="example-tag bool-tag" onclick="setSearch('mechanic OR electrician Darwin')">mechanic <code>OR</code> electrician Darwin</div>
+
+            <div class="example-group-label">AI Overview Searches (turn on AI Overview first)</div>
+            <div class="example-tag ai-tag" onclick="setSearch('centrelink services training employment NT')">centrelink services training employment NT</div>
+            <div class="example-tag ai-tag" onclick="setSearch('how to find a job in the NT')">how to find a job in the NT</div>
+            <div class="example-tag ai-tag" onclick="setSearch('what is a white card and how do I get one')">what is a white card and how do I get one</div>
+            <div class="example-tag ai-tag" onclick="setSearch('best way to open a bank account NT')">best way to open a bank account NT</div>
+        </div>
+    </div>
+
+    <!-- ===== RESULTS PAGE ===== -->
+    <div class="back-bar" id="backBar">
+        <button class="back-btn" onclick="goHome()">&#8592; New Search</button>
+    </div>
+
+    <div class="results-page" id="resultsPage">
+        <div class="results-layout">
+            <div class="results-main">
+                <!-- Feedback -->
+                <div class="feedback-box" id="feedbackBox"></div>
+
+                <!-- AI Teaching Callout -->
+                <div class="ai-teach-callout" id="aiTeachCallout" style="display:none;"></div>
+
+                <!-- AI Overview -->
+                <div id="aiOverviewContainer"></div>
+
+                <!-- Results -->
+                <div class="results-stats" id="resultsStats"></div>
+                <div id="resultsContent"></div>
+            </div>
+            <div class="results-sidebar" id="resultsSidebar"></div>
+        </div>
+    </div>
+
+    <script>
+    // ===== STATE =====
+    let aiModeOn = false;
+
+    // ===== AI MODE TOGGLE =====
+    function toggleAIMode() {
+        aiModeOn = !aiModeOn;
+        document.querySelectorAll('.ai-mode-toggle').forEach(btn => {
+            btn.classList.toggle('active', aiModeOn);
+            const label = btn.querySelector('span:last-child');
+            label.textContent = aiModeOn ? 'AI Overview: ON' : 'AI Overview: OFF';
+        });
+    }
+
+    // ===== SEARCH DATABASE =====
+    const searchDB = {
+        // ---- BASIC: Good searches ----
+        'mechanic jobs darwin': {
+            feedback: 'good',
+            message: 'Great search! You included the job type AND location. This helps you find relevant local jobs.',
+            aiOverview: {
+                body: `<strong>Mechanic jobs in Darwin</strong> are available across several sectors. Key options include:
+                    <ul>
+                        <li><strong>Auto mechanics</strong> &mdash; servicing cars and light vehicles at dealerships and independent workshops</li>
+                        <li><strong>Heavy diesel mechanics</strong> &mdash; working on mining equipment, trucks, and earthmoving machinery (often higher pay)</li>
+                        <li><strong>NT Government fleet maintenance</strong> &mdash; full-time positions with training provided</li>
+                    </ul>
+                    Typical pay ranges from $65,000 to $120,000 depending on the type of work and experience. Many employers in the NT accept entry-level applicants and provide on-the-job training.`,
+                sources: ['seek.com.au', 'indeed.com.au', 'nt.gov.au']
+            },
+            results: [
+                { site: 'SEEK', url: 'seek.com.au > darwin-jobs', title: 'Mechanic Jobs in Darwin NT - SEEK', desc: 'Find mechanic jobs in Darwin. Heavy vehicle mechanics, auto mechanics, and diesel mechanics needed. Entry level positions available. Apply online today.' },
+                { site: 'Indeed', url: 'indeed.com > jobs > Darwin', title: 'Mechanic Jobs in Darwin - Indeed', desc: 'Currently hiring: Auto Mechanic - Darwin ($65,000-$80,000), Diesel Mechanic - Mining ($120,000), Apprentice Mechanic positions available.' },
+                { site: 'NT Gov', url: 'nt.gov.au > employment', title: 'NT Government Jobs - Mechanic Positions', desc: 'Work for the Northern Territory Government. Fleet maintenance mechanics needed in Darwin. Full training provided. Apply online.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'how to write a resume': {
+            feedback: 'good',
+            message: 'Excellent! Asking "how to" questions is a great way to learn new skills.',
+            aiOverview: {
+                body: `To <strong>write a resume</strong> (also called a CV in Australia), follow these steps:
+                    <ul>
+                        <li><strong>Contact details</strong> &mdash; your name, phone number, and email at the top</li>
+                        <li><strong>Summary</strong> &mdash; 2-3 sentences about who you are and what work you are looking for</li>
+                        <li><strong>Work experience</strong> &mdash; list jobs starting with your most recent. Include the job title, employer, and dates</li>
+                        <li><strong>Skills</strong> &mdash; list skills relevant to the job you are applying for</li>
+                        <li><strong>Education and training</strong> &mdash; include any courses, certificates, or qualifications</li>
+                    </ul>
+                    If you have limited work experience, focus on transferable skills, volunteer work, and any training you have completed. Free resume templates are available from Services Australia and SEEK.`,
+                sources: ['seek.com.au', 'servicesaustralia.gov.au', 'nt.gov.au']
+            },
+            results: [
+                { site: 'SEEK', url: 'seek.com.au > career-advice', title: 'How to Write a Resume - SEEK Career Advice', desc: 'Step-by-step guide to writing your first resume. Includes free templates and examples. Learn what employers want to see.' },
+                { site: 'Services Australia', url: 'servicesaustralia.gov.au > resume', title: 'Resume Writing Tips - Australian Government', desc: 'Free help to create your resume. Simple templates available. Tips for people with limited work experience.' },
+                { site: 'NT Gov', url: 'nt.gov.au > jobseekers', title: 'Resume Help - NT Government', desc: 'Free resume workshops in Darwin, Alice Springs, and Katherine. Book an appointment with an employment advisor.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'centrelink alice springs': {
+            feedback: 'good',
+            message: 'Great search! You specified the service AND location. This shows your nearest offices.',
+            aiOverview: {
+                body: `<strong>Centrelink in Alice Springs</strong> is operated by Services Australia. The main service centre is located at:
+                    <ul>
+                        <li><strong>Address:</strong> Alice Plaza, Todd Mall, Alice Springs NT 0870</li>
+                        <li><strong>Phone:</strong> 136 150 (general enquiries)</li>
+                        <li><strong>Hours:</strong> Monday to Friday, 8:30am &ndash; 4:30pm</li>
+                    </ul>
+                    Services include JobSeeker Payment, Youth Allowance, Medicare, and crisis support. You can also access Centrelink services online through <strong>myGov</strong> (my.gov.au).`,
+                sources: ['servicesaustralia.gov.au', 'nt.gov.au']
+            },
+            results: [
+                { site: 'Services Australia', url: 'servicesaustralia.gov.au > offices > alice-springs', title: 'Services Australia - Alice Springs Service Centre', desc: 'Centrelink, Medicare, and Child Support in Alice Springs. Opening hours, address, and phone numbers.' },
+                { site: 'Services Australia', url: 'servicesaustralia.gov.au > payments', title: 'Payments and Services - Services Australia', desc: 'Find out what payments are available. JobSeeker, Youth Allowance, Crisis Payment, and more.' },
+                { site: 'NT Gov', url: 'nt.gov.au > community-services', title: 'Community Services - Alice Springs', desc: 'Financial support, housing assistance, and emergency relief services available in Alice Springs and surrounding communities.' }
+            ],
+            knowledgePanel: {
+                title: 'Services Australia',
+                subtitle: 'Government agency',
+                body: 'Services Australia (formerly Centrelink) delivers government payments and services to Australians. Services include Medicare, Centrelink, and Child Support.',
+                link: 'servicesaustralia.gov.au',
+                info: [
+                    { label: 'Phone', value: '136 150' },
+                    { label: 'Founded', value: '2019 (as Services Australia)' },
+                    { label: 'Minister', value: 'Minister for Government Services' }
+                ]
+            }
+        },
+
+        'free tafe courses nt': {
+            feedback: 'good',
+            message: 'Excellent search! You included what you want (free courses), where (NT), and the provider (TAFE).',
+            aiOverview: {
+                body: `<strong>Free TAFE courses</strong> are available in the Northern Territory through several providers:
+                    <ul>
+                        <li><strong>Charles Darwin University (CDU) TAFE</strong> &mdash; offers free and subsidised courses in construction, hospitality, automotive, digital skills, and more</li>
+                        <li><strong>Batchelor Institute</strong> &mdash; Indigenous-focused education with campuses in Darwin, Katherine, Alice Springs, and remote communities</li>
+                        <li><strong>NT Government subsidies</strong> &mdash; the NT Government funds training in high-demand areas. Eligible residents may pay no fees</li>
+                    </ul>
+                    To check eligibility, contact CDU TAFE on 1800 061 963 or visit your nearest campus. You may also be eligible for <strong>Skills for Education and Employment (SEE)</strong> through Centrelink, which provides free training.`,
+                sources: ['cdu.edu.au', 'batchelor.edu.au', 'nt.gov.au']
+            },
+            results: [
+                { site: 'CDU', url: 'cdu.edu.au > tafe', title: 'Free TAFE Courses - Charles Darwin University', desc: 'Eligible Northern Territory residents can study selected TAFE courses for free. Includes certificates in construction, hospitality, automotive, and more.' },
+                { site: 'NT Gov', url: 'nt.gov.au > education > training', title: 'Skills Training - NT Government', desc: 'Free and subsidised training courses available. Trade qualifications, cert III, and cert IV programs. No experience required for many courses.' },
+                { site: 'Batchelor Institute', url: 'batchelor.edu.au', title: 'Batchelor Institute - TAFE Programs', desc: 'Indigenous-focused education with courses in Darwin, Katherine, Alice Springs, and remote communities. Free courses available.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'health clinic darwin': {
+            feedback: 'good',
+            message: 'Great search! You specified the service type AND location.',
+            aiOverview: {
+                body: `<strong>Health clinics in Darwin</strong> include both general and Aboriginal-specific services:
+                    <ul>
+                        <li><strong>Royal Darwin Hospital</strong> &mdash; the main hospital for the Top End. Emergency available 24/7</li>
+                        <li><strong>Danila Dilba Health Service</strong> &mdash; free health care for Aboriginal and Torres Strait Islander people across multiple Darwin locations</li>
+                        <li><strong>Casuarina, Palmerston, and Nightcliff clinics</strong> &mdash; NT Government community health centres</li>
+                    </ul>
+                    Many clinics offer bulk billing, which means no out-of-pocket cost with a Medicare card. If you need after-hours care, call Healthdirect on <strong>1800 022 222</strong>.`,
+                sources: ['health.nt.gov.au', 'danila.org.au', 'healthdirect.gov.au']
+            },
+            results: [
+                { site: 'NT Health', url: 'health.nt.gov.au > darwin', title: 'Darwin Health Clinics - NT Health', desc: 'Royal Darwin Hospital and health centres across Darwin. Casuarina, Palmerston, and Nightcliff clinics. Emergency and general care available.' },
+                { site: 'Healthdirect', url: 'healthdirect.gov.au > darwin', title: 'Find a GP in Darwin - Health Direct', desc: 'Bulk-billing doctors and medical centres in Darwin. Book appointments online. After-hours services available.' },
+                { site: 'Danila Dilba', url: 'danila.org.au', title: 'Danila Dilba Health Service - Darwin', desc: 'Aboriginal community controlled health service. Free medical care for Aboriginal and Torres Strait Islander people. Multiple Darwin locations.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'warehouse jobs darwin': {
+            feedback: 'good',
+            message: 'Excellent! Specific job type plus location. This is exactly how to search for local jobs.',
+            aiOverview: null,
+            results: [
+                { site: 'SEEK', url: 'seek.com.au > darwin > warehouse', title: 'Warehouse Jobs Darwin NT - SEEK', desc: 'Forklift operators, warehouse workers, and storemen positions in Darwin. Entry level welcome. Apply online today.' },
+                { site: 'Indeed', url: 'indeed.com > warehouse-darwin', title: 'Warehouse Jobs in Darwin - Indeed', desc: 'Currently hiring: Warehouse Assistant ($50,000-$60,000), Forklift Driver ($28/hour), Night shift positions available.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'driver license northern territory': {
+            feedback: 'good',
+            message: 'Great! You specified exactly what you need and included your state.',
+            aiOverview: {
+                body: `To get a <strong>driver licence in the Northern Territory</strong>:
+                    <ul>
+                        <li><strong>Learner permit</strong> &mdash; you must be 16+, pass a theory test, and provide ID. Study the NT Road Rules handbook (free online)</li>
+                        <li><strong>Provisional licence</strong> &mdash; after holding a learner for at least 6 months, book and pass a practical driving test</li>
+                        <li><strong>Full licence</strong> &mdash; after completing the provisional period</li>
+                    </ul>
+                    Book tests at the Motor Vehicle Registry (MVR) in Darwin, Alice Springs, Katherine, or Nhulunbuy. Some remote communities have visiting MVR services. Fees apply for tests and licence cards.`,
+                sources: ['nt.gov.au', 'mvr.nt.gov.au']
+            },
+            results: [
+                { site: 'NT Gov', url: 'nt.gov.au > driving > licences', title: 'Get Your Driver Licence - NT.GOV.AU', desc: 'How to get your NT driver licence. Requirements, tests, fees, and booking information. Learner, provisional, and full licence info.' },
+                { site: 'MVR', url: 'mvr.nt.gov.au', title: 'Motor Vehicle Registry NT - Driver Licensing', desc: 'Book your driving test, renew your licence, or find testing centres in Darwin, Alice Springs, Katherine, and Nhulunbuy.' },
+                { site: 'NT Gov', url: 'nt.gov.au > driving > learner', title: 'Learner Driver Information - Northern Territory', desc: 'Step-by-step guide to getting your learner permit. Study the NT Road Rules handbook online for free.' }
+            ],
+            knowledgePanel: null
+        },
+
+        // ---- BASIC: Improvable searches ----
+        'jobs': {
+            feedback: 'improve',
+            message: 'This search is too broad. Try being more specific! What kind of job? Where?',
+            suggestion: 'Try: "warehouse jobs Darwin" or "kitchen hand jobs Katherine" or "mining jobs NT"',
+            aiOverview: null,
+            results: [
+                { site: 'SEEK', url: 'seek.com.au', title: "SEEK - Australia's #1 Job Site", desc: 'Search thousands of jobs across Australia. Use our filters to find the right job for you.' },
+                { site: 'Indeed', url: 'indeed.com', title: 'Indeed - Job Search Australia', desc: 'Find your next job on Indeed. Millions of jobs to choose from.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'mechanic jobs': {
+            feedback: 'improve',
+            message: 'Good start, but you can improve! Try adding your location to find jobs near you.',
+            suggestion: 'Try: "mechanic jobs Darwin" or "mechanic jobs Alice Springs"',
+            aiOverview: null,
+            results: [
+                { site: 'SEEK', url: 'seek.com.au > jobs', title: 'Mechanic Jobs in Australia - SEEK', desc: 'Thousands of mechanic jobs across Australia. Refine your search by adding a location to find jobs near you.' },
+                { site: 'Indeed', url: 'indeed.com > mechanic-jobs', title: 'Mechanic Jobs - Indeed Australia', desc: 'Browse mechanic positions nationwide. Use filters to narrow down by city, salary range, and experience level.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'centrelink': {
+            feedback: 'improve',
+            message: 'Good! But adding your location will help you find your nearest office.',
+            suggestion: 'Try: "Centrelink Darwin" or "Centrelink Katherine" or "Centrelink phone number"',
+            aiOverview: null,
+            results: [
+                { site: 'Services Australia', url: 'servicesaustralia.gov.au', title: 'Services Australia - Centrelink, Medicare & Child Support', desc: 'Access Centrelink payments, find service centres, or manage your account online through myGov.' },
+                { site: 'Services Australia', url: 'servicesaustralia.gov.au > locations', title: 'Find a Centrelink Service Centre', desc: 'Enter your postcode to find your nearest Centrelink office. Book appointments online.' }
+            ],
+            knowledgePanel: null
+        },
+
+        // ---- BOOLEAN SEARCHES ----
+        '"forklift license" darwin': {
+            feedback: 'bool',
+            message: 'You used <strong>quotation marks</strong> to search for an exact phrase. Google will only show results that contain the words "forklift license" together in that exact order. This is useful when you need a specific phrase.',
+            aiOverview: null,
+            results: [
+                { site: 'NT WorkSafe', url: 'worksafe.nt.gov.au > licences', title: 'Forklift License NT - NT WorkSafe', desc: 'How to get your forklift licence (High Risk Work Licence) in the Northern Territory. Training providers, costs, and requirements.' },
+                { site: 'SEEK', url: 'seek.com.au > forklift-darwin', title: 'Forklift Licence Jobs Darwin - SEEK', desc: 'Jobs requiring a forklift licence in Darwin. Warehouse, logistics, and construction roles available.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'jobs darwin -mining': {
+            feedback: 'bool',
+            message: 'You used the <strong>minus sign (-)</strong> to exclude results about mining. This is helpful when you keep getting results you don\'t want. The minus sign removes those results.',
+            aiOverview: null,
+            results: [
+                { site: 'SEEK', url: 'seek.com.au > darwin', title: 'Jobs in Darwin (excluding mining) - SEEK', desc: 'Hospitality, retail, construction, government, and administration jobs in Darwin. Filtered to exclude mining positions.' },
+                { site: 'Indeed', url: 'indeed.com > darwin-jobs', title: 'Non-Mining Jobs Darwin - Indeed', desc: 'Currently hiring in Darwin: Chef ($55,000), Retail Assistant ($25/hr), Admin Officer ($50,000). No mining roles shown.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'training site:cdu.edu.au': {
+            feedback: 'bool',
+            message: 'You used <strong>site:</strong> to search only within the CDU website. This is useful when you know which website has the information and want to search just that site.',
+            aiOverview: null,
+            results: [
+                { site: 'CDU', url: 'cdu.edu.au > training', title: 'Training Programs - Charles Darwin University', desc: 'Browse all training programs at CDU. TAFE certificates, short courses, and professional development. Enrol online.' },
+                { site: 'CDU', url: 'cdu.edu.au > tafe > short-courses', title: 'Short Courses - CDU TAFE', desc: 'Quick training courses from 1 day to 6 weeks. White card, first aid, responsible service of alcohol, and more.' },
+                { site: 'CDU', url: 'cdu.edu.au > tafe > trade-training', title: 'Trade Training - CDU TAFE', desc: 'Apprenticeships and traineeships in automotive, construction, electrical, plumbing, and more. Start your career in the trades.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'mechanic or electrician darwin': {
+            feedback: 'bool',
+            message: 'You used <strong>OR</strong> to search for either mechanic jobs or electrician jobs. This broadens your search to include results about either term. Useful when you are open to different types of work.',
+            aiOverview: null,
+            results: [
+                { site: 'SEEK', url: 'seek.com.au > darwin > trades', title: 'Mechanic & Electrician Jobs Darwin - SEEK', desc: 'Trade jobs in Darwin including auto mechanics, diesel mechanics, and electricians. Full-time and contract positions.' },
+                { site: 'Indeed', url: 'indeed.com > trades-darwin', title: 'Trades Jobs Darwin - Indeed', desc: 'Mechanic and electrician roles in Darwin NT. $60,000 to $110,000 depending on trade and experience.' },
+                { site: 'CDU', url: 'cdu.edu.au > trades', title: 'Trade Apprenticeships - CDU TAFE', desc: 'Start an apprenticeship in automotive or electrical trades. Earn while you learn. NT Government subsidies available.' }
+            ],
+            knowledgePanel: null
+        },
+
+        // ---- AI OVERVIEW SEARCHES ----
+        'centrelink services training employment nt': {
+            feedback: 'good',
+            message: 'Good complex search. With AI Overview turned on, notice the summary panel at the top that combines information from multiple sources.',
+            aiOverview: {
+                body: `<strong>Centrelink</strong> provides various employment and training services in the Northern Territory. Key programs include:
+                    <ul>
+                        <li><strong>JobSeeker Payment</strong> &mdash; income support while looking for work</li>
+                        <li><strong>Workforce Australia</strong> &mdash; connects job seekers with local employers</li>
+                        <li><strong>Skills for Education and Employment (SEE)</strong> &mdash; free training for eligible participants</li>
+                        <li><strong>CDU TAFE</strong> offers VET courses that may be subsidised through NT Government programs</li>
+                    </ul>
+                    To access these services, visit your nearest Services Australia centre or apply online through myGov.`,
+                sources: ['servicesaustralia.gov.au', 'cdu.edu.au', 'nt.gov.au']
+            },
+            aiTeach: 'This AI Overview was generated by reading several websites and combining the information into one summary. Notice how it lists sources at the bottom &mdash; you can click those to read the original websites. The AI summary saves time, but you should still check the sources, especially for anything about money or payments.',
+            results: [
+                { site: 'Services Australia', url: 'servicesaustralia.gov.au > job-seekers', title: 'Payments and services for job seekers | Services Australia', desc: 'Find out what payments are available if you\'re looking for work. Centrelink offers income support, training assistance, and help finding employment.' },
+                { site: 'Workforce Australia', url: 'workforceaustralia.gov.au', title: 'Workforce Australia - Find Your Next Job', desc: 'Government employment service connecting job seekers with employers. Free resume help, job matching, and career advice.' },
+                { site: 'CDU', url: 'cdu.edu.au > tafe > employment', title: 'Employment Training - CDU TAFE', desc: 'Vocational training to get you job-ready. Free courses available for eligible NT residents.' }
+            ],
+            knowledgePanel: {
+                title: 'Services Australia',
+                subtitle: 'Government agency',
+                body: 'Services Australia (formerly Centrelink) delivers government payments and services to Australians. Services include Medicare, Centrelink, and Child Support.',
+                link: 'servicesaustralia.gov.au',
+                info: [
+                    { label: 'Phone', value: '136 150' },
+                    { label: 'Online', value: 'my.gov.au' }
+                ]
+            }
+        },
+
+        'how to find a job in the nt': {
+            feedback: 'good',
+            message: 'Good question. This is exactly the kind of search that helps you plan ahead and find real support.',
+            aiOverview: {
+                body: `Finding a <strong>job in the Northern Territory</strong> involves a few practical steps and support services:
+                    <ul>
+                        <li><strong>Register with Workforce Australia</strong> &mdash; sign up for free job matching and support from an employment provider</li>
+                        <li><strong>Apply for JobSeeker Payment</strong> &mdash; income support through Centrelink while you look for work</li>
+                        <li><strong>Get your documents sorted</strong> &mdash; you may need ID (birth certificate, proof of address), a Tax File Number (TFN), and a bank account</li>
+                        <li><strong>Consider training</strong> &mdash; free TAFE courses at CDU can give you qualifications that employers want (e.g. white card, forklift licence, first aid)</li>
+                        <li><strong>Specialist support</strong> &mdash; Aboriginal employment services and community organisations can help with resumes, applications, and connecting to local employers</li>
+                    </ul>
+                    Many employers in the NT are keen for reliable workers, particularly in construction, mining services, and hospitality.`,
+                sources: ['workforceaustralia.gov.au', 'servicesaustralia.gov.au', 'cdu.edu.au']
+            },
+            aiTeach: 'This is a great example of where AI Overview is helpful &mdash; it brings together information from many websites about a complex topic. But notice it points you to employment providers without naming which one is right for you. You would need to search further or speak to a service provider for that detail. AI summaries give you a starting point, not the full picture.',
+            results: [
+                { site: 'Workforce Australia', url: 'workforceaustralia.gov.au > help', title: 'Employment Support - Workforce Australia', desc: 'Free help finding work. Employment providers who can support your job search.' },
+                { site: 'Services Australia', url: 'servicesaustralia.gov.au > payments', title: 'JobSeeker Payment - Services Australia', desc: 'Income support while looking for work. Apply through myGov or at your local service centre.' },
+                { site: 'CDU', url: 'cdu.edu.au > tafe > short-courses', title: 'Short Courses - CDU TAFE', desc: 'Quick qualification courses: white card, forklift licence, first aid, RSA. Free for eligible NT residents.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'what is a white card and how do i get one': {
+            feedback: 'good',
+            message: 'Great question! Asking "what is" and "how do I" together gets you both the explanation and the steps.',
+            aiOverview: {
+                body: `A <strong>white card</strong> (also called a General Construction Induction Card) is a nationally recognised card that proves you have completed safety training for the construction industry. You <strong>must have a white card</strong> before you can work on any construction site in Australia.
+                    <ul>
+                        <li><strong>What it covers:</strong> workplace health and safety basics, hazard identification, working safely on construction sites</li>
+                        <li><strong>How to get one:</strong> complete the course CPCCWHS1001 (usually a 1-day course)</li>
+                        <li><strong>Where in the NT:</strong> CDU TAFE, Master Builders NT, and other registered training providers offer the course</li>
+                        <li><strong>Cost:</strong> approximately $80&ndash;$150, but may be free if you are eligible for NT Government subsidies</li>
+                        <li><strong>How long it lasts:</strong> your white card does not expire, but you need to keep it safe</li>
+                    </ul>`,
+                sources: ['safeworkaustralia.gov.au', 'cdu.edu.au', 'worksafe.nt.gov.au']
+            },
+            aiTeach: 'Notice how the AI Overview gives a complete answer with practical details like cost and where to go. For something like a white card, this summary is quite reliable because the information comes from government sources. But always check the date &mdash; costs and providers can change.',
+            results: [
+                { site: 'Safe Work Australia', url: 'safeworkaustralia.gov.au > white-card', title: 'White Card (General Construction Induction) - Safe Work Australia', desc: 'National information about the white card requirement for construction work. Training standards and requirements.' },
+                { site: 'CDU', url: 'cdu.edu.au > white-card', title: 'White Card Course - CDU TAFE Darwin', desc: 'Complete your white card training in 1 day. Available in Darwin, Palmerston, and Alice Springs. Book online.' },
+                { site: 'NT WorkSafe', url: 'worksafe.nt.gov.au > construction', title: 'Construction Safety - NT WorkSafe', desc: 'White card requirements in the Northern Territory. Find approved training providers and understand your obligations.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'best way to open a bank account nt': {
+            feedback: 'good',
+            message: 'Good practical search. This kind of information is important for getting yourself set up.',
+            aiOverview: {
+                body: `To <strong>open a bank account</strong> in the Northern Territory, you generally need:
+                    <ul>
+                        <li><strong>Identification</strong> &mdash; you need 100 points of ID. A driver licence or passport is worth 70 points. A birth certificate is 70 points. A Medicare card is 25 points</li>
+                        <li><strong>If you have limited ID:</strong> some banks accept a letter from Centrelink or another government agency as a form of identification</li>
+                    </ul>
+                    <strong>Options in the NT:</strong>
+                    <ul>
+                        <li><strong>Traditional Banks</strong> (NAB, Commonwealth, ANZ, Westpac) &mdash; branches in Darwin, Alice Springs, Katherine</li>
+                        <li><strong>First Nations-friendly options</strong> &mdash; Traditional Credit Union (TCU) has branches across remote NT communities and in Darwin</li>
+                    </ul>
+                    Start with a basic everyday account. Most banks offer fee-free accounts for people receiving Centrelink payments.`,
+                sources: ['moneysmart.gov.au', 'tcu.com.au', 'servicesaustralia.gov.au']
+            },
+            aiTeach: 'This is a topic where AI summaries are helpful for getting started, but you should be careful. The 100-point ID requirement is standard and reliable (it comes from government rules). But specific bank products, fees, and branch locations can change &mdash; always confirm with the bank directly.',
+            results: [
+                { site: 'MoneySmart', url: 'moneysmart.gov.au > banking', title: 'Opening a Bank Account - MoneySmart (ASIC)', desc: 'Government guide to choosing and opening a bank account. Compare fees and features. Understand the 100 point ID check.' },
+                { site: 'TCU', url: 'tcu.com.au', title: 'Traditional Credit Union - Banking for NT Communities', desc: 'Banking services across the Northern Territory, including remote communities. Basic accounts, savings, and loans.' },
+                { site: 'Services Australia', url: 'servicesaustralia.gov.au > id', title: 'Proving Your Identity - Services Australia', desc: 'What ID you need and how to get replacement documents if you have lost your identification.' }
+            ],
+            knowledgePanel: null
+        },
+
+        // ---- ADDITIONAL SEARCHES ----
+        'what is a cover letter': {
+            feedback: 'good',
+            message: 'Great question! Asking "what is" helps you learn new things.',
+            aiOverview: {
+                body: `A <strong>cover letter</strong> is a short letter (usually one page) that you send with your resume when applying for a job. It explains:
+                    <ul>
+                        <li>Which job you are applying for</li>
+                        <li>Why you want the job</li>
+                        <li>Why you would be good at it</li>
+                        <li>Your contact details</li>
+                    </ul>
+                    Not all jobs ask for a cover letter, but including one shows the employer you are serious about the role. Keep it simple and honest.`,
+                sources: ['seek.com.au', 'servicesaustralia.gov.au']
+            },
+            results: [
+                { site: 'SEEK', url: 'seek.com.au > career-advice > cover-letter', title: 'What is a Cover Letter? - SEEK Career Advice', desc: "A cover letter is a document you send with your resume. It explains why you want the job and why you're a good fit. Free templates available." },
+                { site: 'Services Australia', url: 'servicesaustralia.gov.au > cover-letters', title: 'How to Write a Cover Letter - Services Australia', desc: 'Step-by-step guide with examples. Learn what to include in your cover letter and how to make it stand out.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'mining jobs nt': {
+            feedback: 'good',
+            message: 'Good search! Mining jobs with location. You could also add the specific role.',
+            aiOverview: null,
+            results: [
+                { site: 'SEEK', url: 'seek.com.au > mining-nt', title: 'Mining Jobs Northern Territory - SEEK', desc: 'Mining jobs across NT. Operators, truck drivers, drillers, and FIFO positions. High salaries available.' },
+                { site: 'Mining People', url: 'miningpeople.com.au > nt', title: 'NT Mining Jobs - Mining People', desc: 'Current mining opportunities in the Northern Territory. Entry level to experienced. Apply online.' }
+            ],
+            knowledgePanel: null
+        },
+
+        'fishing regulations nt': {
+            feedback: 'good',
+            message: 'You included the topic AND location. This gives you accurate local rules.',
+            aiOverview: null,
+            results: [
+                { site: 'NT Gov', url: 'nt.gov.au > fishing', title: 'Fishing Rules & Regulations - NT Government', desc: 'Northern Territory fishing regulations, bag limits, and size limits. Learn what you can catch and where.' },
+                { site: 'NT Fisheries', url: 'dpir.nt.gov.au > fisheries', title: 'NT Fisheries - Rules and Licensing', desc: 'Fishing licence requirements, closed seasons, and protected species. Download the NT Fishing Rules app.' }
+            ],
+            knowledgePanel: null
+        }
+    };
+
+    // ===== NAVIGATION =====
+    function showResults() {
+        document.getElementById('landingPage').style.display = 'none';
+        document.getElementById('topBar').style.display = 'flex';
+        document.getElementById('searchTabs').style.display = 'flex';
+        document.getElementById('backBar').style.display = 'block';
+        document.getElementById('resultsPage').style.display = 'block';
+    }
+
+    function goHome() {
+        document.getElementById('landingPage').style.display = 'block';
+        document.getElementById('topBar').style.display = 'none';
+        document.getElementById('searchTabs').style.display = 'none';
+        document.getElementById('backBar').style.display = 'none';
+        document.getElementById('resultsPage').style.display = 'none';
+        document.getElementById('landingSearchInput').value = '';
+        document.getElementById('aiOverviewContainer').innerHTML = '';
+        document.getElementById('resultsContent').innerHTML = '';
+        document.getElementById('resultsSidebar').innerHTML = '';
+        document.getElementById('feedbackBox').style.display = 'none';
+        document.getElementById('aiTeachCallout').style.display = 'none';
+        window.scrollTo(0, 0);
+    }
+
+    // ===== SET SEARCH FROM EXAMPLE TAG =====
+    function setSearch(query) {
+        document.getElementById('landingSearchInput').value = query;
+        performSearch('landing');
+    }
+
+    function feelingLucky() {
+        const examples = ['mechanic jobs Darwin', 'how to write a resume', 'Centrelink Alice Springs', 'free TAFE courses NT', 'what is a white card and how do I get one'];
+        setSearch(examples[Math.floor(Math.random() * examples.length)]);
+    }
+
+    // ===== PERFORM SEARCH =====
+    function performSearch(source) {
+        const inputId = source === 'top' ? 'topSearchInput' : 'landingSearchInput';
+        const query = document.getElementById(inputId).value.trim();
+
+        if (!query) {
+            alert('Please type something to search!');
+            return;
+        }
+
+        // Sync search inputs
+        document.getElementById('topSearchInput').value = query;
+        document.getElementById('landingSearchInput').value = query;
+
+        // Show results page
+        showResults();
+
+        // Lookup
+        const key = query.toLowerCase();
+        let result = searchDB[key];
+
+        // Partial match fallback
+        if (!result) {
+            for (let k in searchDB) {
+                if (key.includes(k) || k.includes(key)) {
+                    result = searchDB[k];
+                    break;
+                }
+            }
+        }
+
+        // Clear containers
+        const feedbackBox = document.getElementById('feedbackBox');
+        const aiTeachCallout = document.getElementById('aiTeachCallout');
+        const aiContainer = document.getElementById('aiOverviewContainer');
+        const resultsContent = document.getElementById('resultsContent');
+        const sidebar = document.getElementById('resultsSidebar');
+        const statsEl = document.getElementById('resultsStats');
+
+        feedbackBox.style.display = 'none';
+        aiTeachCallout.style.display = 'none';
+        aiContainer.innerHTML = '';
+        resultsContent.innerHTML = '';
+        sidebar.innerHTML = '';
+
+        if (result) {
+            // Feedback
+            feedbackBox.style.display = 'block';
+            let fbClass = 'feedback-good';
+            let icon = '&#9989;';
+            if (result.feedback === 'improve') { fbClass = 'feedback-improve'; icon = '&#9888;&#65039;'; }
+            if (result.feedback === 'bool') { fbClass = 'feedback-bool'; icon = '&#128295;'; }
+            feedbackBox.className = 'feedback-box ' + fbClass;
+            feedbackBox.innerHTML = `<strong>${icon} ${result.message}</strong>` +
+                (result.suggestion ? `<div class="suggestion-box">${result.suggestion}</div>` : '');
+
+            // AI Overview
+            if (aiModeOn && result.aiOverview) {
+                let sourcesHTML = result.aiOverview.sources.map(s =>
+                    `<span class="ai-source-chip"><span>&#127760;</span> ${s}</span>`
+                ).join('');
+
+                aiContainer.innerHTML = `
+                    <div class="ai-overview">
+                        <div class="ai-overview-header">
+                            <div class="ai-sparkle">&#10024;</div>
+                            <span>AI Overview</span>
+                        </div>
+                        <div class="ai-overview-body">${result.aiOverview.body}</div>
+                        <div class="ai-overview-footer">
+                            <div class="ai-source-chips">${sourcesHTML}</div>
+                            <button class="ai-show-more">Show more &#9660;</button>
+                        </div>
+                    </div>`;
+
+                // AI Teaching callout
+                if (result.aiTeach) {
+                    aiTeachCallout.style.display = 'block';
+                    aiTeachCallout.innerHTML = `<strong>&#127891; Learning Point: About the AI Overview above</strong><br>${result.aiTeach}`;
+                }
+            } else if (aiModeOn && !result.aiOverview) {
+                // Show note that AI overview doesn't appear for simple searches
+                if (result.feedback !== 'improve') {
+                    aiTeachCallout.style.display = 'block';
+                    aiTeachCallout.innerHTML = `<strong>&#127891; Note:</strong> Not all searches trigger an AI Overview. Google typically shows them for questions and complex topics, not simple searches like job listings. The regular results below are all you need here.`;
+                }
+            }
+
+            // Results stats
+            const count = result.results.length * 823 + Math.floor(Math.random() * 500);
+            const time = (Math.random() * 0.4 + 0.2).toFixed(2);
+            statsEl.textContent = `About ${count.toLocaleString()} results (${time} seconds)`;
+
+            // Render results
+            resultsContent.innerHTML = result.results.map(r => `
+                <div class="result-item">
+                    <div class="result-site-info">
+                        <div class="result-favicon">${(r.site || '?')[0]}</div>
+                        <div class="result-site-text">
+                            <div class="result-site-name">${r.site || ''}</div>
+                            <div class="result-url">${r.url}</div>
+                        </div>
+                    </div>
+                    <a href="#" class="result-title" onclick="return false;">${r.title}</a>
+                    <div class="result-description">${r.desc}</div>
+                </div>
+            `).join('');
+
+            // Knowledge panel
+            if (result.knowledgePanel) {
+                const kp = result.knowledgePanel;
+                let infoRows = (kp.info || []).map(i =>
+                    `<div class="kp-info-row"><span class="kp-info-label">${i.label}</span><span class="kp-info-value">${i.value}</span></div>`
+                ).join('');
+
+                sidebar.innerHTML = `
+                    <div class="knowledge-panel">
+                        <div class="kp-title">${kp.title}</div>
+                        <div class="kp-subtitle">${kp.subtitle}</div>
+                        <div class="kp-body">${kp.body}</div>
+                        <a href="#" class="kp-link" onclick="return false;">${kp.link}</a>
+                        ${infoRows ? `<hr class="kp-divider">${infoRows}` : ''}
+                    </div>`;
+            }
+        } else {
+            // No match
+            feedbackBox.style.display = 'block';
+            feedbackBox.className = 'feedback-box feedback-improve';
+            feedbackBox.innerHTML = `
+                <strong>&#9888;&#65039; This is a practice search! Try one of the example searches to see how different search terms give different results.</strong>
+                <div class="suggestion-box">
+                    Tip: In a real search, being specific helps you find what you need faster!<br>
+                    Examples: "plumber Darwin", "how to write a resume", "health clinic Darwin"
+                </div>`;
+            statsEl.textContent = 'Practice Mode - Try an example search';
+            resultsContent.innerHTML = `
+                <div class="result-item">
+                    <div class="result-site-info">
+                        <div class="result-favicon">?</div>
+                        <div class="result-site-text">
+                            <div class="result-site-name">Example</div>
+                            <div class="result-url">example.com</div>
+                        </div>
+                    </div>
+                    <a href="#" class="result-title" onclick="return false;">This is how search results look</a>
+                    <div class="result-description">Each result shows: a site icon, a website address, a clickable blue title, and a short description. Try the example searches to see real practice results!</div>
+                </div>`;
+        }
+
+        window.scrollTo(0, 0);
+    }
+
+    // ===== KEYBOARD EVENTS =====
+    document.getElementById('landingSearchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') performSearch('landing');
+    });
+
+    document.getElementById('topSearchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') performSearch('top');
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scam Detective — Email Game</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ms-blue: #0078d4;
+      --ms-blue-dark: #005a9e;
+      --ms-blue-light: #deecf9;
+      --ms-navy: #1e3a5f;
+      --ms-navy-hover: #16304f;
+      --ms-sidebar-text: #c8d8ea;
+      --ms-sidebar-active: #2b4d74;
+
+      --bg: #ffffff;
+      --list-bg: #f3f2f1;
+      --surface: #f8f9fa;
+      --border: #d0d0d0;
+      --text: #201f1e;
+      --text-secondary: #605e5c;
+      --hover: #edebe9;
+      --selected: #deecf9;
+
+      --success: #107c10;
+      --danger: #d13438;
+    }
+
+    body.dark-mode {
+      --bg: #1b1a19;
+      --list-bg: #252423;
+      --surface: #2d2c2b;
+      --border: #484644;
+      --text: #f3f2f1;
+      --text-secondary: #a19f9d;
+      --hover: #3b3a39;
+      --selected: #2b4d74;
+      --ms-blue-light: #1a3a5c;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Segoe UI Web', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    body.large-text { font-size: 18px; }
+    body.high-contrast { filter: contrast(1.4); --border: #000; }
+
+    /* ACCESSIBILITY BAR */
+    .accessibility {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 7px 16px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 13px;
+    }
+    .accessibility label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 500; }
+    .a11y-btn {
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text);
+      font-family: inherit;
+    }
+    .a11y-btn:hover { background: var(--hover); }
+
+    /* OUTLOOK-STYLE RIBBON */
+    .ribbon {
+      background: var(--ms-blue);
+      color: white;
+      padding: 0 16px;
+      display: flex;
+      align-items: stretch;
+      height: 52px;
+      flex-shrink: 0;
+    }
+    .ribbon-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-right: 24px;
+      border-right: 1px solid rgba(255,255,255,0.2);
+      margin-right: 20px;
+    }
+    .brand-icon {
+      width: 34px; height: 34px;
+      background: white;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .brand-title { font-size: 16px; font-weight: 600; }
+    .brand-sub { font-size: 11px; opacity: 0.7; }
+    .ribbon-stats {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .stat-box { text-align: center; }
+    .stat-num { font-size: 22px; font-weight: 700; line-height: 1; }
+    .stat-lbl { font-size: 10px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.5px; }
+    .prog-wrap { flex: 1; max-width: 200px; }
+    .prog-text { font-size: 11px; opacity: 0.8; margin-bottom: 5px; }
+    .prog-track { background: rgba(255,255,255,0.25); border-radius: 3px; height: 6px; }
+    .prog-fill { background: #a9e34b; height: 6px; border-radius: 3px; transition: width 0.4s; width: 0%; }
+
+    /* LAYOUT */
+    .layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* DARK NAVY SIDEBAR */
+    .sidebar {
+      width: 200px; min-width: 200px;
+      background: var(--ms-navy);
+      display: flex; flex-direction: column;
+      padding: 10px 0;
+    }
+    .sb-heading {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: rgba(200,216,234,0.45);
+      padding: 8px 16px 4px;
+    }
+    .sb-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 16px;
+      color: var(--ms-sidebar-text);
+      font-size: 14px; cursor: pointer;
+      transition: background 0.1s;
+    }
+    .sb-item:hover { background: var(--ms-navy-hover); }
+    .sb-item.active { background: var(--ms-sidebar-active); color: white; font-weight: 600; }
+    .sb-icon { font-size: 15px; width: 20px; text-align: center; }
+    .sb-count {
+      margin-left: auto;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px; padding: 1px 7px;
+      font-size: 11px; font-weight: 700;
+    }
+    .sb-divider { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 8px 0; }
+
+    /* EMAIL LIST */
+    .email-list {
+      width: 310px; min-width: 280px;
+      background: var(--list-bg);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .list-head {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--list-bg);
+    }
+    .list-head-title { font-size: 14px; font-weight: 700; }
+    .list-head-sub { font-size: 11px; color: var(--text-secondary); }
+    .email-scroll { overflow-y: auto; flex: 1; }
+
+    .email-item {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.1s;
+      background: var(--list-bg);
+    }
+    .email-item:hover { background: var(--hover); }
+    .email-item.is-active { background: var(--ms-blue-light); border-left: 3px solid var(--ms-blue); }
+    .email-item.done-scam { border-left: 3px solid var(--danger); }
+    .email-item.done-real { border-left: 3px solid var(--success); }
+
+    .ei-row1 { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+    .ei-sender { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
+    .ei-date { font-size: 11px; color: var(--text-secondary); flex-shrink: 0; }
+    .ei-subject { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .ei-preview { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ei-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; margin-top: 5px; }
+    .badge-scam { background: #fde7e9; color: #a4262c; }
+    .badge-real { background: #dff6dd; color: #107c10; }
+    body.dark-mode .badge-scam { background: #4a1215; color: #f9a8ab; }
+    body.dark-mode .badge-real { background: #0f2d0f; color: #92d292; }
+
+    /* READING PANE */
+    .reading-pane { flex: 1; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
+
+    .pane-toolbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 7px 18px;
+      display: flex; align-items: center; gap: 6px; min-height: 40px;
+    }
+    .pane-btn {
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 2px; cursor: pointer;
+      font-size: 12px; color: var(--text); font-family: inherit;
+    }
+    .pane-btn:hover { background: var(--hover); border-color: var(--ms-blue); }
+
+    .email-content { flex: 1; padding: 24px 32px; overflow-y: auto; }
+
+    .msg-subject { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+    .msg-meta { font-size: 13px; color: var(--text-secondary); margin-bottom: 3px; }
+    .msg-meta strong { color: var(--text); }
+    .msg-rule { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+    .msg-body { font-size: 14px; line-height: 1.75; white-space: pre-wrap; }
+
+    /* VERDICT BAR */
+    .verdict-bar {
+      background: #fff4ce;
+      border-top: 2px solid #f9c73c;
+      padding: 13px 22px;
+      display: none; align-items: center; gap: 18px;
+    }
+    body.dark-mode .verdict-bar { background: #2a2200; border-top-color: #7a5c00; }
+    .verdict-bar.visible { display: flex; }
+    .verdict-q { font-size: 14px; font-weight: 700; flex-shrink: 0; }
+    .verdict-btns { display: flex; gap: 10px; flex: 1; }
+    .vbtn {
+      flex: 1; max-width: 220px;
+      padding: 11px 18px;
+      border: none; border-radius: 2px;
+      font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+      transition: filter 0.1s, transform 0.1s;
+    }
+    .vbtn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .vbtn:active { transform: translateY(0); }
+    .vbtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; filter: none; }
+    .vbtn-scam { background: var(--danger); color: white; }
+    .vbtn-real { background: var(--success); color: white; }
+
+    /* EMPTY + FINAL */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; text-align: center; color: var(--text-secondary); padding: 40px;
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 14px; }
+    .empty-state h2 { font-size: 19px; color: var(--text); margin-bottom: 10px; }
+    .empty-state p { font-size: 14px; line-height: 1.6; max-width: 340px; }
+
+    .final-screen {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; text-align: center; padding: 40px;
+    }
+    .final-screen.show { display: flex; }
+    .final-icon { font-size: 56px; margin-bottom: 14px; }
+    .final-score { font-size: 54px; font-weight: 800; color: var(--ms-blue); line-height: 1; }
+    .final-lbl { font-size: 15px; color: var(--text-secondary); margin-bottom: 20px; margin-top: 6px; }
+    .final-msg { font-size: 16px; line-height: 1.65; max-width: 400px; margin-bottom: 26px; }
+    .final-replay {
+      padding: 12px 36px;
+      background: var(--ms-blue); color: white;
+      border: none; border-radius: 2px;
+      font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .final-replay:hover { background: var(--ms-blue-dark); }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55); z-index: 200;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--bg); border-radius: 3px;
+      max-width: 540px; width: 100%;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.35); overflow: hidden;
+    }
+    .modal-head { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); }
+    .modal-verdict { font-size: 21px; font-weight: 700; margin-bottom: 7px; }
+    .verdict-ok { color: var(--success); }
+    .verdict-no { color: var(--danger); }
+    .verdict-tag {
+      display: inline-block; padding: 3px 12px;
+      border-radius: 2px; font-size: 12px; font-weight: 700;
+    }
+    .vtag-scam { background: #fde7e9; color: #a4262c; }
+    .vtag-real { background: #dff6dd; color: #107c10; }
+    body.dark-mode .vtag-scam { background: #4a1215; color: #f9a8ab; }
+    body.dark-mode .vtag-real { background: #0f2d0f; color: #92d292; }
+
+    .modal-body { padding: 18px 22px; max-height: 58vh; overflow-y: auto; }
+    .modal-expl { font-size: 14px; line-height: 1.65; margin-bottom: 14px; }
+
+    .flag-block { padding: 12px 14px; margin-bottom: 14px; border-radius: 2px; }
+    .flag-block.scam-flags { background: #fde7e9; border-left: 4px solid #d13438; }
+    .flag-block.real-flags { background: #dff6dd; border-left: 4px solid #107c10; }
+    body.dark-mode .flag-block.scam-flags { background: #3a0d10; border-left-color: #f04048; }
+    body.dark-mode .flag-block.real-flags { background: #0a2010; border-left-color: #3fc73f; }
+    .flag-title {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 9px;
+    }
+    .scam-flags .flag-title { color: #a4262c; }
+    .real-flags .flag-title { color: #107c10; }
+    body.dark-mode .scam-flags .flag-title { color: #f9a8ab; }
+    body.dark-mode .real-flags .flag-title { color: #92d292; }
+    .flag-item { font-size: 13px; line-height: 1.55; padding: 3px 0; }
+
+    .safe-tip {
+      background: var(--ms-blue-light);
+      border-left: 4px solid var(--ms-blue);
+      padding: 12px 14px;
+      font-size: 13px; line-height: 1.6;
+    }
+    .safe-tip strong { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ms-blue); }
+    body.dark-mode .safe-tip { background: #1a2d40; }
+
+    .modal-foot {
+      padding: 12px 22px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end;
+    }
+    .next-btn {
+      padding: 9px 26px;
+      background: var(--ms-blue); color: white;
+      border: none; border-radius: 2px;
+      font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+    }
+    .next-btn:hover { background: var(--ms-blue-dark); }
+
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- ACCESSIBILITY BAR -->
+  <div class="accessibility">
+    <strong style="font-size:12px;">View:</strong>
+    <label><input type="checkbox" id="darkMode"> Dark Mode</label>
+    <label><input type="checkbox" id="largeText"> Larger Text</label>
+    <label><input type="checkbox" id="highContrast"> High Contrast</label>
+    <button class="a11y-btn" id="readBtn" style="margin-left:auto;">🔊 Read Aloud</button>
+    <button class="a11y-btn" id="resetBtn">↺ Start Over</button>
+  </div>
+
+  <!-- RIBBON -->
+  <div class="ribbon">
+    <div class="ribbon-brand">
+      <div class="brand-icon">📨</div>
+      <div>
+        <div class="brand-title">Scam Detective</div>
+        <div class="brand-sub">Spot the fake emails</div>
+      </div>
+    </div>
+    <div class="ribbon-stats">
+      <div class="stat-box">
+        <div class="stat-num" id="scoreNum">0</div>
+        <div class="stat-lbl">Correct</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="wrongNum">0</div>
+        <div class="stat-lbl">Wrong</div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-text" id="progText">0 of 8 emails checked</div>
+        <div class="prog-track">
+          <div class="prog-fill" id="progFill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sb-heading">Folders</div>
+      <div class="sb-item active">
+        <span class="sb-icon">📥</span>
+        <span>Inbox</span>
+        <span class="sb-count" id="sbRemaining">8</span>
+      </div>
+      <hr class="sb-divider">
+      <div class="sb-heading">My results</div>
+      <div class="sb-item">
+        <span class="sb-icon">🚨</span>
+        <span>Scams found</span>
+        <span class="sb-count" id="sbScams">0</span>
+      </div>
+      <div class="sb-item">
+        <span class="sb-icon">✅</span>
+        <span>Real emails</span>
+        <span class="sb-count" id="sbReal">0</span>
+      </div>
+    </div>
+
+    <!-- EMAIL LIST -->
+    <div class="email-list">
+      <div class="list-head">
+        <div class="list-head-title">Inbox</div>
+        <div class="list-head-sub">Read each email — then decide</div>
+      </div>
+      <div class="email-scroll" id="emailList"></div>
+    </div>
+
+    <!-- READING PANE -->
+    <div class="reading-pane">
+      <div class="pane-toolbar">
+        <button class="pane-btn" id="readBtn2">🔊 Read email aloud</button>
+      </div>
+
+      <div class="email-content" id="emailContent">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">🕵️</div>
+          <h2>Pick an email to investigate</h2>
+          <p>Read carefully, then decide — is it a <strong>SCAM</strong> or is it <strong>REAL</strong>?</p>
+          <br>
+          <p style="font-size:12px;color:var(--text-secondary);">8 emails in your inbox &nbsp;·&nbsp; 5 are scams &nbsp;·&nbsp; 3 are real</p>
+        </div>
+        <div class="final-screen" id="finalScreen">
+          <div class="final-icon" id="finalIcon"></div>
+          <div class="final-score" id="finalScore"></div>
+          <div class="final-lbl">emails correct</div>
+          <div class="final-msg" id="finalMsg"></div>
+          <button class="final-replay" onclick="resetApp()">↺ Play again</button>
+        </div>
+      </div>
+
+      <!-- VERDICT BAR -->
+      <div class="verdict-bar" id="verdictBar">
+        <div class="verdict-q">Is this email a SCAM or REAL?</div>
+        <div class="verdict-btns">
+          <button class="vbtn vbtn-scam" id="btnScam" onclick="submitVerdict('scam')">🚨 SCAM — Don't trust it</button>
+          <button class="vbtn vbtn-real" id="btnReal" onclick="submitVerdict('real')">✅ REAL — It's genuine</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-head" id="modalHead"></div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-foot">
+        <button class="next-btn" id="nextBtn"></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var EMAILS = [
+      {
+        id: 1,
+        from: 'centrelink-payments@gov-alert.com',
+        fromDisplay: 'Centrelink Payments',
+        subject: 'URGENT: Your payment has been suspended',
+        date: 'Today, 9:14am',
+        preview: 'Call us NOW on 0488 122 433 to fix your account...',
+        body: 'Dear Customer,\n\nYour Centrelink payment has been SUSPENDED due to a problem with your account.\n\nYou must call us URGENTLY on:\n\n0488 122 433\n\nYou need to call within 24 hours or your payments will be permanently stopped.\n\nHave your Medicare card ready when you call.\n\nDo not ignore this message.\n\nCentrelink Payments Team',
+        isScam: true,
+        explanation: 'This email is trying to trick you into calling a fake number. Real Centrelink never contacts you from a private email address like @gov-alert.com, and their real number is 132 850 — not a mobile number starting with 04.',
+        flags: [
+          '🔴 Email address ends in @gov-alert.com — not a real government address',
+          '🔴 Phone number 0488 122 433 is a mobile number — Centrelink\'s real number is 132 850',
+          '🔴 Uses scary words like "URGENT" and "PERMANENTLY STOPPED" to make you panic',
+          '🔴 Asks for your Medicare card over the phone — Centrelink does not do this',
+          '🔴 No reference number, no myGov link, no proper sign-off'
+        ],
+        safeAction: 'If you\'re worried about your Centrelink payments, call the real number: 132 850, or go to a Centrelink office in person at 41-43 Smith Street Mall, Darwin.'
+      },
+      {
+        id: 2,
+        from: 'jenny.morris@nt.gov.au',
+        fromDisplay: 'Jenny Morris',
+        subject: 'Your Motor Vehicle Registry appointment — Wednesday 2 April',
+        date: 'Yesterday, 3:22pm',
+        preview: 'This is a reminder about your scheduled appointment on Wednesday...',
+        body: 'Hi,\n\nThis is a reminder about your appointment with the Motor Vehicle Registry.\n\nAPPOINTMENT DETAILS:\nDate: Wednesday, 2 April 2025\nTime: 10:00 AM\nLocation: Motor Vehicle Registry\n         Goyder Centre, 25 Chung Wah Terrace, Palmerston NT 0830\n\nWHAT TO BRING:\n- Photo ID (or two other forms of ID if you do not have a photo ID)\n- Proof of your current address\n\nIf you cannot attend, you must contact us at least 24 hours before.\n\nRegards,\nJenny\n\n──────────────────────────────\nJenny Morris\nLicensing Officer\nNT Motor Vehicle Registry\n\nPhone:  (08) 8999 3456\nEmail:  jenny.morris@nt.gov.au\n\nGoyder Centre, 25 Chung Wah Terrace\nPalmerston NT 0830\n\nThis email and any attachments may contain confidential\ninformation. If you are not the intended recipient, please\ndelete it and notify the sender immediately.\n──────────────────────────────',
+        isScam: false,
+        isRealFlags: true,
+        explanation: 'This is a genuine email from the Motor Vehicle Registry. It uses an official NT government email address (@nt.gov.au), has a proper auto-signature with full contact details and office address, and only asks you to bring standard documents; not money or personal details. Notice the auto-signature at the bottom; real professional emails always include one.',
+        flags: [
+          '✅ Email address is @nt.gov.au — a real Northern Territory government address',
+          '✅ Has a proper auto-signature: full name, title, organisation, phone, email, and office address',
+          '✅ Phone number starts with (08) — a landline, not a mobile',
+          '✅ Does NOT ask for money, bank details, or passwords',
+          '✅ Calm, professional language — no panic or scare tactics'
+        ],
+        safeAction: 'Keep this appointment. If you need to reschedule, call the Motor Vehicle Registry on (08) 8999 3456.'
+      },
+      {
+        id: 3,
+        from: 'refund@ato-gov-australia.net',
+        fromDisplay: 'ATO Tax Refund',
+        subject: 'You have a tax refund of $847.00 waiting',
+        date: 'Today, 7:58am',
+        preview: 'Reply with your bank account details to receive your refund...',
+        body: 'Dear Australian Resident,\n\nThe Australian Taxation Office has processed your tax return and you are eligible for a refund of:\n\n$847.00\n\nTo receive your refund, you must reply to this email with:\n\n- Your full name\n- Your bank account BSB and account number\n- Your date of birth\n- Your Tax File Number (TFN)\n\nYou must reply within 5 business days or the refund will be cancelled.\n\nAustralian Taxation Office\nRefund Processing Department',
+        isScam: true,
+        explanation: 'The real ATO never asks you to email your bank account details, TFN, or date of birth. They process refunds directly to the bank account already registered — they do not need to ask for it. This is an identity theft scam.',
+        flags: [
+          '🔴 Email from @ato-gov-australia.net — the real ATO uses @ato.gov.au',
+          '🔴 Asks you to email your Tax File Number (TFN) — never do this',
+          '🔴 Asks for bank BSB and account number over email — a major warning sign',
+          '🔴 The ATO never emails your refund amount — they use myGov',
+          '🔴 Fake deadline: "5 business days or the refund will be cancelled"'
+        ],
+        safeAction: 'Never email your TFN or bank details to anyone. If you think you have a real refund, log in to myGov at my.gov.au or call the ATO on 13 28 61.'
+      },
+      {
+        id: 4,
+        from: 'noreply@servicesaustralia.gov.au',
+        fromDisplay: 'Services Australia',
+        subject: 'Centrelink reporting reminder — fortnight ending 12 April',
+        date: '3 days ago',
+        preview: 'Your income report for the fortnight ending 12 April is due tonight...',
+        body: 'Dear Participant,\n\nThis is a reminder that your income report for the fortnight ending 12 April 2025 is due by midnight tonight.\n\nHOW TO REPORT:\n\n1. Online: Log in to my.gov.au and use the Express Plus Centrelink app\n2. Phone: Call 133 276 and follow the prompts\n3. In person: Visit your nearest Centrelink office\n\nDarwin Centrelink Office:\n41-43 Smith Street Mall, Darwin NT 0800\nHours: Mon–Fri, 8:30am – 4:30pm\n\nIf you do not report on time, your payment may be delayed.\n\nFor help, call 132 850.\n\nServices Australia',
+        isScam: false,
+        isRealFlags: true,
+        explanation: 'This is a genuine Services Australia notification. The email address ends in @servicesaustralia.gov.au — a real government address. It points you to official channels only: myGov, a 13xx phone number, or in person at the real Darwin office.',
+        flags: [
+          '✅ Email from @servicesaustralia.gov.au — an official government address',
+          '✅ Directs you to my.gov.au — the real myGov website',
+          '✅ Phone numbers 132 850 and 133 276 are real Centrelink numbers',
+          '✅ Real Darwin office address: 41-43 Smith Street Mall',
+          '✅ No request for personal details, passwords, or money'
+        ],
+        safeAction: 'Report your income as directed — through myGov, by phone on 133 276, or in person at the Smith Street Mall Centrelink office.'
+      },
+      {
+        id: 5,
+        from: 'jobs@nt-employment-register.com',
+        fromDisplay: 'NT Employment Register',
+        subject: 'Job offer waiting for you — register today',
+        date: '2 days ago',
+        preview: 'We have found work in Darwin. Pay the $85 registration fee to secure your spot...',
+        body: 'Dear Job Seeker,\n\nGood news! We have matched your profile to 3 job vacancies in Darwin.\n\nPositions available:\n- Labouring / General Hand — $28/hr\n- Warehouse Packing — $26/hr\n- Roadworks Crew — $32/hr\n\nTo secure your place you must pay a ONE-TIME registration fee of $85 by bank transfer.\n\nPayment details:\nBSB: 062-551\nAccount: 1044 8823\nRef: Your full name\n\nOnce payment is received, we will send you full details and contact your employer.\n\nDo not miss this opportunity.\n\nNT Employment Register',
+        isScam: true,
+        explanation: 'Real employers and employment agencies NEVER ask you to pay money to get a job. This is a classic job scam. If you pay the $85, you will never hear from them again and you will not get the money back.',
+        flags: [
+          '🔴 Real jobs never require you to pay a "registration fee" — this is always a scam',
+          '🔴 Not an official government employment service',
+          '🔴 Asks you to send money to a random bank account',
+          '🔴 No company name, no real address, no contact person for the jobs',
+          '🔴 Vague pressure: "Do not miss this opportunity"'
+        ],
+        safeAction: 'Real job services like your jobactive provider or Centrelink\'s employment services are always free. Never pay money to apply for work. Report job scams at scamwatch.gov.au.'
+      },
+      {
+        id: 6,
+        from: 'noreply@my.gov.au',
+        fromDisplay: 'myGov',
+        subject: 'myGov message from Medicare — claim processed',
+        date: '4 days ago',
+        preview: 'You have a new message in your myGov inbox from Medicare...',
+        body: 'Hi,\n\nYou have a new message in your myGov inbox.\n\nSENT BY: Medicare\nSUBJECT: Your Medicare claim has been processed\n\nTo read your message, log in at:\nhttps://my.gov.au\n\nDo not reply to this email — it is a notification only.\n\nFor help with myGov, visit my.gov.au/help or call 132 307.\n\nServices Australia — myGov team',
+        isScam: false,
+        isRealFlags: true,
+        explanation: 'This is a genuine myGov notification. The real myGov always sends short emails that just tell you to log in — they never include your personal details or ask for bank account information. The only link is to my.gov.au, which is the real myGov address.',
+        flags: [
+          '✅ From @my.gov.au — the official myGov email address',
+          '✅ Only directs you to log in at my.gov.au — the real website',
+          '✅ Says "do not reply" — consistent with real automated government notifications',
+          '✅ No personal information, no bank details, no pressure tactics',
+          '✅ Help number 132 307 is the real myGov support number'
+        ],
+        safeAction: 'Log in to myGov by typing my.gov.au directly into your browser — do not click links in emails you are unsure about.'
+      },
+      {
+        id: 7,
+        from: 'darwin-prize-winner@hotmail.com',
+        fromDisplay: 'Darwin Community Prizes',
+        subject: 'CONGRATULATIONS! You won a $2,000 Woolworths voucher',
+        date: 'Today, 11:03am',
+        preview: 'You have been selected as our Darwin winner. Click to claim your $2,000...',
+        body: 'CONGRATULATIONS!!!\n\nYou have been randomly selected as our Darwin area winner!\n\nPRIZE: $2,000 Woolworths Gift Card\n\nTo claim your prize you must:\n\n1. Click the link below within 48 hours\n2. Confirm your name and address\n3. Pay a $12.95 delivery and handling fee\n\nCLAIM NOW: www.darwin-prizes-2025.com/claim\n\nThis offer expires in 48 hours. After that your prize will be given to another winner.\n\nDarwin Community Prizes Team',
+        isScam: true,
+        explanation: 'You did not win anything. This is a classic prize scam. The "$12.95 delivery fee" is how they steal your money or card details. Real prize draws never ask winners to pay anything to collect a prize, and Woolworths never runs promotions from a Hotmail address.',
+        flags: [
+          '🔴 Email from a Hotmail address — Woolworths uses @woolworths.com.au',
+          '🔴 You never entered a competition — you cannot win one you did not enter',
+          '🔴 Asks you to pay $12.95 — this is how they steal your money or card details',
+          '🔴 The website darwin-prizes-2025.com is not a real Woolworths website',
+          '🔴 "48 hours or prize goes to someone else" — fake deadline to rush you'
+        ],
+        safeAction: 'Delete this email. Never pay money to claim a "prize." If in doubt, go directly to woolworths.com.au — not via a link from any email.'
+      },
+      {
+        id: 8,
+        from: 'account-suspended@mygov-secure-login.com',
+        fromDisplay: 'myGov Security Alert',
+        subject: 'ACTION REQUIRED: Your myGov account has been locked',
+        date: 'Today, 6:45am',
+        preview: 'Your account has been suspended. Verify your identity within 2 hours...',
+        body: 'SECURITY ALERT — myGov Account Suspended\n\nDear User,\n\nYour myGov account has been locked due to suspicious login activity.\n\nTo unlock your account, you must verify your identity immediately:\n\nClick here to verify: www.mygov-secure-login.com/verify\n\nYou will need to enter:\n- Your myGov username and password\n- Your Medicare number\n- Your bank account details\n\nIf you do not verify within 2 hours, your account will be permanently deleted and your Centrelink payments cancelled.\n\nmyGov Security Team',
+        isScam: true,
+        explanation: 'This is a phishing scam. It wants you to enter your myGov username, password, Medicare number and bank details into a fake website so they can steal them. The real myGov is at my.gov.au — not mygov-secure-login.com. Notice it says "Dear User" — it does not know your actual name, which is a sign it was sent to thousands of random people.',
+        flags: [
+          '🔴 Says "Dear User" — the real myGov knows your name and uses it',
+          '🔴 Email from @mygov-secure-login.com — real myGov uses @my.gov.au',
+          '🔴 The link goes to a fake website to steal your username and password',
+          '🔴 Asks for bank account details — the real myGov never does this by email',
+          '🔴 "Permanently deleted, Centrelink cancelled" — extreme scare tactics to stop you thinking clearly',
+          '🔴 "Verify within 2 hours" — fake deadline designed to rush you into a mistake'
+        ],
+        safeAction: 'Do NOT click the link. Type my.gov.au directly into your browser to check your account, or call myGov on 132 307.'
+      }
+    ];
+
+    var APP = { answered: {}, score: 0, wrong: 0, currentEmail: null };
+
+    function init() {
+      document.getElementById('darkMode').onchange = function(e) {
+        document.body.classList.toggle('dark-mode', e.target.checked);
+      };
+      document.getElementById('largeText').onchange = function(e) {
+        document.body.classList.toggle('large-text', e.target.checked);
+      };
+      document.getElementById('highContrast').onchange = function(e) {
+        document.body.classList.toggle('high-contrast', e.target.checked);
+      };
+      document.getElementById('readBtn').onclick = readAloud;
+      document.getElementById('readBtn2').onclick = readAloud;
+      document.getElementById('resetBtn').onclick = function() {
+        if (confirm('Start over? All progress will be lost.')) resetApp();
+      };
+      renderList();
+    }
+
+    function renderList() {
+      var container = document.getElementById('emailList');
+      container.innerHTML = '';
+      var scams = 0, reals = 0;
+      EMAILS.forEach(function(em) {
+        var ans = APP.answered[em.id];
+        if (ans) { if (em.isScam) scams++; else reals++; }
+
+        var div = document.createElement('div');
+        var cls = 'email-item';
+        if (APP.currentEmail && APP.currentEmail.id === em.id) cls += ' is-active';
+        if (ans) cls += em.isScam ? ' done-scam' : ' done-real';
+        div.className = cls;
+
+        var badge = '';
+        if (ans) {
+          var icon = ans.correct ? '✅' : '❌';
+          var bc = em.isScam ? 'badge-scam' : 'badge-real';
+          var bl = em.isScam ? 'SCAM' : 'REAL';
+          badge = '<div><span class="ei-badge ' + bc + '">' + icon + ' ' + bl + '</span></div>';
+        }
+
+        div.innerHTML =
+          '<div class="ei-row1">' +
+            '<div class="ei-sender">' + esc(em.fromDisplay) + '</div>' +
+            '<div class="ei-date">' + em.date + '</div>' +
+          '</div>' +
+          '<div class="ei-subject">' + esc(em.subject) + '</div>' +
+          '<div class="ei-preview">' + esc(em.preview) + '</div>' +
+          badge;
+
+        div.onclick = (function(e2) { return function() { openEmail(e2); }; })(em);
+        container.appendChild(div);
+      });
+
+      document.getElementById('sbScams').textContent = scams;
+      document.getElementById('sbReal').textContent = reals;
+      document.getElementById('sbRemaining').textContent = EMAILS.length - Object.keys(APP.answered).length;
+    }
+
+    function openEmail(em) {
+      APP.currentEmail = em;
+
+      var content = document.getElementById('emailContent');
+      // Preserve anchored elements
+      var empty = document.getElementById('emptyState');
+      var final = document.getElementById('finalScreen');
+
+      content.innerHTML =
+        '<div class="msg-subject">' + esc(em.subject) + '</div>' +
+        '<div class="msg-meta"><strong>From:</strong> ' + esc(em.fromDisplay) + ' &lt;' + esc(em.from) + '&gt;</div>' +
+        '<div class="msg-meta"><strong>Date:</strong> ' + em.date + '</div>' +
+        '<hr class="msg-rule">' +
+        '<div class="msg-body" id="msgBody">' + esc(em.body) + '</div>';
+
+      content.appendChild(empty);
+      content.appendChild(final);
+      empty.style.display = 'none';
+      final.classList.remove('show');
+
+      var ans = APP.answered[em.id];
+      var bar = document.getElementById('verdictBar');
+      bar.classList.add('visible');
+      document.getElementById('btnScam').disabled = !!ans;
+      document.getElementById('btnReal').disabled = !!ans;
+
+      renderList();
+    }
+
+    function submitVerdict(choice) {
+      var em = APP.currentEmail;
+      if (!em || APP.answered[em.id]) return;
+
+      var correct = (choice === 'scam') === em.isScam;
+      APP.answered[em.id] = { choice: choice, correct: correct };
+      if (correct) APP.score++; else APP.wrong++;
+
+      document.getElementById('scoreNum').textContent = APP.score;
+      document.getElementById('wrongNum').textContent = APP.wrong;
+      var done = Object.keys(APP.answered).length;
+      document.getElementById('progText').textContent = done + ' of ' + EMAILS.length + ' emails checked';
+      document.getElementById('progFill').style.width = Math.round((done / EMAILS.length) * 100) + '%';
+
+      document.getElementById('btnScam').disabled = true;
+      document.getElementById('btnReal').disabled = true;
+
+      showModal(em, correct);
+      renderList();
+    }
+
+    function showModal(em, correct) {
+      var head = document.getElementById('modalHead');
+      var verdictTxt = correct ? '✅ Correct!' : '❌ Wrong — here\'s why';
+      var verdictCls = correct ? 'verdict-ok' : 'verdict-no';
+      var tagCls = em.isScam ? 'vtag-scam' : 'vtag-real';
+      var tagTxt = em.isScam ? '🚨 This is a SCAM' : '✅ This is REAL';
+      head.innerHTML =
+        '<div class="modal-verdict ' + verdictCls + '">' + verdictTxt + '</div>' +
+        '<span class="verdict-tag ' + tagCls + '">' + tagTxt + '</span>';
+
+      var body = document.getElementById('modalBody');
+      var flagCls = em.isRealFlags ? 'real-flags' : 'scam-flags';
+      var flagTitle = em.isRealFlags ? 'Why it\'s genuine:' : 'The warning signs:';
+      var flagsHtml = (em.flags || []).map(function(f) {
+        return '<div class="flag-item">' + esc(f) + '</div>';
+      }).join('');
+
+      body.innerHTML =
+        '<div class="modal-expl">' + esc(em.explanation) + '</div>' +
+        '<div class="flag-block ' + flagCls + '">' +
+          '<div class="flag-title">' + flagTitle + '</div>' + flagsHtml +
+        '</div>' +
+        '<div class="safe-tip"><strong>What to do</strong>' + esc(em.safeAction) + '</div>';
+
+      var done = Object.keys(APP.answered).length;
+      var isLast = (done === EMAILS.length);
+      var btn = document.getElementById('nextBtn');
+      btn.textContent = isLast ? '🏆 See my final score' : 'Next email →';
+      btn.onclick = function() { closeModal(isLast); };
+
+      document.getElementById('modalOverlay').classList.add('show');
+    }
+
+    function closeModal(isLast) {
+      document.getElementById('modalOverlay').classList.remove('show');
+      if (isLast) { showFinalScreen(); return; }
+
+      // Auto-advance to next unanswered email
+      var next = null;
+      var pastCurrent = false;
+      for (var i = 0; i < EMAILS.length; i++) {
+        if (APP.currentEmail && EMAILS[i].id === APP.currentEmail.id) {
+          pastCurrent = true;
+          continue;
+        }
+        if (pastCurrent && !APP.answered[EMAILS[i].id]) { next = EMAILS[i]; break; }
+      }
+      // Wrap around if needed
+      if (!next) {
+        for (var i = 0; i < EMAILS.length; i++) {
+          if (!APP.answered[EMAILS[i].id]) { next = EMAILS[i]; break; }
+        }
+      }
+      if (next) openEmail(next);
+    }
+
+    function showFinalScreen() {
+      APP.currentEmail = null;
+      document.getElementById('verdictBar').classList.remove('visible');
+
+      var content = document.getElementById('emailContent');
+      var empty = document.getElementById('emptyState');
+      var final = document.getElementById('finalScreen');
+      content.innerHTML = '';
+      content.appendChild(empty);
+      content.appendChild(final);
+      empty.style.display = 'none';
+      final.classList.add('show');
+
+      var pct = Math.round((APP.score / EMAILS.length) * 100);
+      document.getElementById('finalScore').textContent = APP.score + '/' + EMAILS.length;
+
+      var icon, msg;
+      if (pct === 100) {
+        icon = '🏆'; msg = 'Perfect score. You are a Scam Detective. You know exactly what to look for — share what you\'ve learned with your mob.';
+      } else if (pct >= 75) {
+        icon = '🌟'; msg = 'Great work. You spotted most of the scams. Remember: if something feels wrong about an email, trust that feeling and check before you act.';
+      } else if (pct >= 50) {
+        icon = '👍'; msg = 'Good effort. Scammers are tricky. The main rule: real government emails always end in .gov.au, real Centrelink numbers start with 13, and no real service ever asks you to pay money to get money.';
+      } else {
+        icon = '💪'; msg = 'Keep learning — scams are built to fool people. The big rule: if an email scares you or asks for money or personal details, always check by calling the real number or going in person.';
+      }
+
+      document.getElementById('finalIcon').textContent = icon;
+      document.getElementById('finalMsg').textContent = msg;
+      renderList();
+    }
+
+    function resetApp() {
+      APP.answered = {}; APP.score = 0; APP.wrong = 0; APP.currentEmail = null;
+      document.getElementById('scoreNum').textContent = '0';
+      document.getElementById('wrongNum').textContent = '0';
+      document.getElementById('progText').textContent = '0 of ' + EMAILS.length + ' emails checked';
+      document.getElementById('progFill').style.width = '0%';
+      document.getElementById('verdictBar').classList.remove('visible');
+      document.getElementById('modalOverlay').classList.remove('show');
+
+      var content = document.getElementById('emailContent');
+      var empty = document.getElementById('emptyState');
+      var final = document.getElementById('finalScreen');
+      content.innerHTML = '';
+      empty.style.display = '';
+      final.classList.remove('show');
+      content.appendChild(empty);
+      content.appendChild(final);
+      renderList();
+    }
+
+    function readAloud() {
+      var el = document.getElementById('msgBody');
+      if (!el) { alert('Select an email first.'); return; }
+      if ('speechSynthesis' in window) {
+        var u = new SpeechSynthesisUtterance(el.textContent);
+        u.lang = 'en-AU'; u.rate = 0.88;
+        speechSynthesis.cancel(); speechSynthesis.speak(u);
+      } else {
+        alert(el.textContent);
+      }
+    }
+
+    function esc(s) {
+      var d = document.createElement('div');
+      d.textContent = s; return d.innerHTML;
+    }
+
+    document.readyState === 'loading'
+      ? document.addEventListener('DOMContentLoaded', init)
+      : init();
+  </script>
+</body>
+</html>
