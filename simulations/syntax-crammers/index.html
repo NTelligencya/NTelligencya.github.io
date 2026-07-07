@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Syntax Crammers — NT World Ink</title>
+<meta name="description" content="Interactive typing drills that make syntax stick: Excel formulas, Bash, PowerShell and MCP config JSON. Learn, copy, recall — with progress saved in your browser.">
+<style>
+  :root {
+    /* Ochre-on-black scheme, matching the simulations catalogue. */
+    --bg: #000000;
+    --panel: #0a0a0a;
+    --white: #f4f4f2;
+    --body: #d5d8d9;
+    --grey: #b9bcbd;
+    --grey-dim: #7d8183;
+    --grey-faint: #35383a;
+    --ochre: #e0983c;
+    --ochre-bright: #f2ab52;
+    --ochre-deep: #6b3d10;
+    --ochre-faint: #2a1c0c;
+    --glow: rgba(224, 152, 60, 0.40);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--body);
+    font-family: Baskerville, "Baskerville Old Face", "Libre Baskerville", "Times New Roman", serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Banner ---------- */
+  .banner {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    background: url("../assets/bannerochre.png") center 45% / cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 1.5rem;
+  }
+  .banner::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center 45%, rgba(0,0,0,0) 20%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+  }
+  .banner h1 {
+    position: relative;
+    z-index: 2;
+    font-size: clamp(2.2rem, 6vw, 4.6rem);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    text-shadow: 0 0 34px rgba(224,152,60,0.55), 0 2px 10px rgba(0,0,0,0.95);
+  }
+  .banner p {
+    position: relative;
+    z-index: 2;
+    margin-top: 0.9rem;
+    font-size: clamp(1rem, 2.4vw, 1.35rem);
+    font-style: italic;
+    color: var(--body);
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.95);
+  }
+
+  /* ---------- Nav ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(6,6,6,0.94);
+    border-top: 1px solid var(--ochre-faint);
+    border-bottom: 1px solid rgba(224,152,60,0.28);
+    box-shadow: 0 8px 24px -6px var(--glow), 0 16px 48px -10px rgba(224,152,60,0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2.2rem;
+    padding: 1rem 1.2rem;
+    flex-wrap: wrap;
+    font-size: 1.02rem;
+    letter-spacing: 0.05em;
+  }
+  nav a {
+    color: var(--grey-dim);
+    text-decoration: none;
+    transition: color 0.2s ease, text-shadow 0.2s ease;
+  }
+  nav a:hover { color: var(--ochre-bright); text-shadow: 0 0 14px rgba(224,152,60,0.6); }
+  nav .home { color: var(--ochre); }
+
+  /* ---------- Layout ---------- */
+  main { max-width: 1080px; margin: 0 auto; padding: 4rem 1.5rem 5rem; }
+
+  .intro { max-width: 760px; margin-bottom: 3rem; }
+  .eyebrow {
+    font-family: "Consolas", "SF Mono", ui-monospace, monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.14em;
+    color: var(--ochre);
+    text-transform: lowercase;
+    margin-bottom: 0.9rem;
+  }
+  .intro h2 {
+    font-weight: 400;
+    font-size: clamp(1.7rem, 3.6vw, 2.4rem);
+    letter-spacing: 0.03em;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+  .intro p { color: var(--body); font-size: 1.12rem; margin-bottom: 0.9rem; }
+  .intro .note { color: var(--grey-dim); font-size: 0.98rem; }
+
+  /* ---------- How it works strip ---------- */
+  .how {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 3.5rem;
+  }
+  .how .step {
+    background: var(--panel);
+    border: 1px solid var(--grey-faint);
+    padding: 1.2rem 1.4rem;
+  }
+  .how .step .n {
+    font-family: "Consolas", "SF Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--ochre);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  .how .step h3 { font-weight: 400; font-size: 1.2rem; color: var(--white); margin-bottom: 0.3rem; }
+  .how .step p { font-size: 0.95rem; color: var(--grey); }
+
+  /* ---------- Cards ---------- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .card-link { text-decoration: none; color: inherit; display: flex; }
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--grey-faint);
+    padding: 1.7rem 1.7rem 1.6rem;
+    box-shadow:
+      0 4px 18px rgba(0,0,0,0.8),
+      0 0 0 1px rgba(224,152,60,0.04),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  }
+  .card-link:hover .card, .card-link:focus-visible .card {
+    border-color: var(--ochre);
+    transform: translateY(-4px);
+    box-shadow:
+      0 12px 36px rgba(0,0,0,0.9),
+      0 0 28px -4px var(--glow);
+  }
+  .card-link:focus-visible .card { outline: 2px solid var(--ochre-bright); outline-offset: 2px; }
+
+  .card .tag {
+    align-self: flex-start;
+    font-family: "Consolas", "SF Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.6rem;
+    border: 1px solid var(--ochre-deep);
+    color: var(--ochre);
+    margin-bottom: 1rem;
+  }
+  .card h4 {
+    font-weight: 400;
+    font-size: 1.4rem;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    margin-bottom: 0.6rem;
+  }
+  .card .desc { font-size: 1rem; color: var(--grey); margin-bottom: 1.1rem; flex-grow: 1; }
+  .card .meta {
+    font-family: "Consolas", "SF Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    color: var(--grey-dim);
+    border-top: 1px solid var(--ochre-faint);
+    padding-top: 0.85rem;
+  }
+  .card .open {
+    margin-top: 0.9rem;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    color: var(--ochre);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .card-link:hover .open { color: var(--ochre-bright); text-shadow: 0 0 12px rgba(224,152,60,0.5); }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--ochre-faint);
+    text-align: center;
+    padding: 2.6rem 1.5rem;
+    color: var(--grey-dim);
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+  }
+  footer a { color: var(--ochre); text-decoration: none; }
+  footer a:hover { color: var(--ochre-bright); }
+  footer .fine { display: block; margin-top: 0.7rem; font-style: italic; color: var(--grey-faint); }
+
+  @media (max-width: 520px) {
+    main { padding: 2.6rem 1.1rem 3.5rem; }
+    .banner { min-height: 260px; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="banner">
+    <h1>Syntax Crammers</h1>
+    <p>type it until it sticks &mdash; learn, copy, recall</p>
+  </header>
+
+  <nav>
+    <a class="home" href="/simulations/">&larr; all simulation tools</a>
+    <a href="/">ntworld.ink</a>
+  </nav>
+
+  <main>
+    <section class="intro">
+      <div class="eyebrow">// afternoon syntax crammers</div>
+      <h2>Muscle memory for the syntax you keep forgetting.</h2>
+      <p>Reading syntax doesn't make it stick; typing it does. Each crammer opens on a contents dashboard so you can see exactly what's covered, drill one topic at a time or run the whole deck, and every card goes through three passes until you can produce it from memory. Miss one, and it circles back until you don't.</p>
+      <p class="note">Your progress is saved in your own browser between visits &mdash; nothing is installed and nothing is uploaded. Works offline once loaded.</p>
+    </section>
+
+    <div class="how">
+      <div class="step">
+        <span class="n">PASS 01</span>
+        <h3>Learn</h3>
+        <p>See what the command does, its exact syntax, and the gotchas worth knowing.</p>
+      </div>
+      <div class="step">
+        <span class="n">PASS 02</span>
+        <h3>Copy</h3>
+        <p>Type it once while looking &mdash; the target lights up green as you match it.</p>
+      </div>
+      <div class="step">
+        <span class="n">PASS 03</span>
+        <h3>Recall</h3>
+        <p>Type it from memory. Missed cards resurface later in the session until they stick.</p>
+      </div>
+    </div>
+
+    <section class="cards">
+
+      <a class="card-link" href="excel.html">
+        <div class="card">
+          <span class="tag">Available</span>
+          <h4>Excel Formulas</h4>
+          <p class="desc">From SUM to XLOOKUP, INDEX/MATCH, dynamic arrays and structured references &mdash; the formulas that do real work, including the $ locks and gotchas that usually trip people up.</p>
+          <div class="meta">63 CARDS &middot; 8 TOPICS &middot; FORGIVING MATCH</div>
+          <span class="open">Open crammer &rarr;</span>
+        </div>
+      </a>
+
+      <a class="card-link" href="bash.html">
+        <div class="card">
+          <span class="tag">Available</span>
+          <h4>Bash &amp; Linux Commands</h4>
+          <p class="desc">The terminal essentials: navigating, managing files, grep and find, pipes and redirection, permissions, processes and remote access &mdash; typed until they're reflex.</p>
+          <div class="meta">42 CARDS &middot; 9 TOPICS &middot; STRICT MATCH</div>
+          <span class="open">Open crammer &rarr;</span>
+        </div>
+      </a>
+
+      <a class="card-link" href="powershell.html">
+        <div class="card">
+          <span class="tag">Available</span>
+          <h4>PowerShell</h4>
+          <p class="desc">The Verb-Noun commands behind Windows automation: files and folders, the object pipeline, JSON and CSV data, web requests &mdash; plus the aliases that map them back to Bash.</p>
+          <div class="meta">42 CARDS &middot; 10 TOPICS &middot; STRICT MATCH</div>
+          <span class="open">Open crammer &rarr;</span>
+        </div>
+      </a>
+
+      <a class="card-link" href="mcp-json.html">
+        <div class="card">
+          <span class="tag">Available</span>
+          <h4>MCP Config JSON</h4>
+          <p class="desc">The JSON that wires AI tools together: strings, arrays and nesting done right, local and remote server entries, and the safe way to handle secrets with environment variables.</p>
+          <div class="meta">20 CARDS &middot; 6 TOPICS &middot; FORGIVING MATCH</div>
+          <span class="open">Open crammer &rarr;</span>
+        </div>
+      </a>
+
+    </section>
+  </main>
+
+  <footer>
+    <a href="/simulations/">All simulation tools</a> &middot; <a href="/">Back to ntworld.ink</a>
+    <span class="fine">&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+  </footer>
+
+</body>
+</html>
