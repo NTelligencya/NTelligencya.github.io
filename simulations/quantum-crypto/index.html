@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Maths That Guards the Internet</title>
+<style>
+  :root {
+    --ink: #000000; --panel: #0a0a0a;
+    --white: #f4f4f2; --body: #d5d8d9; --grey: #b9bcbd;
+    --grey-dim: #7d8183; --line: #35383a;
+    --glow: rgba(230, 235, 238, 0.35);
+    --accent: #e0983c; --accent-bright: #f2ab52; --accent-deep: #6b3d10;
+    --accent-glow: rgba(224, 152, 60, 0.40);
+    --alice: #cf5148; --bob: #4f86ad; --common: #d9a441;
+    --mix-a: #d47a44; --mix-b: #949577; --mix-final: #a77e67; --mix-eve: #b4875d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--ink); color: var(--white);
+    font-family: Baskerville, "Baskerville Old Face", "Libre Baskerville", "Times New Roman", serif;
+    font-weight: 400; overflow: hidden;
+  }
+  #stage { height: 100vh; display: flex; flex-direction: column; }
+
+  /* Chrome */
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 28px; flex-wrap: wrap;
+    padding: 20px 36px; font-size: 14px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--grey-dim); flex-shrink: 0;
+  }
+  header .mod-tag { color: var(--white); }
+  footer {
+    flex-shrink: 0; display: flex; justify-content: center; align-items: center;
+    gap: 10px; padding: 22px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background .3s, box-shadow .3s; }
+  .dot.on { background: var(--white); box-shadow: 0 0 10px var(--glow); }
+  main { flex: 1; display: flex; padding: 14px 60px; overflow: auto; }
+  .beat { display: none; max-width: 1100px; width: 100%; margin: auto; animation: rise .45s ease; }
+  .beat.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* Shared elements */
+  .eyebrow { color: var(--grey-dim); font-size: 15px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 14px; }
+  h1 { font-weight: 400; font-size: 56px; line-height: 1.1; letter-spacing: 0.04em; }
+  h2 { font-weight: 400; font-size: 40px; line-height: 1.15; margin-bottom: 28px; letter-spacing: 0.04em; }
+  .lede { font-size: 22px; color: var(--grey); margin-top: 18px; max-width: 780px; }
+  .myth {
+    display: inline-block; margin-top: 26px; padding: 9px 20px;
+    border: 1px solid var(--white); border-radius: 24px;
+    color: var(--white); font-size: 18px;
+    box-shadow: 0 0 16px -4px var(--glow);
+  }
+  .callout {
+    border-left: 3px solid var(--white); background: var(--panel);
+    padding: 26px 32px; border-radius: 0 10px 10px 0;
+    font-size: 26px; line-height: 1.45; max-width: 880px; color: var(--body);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.8), 0 0 0 1px rgba(230,235,238,0.04);
+  }
+  .callout strong { font-weight: 400; color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  .caption { color: var(--grey-dim); font-size: 14px; margin-top: 22px; max-width: 900px; line-height: 1.55; }
+  .cite { color: var(--grey-dim); font-size: 13px; margin-top: 14px; line-height: 1.6; }
+  .btn {
+    display: inline-block; margin-top: 30px; padding: 13px 32px;
+    background: var(--white); color: var(--ink); border: none; border-radius: 7px;
+    font-size: 18px; font-weight: 400; font-family: inherit; cursor: pointer;
+    transition: box-shadow .2s;
+  }
+  .btn:hover { box-shadow: 0 0 20px -2px var(--glow); }
+  .btn.ghost { background: transparent; color: var(--grey); border: 1px solid var(--line); }
+  .btn.ghost:hover { color: var(--white); border-color: var(--grey-dim); }
+  .btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
+  .btn:focus-visible, .menu-item:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
+  .navhint { position: fixed; right: 30px; bottom: 20px; color: var(--grey-dim); font-size: 13px; letter-spacing: 1px; }
+  .mono { font-family: Consolas, "SF Mono", ui-monospace, monospace; }
+
+  /* Menu */
+  .menu-item {
+    display: flex; align-items: baseline; gap: 24px; width: 100%;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 24px 30px; margin-bottom: 14px; cursor: pointer; text-align: left;
+    color: var(--white); font-family: inherit; font-weight: 400;
+    transition: border-color .2s, box-shadow .25s;
+  }
+  .menu-item:hover { border-color: var(--grey-dim); box-shadow: 0 0 26px -6px var(--glow); }
+  .menu-item .num { color: var(--grey-dim); font-size: 15px; letter-spacing: 3px; }
+  .menu-item .name { font-size: 26px; flex: 1; }
+  .menu-item .state { color: var(--grey-dim); font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* Generic panels & pairs */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 10px; }
+  .pair .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 30px 34px; font-size: 25px; line-height: 1.5; color: var(--body); }
+  .pair .card em { font-style: normal; color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  .qline { margin-top: 34px; font-size: 24px; color: var(--grey); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; }
+  .panel .lbl, .lbl { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-bottom: 14px; }
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 6px; }
+  .trio .hcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; }
+  .trio .hcard h3, .helps .hcard h3 { font-weight: 400; font-size: 23px; color: var(--white); margin-bottom: 10px; }
+  .trio .hcard p, .helps .hcard p { font-size: 17px; line-height: 1.55; color: var(--grey); }
+  .helps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 6px; }
+  .helps .hcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; }
+  .reveal-ans { display: none; margin-top: 18px; font-size: 30px; color: var(--white); text-shadow: 0 0 16px rgba(255,255,255,0.4); }
+  .reveal-ans.shown { display: block; animation: rise .4s ease; }
+  .reveal-ans .note { display: block; font-size: 16px; color: var(--grey-dim); margin-top: 8px; text-shadow: none; }
+
+  /* Big counters & digit wall */
+  .bigcount {
+    font-family: Consolas, "SF Mono", ui-monospace, monospace;
+    font-size: 52px; color: var(--white); letter-spacing: 3px;
+    text-shadow: 0 0 18px rgba(255,255,255,0.3); margin: 14px 0 6px;
+    transition: color .3s;
+  }
+  .bigcount.found { color: var(--accent-bright); text-shadow: 0 0 20px var(--accent-glow); }
+  .countnote { font-size: 16px; color: var(--grey-dim); min-height: 24px; }
+  .zerowall {
+    font-family: Consolas, "SF Mono", ui-monospace, monospace;
+    font-size: 13px; line-height: 1.7; letter-spacing: 1px;
+    color: var(--grey-dim); word-break: break-all; max-height: 190px; overflow: hidden;
+    margin-top: 14px; position: relative;
+  }
+  .zerowall::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 70px; background: linear-gradient(transparent, var(--panel)); }
+  .zerowall .lead { color: var(--white); font-size: 15px; }
+
+  /* Stage boxes (multiplication) */
+  .tokenflow { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; margin-top: 10px; }
+  .stagebox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; font-size: 27px; min-width: 150px; text-align: center; }
+  .stagebox .sub { display: block; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-top: 10px; }
+  .arrow { color: var(--white); font-size: 30px; }
+  .hidden-step { opacity: 0; transition: opacity .6s; }
+  .hidden-step.shown { opacity: 1; }
+  .stagebox.hot { border-color: var(--accent); box-shadow: 0 0 22px -4px var(--accent-glow); }
+  .stagebox.hot .big { color: var(--accent-bright); }
+  .stagebox .big { font-family: Consolas, ui-monospace, monospace; font-size: 30px; color: var(--white); }
+
+  /* Ladder (record bars) — neutral fills, accent for the highlighted rung */
+  .ladder { margin-top: 6px; }
+  .rung {
+    display: grid; grid-template-columns: 330px 1fr 190px; align-items: center; gap: 24px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 26px; margin-bottom: 14px;
+    opacity: 0; transform: translateY(8px); transition: opacity .5s, transform .5s;
+  }
+  .rung.shown { opacity: 1; transform: none; }
+  .rung .rname { font-size: 23px; }
+  .rung .rsub { color: var(--grey-dim); font-size: 15px; margin-top: 5px; line-height: 1.45; }
+  .rung .track { height: 28px; background: var(--line); border-radius: 6px; overflow: hidden; }
+  .rung .fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--grey-dim), var(--grey)); border-radius: 6px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+  .rung.accent .fill { background: linear-gradient(90deg, var(--accent-deep), var(--accent)); box-shadow: 0 0 14px var(--accent-glow); }
+  .rung .rvalue { font-family: Consolas, ui-monospace, monospace; color: var(--grey); font-size: 18px; text-align: right; line-height: 1.5; }
+
+  /* Calc lines */
+  .calcline {
+    font-family: Consolas, "SF Mono", ui-monospace, monospace; font-size: 27px; color: var(--body);
+    padding: 15px 0; border-bottom: 1px solid var(--line);
+    opacity: 0; transition: opacity .5s;
+  }
+  .calcline.shown { opacity: 1; }
+  .calcline:last-of-type { border-bottom: none; }
+  .calcline .op { color: var(--grey-dim); font-size: 19px; }
+  .calcline.result { color: var(--white); font-size: 34px; text-shadow: 0 0 22px rgba(255,255,255,0.35); }
+
+  /* Two-column compare cards */
+  .tvi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 6px; }
+  .tvi-card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 28px 32px; }
+  .tvi-card.now { border-color: var(--grey); box-shadow: 0 0 26px -6px var(--glow); }
+  .tvi-card.warn { border-color: var(--accent-deep); box-shadow: 0 0 26px -6px var(--accent-glow); }
+  .tvi-card .lbl { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-bottom: 6px; }
+  .tvi-card .when { font-size: 27px; color: var(--white); margin-bottom: 18px; }
+  .tvi-card ul { list-style: none; }
+  .tvi-card li { font-size: 19px; line-height: 1.5; padding: 9px 0 9px 22px; position: relative; color: var(--body); }
+  .tvi-card li::before { content: ''; position: absolute; left: 0; top: 19px; width: 8px; height: 8px; border-radius: 50%; background: var(--grey); }
+  .tvi-card.warn li::before { background: var(--accent); }
+
+  /* Paint mixing */
+  .actors { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 26px; margin-top: 6px; }
+  .actor { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 22px 26px; text-align: center; }
+  .actor h3 { font-weight: 400; font-size: 24px; color: var(--white); margin-bottom: 4px; }
+  .actor .role { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-bottom: 16px; }
+  .swatchrow { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 10px 0; opacity: 0; transition: opacity .6s; }
+  .swatchrow.shown { opacity: 1; }
+  .swatch { width: 58px; height: 58px; border-radius: 50%; border: 2px solid var(--line); flex-shrink: 0; }
+  .swatch.secret { border: 2px dashed var(--grey); }
+  .swatch.big { width: 74px; height: 74px; box-shadow: 0 0 22px -4px var(--glow); }
+  .swlabel { font-size: 14px; color: var(--grey-dim); width: 100%; margin-top: 2px; }
+  .plus { color: var(--grey-dim); font-size: 24px; }
+  .paint-eve { margin-top: 20px; }
+
+  /* Clock */
+  .clockrow { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+  .clockbox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  svg text { font-family: Baskerville, "Baskerville Old Face", "Libre Baskerville", "Times New Roman", serif; font-weight: 400; }
+  svg .svgmono { font-family: Consolas, ui-monospace, monospace; }
+  .clock-side { flex: 1; min-width: 280px; }
+  .clock-side .btn { margin-top: 14px; }
+  .hopline { font-family: Consolas, ui-monospace, monospace; font-size: 19px; color: var(--grey); margin-top: 16px; min-height: 28px; }
+  .hopline .cur { color: var(--accent-bright); }
+
+  /* Exchange steps */
+  .exch { margin-top: 6px; }
+  .exch-step {
+    display: grid; grid-template-columns: 200px 1fr; gap: 22px; align-items: start;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 26px; margin-bottom: 14px;
+    opacity: 0; transform: translateY(8px); transition: opacity .5s, transform .5s;
+  }
+  .exch-step.shown { opacity: 1; transform: none; }
+  .exch-step .who { font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); padding-top: 4px; }
+  .exch-step .what { font-size: 21px; line-height: 1.55; color: var(--body); }
+  .exch-step .what .mono { color: var(--white); }
+  .exch-step.secret { border-style: dashed; border-color: var(--grey-dim); }
+  .exch-step.public .who::after { content: " · EVE COPIES THIS"; color: var(--accent); }
+  .exch-step.final { border-color: var(--grey); box-shadow: 0 0 26px -6px var(--glow); }
+  .evebar {
+    border-left: 3px solid var(--accent); background: var(--panel);
+    padding: 20px 26px; border-radius: 0 10px 10px 0; margin-top: 20px;
+    font-size: 20px; line-height: 1.5; color: var(--body);
+    opacity: 0; transition: opacity .5s;
+  }
+  .evebar.shown { opacity: 1; }
+  .evebar .mono { color: var(--accent-bright); }
+
+  /* Curve */
+  .curverow { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+  .curvebox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  .curve-side { flex: 1; min-width: 280px; }
+  .curve-side .btn { margin-top: 14px; }
+
+  /* Key size bars */
+  .keybars { margin-top: 10px; max-width: 860px; }
+  .keybar { display: grid; grid-template-columns: 260px 1fr 110px; gap: 20px; align-items: center; padding: 14px 0; }
+  .keybar .kname { font-size: 21px; color: var(--body); }
+  .keybar .kname .sub { display: block; font-size: 14px; color: var(--grey-dim); }
+  .keybar .track { height: 30px; background: var(--line); border-radius: 6px; overflow: hidden; }
+  .keybar .fill { height: 100%; width: 0; border-radius: 6px; transition: width 1s cubic-bezier(.4,0,.2,1); background: linear-gradient(90deg, var(--grey-dim), var(--grey)); }
+  .keybar.accent .fill { background: linear-gradient(90deg, var(--accent-deep), var(--accent)); box-shadow: 0 0 14px var(--accent-glow); }
+  .keybar .kval { font-family: Consolas, ui-monospace, monospace; font-size: 19px; color: var(--grey); text-align: right; }
+
+  /* Mosca sliders */
+  .mosca { max-width: 900px; }
+  .m-slider { display: grid; grid-template-columns: 340px 1fr 90px; gap: 20px; align-items: center; padding: 13px 0; }
+  .m-slider .sname { font-size: 19px; color: var(--body); line-height: 1.35; }
+  .m-slider .sname .sub { display: block; font-size: 14px; color: var(--grey-dim); }
+  .m-slider .sval { font-family: Consolas, ui-monospace, monospace; font-size: 22px; color: var(--white); text-align: right; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; border-radius: 3px; background: var(--line); outline: none; }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--white); cursor: pointer; box-shadow: 0 0 12px var(--glow); border: none;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--white);
+    cursor: pointer; border: none; box-shadow: 0 0 12px var(--glow);
+  }
+  .mosca-viz { margin-top: 26px; }
+  .mv-row { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: center; padding: 8px 0; }
+  .mv-row .mvname { font-size: 16px; color: var(--grey-dim); letter-spacing: 1px; text-transform: uppercase; }
+  .mv-track { position: relative; height: 34px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .mv-seg { position: absolute; top: 0; bottom: 0; }
+  .mv-seg.x { background: var(--grey-dim); left: 0; }
+  .mv-seg.y { background: var(--grey); }
+  .mv-seg.z { background: linear-gradient(90deg, var(--accent-deep), var(--accent)); left: 0; }
+  .mv-seg .mvlbl { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: Consolas, ui-monospace, monospace; font-size: 14px; color: var(--ink); }
+  .mv-seg.x .mvlbl, .mv-seg.y .mvlbl { color: var(--ink); }
+  .verdict { margin-top: 24px; font-size: 26px; color: var(--white); min-height: 40px; }
+  .verdict .bad { color: var(--accent-bright); text-shadow: 0 0 18px var(--accent-glow); }
+  .verdict .ok { color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  .verdict .sub { display: block; font-size: 16px; color: var(--grey-dim); margin-top: 8px; }
+
+  /* Timeline */
+  .tline { margin-top: 6px; max-width: 900px; }
+  .tl-item {
+    display: grid; grid-template-columns: 150px 1fr; gap: 24px; align-items: start;
+    padding: 16px 0 16px 0; border-bottom: 1px solid var(--line);
+    opacity: 0; transform: translateY(8px); transition: opacity .5s, transform .5s;
+  }
+  .tl-item.shown { opacity: 1; transform: none; }
+  .tl-item:last-of-type { border-bottom: none; }
+  .tl-item .year { font-family: Consolas, ui-monospace, monospace; font-size: 24px; color: var(--white); }
+  .tl-item.accent .year { color: var(--accent-bright); text-shadow: 0 0 14px var(--accent-glow); }
+  .tl-item .ttext { font-size: 19px; line-height: 1.5; color: var(--body); }
+  .tl-item .ttext .tsub { display: block; font-size: 15px; color: var(--grey-dim); margin-top: 5px; }
+
+  /* Period wave */
+  .wavebox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-top: 6px; }
+
+  /* Harvest flow */
+  .chain { display: grid; grid-template-columns: 1fr 42px 1fr 42px 1fr; gap: 10px; align-items: center; margin-top: 6px; }
+  .chain .ccard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 24px 26px; font-size: 19px; line-height: 1.5; color: var(--body); }
+  .chain .ccard.now { border-color: var(--grey); box-shadow: 0 0 26px -6px var(--glow); }
+  .chain .ccard.warn { border-color: var(--accent-deep); box-shadow: 0 0 26px -6px var(--accent-glow); }
+  .chain .ccard .lbl { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-bottom: 10px; }
+  .chain .charrow { color: var(--white); font-size: 26px; text-align: center; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beat, .reveal-ans.shown { animation: none; }
+    .rung, .rung .fill, .keybar .fill, .tl-item, .exch-step, .swatchrow { transition: none; }
+  }
+  @media (max-width: 900px) {
+    h1 { font-size: 38px; } h2 { font-size: 30px; }
+    .pair, .tvi-grid, .helps, .trio, .actors { grid-template-columns: 1fr; }
+    .clockrow, .curverow { flex-direction: column; }
+    .rung { grid-template-columns: 1fr; gap: 10px; }
+    .rung .rvalue { text-align: left; }
+    .chain { grid-template-columns: 1fr; }
+    .keybar, .m-slider, .mv-row { grid-template-columns: 1fr; gap: 8px; }
+    .keybar .kval, .m-slider .sval { text-align: left; }
+    .exch-step { grid-template-columns: 1fr; gap: 8px; }
+    .tl-item { grid-template-columns: 1fr; gap: 6px; }
+    main { padding: 0 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <header>
+    <span class="mod-tag" id="hdrLeft">The maths that guards the internet</span>
+    <span id="hdrRight">Press M for menu</span>
+  </header>
+  <main id="main">
+
+    <!-- ============ MENU ============ -->
+    <section class="beat" data-scene="menu">
+      <div class="eyebrow">An interactive walkthrough</div>
+      <h1>The maths that guards the internet</h1>
+      <p class="lede">Why encryption works, why quantum computers threaten it, and what happens next. Five short modules; high-school maths is plenty.</p>
+      <div style="margin-top:44px">
+        <button class="menu-item" onclick="goModule(1)">
+          <span class="num">01</span><span class="name">One-way streets</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(2)">
+          <span class="num">02</span><span class="name">Prime padlocks</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(3)">
+          <span class="num">03</span><span class="name">Secrets in public</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(4)">
+          <span class="num">04</span><span class="name">The elliptic curve</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(5)">
+          <span class="num">05</span><span class="name">The quantum horizon</span><span class="state">Start</span>
+        </button>
+      </div>
+      <a class="btn ghost" href="../" style="margin-top:24px; text-decoration:none">&larr; Back to catalogue</a>
+    </section>
+
+    <!-- ============ MODULE 1 ============ -->
+
+    <!-- 1.0 Title -->
+    <section class="beat" data-scene="m1">
+      <div class="eyebrow">Module 01</div>
+      <h1>One-way streets</h1>
+      <div class="myth">Myth we'll unpick: "Encryption is unbreakable"</div>
+      <p class="lede">Every padlock you see in your browser is a maths problem. This module is about what kind of problem.</p>
+    </section>
+
+    <!-- 1.1 Which sum would you rather do? -->
+    <section class="beat" data-scene="m1" data-onenter="resetAsym">
+      <h2>Which sum would you rather do?</h2>
+      <div class="pair">
+        <div class="card">
+          <em>Forwards:</em><br>13 &times; 17 = ?
+          <div class="reveal-ans" id="asymA">= 221<span class="note">Pen and paper, ten seconds. A calculator, instantly.</span></div>
+          <button class="btn ghost" id="asymABtn" onclick="asymReveal('A')">Work it out</button>
+        </div>
+        <div class="card">
+          <em>Backwards:</em><br>? &times; ? = 391<br><span style="font-size:18px; color:var(--grey-dim)">(two whole numbers, both bigger than 1)</span>
+          <div class="reveal-ans" id="asymB">= 17 &times; 23<span class="note">No formula gets you there. You had to hunt: try 3, try 7, try 11, try 13&hellip;</span></div>
+          <button class="btn ghost" id="asymBBtn" onclick="asymReveal('B')">Hunt for it</button>
+        </div>
+      </div>
+      <p class="qline">Same relationship between three numbers. Opposite directions. One is a stroll; the other is a search.</p>
+    </section>
+
+    <!-- 1.2 One-way things -->
+    <section class="beat" data-scene="m1">
+      <h2>You already know one-way processes</h2>
+      <div class="trio">
+        <div class="hcard"><h3>Scramble an egg</h3><p>Thirty seconds with a fork. Now un-scramble it.</p></div>
+        <div class="hcard"><h3>Mix two paints</h3><p>One stir and they're blended. Now separate the original colours back out.</p></div>
+        <div class="hcard"><h3>Multiply two primes</h3><p>Instant, even for enormous numbers. Now, given only the answer, find the primes.</p></div>
+      </div>
+      <p class="qline">Easy to <span style="color:var(--white)">do</span>, hard to <span style="color:var(--white)">undo</span>. Mathematicians call these one-way functions, and the third one runs the internet.</p>
+    </section>
+
+    <!-- 1.3 Hard doesn't mean impossible -->
+    <section class="beat" data-scene="m1" data-onenter="resetPin">
+      <h2>"Hard" never means impossible. It means slow.</h2>
+      <div class="tvi-grid">
+        <div class="tvi-card">
+          <div class="lbl">A 4-digit PIN &middot; 10,000 possibilities</div>
+          <div class="bigcount" id="pinCount">0000</div>
+          <div class="countnote" id="pinNote">Any code can be beaten by trying everything. Watch.</div>
+          <button class="btn" id="pinBtn" onclick="pinRun()">Try every PIN</button>
+        </div>
+        <div class="tvi-card">
+          <div class="lbl">A modern encryption key &middot; possibilities:</div>
+          <div class="zerowall" id="keyWall"><span class="lead">Same attack, new target &mdash; press the button.</span></div>
+          <button class="btn ghost" id="wallBtn" onclick="wallRun()">Count the possibilities</button>
+        </div>
+      </div>
+      <p class="caption" id="pinCaption">A computer trying a billion keys every second, running since the Big Bang, would so far have checked roughly 0.000&hellip;(nearly 600 more zeros)&hellip;1 percent of them. Figures illustrative of a 2,048-bit key.</p>
+    </section>
+
+    <!-- 1.4 Key point -->
+    <section class="beat" data-scene="m1">
+      <div class="callout">Modern encryption is never unbreakable; it is <strong>too slow to break</strong>. Security is a time gap: instant for you, longer than the age of the universe for the attacker. Cryptography is the art of choosing sums that are <strong>one-way streets</strong>.</div>
+      <p class="caption">Hold that thought, because the whole quantum story in Module 5 is about that time gap suddenly closing for some — not all — of these sums.</p>
+      <button class="btn ghost" style="margin-top:26px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+    <!-- ============ MODULE 2 ============ -->
+
+    <!-- 2.0 Title -->
+    <section class="beat" data-scene="m2">
+      <div class="eyebrow">Module 02</div>
+      <h1>Prime padlocks</h1>
+      <div class="myth">Myth we'll bust: "A big enough computer can crack anything"</div>
+      <p class="lede">RSA, the original padlock of the internet, is nothing more than a multiplication left half-finished.</p>
+    </section>
+
+    <!-- 2.1 Build the padlock -->
+    <section class="beat" data-scene="m2" data-onenter="resetPadlock">
+      <h2>Build a padlock in one click</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:24px">Take two prime numbers. Primes are the atoms of arithmetic: every whole number is built from them in exactly one way.</p>
+      <div class="tokenflow">
+        <div class="stagebox"><span class="big">569</span><span class="sub">prime · secret</span></div>
+        <div class="stagebox" style="border:none; background:transparent"><span class="arrow">&times;</span></div>
+        <div class="stagebox"><span class="big">587</span><span class="sub">prime · secret</span></div>
+        <div class="arrow hidden-step" id="pl-a">&rarr;</div>
+        <div class="stagebox hot hidden-step" id="pl-b"><span class="big">334,003</span><span class="sub">the padlock · public</span></div>
+      </div>
+      <button class="btn" id="plBtn" onclick="padlockStep()">Multiply them</button>
+      <p class="caption" id="plNote">The product is published to the whole world; that is the point of it. The two primes stay in your pocket. Locking a message uses only the product; unlocking needs the primes.</p>
+    </section>
+
+    <!-- 2.2 Now crack it -->
+    <section class="beat" data-scene="m2" data-onenter="resetCrack">
+      <h2>Now be the attacker</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:24px">All Eve has is the public number. To break in, she must rediscover the primes: try dividing by 2, by 3, by 5, by 7&hellip;</p>
+      <div class="panel" style="max-width:640px">
+        <div class="lbl">Cracking 334,003 by trial division</div>
+        <div class="bigcount" id="crackCount">&divide; &hellip;</div>
+        <div class="countnote" id="crackNote">&nbsp;</div>
+      </div>
+      <button class="btn" id="crackBtn" onclick="crackRun()">Start dividing</button>
+      <p class="caption">Six digits: a few hundred tries, no trouble at all for a computer. But the search grows brutally with size &mdash; every extra digit multiplies the work. Real attackers have far cleverer methods than trial division; they explode too, just a little more slowly. See the next screen for the actual world records.</p>
+    </section>
+
+    <!-- 2.3 The wall: real records -->
+    <section class="beat" data-scene="m2" data-onenter="resetRecords">
+      <h2>The world records</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:24px">These are real, published factoring records &mdash; the best that humanity's algorithms and hardware have ever done.</p>
+      <div class="ladder">
+        <div class="rung" id="rec0">
+          <div><div class="rname">RSA-100 &middot; 100 digits</div><div class="rsub">factored 1991; a few days of computing</div></div>
+          <div class="track"><div class="fill" data-w="14"></div></div>
+          <div class="rvalue">days</div>
+        </div>
+        <div class="rung" id="rec1">
+          <div><div class="rname">RSA-129 &middot; 129 digits</div><div class="rsub">factored 1994; eight months, hundreds of volunteers' computers around the world</div></div>
+          <div class="track"><div class="fill" data-w="32"></div></div>
+          <div class="rvalue">months</div>
+        </div>
+        <div class="rung" id="rec2">
+          <div><div class="rname">RSA-250 &middot; 250 digits</div><div class="rsub">factored 2020; about 2,700 core-years of processing on a modern cluster</div></div>
+          <div class="track"><div class="fill" data-w="58"></div></div>
+          <div class="rvalue">2,700 core-years</div>
+        </div>
+        <div class="rung accent" id="rec3">
+          <div><div class="rname">RSA-2048 &middot; 617 digits</div><div class="rsub">the size guarding your banking today; never factored</div></div>
+          <div class="track"><div class="fill" data-w="100"></div></div>
+          <div class="rvalue">&gt; age of the universe</div>
+        </div>
+      </div>
+      <button class="btn" id="recBtn" onclick="recordStep()">First record: 1991</button>
+      <p class="caption">Bars are on a compressed (logarithmic) scale; drawn honestly, the last bar would not fit inside the solar system. Even harnessing every computer on Earth, the best known classical algorithm would not finish a 617-digit number in the lifetime of the universe.</p>
+      <p class="cite">Records: RSA Factoring Challenge; RSA-250 factored by Boudot, Gaudry, Guillevic, Heninger, Thom&eacute; &amp; Zimmermann (2020). "Core-year": one processor core running flat-out for one year.</p>
+    </section>
+
+    <!-- 2.4 How the padlock is used -->
+    <section class="beat" data-scene="m2">
+      <h2>Locking without the key</h2>
+      <div class="tvi-grid">
+        <div class="tvi-card">
+          <div class="lbl">Locking &middot; anyone can do it</div>
+          <div class="when">Uses the public product</div>
+          <ul>
+            <li>Your browser fetches the padlock: <span class="mono">334,003</span> (really, a 617-digit version)</li>
+            <li>It scrambles your message with maths built on that product</li>
+            <li>Anyone can lock; that's why it's called a <span style="color:var(--white)">public key</span></li>
+          </ul>
+        </div>
+        <div class="tvi-card now">
+          <div class="lbl">Unlocking &middot; only one party can</div>
+          <div class="when">Needs the two primes</div>
+          <ul>
+            <li>The unscrambling recipe requires <span class="mono">569</span> and <span class="mono">587</span> themselves</li>
+            <li>Whoever holds the primes holds the <span style="color:var(--white)">private key</span></li>
+            <li>Everyone else faces the search from the last two screens</li>
+          </ul>
+        </div>
+      </div>
+      <p class="caption">Honest simplification: real RSA wraps the primes in a little more machinery (exponents and a theorem of Euler's) to do the locking and unlocking. None of that machinery adds security; the entire secret is that factoring is slow. This scheme is RSA &mdash; Rivest, Shamir and Adleman, 1977.</p>
+    </section>
+
+    <!-- 2.5 Key point -->
+    <section class="beat" data-scene="m2">
+      <div class="callout">An RSA public key is a <strong>multiplication left half-finished</strong>. The whole world is trusted with the answer, because nobody &mdash; with any classical computer &mdash; can find the question <strong>before the stars burn out</strong>. Remember that "before".</div>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+    <!-- ============ MODULE 3 ============ -->
+
+    <!-- 3.0 Title -->
+    <section class="beat" data-scene="m3">
+      <div class="eyebrow">Module 03</div>
+      <h1>Secrets in public</h1>
+      <div class="myth">Myth we'll bust: "You can't agree a secret on a tapped line"</div>
+      <p class="lede">Alice and Bob have never met. Eve records every word that passes between them. By the end of this module, Alice and Bob will share a secret &mdash; and Eve, holding a perfect transcript, won't have it.</p>
+    </section>
+
+    <!-- 3.1 Paint mixing -->
+    <section class="beat" data-scene="m3" data-onenter="resetPaint">
+      <h2>First, do it with paint</h2>
+      <div class="actors">
+        <div class="actor">
+          <h3>Alice</h3><div class="role">wants a shared secret</div>
+          <div class="swatchrow" id="pA1"><div><div class="swatch" style="background:var(--common)"></div><div class="swlabel">common</div></div><span class="plus">+</span><div><div class="swatch secret" style="background:var(--alice)"></div><div class="swlabel">her secret</div></div></div>
+          <div class="swatchrow" id="pA2"><span class="plus">=</span><div><div class="swatch" style="background:var(--mix-a)"></div><div class="swlabel">her mix &rarr; posted to Bob</div></div></div>
+          <div class="swatchrow" id="pA3"><div><div class="swatch" style="background:var(--mix-b)"></div><div class="swlabel">Bob's mix</div></div><span class="plus">+</span><div><div class="swatch secret" style="background:var(--alice)"></div><div class="swlabel">her secret</div></div><span class="plus">=</span><div><div class="swatch big" style="background:var(--mix-final)"></div><div class="swlabel">final</div></div></div>
+        </div>
+        <div class="actor">
+          <h3>Bob</h3><div class="role">wants the same secret</div>
+          <div class="swatchrow" id="pB1"><div><div class="swatch" style="background:var(--common)"></div><div class="swlabel">common</div></div><span class="plus">+</span><div><div class="swatch secret" style="background:var(--bob)"></div><div class="swlabel">his secret</div></div></div>
+          <div class="swatchrow" id="pB2"><span class="plus">=</span><div><div class="swatch" style="background:var(--mix-b)"></div><div class="swlabel">his mix &rarr; posted to Alice</div></div></div>
+          <div class="swatchrow" id="pB3"><div><div class="swatch" style="background:var(--mix-a)"></div><div class="swlabel">Alice's mix</div></div><span class="plus">+</span><div><div class="swatch secret" style="background:var(--bob)"></div><div class="swlabel">his secret</div></div><span class="plus">=</span><div><div class="swatch big" style="background:var(--mix-final)"></div><div class="swlabel">final</div></div></div>
+        </div>
+        <div class="actor">
+          <h3>Eve</h3><div class="role">sees everything sent</div>
+          <div class="swatchrow" id="pE1"><div><div class="swatch" style="background:var(--common)"></div><div class="swlabel">common</div></div><div><div class="swatch" style="background:var(--mix-a)"></div><div class="swlabel">Alice's mix</div></div><div><div class="swatch" style="background:var(--mix-b)"></div><div class="swlabel">Bob's mix</div></div></div>
+          <div class="swatchrow paint-eve" id="pE2"><div><div class="swatch" style="background:var(--mix-eve)"></div><div class="swlabel">her best blend</div></div><span class="plus">vs</span><div><div class="swatch big" style="background:var(--mix-final)"></div><div class="swlabel">the real secret</div></div></div>
+        </div>
+      </div>
+      <button class="btn" id="paintBtn" onclick="paintStep()">Step 1: agree a common colour, in public</button>
+      <p class="caption" id="paintNote">The trick: mixing paint is a one-way street. Eve can add paint to what she has, but she can never un-stir a tin. Everything she can blend contains too much of the common colour &mdash; close, but close is worthless. A key must be exact.</p>
+    </section>
+
+    <!-- 3.2 Clock arithmetic -->
+    <section class="beat" data-scene="m3" data-onenter="resetClock">
+      <h2>Now do it with numbers: clock arithmetic</h2>
+      <div class="clockrow">
+        <div class="clockbox">
+          <svg id="clockSvg" width="430" height="430" viewBox="0 0 430 430" role="img" aria-label="A 23-position clock face showing hops made by repeated multiplication by 5"></svg>
+        </div>
+        <div class="clock-side">
+          <p style="font-size:20px; color:var(--grey); line-height:1.55">A clock with <span style="color:var(--white)">23 hours</span>. Start at 1 and keep multiplying by 5; whenever you pass 23, wrap around like midnight. Written as maths: 5<sup>x</sup> mod 23.</p>
+          <div class="hopline" id="hopLine">position: 1 &middot; hops: 0</div>
+          <button class="btn" id="hopBtn" onclick="clockHop()">&times;5 &mdash; hop</button>
+          <button class="btn ghost" id="eveHopBtn" onclick="eveHunt()" disabled>Eve: how many hops was that?</button>
+          <p class="caption" id="clockNote">Going forward is easy: hop, hop, hop. Going backward &mdash; "the marker is on 8; how many hops got it there?" &mdash; there's no formula. You count hops until it matches. That reverse problem is called the <span style="color:var(--white)">discrete logarithm</span>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3.3 The exchange -->
+    <section class="beat" data-scene="m3" data-onenter="resetExch">
+      <h2>The Diffie&ndash;Hellman exchange, with real numbers</h2>
+      <div class="exch">
+        <div class="exch-step public" id="ex0">
+          <div class="who">Both, aloud</div>
+          <div class="what">Agree the clock and the hop, in public: clock size <span class="mono">23</span>, multiplier <span class="mono">5</span>.</div>
+        </div>
+        <div class="exch-step secret" id="ex1">
+          <div class="who">Each, silently</div>
+          <div class="what">Alice picks a secret hop-count: <span class="mono">6</span>. Bob picks his: <span class="mono">15</span>. These numbers are never sent to anyone, ever.</div>
+        </div>
+        <div class="exch-step public" id="ex2">
+          <div class="who">Both, aloud</div>
+          <div class="what">Each does their hops and posts the landing spot. Alice: 5<sup>6</sup> mod 23 = <span class="mono">8</span>. Bob: 5<sup>15</sup> mod 23 = <span class="mono">19</span>.</div>
+        </div>
+        <div class="exch-step final" id="ex3">
+          <div class="who">Each, silently</div>
+          <div class="what">Now each starts from the <em>other's</em> landing spot and does their own hops again. Alice: 19<sup>6</sup> mod 23 = <span class="mono">2</span>. Bob: 8<sup>15</sup> mod 23 = <span class="mono">2</span>. Same number. <span style="color:var(--white)">The shared secret is 2.</span></div>
+        </div>
+      </div>
+      <div class="evebar" id="exEve">Eve's transcript: <span class="mono">23, 5, 8, 19</span>. To get the secret she needs Alice's <span class="mono">6</span> or Bob's <span class="mono">15</span> &mdash; and the only way in is counting hops: the discrete logarithm from the last screen.</div>
+      <button class="btn" id="exchBtn" onclick="exchStep()">Step 1: the public agreement</button>
+      <p class="caption">It works because hopping is order-blind: Bob's 15 hops then Alice's 6 lands exactly where Alice's 6 then Bob's 15 lands. Eve can't take a single hop of the journey without a secret count. Published by Whitfield Diffie and Martin Hellman in 1976 &mdash; the first public method for creating a secret in full view.</p>
+    </section>
+
+    <!-- 3.4 Scale + where you've met it -->
+    <section class="beat" data-scene="m3">
+      <h2>You used this today</h2>
+      <div class="pair">
+        <div class="card">
+          <em>The toy version</em><br>
+          <span style="font-size:20px; color:var(--grey)">Our clock had 23 positions. Eve cracks it in at most 22 tries; your calculator does it before you blink.</span>
+        </div>
+        <div class="card">
+          <em>The real version</em><br>
+          <span style="font-size:20px; color:var(--grey)">Real clocks have a 617-digit number of positions &mdash; more positions than there are atoms in the observable universe (about 10<sup>80</sup>). Counting hops stops being a joke and becomes a heat-death-of-the-universe project.</span>
+        </div>
+      </div>
+      <p class="qline">Every time your browser shows the padlock icon, a handshake like this &mdash; agree in public, hop in private &mdash; ran before the page even loaded. Modern browsers usually run it on an <span style="color:var(--white)">elliptic curve</span> instead of a clock. That's the next module.</p>
+    </section>
+
+    <!-- 3.5 Key point -->
+    <section class="beat" data-scene="m3">
+      <div class="callout">Alice and Bob <strong>never sent the secret</strong> &mdash; they each built it at home from a public half and a private half. Eve heard everything and learned nothing; she is stuck counting hops around a clock <strong>the size of the universe</strong>.</div>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+    <!-- ============ MODULE 4 ============ -->
+
+    <!-- 4.0 Title -->
+    <section class="beat" data-scene="m4">
+      <div class="eyebrow">Module 04</div>
+      <h1>The elliptic curve</h1>
+      <div class="myth"><span class="mono">y&sup2; = x&sup3; &minus; 2x + 2</span></div>
+      <p class="lede">A stranger padlock with much smaller keys &mdash; built by playing billiards on a curve. This is the one your phone actually uses.</p>
+    </section>
+
+    <!-- 4.1 Meet the curve -->
+    <section class="beat" data-scene="m4" data-onenter="resetCurve">
+      <h2>The only move in the game</h2>
+      <div class="curverow">
+        <div class="curvebox">
+          <svg id="curveSvg" width="560" height="440" viewBox="0 0 560 440" role="img" aria-label="An elliptic curve with points being added by the chord-and-tangent rule"></svg>
+        </div>
+        <div class="curve-side">
+          <p style="font-size:20px; color:var(--grey); line-height:1.55">Pick a starting point <span style="color:var(--white)">P</span> on the curve. To "add" points: draw a straight line through them, see where it strikes the curve a third time, then reflect that strike through the middle. That's it &mdash; the whole rulebook.</p>
+          <button class="btn" id="curveBtn" onclick="curveStep()">Double it: P + P</button>
+          <p class="caption" id="curveNote">A line through two points of a curve like this always strikes it at exactly one more &mdash; that's what makes the game playable. Mathematicians call the move <span style="color:var(--white)">point addition</span>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4.2 The secret is a hop count -->
+    <section class="beat" data-scene="m4">
+      <h2>Same trapdoor, new table</h2>
+      <div class="tvi-grid">
+        <div class="tvi-card now">
+          <div class="lbl">Private key</div>
+          <div class="when">How many times you hopped</div>
+          <ul>
+            <li>Pick a giant number <span class="mono">n</span> &mdash; that's the secret</li>
+            <li>Hop the point <span class="mono">n</span> times: P, 2P, 3P, &hellip; nP</li>
+            <li>Fast even for astronomical <span class="mono">n</span>: double your way up &mdash; P, 2P, 4P, 8P&hellip; &mdash; exactly like the shortcut for 5<sup>15</sup> on the clock. A trillion hops takes about forty doublings.</li>
+          </ul>
+        </div>
+        <div class="tvi-card">
+          <div class="lbl">Public key</div>
+          <div class="when">Where you landed</div>
+          <ul>
+            <li>Publish the landing point <span class="mono">nP</span> to the world</li>
+            <li>Attacker sees start P and finish nP</li>
+            <li>To find <span class="mono">n</span>, they must retrace the hops &mdash; one&hellip; by one&hellip; by one</li>
+          </ul>
+        </div>
+      </div>
+      <p class="caption">Recognise the shape? It's the clock from Module 3 with the clock face swapped for a curve. Forward: instant. Backward: count every hop. On curves, even the cleverest known classical shortcuts barely dent the search.</p>
+    </section>
+
+    <!-- 4.3 The real curve: a cloud of dots -->
+    <section class="beat" data-scene="m4" data-onenter="resetCloud">
+      <h2>The real thing wears clock arithmetic</h2>
+      <div class="curverow">
+        <div class="curvebox">
+          <svg id="cloudSvg" width="470" height="470" viewBox="0 0 470 470" role="img" aria-label="The same elliptic curve over whole numbers mod 97: a scattered cloud of dots"></svg>
+        </div>
+        <div class="curve-side">
+          <p style="font-size:20px; color:var(--grey); line-height:1.55">Computers hate the smooth curve's endless decimals, so real systems keep only whole-number points and wrap everything mod a prime &mdash; here, <span class="mono">97</span>. The same equation <span class="mono">y&sup2; = x&sup3; &minus; 2x + 2</span> shatters into confetti. The addition rule still works perfectly; the visual pattern is simply gone.</p>
+          <div class="hopline" id="cloudLine">&nbsp;</div>
+          <button class="btn" id="cloudBtn" onclick="cloudHop()">Alice hops 13 times</button>
+          <button class="btn ghost" id="cloudEveBtn" onclick="cloudEve()" disabled>Eve: find her hop count</button>
+          <p class="caption" id="cloudNote">97 positions is a toy. The curve in your phone (P-256 or Curve25519) has a hop count with 78 digits &mdash; and hopping leaves no trail: 13P sits nowhere near 12P.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4.4 Why curves won -->
+    <section class="beat" data-scene="m4" data-onenter="resetKeybars">
+      <h2>Why curves won</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:24px">For the same level of security &mdash; a search no classical computer finishes &mdash; compare the key sizes. Bars drawn to true scale, for once.</p>
+      <div class="keybars">
+        <div class="keybar">
+          <div class="kname">RSA padlock<span class="sub">prime factoring, Module 2</span></div>
+          <div class="track"><div class="fill" data-w="100"></div></div>
+          <div class="kval">3,072 bits</div>
+        </div>
+        <div class="keybar accent">
+          <div class="kname">Elliptic-curve padlock<span class="sub">curve hops, this module</span></div>
+          <div class="track"><div class="fill" data-w="8.3"></div></div>
+          <div class="kval">256 bits</div>
+        </div>
+      </div>
+      <button class="btn" id="kbBtn" onclick="keybarsRun()">Compare</button>
+      <p class="caption">A twelfth of the size for equal strength (NIST equivalence). Smaller keys mean faster handshakes, longer battery life and cheaper chips &mdash; which is why your browser, your phone, Signal and WhatsApp all run their handshakes on curves (X25519, P-256) rather than RSA.</p>
+    </section>
+
+    <!-- 4.5 Key point -->
+    <section class="beat" data-scene="m4">
+      <div class="callout">Three different sums &mdash; <strong>factoring</strong>, <strong>clock powers</strong>, <strong>curve hops</strong> &mdash; one shared shape: easy forward, catastrophically slow backward. Every padlock on the internet leans on one of the three. Now for the horizon.</div>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+    <!-- ============ MODULE 5 ============ -->
+
+    <!-- 5.0 Title -->
+    <section class="beat" data-scene="m5">
+      <div class="eyebrow">Module 05</div>
+      <h1>The quantum horizon</h1>
+      <div class="myth">Shor's algorithm, 1994</div>
+      <p class="lede">Everything in Modules 1&ndash;4 is safe from every computer humanity has ever built. The catch: it is not safe from a computer humanity knows how to describe &mdash; and is now racing to build.</p>
+    </section>
+
+    <!-- 5.1 The hidden pattern -->
+    <section class="beat" data-scene="m5" data-onenter="resetWave">
+      <h2>All three padlocks hide the same weakness: a rhythm</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:20px">Watch the powers of 2 on a 15-hour clock: 2<sup>x</sup> mod 15.</p>
+      <div class="wavebox">
+        <svg id="waveSvg" width="860" height="240" viewBox="0 0 860 240" role="img" aria-label="Powers of two mod fifteen, showing the repeating cycle 1, 2, 4, 8"></svg>
+      </div>
+      <button class="btn" id="waveBtn" onclick="waveStep()">Compute the powers</button>
+      <p class="caption" id="waveNote">1, 2, 4, 8 &mdash; then back to 1, forever. The sequence repeats with <span style="color:var(--white)">period 4</span>. Every trapdoor in this walkthrough has a cycle like this buried in it; for real key sizes the cycle is astronomically long, and no classical computer can walk far enough along it to see the rhythm.</p>
+    </section>
+
+    <!-- 5.2 Shor's trick -->
+    <section class="beat" data-scene="m5" data-onenter="resetShor">
+      <h2>The rhythm unlocks the padlock</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:20px">Here is a padlock being picked. The public number is 15; nobody has told us its primes.</p>
+      <div style="max-width:760px">
+        <div class="calcline" id="shor0">period of 2<sup>x</sup> mod 15 &nbsp;<span class="op">&rarr;</span>&nbsp; r = 4</div>
+        <div class="calcline" id="shor1">2<sup>r/2</sup> = 2&sup2; = 4</div>
+        <div class="calcline" id="shor2">gcd(4 &minus; 1, 15) = 3 &nbsp;&nbsp;&nbsp; gcd(4 + 1, 15) = 5</div>
+        <div class="calcline result" id="shor3">15 = 3 &times; 5 &nbsp;<span class="op">factored &mdash; no search</span></div>
+      </div>
+      <button class="btn" id="shorBtn" onclick="shorStep()">Pick the lock</button>
+      <p class="caption">Once you know the rhythm, the factors fall out with high-school arithmetic (gcd is the greatest common divisor &mdash; find it by hand). Finding the rhythm is the hard part, and that is exactly what a quantum computer is unnaturally good at: it can explore every position of the cycle in superposition, and interference makes the period readable. Peter Shor proved it in 1994; in 2001 IBM ran this very sum &mdash; 15 = 3 &times; 5 &mdash; on a 7-qubit machine. The same period-finding trick also demolishes clock powers and curve hops: <span style="color:var(--white)">one attack, all three padlocks</span>.</p>
+    </section>
+
+    <!-- 5.3 What breaks, what bends -->
+    <section class="beat" data-scene="m5">
+      <h2>What breaks, and what merely bends</h2>
+      <div class="tvi-grid">
+        <div class="tvi-card warn">
+          <div class="lbl">Breaks &middot; Shor's algorithm</div>
+          <div class="when">Every public-key padlock</div>
+          <ul>
+            <li>RSA &mdash; prime factoring (Module 2)</li>
+            <li>Diffie&ndash;Hellman &mdash; clock powers (Module 3)</li>
+            <li>Elliptic curves &mdash; curve hops (Module 4)</li>
+            <li>Broken outright: the one-way street becomes two-way</li>
+          </ul>
+        </div>
+        <div class="tvi-card">
+          <div class="lbl">Bends &middot; Grover's algorithm</div>
+          <div class="when">Symmetric ciphers &amp; hashes</div>
+          <ul>
+            <li>AES &mdash; the cipher that scrambles the actual data</li>
+            <li>SHA-256 &mdash; hashing and integrity</li>
+            <li>Quantum search only halves their strength</li>
+            <li>Fix: double the key length. AES-256 already did.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="caption">Notice the asymmetry: the quantum threat is aimed at the <span style="color:var(--white)">handshake</span> &mdash; the public-key step that agrees the secret. But the handshake protects everything that follows, so breaking it breaks the lot.</p>
+    </section>
+
+    <!-- 5.4 Harvest now, decrypt later -->
+    <section class="beat" data-scene="m5">
+      <h2>The attack that already started</h2>
+      <div class="chain">
+        <div class="ccard now">
+          <div class="lbl">Today</div>
+          An eavesdropper records encrypted traffic wholesale. Can't read a byte of it &mdash; doesn't care. Disk space is cheap; patience is free.
+        </div>
+        <div class="charrow">&rarr;</div>
+        <div class="ccard">
+          <div class="lbl">The day a big enough quantum computer exists</div>
+          The recorded handshakes are broken with Shor's algorithm; the session keys fall out.
+        </div>
+        <div class="charrow">&rarr;</div>
+        <div class="ccard warn">
+          <div class="lbl">The day after</div>
+          The archive opens. Everything recorded over the decades reads as plain text.
+        </div>
+      </div>
+      <p class="qline">This is called <span style="color:var(--white)">harvest now, decrypt later</span>. It means the deadline isn't the day quantum computers arrive &mdash; it's already passed for any secret that must still matter then: health records, genomic data, defence and intelligence traffic, cabinet papers, long-term legal and financial records.</p>
+    </section>
+
+    <!-- 5.5 Mosca's inequality -->
+    <section class="beat" data-scene="m5" data-onenter="resetMosca">
+      <h2>Work out your own deadline</h2>
+      <p class="lede" style="margin-top:0; margin-bottom:18px">Michele Mosca's rule of thumb: you are already in trouble if X + Y &gt; Z. Drag the sliders.</p>
+      <div class="mosca">
+        <div class="m-slider">
+          <div class="sname">X &mdash; secrecy lifetime<span class="sub">how many years must your data stay secret?</span></div>
+          <input type="range" min="1" max="40" value="10" id="mX" oninput="moscaUpdate()">
+          <div class="sval" id="mXv">10 yrs</div>
+        </div>
+        <div class="m-slider">
+          <div class="sname">Y &mdash; migration time<span class="sub">years to find and replace every padlock you own</span></div>
+          <input type="range" min="1" max="20" value="7" id="mY" oninput="moscaUpdate()">
+          <div class="sval" id="mYv">7 yrs</div>
+        </div>
+        <div class="m-slider">
+          <div class="sname">Z &mdash; quantum arrival<span class="sub">years until a cryptographically relevant quantum computer</span></div>
+          <input type="range" min="3" max="40" value="12" id="mZ" oninput="moscaUpdate()">
+          <div class="sval" id="mZv">12 yrs</div>
+        </div>
+        <div class="mosca-viz">
+          <div class="mv-row">
+            <div class="mvname">X + Y &middot; time you need</div>
+            <div class="mv-track"><div class="mv-seg x" id="mvX"><div class="mvlbl">X</div></div><div class="mv-seg y" id="mvY"><div class="mvlbl">Y</div></div></div>
+          </div>
+          <div class="mv-row">
+            <div class="mvname">Z &middot; time you have</div>
+            <div class="mv-track"><div class="mv-seg z" id="mvZ"><div class="mvlbl">Z</div></div></div>
+          </div>
+        </div>
+        <div class="verdict" id="moscaVerdict"></div>
+      </div>
+      <p class="caption">Nobody knows Z; serious estimates range from about a decade to several, and "never" is a minority view you would be betting the archive on. The uncomfortable part of the sum: Z is the only term you don't control.</p>
+    </section>
+
+    <!-- 5.6 The timeline -->
+    <section class="beat" data-scene="m5" data-onenter="resetTimeline">
+      <h2>The official timetable</h2>
+      <div class="tline">
+        <div class="tl-item" id="tl0"><div class="year">1994</div><div class="ttext">Peter Shor publishes the algorithm. The padlocks are broken in theory from this day on; all that's missing is the machine.</div></div>
+        <div class="tl-item" id="tl1"><div class="year">2001</div><div class="ttext">IBM factors 15 on a 7-qubit quantum computer.<span class="tsub">A toy &mdash; and a proof that the theory runs on real hardware.</span></div></div>
+        <div class="tl-item" id="tl2"><div class="year">2016</div><div class="ttext">NIST opens a worldwide competition for quantum-proof replacements. Dozens of candidate designs; years of public attack-testing.</div></div>
+        <div class="tl-item accent" id="tl3"><div class="year">2024</div><div class="ttext">The winners become standards: ML-KEM for key exchange, ML-DSA and SLH-DSA for signatures.<span class="tsub">FIPS 203, 204, 205 &mdash; built on lattice and hash problems with no known quantum shortcut.</span></div></div>
+        <div class="tl-item" id="tl4"><div class="year">2024&ndash;25</div><div class="ttext">Already live: Chrome, Firefox, Cloudflare, Signal and iMessage ship hybrid classical-plus-ML-KEM handshakes.<span class="tsub">A growing slice of your browsing is quantum-safe today.</span></div></div>
+        <div class="tl-item accent" id="tl5"><div class="year">2030</div><div class="ttext">Australia's ASD stops approving RSA, Diffie&ndash;Hellman and elliptic-curve crypto for government systems &mdash; five years ahead of the US.<span class="tsub">NIST deprecates the same algorithms in the US the same year.</span></div></div>
+        <div class="tl-item" id="tl6"><div class="year">2035</div><div class="ttext">NIST disallows them outright for US federal systems. The migration is meant to be finished.</div></div>
+      </div>
+      <button class="btn" id="tlBtn" onclick="timelineStep()">1994: the starting gun</button>
+      <p class="cite">Sources: NIST FIPS 203/204/205 (August 2024); NIST IR 8547 (transition to post-quantum cryptography); ASD Guidelines for Cryptography / ISM (2024 update, 2030 sunset for approved use of RSA, ECDH, ECDSA and DH).</p>
+    </section>
+
+    <!-- 5.7 What organisations must do now -->
+    <section class="beat" data-scene="m5">
+      <h2>What organisations have to do about it</h2>
+      <div class="helps">
+        <div class="hcard">
+          <h3>1 &middot; Find every padlock</h3>
+          <p>A cryptographic inventory. Most organisations cannot list where their crypto lives &mdash; it hides in TLS, VPNs, code signing, backups, badge readers, medical devices. You cannot migrate what you haven't found.</p>
+        </div>
+        <div class="hcard">
+          <h3>2 &middot; Buy crypto-agility</h3>
+          <p>Any system that will still be running in 2030 must be able to swap algorithms without a rebuild. The question to put to every vendor from now on: "how do I change your cryptography?"</p>
+        </div>
+        <div class="hcard">
+          <h3>3 &middot; Longest-lived secrets first</h3>
+          <p>Triage by Mosca's X: data that must stay secret for decades gets hybrid post-quantum protection now, because for that data, harvest-now-decrypt-later already applies.</p>
+        </div>
+      </div>
+      <p class="caption">This is why the dates matter to a cyber security student in particular: the refit of every server, browser, bank, hospital and satellite is scheduled for exactly the years your career begins.</p>
+    </section>
+
+    <!-- 5.8 Close -->
+    <section class="beat" data-scene="m5">
+      <h2>Why this matters</h2>
+      <div class="callout">The padlocks work because some sums are <strong>slow backwards</strong> &mdash; and a new kind of computer makes three of those sums fast. The largest cryptographic refit in history now has dates on the calendar: <strong>2030</strong> in Australia, <strong>2035</strong> in the US. Most people in the room won't know why those dates are there. <strong>You will.</strong></div>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+  </main>
+  <footer id="dots"></footer>
+</div>
+<div class="navhint">&larr; &rarr; or space &nbsp;|&nbsp; M menu</div>
+
+<script>
+  const beats = Array.from(document.querySelectorAll('.beat'));
+  let idx = 0;
+
+  const sceneTitles = {
+    m1: 'Module 01 · One-way streets',
+    m2: 'Module 02 · Prime padlocks',
+    m3: 'Module 03 · Secrets in public',
+    m4: 'Module 04 · The elliptic curve',
+    m5: 'Module 05 · The quantum horizon'
+  };
+  const onEnterHooks = {
+    resetAsym: resetAsymState, resetPin: resetPinState,
+    resetPadlock: resetPadlockState, resetCrack: resetCrackState, resetRecords: resetRecordsState,
+    resetPaint: resetPaintState, resetClock: resetClockState, resetExch: resetExchState,
+    resetCurve: resetCurveState, resetCloud: resetCloudState, resetKeybars: resetKeybarsState,
+    resetWave: resetWaveState, resetShor: resetShorState, resetMosca: resetMoscaState,
+    resetTimeline: resetTimelineState
+  };
+
+  function show(i) {
+    idx = Math.max(0, Math.min(i, beats.length - 1));
+    beats.forEach((b, n) => b.classList.toggle('active', n === idx));
+    const scene = beats[idx].dataset.scene;
+    document.getElementById('hdrLeft').textContent =
+      scene === 'menu' ? 'The maths that guards the internet' : sceneTitles[scene];
+    const dots = document.getElementById('dots');
+    dots.innerHTML = '';
+    if (scene !== 'menu') {
+      const moduleBeats = beats.filter(b => b.dataset.scene === scene);
+      const pos = moduleBeats.indexOf(beats[idx]);
+      moduleBeats.forEach((_, n) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (n === pos ? ' on' : '');
+        dots.appendChild(d);
+      });
+    }
+    const hook = beats[idx].dataset.onenter;
+    if (hook && onEnterHooks[hook]) onEnterHooks[hook]();
+  }
+
+  function goMenu() { show(0); }
+  function goModule(n) {
+    const i = beats.findIndex(b => b.dataset.scene === 'm' + n);
+    if (i > -1) show(i);
+  }
+  function next() { if (idx < beats.length - 1) show(idx + 1); }
+  function prev() { if (idx > 0) show(idx - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') prev();
+    else if (e.key === 'm' || e.key === 'M') goMenu();
+    else if (e.key >= '1' && e.key <= '5') goModule(Number(e.key));
+  });
+  document.getElementById('main').addEventListener('click', e => {
+    if (e.target.closest('button, svg, a, input, .m-slider')) return;
+    next();
+  });
+
+  /* ---------- Module 1 ---------- */
+
+  // 1.1 asymmetry
+  function asymReveal(which) {
+    document.getElementById('asym' + which).classList.add('shown');
+    document.getElementById('asym' + which + 'Btn').style.display = 'none';
+  }
+  function resetAsymState() {
+    ['A', 'B'].forEach(w => {
+      document.getElementById('asym' + w).classList.remove('shown');
+      document.getElementById('asym' + w + 'Btn').style.display = '';
+    });
+  }
+
+  // 1.3 PIN brute force + key wall
+  let pinRunning = false;
+  function pinRun() {
+    if (pinRunning) return;
+    pinRunning = true;
+    const el = document.getElementById('pinCount');
+    const note = document.getElementById('pinNote');
+    el.classList.remove('found');
+    note.textContent = 'Trying every combination…';
+    const t0 = performance.now(), DUR = 1600, TARGET = 7351;
+    function tick(t) {
+      const p = Math.min(1, (t - t0) / DUR);
+      const n = Math.floor(p * TARGET);
+      el.textContent = String(n).padStart(4, '0');
+      if (p < 1) requestAnimationFrame(tick);
+      else {
+        el.textContent = '7351';
+        el.classList.add('found');
+        note.textContent = 'Found. 7,351 tries, well under two seconds. Four digits is not a lock; it is a speed bump.';
+        pinRunning = false;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  function wallRun() {
+    const wall = document.getElementById('keyWall');
+    wall.innerHTML = '<span class="lead">2<sup>2048</sup> keys — roughly a 1 followed by 616 zeros:</span><br>' +
+      '1' + '0'.repeat(616);
+    document.getElementById('wallBtn').style.display = 'none';
+  }
+  function resetPinState() {
+    pinRunning = false;
+    const el = document.getElementById('pinCount');
+    el.textContent = '0000'; el.classList.remove('found');
+    document.getElementById('pinNote').textContent = 'Any code can be beaten by trying everything. Watch.';
+    document.getElementById('keyWall').innerHTML = '<span class="lead">Same attack, new target — press the button.</span>';
+    document.getElementById('wallBtn').style.display = '';
+  }
+
+  /* ---------- Module 2 ---------- */
+
+  // 2.1 padlock
+  let plDone = false;
+  function padlockStep() {
+    if (plDone) return;
+    plDone = true;
+    ['pl-a', 'pl-b'].forEach(id => document.getElementById(id).classList.add('shown'));
+    const b = document.getElementById('plBtn');
+    b.textContent = 'Done. Instant — and still instant at 617 digits.';
+    b.disabled = true;
+  }
+  function resetPadlockState() {
+    plDone = false;
+    ['pl-a', 'pl-b'].forEach(id => document.getElementById(id).classList.remove('shown'));
+    const b = document.getElementById('plBtn');
+    b.textContent = 'Multiply them'; b.disabled = false;
+  }
+
+  // 2.2 crack by trial division
+  let crackRunning = false;
+  function crackRun() {
+    if (crackRunning) return;
+    crackRunning = true;
+    const el = document.getElementById('crackCount');
+    const note = document.getElementById('crackNote');
+    const btn = document.getElementById('crackBtn');
+    btn.disabled = true;
+    el.classList.remove('found');
+    const t0 = performance.now(), DUR = 2800, LAST = 569; // divisors: 2, then odd 3..569
+    function divisorAt(p) { const n = Math.floor(p * 284); return n === 0 ? 2 : 1 + 2 * n; }
+    function triesFor(d) { return d <= 2 ? 1 : 1 + (d - 1) / 2; }
+    function tick(t) {
+      const p = Math.min(1, (t - t0) / DUR);
+      const d = divisorAt(p);
+      el.innerHTML = '&divide; ' + d + ' &hellip; no';
+      note.textContent = 'tries so far: ' + Math.round(triesFor(d));
+      if (p < 1) requestAnimationFrame(tick);
+      else {
+        el.innerHTML = '&divide; 569 = 587 &nbsp;&#10003;';
+        el.classList.add('found');
+        note.textContent = 'Cracked: 334,003 = 569 × 587, after 285 tries.';
+        btn.textContent = 'Cracked';
+        crackRunning = false;
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  function resetCrackState() {
+    crackRunning = false;
+    const el = document.getElementById('crackCount');
+    el.innerHTML = '&divide; &hellip;'; el.classList.remove('found');
+    document.getElementById('crackNote').innerHTML = '&nbsp;';
+    const btn = document.getElementById('crackBtn');
+    btn.disabled = false; btn.textContent = 'Start dividing';
+  }
+
+  // 2.3 records ladder
+  const recLabels = [
+    'First record: 1991',
+    'Next: the famous one, 1994',
+    'Next: the current record, 2020',
+    'And the size your bank uses',
+    'That last bar is the whole business model of the internet'
+  ];
+  let recIdx = 0;
+  function recordStep() {
+    if (recIdx >= 4) return;
+    const rung = document.getElementById('rec' + recIdx);
+    rung.classList.add('shown');
+    const fill = rung.querySelector('.fill');
+    requestAnimationFrame(() => { fill.style.width = fill.dataset.w + '%'; });
+    recIdx++;
+    document.getElementById('recBtn').textContent = recLabels[recIdx];
+  }
+  function resetRecordsState() {
+    recIdx = 0;
+    for (let n = 0; n < 4; n++) {
+      const rung = document.getElementById('rec' + n);
+      rung.classList.remove('shown');
+      rung.querySelector('.fill').style.width = '0';
+    }
+    document.getElementById('recBtn').textContent = recLabels[0];
+  }
+
+  /* ---------- Module 3 ---------- */
+
+  // 3.1 paint
+  const paintSteps = [
+    ['pA1', 'pB1'],
+    ['pA2', 'pB2', 'pE1'],
+    ['pA3', 'pB3'],
+    ['pE2']
+  ];
+  const paintLabels = [
+    'Step 1: agree a common colour, in public',
+    'Step 2: each stirs a secret colour in, privately',
+    'Step 3: swap the mixes — Eve photographs both',
+    'Step 4: stir your own secret into the other’s mix',
+    'Eve’s turn: her best possible blend'
+  ];
+  let paintIdx = 0;
+  function paintStep() {
+    if (paintIdx >= paintSteps.length) return;
+    paintSteps[paintIdx].forEach(id => document.getElementById(id).classList.add('shown'));
+    paintIdx++;
+    const b = document.getElementById('paintBtn');
+    if (paintIdx < paintSteps.length) b.textContent = paintLabels[paintIdx];
+    else { b.textContent = 'Close — and close is worthless'; b.disabled = true; }
+  }
+  function resetPaintState() {
+    paintIdx = 0;
+    paintSteps.flat().forEach(id => document.getElementById(id).classList.remove('shown'));
+    const b = document.getElementById('paintBtn');
+    b.textContent = paintLabels[0]; b.disabled = false;
+  }
+
+  // 3.2 clock
+  const CLK = { cx: 215, cy: 215, r: 168, mod: 23 };
+  const pow5 = [1, 5, 2, 10, 4, 20, 8]; // 5^0 .. 5^6 mod 23
+  let hopIdx = 0, eveRunning = false;
+  function clockPos(v) {
+    const a = (v / CLK.mod) * 2 * Math.PI - Math.PI / 2;
+    return [CLK.cx + CLK.r * Math.cos(a), CLK.cy + CLK.r * Math.sin(a)];
+  }
+  function buildClock() {
+    const svg = document.getElementById('clockSvg');
+    let s = '<circle cx="' + CLK.cx + '" cy="' + CLK.cy + '" r="' + CLK.r + '" fill="none" stroke="#35383a" stroke-width="1.5"/>';
+    for (let v = 0; v < CLK.mod; v++) {
+      const [x, y] = clockPos(v);
+      const [lx, ly] = [CLK.cx + (CLK.r + 20) * Math.cos((v / CLK.mod) * 2 * Math.PI - Math.PI / 2),
+                        CLK.cy + (CLK.r + 20) * Math.sin((v / CLK.mod) * 2 * Math.PI - Math.PI / 2)];
+      s += '<circle cx="' + x + '" cy="' + y + '" r="4" fill="#35383a" id="ctick' + v + '"/>';
+      s += '<text class="svgmono" x="' + lx + '" y="' + (ly + 4) + '" text-anchor="middle" font-size="13" fill="#7d8183">' + v + '</text>';
+    }
+    s += '<g id="chords"></g>';
+    const [mx, my] = clockPos(1);
+    s += '<circle id="clockMarker" cx="' + mx + '" cy="' + my + '" r="9" fill="#f4f4f2" filter="drop-shadow(0 0 6px rgba(230,235,238,0.65))"/>';
+    svg.innerHTML = s;
+  }
+  function markTick(v, on) {
+    const t = document.getElementById('ctick' + v);
+    if (t) t.setAttribute('fill', on ? '#b9bcbd' : '#35383a');
+  }
+  function moveMarker(v, accent) {
+    const m = document.getElementById('clockMarker');
+    const [x, y] = clockPos(v);
+    m.setAttribute('cx', x); m.setAttribute('cy', y);
+    m.setAttribute('fill', accent ? '#f2ab52' : '#f4f4f2');
+  }
+  function drawChord(a, b, accent) {
+    const [x1, y1] = clockPos(a), [x2, y2] = clockPos(b);
+    const g = document.getElementById('chords');
+    g.innerHTML += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 +
+      '" stroke="' + (accent ? '#e0983c' : '#7d8183') + '" stroke-width="1.5" opacity="0.55"/>';
+  }
+  function clockHop() {
+    if (hopIdx >= pow5.length - 1) return;
+    drawChord(pow5[hopIdx], pow5[hopIdx + 1], false);
+    hopIdx++;
+    markTick(pow5[hopIdx], true);
+    moveMarker(pow5[hopIdx], false);
+    document.getElementById('hopLine').innerHTML =
+      'position: <span class="cur">' + pow5[hopIdx] + '</span> &middot; hops: ' + hopIdx;
+    if (hopIdx === pow5.length - 1) {
+      const b = document.getElementById('hopBtn');
+      b.textContent = 'Alice lands on 8 after 6 hops'; b.disabled = true;
+      document.getElementById('eveHopBtn').disabled = false;
+    }
+  }
+  function eveHunt() {
+    if (eveRunning) return;
+    eveRunning = true;
+    document.getElementById('eveHopBtn').disabled = true;
+    document.getElementById('chords').innerHTML = '';
+    let k = 0;
+    const timer = setInterval(() => {
+      k++;
+      drawChord(pow5[k - 1], pow5[k], true);
+      moveMarker(pow5[k], true);
+      document.getElementById('hopLine').innerHTML =
+        'Eve tries x = ' + k + ': lands on <span class="cur">' + pow5[k] + '</span>' + (pow5[k] === 8 ? ' — match!' : ' … no');
+      if (pow5[k] === 8) {
+        clearInterval(timer);
+        document.getElementById('clockNote').innerHTML =
+          'Eve found x = 6 in six tries — because a 23-hour clock is a toy. On a real clock with a 617-digit number of hours, counting hops is the search from Module 1: <span style="color:var(--white)">longer than the universe has left</span>.';
+        eveRunning = false;
+      }
+    }, 450);
+  }
+  function resetClockState() {
+    hopIdx = 0; eveRunning = false;
+    buildClock();
+    document.getElementById('hopLine').innerHTML = 'position: 1 &middot; hops: 0';
+    const b = document.getElementById('hopBtn');
+    b.textContent = '×5 — hop'; b.disabled = false;
+    document.getElementById('eveHopBtn').disabled = true;
+    document.getElementById('clockNote').innerHTML =
+      'Going forward is easy: hop, hop, hop. Going backward — "the marker is on 8; how many hops got it there?" — there’s no formula. You count hops until it matches. That reverse problem is called the <span style="color:var(--white)">discrete logarithm</span>.';
+  }
+
+  // 3.3 exchange
+  const exchIds = ['ex0', 'ex1', 'ex2', 'ex3', 'exEve'];
+  const exchLabels = [
+    'Step 1: the public agreement',
+    'Step 2: the private picks',
+    'Step 3: swap landing spots, in public',
+    'Step 4: the secret appears on both sides',
+    'And what did Eve get?'
+  ];
+  let exchIdx = 0;
+  function exchStep() {
+    if (exchIdx >= exchIds.length) return;
+    document.getElementById(exchIds[exchIdx]).classList.add('shown');
+    exchIdx++;
+    const b = document.getElementById('exchBtn');
+    if (exchIdx < exchIds.length) b.textContent = exchLabels[exchIdx];
+    else { b.textContent = 'A transcript, and no key'; b.disabled = true; }
+  }
+  function resetExchState() {
+    exchIdx = 0;
+    exchIds.forEach(id => document.getElementById(id).classList.remove('shown'));
+    const b = document.getElementById('exchBtn');
+    b.textContent = exchLabels[0]; b.disabled = false;
+  }
+
+  /* ---------- Module 4 ---------- */
+
+  // 4.1 real curve: y^2 = x^3 - 2x + 2, precomputed points
+  const CV = {
+    P:  [-1, 1.73205],
+    steps: [
+      { slope: 0.28868, strike: [2.08333, 2.62214],  res: [2.08333, -2.62214], name: '2P' },
+      { slope: -1.41217, strike: [0.91089, -0.96655], res: [0.91089, 0.96655],  name: '3P' },
+      { slope: -0.40060, strike: [0.24959, 1.23146],  res: [0.24959, -1.23146], name: '4P' }
+    ],
+    labels: ['Double it: P + P', 'Now add P again: 2P + P', 'Again: 3P + P', 'The only move, forever']
+  };
+  const sx = x => (x + 2.7) / 6.0 * 560;
+  const sy = y => (3.3 - y) / 6.6 * 440;
+  let curveIdx = 0;
+  function buildCurve() {
+    const svg = document.getElementById('curveSvg');
+    let s = '<line x1="' + sx(-2.7) + '" y1="' + sy(0) + '" x2="' + sx(3.3) + '" y2="' + sy(0) + '" stroke="#35383a"/>';
+    s += '<line x1="' + sx(0) + '" y1="0" x2="' + sx(0) + '" y2="440" stroke="#35383a"/>';
+    const root = -1.7693, pts = [];
+    for (let x = 3.3; x >= root; x -= 0.02) pts.push([x, Math.sqrt(Math.max(0, x * x * x - 2 * x + 2))]);
+    pts.push([root, 0]);
+    for (let x = root; x <= 3.3; x += 0.02) pts.push([x, -Math.sqrt(Math.max(0, x * x * x - 2 * x + 2))]);
+    s += '<polyline fill="none" stroke="#b9bcbd" stroke-width="2" points="' +
+      pts.map(p => sx(p[0]).toFixed(1) + ',' + sy(p[1]).toFixed(1)).join(' ') + '"/>';
+    s += '<g id="cvSteps"></g>';
+    s += '<circle cx="' + sx(CV.P[0]) + '" cy="' + sy(CV.P[1]) + '" r="7" fill="#f4f4f2" filter="drop-shadow(0 0 6px rgba(230,235,238,0.6))"/>';
+    s += '<text x="' + (sx(CV.P[0]) - 30) + '" y="' + (sy(CV.P[1]) - 12) + '" font-size="19" fill="#f4f4f2">P</text>';
+    svg.innerHTML = s;
+  }
+  function curveStep() {
+    if (curveIdx >= CV.steps.length) return;
+    const st = CV.steps[curveIdx];
+    const g = document.getElementById('cvSteps');
+    const x1 = -2.7, x2 = 3.3;
+    const yA = CV.P[1] + st.slope * (x1 - CV.P[0]);
+    const yB = CV.P[1] + st.slope * (x2 - CV.P[0]);
+    let s = '<line x1="' + sx(x1) + '" y1="' + sy(yA) + '" x2="' + sx(x2) + '" y2="' + sy(yB) + '" stroke="#7d8183" stroke-width="1.5" opacity="0.7"/>';
+    s += '<circle cx="' + sx(st.strike[0]) + '" cy="' + sy(st.strike[1]) + '" r="6" fill="none" stroke="#e0983c" stroke-width="2"/>';
+    s += '<line x1="' + sx(st.strike[0]) + '" y1="' + sy(st.strike[1]) + '" x2="' + sx(st.res[0]) + '" y2="' + sy(st.res[1]) + '" stroke="#e0983c" stroke-width="1.5" stroke-dasharray="5 5"/>';
+    s += '<circle cx="' + sx(st.res[0]) + '" cy="' + sy(st.res[1]) + '" r="7" fill="#f2ab52" filter="drop-shadow(0 0 6px rgba(224,152,60,0.6))"/>';
+    s += '<text x="' + (sx(st.res[0]) + 14) + '" y="' + (sy(st.res[1]) + 6) + '" font-size="19" fill="#f2ab52">' + st.name + '</text>';
+    g.innerHTML += s;
+    curveIdx++;
+    const b = document.getElementById('curveBtn');
+    if (curveIdx < CV.steps.length) b.textContent = CV.labels[curveIdx];
+    else {
+      b.textContent = CV.labels[3]; b.disabled = true;
+      document.getElementById('curveNote').innerHTML =
+        'Line, strike, reflect — hop after hop: P, 2P, 3P, 4P… Notice the hops don’t drift in one direction; they <span style="color:var(--white)">leap</span>. Keep that in mind for the next screen.';
+    }
+  }
+  function resetCurveState() {
+    curveIdx = 0;
+    buildCurve();
+    const b = document.getElementById('curveBtn');
+    b.textContent = CV.labels[0]; b.disabled = false;
+    document.getElementById('curveNote').innerHTML =
+      'A line through two points of a curve like this always strikes it at exactly one more — that’s what makes the game playable. Mathematicians call the move <span style="color:var(--white)">point addition</span>.';
+  }
+
+  // 4.3 curve over F_97
+  const FP = 97, FA = FP - 2, FB = 2; // y^2 = x^3 - 2x + 2 mod 97
+  let cloudChain = [], cloudRunning = false;
+  function fmod(n) { return ((n % FP) + FP) % FP; }
+  function finv(n) { // extended Euclid
+    let [a, b, x0, x1] = [FP, fmod(n), 0, 1];
+    while (b !== 0) { const q = Math.floor(a / b); [a, b] = [b, a - q * b]; [x0, x1] = [x1, x0 - q * x1]; }
+    return fmod(x0);
+  }
+  function ecAdd(p1, p2) {
+    if (!p1) return p2; if (!p2) return p1;
+    const [x1, y1] = p1, [x2, y2] = p2;
+    if (x1 === x2 && fmod(y1 + y2) === 0) return null; // point at infinity
+    let m;
+    if (x1 === x2 && y1 === y2) m = fmod((3 * x1 * x1 + FA) * finv(2 * y1));
+    else m = fmod((y2 - y1) * finv(x2 - x1));
+    const x3 = fmod(m * m - x1 - x2);
+    return [x3, fmod(m * (x1 - x3) - y1)];
+  }
+  function cloudDot(x, y) { return document.getElementById('cd_' + x + '_' + y); }
+  function cpx(x) { return 30 + x / 96 * 410; }
+  function cpy(y) { return 30 + (96 - y) / 96 * 410; }
+  function buildCloud() {
+    const pts = [];
+    for (let x = 0; x < FP; x++) {
+      const rhs = fmod(x * x * x + FA * x + FB);
+      for (let y = 0; y < FP; y++) if (fmod(y * y) === rhs) pts.push([x, y]);
+    }
+    // choose a base point whose first 16 multiples stay finite
+    let G = null;
+    for (const cand of pts) {
+      let q = cand, ok = true;
+      const chain = [null, cand];
+      for (let k = 2; k <= 16; k++) {
+        q = ecAdd(q, cand);
+        if (!q) { ok = false; break; }
+        chain.push(q);
+      }
+      if (ok) { G = cand; cloudChain = chain; break; }
+    }
+    const svg = document.getElementById('cloudSvg');
+    let s = '<rect x="8" y="8" width="454" height="454" fill="none" stroke="#35383a"/>';
+    s += '<g id="cloudTrail"></g>';
+    for (const [x, y] of pts) s += '<circle id="cd_' + x + '_' + y + '" cx="' + cpx(x) + '" cy="' + cpy(y) + '" r="3" fill="#7d8183"/>';
+    svg.innerHTML = s + '<text class="svgmono" x="14" y="450" font-size="12" fill="#7d8183">0</text>' +
+      '<text class="svgmono" x="430" y="450" font-size="12" fill="#7d8183">x → 96</text>' +
+      '<text class="svgmono" x="14" y="26" font-size="12" fill="#7d8183">y ↑ 96</text>';
+    const [gx, gy] = cloudChain[1];
+    const d = cloudDot(gx, gy);
+    if (d) { d.setAttribute('r', '6'); d.setAttribute('fill', '#f4f4f2'); }
+  }
+  function cloudMark(k, accent) {
+    const [x, y] = cloudChain[k];
+    const d = cloudDot(x, y);
+    if (d) { d.setAttribute('r', '5.5'); d.setAttribute('fill', accent ? '#f2ab52' : '#b9bcbd'); }
+  }
+  function cloudLineTo(k) {
+    const [x1, y1] = cloudChain[k - 1], [x2, y2] = cloudChain[k];
+    document.getElementById('cloudTrail').innerHTML +=
+      '<line x1="' + cpx(x1) + '" y1="' + cpy(y1) + '" x2="' + cpx(x2) + '" y2="' + cpy(y2) + '" stroke="#7d8183" stroke-width="1" opacity="0.35"/>';
+  }
+  function cloudHop() {
+    if (cloudRunning) return;
+    cloudRunning = true;
+    document.getElementById('cloudBtn').disabled = true;
+    let k = 1;
+    const timer = setInterval(() => {
+      k++;
+      cloudLineTo(k); cloudMark(k, k === 13);
+      const [x, y] = cloudChain[k];
+      document.getElementById('cloudLine').innerHTML =
+        'hop ' + (k - 1) + ' of 12 &middot; now at (<span class="cur">' + x + ', ' + y + '</span>)';
+      if (k === 13) {
+        clearInterval(timer);
+        document.getElementById('cloudLine').innerHTML =
+          'Alice publishes her landing point: 13G = (<span class="cur">' + x + ', ' + y + '</span>). Her secret: <span class="cur">13</span>.';
+        document.getElementById('cloudEveBtn').disabled = false;
+        cloudRunning = false;
+      }
+    }, 300);
+  }
+  function cloudEve() {
+    if (cloudRunning) return;
+    cloudRunning = true;
+    document.getElementById('cloudEveBtn').disabled = true;
+    const target = cloudChain[13];
+    let k = 0;
+    const timer = setInterval(() => {
+      k++;
+      const [x, y] = cloudChain[k];
+      const hit = x === target[0] && y === target[1];
+      document.getElementById('cloudLine').innerHTML =
+        'Eve tries k = ' + k + ': (' + x + ', ' + y + ')' + (hit ? ' — <span class="cur">match, k = 13</span>' : ' … no');
+      if (hit) {
+        clearInterval(timer);
+        document.getElementById('cloudNote').innerHTML =
+          'Thirteen tries, because 97 positions is a toy. The curve in your phone has a hop count with <span style="color:var(--white)">78 digits</span> — and hops leave no trail: 13G sits nowhere near 12G, so there is nothing to aim by. Counting is all there is.';
+        cloudRunning = false;
+      }
+    }, 260);
+  }
+  function resetCloudState() {
+    cloudRunning = false;
+    buildCloud();
+    document.getElementById('cloudLine').innerHTML = '&nbsp;';
+    const b = document.getElementById('cloudBtn');
+    b.disabled = false; b.textContent = 'Alice hops 13 times';
+    document.getElementById('cloudEveBtn').disabled = true;
+    document.getElementById('cloudNote').innerHTML =
+      '97 positions is a toy. The curve in your phone (P-256 or Curve25519) has a hop count with 78 digits — and hopping leaves no trail: 13P sits nowhere near 12P.';
+  }
+
+  // 4.4 key bars
+  let kbDone = false;
+  function keybarsRun() {
+    if (kbDone) return;
+    kbDone = true;
+    document.querySelectorAll('.keybar .fill').forEach(f => { f.style.width = f.dataset.w + '%'; });
+    const b = document.getElementById('kbBtn');
+    b.textContent = 'A twelfth of the key, the same wall of time'; b.disabled = true;
+  }
+  function resetKeybarsState() {
+    kbDone = false;
+    document.querySelectorAll('.keybar .fill').forEach(f => { f.style.width = '0'; });
+    const b = document.getElementById('kbBtn');
+    b.textContent = 'Compare'; b.disabled = false;
+  }
+
+  /* ---------- Module 5 ---------- */
+
+  // 5.1 the rhythm: 2^x mod 15
+  const waveVals = [1, 2, 4, 8, 1, 2, 4, 8, 1, 2, 4, 8];
+  const wx = i => 70 + i * 66;
+  const wy = v => 205 - v * 20;
+  let waveStage = 0;
+  function buildWave() {
+    const svg = document.getElementById('waveSvg');
+    let s = '<g id="wavebands"></g>';
+    s += '<line x1="40" y1="222" x2="830" y2="222" stroke="#35383a"/>';
+    for (let i = 0; i < 12; i++) {
+      s += '<text class="svgmono" x="' + wx(i) + '" y="238" text-anchor="middle" font-size="13" fill="#7d8183">x=' + i + '</text>';
+      s += '<g id="wd' + i + '" opacity="0"><circle cx="' + wx(i) + '" cy="' + wy(waveVals[i]) + '" r="7" fill="#b9bcbd"/>' +
+           '<text class="svgmono" x="' + wx(i) + '" y="' + (wy(waveVals[i]) - 16) + '" text-anchor="middle" font-size="15" fill="#f4f4f2">' + waveVals[i] + '</text></g>';
+    }
+    svg.innerHTML = s;
+  }
+  function waveStep() {
+    if (waveStage === 0) {
+      waveStage = 1;
+      const btn = document.getElementById('waveBtn');
+      btn.disabled = true;
+      let i = 0;
+      const timer = setInterval(() => {
+        document.getElementById('wd' + i).setAttribute('opacity', '1');
+        i++;
+        if (i >= 12) { clearInterval(timer); btn.disabled = false; btn.textContent = 'Find the rhythm'; }
+      }, 130);
+    } else if (waveStage === 1) {
+      waveStage = 2;
+      let s = '';
+      for (let g = 0; g < 3; g++) {
+        const xa = wx(g * 4) - 26, xb = wx(g * 4 + 3) + 26;
+        s += '<rect x="' + xa + '" y="30" width="' + (xb - xa) + '" height="192" fill="rgba(224,152,60,0.07)" stroke="rgba(224,152,60,0.4)" stroke-dasharray="4 4"/>';
+        s += '<text class="svgmono" x="' + ((xa + xb) / 2) + '" y="22" text-anchor="middle" font-size="13" fill="#e0983c">r = 4</text>';
+      }
+      document.getElementById('wavebands').innerHTML = s;
+      const btn = document.getElementById('waveBtn');
+      btn.textContent = 'The rhythm: 1, 2, 4, 8 — repeat, forever'; btn.disabled = true;
+    }
+  }
+  function resetWaveState() {
+    waveStage = 0;
+    buildWave();
+    const btn = document.getElementById('waveBtn');
+    btn.textContent = 'Compute the powers'; btn.disabled = false;
+  }
+
+  // 5.2 Shor
+  const shorLabels = [
+    'Pick the lock',
+    'Step 2: turn the rhythm into a number',
+    'Step 3: two greatest-common-divisor sums — pen-and-paper stuff',
+    'And the primes fall out',
+    'Factored: no search, just the rhythm'
+  ];
+  let shorIdx = 0;
+  function shorStep() {
+    if (shorIdx >= 4) return;
+    document.getElementById('shor' + shorIdx).classList.add('shown');
+    shorIdx++;
+    const b = document.getElementById('shorBtn');
+    b.textContent = shorLabels[shorIdx];
+    if (shorIdx === 4) b.disabled = true;
+  }
+  function resetShorState() {
+    shorIdx = 0;
+    for (let n = 0; n < 4; n++) document.getElementById('shor' + n).classList.remove('shown');
+    const b = document.getElementById('shorBtn');
+    b.textContent = shorLabels[0]; b.disabled = false;
+  }
+
+  // 5.5 Mosca
+  function moscaUpdate() {
+    const X = +document.getElementById('mX').value;
+    const Y = +document.getElementById('mY').value;
+    const Z = +document.getElementById('mZ').value;
+    document.getElementById('mXv').textContent = X + ' yrs';
+    document.getElementById('mYv').textContent = Y + ' yrs';
+    document.getElementById('mZv').textContent = Z + ' yrs';
+    const S = Math.max(X + Y, Z);
+    const el = (id) => document.getElementById(id);
+    el('mvX').style.width = (X / S * 100) + '%';
+    el('mvY').style.left = (X / S * 100) + '%';
+    el('mvY').style.width = (Y / S * 100) + '%';
+    el('mvZ').style.width = (Z / S * 100) + '%';
+    el('mvX').querySelector('.mvlbl').textContent = (X / S) > 0.09 ? 'X = ' + X : '';
+    el('mvY').querySelector('.mvlbl').textContent = (Y / S) > 0.09 ? 'Y = ' + Y : '';
+    el('mvZ').querySelector('.mvlbl').textContent = 'Z = ' + Z;
+    const diff = X + Y - Z, v = document.getElementById('moscaVerdict');
+    if (diff > 0) {
+      v.innerHTML = '<span class="bad">Exposed by ' + diff + ' year' + (diff === 1 ? '' : 's') + '.</span> X + Y &gt; Z: secrets encrypted today outlive their protection.<span class="sub">Anything harvested now gets read while it still matters. By this arithmetic, the migration is already late.</span>';
+    } else {
+      v.innerHTML = '<span class="ok">Inside the window, with ' + (-diff) + ' year' + (diff === 0 ? 's' : (-diff === 1 ? '' : 's')) + ' to spare.</span><span class="sub">…if your guess for Z is right. Z is the one number on this screen you don’t control.</span>';
+    }
+  }
+  function resetMoscaState() {
+    document.getElementById('mX').value = 10;
+    document.getElementById('mY').value = 7;
+    document.getElementById('mZ').value = 12;
+    moscaUpdate();
+  }
+
+  // 5.6 timeline
+  const tlLabels = [
+    '1994: the starting gun',
+    '2001: the toy demo',
+    '2016: the worldwide competition',
+    '2024: the replacements arrive',
+    'Meanwhile, in your browser',
+    '2030: Australia’s deadline',
+    '2035: the final ban',
+    'The dates are set — now count backwards from 2030'
+  ];
+  let tlIdx = 0;
+  function timelineStep() {
+    if (tlIdx >= 7) return;
+    document.getElementById('tl' + tlIdx).classList.add('shown');
+    tlIdx++;
+    const b = document.getElementById('tlBtn');
+    b.textContent = tlLabels[tlIdx];
+    if (tlIdx === 7) b.disabled = true;
+  }
+  function resetTimelineState() {
+    tlIdx = 0;
+    for (let n = 0; n < 7; n++) document.getElementById('tl' + n).classList.remove('shown');
+    const b = document.getElementById('tlBtn');
+    b.textContent = tlLabels[0]; b.disabled = false;
+  }
+
+  show(0);
+</script>
+</body>
+</html>
