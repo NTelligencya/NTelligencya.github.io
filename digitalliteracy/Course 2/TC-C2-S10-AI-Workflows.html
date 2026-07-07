@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 10, AI Workflows You'll Actually Use</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.workflow-block):not(.workflow-block *):not(.prompt-card):not(.prompt-card *):not(.checklist-box):not(.checklist-box *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .workflow-block{background:rgba(10,22,40,0.02)!important;border:1px solid rgba(10,22,40,0.08)!important;padding:22px 24px!important;margin:22px 0!important;border-top:4px solid var(--accent)!important}
+        .workflow-block h3{font-family:'Fraunces',serif!important;font-size:1.3rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:6px!important}
+        .workflow-block .wf-meta{font-size:0.78rem;color:var(--accent)!important;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-bottom:12px;display:block}
+        .workflow-block .wf-intro{font-size:0.95rem!important;line-height:1.7!important;color:var(--navy-600)!important;margin-bottom:14px!important}
+        .workflow-block .step{margin-bottom:12px!important;padding-left:36px!important;position:relative!important}
+        .workflow-block .step .num{position:absolute;left:0;top:0;width:26px;height:26px;background:var(--accent);color:var(--white)!important;font-size:0.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:50%}
+        .workflow-block .step h5{font-size:0.95rem!important;font-weight:600!important;color:var(--navy-900)!important;margin-bottom:4px!important}
+        .workflow-block .step p{font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin-bottom:6px!important}
+        .prompt-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;padding:14px 16px!important;margin:10px 0!important}
+        .prompt-card .prompt-text{font-family:'JetBrains Mono',monospace!important;font-size:0.82rem!important;line-height:1.55!important;color:var(--navy-900)!important;background:var(--white)!important;padding:10px 12px!important;border:1px solid rgba(10,22,40,0.1)!important;white-space:pre-wrap!important;font-weight:400!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#what-is-workflow" class="active">What Counts as a Workflow</a></li>
+            <li><a href="#workflow-raw-notes">Raw Notes to Report Draft</a></li>
+            <li><a href="#workflow-plain-language">Policy to Plain Language</a></li>
+            <li><a href="#workflow-research">Multi-Document Research Synthesis</a></li>
+            <li><a href="#workflow-data-to-story">Data to Story</a></li>
+            <li><a href="#workflow-meeting-chain">Meeting Chain: Agenda to Follow-Up</a></li>
+            <li><a href="#workflow-grant">Grant Application Support</a></li>
+            <li><a href="#workflow-stakeholder">Stakeholder Comms Loop</a></li>
+            <li><a href="#build-your-own">Building Your Own Workflow</a></li>
+        </ul>
+        <div class="nav-section-label">Tools in Play</div>
+        <ul>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+            <li><a href="https://claude.ai/" target="_blank">Claude</a></li>
+            <li><a href="https://chatgpt.com/" target="_blank">ChatGPT</a></li>
+            <li><a href="https://notebooklm.google/" target="_blank">NotebookLM</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 10, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>AI Workflows You'll Actually Use</h1>
+            <p class="header-subtitle">Moving from one-off prompts to repeatable workflows that save real hours. Seven workflows worth trying on your own work, plus a template for building your own.</p>
+        </div>
+
+        <section class="content-section" id="what-is-workflow">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83L4.83,10.5C4.44,10.11 4.44,9.47 4.83,9.08L9.17,4.75C9.56,4.36 10.2,4.36 10.59,4.75C11,5.14 11,5.77 10.59,6.17L7.67,9H20V11H7.67L10.59,13.41Z"/></svg></div>
+                <h2 class="section-title">What Counts as a Workflow</h2>
+            </div>
+            <div class="section-text">
+                <p>A single prompt is a sentence. A workflow is a sequence. You do the same two or three moves in order, repeatedly, and the output from one step becomes the input to the next. That repeatability is the difference between "I used AI once this week" and "AI is part of how I work".</p>
+                <p class="pullquote">A prompt saves a minute. A workflow saves an afternoon.</p>
+                <p>This session walks through seven workflows that land for most NT professionals. They're not magic, they're just the combinations I see consistently save time. Pick one, try it on something real next week, and notice whether it earns its place. Then pick another.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="workflow-raw-notes">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M7,7H17V5H19V19H5V5H7V7M9,9H15V11H9V9M9,13H15V15H9V13M9,17H13V19H9V17Z"/></svg></div>
+                <h2 class="section-title">Raw Notes to Report Draft</h2>
+            </div>
+            <div class="section-text">
+                <div class="workflow-block">
+                    <span class="wf-meta">Three steps, 15 minutes</span>
+                    <h3>Turn scattered notes into a first-draft report</h3>
+                    <p class="wf-intro">You've got half a page of messy notes from a site visit, a stakeholder conversation, or a week of observations. You need to turn it into a proper report. The AI does the structure; you do the judgement.</p>
+
+                    <div class="step">
+                        <span class="num">1</span>
+                        <h5>Brain-dump into one document</h5>
+                        <p>Paste or type everything you have into a single Word document or a fresh chat. Don't tidy it. Dates, names, quotes, half-sentences, typos, all in.</p>
+                    </div>
+                    <div class="step">
+                        <span class="num">2</span>
+                        <h5>Ask the AI to propose structure before drafting</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">I've pasted raw notes from [describe]. Before you write anything, propose an outline for a report based on these notes. Tell me what the sections should be and what each would contain. Don't draft yet.</div>
+                        </div>
+                        <p>Adjust the outline until it matches what you actually need.</p>
+                    </div>
+                    <div class="step">
+                        <span class="num">3</span>
+                        <h5>Draft section by section, reviewing as you go</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Now draft section 1 using the notes. Keep it to about 200 words, NT Gov style, plain language. Flag any claim where the notes are ambiguous or where I'd need to verify a detail.</div>
+                        </div>
+                        <p>Review each section. Rewrite weak bits. Move on. By the end you have a draft you wrote, assisted, not a draft you blindly accepted.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="workflow-plain-language">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M5.41,21L6.12,17H2.12L2.47,15H6.47L7.53,9H3.53L3.88,7H7.88L8.59,3H10.59L9.88,7H15.88L16.59,3H18.59L17.88,7H21.88L21.53,9H17.53L16.47,15H20.47L20.12,17H16.12L15.41,21H13.41L14.12,17H8.12L7.41,21H5.41M9.53,9L8.47,15H14.47L15.53,9H9.53Z"/></svg></div>
+                <h2 class="section-title">Policy to Plain Language</h2>
+            </div>
+            <div class="section-text">
+                <div class="workflow-block">
+                    <span class="wf-meta">Three steps, 10 minutes</span>
+                    <h3>Translate a policy document into what it means for your team</h3>
+                    <p class="wf-intro">A new or updated policy lands in your inbox. It's 14 pages, written in government prose, and you're expected to know what it means for your team. The AI can take the document-to-implications leap you'd otherwise do on your own.</p>
+
+                    <div class="step">
+                        <span class="num">1</span>
+                        <h5>Summarise the policy at three levels</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Summarise this policy at three levels: one sentence (for someone walking past the office), one paragraph (for someone on my team), one page (for someone who'll need to apply it). Cover what it changes, who's affected, and when it takes effect.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">2</span>
+                        <h5>Translate into "what this means for us"</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Given this policy and the fact that my team does [describe your work], what specifically changes for us day-to-day? What new things will we need to do, stop doing, or do differently? Anything that's genuinely unclear from the document?</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">3</span>
+                        <h5>Draft the update to your team</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Draft a short Teams channel post or email to my team explaining the policy change in plain English. Tone: clear, not alarmist, one concrete "what you need to do" section. Under 200 words.</div>
+                        </div>
+                        <p>Review, adjust, send. What used to be an afternoon is 15 minutes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="workflow-research">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3Z"/></svg></div>
+                <h2 class="section-title">Multi-Document Research Synthesis</h2>
+            </div>
+            <div class="section-text">
+                <div class="workflow-block">
+                    <span class="wf-meta">Four steps, 30 minutes</span>
+                    <h3>Find the common thread across several documents</h3>
+                    <p class="wf-intro">You've got five or six reports, papers, or policy docs on a topic and you need to make sense of them for a brief, a presentation, or your own understanding. NotebookLM or Claude earn their keep here.</p>
+
+                    <div class="step">
+                        <span class="num">1</span>
+                        <h5>Collect the documents in one place</h5>
+                        <p>Upload them to NotebookLM (purpose-built for this) or attach them to a single Claude chat. For Copilot, drop them in a SharePoint folder and point Copilot at it.</p>
+                    </div>
+                    <div class="step">
+                        <span class="num">2</span>
+                        <h5>Ask for the landscape</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Read all of the attached documents. Tell me: what's the broad topic they share, what positions or findings do they have in common, where do they genuinely disagree, and what's the most important question none of them answer clearly?</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">3</span>
+                        <h5>Drill into what you need</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Focusing on [specific angle], what do these documents collectively say? Include direct quotes or references where they support something specific. Flag anything I should check against the original source.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">4</span>
+                        <h5>Produce a usable output</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Now draft a two-page synthesis of what these documents say, aimed at [audience]. Structure it as: what we know, what's disputed, what we don't yet know. Keep it honest. Include a short bibliography pointing back to which document said what.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="workflow-data-to-story">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z"/></svg></div>
+                <h2 class="section-title">Data to Story</h2>
+            </div>
+            <div class="section-text">
+                <div class="workflow-block">
+                    <span class="wf-meta">Three steps, 20 minutes</span>
+                    <h3>Turn a spreadsheet into what it's saying</h3>
+                    <p class="wf-intro">You've got monthly stats, a program register, survey results. You need to explain what they mean to someone who won't read the sheet. Copilot in Excel plus a short writing workflow lands this.</p>
+
+                    <div class="step">
+                        <span class="num">1</span>
+                        <h5>Get Copilot to analyse the shape of the data</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Look at this sheet. What are the top three things an outsider should know about this data? Any outliers, notable trends, or quality issues worth flagging? Be honest about what the data does and doesn't support.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">2</span>
+                        <h5>Turn the findings into a narrative</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Based on your analysis, write a three-paragraph narrative for a non-technical audience. Paragraph 1: what's happening. Paragraph 2: the one or two things I'd most want a reader to notice. Paragraph 3: what this might mean going forward. Plain language, no jargon.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">3</span>
+                        <h5>Ask Copilot for one supporting chart</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Suggest the single most useful chart from this data to support the narrative above. Describe what it would show, what chart type, and generate it if you can.</div>
+                        </div>
+                        <p>Three paragraphs plus one good chart is almost always more effective than ten charts and no words.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="workflow-meeting-chain">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3H18V1M17,12H12V17H17V12Z"/></svg></div>
+                <h2 class="section-title">Meeting Chain: Agenda to Follow-Up</h2>
+            </div>
+            <div class="section-text">
+                <div class="workflow-block">
+                    <span class="wf-meta">Four steps, across one meeting</span>
+                    <h3>From agenda to follow-up email, with the meeting in the middle</h3>
+                    <p class="wf-intro">A full-cycle workflow that uses AI before, during, and after a meeting. Especially useful for recurring meetings you organise.</p>
+
+                    <div class="step">
+                        <span class="num">1</span>
+                        <h5>Agenda, before the meeting</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">I've got a meeting next Tuesday about [topic] with [who, roughly]. Help me draft a clear agenda. Maximum 5 items, with a time allocation and an owner for each. Start with the goal of the meeting in one sentence.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">2</span>
+                        <h5>Prep brief for yourself</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Based on the agenda and our recent conversations (from emails and Teams), what should I expect people to raise? What's the one outcome I should push for? What's the biggest risk of this meeting going sideways, and how do I pre-empt it?</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">3</span>
+                        <h5>Recap, after the meeting</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Generate a recap of this Teams meeting: discussion points, decisions, actions with owners. Then draft a follow-up email to attendees with the recap and any asks that came out of it. Warm but brief.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">4</span>
+                        <h5>Status update, a week later</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Based on the meeting recap from last Tuesday, draft a short status update for the team showing progress against each action. Include anything I've since received by email that's relevant.</div>
+                        </div>
+                        <p>The cumulative effect: meetings that stay on track, land decisions, and follow through.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="workflow-grant">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M5,6H23V18H5V6M14,9A3,3 0 0,1 17,12A3,3 0 0,1 14,15A3,3 0 0,1 11,12A3,3 0 0,1 14,9M9,8A2,2 0 0,1 7,10V14A2,2 0 0,1 9,16H19A2,2 0 0,1 21,14V10A2,2 0 0,1 19,8H9M1,10H3V20H19V22H1V10Z"/></svg></div>
+                <h2 class="section-title">Grant Application Support</h2>
+            </div>
+            <div class="section-text">
+                <div class="workflow-block">
+                    <span class="wf-meta">Five steps, over a few days</span>
+                    <h3>Structure a grant application without the panic</h3>
+                    <p class="wf-intro">Grant applications are where AI can legitimately save days, if you use it for the lift-and-shift parts and keep your judgement on the specifics. The AI doesn't invent your program, you do. It just helps you articulate it in the form's vocabulary.</p>
+
+                    <div class="step">
+                        <span class="num">1</span>
+                        <h5>Decode the application</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Read the grant guidelines. In plain English, tell me: what they're actually funding, what they care about most (priorities, keywords), what's a dealbreaker, what word counts apply to each section, and what evidence or documents I'll need.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">2</span>
+                        <h5>Gather your raw material</h5>
+                        <p>Pull together what you already have: program descriptions, past evaluations, stats, quotes, letters of support. Drop into one folder or chat.</p>
+                    </div>
+                    <div class="step">
+                        <span class="num">3</span>
+                        <h5>Draft each section with context</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Draft the "Need" section using the attached background. Audience: the assessment panel. Tone: evidence-based but human. Word limit: 400. Use the framing the funder cares about (point back to their priorities).</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">4</span>
+                        <h5>Critique your own application</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Now read this draft as a sceptical assessor. What's weak? What's unsupported? What would make you score this lower than competitors? Suggest three specific improvements.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">5</span>
+                        <h5>Final polish and verification</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Final pass: flag any statement in this application that sounds specific but isn't backed by evidence in my background material. Flag anything I may have overclaimed. Tighten wording where it's wasting words.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="workflow-stakeholder">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg></div>
+                <h2 class="section-title">Stakeholder Comms Loop</h2>
+            </div>
+            <div class="section-text">
+                <div class="workflow-block">
+                    <span class="wf-meta">Three steps, ongoing</span>
+                    <h3>Keep stakeholders informed without drowning them or yourself</h3>
+                    <p class="wf-intro">For anyone with external partners, community organisations, or senior stakeholders who need regular updates, this workflow replaces the "oh dear I haven't updated them in a month" panic.</p>
+
+                    <div class="step">
+                        <span class="num">1</span>
+                        <h5>Gather the month's updates</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Based on emails, meetings, and Teams chats in the last four weeks involving [stakeholder or project], what's changed that they'd want to know about? Exclude anything routine or internal-only.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">2</span>
+                        <h5>Draft the right update for the right audience</h5>
+                        <div class="prompt-card">
+                            <div class="prompt-text">Draft a short update email for [stakeholder]. Tone matches our past correspondence with them. Include: what's happened, what's coming next, anything I need from them, and any open questions. Keep it under 300 words.</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="num">3</span>
+                        <h5>Schedule the next one</h5>
+                        <p>Set a calendar reminder to do this again at the same cadence. The AI makes it fast, the habit makes it work.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="build-your-own">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z"/></svg></div>
+                <h2 class="section-title">Building Your Own Workflow</h2>
+            </div>
+            <div class="section-text">
+                <p>The seven above are starting points. The real win is spotting your own repetitive work and turning it into a workflow. A template for doing that:</p>
+                <div class="checklist-box">
+                    <h4>How to build a workflow</h4>
+                    <p><strong>1. Pick a task you do at least monthly.</strong> Not a one-off. Something recurring.</p>
+                    <p><strong>2. Break it into 2-4 steps.</strong> What do you actually do in order? Write them down in plain English.</p>
+                    <p><strong>3. For each step, ask: "is this AI-able?"</strong> Drafting, summarising, analysing, rewriting are usually yes. Personal judgement, external relationships, or decisions that need your authority are usually no.</p>
+                    <p><strong>4. Write a prompt for each AI-able step.</strong> Include the context the AI will need. Save the prompts in your library (see Session 7).</p>
+                    <p><strong>5. Run the workflow next time the task comes up.</strong> Notice what doesn't work. Refine. By the third run it's smooth.</p>
+                    <p><strong>6. Document for handover.</strong> If you're building workflows for your team, write them down. A good workflow survives the person who built it.</p>
+                </div>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Aim for one real workflow, not ten ideas</h4>
+                        <p>Most people come out of an AI course with a list of things they'd like to try and none they actually use. Pick <em>one</em> workflow from this session. Use it on real work next week. That one becomes habit, then the second comes easier.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 10</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 4, Word, Faster, Cleaner Documents</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.tip-card):not(.tip-card *):not(.checklist-box):not(.checklist-box *):not(.shortcut-grid):not(.shortcut-grid *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .tip-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;padding:16px 18px!important;margin:12px 0!important}
+        .tip-card h5{font-size:0.98rem!important;font-weight:600!important;color:var(--navy-900)!important;margin-bottom:8px!important}
+        .tip-card p{font-size:0.89rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin-bottom:6px!important}
+        .tip-card p:last-child{margin-bottom:0!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .shortcut-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))!important;gap:10px!important;margin:16px 0!important}
+        .shortcut-grid .sc{background:var(--white)!important;border:1px solid rgba(10,22,40,0.1)!important;padding:10px 14px!important;font-size:0.85rem!important}
+        .shortcut-grid .sc .key{font-family:'JetBrains Mono',monospace!important;color:var(--navy-900)!important;font-weight:500!important;display:block!important;margin-bottom:3px!important}
+        .shortcut-grid .sc .desc{color:var(--navy-400)!important;font-size:0.8rem!important;display:block!important}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#why-structure" class="active">Why Structure Matters</a></li>
+            <li><a href="#styles">Styles, the Secret of Clean Documents</a></li>
+            <li><a href="#headings-toc">Headings and a Working Table of Contents</a></li>
+            <li><a href="#templates">Templates for Work You Do Often</a></li>
+            <li><a href="#tracking">Track Changes and Comments</a></li>
+            <li><a href="#images-tables">Images, Tables, and Page Layout</a></li>
+            <li><a href="#shortcuts">Shortcuts Worth Knowing</a></li>
+            <li><a href="#setup-for-ai">Setting Up for AI-Assisted Drafting</a></li>
+        </ul>
+        <div class="nav-section-label">Quick Links</div>
+        <ul>
+            <li><a href="https://www.office.com/launch/word" target="_blank">Word on the Web</a></li>
+            <li><a href="https://support.microsoft.com/en-au/word" target="_blank">Word Help</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 4, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>Word, Faster, Cleaner Documents</h1>
+            <p class="header-subtitle">The handful of Word habits that separate documents that age well from documents that turn into spaghetti. Styles, headings, templates, track changes, and a document set up so Copilot can actually help you in Day 2.</p>
+        </div>
+
+        <section class="content-section" id="why-structure">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z"/></svg></div>
+                <h2 class="section-title">Why Structure Matters</h2>
+            </div>
+            <div class="section-text">
+                <p>Word has two kinds of users. The first writes by making the current line bold or big or centred until the document looks right. The second writes by applying headings and styles, and trusts Word to make it look right. The first approach works for a one-page letter. The second is the only way to write anything longer without the document turning into a mess.</p>
+                <p class="pullquote">The document that ages well is the one where the structure is explicit, not just visual.</p>
+                <p>Explicit structure means: Word knows which line is a heading, which paragraph is body text, which bit is a quote, which list is a real list. Once Word knows, it can generate a table of contents, let you jump around with the navigation pane, style the whole document consistently, and (in Day 2) let Copilot understand what's what.</p>
+                <p>This session is a short, practical pass at that structure. Most of it is free once you know where to look.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="styles">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20.71,4.63L19.37,3.29C19,2.9 18.35,2.9 17.96,3.29L9,12.25L11.75,15L20.71,6.04C21.1,5.65 21.1,5 20.71,4.63M7,14A3,3 0 0,0 4,17C4,18.31 2.84,19 2,19C2.92,20.22 4.5,21 6,21A4,4 0 0,0 10,17A3,3 0 0,0 7,14Z"/></svg></div>
+                <h2 class="section-title">Styles, the Secret of Clean Documents</h2>
+            </div>
+            <div class="section-text">
+                <p>Styles are named formats. "Heading 1" isn't just bold 18pt text, it's a label. Apply it, and Word knows that paragraph is a top-level heading. Apply "Heading 2" to a sub-heading. "Normal" to body text. "Quote" to a pulled-out quote.</p>
+                <p>The magic is that if you later want all your Heading 1s to be a different colour, or a different font, or centred, you change the style once and every heading updates. If you manually styled each heading by clicking bold and changing the size, you have to redo every one of them.</p>
+                <div class="tip-card">
+                    <h5>Find the Styles gallery</h5>
+                    <p>It's on the Home ribbon, the row of named boxes (Normal, No Spacing, Heading 1, Heading 2, etc.). Click on a paragraph, click the style. Done.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Build a habit: apply as you write</h5>
+                    <p>As soon as you type a heading, click Heading 1 (or Ctrl+Alt+1). As soon as you type a subheading, Heading 2. Small movement, huge long-term payoff.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Modify a style once, it propagates</h5>
+                    <p>Right-click the style name in the gallery, Modify. Change font, colour, spacing. Every paragraph of that style updates instantly. This is how you make a 50-page document consistent in 30 seconds instead of 30 minutes.</p>
+                </div>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Inherited documents, reset the styles</h4>
+                        <p>If you've been given a messy document by someone else, select all (Ctrl+A), click Normal, and start applying styles fresh. It's almost always faster than untangling what's there. The content stays, only the formatting resets.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="headings-toc">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M3,9H17V7H3V9M3,13H17V11H3V13M3,17H17V15H3V17M19,17H21V15H19V17M19,7V9H21V7H19M19,13H21V11H19V13Z"/></svg></div>
+                <h2 class="section-title">Headings and a Working Table of Contents</h2>
+            </div>
+            <div class="section-text">
+                <p>Once your headings use proper heading styles, two powerful things become free.</p>
+                <p><strong>The navigation pane.</strong> View, Navigation Pane. A sidebar appears showing your document structure. Click any heading to jump there. Drag headings to reorder whole sections. Suddenly a 40-page report feels navigable rather than overwhelming.</p>
+                <p><strong>A real table of contents.</strong> References, Table of Contents, pick one. Word builds it from your headings, and "Update" regenerates it when headings change. No manual typing, no broken page numbers.</p>
+                <div class="tip-card">
+                    <h5>Use three heading levels, not seven</h5>
+                    <p>Heading 1 for top sections, Heading 2 for sub-sections, Heading 3 for sub-sub-sections. Beyond that, you're probably over-structuring. Most reports only need two levels.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>One Heading 1 at the start, not on every section</h5>
+                    <p>Usually your document title is Heading 1, and everything else is Heading 2 or lower. Some templates differ, check yours.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="templates">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V9H5V5H19V19H5V15H3V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M10.08,15.58L11.5,17L16.5,12L11.5,7L10.08,8.41L12.67,11H3V13H12.67L10.08,15.58Z"/></svg></div>
+                <h2 class="section-title">Templates for Work You Do Often</h2>
+            </div>
+            <div class="section-text">
+                <p>If you write the same kind of document repeatedly (briefing notes, case notes, meeting minutes, incident reports, grant applications), build a template once and reuse it. Your organisation might already have templates buried somewhere, worth asking about.</p>
+                <div class="tip-card">
+                    <h5>What a template is</h5>
+                    <p>A Word file saved as a template (.dotx). Opening it creates a new document based on it, rather than editing the original. Fonts, styles, section headings, and standard text all come through.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Start with a real document you liked</h5>
+                    <p>Take an example that worked. Strip out the specifics, keep the structure and standing text. Save as template. Use it next time. Refine as you notice what keeps needing to be added or removed.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Host templates on SharePoint</h5>
+                    <p>If the whole team uses a template, put it on the team's SharePoint site. Updates propagate, nobody's using a three-year-old copy off their desktop.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Content controls for fillable bits</h5>
+                    <p>The Developer tab (turn it on in File, Options, Customize Ribbon) lets you add "content controls", placeholder fields that people can fill in without breaking the layout. Useful for forms and standard documents.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="tracking">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z"/></svg></div>
+                <h2 class="section-title">Track Changes and Comments</h2>
+            </div>
+            <div class="section-text">
+                <p>The two review features that turn collaborative writing from a nightmare into a workflow.</p>
+                <p><strong>Track Changes</strong> (Review, Track Changes) records everything you add, delete, or modify as marked-up edits. The original author can then accept or reject each change, one by one or all at once.</p>
+                <p><strong>Comments</strong> (Review, New Comment) let you leave a margin note tied to a specific bit of text, without changing it. Good for questions, suggestions, or flagging something for the author to think about.</p>
+                <div class="tip-card">
+                    <h5>Use comments more than Track Changes for suggestions</h5>
+                    <p>If you're suggesting a rewrite, often a comment saying "consider reframing this as..." is cleaner than an actual edit. The author keeps control.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Resolve, don't delete</h5>
+                    <p>Clicking "Resolve" on a comment marks it done but keeps it in the document's history. Helpful for audit and review trails.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Set the display to "All Markup" while reviewing, "No Markup" to check the clean version</h5>
+                    <p>The dropdown on the Review ribbon toggles. All Markup shows everyone's changes. No Markup shows what the document would look like if everything is accepted. Useful for reading flow.</p>
+                </div>
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Before you send to an external party, accept all and remove comments</h4>
+                        <p>Track changes and comments sent outside the organisation can reveal internal deliberations you didn't mean to share. Review, Inspect Document, Inspect, remove. Or just accept all changes and delete all comments before finalising.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="images-tables">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg></div>
+                <h2 class="section-title">Images, Tables, and Page Layout</h2>
+            </div>
+            <div class="section-text">
+                <p>Three small things that fix the most common layout headaches.</p>
+                <div class="tip-card">
+                    <h5>Images, pick the right "wrap"</h5>
+                    <p>When you insert an image, Word's default is "In Line With Text", which means it sits in the text like a letter. Usually you want "In Front of Text" or "Tight" so text flows around it. Click the image, Layout Options icon (small arrow top-right), pick the one you want.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Tables, use Insert Table, not Draw Table</h5>
+                    <p>Insert Table with a set number of columns and rows produces a clean, well-behaved table. Draw Table and paste-from-Excel often lead to tables that fight you forever.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Page breaks, use a real one</h5>
+                    <p>Ctrl+Enter inserts a page break. Don't hit Enter 30 times to push content to the next page, the moment anything above changes, your alignment breaks. Real page breaks stay put.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Section breaks for different formatting in different parts of the document</h5>
+                    <p>Layout, Breaks, Section Break. Useful when you want part of the document in landscape, or with different headers, or no page numbers on the first page. Worth learning when you need it.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="shortcuts">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,10H17V8H19M19,13H17V11H19M16,10H14V8H16M16,13H14V11H16M16,17H8V15H16M7,10H5V8H7M7,13H5V11H7M8,11H10V13H8M8,8H10V10H8M11,11H13V13H11M11,8H13V10H11M20,5H4C2.89,5 2,5.89 2,7V17A2,2 0 0,0 4,19H20A2,2 0 0,0 22,17V7C22,5.89 21.1,5 20,5Z"/></svg></div>
+                <h2 class="section-title">Shortcuts Worth Knowing</h2>
+            </div>
+            <div class="section-text">
+                <p>A dozen shortcuts that save real time. Learn three or four at a time, they'll stick.</p>
+                <div class="shortcut-grid">
+                    <div class="sc"><span class="key">Ctrl+S</span><span class="desc">Save (still worth doing manually)</span></div>
+                    <div class="sc"><span class="key">Ctrl+Z</span><span class="desc">Undo, infinite</span></div>
+                    <div class="sc"><span class="key">Ctrl+Y</span><span class="desc">Redo</span></div>
+                    <div class="sc"><span class="key">Ctrl+F</span><span class="desc">Find</span></div>
+                    <div class="sc"><span class="key">Ctrl+H</span><span class="desc">Find and Replace</span></div>
+                    <div class="sc"><span class="key">Ctrl+K</span><span class="desc">Insert hyperlink</span></div>
+                    <div class="sc"><span class="key">Ctrl+Enter</span><span class="desc">Page break</span></div>
+                    <div class="sc"><span class="key">Ctrl+Alt+1/2/3</span><span class="desc">Heading 1, 2, 3</span></div>
+                    <div class="sc"><span class="key">Ctrl+Shift+N</span><span class="desc">Normal style</span></div>
+                    <div class="sc"><span class="key">Ctrl+Shift+C</span><span class="desc">Copy formatting</span></div>
+                    <div class="sc"><span class="key">Ctrl+Shift+V</span><span class="desc">Paste formatting</span></div>
+                    <div class="sc"><span class="key">Ctrl+Shift+8</span><span class="desc">Show formatting marks</span></div>
+                </div>
+                <p style="margin-top:14px"><strong>The one that changes everything.</strong> Ctrl+Shift+8 shows the hidden formatting marks (paragraph symbols, tabs, spaces, page breaks). When a document's layout is misbehaving, turn this on and you can see what's actually going on. Almost every layout problem becomes obvious.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="setup-for-ai">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z"/></svg></div>
+                <h2 class="section-title">Setting Up for AI-Assisted Drafting</h2>
+            </div>
+            <div class="section-text">
+                <p>Everything above pays off when Copilot enters the picture. An AI that can see your document's structure (because the headings are proper headings and the styles are consistent) produces much better summaries, rewrites, and analyses than an AI staring at a wall of visually-formatted text.</p>
+                <p class="pullquote">A well-structured document is a good input to an AI. A messy document is a coin flip.</p>
+                <div class="checklist-box">
+                    <h4>What a Copilot-ready Word document looks like</h4>
+                    <p>Real Heading 1 / Heading 2 / Heading 3 styles, applied consistently.</p>
+                    <p>Normal style for body text, not manually-formatted bold or italic.</p>
+                    <p>Real lists (bullet or numbered) instead of paragraphs starting with a dash.</p>
+                    <p>Images with real "wrap" settings rather than text pushed around with spaces.</p>
+                    <p>A sensible filename and location in OneDrive or SharePoint so Copilot can find it.</p>
+                </div>
+                <p>Session 8 (Copilot in Word, Excel &amp; PowerPoint) picks up from here. The document you've set up the way this session describes is the document Copilot will earn its keep on.</p>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 4</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

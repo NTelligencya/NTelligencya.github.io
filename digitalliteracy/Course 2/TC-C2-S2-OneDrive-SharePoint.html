@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 2, OneDrive, SharePoint &amp; File Sense</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--red:#b91c1c;--red-soft:rgba(185,28,28,0.06);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.activity-box):not(.activity-box *):not(.compare-two):not(.compare-two *):not(.checklist-box):not(.checklist-box *):not(.perm-card):not(.perm-card *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .compare-two{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;margin:18px 0!important}
+        .compare-two .col{padding:18px 20px!important;border:1px solid rgba(10,22,40,0.08)!important;border-top:3px solid var(--accent)!important;background:rgba(10,22,40,0.02)!important}
+        .compare-two .col h5{font-family:'Fraunces',serif!important;font-size:1.1rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .compare-two .col p{font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin-bottom:8px!important}
+        .compare-two .col p:last-child{margin-bottom:0!important}
+        .perm-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;padding:16px 18px!important;margin:12px 0!important}
+        .perm-card h5{font-size:0.95rem!important;font-weight:600!important;color:var(--navy-900)!important;margin-bottom:8px!important}
+        .perm-card p{font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin:0!important}
+        .perm-card.risk{border-left-color:var(--red)!important;background:var(--red-soft)!important}
+        .perm-card.risk h5{color:var(--red)!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .activity-box{background:rgba(59,130,246,0.06)!important;border:1px solid rgba(59,130,246,0.25)!important;padding:20px 22px!important;margin:18px 0!important}
+        .activity-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .activity-box .label{display:inline-block;background:var(--accent);color:var(--white)!important;font-size:0.7rem;font-weight:600;padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px}
+        .activity-box p{color:var(--navy-600)!important;margin-bottom:8px!important;font-size:0.92rem!important;line-height:1.65!important}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+            .compare-two{grid-template-columns:1fr!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#where-files-live" class="active">Where Your Files Actually Live</a></li>
+            <li><a href="#onedrive-vs-sharepoint">OneDrive vs SharePoint</a></li>
+            <li><a href="#sharing">Sharing, in Plain English</a></li>
+            <li><a href="#permissions">The Four Permission Levels</a></li>
+            <li><a href="#version-history">Version History, Your Safety Net</a></li>
+            <li><a href="#sync-offline">Syncing and Working Offline</a></li>
+            <li><a href="#team-sites">Teams Sites and Where Your Files Go</a></li>
+            <li><a href="#file-sense">A Few Habits That Save Hours</a></li>
+        </ul>
+        <div class="nav-section-label">Quick Links</div>
+        <ul>
+            <li><a href="https://onedrive.live.com/" target="_blank">OneDrive on the Web</a></li>
+            <li><a href="https://www.office.com/" target="_blank">Office Portal</a></li>
+            <li><a href="https://learn.microsoft.com/en-us/onedrive/" target="_blank">OneDrive Docs</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 2, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>OneDrive, SharePoint &amp; File Sense</h1>
+            <p class="header-subtitle">Where your files actually live, how sharing and permissions work, how to share without accidentally exposing things, how to roll back a mistake, and a few habits that save hours over the course of a project.</p>
+        </div>
+
+        <section class="content-section" id="where-files-live">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/></svg></div>
+                <h2 class="section-title">Where Your Files Actually Live</h2>
+            </div>
+            <div class="section-text">
+                <p>There was a time when "my files" meant files on the C drive of the laptop in front of you. That time is gone. Your work files now live in the cloud, and the copy on your laptop is just a local mirror that keeps in sync with the master.</p>
+                <p class="pullquote">Your laptop is a window into your files. The files themselves are on Microsoft's servers.</p>
+                <p>Why that matters: you can break your laptop, drop it in a creek, leave it on a plane, and your files are still fine. You can sign in to any other device and everything comes back. That's the upside.</p>
+                <p>The downside: people still think files "live" in folders they see in File Explorer, and they end up confused about what's synced, what's backed up, and what's actually somewhere everyone on the team can see. This session is about clearing that confusion up.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="onedrive-vs-sharepoint">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M10,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8A2,2 0 0,0 20,6H12L10,4Z"/></svg></div>
+                <h2 class="section-title">OneDrive vs SharePoint</h2>
+            </div>
+            <div class="section-text">
+                <p>Two names, easy to confuse, different jobs.</p>
+
+                <div class="compare-two">
+                    <div class="col">
+                        <h5>OneDrive</h5>
+                        <p><strong>Yours.</strong> Your personal work storage. Think of it as the new "Documents" folder, just in the cloud.</p>
+                        <p><strong>Default private.</strong> Nobody else can see your OneDrive unless you share something specifically.</p>
+                        <p><strong>Good for:</strong> drafts, personal notes, files you're working on before they're ready for a team, scans of reports, anything that's yours.</p>
+                        <p><strong>Leaves when you leave.</strong> When you exit the organisation, your OneDrive goes with your account.</p>
+                    </div>
+                    <div class="col">
+                        <h5>SharePoint</h5>
+                        <p><strong>Ours.</strong> Shared storage for a whole team, project, or branch.</p>
+                        <p><strong>Permissioned.</strong> Everyone on the site can see everything on the site unless folders are restricted.</p>
+                        <p><strong>Good for:</strong> final documents, policies, shared templates, project files the team all needs, records that survive staff changes.</p>
+                        <p><strong>Survives staff changes.</strong> When someone leaves, the files stay on the team's site.</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:18px"><strong>The rule of thumb</strong> that works 90 percent of the time: if a file is just yours and nobody would ever need it if you won the lottery tomorrow, OneDrive is fine. If someone else might ever need the file and you're not there to email it to them, it belongs on SharePoint.</p>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Under every Teams team is a SharePoint site</h4>
+                        <p>When you join a Microsoft Team, you're automatically joining a SharePoint site. The "Files" tab inside a Team is just a window into that site's document library. Knowing this makes a lot of Teams quirks make sense.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="sharing">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M18,16.08C17.24,16.08 16.56,16.38 16.04,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.21,8 18,8A3,3 0 0,0 21,5A3,3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.79,9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.79,15 7.5,14.69 8.04,14.19L15.16,18.34C15.11,18.55 15.08,18.77 15.08,19C15.08,20.61 16.39,21.92 18,21.92C19.61,21.92 20.92,20.61 20.92,19A2.92,2.92 0 0,0 18,16.08Z"/></svg></div>
+                <h2 class="section-title">Sharing, in Plain English</h2>
+            </div>
+            <div class="section-text">
+                <p>There are two wrong ways to share a file, and one right way.</p>
+                <p><strong>The old wrong way: email the file as an attachment.</strong> Now there are three or four versions in three or four inboxes. Nobody knows which is current. Edits get made in parallel. Chaos.</p>
+                <p><strong>The other wrong way: send a link without thinking about permissions.</strong> Either the recipient hits a wall (no access) or you've opened it up to "anyone with the link" and now it's shareable with the whole internet.</p>
+                <p><strong>The right way: use "Share" in the Office app, pick the right permission, paste the link.</strong> Everyone sees the live document. One version. Changes tracked. History preserved.</p>
+                <div class="pullquote">Don't email attachments. Share the link.</div>
+                <p>When you click Share in Word, Excel, PowerPoint, or right-click a file in OneDrive or SharePoint, you get a dialog. The three things to pay attention to:</p>
+                <p><strong>Who can access.</strong> Specific people, people in your organisation, or anyone with the link. Default to "specific people" unless you have a reason otherwise.</p>
+                <p><strong>Can edit or view only.</strong> If they don't need to edit, give view. You can always upgrade later.</p>
+                <p><strong>Expiry date.</strong> Optional, but a good habit for external sharing. "Expires in 30 days" prevents links from living forever.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="permissions">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18Z"/></svg></div>
+                <h2 class="section-title">The Four Permission Levels</h2>
+            </div>
+            <div class="section-text">
+                <p>Every sharing link in M365 falls into one of four buckets. Know which you're handing out.</p>
+
+                <div class="perm-card">
+                    <h5>Specific people</h5>
+                    <p>Only the named people can open the file. Safest default. Use this for anything sensitive, or anything you only need to share with a handful of people.</p>
+                </div>
+                <div class="perm-card">
+                    <h5>People in your organisation</h5>
+                    <p>Anyone signed into your org's tenant can open the file. Good for widely-useful documents (policy notes, templates) where you don't want to maintain a list. Not for sensitive content.</p>
+                </div>
+                <div class="perm-card">
+                    <h5>People with existing access</h5>
+                    <p>A way to send a link to a file without changing who can access it. Useful when you know the person already has access and you just want to point them to the exact file.</p>
+                </div>
+                <div class="perm-card risk">
+                    <h5>Anyone with the link (caution)</h5>
+                    <p>The link works for anyone who has it, inside or outside the organisation, no sign-in required. This is how accidental public disclosures happen. Only use if the content is genuinely fine for the public internet, and prefer to add an expiry date.</p>
+                </div>
+
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Check the default in your org</h4>
+                        <p>Some organisations default to "anyone with the link", others to "people in your org", others to "specific people". Whatever yours is, know it before you click Share. One moment of attention prevents a lot of later stress.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="version-history">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3M12,8V13L16.28,15.54L17,14.33L13.5,12.25V8H12Z"/></svg></div>
+                <h2 class="section-title">Version History, Your Safety Net</h2>
+            </div>
+            <div class="section-text">
+                <p>Every file in OneDrive and SharePoint keeps a version history, automatically. Every time you save (and it auto-saves every few seconds in the cloud apps), a new version is recorded. You can roll back to any previous version without losing the current one.</p>
+                <p><strong>How to find it.</strong> Right-click a file in OneDrive or SharePoint in your browser, choose "Version history". You'll see a list of saved versions with timestamps and who changed them. Click any one to preview, open, or restore.</p>
+                <p><strong>What it saves you from:</strong></p>
+                <p>A colleague overwriting a good version with a bad one.</p>
+                <p>An accidental "select all, delete, save" disaster.</p>
+                <p>A Copilot edit that went wrong.</p>
+                <p>A file you sent to the wrong version of.</p>
+                <p class="pullquote">You almost never actually lose work in M365. You just have to know where the spare copy is.</p>
+                <p><strong>How long it keeps versions.</strong> By default, 500 versions per file. For most users this is weeks or months of history. Deleted files also go to a Recycle Bin for 93 days before they're truly gone.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="sync-offline">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13.57 17.4,15 16.42,16.06L17.85,17.5C19.2,16.1 20,14.14 20,12A8,8 0 0,0 12,4M6.15,6.5L4.72,8C3.36,9.4 2.57,11.36 2.57,13.5A8,8 0 0,0 10.57,21.5V24.5L14.57,20.5L10.57,16.5V19.5A6,6 0 0,1 4.57,13.5C4.57,11.93 5.17,10.5 6.15,9.44V6.5Z"/></svg></div>
+                <h2 class="section-title">Syncing and Working Offline</h2>
+            </div>
+            <div class="section-text">
+                <p>The OneDrive app on your laptop keeps a local copy of your cloud files, and syncs changes up and down automatically when you're online. That means you can work on a file on the plane, and when you land and reconnect, your changes go up to the cloud.</p>
+                <p><strong>The little cloud icons in File Explorer</strong> tell you what's synced:</p>
+                <p><strong>Cloud outline:</strong> the file is in the cloud but not downloaded to this laptop. Takes zero space until you open it. Needs internet.</p>
+                <p><strong>Green tick:</strong> the file is downloaded to the laptop. Opens without internet.</p>
+                <p><strong>Solid green circle with tick:</strong> "always keep on this device". The file is pinned locally and guaranteed to work offline.</p>
+                <p><strong>Blue circular arrows:</strong> the file is syncing right now.</p>
+                <p><strong>Red circle:</strong> sync problem. Click the OneDrive icon in the taskbar to see what's wrong.</p>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>For travel to remote areas</h4>
+                        <p>Before you travel, right-click the OneDrive folders you'll need and choose "Always keep on this device". That pins them so they're guaranteed to work offline. When you're back in coverage, everything syncs back up. Copilot and Office web features won't work offline, but editing existing documents will.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="team-sites">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg></div>
+                <h2 class="section-title">Teams Sites and Where Your Files Really Go</h2>
+            </div>
+            <div class="section-text">
+                <p>Teams is where most files end up in a modern workplace, and it's also where the most confusion happens. A quick explanation saves a lot of frustration.</p>
+                <p><strong>Every Team has a SharePoint site behind it.</strong> The Files tab inside a Teams channel is a view of a folder on that site. If you upload a file to a channel, it's actually landing on SharePoint.</p>
+                <p><strong>Every channel has its own folder.</strong> Files uploaded to "General" don't appear in "Project Alpha" and vice versa. If someone can't find the file you shared, it's usually because they're looking in the wrong channel.</p>
+                <p><strong>A private channel has a separate site.</strong> Private channels have their own mini-SharePoint site, which is why their files are invisible to people not in the channel.</p>
+                <p><strong>Chat files go to your OneDrive.</strong> When you send a file in a 1-on-1 or group chat (not a channel), it lands in your OneDrive in a folder called "Microsoft Teams Chat Files", and is auto-shared with the chat participants.</p>
+
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>This matters for records and handover</h4>
+                        <p>Chat files live in the sender's OneDrive, which means they disappear when the sender leaves. Anything that needs to survive a staff change should be posted to a channel (goes to SharePoint) or uploaded directly to the team site, not sent as a chat file.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="file-sense">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg></div>
+                <h2 class="section-title">A Few Habits That Save Hours</h2>
+            </div>
+            <div class="section-text">
+                <div class="checklist-box">
+                    <h4>Small habits, big payoff</h4>
+                    <p><strong>Name files with dates in the YYYY-MM-DD format.</strong> "2026-04-report-draft.docx" sorts correctly forever. "April report final final v2.docx" does not.</p>
+                    <p><strong>Stop using "final" in filenames.</strong> Version history does this better. Just call it what it is and let M365 track versions.</p>
+                    <p><strong>One folder per project, not one folder per filetype.</strong> All documents, spreadsheets, and emails for a single project live together. Much easier to find six months later.</p>
+                    <p><strong>Use Shortcut (OneDrive) to pin frequently-accessed SharePoint folders.</strong> They appear in your OneDrive without you having to click through five menus.</p>
+                    <p><strong>When you share, think "who and why", not just "here's the link".</strong> Thirty seconds of thought about permissions prevents a lot of embarrassment.</p>
+                    <p><strong>When in doubt, check the sharing dialog's list of who has access.</strong> Right-click a file, "Manage access". You'll sometimes be surprised.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 2</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

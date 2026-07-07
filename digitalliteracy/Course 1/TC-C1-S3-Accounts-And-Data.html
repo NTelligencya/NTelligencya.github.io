@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 3, Your Accounts and Your Data</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--red:#b91c1c;--red-soft:rgba(185,28,28,0.06);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.activity-box):not(.activity-box *):not(.dos-donts):not(.dos-donts *):not(.checklist-box):not(.checklist-box *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .dos-donts{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;margin:18px 0!important}
+        .dos-donts .do,.dos-donts .dont{padding:18px 20px!important;border:1px solid rgba(10,22,40,0.08)!important;border-top:3px solid var(--green)!important;background:var(--green-soft)!important}
+        .dos-donts .dont{border-top-color:var(--red)!important;background:var(--red-soft)!important}
+        .dos-donts h5{font-size:0.8rem!important;text-transform:uppercase!important;letter-spacing:0.1em!important;font-weight:600!important;margin-bottom:10px!important;color:var(--green)!important}
+        .dos-donts .dont h5{color:var(--red)!important}
+        .dos-donts p{font-size:0.88rem!important;line-height:1.55!important;margin-bottom:6px!important;color:var(--navy-600)!important}
+        .dos-donts p:last-child{margin-bottom:0!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .activity-box{background:rgba(59,130,246,0.06)!important;border:1px solid rgba(59,130,246,0.25)!important;padding:20px 22px!important;margin:18px 0!important}
+        .activity-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .activity-box .label{display:inline-block;background:var(--accent);color:var(--white)!important;font-size:0.7rem;font-weight:600;padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px}
+        .activity-box p{color:var(--navy-600)!important;margin-bottom:8px!important;font-size:0.92rem!important;line-height:1.65!important}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+            .dos-donts{grid-template-columns:1fr!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE AI Training" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#why-it-matters" class="active">Why This Matters</a></li>
+            <li><a href="#personal-data">What Personal Data Is</a></li>
+            <li><a href="#passwords">Strong Passwords, the Simple Version</a></li>
+            <li><a href="#password-manager">The Password Manager Trick</a></li>
+            <li><a href="#two-factor">Two-Factor Authentication</a></li>
+            <li><a href="#ai-sharing">What to Share With AI, and What Not To</a></li>
+            <li><a href="#privacy-settings">Privacy Settings That Actually Matter</a></li>
+            <li><a href="#try-it">Try It Yourself</a></li>
+        </ul>
+        <div class="nav-section-label">Useful Links</div>
+        <ul>
+            <li><a href="https://www.esafety.gov.au/" target="_blank">eSafety Commissioner</a></li>
+            <li><a href="https://haveibeenpwned.com/" target="_blank">Have I Been Pwned?</a></li>
+            <li><a href="https://www.cyber.gov.au/" target="_blank">cyber.gov.au</a></li>
+            <li><a href="https://bitwarden.com/" target="_blank">Bitwarden (free password manager)</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 3, AI &amp; Online Cyber Safety Skills</span>
+            <h1>Your Accounts and Your Data</h1>
+            <p class="header-subtitle">The practical habits that protect you online. Strong passwords without the pain, two-factor authentication in plain English, what's safe to share with AI tools, and a couple of privacy settings worth actually changing.</p>
+        </div>
+
+        <section class="content-section" id="why-it-matters">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1Z"/></svg></div>
+                <h2 class="section-title">Why This Matters</h2>
+            </div>
+            <div class="section-text">
+                <p>Almost everything about modern life runs through online accounts: email, banking, MyGov, Centrelink, power bills, the kids' school, Facebook, WhatsApp, photos, medical records. If someone gets into one of those accounts, they can often get into many of the others.</p>
+                <p>You don't need to become an IT expert to stay safe. You need three habits:</p>
+                <p class="pullquote">Strong passwords you don't have to remember. A second layer of protection on important accounts. A sensible rule for what you put online.</p>
+                <p>That's the whole session.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="personal-data">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/></svg></div>
+                <h2 class="section-title">What Personal Data Is</h2>
+            </div>
+            <div class="section-text">
+                <p>"Personal data" is anything that, on its own or combined with other information, could identify you or be used to pretend to be you. Some of it is obvious, some less so.</p>
+                <p><strong>The very private stuff.</strong> Tax file number. Medicare number. Driver's licence number. Passport number. Bank account and card numbers. These are what criminals want. Treat them like cash.</p>
+                <p><strong>The moderately private stuff.</strong> Your full date of birth. Your full address. Your mother's maiden name. The suburb you grew up in. Your first pet's name. These are the answers to "security questions", so sharing them publicly means someone might be able to reset your accounts.</p>
+                <p><strong>The stuff that seems harmless but isn't always.</strong> Your daily routine. Photos of the inside of your house. When you're away on holiday. The school your kids go to. Useful to a stranger with bad intentions.</p>
+                <p><strong>The stuff you probably don't need to worry about.</strong> Your name. The town you live in. Your age (roughly). Opinions, interests, photos of food. Normal life.</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>The rule of thumb</h4>
+                        <p>Before you post or paste something, ask: "if a stranger saw this, could they use it to pretend to be me, or to guess the answer to one of my security questions?" If yes, don't share it.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="passwords">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/></svg></div>
+                <h2 class="section-title">Strong Passwords, the Simple Version</h2>
+            </div>
+            <div class="section-text">
+                <p>Everyone tells you to use "strong passwords" and nobody says what that actually means. Here's the honest version.</p>
+                <p><strong>A strong password is long.</strong> Length matters more than adding symbols and capitals. Twelve characters minimum, and longer is better.</p>
+                <p><strong>A strong password is unique.</strong> Using the same password on multiple sites is the single biggest mistake people make. When one site gets hacked (they all do, eventually), the attackers try that same password on your email, your bank, and everything else.</p>
+                <p><strong>A strong password is not based on your life.</strong> Your kid's name, your birthday, your pet, your footy team. Anything a stranger could guess from your Facebook isn't strong.</p>
+
+                <div class="dos-donts">
+                    <div class="do">
+                        <h5>Stronger</h5>
+                        <p><strong>correct-horse-battery-staple-42</strong></p>
+                        <p>Long, random, easy for you to remember, almost impossible to guess or crack.</p>
+                        <p>Four random words plus a number is a solid recipe.</p>
+                    </div>
+                    <div class="dont">
+                        <h5>Weaker</h5>
+                        <p><strong>Sarah2019!</strong></p>
+                        <p>Short, based on a real name and a real year, with the "!" that hackers expect. Easy to crack with modern tools.</p>
+                    </div>
+                </div>
+
+                <p><strong>The passphrase trick.</strong> Instead of one word with symbols jammed in, string four random words together with a few extras: <em>wombat-stereo-rocket-yellow-88</em>. That's much harder for a computer to guess than <em>P@ssw0rd1</em>, and easier for you to remember.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="password-manager">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M17,3H7A2,2 0 0,0 5,5V21L12,18L19,21V5C19,3.89 18.1,3 17,3Z"/></svg></div>
+                <h2 class="section-title">The Password Manager Trick</h2>
+            </div>
+            <div class="section-text">
+                <p>Here's the secret everyone in IT uses but rarely explains clearly: you don't remember your passwords. A program remembers them for you.</p>
+                <p>A password manager is an app that stores all your passwords safely, fills them in for you when you log in, and generates strong new ones when you need them. You only ever have to remember one password (the one for the manager itself). That one should be very strong and never used anywhere else.</p>
+
+                <div class="pullquote">You remember one good password. The manager remembers everything else.</div>
+
+                <p><strong>Good free options:</strong></p>
+                <p><strong>Bitwarden.</strong> Free, well-regarded, works on everything. Probably the easiest start.</p>
+                <p><strong>Built into your browser.</strong> Chrome, Safari, Firefox and Edge all have built-in password savers. Not quite as strong as a dedicated manager, but miles better than reusing passwords.</p>
+                <p><strong>Built into your phone.</strong> iPhones (Keychain) and Androids (Google Password Manager) both offer to save passwords. Again, not perfect, but a huge improvement over typing the same password into 30 sites.</p>
+
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>The notebook method is OK, with caution</h4>
+                        <p>Writing your passwords in a little notebook and keeping it at home is safer than reusing passwords, and way better than nothing. The risk is different, someone in your home, not someone on the internet. If that works for you, use it. Just don't write the name of the site right next to the password, use a hint only you'd understand.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="two-factor">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M11,7H15V9H11V11H13A2,2 0 0,1 15,13V15A2,2 0 0,1 13,17H9V15H13V13H11A2,2 0 0,1 9,11V9A2,2 0 0,1 11,7M16,3H8A2,2 0 0,0 6,5V19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V5A2,2 0 0,0 16,3Z"/></svg></div>
+                <h2 class="section-title">Two-Factor Authentication</h2>
+            </div>
+            <div class="section-text">
+                <p>Two-factor authentication, or "2FA", is a second lock on your most important accounts. Even if someone steals your password, they can't get in without the second factor, which is usually a code sent to your phone or generated by an app.</p>
+                <p>You've probably already used it without knowing the name. When your bank texts you a code to confirm a payment, that's two-factor. The password is the first factor, the code is the second.</p>
+                <p class="pullquote">Passwords alone are like a front door with one lock. 2FA is the deadbolt.</p>
+                <p><strong>Accounts that really need 2FA turned on:</strong></p>
+                <p>Your primary email address. This is the master key. If someone gets into your email, they can reset the passwords to everything else.</p>
+                <p>MyGov.</p>
+                <p>Your bank (usually on by default now).</p>
+                <p>Facebook, Instagram, and any social media where losing access would hurt.</p>
+                <p>Your Apple ID or Google account (these control your phone).</p>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Text codes are OK, authenticator apps are better</h4>
+                        <p>The code texted to your phone (SMS 2FA) is the most common kind and far better than nothing. An "authenticator app" (Google Authenticator, Microsoft Authenticator, or 1Password's built-in one) is a step safer because it can't be intercepted by someone switching your SIM. Start with SMS if that's what the site offers, upgrade to an app when you're ready.</p>
+                    </div>
+                </div>
+
+                <p><strong>Backup codes.</strong> When you turn 2FA on, the site usually offers you a set of backup codes in case you lose your phone. Save them. Print them out, or save them in your password manager. Otherwise if your phone is lost or stolen, you're locked out of your own accounts.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="ai-sharing">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M17.5,12A2.5,2.5 0 0,1 20,14.5A2.5,2.5 0 0,1 17.5,17A2.5,2.5 0 0,1 15,14.5A2.5,2.5 0 0,1 17.5,12M6.5,12A2.5,2.5 0 0,1 9,14.5A2.5,2.5 0 0,1 6.5,17A2.5,2.5 0 0,1 4,14.5A2.5,2.5 0 0,1 6.5,12M12,3A2.5,2.5 0 0,1 14.5,5.5A2.5,2.5 0 0,1 12,8A2.5,2.5 0 0,1 9.5,5.5A2.5,2.5 0 0,1 12,3Z"/></svg></div>
+                <h2 class="section-title">What to Share With AI, and What Not To</h2>
+            </div>
+            <div class="section-text">
+                <p>AI chatbots are useful, and most of what you'd type in is completely fine. But they're not a private diary and they're not your bank. A quick rule of thumb keeps you out of trouble.</p>
+                <p class="pullquote">Don't paste anything into a free AI tool that you wouldn't want a stranger to read.</p>
+
+                <div class="dos-donts">
+                    <div class="do">
+                        <h5>Fine to share</h5>
+                        <p>Your first name, your general location (town or state), your age, your job type.</p>
+                        <p>Documents with your name and address but not your sensitive numbers.</p>
+                        <p>A copy of a letter where you've blacked out the account numbers.</p>
+                        <p>Photos you'd happily post on Facebook.</p>
+                        <p>Opinions, preferences, plans, ideas.</p>
+                    </div>
+                    <div class="dont">
+                        <h5>Don't share</h5>
+                        <p>Tax file number, Medicare number, driver's licence or passport details.</p>
+                        <p>Full bank account numbers, credit card numbers, the CVV on the back.</p>
+                        <p>Passwords to any account.</p>
+                        <p>Confidential work documents if the tool isn't one your workplace approves.</p>
+                        <p>Other people's personal details they haven't agreed to share.</p>
+                    </div>
+                </div>
+
+                <p><strong>Why.</strong> Free AI tools may use what you type to improve their model, meaning a future version of the AI could have seen it. Paid and enterprise versions usually don't do this, but the safe default is to assume anything you type could be read by a human reviewer, stored indefinitely, or show up somewhere you don't expect.</p>
+                <p><strong>The workaround that always works.</strong> Blank out the sensitive bits before pasting. Instead of pasting a bill with your account number, type "[account number]" where the number was. The AI still understands the letter, you stay safe.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="privacy-settings">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,15C12.81,15 13.5,14.7 14.11,14.11C14.7,13.5 15,12.81 15,12C15,11.19 14.7,10.5 14.11,9.89C13.5,9.3 12.81,9 12,9C11.19,9 10.5,9.3 9.89,9.89C9.3,10.5 9,11.19 9,12C9,12.81 9.3,13.5 9.89,14.11C10.5,14.7 11.19,15 12,15M12,2L3,7V10C3,15.5 6.84,20.74 12,22C17.16,20.74 21,15.5 21,10V7L12,2Z"/></svg></div>
+                <h2 class="section-title">Privacy Settings That Actually Matter</h2>
+            </div>
+            <div class="section-text">
+                <p>You could spend a full day tweaking privacy settings on every app. Here are the five that return the most benefit for the time.</p>
+                <div class="checklist-box">
+                    <h4>The five quick wins</h4>
+                    <p><strong>Your Facebook profile privacy.</strong> Set who can see your posts to "Friends" not "Public" by default. Set who can send you friend requests to "Friends of friends".</p>
+                    <p><strong>Your Google account.</strong> Visit myaccount.google.com once a year. Check which apps have access to your data, remove any you no longer use.</p>
+                    <p><strong>Your phone's app permissions.</strong> On both iPhone and Android, you can see which apps have access to your location, microphone, camera and contacts. Turn off any that don't genuinely need it.</p>
+                    <p><strong>Location on photos.</strong> Modern phones tag every photo with the exact GPS location it was taken. Turn this off if you share photos online, or at least know it's happening.</p>
+                    <p><strong>Two-factor on the big three.</strong> Primary email, MyGov, main bank. If you do nothing else from this session, do this.</p>
+                </div>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Ask the AI for a walkthrough</h4>
+                        <p>You don't need to remember where each setting is. You can literally ask an AI: "Can you walk me through turning on two-factor authentication for my Gmail account, one step at a time?" It'll take you through it. Same for any of the settings above.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="try-it">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.59,7.58L10,14.17L7.41,11.59L6,13L10,17L18,9"/></svg></div>
+                <h2 class="section-title">Try It Yourself</h2>
+            </div>
+            <div class="section-text">
+                <div class="activity-box">
+                    <span class="label">Activity, 15 minutes</span>
+                    <h4>Do one thing from this session before you leave the room.</h4>
+                    <p><strong>Option 1.</strong> Check whether your email address has been in a data breach. Go to <a href="https://haveibeenpwned.com/" target="_blank">haveibeenpwned.com</a> and paste in your email. If it's been in a breach (it probably has), change that password today, starting with any site where you were reusing it.</p>
+                    <p><strong>Option 2.</strong> Turn on two-factor authentication for your primary email account. Ask an AI to walk you through it if you need help.</p>
+                    <p><strong>Option 3.</strong> Install Bitwarden (free) on your phone and save five passwords into it. Not all at once, just start.</p>
+                    <p><strong>Option 4.</strong> Go into your phone settings and check which apps have access to your location. Turn it off for anything that doesn't genuinely need it.</p>
+                    <p style="margin-top:10px"><strong>One is enough.</strong> You don't need to fix everything today. One new habit, done properly, is worth more than a long list you'll never do.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, AI &amp; Online Cyber Safety Skills, Session 3</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

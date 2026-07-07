@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 5, Excel, Structured Data &amp; Useful Formulas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--red:#b91c1c;--red-soft:rgba(185,28,28,0.06);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.formula-card):not(.formula-card *):not(.data-table):not(.data-table *):not(.checklist-box):not(.checklist-box *):not(.compare-two):not(.compare-two *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .formula-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;padding:18px 20px!important;margin:14px 0!important}
+        .formula-card h5{font-family:'JetBrains Mono',monospace!important;font-size:1rem!important;color:var(--navy-900)!important;margin-bottom:8px!important;font-weight:500!important}
+        .formula-card .what{font-size:0.9rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin-bottom:8px!important}
+        .formula-card .example{font-family:'JetBrains Mono',monospace!important;font-size:0.85rem!important;background:var(--white)!important;padding:10px 12px!important;border:1px solid rgba(10,22,40,0.1)!important;color:var(--navy-900)!important;margin:6px 0!important;white-space:pre-wrap!important}
+        .formula-card .note{font-size:0.82rem!important;color:var(--navy-400)!important;font-style:italic!important;margin-top:6px!important;line-height:1.5!important}
+        .data-table{width:100%!important;border-collapse:collapse!important;margin:14px 0!important;font-size:0.88rem!important;background:var(--white)!important}
+        .data-table th,.data-table td{text-align:left!important;padding:8px 12px!important;border:1px solid rgba(10,22,40,0.1)!important;color:var(--navy-600)!important}
+        .data-table th{background:var(--navy-900)!important;color:var(--white)!important;font-weight:500!important;font-size:0.78rem!important;text-transform:uppercase!important;letter-spacing:0.06em!important}
+        .data-table tr:nth-child(even) td{background:rgba(10,22,40,0.02)!important}
+        .data-table td strong{color:var(--navy-900)!important;font-weight:600!important}
+        .compare-two{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;margin:18px 0!important}
+        .compare-two .col{padding:18px 20px!important;border:1px solid rgba(10,22,40,0.08)!important;border-top:3px solid var(--accent)!important;background:rgba(10,22,40,0.02)!important}
+        .compare-two .col.good{border-top-color:var(--green)!important;background:var(--green-soft)!important}
+        .compare-two .col.bad{border-top-color:var(--red)!important;background:var(--red-soft)!important}
+        .compare-two .col h5{font-family:'Fraunces',serif!important;font-size:1.05rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .compare-two .col p{font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin-bottom:8px!important}
+        .compare-two .col p:last-child{margin-bottom:0!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+            .compare-two{grid-template-columns:1fr!important}
+            .data-table{font-size:0.8rem!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#clean-data-wins" class="active">Why Clean Data Wins</a></li>
+            <li><a href="#good-vs-bad">Good Sheets vs Bad Sheets</a></li>
+            <li><a href="#tables">Tables, Not Just Ranges</a></li>
+            <li><a href="#named-ranges">Named Ranges</a></li>
+            <li><a href="#everyday-formulas">The Everyday Formulas</a></li>
+            <li><a href="#lookups">XLOOKUP, the One to Learn</a></li>
+            <li><a href="#conditional">Conditional Formatting and Filters</a></li>
+            <li><a href="#charts">Charts That Communicate</a></li>
+            <li><a href="#sample-dataset">A Sample Dataset to Work From</a></li>
+        </ul>
+        <div class="nav-section-label">Quick Links</div>
+        <ul>
+            <li><a href="https://www.office.com/launch/excel" target="_blank">Excel on the Web</a></li>
+            <li><a href="https://support.microsoft.com/en-au/excel" target="_blank">Excel Help</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 5, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>Excel, Structured Data &amp; Useful Formulas</h1>
+            <p class="header-subtitle">How to set up a spreadsheet that's actually useful. Tables, named ranges, the handful of formulas you'll use every week, and why the shape of your data decides what you can do with it. Also the groundwork for Copilot to make sense of your sheet in Day 2.</p>
+        </div>
+
+        <section class="content-section" id="clean-data-wins">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,3C7.58,3 4,4.79 4,7C4,9.21 7.58,11 12,11C16.42,11 20,9.21 20,7C20,4.79 16.42,3 12,3M4,9V12C4,14.21 7.58,16 12,16C16.42,16 20,14.21 20,12V9C20,11.21 16.42,13 12,13C7.58,13 4,11.21 4,9M4,14V17C4,19.21 7.58,21 12,21C16.42,21 20,19.21 20,17V14C20,16.21 16.42,18 12,18C7.58,18 4,16.21 4,14Z"/></svg></div>
+                <h2 class="section-title">Why Clean Data Wins</h2>
+            </div>
+            <div class="section-text">
+                <p>Excel is the most abused program in any office. People use it as a document, a database, a presentation, a calculator, and a to-do list. Often all at once, in the same file. That's why half the spreadsheets in any organisation are fighting the person trying to use them.</p>
+                <p class="pullquote">Excel rewards structure ruthlessly. Give it structured data, you get superpowers. Give it a mess, you get a mess back.</p>
+                <p>This session isn't about advanced Excel. It's about the handful of habits that turn a messy sheet into a sheet formulas, filters, charts and (in Day 2) Copilot can work with. Once the foundation is right, everything else gets easier.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="good-vs-bad">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></div>
+                <h2 class="section-title">Good Sheets vs Bad Sheets</h2>
+            </div>
+            <div class="section-text">
+                <p>Most of what makes a spreadsheet usable comes down to its shape. A "good" sheet has one row per record, one column per attribute, no merged cells, no blank rows in the middle, no titles taking up the top ten rows.</p>
+
+                <div class="compare-two">
+                    <div class="col good">
+                        <h5>A good shape</h5>
+                        <p>Row 1 is a single header row (column names).</p>
+                        <p>Row 2 onwards is data, one record per row.</p>
+                        <p>One fact per column. Dates in a Date column, names in a Name column.</p>
+                        <p>No merged cells. No blank rows.</p>
+                        <p>Numbers are numbers. Dates are dates. Not text that looks like a number.</p>
+                        <p>Anything "about" the sheet (notes, title, instructions) lives on a separate tab.</p>
+                    </div>
+                    <div class="col bad">
+                        <h5>A bad shape</h5>
+                        <p>The "title" of the sheet is merged across row 1 through row 5.</p>
+                        <p>Multiple header rows, or headers repeated halfway down.</p>
+                        <p>Data broken up by blank rows as visual separators.</p>
+                        <p>One column mixes types ("$500 or TBC").</p>
+                        <p>Dates stored as text (15/4/2026 as a string).</p>
+                        <p>Totals in the middle of the data, not at the bottom or on a separate sheet.</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:18px"><strong>The test.</strong> Can you sort and filter the data without breaking anything? If yes, the shape is probably good. If the whole sheet falls apart the moment you sort by one column, the shape is wrong.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="tables">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M5,4H19A2,2 0 0,1 21,6V18A2,2 0 0,1 19,20H5A2,2 0 0,1 3,18V6A2,2 0 0,1 5,4M5,8V12H11V8H5M13,8V12H19V8H13M5,14V18H11V14H5M13,14V18H19V14H13Z"/></svg></div>
+                <h2 class="section-title">Tables, Not Just Ranges</h2>
+            </div>
+            <div class="section-text">
+                <p>Excel has a feature called <strong>Tables</strong> that's one of the most under-used things in the product. Select your data, Insert, Table (or Ctrl+T), and Excel converts your range into a proper Table. Suddenly you get:</p>
+                <p><strong>Filter dropdowns on every column,</strong> automatically.</p>
+                <p><strong>Auto-expand.</strong> Add a row at the bottom, it's in the Table. Add a column to the right, it's in the Table.</p>
+                <p><strong>Formulas that use column names,</strong> like <code>=SUM(Sales[Amount])</code> instead of <code>=SUM(C2:C847)</code>. Easier to read, and it adjusts when the Table grows.</p>
+                <p><strong>Banded rows</strong> and a cleaner look, for free.</p>
+                <p><strong>A name</strong> so you can refer to the whole table in formulas across sheets.</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Name the table sensibly</h4>
+                        <p>When you create a Table, Excel calls it "Table1". Click into it, Table Design ribbon, rename to something real (Sales, Registrations, Incidents). Formulas then read as <code>Sales[Amount]</code>, which is much easier than decoding what Table3 refers to six months later.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="named-ranges">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M17.63,5.84C17.27,5.33 16.67,5 16,5L5,5.01C3.9,5.01 3,5.9 3,7V17C3,18.1 3.9,18.99 5,18.99L16,19C16.67,19 17.27,18.67 17.63,18.16L22,12L17.63,5.84Z"/></svg></div>
+                <h2 class="section-title">Named Ranges</h2>
+            </div>
+            <div class="section-text">
+                <p>Similar idea, different use case. A <strong>named range</strong> is a name you give to a specific cell or range of cells. Then you can refer to it by name instead of by cell reference.</p>
+                <p>Select a cell or range, click in the Name Box (top-left, where the cell reference shows), type a name, Enter. Done. Now you can use that name in any formula: <code>=A2*TaxRate</code> is friendlier than <code>=A2*Sheet2!$B$4</code>.</p>
+                <p>Good for: tax rates, conversion factors, thresholds, anything you might change later and have referenced in 20 places. Change the named range's value, every formula updates.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="everyday-formulas">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M10.59,13.41C11,13.8 11,14.44 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83L4.83,10.5C4.44,10.11 4.44,9.47 4.83,9.08L9.17,4.75C9.56,4.36 10.2,4.36 10.59,4.75C11,5.14 11,5.77 10.59,6.17L7.67,9H20V11H7.67L10.59,13.41Z" transform="scale(-1 1) translate(-24 0)"/></svg></div>
+                <h2 class="section-title">The Everyday Formulas</h2>
+            </div>
+            <div class="section-text">
+                <p>You don't need to know 200 Excel functions. You need maybe 10, cold. These are the ones.</p>
+
+                <div class="formula-card">
+                    <h5>SUM, AVERAGE, COUNT, COUNTA, MIN, MAX</h5>
+                    <p class="what">The basics. SUM adds, AVERAGE averages, COUNT counts numbers, COUNTA counts non-empty cells, MIN and MAX find the smallest and largest.</p>
+                    <div class="example">=SUM(Sales[Amount])
+=AVERAGE(Ages)
+=COUNTA(Sales[Customer])</div>
+                </div>
+
+                <div class="formula-card">
+                    <h5>IF</h5>
+                    <p class="what">Returns one thing if a condition is true, another if not. The building block of conditional logic.</p>
+                    <div class="example">=IF(B2&gt;1000, "Review", "OK")</div>
+                    <p class="note">Reads as: if B2 is greater than 1000, say "Review", otherwise say "OK".</p>
+                </div>
+
+                <div class="formula-card">
+                    <h5>SUMIFS, COUNTIFS, AVERAGEIFS</h5>
+                    <p class="what">Sum / count / average, but only the rows that match one or more conditions. The workhorses of any reporting sheet.</p>
+                    <div class="example">=SUMIFS(Sales[Amount], Sales[Region], "NT")
+=COUNTIFS(Sales[Region], "NT", Sales[Month], "April")</div>
+                    <p class="note">Reads as: sum the Amount column, only where Region is "NT".</p>
+                </div>
+
+                <div class="formula-card">
+                    <h5>TEXTJOIN, CONCAT</h5>
+                    <p class="what">Glue multiple pieces of text together. TEXTJOIN is the modern version, with a separator.</p>
+                    <div class="example">=TEXTJOIN(", ", TRUE, A2:A10)</div>
+                    <p class="note">Joins everything in A2 to A10 with a comma between, ignoring blanks.</p>
+                </div>
+
+                <div class="formula-card">
+                    <h5>LEFT, RIGHT, MID, LEN, TRIM</h5>
+                    <p class="what">For pulling bits out of text. LEFT takes the first N characters, RIGHT the last N, MID a chunk in the middle, LEN gives the length, TRIM strips extra spaces.</p>
+                    <div class="example">=LEFT(A2, 3)
+=TRIM(A2)</div>
+                </div>
+
+                <div class="formula-card">
+                    <h5>TODAY, NOW, DATEDIF</h5>
+                    <p class="what">Date arithmetic. TODAY() gives today's date. DATEDIF calculates the difference between two dates in years, months, or days.</p>
+                    <div class="example">=TODAY()
+=DATEDIF(StartDate, TODAY(), "d")</div>
+                    <p class="note">Second one gives the number of days between StartDate and today.</p>
+                </div>
+
+                <div class="formula-card">
+                    <h5>IFERROR</h5>
+                    <p class="what">Wrap any formula in IFERROR to return a clean fallback if it fails. Stops #N/A and #DIV/0 showing all over the sheet.</p>
+                    <div class="example">=IFERROR(A2/B2, "")</div>
+                </div>
+
+                <p style="margin-top:16px">Those are the ones. Combine them and you can do 80 percent of what anyone ever needs in Excel. The one worth its own section is XLOOKUP.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="lookups">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg></div>
+                <h2 class="section-title">XLOOKUP, the One to Learn</h2>
+            </div>
+            <div class="section-text">
+                <p>If you've ever been scared of VLOOKUP, good news, it's been retired by Microsoft's own newer function, XLOOKUP. Same idea, better in every way.</p>
+                <p><strong>What it does.</strong> Looks up a value in one column, returns a related value from another column. "Find this customer's ID, give me their suburb."</p>
+                <div class="formula-card">
+                    <h5>XLOOKUP syntax</h5>
+                    <p class="what">Three required arguments. Two optional.</p>
+                    <div class="example">=XLOOKUP(what_to_find, where_to_look, what_to_return)</div>
+                    <p class="note">Concrete example: =XLOOKUP("NT-100", Customers[ID], Customers[Suburb])</p>
+                </div>
+                <p>Find "NT-100" in the Customers table's ID column, return the Suburb from the same row. Clean. Readable. Works left to right, right to left, up, or down. Returns "#N/A" if not found, or whatever you tell it to with the optional fourth argument:</p>
+                <div class="formula-card">
+                    <h5>XLOOKUP with a fallback</h5>
+                    <div class="example">=XLOOKUP("NT-100", Customers[ID], Customers[Suburb], "Not found")</div>
+                </div>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>You'll still see VLOOKUP in old sheets</h4>
+                        <p>Plenty of inherited spreadsheets use VLOOKUP, INDEX/MATCH, or HLOOKUP. They still work, you don't need to rewrite them. For anything new, XLOOKUP is simpler and more forgiving. Learn it once.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="conditional">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12H12"/></svg></div>
+                <h2 class="section-title">Conditional Formatting and Filters</h2>
+            </div>
+            <div class="section-text">
+                <p>Two features that turn a wall of numbers into something your eye can actually scan.</p>
+                <p><strong>Filters.</strong> If you're using a Table (see above), filters are already on. Otherwise, select your data and Home, Sort &amp; Filter, Filter. The arrow in each column header lets you filter, sort, and search. The most-used feature in any reporting sheet.</p>
+                <p><strong>Conditional formatting.</strong> Home, Conditional Formatting. Highlight cells above a threshold, colour-scale a column from low to high, put data bars in cells to show relative size. Three uses that pay for themselves:</p>
+                <p>Highlight cells greater than, less than, or between given values. "Any amount over $10,000 in red."</p>
+                <p>Top/bottom rules. "Highlight the top 10 percent."</p>
+                <p>Colour scales. For a column of numbers, green at the bottom, red at the top (or vice versa). Immediate visual sense of the distribution.</p>
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Don't over-format</h4>
+                        <p>Two or three conditional formats on the columns that matter is useful. Twelve different colour rules make the sheet harder to read, not easier. Less is more.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="charts">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z"/></svg></div>
+                <h2 class="section-title">Charts That Communicate</h2>
+            </div>
+            <div class="section-text">
+                <p>Excel will let you make any chart you want. Most of them you shouldn't. Four chart types do about 95 percent of real work:</p>
+                <p><strong>Bar or column,</strong> for comparing amounts across categories. "Visits per region."</p>
+                <p><strong>Line,</strong> for something changing over time. "Monthly visits over the year."</p>
+                <p><strong>Stacked bar or column,</strong> for breaking a total into parts. "Visits by region, with each region split by program."</p>
+                <p><strong>Scatter,</strong> for relationships between two numbers. Less common, but the right one when you need it.</p>
+                <p class="pullquote">3D, pie with 14 slices, doughnut, radar, and "stock" charts, almost always wrong. Stick to the boring ones.</p>
+                <p><strong>Rules that make charts clearer:</strong></p>
+                <p>One idea per chart. If you're comparing three things, don't also add a fourth dimension with colour.</p>
+                <p>Label axes. "Amount ($)" not just "Amount".</p>
+                <p>Start y-axis at zero for bar charts. Zoomed-in axes exaggerate differences misleadingly.</p>
+                <p>Title says the point, not the subject. "Visits up 30 percent in Q2" tells the story. "Visits by quarter" describes the data.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="sample-dataset">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19M17,17H7V7H17"/></svg></div>
+                <h2 class="section-title">A Sample Dataset to Work From</h2>
+            </div>
+            <div class="section-text">
+                <p>To make the ideas in this session concrete, here's a small sample dataset, a fictional regional program register. A realistic shape, small enough to read, structured the way a "good" sheet should be.</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Program ID</th><th>Program Name</th><th>Region</th><th>Start Date</th><th>Participants</th><th>Budget</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>PG-001</strong></td><td>Digital Literacy, Evenings</td><td>Barkly</td><td>2026-03-04</td><td>12</td><td>$8,400</td><td>Active</td></tr>
+                        <tr><td><strong>PG-002</strong></td><td>Youth Skills Workshop</td><td>Top End</td><td>2026-02-18</td><td>18</td><td>$12,000</td><td>Active</td></tr>
+                        <tr><td><strong>PG-003</strong></td><td>Elder Digital Outreach</td><td>Central</td><td>2026-01-20</td><td>9</td><td>$5,600</td><td>Completed</td></tr>
+                        <tr><td><strong>PG-004</strong></td><td>Cyber Safety Awareness</td><td>Barkly</td><td>2026-04-02</td><td>15</td><td>$7,200</td><td>Planning</td></tr>
+                        <tr><td><strong>PG-005</strong></td><td>Remote Worker Training</td><td>Big Rivers</td><td>2026-03-11</td><td>11</td><td>$9,800</td><td>Active</td></tr>
+                        <tr><td><strong>PG-006</strong></td><td>Community IT Support</td><td>Central</td><td>2026-02-05</td><td>22</td><td>$14,500</td><td>Active</td></tr>
+                        <tr><td><strong>PG-007</strong></td><td>Basic Excel for Admin</td><td>Top End</td><td>2026-04-22</td><td>14</td><td>$6,400</td><td>Planning</td></tr>
+                        <tr><td><strong>PG-008</strong></td><td>Women in Digital Skills</td><td>Barkly</td><td>2026-03-18</td><td>10</td><td>$7,900</td><td>Active</td></tr>
+                    </tbody>
+                </table>
+
+                <p><strong>What this dataset demonstrates:</strong></p>
+                <p>One row per record (one program). One column per attribute.</p>
+                <p>Dates in ISO format (YYYY-MM-DD) so they sort correctly and Excel treats them as real dates.</p>
+                <p>Numbers as numbers, not text.</p>
+                <p>A clear status column with a limited set of values (Active, Completed, Planning), which makes filtering and counting easy.</p>
+                <p>Regional names drawn from NT context, so examples later in the day can use realistic data.</p>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Questions you could answer with formulas on a set like this</h4>
+                        <p>Total budget across all Active programs: <code>=SUMIFS(Budget, Status, "Active")</code></p>
+                        <p>Count of programs in the Barkly region: <code>=COUNTIFS(Region, "Barkly")</code></p>
+                        <p>Average participants per program: <code>=AVERAGE(Participants)</code></p>
+                        <p>Look up a specific program's status: <code>=XLOOKUP("PG-005", ID, Status)</code></p>
+                    </div>
+                </div>
+
+                <p>When we come back to Excel in Session 8 (Copilot in Word, Excel &amp; PowerPoint), this is roughly the shape of sheet Copilot can actually do useful work on. Structured data in, useful answers out.</p>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 5</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

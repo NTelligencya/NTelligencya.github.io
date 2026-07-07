@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just Ask It, The Mindset Shift for Working with AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.exchange):not(.exchange *):not(.you-label):not(.ai-label){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0!important;color:var(--navy-600)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.35rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:22px 26px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:20px 0!important;font-weight:400!important}
+        .exchange{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-radius:0!important;padding:18px 20px!important;margin:14px 0!important}
+        .you-label,.ai-label{font-size:0.7rem!important;font-weight:600!important;text-transform:uppercase!important;letter-spacing:0.12em!important;display:block!important;margin-bottom:4px!important}
+        .you-label{color:var(--accent)!important}
+        .ai-label{color:var(--navy-900)!important}
+        .exchange .you-msg{font-family:'JetBrains Mono',monospace!important;font-size:0.9rem!important;color:var(--navy-900)!important;background:var(--white)!important;padding:12px 14px!important;border:1px solid rgba(10,22,40,0.08)!important;margin-bottom:14px!important;white-space:pre-wrap!important;font-weight:400!important}
+        .exchange .ai-msg{font-size:0.95rem!important;line-height:1.7!important;color:var(--navy-600)!important;padding:4px 2px!important}
+        .exchange .ai-msg p{margin-bottom:10px!important;color:var(--navy-600)!important}
+        .exchange .ai-msg p:last-child{margin-bottom:0!important}
+        .checklist{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:22px!important;position:relative!important}
+        .checklist p::before{content:'?';position:absolute;left:0;top:0;color:var(--accent);font-weight:600}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE AI Training" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#big-idea" class="active">The Big Idea</a></li>
+            <li><a href="#mindset-shift">The Mindset Shift</a></li>
+            <li><a href="#why-it-works">Why This Works</a></li>
+            <li><a href="#examples">Worked Examples</a></li>
+            <li><a href="#starter-questions">Four Starter Questions</a></li>
+            <li><a href="#take-home">The Take-Home</a></li>
+        </ul>
+        <div class="nav-section-label">Try It Now</div>
+        <ul>
+            <li><a href="https://claude.ai/" target="_blank">Claude</a></li>
+            <li><a href="https://chatgpt.com/" target="_blank">ChatGPT</a></li>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+            <li><a href="https://gemini.google.com/app" target="_blank">Google Gemini</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Charles Darwin University TAFE</span>
+            <h1>Just Ask It</h1>
+            <p class="header-subtitle">If you want to know whether an AI can do something, the fastest way to find out is to ask the AI itself. This page explains why that works, and how to get comfortable doing it.</p>
+        </div>
+
+        <section class="content-section" id="big-idea">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,17H11V11H13M13,9H11V7H13V9Z"/></svg></div>
+                <h2 class="section-title">The Big Idea</h2>
+            </div>
+            <div class="section-text">
+                <p>At almost every workshop, someone catches me during the tea break and asks, "Can ChatGPT do this?" or "Does Copilot know about that?" My answer is always the same.</p>
+                <p class="pullquote">Just ask it.</p>
+                <p>AI chat tools are really good at talking about themselves. They can tell you what they can do, what they can't, what they need from you, and when they're about to make something up. But you have to ask. It doesn't volunteer.</p>
+                <p>This is a small habit that changes everything about how useful AI becomes to you. Once you start asking the AI what it can do, you stop waiting for a teacher or a techy friend to tell you.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="mindset-shift">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M7.11,8.53L5.7,7.11C4.8,8.27 4.24,9.61 4.07,11H6.06C6.2,10.11 6.56,9.27 7.11,8.53M6.06,13H4.07C4.24,14.39 4.8,15.73 5.7,16.89L7.11,15.47C6.56,14.73 6.2,13.89 6.06,13M7.11,18.3C8.27,19.2 9.61,19.76 11,19.93V17.94C10.11,17.8 9.27,17.44 8.53,16.89L7.11,18.3M13,17.94V19.93C14.39,19.76 15.73,19.2 16.89,18.3L15.47,16.89C14.73,17.44 13.89,17.8 13,17.94M19.93,13H17.94C17.8,13.89 17.44,14.73 16.89,15.47L18.3,16.89C19.2,15.73 19.76,14.39 19.93,13M17.94,11H19.93C19.76,9.61 19.2,8.27 18.3,7.11L16.89,8.53C17.44,9.27 17.8,10.11 17.94,11M16.89,5.7C15.73,4.8 14.39,4.24 13,4.07V6.06C13.89,6.2 14.73,6.56 15.47,7.11L16.89,5.7M11,4.07C9.61,4.24 8.27,4.8 7.11,5.7L8.53,7.11C9.27,6.56 10.11,6.2 11,6.06V4.07Z"/></svg></div>
+                <h2 class="section-title">The Mindset Shift</h2>
+            </div>
+            <div class="section-text">
+                <p>Most of us learned to use the internet through Google. You type a few keywords, you get a page of links, you click the best one. That's a search-engine mindset. It's about finding.</p>
+                <p>An AI chat tool is different. You're not searching, you're instructing a helper. It works more like explaining a job to a new assistant than typing into a search bar. The more context you give, the better it does. You can describe your situation in whole sentences. You can paste in a document. You can ask a follow-up. You can say, "no, do it differently."</p>
+                <p class="pullquote">Stop searching. Start guiding.</p>
+                <p>The shift sounds small. In practice it changes what you can do on your own, without waiting for help.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="why-it-works">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M9,20H7V10H9V20M13,20H11V4H13V20M17,20H15V14H17V20Z"/></svg></div>
+                <h2 class="section-title">Why This Works</h2>
+            </div>
+            <div class="section-text">
+                <p>AI chat tools have read an enormous amount of text, including their own documentation, help pages, and user guides. They know, in a fairly reliable way:</p>
+                <p><strong>What they can do.</strong> Writing, summarising, translating, explaining, tutoring, coding, image understanding, and more. If you ask, they'll list it.</p>
+                <p><strong>What they can't do.</strong> They can't access your real-time location. They can't read your email unless you paste it in. They usually can't open a link unless you have a special tool turned on. They'll tell you.</p>
+                <p><strong>What they need from you.</strong> If you ask "can you help me with my rates notice," a good AI will ask to see the notice, or ask what exactly you want to know.</p>
+                <p><strong>Where they're likely to get things wrong.</strong> Ask "how confident are you in that answer" and most AIs will tell you honestly.</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>They're not perfect self-reporters</h4>
+                        <p>AI tools are mostly honest about themselves but not always correct. They can be out of date about their own new features. If an AI says "I can't do X," and you read somewhere else that it now can, try it anyway. Don't take the AI's word as final, but do take it seriously.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="examples">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M6,9H18V11H6M14,14H6V12H14M18,8H6V6H18"/></svg></div>
+                <h2 class="section-title">Worked Examples</h2>
+            </div>
+            <div class="section-text">
+                <p>Here are six things people have asked me whether an AI can do. In each case, the answer is the same: ask the AI. These are real examples of what the AI is likely to say back.</p>
+
+                <div class="exchange">
+                    <span class="you-label">You ask</span>
+                    <div class="you-msg">Can you help me plan a week of meals on a tight budget?</div>
+                    <span class="ai-label">Claude says</span>
+                    <div class="ai-msg">
+                        <p>Yes, I can help with that. To do a good job, it would help to know a few things: how many people are you feeding, roughly what's your budget for the week, are there any foods you or your family don't eat, and do you have a freezer and an oven or just a cooktop?</p>
+                        <p>If you don't want to answer all that, I can also just start with a sensible budget plan for two adults cooking with basic equipment, and you can tell me what to change.</p>
+                    </div>
+                </div>
+
+                <div class="exchange">
+                    <span class="you-label">You ask</span>
+                    <div class="you-msg">Can you read this PDF and tell me what it means for me? (attaches a letter)</div>
+                    <span class="ai-label">Claude says</span>
+                    <div class="ai-msg">
+                        <p>Yes. I've read the letter. It's a notice from your energy retailer telling you that your concession has not been applied to your account for the last two bills. It says you need to contact them within 30 days to have the concession backdated, otherwise you'll only get it from the date you call.</p>
+                        <p>In plain terms: you're probably owed money back. The quickest action is to phone the number at the top of the letter and ask them to backdate the concession. I can draft what you could say on the call if you want.</p>
+                    </div>
+                </div>
+
+                <div class="exchange">
+                    <span class="you-label">You ask</span>
+                    <div class="you-msg">Do you know how to fix a Wi-Fi problem?</div>
+                    <span class="ai-label">Claude says</span>
+                    <div class="ai-msg">
+                        <p>I can usually help you troubleshoot it, yes. I can't actually see your network, so I'll need to ask you some questions as we go. To start: what exactly is happening? Is the Wi-Fi showing up as connected but nothing loads, or can you not see your network at all? And is this on one device or all of them?</p>
+                        <p>Once you tell me that, I can walk you through the most likely causes in order, from simplest to most involved.</p>
+                    </div>
+                </div>
+
+                <div class="exchange">
+                    <span class="you-label">You ask</span>
+                    <div class="you-msg">Can you help me practise for a job interview?</div>
+                    <span class="ai-label">Claude says</span>
+                    <div class="ai-msg">
+                        <p>Absolutely, this is something I'm genuinely good at. Tell me what job you're going for, and paste the job ad if you have it. I'll ask you questions the way a real interviewer would, one at a time, and give you feedback on each answer before we go to the next.</p>
+                        <p>We can also practise specific things you're worried about, like what to say about a gap in your work history, or how to answer "tell me about yourself" without rambling.</p>
+                    </div>
+                </div>
+
+                <div class="exchange">
+                    <span class="you-label">You ask</span>
+                    <div class="you-msg">Are you good at understanding voice messages?</div>
+                    <span class="ai-label">Claude says</span>
+                    <div class="ai-msg">
+                        <p>I can listen to audio you upload to me, yes, and I can transcribe it and tell you what's in it. What I can't do is listen live while you speak, or call someone on your behalf.</p>
+                        <p>If you want to try: record the voice message, save it as a file on your phone, and attach it to a message to me. I'll write out what was said and we can go from there.</p>
+                    </div>
+                </div>
+
+                <div class="exchange">
+                    <span class="you-label">You ask</span>
+                    <div class="you-msg">Can you remember what we talked about yesterday?</div>
+                    <span class="ai-label">Claude says</span>
+                    <div class="ai-msg">
+                        <p>Good question, and the honest answer is: usually no. By default I don't carry memory between separate conversations. Each new chat starts fresh.</p>
+                        <p>Some AI tools have a memory feature you can turn on, but it's off unless you switch it on. If you want me to pick up where we left off, paste in what we covered last time and I'll work from that.</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:20px"><strong>Notice the pattern.</strong> In every case the AI does three useful things: it answers the "can you" question honestly, it tells you what it needs from you to actually help, and it offers a next step. You get those things for free just by asking.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="starter-questions">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M10,19H13V22H10V19M12,2C17.35,2.22 19.68,7.62 16.5,11.67C15.67,12.67 14.33,13.33 13.67,14.17C13,15 13,16 13,17H10C10,15.33 10,13.92 10.67,12.92C11.33,11.92 12.67,11.33 13.5,10.67C15.92,8.43 15.32,5.26 12,5A3,3 0 0,0 9,8H6A6,6 0 0,1 12,2Z"/></svg></div>
+                <h2 class="section-title">Four Starter Questions to Ask Any AI</h2>
+            </div>
+            <div class="section-text">
+                <p>Any time you pick up a new AI tool for the first time, or you're not sure what it'll do with a particular job, open with one of these. They work for Claude, ChatGPT, Copilot, Gemini, or any other chat AI.</p>
+                <div class="checklist">
+                    <h4>The four openers</h4>
+                    <p><strong>"What can you help me with?"</strong> A plain overview, in the AI's own words.</p>
+                    <p><strong>"What can't you do?"</strong> The limits, honestly stated, before you waste time.</p>
+                    <p><strong>"What do you need from me to do a good job on this?"</strong> Turns the AI into a collaborator instead of a guesser.</p>
+                    <p><strong>"How confident are you in that answer?"</strong> Catches hallucinations before they become mistakes.</p>
+                </div>
+                <p>These are not clever prompts. They're just conversation. That's the point.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="take-home">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg></div>
+                <h2 class="section-title">The Take-Home</h2>
+            </div>
+            <div class="section-text">
+                <p>You don't need a course, a manual, or a tech-savvy friend to find out whether an AI can help you with something. You need to open the app and type the question in plain English.</p>
+                <p>The AI will tell you yes, no, or "here's what I'd need to do it." That's the whole skill.</p>
+                <p class="pullquote">The AI is not an oracle you query. It's a helper you direct.</p>
+                <p>Once that clicks, digital literacy stops being a thing other people have and becomes something you can build, one conversation at a time. That's what this training is really about.</p>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, AI &amp; Online Cyber Safety Skills, Delivered under the Barkly Workforce Grant</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

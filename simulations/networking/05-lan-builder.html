@@ -133,6 +133,12 @@
             stroke: #e74c3c;
         }
 
+        .canvas-svg line.temp-line {
+            stroke: #f1c40f;
+            stroke-dasharray: 6 4;
+            pointer-events: none;
+        }
+
         .network-device {
             position: absolute;
             background: rgba(0, 0, 0, 0.7);
@@ -155,6 +161,15 @@
             box-shadow: 0 0 15px rgba(241, 196, 15, 0.5);
         }
 
+        .network-device.connect-source {
+            border-color: #f1c40f;
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.5);
+        }
+
+        body.connect-mode .network-device {
+            cursor: crosshair;
+        }
+
         .network-device .dev-icon {
             font-size: 2rem;
         }
@@ -173,21 +188,26 @@
 
         .network-device .port-dot {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             background: #27ae60;
+            border: 2px solid rgba(255, 255, 255, 0.7);
             border-radius: 50%;
             cursor: crosshair;
         }
 
+        .network-device .port-dot:hover {
+            box-shadow: 0 0 8px #27ae60;
+        }
+
         .network-device .port-dot.top {
-            top: -6px;
+            top: -7px;
             left: 50%;
             transform: translateX(-50%);
         }
 
         .network-device .port-dot.bottom {
-            bottom: -6px;
+            bottom: -7px;
             left: 50%;
             transform: translateX(-50%);
         }
@@ -307,8 +327,8 @@
     <div class="header">
         <h1>🌐 LAN Builder Simulator</h1>
         <div class="toolbar">
-            <button class="tool-btn" onclick="setTool('select')">🖱️ Select</button>
-            <button class="tool-btn" onclick="setTool('connect')">🔗 Connect</button>
+            <button class="tool-btn active" onclick="setTool('select', event)">🖱️ Select</button>
+            <button class="tool-btn" onclick="setTool('connect', event)">🔗 Connect</button>
             <button class="tool-btn" onclick="testPing()">📡 Test Ping</button>
             <button class="tool-btn" onclick="clearCanvas()">🗑️ Clear</button>
         </div>
@@ -357,6 +377,7 @@
         <div class="status-item">Devices: <span id="deviceCount">0</span></div>
         <div class="status-item">Connections: <span id="connectionCount">0</span></div>
         <div class="status-item">Tool: <span id="currentTool">select</span></div>
+        <div class="status-item" id="hintText">Drag devices onto the grid, then use Connect to cable them up</div>
     </div>
     <div class="ping-result" id="pingResult">
         <span class="close" onclick="closePing()">✕</span>
@@ -382,13 +403,26 @@
         let selectedDevice = null;
         let currentTool = 'select';
         let connectingFrom = null;
+        let tempLine = null;
 
-        function setTool(tool) {
+        function setTool(tool, e) {
             currentTool = tool;
             document.getElementById('currentTool').textContent = tool;
             document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            connectingFrom = null;
+            e.currentTarget.classList.add('active');
+            document.body.classList.toggle('connect-mode', tool === 'connect');
+            cancelConnecting();
+        }
+
+        function updateHint() {
+            const hint = document.getElementById('hintText');
+            if (currentTool === 'connect') {
+                hint.textContent = connectingFrom
+                    ? 'Now click the second device to link them (Esc cancels)'
+                    : 'Click one device, then another — or drag between the green dots';
+            } else {
+                hint.textContent = 'Drag devices onto the grid, then use Connect to cable them up';
+            }
         }
 
         function dragStart(e, type) {
@@ -428,28 +462,40 @@
             div.style.left = dev.x + 'px';
             div.style.top = dev.y + 'px';
             div.innerHTML = `
-                <div class="port-dot top" onclick="handlePort(${dev.id}, 'top', event)"></div>
+                <div class="port-dot top" onmousedown="startPortDrag(${dev.id}, event)" onclick="handlePort(${dev.id}, 'top', event)"></div>
                 <div class="dev-icon">${info.icon}</div>
                 <div class="dev-name">${dev.name}</div>
                 <div class="dev-ip">${dev.ip}</div>
-                <div class="port-dot bottom" onclick="handlePort(${dev.id}, 'bottom', event)"></div>
+                <div class="port-dot bottom" onmousedown="startPortDrag(${dev.id}, event)" onclick="handlePort(${dev.id}, 'bottom', event)"></div>
             `;
-            div.onclick = (e) => { if (!e.target.classList.contains('port-dot')) selectDevice(dev.id); };
+            div.onclick = (e) => {
+                if (e.target.classList.contains('port-dot')) return;
+                if (currentTool === 'connect') {
+                    if (!dev._moved) handleConnectClick(dev.id);
+                    dev._moved = false;
+                    return;
+                }
+                selectDevice(dev.id);
+            };
             makeDraggable(div, dev);
             document.getElementById('canvas').appendChild(div);
         }
 
         function makeDraggable(el, dev) {
-            let offsetX, offsetY, isDragging = false;
+            let offsetX, offsetY, startX, startY, isDragging = false;
             el.onmousedown = (e) => {
                 if (e.target.classList.contains('port-dot')) return;
                 isDragging = true;
+                dev._moved = false;
+                startX = e.clientX;
+                startY = e.clientY;
                 offsetX = e.offsetX;
                 offsetY = e.offsetY;
                 el.style.zIndex = 100;
             };
             document.addEventListener('mousemove', (e) => {
                 if (!isDragging) return;
+                if (Math.abs(e.clientX - startX) > 3 || Math.abs(e.clientY - startY) > 3) dev._moved = true;
                 const canvas = document.getElementById('canvas').getBoundingClientRect();
                 dev.x = e.clientX - canvas.left - offsetX;
                 dev.y = e.clientY - canvas.top - offsetY;
@@ -498,26 +544,88 @@
             devices = devices.filter(d => d.id !== id);
             connections = connections.filter(c => c.from !== id && c.to !== id);
             document.getElementById('dev-' + id).remove();
+            cancelConnecting();
             renderConnections();
             updateCounts();
-            document.getElementById('propsContent').innerHTML = '<p style="color:#666;">Select a device</p>';
+            document.getElementById('propsContent').innerHTML = '<p style="color:#666;">Select a device to configure</p>';
         }
 
         function handlePort(devId, port, e) {
             e.stopPropagation();
             if (currentTool !== 'connect') return;
-            if (!connectingFrom) {
-                connectingFrom = { id: devId, port };
-                e.target.style.background = '#f1c40f';
+            handleConnectClick(devId);
+        }
+
+        function handleConnectClick(devId) {
+            if (connectingFrom === null) {
+                connectingFrom = devId;
+                document.getElementById('dev-' + devId).classList.add('connect-source');
+                updateHint();
+            } else if (connectingFrom !== devId) {
+                addConnection(connectingFrom, devId);
+                cancelConnecting();
             } else {
-                if (connectingFrom.id !== devId) {
-                    connections.push({ from: connectingFrom.id, to: devId });
-                    renderConnections();
-                    updateCounts();
-                }
-                connectingFrom = null;
-                document.querySelectorAll('.port-dot').forEach(p => p.style.background = '');
+                cancelConnecting();
             }
+        }
+
+        function addConnection(a, b) {
+            if (a === b) return;
+            const exists = connections.some(c => (c.from === a && c.to === b) || (c.from === b && c.to === a));
+            if (exists) return;
+            connections.push({ from: a, to: b });
+            renderConnections();
+            updateCounts();
+        }
+
+        function cancelConnecting() {
+            connectingFrom = null;
+            document.querySelectorAll('.network-device.connect-source').forEach(d => d.classList.remove('connect-source'));
+            if (tempLine) {
+                tempLine.remove();
+                tempLine = null;
+            }
+            updateHint();
+        }
+
+        function startPortDrag(devId, e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const startX = e.clientX, startY = e.clientY;
+            let dragging = false;
+
+            const onMove = (ev) => {
+                if (!dragging) {
+                    if (Math.abs(ev.clientX - startX) <= 4 && Math.abs(ev.clientY - startY) <= 4) return;
+                    dragging = true;
+                    cancelConnecting();
+                    const devEl = document.getElementById('dev-' + devId);
+                    const r = devEl.getBoundingClientRect();
+                    const canvasStart = document.getElementById('canvas').getBoundingClientRect();
+                    tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    tempLine.setAttribute('class', 'temp-line');
+                    tempLine.setAttribute('x1', r.left - canvasStart.left + r.width / 2);
+                    tempLine.setAttribute('y1', r.top - canvasStart.top + r.height / 2);
+                    document.getElementById('connectionsSvg').appendChild(tempLine);
+                    devEl.classList.add('connect-source');
+                }
+                const canvas = document.getElementById('canvas').getBoundingClientRect();
+                tempLine.setAttribute('x2', ev.clientX - canvas.left);
+                tempLine.setAttribute('y2', ev.clientY - canvas.top);
+            };
+            const onUp = (ev) => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                if (!dragging) return;
+                const hit = document.elementFromPoint(ev.clientX, ev.clientY);
+                const targetEl = hit ? hit.closest('.network-device') : null;
+                if (targetEl) {
+                    addConnection(devId, parseInt(targetEl.id.replace('dev-', ''), 10));
+                }
+                cancelConnecting();
+            };
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
         }
 
         function renderConnections() {
@@ -592,11 +700,22 @@
             if (confirm('Clear all devices and connections?')) {
                 devices = [];
                 connections = [];
+                selectedDevice = null;
+                cancelConnecting();
                 document.querySelectorAll('.network-device').forEach(d => d.remove());
                 document.getElementById('connectionsSvg').innerHTML = '';
+                document.getElementById('propsContent').innerHTML = '<p style="color:#666;">Select a device to configure</p>';
                 updateCounts();
             }
         }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') cancelConnecting();
+        });
+
+        document.getElementById('canvas').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) cancelConnecting();
+        });
     </script>
 </body>
 

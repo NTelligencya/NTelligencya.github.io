@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 1, Orientation &amp; Your Digital Workspace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.activity-box):not(.activity-box *):not(.app-card):not(.app-card *):not(.checklist-box):not(.checklist-box *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .app-grid{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;gap:14px!important;margin:18px 0!important}
+        .app-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-top:3px solid var(--accent)!important;padding:16px 18px!important}
+        .app-card h5{font-family:'Fraunces',serif!important;font-size:1rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:8px!important}
+        .app-card p{font-size:0.85rem!important;line-height:1.55!important;color:var(--navy-600)!important;margin-bottom:6px!important}
+        .app-card p:last-child{margin-bottom:0!important}
+        .app-card .tag{display:inline-block;font-size:0.7rem;color:var(--accent)!important;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;font-weight:600}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .activity-box{background:rgba(59,130,246,0.06)!important;border:1px solid rgba(59,130,246,0.25)!important;padding:20px 22px!important;margin:18px 0!important}
+        .activity-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .activity-box .label{display:inline-block;background:var(--accent);color:var(--white)!important;font-size:0.7rem;font-weight:600;padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px}
+        .activity-box p{color:var(--navy-600)!important;margin-bottom:8px!important;font-size:0.92rem!important;line-height:1.65!important}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#why-this-first" class="active">Why We Start Here</a></li>
+            <li><a href="#how-it-fits">How M365 Fits Together</a></li>
+            <li><a href="#the-tour">A Quick Tour of the Apps</a></li>
+            <li><a href="#your-account">Your Account, Your Identity</a></li>
+            <li><a href="#across-devices">Working Across Devices</a></li>
+            <li><a href="#tenant-boundary">What's Inside Your Tenant, What Isn't</a></li>
+            <li><a href="#settings-worth">Settings Worth Five Minutes</a></li>
+        </ul>
+        <div class="nav-section-label">Quick Links</div>
+        <ul>
+            <li><a href="https://www.office.com/" target="_blank">Office on the Web</a></li>
+            <li><a href="https://portal.office.com/" target="_blank">Microsoft 365 Portal</a></li>
+            <li><a href="https://outlook.office.com/" target="_blank">Outlook on the Web</a></li>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 1, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>Orientation &amp; Your Digital Workspace</h1>
+            <p class="header-subtitle">A sensible mental map of the Microsoft 365 environment you work in. How the apps fit together, what your account actually is, how to work across devices, and which boundaries matter for data and AI.</p>
+        </div>
+
+        <section class="content-section" id="why-this-first">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,17H11V11H13M13,9H11V7H13V9Z"/></svg></div>
+                <h2 class="section-title">Why We Start Here</h2>
+            </div>
+            <div class="section-text">
+                <p>Most people who use Microsoft 365 every day have never had 30 minutes of someone explaining how the pieces fit together. They've just been handed a laptop, pointed at their inbox, and told to get on with it. That's how you end up with a desktop full of unnamed Word files, seventeen Teams you don't remember joining, and OneDrive full of duplicates of the same attachment.</p>
+                <p>The next two days will go much better if the map in your head matches what's actually on your screen. That's what this session is for.</p>
+                <p class="pullquote">Before we add AI on top, we make sure the foundation underneath it is solid.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="how-it-fits">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M3,11H5V13H3V11M11,5H13V7H11V5M9,11H13V13H11V15H9V11M15,11H17V13H15V11M7,5H9V7H7V5M5,5H7V7H5V5M19,5H21V7H19V5M15,5H17V7H15V5M11,9H13V11H11V9M5,15H7V17H5V15M7,11H9V13H7V11M3,3V7H1V3A2,2 0 0,1 3,1H7V3H3M17,1H21A2,2 0 0,1 23,3V7H21V3H17V1M3,23A2,2 0 0,1 1,21V17H3V21H7V23H3M21,21V17H23V21A2,2 0 0,1 21,23H17V21H21Z"/></svg></div>
+                <h2 class="section-title">How Microsoft 365 Fits Together</h2>
+            </div>
+            <div class="section-text">
+                <p>Microsoft 365 is not one program. It's a bundle of programs that share the same account, the same storage, and (increasingly) the same AI. Understanding the shape of the bundle is half the battle.</p>
+                <p><strong>Your account</strong> is the centre. It's a work email address plus a password, often with two-factor authentication. Every app you use is logged in through that account.</p>
+                <p><strong>Cloud storage (OneDrive and SharePoint)</strong> is where your files live. Not on your laptop. On Microsoft's servers, synced to your laptop. This is a huge shift for anyone who still thinks of "the C drive" as home base.</p>
+                <p><strong>Communication (Outlook, Teams)</strong> is how you talk to other people, inside and outside your organisation.</p>
+                <p><strong>Documents (Word, Excel, PowerPoint, OneNote)</strong> is how you make things.</p>
+                <p><strong>Coordination (Planner, To Do, Forms, Lists)</strong> is how you organise the work.</p>
+                <p><strong>Copilot</strong> is the AI layer sitting on top of all of the above, it can see anything the account can see and help you do the work.</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>The one rule that changes everything</h4>
+                        <p>Your files don't live on your laptop anymore. They live in the cloud and sync down to your laptop. Once that clicks, sharing, versioning, and getting work onto a different device all make sense.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="the-tour">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/></svg></div>
+                <h2 class="section-title">A Quick Tour of the Apps</h2>
+            </div>
+            <div class="section-text">
+                <p>You've probably used half of these. You might have avoided the other half. This is the whistlestop version, we'll go deeper in later sessions.</p>
+
+                <div class="app-grid">
+                    <div class="app-card">
+                        <span class="tag">Email, calendar</span>
+                        <h5>Outlook</h5>
+                        <p>Your inbox, calendar, and contacts. The hub most people spend most of their day in.</p>
+                    </div>
+                    <div class="app-card">
+                        <span class="tag">Chat, meetings</span>
+                        <h5>Teams</h5>
+                        <p>Chat with colleagues, run meetings, share files quickly. Channels for ongoing work, DMs for quick asks.</p>
+                    </div>
+                    <div class="app-card">
+                        <span class="tag">Personal files</span>
+                        <h5>OneDrive</h5>
+                        <p>Your personal cloud folder. Files that are yours, and things-in-progress before you share them.</p>
+                    </div>
+                    <div class="app-card">
+                        <span class="tag">Shared files, sites</span>
+                        <h5>SharePoint</h5>
+                        <p>Shared storage for a whole team or a project. Underneath every Teams team is a SharePoint site.</p>
+                    </div>
+                    <div class="app-card">
+                        <span class="tag">Documents</span>
+                        <h5>Word, Excel, PowerPoint</h5>
+                        <p>The classic document apps, now with cloud saving by default and AI built in. We'll spend serious time in each.</p>
+                    </div>
+                    <div class="app-card">
+                        <span class="tag">Notes</span>
+                        <h5>OneNote</h5>
+                        <p>A digital notebook. Under-used, surprisingly good for meeting notes, project journals, and team knowledge.</p>
+                    </div>
+                    <div class="app-card">
+                        <span class="tag">Tasks</span>
+                        <h5>Planner &amp; To Do</h5>
+                        <p>Planner for team tasks on a board. To Do for your personal list. They talk to each other.</p>
+                    </div>
+                    <div class="app-card">
+                        <span class="tag">Surveys, intake</span>
+                        <h5>Forms</h5>
+                        <p>Quick surveys and intake forms. Results land in Excel or Power Automate.</p>
+                    </div>
+                    <div class="app-card">
+                        <span class="tag">AI layer</span>
+                        <h5>Copilot</h5>
+                        <p>Sits on top of everything above. Summaries, drafts, analysis, search across your files. Day 2 is mostly Copilot.</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:18px"><strong>What you don't need to learn all of.</strong> A lot of people try to master everything and end up using nothing well. Pick the three or four you'll genuinely use (for most NT Gov roles that's Outlook, Teams, Word, and one of Excel or PowerPoint). Get confident with those. The rest becomes easy once the core four click.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="your-account">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/></svg></div>
+                <h2 class="section-title">Your Account, Your Identity</h2>
+            </div>
+            <div class="section-text">
+                <p>Your work email address is not just an email address. It's your identity across everything Microsoft. Your documents, calendar, Teams, chats, SharePoint permissions, and Copilot history are all linked to that one login.</p>
+                <p><strong>What that means practically:</strong></p>
+                <p>When someone gives you "access" to a file or a site, they're adding your email address to a list. That's how permissions work.</p>
+                <p>When you leave an organisation, your account is deactivated, and with it goes everything attached. Copy anything personal out before you go.</p>
+                <p>When you share a link to a file, Microsoft checks the viewer's account against the permission list before letting them in. "Anyone with the link" is a different setting, and it's the one that causes accidental leaks.</p>
+                <p>When Copilot "knows" things about your work, it's because it can see everything your account can see, nothing more, nothing less.</p>
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Two-factor authentication is non-negotiable</h4>
+                        <p>If someone gets into your work account, they get your files, your email, your Teams, and (if your org has it) Copilot acting on your behalf. Two-factor on this account is the most important setting in your entire working life. If your org hasn't turned it on yet, push for it.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="across-devices">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M4,6H20V16H4M20,18A2,2 0 0,0 22,16V6C22,4.89 21.1,4 20,4H4C2.89,4 2,4.89 2,6V16A2,2 0 0,0 4,18H0V20H24V18H20Z"/></svg></div>
+                <h2 class="section-title">Working Across Devices</h2>
+            </div>
+            <div class="section-text">
+                <p>One of the best things about M365 is that your workspace follows you. Your email on the desktop is the same email on the phone, the web, and the laptop at home. But the app experience isn't identical on each, and knowing the differences saves time.</p>
+                <p><strong>Desktop apps (installed on your laptop).</strong> Most features, best for heavy work, work offline once files have synced.</p>
+                <p><strong>Web apps (office.com in a browser).</strong> Almost everything the desktop has, no install needed, handy when you're on a borrowed computer. Requires a connection.</p>
+                <p><strong>Mobile apps (on your phone).</strong> Simplified versions. Good for quick replies, reading on the go, approvals. Not where you write a 20-page report.</p>
+                <p><strong>Shared machines.</strong> Sign out when you're done. Your browser may remember your credentials, which is useful on your own device and a real problem on a shared one.</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Working offline in remote areas</h4>
+                        <p>The M365 desktop apps work fine without internet for anything already open or downloaded. Changes sync back up when you reconnect. This is different from Copilot, which needs a live cloud connection for every AI action. Plan heavy editing on the plane, save the Copilot work for when you're online.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="tenant-boundary">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,11.99H19C18.47,16.11 15.72,19.78 12,20.93V12H5V6.3L12,3.19V11.99Z"/></svg></div>
+                <h2 class="section-title">What's Inside Your Tenant, What Isn't</h2>
+            </div>
+            <div class="section-text">
+                <p>This one matters for AI. Your organisation's M365 setup is called a "tenant". Think of it as a walled garden. Inside the garden: your documents, your Teams, your email, and any AI that runs through your organisation's Copilot licence. Outside the garden: the public internet, including free consumer AI tools like ChatGPT, Claude on the free tier, and Gemini.</p>
+                <p class="pullquote">Data that stays inside the tenant is covered by your organisation's agreements with Microsoft. Data that leaves the tenant is not.</p>
+                <p><strong>Inside the tenant (generally safe for work content):</strong></p>
+                <p>Microsoft 365 Copilot, when it's reading your documents, summarising your emails, or helping you write in Word. Actions stay within your org's Microsoft agreement.</p>
+                <p>Teams chats and files within your organisation.</p>
+                <p>OneDrive and SharePoint content your account has access to.</p>
+                <p><strong>Outside the tenant (be careful with work content):</strong></p>
+                <p>The free web version of ChatGPT, Claude, or Gemini, pasting work content into those is sending it to a third party.</p>
+                <p>External collaborators you share files with (their actions are governed by their organisation, not yours).</p>
+                <p>Anywhere a link is set to "anyone with the link".</p>
+                <p>We'll come back to this in Session 11 (Responsible Use), but the mental model starts here.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="settings-worth">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg></div>
+                <h2 class="section-title">Settings Worth Five Minutes</h2>
+            </div>
+            <div class="section-text">
+                <p>The defaults are mostly sensible. A handful of settings are worth changing once and then forgetting about.</p>
+                <div class="checklist-box">
+                    <h4>The five quick wins</h4>
+                    <p><strong>Confirm two-factor authentication is on.</strong> In portal.office.com, check your security info. Your workplace IT may have already forced this.</p>
+                    <p><strong>Set OneDrive to sync automatically</strong> so your Documents, Desktop, and Pictures folders live in OneDrive. This is the single best protection against a laptop dying with your work on it.</p>
+                    <p><strong>Turn on automatic cloud save in Office</strong> (File, Options, Save). Your work is saved every few seconds, and you can always roll back to a version from yesterday.</p>
+                    <p><strong>Set Outlook to automatic reply mode when you're away</strong> so people get told rather than wondering. Takes 30 seconds the first time, protects your inbox forever.</p>
+                    <p><strong>Make sure your mobile Authenticator app is set up</strong> so you can approve logins from your phone. It's much less painful than typing codes.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 1</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

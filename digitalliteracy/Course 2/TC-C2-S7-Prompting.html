@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 7, Prompting Skills That Work</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--red:#b91c1c;--red-soft:rgba(185,28,28,0.06);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.prompt-card):not(.prompt-card *):not(.compare-two):not(.compare-two *):not(.checklist-box):not(.checklist-box *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .prompt-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;padding:18px 20px!important;margin:14px 0!important}
+        .prompt-card h5{font-size:1rem!important;font-weight:600!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .prompt-card .prompt-text{font-family:'JetBrains Mono',monospace!important;font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-900)!important;background:var(--white)!important;padding:12px 14px!important;border:1px solid rgba(10,22,40,0.1)!important;margin:8px 0!important;white-space:pre-wrap!important;font-weight:400!important}
+        .prompt-card .note{font-size:0.85rem!important;color:var(--navy-400)!important;font-style:italic!important;line-height:1.6!important;margin-top:8px!important}
+        .compare-two{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;margin:18px 0!important}
+        .compare-two .col{padding:18px 20px!important;border:1px solid rgba(10,22,40,0.08)!important;border-top:3px solid var(--amber)!important;background:var(--amber-soft)!important}
+        .compare-two .col.good{border-top-color:var(--green)!important;background:var(--green-soft)!important}
+        .compare-two .col h5{font-size:0.8rem!important;text-transform:uppercase!important;letter-spacing:0.1em!important;font-weight:600!important;margin-bottom:10px!important;color:var(--amber)!important}
+        .compare-two .col.good h5{color:var(--green)!important}
+        .compare-two .col .prompt-text{font-family:'JetBrains Mono',monospace!important;font-size:0.84rem!important;line-height:1.55!important;color:var(--navy-900)!important;background:var(--white)!important;padding:10px 12px!important;border:1px solid rgba(10,22,40,0.1)!important;white-space:pre-wrap!important}
+        .compare-two .col .note{font-size:0.82rem!important;color:var(--navy-600)!important;margin-top:8px!important;font-style:italic!important;line-height:1.55!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+            .compare-two{grid-template-columns:1fr!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#what-a-prompt-is" class="active">What a Prompt Is</a></li>
+            <li><a href="#anatomy">The Anatomy of a Working Prompt</a></li>
+            <li><a href="#role-context">Role, Task, Context, Format</a></li>
+            <li><a href="#feeding-content">Feeding the AI Your Content</a></li>
+            <li><a href="#iterating">Iterating, Not Restarting</a></li>
+            <li><a href="#honesty-checks">Honesty Checks</a></li>
+            <li><a href="#patterns">Patterns for Common Work Tasks</a></li>
+            <li><a href="#prompt-library">Building a Reusable Prompt Library</a></li>
+            <li><a href="#four-habits">Four Habits That Make Every Prompt Better</a></li>
+        </ul>
+        <div class="nav-section-label">Try Prompts On</div>
+        <ul>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+            <li><a href="https://chatgpt.com/" target="_blank">ChatGPT</a></li>
+            <li><a href="https://claude.ai/" target="_blank">Claude</a></li>
+            <li><a href="https://gemini.google.com/app" target="_blank">Google Gemini</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 7, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>Prompting Skills That Work</h1>
+            <p class="header-subtitle">The single skill that turns AI from "a bit useful" into "genuinely valuable at work". How to ask for what you want, feed the AI your actual content, iterate when the first answer misses, and build a small personal library of prompts you can reach for again.</p>
+        </div>
+
+        <section class="content-section" id="what-a-prompt-is">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2Z"/></svg></div>
+                <h2 class="section-title">What a Prompt Is</h2>
+            </div>
+            <div class="section-text">
+                <p>A "prompt" is the message you type to an AI. That's the whole definition. You'll see the phrase "prompt engineering" thrown around, but for everyday work use it's not engineering at all. It's writing clearly to a capable new colleague who has no context yet.</p>
+                <p class="pullquote">If you could brief a new staff member on a task clearly, you already know how to prompt an AI. The rest is small adjustments.</p>
+                <p>Everything in this session is about making those small adjustments reliable, so you get useful work out of an AI the first or second time, not the sixth or seventh.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="anatomy">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M17,17H7V15H17V17M17,13H7V11H17V13M17,9H7V7H17V9Z"/></svg></div>
+                <h2 class="section-title">The Anatomy of a Working Prompt</h2>
+            </div>
+            <div class="section-text">
+                <p>The same information, asked two ways. One produces a generic answer, the other produces something you can use.</p>
+
+                <div class="compare-two">
+                    <div class="col">
+                        <h5>Weak prompt</h5>
+                        <div class="prompt-text">Write me a briefing note.</div>
+                        <p class="note">The AI knows nothing about the topic, audience, length, tone, or format. You'll get a generic template.</p>
+                    </div>
+                    <div class="col good">
+                        <h5>Working prompt</h5>
+                        <div class="prompt-text">Write a one-page briefing note for my manager on options for replacing our paper-based incident log with a digital system. Audience is a senior manager who's not technical. Keep it to three options (low cost, moderate, full replacement), one paragraph each, with a clear recommendation at the end.</div>
+                        <p class="note">Task, audience, length, structure, and the shape of the decision all in one message.</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:18px"><strong>The pattern.</strong> The weak prompt asks for a thing. The working prompt tells the AI enough that it can do the thing properly. The difference is usually two or three extra sentences.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="role-context">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A4,4 0 0,1 16,6C16,8.88 13.85,11.43 11.16,11.93C11.18,11.74 11.2,11.55 11.2,11.35C11.2,8.31 13.65,5.86 16.69,5.86V5.86C16.69,5.86 16.73,5.86 16.77,5.86L16.77,5.86C16.85,5.86 16.92,5.86 17,5.86C16.92,3.72 15.17,2 13,2M6,6A2,2 0 0,0 4,8V14A2,2 0 0,0 6,16V22H14V16A2,2 0 0,0 16,14V8A2,2 0 0,0 14,6H6M12,13A1,1 0 0,1 13,14A1,1 0 0,1 12,15A1,1 0 0,1 11,14A1,1 0 0,1 12,13Z" transform="scale(0.9) translate(1 1)"/></svg></div>
+                <h2 class="section-title">Role, Task, Context, Format</h2>
+            </div>
+            <div class="section-text">
+                <p>Four ingredients. Not every prompt needs all four, but once you know them you'll notice when one is missing and the answer suffers for it.</p>
+                <p><strong>Role.</strong> Who the AI should pretend to be. "Act as a cautious policy writer." "You're a data analyst reviewing this sheet." Useful when you want a particular perspective or tone.</p>
+                <p><strong>Task.</strong> What you want it to do. "Draft this", "summarise that", "compare these", "find the gaps".</p>
+                <p><strong>Context.</strong> What the AI needs to know to do the job well. The audience, the setting, what's happened already, any constraints.</p>
+                <p><strong>Format.</strong> What the answer should look like. Length, structure, tone. "Three bullet points." "Under 200 words." "Keep it plain English."</p>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>You don't label them</h4>
+                        <p>You don't write "Role:" and "Task:" like filling in a form. You write one or two normal sentences that happen to include those ingredients. The AI picks them up without prompting.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="feeding-content">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg></div>
+                <h2 class="section-title">Feeding the AI Your Content</h2>
+            </div>
+            <div class="section-text">
+                <p>Here's where working AI gets properly powerful. The AI can work on <em>your</em> documents, <em>your</em> data, <em>your</em> draft. You just have to give it to them.</p>
+                <p>In Copilot inside Word, Excel, Outlook, the current document or email is already the context. You don't need to paste it.</p>
+                <p>In consumer ChatGPT or Claude, you paste the content into the chat, or you upload the file. Then you ask what you want done with it.</p>
+
+                <div class="prompt-card">
+                    <h5>Prompt with pasted content</h5>
+                    <div class="prompt-text">I'm going to paste a report below. Read it, then tell me in plain English: what the three main findings are, who the recommendations are aimed at, and what I personally need to act on if I'm the manager of a small team in the NT public sector.
+
+[paste report]</div>
+                    <p class="note">This prompt works for anything from a 5-page policy update to a 50-page consultant report.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Prompt with uploaded file</h5>
+                    <div class="prompt-text">Attached is our team's monthly stats spreadsheet. Can you give me a short summary of what changed compared to last month's trends, flag anything unusual, and suggest one or two questions the leadership team might ask about the numbers?</div>
+                    <p class="note">Works in Claude, ChatGPT (with file upload), and Copilot inside Excel.</p>
+                </div>
+
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Mind where you paste</h4>
+                        <p>Session 6's rule still applies. Copilot inside M365 keeps content within your tenant. Consumer ChatGPT or Claude on the free tier does not. For anything sensitive, prefer Copilot. For your own research and drafts, consumer tools are fine.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="iterating">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13.57 17.4,15 16.42,16.06L17.85,17.5C19.2,16.1 20,14.14 20,12A8,8 0 0,0 12,4M6.15,6.5L4.72,8C3.36,9.4 2.57,11.36 2.57,13.5A8,8 0 0,0 10.57,21.5V24.5L14.57,20.5L10.57,16.5V19.5A6,6 0 0,1 4.57,13.5C4.57,11.93 5.17,10.5 6.15,9.44V6.5Z"/></svg></div>
+                <h2 class="section-title">Iterating, Not Restarting</h2>
+            </div>
+            <div class="section-text">
+                <p>The biggest mistake beginners make is abandoning a chat after a weak first answer. Don't. The AI remembers everything in the conversation, and it's good at fixing its own output when you tell it what to change.</p>
+                <p class="pullquote">If the first answer misses, say what's wrong. The second answer is almost always better.</p>
+                <p><strong>Useful things to say back to the AI:</strong></p>
+                <p>"That's too long. Tighten to half the length, same points."</p>
+                <p>"Too formal. Rewrite so it sounds like a real person, not a press release."</p>
+                <p>"Keep paragraph two. Rewrite the others to match that tone."</p>
+                <p>"The third recommendation doesn't quite fit because [reason]. Try it again with that in mind."</p>
+                <p>"Give me three more options, different from these."</p>
+                <p>"Pretend I'm my manager reviewing this. What would they push back on?"</p>
+                <p>Iteration is where AI becomes useful. The first pass is rarely good enough. The third pass often is.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="honesty-checks">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9Z"/></svg></div>
+                <h2 class="section-title">Honesty Checks</h2>
+            </div>
+            <div class="section-text">
+                <p>AI answers sound confident whether they're right or wrong. A short habit of asking for honesty catches a lot of errors that would otherwise go out the door.</p>
+
+                <div class="prompt-card">
+                    <h5>The confidence check</h5>
+                    <div class="prompt-text">Before I use this, tell me honestly: how confident are you in this answer? Where are the parts you're less sure about? And if I wanted to verify this, where should I look?</div>
+                    <p class="note">Works on almost any AI. Not infallible, but most will acknowledge the soft spots in their answer.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>The devil's advocate check</h5>
+                    <div class="prompt-text">Now argue against what you just wrote. What's weak about this recommendation? What would a thoughtful colleague push back on?</div>
+                    <p class="note">A surprisingly good way to stress-test the AI's own work. Often surfaces issues you'd have missed.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>The source check</h5>
+                    <div class="prompt-text">Did any of the facts or figures in this answer come from specific sources you can name? Which parts are from training data and which are things you're likely to have made up? Flag anything I should double-check.</div>
+                    <p class="note">Most AIs will admit when they've generated specifics (dates, figures, quotes) rather than drawing from reliable memory. Catches hallucinations before they leave you.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="patterns">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M3,11H21V13H3V11M3,7H21V9H3V7M3,15H21V17H3V15Z"/></svg></div>
+                <h2 class="section-title">Patterns for Common Work Tasks</h2>
+            </div>
+            <div class="section-text">
+                <p>A short set of reusable prompt patterns for the kinds of work most NT professionals do often. Copy, adjust, use.</p>
+
+                <div class="prompt-card">
+                    <h5>Summarise a long document for a specific audience</h5>
+                    <div class="prompt-text">I'll paste a document below. Please summarise it in plain English for someone in [role, e.g. a community services manager], in about 200 words, with three key takeaways and any action items flagged clearly. Highlight anything that would change how my team does things.
+
+[paste content]</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Draft a stakeholder email</h5>
+                    <div class="prompt-text">Please draft a short email to [stakeholder type, e.g. a community partner organisation] on behalf of a [your role]. The email needs to [purpose, e.g. confirm dates for an upcoming workshop and ask for their preferred format]. Tone should be warm but professional. Leave placeholders I can fill in. About 120 words.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Turn notes into a briefing</h5>
+                    <div class="prompt-text">Below are my raw notes from a meeting. Please turn these into a short briefing note in the NT Gov style, with a purpose statement, background, key issues, and recommendations. Flag any points where my notes look ambiguous or incomplete.
+
+[paste notes]</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Compare options</h5>
+                    <div class="prompt-text">I'm deciding between three options for [problem]. They are A [describe], B [describe], and C [describe]. Please lay them out in a table with columns for pros, cons, cost (relative), time required, and main risk. At the end, tell me which one you'd lean toward and why.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Explain something technical</h5>
+                    <div class="prompt-text">Please explain [concept] in plain English, assuming I understand [related thing they already know] but have never worked with this before. Keep it under 300 words and use one real-world analogy.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Prepare for a meeting</h5>
+                    <div class="prompt-text">I have a meeting with [who] to discuss [topic]. Here's the background [short description]. What questions should I expect? What questions should I come prepared to ask? What's a sensible outcome I should aim for? Keep it practical.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Review a draft before it goes out</h5>
+                    <div class="prompt-text">Below is a [document type] I'm about to send to [audience]. Please read it as if you were the recipient. What's unclear? What would you push back on? What's missing? Suggest three specific edits that would improve it.
+
+[paste draft]</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Plain-language translation of policy</h5>
+                    <div class="prompt-text">Below is a policy document. I need to explain what it actually means for day-to-day team operations, in language my team can understand. Please give me a plain-English summary of the key rules, a "what this means for us" paragraph, and any grey areas where we'd need to check with our manager.
+
+[paste policy]</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="prompt-library">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z"/></svg></div>
+                <h2 class="section-title">Building a Reusable Prompt Library</h2>
+            </div>
+            <div class="section-text">
+                <p>You'll reach for the same five or six prompts over and over. Save them. A personal prompt library turns AI from a tool you reinvent daily into a tool that starts faster every time.</p>
+                <p><strong>Where to keep it.</strong> A OneNote page called "My Prompts". A Word document in OneDrive. A note in your team's SharePoint site if they'd find it useful too. Not a scattered mess of bookmarked chats.</p>
+                <p><strong>What to save.</strong></p>
+                <p>The prompts that have genuinely worked for you, with a note on what you used them for.</p>
+                <p>Any context block you find yourself retyping often ("I'm a [role] in the [team], we work on [scope]"). Save the context, paste it at the start of new chats.</p>
+                <p>A handful of "universal closers": the confidence check, the devil's advocate check, "tighten this to half the length, same points".</p>
+                <p class="pullquote">A good prompt is a small piece of intellectual property. Treat it like one.</p>
+                <p><strong>What not to save.</strong> Prompts full of sensitive specifics. Keep the template general and fill in the specifics at the time. That way you can share your library with a colleague, or with your future self, without worrying about what's in it.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="four-habits">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,17H11V11H13M13,9H11V7H13V9Z"/></svg></div>
+                <h2 class="section-title">Four Habits That Make Every Prompt Better</h2>
+            </div>
+            <div class="section-text">
+                <div class="checklist-box">
+                    <h4>Four small habits</h4>
+                    <p><strong>1. Tell it who you are and what you're working with.</strong> "I'm a program manager in the NT public sector", "I haven't done a grant application in five years", "This is for an internal audience". One sentence of context changes the whole answer.</p>
+                    <p><strong>2. Tell it what "good" looks like.</strong> "Under 200 words", "plain English, no jargon", "three options, not a list of ten", "a tone that's warm but not casual".</p>
+                    <p><strong>3. Ask it to ask you questions.</strong> "Before you draft, ask me any questions you need answers to." Stops the AI from guessing.</p>
+                    <p><strong>4. Push back when the answer isn't right.</strong> "That's not quite it, this bit is wrong because X, try again with that in mind." The second answer is almost always better than the first.</p>
+                </div>
+
+                <p style="margin-top:16px">That's the session. Sessions 8, 9, and 10 put these habits to work inside Word, Excel, PowerPoint, Outlook, Teams, and the real workflows they enable.</p>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 7</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

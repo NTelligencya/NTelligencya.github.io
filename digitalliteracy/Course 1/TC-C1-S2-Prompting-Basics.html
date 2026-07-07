@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 2, Talking to AI, Prompting Basics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.compare-box):not(.compare-box *):not(.activity-box):not(.activity-box *):not(.prompt-demo):not(.prompt-demo *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0!important;color:var(--navy-600)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .compare-box{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;margin:18px 0!important}
+        .compare-box .weak,.compare-box .strong{padding:16px 18px!important;border:1px solid rgba(10,22,40,0.08)!important;border-top:3px solid var(--amber)!important;background:var(--amber-soft)!important}
+        .compare-box .strong{border-top-color:var(--green)!important;background:var(--green-soft)!important}
+        .compare-box h5{font-size:0.75rem!important;text-transform:uppercase!important;letter-spacing:0.1em!important;font-weight:600!important;margin-bottom:10px!important;color:var(--amber)!important}
+        .compare-box .strong h5{color:var(--green)!important}
+        .compare-box .prompt-text{font-family:'JetBrains Mono',monospace!important;font-size:0.85rem!important;line-height:1.55!important;color:var(--navy-900)!important;background:var(--white)!important;padding:10px 12px!important;border:1px solid rgba(10,22,40,0.1)!important;white-space:pre-wrap!important;font-weight:400!important}
+        .compare-box .note{font-size:0.82rem!important;color:var(--navy-600)!important;margin-top:8px!important;font-style:italic!important;line-height:1.55!important}
+        .prompt-demo{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;padding:18px 20px!important;margin:16px 0!important;border-left:3px solid var(--accent)!important}
+        .prompt-demo h5{font-size:0.95rem!important;font-weight:600!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .prompt-demo .prompt-text{font-family:'JetBrains Mono',monospace!important;font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-900)!important;background:var(--white)!important;padding:12px 14px!important;border:1px solid rgba(10,22,40,0.08)!important;margin:8px 0!important;white-space:pre-wrap!important;font-weight:400!important}
+        .prompt-demo .note{font-size:0.85rem!important;color:var(--navy-400)!important;font-style:italic!important;line-height:1.6!important;margin-top:8px!important}
+        .activity-box{background:rgba(59,130,246,0.06)!important;border:1px solid rgba(59,130,246,0.25)!important;padding:20px 22px!important;margin:18px 0!important}
+        .activity-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .activity-box .label{display:inline-block;background:var(--accent);color:var(--white)!important;font-size:0.7rem;font-weight:600;padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px}
+        .activity-box p{color:var(--navy-600)!important;margin-bottom:8px!important;font-size:0.92rem!important;line-height:1.65!important}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+            .compare-box{grid-template-columns:1fr!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE AI Training" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#what-is-prompt" class="active">What a Prompt Is</a></li>
+            <li><a href="#anatomy">The Four Parts</a></li>
+            <li><a href="#weak-vs-strong">Weak vs Strong Prompts</a></li>
+            <li><a href="#give-context">Give It Context</a></li>
+            <li><a href="#set-role">Set a Role</a></li>
+            <li><a href="#show-example">Show an Example</a></li>
+            <li><a href="#iterating">Keep Going, Don't Restart</a></li>
+            <li><a href="#spotting-wrong">Spotting When It's Wrong</a></li>
+            <li><a href="#try-it">Try It Yourself</a></li>
+        </ul>
+        <div class="nav-section-label">Try Prompts On</div>
+        <ul>
+            <li><a href="https://chatgpt.com/" target="_blank">ChatGPT</a></li>
+            <li><a href="https://claude.ai/" target="_blank">Claude</a></li>
+            <li><a href="https://gemini.google.com/app" target="_blank">Google Gemini</a></li>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 2, AI &amp; Online Cyber Safety Skills</span>
+            <h1>Talking to AI, Prompting Basics</h1>
+            <p class="header-subtitle">The single skill that separates "AI is a bit rubbish" from "AI is actually useful" is how you ask. This session is about asking better, without turning it into a science.</p>
+        </div>
+
+        <section class="content-section" id="what-is-prompt">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2Z"/></svg></div>
+                <h2 class="section-title">What a Prompt Is</h2>
+            </div>
+            <div class="section-text">
+                <p>A "prompt" is just the message you type to the AI. That's the whole definition. You might see the phrase "prompt engineering" and think it's a technical field. It's not. It's writing clearly, in plain English, to a patient helper.</p>
+                <p class="pullquote">A good prompt is not a magic spell. It's an instruction you'd be comfortable giving a new co-worker on their first day.</p>
+                <p>If you'd describe the task clearly to a human helper, you already know how to prompt an AI. The tricks below just help you do it a bit more reliably.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="anatomy">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M17,17H7V15H17V17M17,13H7V11H17V13M17,9H7V7H17V9Z"/></svg></div>
+                <h2 class="section-title">The Four Parts of a Good Prompt</h2>
+            </div>
+            <div class="section-text">
+                <p>The four ingredients. Not every prompt needs all four, but once you know them you'll recognise when one is missing.</p>
+                <p><strong>1. Task.</strong> What do you actually want it to do? "Write a letter." "Explain this word." "Give me three ideas."</p>
+                <p><strong>2. Context.</strong> What's the situation? "I'm a volunteer at a community centre." "My daughter is ten years old." "We're planning a small family dinner."</p>
+                <p><strong>3. Role (optional).</strong> Who should the AI pretend to be? "Act as a friendly mechanic." "Explain it like a maths teacher." Giving it a role sharpens the tone.</p>
+                <p><strong>4. Format.</strong> What should the answer look like? "Keep it short." "Give me a list." "Make it sound friendly, not corporate." "Leave spaces for me to fill in the details."</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>You don't have to label them</h4>
+                        <p>You don't write "Task:" and "Context:" like filling in a form. You just write a normal sentence that happens to include those bits. The AI picks them up without help.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="weak-vs-strong">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg></div>
+                <h2 class="section-title">Weak vs Strong Prompts</h2>
+            </div>
+            <div class="section-text">
+                <p>Same task, two different prompts. See the difference.</p>
+
+                <div class="compare-box">
+                    <div class="weak">
+                        <h5>Weak prompt</h5>
+                        <div class="prompt-text">Write me a complaint letter.</div>
+                        <p class="note">The AI has no idea who you are, what happened, or who the letter is to. You'll get a generic template that doesn't fit.</p>
+                    </div>
+                    <div class="strong">
+                        <h5>Strong prompt</h5>
+                        <div class="prompt-text">Can you draft a complaint letter to my electricity retailer? They charged me a late fee on a bill I paid on time, I have the receipt. I want the fee refunded. Keep it firm but polite, leave spaces for the account number and dates, and keep it under half a page.</div>
+                        <p class="note">Task, context, tone, and format are all in one message. The reply will be ready to use with a few tweaks.</p>
+                    </div>
+                </div>
+
+                <div class="compare-box">
+                    <div class="weak">
+                        <h5>Weak prompt</h5>
+                        <div class="prompt-text">Help me plan meals.</div>
+                        <p class="note">Meals for who, on what budget, with what equipment? The AI will guess and probably miss.</p>
+                    </div>
+                    <div class="strong">
+                        <h5>Strong prompt</h5>
+                        <div class="prompt-text">Can you help me plan a week of dinners for two adults and two kids? We've got a budget of about $150, a standard oven and cooktop but no microwave, and the kids don't eat mushrooms. Give me a shopping list at the end.</div>
+                        <p class="note">The AI now has the who, the budget, the constraints, and the format for the answer.</p>
+                    </div>
+                </div>
+
+                <div class="compare-box">
+                    <div class="weak">
+                        <h5>Weak prompt</h5>
+                        <div class="prompt-text">Explain superannuation.</div>
+                        <p class="note">Pitched at who? A textbook answer, probably too long, probably too formal.</p>
+                    </div>
+                    <div class="strong">
+                        <h5>Strong prompt</h5>
+                        <div class="prompt-text">Can you explain in plain English how superannuation works? Pretend you're explaining to a friend who's never had a full-time job before. Use a real-life example with real numbers. Keep it short.</div>
+                        <p class="note">Reading level, audience, example type, length. The answer lands.</p>
+                    </div>
+                </div>
+
+                <p style="margin-top:18px"><strong>The pattern.</strong> Weak prompts leave the AI guessing. Strong prompts tell the AI enough to do the job properly. The difference is usually one or two extra sentences of context.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="give-context">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z"/></svg></div>
+                <h2 class="section-title">Give It Context</h2>
+            </div>
+            <div class="section-text">
+                <p>This is the single most useful habit. Before asking your question, tell the AI one or two things about your situation. You'll get an answer built for you, not a generic one.</p>
+                <p><strong>What kind of context helps?</strong></p>
+                <p>Who you are: "I'm a community health worker." "I'm retired." "I'm a student at TAFE."</p>
+                <p>What you know: "I haven't done maths since school." "I've used Word but never Excel." "I know nothing about cars."</p>
+                <p>What the situation is: "I'm writing this on my phone." "I'm in a hurry." "I'm dealing with a family member who's unwell."</p>
+                <p>What you've already tried: "I've already Googled this and the answers were confusing."</p>
+
+                <div class="prompt-demo">
+                    <h5>Example, adding context to the same question</h5>
+                    <div class="prompt-text">I'm a volunteer who's just been asked to take the minutes at a monthly community meeting. I've never done this before. The meetings run about an hour, with about 12 people and a loose agenda. Can you tell me in plain English what good minutes look like, what to write down and what to leave out, and suggest a simple format I could use the first time?</div>
+                    <p class="note">Without the first sentence, you'd get a textbook explanation of meeting minutes. With it, you get advice a first-time note-taker can actually use.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="set-role">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,12A3,3 0 0,0 15,9A3,3 0 0,0 12,6A3,3 0 0,0 9,9A3,3 0 0,0 12,12M12,14C9.33,14 4,15.34 4,18V20H20V18C20,15.34 14.67,14 12,14Z"/></svg></div>
+                <h2 class="section-title">Set a Role (When It Helps)</h2>
+            </div>
+            <div class="section-text">
+                <p>Telling the AI who to pretend to be gives you a different flavour of answer for the same question. It's optional, but it's a cheap trick that works.</p>
+
+                <div class="prompt-demo">
+                    <h5>Different roles, same topic</h5>
+                    <div class="prompt-text">Act as a friendly mechanic and explain what a timing belt is, and why it matters when you're buying a second-hand car.</div>
+                    <p class="note">You'll get a reply that sounds like a tradie talking across a workbench, not a Wikipedia article.</p>
+                </div>
+
+                <div class="prompt-demo">
+                    <h5>Another one</h5>
+                    <div class="prompt-text">Act as a gentle tutor who's explaining things to a high school student. Explain how interest on a credit card builds up over a year, using a real-world example.</div>
+                    <p class="note">Same information, but patient, worked-through, and at a pitched reading level.</p>
+                </div>
+
+                <p><strong>When a role helps.</strong> When you want a particular tone (friendly, formal, cautious, direct). When you want a specific viewpoint (a small business owner, a teacher, a nurse). When you want the AI to stay in one lane rather than covering every angle.</p>
+                <p><strong>When a role doesn't help.</strong> For quick factual questions, or where you actually want the AI's own voice, which is usually clear and even-handed.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="show-example">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,19L10.5,15.5L7,14L10.5,12.5L12,9L13.5,12.5L17,14L13.5,15.5L12,19Z"/></svg></div>
+                <h2 class="section-title">Show an Example</h2>
+            </div>
+            <div class="section-text">
+                <p>The fastest way to get the AI to produce exactly what you want is to show it one that's like what you want.</p>
+
+                <div class="prompt-demo">
+                    <h5>Example, style-matching</h5>
+                    <div class="prompt-text">Here's a text message I sent last week that I was happy with: [paste message]. Can you write me a new message to a different person but in the same tone? This one's going to my boss, asking to shift my start time on Thursday because of a medical appointment.</div>
+                    <p class="note">The AI will match your voice, not invent a corporate one. This works brilliantly for emails, texts, and social posts.</p>
+                </div>
+
+                <div class="prompt-demo">
+                    <h5>Example, shape-matching</h5>
+                    <div class="prompt-text">Here's a meal plan someone made for me last year that I really liked: [paste plan]. Can you make me a new one, same layout, same length, same level of detail, but for this week based on what's in my fridge?</div>
+                    <p class="note">Showing the AI a finished example is 10 times faster than describing what you want in words.</p>
+                </div>
+
+                <p style="margin-top:16px">This trick is called "few-shot" in the technical literature. You don't need to know the name. You just need to know: if you want a specific style, show the AI a sample of that style.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="iterating">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12C18,13.57 17.4,15 16.42,16.06L17.85,17.5C19.2,16.1 20,14.14 20,12A8,8 0 0,0 12,4M6.15,6.5L4.72,8C3.36,9.4 2.57,11.36 2.57,13.5A8,8 0 0,0 10.57,21.5V24.5L14.57,20.5L10.57,16.5V19.5A6,6 0 0,1 4.57,13.5C4.57,11.93 5.17,10.5 6.15,9.44L6.15,6.5Z"/></svg></div>
+                <h2 class="section-title">Keep Going, Don't Restart</h2>
+            </div>
+            <div class="section-text">
+                <p>The most common beginner mistake is giving up on a prompt because the first answer wasn't right, and starting over. Don't. The AI remembers everything in the same conversation, and it's really good at fixing its own work when you tell it what's wrong.</p>
+
+                <p class="pullquote">If the first answer isn't right, say what's wrong. The second one will almost always be better.</p>
+
+                <p><strong>Things to say back to the AI:</strong></p>
+                <p>"That's too long. Make it half the length, same points."</p>
+                <p>"That's too formal. Rewrite it the way a friend would say it."</p>
+                <p>"The third point isn't right because [why]. Try again."</p>
+                <p>"I like the second paragraph. Keep it. Rewrite the first one to match that tone."</p>
+                <p>"Explain more about the first idea. Drop the others for now."</p>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>The AI won't be offended</h4>
+                        <p>It's fine to say "no, that's wrong", "I don't like this", or "try again, differently". It has no ego. It will just do another version.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="spotting-wrong">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,9A3.02,3.02 0 0,0 9,12C9,13.68 10.32,15 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg></div>
+                <h2 class="section-title">Spotting When It's Wrong</h2>
+            </div>
+            <div class="section-text">
+                <p>Remember from Session 1: AI is confident in a way that can fool you. Prompting better doesn't stop hallucinations. It just makes them easier to spot, because your answer is more specific.</p>
+                <p><strong>Warning signs.</strong> Keep your eye out for these:</p>
+                <p>A quote or a statistic with no source. If the AI says "a 2024 study found that...", ask "which study, exactly?"</p>
+                <p>Very specific facts about small places, niche topics, or local organisations. The AI is guessing more than you'd think.</p>
+                <p>Phone numbers, web addresses, or book titles. These are hallucination hotspots. Verify before acting.</p>
+                <p>A tone that sounds completely sure when the question was genuinely hard. Real experts hedge. An AI that doesn't hedge on a hard question is often wrong.</p>
+
+                <div class="prompt-demo">
+                    <h5>The honesty check</h5>
+                    <div class="prompt-text">Before you answer, tell me: is this question something you're sure about, or something you might be making up parts of? And if I wanted to verify your answer, where should I look?</div>
+                    <p class="note">Works on every AI on the market. It won't catch every mistake, but it catches a lot, and it's a good habit.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="try-it">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.59,7.58L10,14.17L7.41,11.59L6,13L10,17L18,9"/></svg></div>
+                <h2 class="section-title">Try It Yourself</h2>
+            </div>
+            <div class="section-text">
+                <div class="activity-box">
+                    <span class="label">Activity, 10 minutes</span>
+                    <h4>Take a weak prompt and rebuild it in front of the AI.</h4>
+                    <p><strong>Round 1.</strong> Type a short, lazy prompt: "Write me an email." Just those four words. See what you get.</p>
+                    <p><strong>Round 2.</strong> In the same chat, type: "Let's make that better. The email is to my landlord. The hot water has been off for three days. I want it fixed but I'm not angry yet. Keep it short. Can you try again?"</p>
+                    <p><strong>Round 3.</strong> Read the new version. Find something you'd change. Say so: "That second line sounds too stiff, can you rewrite just that line in a friendlier way?"</p>
+                    <p><strong>Round 4.</strong> Ask one last thing: "If they don't reply within 24 hours, what should I send next?"</p>
+                    <p style="margin-top:10px">Notice how different the final output is from Round 1. That's prompting. The first attempt is almost always weak. The third or fourth is where the AI genuinely earns its keep.</p>
+                </div>
+
+                <p style="margin-top:18px"><strong>The takeaway.</strong> You don't need to learn prompt engineering. You need one habit: treat the AI like a new helper who doesn't know you yet. Tell it who you are, what you want, what "good" looks like. When the first answer misses, say what's wrong. Keep going in the same chat. That's it.</p>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, AI &amp; Online Cyber Safety Skills, Session 2</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

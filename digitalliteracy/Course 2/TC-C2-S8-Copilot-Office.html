@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 8, Copilot in Word, Excel &amp; PowerPoint</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--red:#b91c1c;--red-soft:rgba(185,28,28,0.06);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.prompt-card):not(.prompt-card *):not(.checklist-box):not(.checklist-box *):not(.app-block):not(.app-block *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .prompt-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;padding:18px 20px!important;margin:14px 0!important}
+        .prompt-card h5{font-size:1rem!important;font-weight:600!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .prompt-card .prompt-text{font-family:'JetBrains Mono',monospace!important;font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-900)!important;background:var(--white)!important;padding:12px 14px!important;border:1px solid rgba(10,22,40,0.1)!important;margin:8px 0!important;white-space:pre-wrap!important;font-weight:400!important}
+        .prompt-card .note{font-size:0.85rem!important;color:var(--navy-400)!important;font-style:italic!important;line-height:1.6!important;margin-top:8px!important}
+        .app-block{background:rgba(10,22,40,0.02)!important;border:1px solid rgba(10,22,40,0.08)!important;padding:22px 24px!important;margin:20px 0!important;border-top:4px solid var(--accent)!important}
+        .app-block h3{font-family:'Fraunces',serif!important;font-size:1.3rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:6px!important}
+        .app-block .app-tag{font-size:0.7rem;color:var(--accent)!important;text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:10px;display:block}
+        .app-block p{font-size:0.95rem!important;line-height:1.7!important;color:var(--navy-600)!important;margin-bottom:12px!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#what-copilot-sees" class="active">What Copilot Sees, in Each App</a></li>
+            <li><a href="#licence-note">A Note on Licensing</a></li>
+            <li><a href="#copilot-word">Copilot in Word</a></li>
+            <li><a href="#copilot-excel">Copilot in Excel</a></li>
+            <li><a href="#copilot-ppt">Copilot in PowerPoint</a></li>
+            <li><a href="#reviewing-output">Reviewing What Copilot Produces</a></li>
+            <li><a href="#when-to-reach">When to Reach for Copilot, When Not To</a></li>
+            <li><a href="#practice-prompts">Practice Prompts for Day 2</a></li>
+        </ul>
+        <div class="nav-section-label">Quick Links</div>
+        <ul>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+            <li><a href="https://support.microsoft.com/en-au/copilot" target="_blank">Copilot Help</a></li>
+            <li><a href="https://adoption.microsoft.com/copilot-prompt-gallery/" target="_blank">Microsoft Prompt Gallery</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 8, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>Copilot in Word, Excel &amp; PowerPoint</h1>
+            <p class="header-subtitle">How Copilot actually works inside the three documents apps you use most. What it can see, what it can do well, what it can't, and the prompts that earn it a place on your desktop.</p>
+        </div>
+
+        <section class="content-section" id="what-copilot-sees">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg></div>
+                <h2 class="section-title">What Copilot Sees, in Each App</h2>
+            </div>
+            <div class="section-text">
+                <p>The thing that makes Copilot different from the free consumer chatbots is that it can already see the work in front of you. You don't need to paste, copy, or upload. The file you have open is the context.</p>
+                <p><strong>In Word,</strong> Copilot sees the current document. It can read all of it, summarise, rewrite, continue, and edit.</p>
+                <p><strong>In Excel,</strong> Copilot sees the active worksheet. It can analyse your data, suggest formulas, and generate charts, but it works best when your data is in a proper Excel Table (see Session 5).</p>
+                <p><strong>In PowerPoint,</strong> Copilot sees the current deck. It can generate slides, rewrite content, adjust design, and turn a Word document into a first-draft deck.</p>
+                <p class="pullquote">Copilot is an AI that knows what's in front of you. Your job is to tell it what to do with that.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="licence-note">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z"/></svg></div>
+                <h2 class="section-title">A Note on Licensing</h2>
+            </div>
+            <div class="section-text">
+                <p>"Copilot" means several different things, and the one you have depends on your organisation's licence.</p>
+                <p><strong>Free Copilot</strong> (copilot.microsoft.com, or the Copilot button in some Windows and Edge versions) is a general chat tool, not connected to your documents. Fine for general questions, not what this session is about.</p>
+                <p><strong>Microsoft 365 Copilot</strong> (the paid add-on, or "M365 Copilot") is the version embedded inside Word, Excel, Outlook, Teams, and PowerPoint. It can read and act on your content. This is the one this session assumes.</p>
+                <p><strong>Copilot for specific apps</strong> like "Copilot in Word" or "Copilot in Excel" are the same M365 Copilot, just accessed inside that app.</p>
+                <p>If your ribbon doesn't have a Copilot button in Word, Excel, or PowerPoint, your organisation likely doesn't have the paid licence yet. The prompts and patterns below still apply, you'd just be running them through the free web Copilot with content pasted in, which is fine for non-sensitive work.</p>
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Check your organisation's policy before heavy use</h4>
+                        <p>Some organisations have M365 Copilot turned on but with guardrails (certain sites or SharePoint content is excluded). Others have it in pilot for a team only. Know what your arrangement is before relying on it for sensitive work.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="copilot-word">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z"/></svg></div>
+                <h2 class="section-title">Copilot in Word</h2>
+            </div>
+            <div class="section-text">
+                <p>The tasks where Copilot in Word earns its keep. None of these replace good writing. They save the empty-page minutes, the reformatting minutes, and the "how do I summarise this 40-page thing" minutes.</p>
+
+                <div class="app-block">
+                    <span class="app-tag">Draft from a prompt</span>
+                    <h3>Start a document from a description, not a blank page</h3>
+                    <p>Copilot can generate an entire first draft from a short brief. It'll produce structured output (headings, paragraphs), usually in a reasonable tone, always in need of some edits.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Draft a one-page briefing note for a senior manager on options for moving our paper-based incident log to a digital system. Include a background paragraph, three options (low cost, moderate, full replacement), pros and cons for each, and a recommendation. Australian English, plain language, no corporate jargon.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Summarise an existing document</span>
+                    <h3>Turn a long document into what you need to know</h3>
+                    <p>Open the document, ask Copilot for what you actually want. Not just "summarise", but the specific thing you need.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Give me a plain-English summary of this document in under 200 words. Include the three main findings, who the recommendations are aimed at, and what a program manager in my position needs to actually do about this.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Rewrite</span>
+                    <h3>Adjust tone, length, or reading level</h3>
+                    <p>Highlight a paragraph, click Copilot, tell it what to change. Good for taking something formal and making it plain, or the reverse.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Rewrite this paragraph in plain English for an audience who doesn't know government jargon. Keep the facts and the ask, drop the filler.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Ask questions of the document</span>
+                    <h3>Interrogate a document instead of scanning it</h3>
+                    <p>Instead of Ctrl+F and hoping to guess the keyword, just ask.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Does this document say anything about training obligations for remote staff? If yes, quote the exact sentences. If not, tell me.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Generate structure</span>
+                    <h3>Build an outline you then fill in</h3>
+                    <p>Particularly good for repeated document types. Grants, reports, briefings, policies.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Give me a standard outline for a grant acquittal report, section by section. For each section, one sentence on what goes in it. Leave headings I can fill in.</div>
+                    </div>
+                </div>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Good Word structure pays off here</h4>
+                        <p>Documents with real heading styles (see Session 4) produce noticeably better Copilot output. A document where headings are "just bold text" confuses it. A document with clean Heading 1, 2, 3 styles lets Copilot navigate and summarise far more reliably.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="copilot-excel">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M5,4H19A2,2 0 0,1 21,6V18A2,2 0 0,1 19,20H5A2,2 0 0,1 3,18V6A2,2 0 0,1 5,4M5,8V12H11V8H5M13,8V12H19V8H13M5,14V18H11V14H5M13,14V18H19V14H13Z"/></svg></div>
+                <h2 class="section-title">Copilot in Excel</h2>
+            </div>
+            <div class="section-text">
+                <p>Excel is where Copilot either shines or fails hard. The difference is entirely whether your data is shaped like a Table (Session 5). Clean, columnar data: Copilot is brilliant. Merged cells, stacked headers, blank rows: Copilot flounders.</p>
+
+                <div class="app-block">
+                    <span class="app-tag">Natural-language formulas</span>
+                    <h3>Describe the formula you want</h3>
+                    <p>Instead of remembering the exact syntax, describe the result.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Add a column that shows total budget for each region, summed across all programs in this Table. Use a formula that uses column names, not cell references.</div>
+                        <p class="note">Copilot will produce something like =SUMIFS(Programs[Budget], Programs[Region], [@Region]), and drop it into the right cell.</p>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Find patterns</span>
+                    <h3>Ask what's in the data before you know what to ask</h3>
+                    <p>Great for "I've been handed a spreadsheet and need to figure out what matters."</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Look across this sheet and tell me: what are the three most interesting patterns or outliers? Which rows look unusual compared to the rest? Are there any columns that seem inconsistent or poorly formatted?</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Clean up data</span>
+                    <h3>Tidy a messy import</h3>
+                    <p>Especially useful for data pulled out of other systems.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">In this sheet, column C mixes dates written several ways (some as text, some as proper dates, some with slashes, some with dashes). Please standardise the column to ISO dates (YYYY-MM-DD) and flag any rows where the original value is unclear.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Chart generation</span>
+                    <h3>First-pass charts from a description</h3>
+                    <p>Copilot can produce a chart from your Table and let you refine it from there.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Make me a bar chart showing total participants by region across all Active programs. Sort the bars from highest to lowest. Put the region name under each bar, and label the y-axis "Participants".</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Analysis</span>
+                    <h3>Ask questions in English, get numerical answers</h3>
+                    <p>The answer is grounded in your data, not made up.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Looking at this Table, what's the average budget per participant across all Active programs? Which region has the highest, and which the lowest? Give me the numbers and point out if any are outliers worth investigating.</div>
+                    </div>
+                </div>
+
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Verify before you trust numbers</h4>
+                        <p>Copilot in Excel is grounded in your data, but it can still make arithmetic mistakes or misinterpret a column. For anything where the number matters, spot-check one or two against a manual calculation before using the answer. Trust but verify.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="copilot-ppt">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M21,3H3A2,2 0 0,0 1,5V17A2,2 0 0,0 3,19H10V21H8V23H16V21H14V19H21A2,2 0 0,0 23,17V5A2,2 0 0,0 21,3M21,17H3V5H21V17Z"/></svg></div>
+                <h2 class="section-title">Copilot in PowerPoint</h2>
+            </div>
+            <div class="section-text">
+                <p>PowerPoint is where Copilot feels most magical and sometimes most misleading. It can generate a deck from nothing in seconds. Whether the deck is <em>good</em> is a different question.</p>
+
+                <div class="app-block">
+                    <span class="app-tag">Deck from a document</span>
+                    <h3>Turn a Word document into a draft deck</h3>
+                    <p>The killer feature. If you have a Word document with clean heading structure, Copilot can turn each section into a slide.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Turn the attached Word document into a 10-slide presentation. Use one slide per main section. First slide is the title. Last slide is recommendations. Keep the tone professional but not dry. Use bullet points sparingly.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Deck from a brief</span>
+                    <h3>Start with a description, get a first draft</h3>
+                    <p>Good when you don't have a source document but know roughly what the deck needs to cover.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Create a 6-slide deck for an internal team update on our digital skills training rollout. Slides: title, why we're doing this, what we've delivered, feedback so far, what's next, questions. Keep text minimal, suggest a simple image for each slide.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Rewrite and tighten</span>
+                    <h3>Fix a dense slide</h3>
+                    <p>The classic corporate problem: slides with too much text. Copilot can cut ruthlessly.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">This slide has too much text. Rewrite it so the main point is the headline, and the rest fits in three short bullets or less. Keep the facts, lose the filler.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Speaker notes</span>
+                    <h3>Generate notes for each slide</h3>
+                    <p>Often more useful than the slides themselves, because the slides are for the room and the notes are for you.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">For each slide in this deck, write 3-4 sentences of speaker notes. Notes should sound natural when read aloud, expand slightly on each bullet, and include one thing I shouldn't forget to say. Not a script, more of a prompt.</div>
+                    </div>
+                </div>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Generated decks always need editing</h4>
+                        <p>Copilot in PowerPoint will produce a plausible-looking deck from almost anything. It may also include bullet points that overstate, imagery that's generic, or structure that's fine for a template but wrong for your specific audience. Treat the output as a scaffold, not a finished product.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="reviewing-output">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M10,17L5,12L6.41,10.58L10,14.17L17.59,6.58L19,8L10,17Z"/></svg></div>
+                <h2 class="section-title">Reviewing What Copilot Produces</h2>
+            </div>
+            <div class="section-text">
+                <p>The same "human in the loop" principle from Session 6 applies, harder, in the document apps. The AI produces polished-looking output that <em>sounds</em> right whether it is or not. Your review is the last gate.</p>
+                <div class="checklist-box">
+                    <h4>The review pass</h4>
+                    <p><strong>Facts and figures.</strong> Any specific number, date, statute, or name. Check it against a source.</p>
+                    <p><strong>Tone.</strong> Does this sound like something you'd say? Or does it sound like a generic press release?</p>
+                    <p><strong>Missing context.</strong> Is there something in the real situation the AI couldn't have known?</p>
+                    <p><strong>Overclaims.</strong> Does it say "we will" or "this guarantees" when the actual situation is "we plan to" or "this should"?</p>
+                    <p><strong>Sensitive specifics.</strong> Names, identifying details, things you wouldn't want in writing even if accurate.</p>
+                    <p><strong>Your voice.</strong> Rewrite enough that the output sounds like you, not the AI's default-polite tone.</p>
+                </div>
+                <p class="pullquote">The AI drafts, you decide. If it goes out with your name on it, the responsibility is yours.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="when-to-reach">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,3A9,9 0 0,0 3,12H0L4,16L8,12H5A7,7 0 0,1 12,5A7,7 0 0,1 19,12A7,7 0 0,1 12,19C10.5,19 9.09,18.5 7.94,17.7L6.5,19.14C8.04,20.3 9.94,21 12,21A9,9 0 0,0 21,12A9,9 0 0,0 12,3M14,12A2,2 0 0,0 12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12Z"/></svg></div>
+                <h2 class="section-title">When to Reach for Copilot, When Not To</h2>
+            </div>
+            <div class="section-text">
+                <p>Not every task is a Copilot task. Knowing the difference saves you from both underusing and overusing.</p>
+                <p><strong>Good Copilot tasks:</strong> first drafts, summaries, rewrites, outline generation, "what does this say and what's it asking me to do", rough chart generation, natural-language formulas, plain-English translation of policy.</p>
+                <p><strong>Bad Copilot tasks:</strong> anything requiring current external information it doesn't have, anything involving a sensitive interpersonal situation, anything where the exact wording carries legal weight, anything where the value is your personal judgement or authorship.</p>
+                <p><strong>Tasks where Copilot is a time trap:</strong> anything simple enough that you'd write it faster than you'd prompt, anything so specific that you'd need to write most of it as context anyway, anything where the AI's first draft will be close enough that you don't critically review it.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="practice-prompts">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2Z"/></svg></div>
+                <h2 class="section-title">Practice Prompts for Day 2</h2>
+            </div>
+            <div class="section-text">
+                <p>A short set of prompts worth trying on your own work after the course. Save them to your prompt library (see Session 7).</p>
+                <div class="prompt-card">
+                    <h5>Word, summarise a real document</h5>
+                    <div class="prompt-text">Summarise this document in 150 words for someone in my role. Include the three most important points, what's being asked of us, and one thing I should flag to my manager.</div>
+                </div>
+                <div class="prompt-card">
+                    <h5>Word, rewrite a section you've been stuck on</h5>
+                    <div class="prompt-text">I've drafted this paragraph but it's not working. Please rewrite it three different ways: one more formal, one more direct, one warmer. I'll pick the closest and ask you to refine.</div>
+                </div>
+                <div class="prompt-card">
+                    <h5>Excel, ask the sheet a question</h5>
+                    <div class="prompt-text">Looking at this sheet, what are the top three things I should be paying attention to? Any data quality issues? Any rows that look like mistakes or outliers?</div>
+                </div>
+                <div class="prompt-card">
+                    <h5>Excel, add a formula in words</h5>
+                    <div class="prompt-text">Add a new column that calculates the difference between the planned budget and the actual spend, and flags any row where the difference is more than 10 percent.</div>
+                </div>
+                <div class="prompt-card">
+                    <h5>PowerPoint, Word to deck</h5>
+                    <div class="prompt-text">Convert the attached document into a 6-slide presentation for a team meeting. Keep slides visual and sparse. Include speaker notes for each slide.</div>
+                </div>
+                <div class="prompt-card">
+                    <h5>PowerPoint, tighten a slide</h5>
+                    <div class="prompt-text">This slide is too dense. Rewrite it with a clear headline stating the main point, followed by no more than three short bullets. Move the rest to speaker notes.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 8</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

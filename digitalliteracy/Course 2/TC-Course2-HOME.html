@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Digital Skills & AI for the Workplace, 2 Day Course</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .sidebar-image{width:100%!important;height:auto!important;border-radius:0!important;margin-bottom:16px!important;border:1px solid rgba(59,130,246,.2)!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .header-meta{margin-top:18px!important;display:flex!important;gap:20px!important;flex-wrap:wrap!important;position:relative;z-index:2}
+        .header-meta span{font-size:0.8rem!important;color:var(--navy-200)!important;letter-spacing:0.05em!important}
+        .header-meta strong{color:var(--white)!important;font-weight:500!important}
+        .day-label{display:inline-block!important;background:var(--accent)!important;color:var(--white)!important;padding:4px 12px!important;font-size:0.75rem!important;font-weight:500!important;letter-spacing:0.1em!important;text-transform:uppercase!important;margin-bottom:14px!important;margin-top:10px!important}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.session-number):not(.session-card):not(.day-label){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span:not(.session-number):not(.day-label){color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0!important;color:var(--navy-600)!important}
+        .session-grid{display:grid!important;gap:16px!important;margin-top:20px!important}
+        .session-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-radius:0!important;padding:20px!important;cursor:pointer!important;transition:all 0.2s ease!important}
+        .session-card:hover{background:var(--accent-soft)!important;border-color:var(--accent)!important;transform:translateY(-2px)!important;box-shadow:0 4px 12px rgba(59,130,246,0.15)!important}
+        .session-header{display:flex!important;align-items:center!important;gap:12px!important;margin-bottom:12px!important}
+        .session-number{width:36px!important;height:36px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;color:var(--white)!important;border-radius:50%!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:0.9rem!important;font-weight:600!important;flex-shrink:0!important}
+        .session-title{font-size:1.1rem!important;font-weight:500!important;color:var(--navy-900)!important;margin:0!important}
+        .session-time{font-size:0.75rem!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.1em!important;margin-left:auto!important;font-weight:500!important}
+        .topic-list{margin:0!important;padding:0!important}
+        .topic-item{padding:6px 0!important;border-bottom:1px solid rgba(10,22,40,0.04)!important;font-size:0.9rem!important;color:var(--navy-600)!important}
+        .topic-item:last-child{border-bottom:none!important}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .session-time{margin-left:0!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills & AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#welcome" class="active">Welcome</a></li>
+            <li><a href="#what-youll-learn">What You'll Learn</a></li>
+            <li><a href="#who-its-for">Who It's For</a></li>
+            <li><a href="#day1">Day 1, Foundations & Core M365</a></li>
+            <li><a href="#day2">Day 2, AI, Copilot & Workflows</a></li>
+            <li><a href="#takeaways">What You'll Take Away</a></li>
+        </ul>
+        <div class="nav-section-label">Tools We'll Use</div>
+        <ul>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+            <li><a href="https://www.microsoft.com/microsoft-365" target="_blank">Microsoft 365</a></li>
+            <li><a href="https://chatgpt.com/" target="_blank">ChatGPT</a></li>
+            <li><a href="https://claude.ai/" target="_blank">Claude</a></li>
+            <li><a href="https://notebooklm.google/" target="_blank">NotebookLM</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Charles Darwin University TAFE · Course 2</span>
+            <h1>Microsoft Digital Skills & AI for the Workplace</h1>
+            <p class="header-subtitle">A two-day hands-on course building practical digital workplace skills for Northern Territory professionals, with a focus on Microsoft 365 tools and AI-assisted workflows. Contextualised to the tools, policies, and environments you actually work in.</p>
+            <div class="header-meta">
+                <span><strong>2 days</strong> · Weekday delivery</span>
+                <span><strong>Beginner–Intermediate</strong></span>
+                <span>Up to <strong>15</strong> participants</span>
+                <span>Designed for <strong>NT-based organisations</strong></span>
+            </div>
+        </div>
+
+        <section class="content-section" id="welcome">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M11,6V12.5L16,11L11,6Z"/></svg></div>
+                <h2 class="section-title">Welcome</h2>
+            </div>
+            <div class="section-text">
+                <p>This course is built for people doing real work in NT-based organisations, government staff, community-controlled organisations, health and social services, educators, and program teams, who want to get measurably more out of Microsoft 365 and AI tools.</p>
+                <p>Over two days we'll move from the core M365 apps most workplaces already pay for, into AI-assisted workflows that save genuine time on the tasks you actually do: emails, meetings, reports, documents, spreadsheets, and presentations.</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Contextualised to your environment</h4>
+                        <p>Examples, datasets, and scenarios are drawn from NT workplaces, regional program delivery, multi-site teams, and the realities of working with mixed connectivity. What we cover should look like the work on your desk next week.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="what-youll-learn">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z"/></svg></div>
+                <h2 class="section-title">What You'll Learn</h2>
+            </div>
+            <div class="section-text">
+                <p><strong>Microsoft 365, the core toolkit</strong>. Teams, SharePoint, OneDrive, Outlook, OneNote, Planner and Forms, used the way they're meant to work together.</p>
+                <p><strong>Word, Excel and PowerPoint with Copilot</strong>. How to drive the document tools you already use with AI, including formulas, drafting, formatting, and design.</p>
+                <p><strong>AI foundations for work</strong>. What AI tools actually are, what they're good at, how to prompt them well, and how to judge the output.</p>
+                <p><strong>AI-assisted workflows</strong>. Practical patterns for email triage, meeting notes, first drafts, summarisation, and research, with attention to what stays inside your tenant and what doesn't.</p>
+                <p><strong>Responsible use</strong>. Privacy, information security, policy alignment, and the guardrails that matter for government and community-sector work.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="who-its-for">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg></div>
+                <h2 class="section-title">Who It's For</h2>
+            </div>
+            <div class="section-text">
+                <p>NT Government staff, Aboriginal community-controlled organisation workers, health and social-service staff, educators, program staff, and admin teams who use Microsoft 365 in their day-to-day role.</p>
+                <p>No deep IT background is assumed. If you log into a work computer, use Outlook and Teams, and want your tools to do more of the heavy lifting, this course is built for you.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="day1">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,19H5V5H19V19M17,12H12V17H10V12H7V10H10V7H12V10H17V12Z"/></svg></div>
+                <h2 class="section-title">Day 1, Foundations &amp; Core Microsoft 365</h2>
+            </div>
+            <div class="section-text">
+                <span class="day-label">Day 1</span>
+                <p>We'll get the fundamentals of Microsoft 365 under your belt, the apps that already live on your work device, and set up good habits for files, collaboration, and communication before we add AI on top.</p>
+            </div>
+
+            <div class="session-grid">
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">1</span>
+                        <h4 class="session-title">Orientation &amp; Your Digital Workspace</h4>
+                        <span class="session-time">Day 1 · Morning</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">How M365 fits together, apps, accounts, and the cloud</div>
+                        <div class="topic-item">Working across devices safely</div>
+                        <div class="topic-item">Setting up your environment for the two days</div>
+                        <div class="topic-item">What's inside your tenant vs what isn't</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">2</span>
+                        <h4 class="session-title">OneDrive, SharePoint &amp; File Sense</h4>
+                        <span class="session-time">Day 1 · Morning</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">Where your files actually live, and why it matters</div>
+                        <div class="topic-item">Sharing, permissions, and version history</div>
+                        <div class="topic-item">Working offline and syncing when you're back online</div>
+                        <div class="topic-item">Team sites vs personal storage</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">3</span>
+                        <h4 class="session-title">Teams, Outlook &amp; Working Together</h4>
+                        <span class="session-time">Day 1 · Midday</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">Channels, chats, and meetings that don't waste time</div>
+                        <div class="topic-item">Outlook calendar, rules, and shared mailboxes</div>
+                        <div class="topic-item">Planner and To Do for tracking real work</div>
+                        <div class="topic-item">OneNote and Forms for team knowledge and intake</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">4</span>
+                        <h4 class="session-title">Word, Faster, Cleaner Documents</h4>
+                        <span class="session-time">Day 1 · Afternoon</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">Styles, headings, and tables of contents that actually work</div>
+                        <div class="topic-item">Templates for repeatable documents</div>
+                        <div class="topic-item">Track changes and review workflows</div>
+                        <div class="topic-item">Setting up for AI-assisted drafting in Day 2</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">5</span>
+                        <h4 class="session-title">Excel, Structured Data &amp; Useful Formulas</h4>
+                        <span class="session-time">Day 1 · Afternoon</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">Tables, named ranges, and clean data habits</div>
+                        <div class="topic-item">Everyday formulas: IF, SUMIFS, XLOOKUP, TEXTJOIN</div>
+                        <div class="topic-item">Charts that communicate, not decorate</div>
+                        <div class="topic-item">Sample dataset: a regional program register to work from</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="day2">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z"/></svg></div>
+                <h2 class="section-title">Day 2, AI &amp; Copilot for Real Work</h2>
+            </div>
+            <div class="section-text">
+                <span class="day-label">Day 2</span>
+                <p>Now that the M365 foundation is solid, we layer AI on top. We'll look at what Copilot and the main general-purpose AI tools can do, build confident prompting skills, and work through the exact task patterns that save the most time in a typical NT workplace.</p>
+            </div>
+
+            <div class="session-grid">
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">6</span>
+                        <h4 class="session-title">AI Foundations for the Workplace</h4>
+                        <span class="session-time">Day 2 · Morning</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">What AI tools actually are, in plain English</div>
+                        <div class="topic-item">Copilot vs ChatGPT, Claude, Gemini, what each is for</div>
+                        <div class="topic-item">Where the data goes: tenant-bound vs public tools</div>
+                        <div class="topic-item">What AI is good at, and where it's unreliable</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">7</span>
+                        <h4 class="session-title">Prompting Skills That Work</h4>
+                        <span class="session-time">Day 2 · Morning</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">Role, task, context, format, the prompt anatomy</div>
+                        <div class="topic-item">Feeding the AI your own documents and data</div>
+                        <div class="topic-item">Iterating: refining rather than restarting</div>
+                        <div class="topic-item">A reusable prompt library for everyday tasks</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">8</span>
+                        <h4 class="session-title">Copilot in Word, Excel &amp; PowerPoint</h4>
+                        <span class="session-time">Day 2 · Midday</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">Word: drafting, summarising, and rewriting with Copilot</div>
+                        <div class="topic-item">Excel: natural-language formulas, data cleanup, and chart suggestions</div>
+                        <div class="topic-item">PowerPoint: from brief or Word doc to a first-pass deck</div>
+                        <div class="topic-item">Review discipline, what to always check before sending</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">9</span>
+                        <h4 class="session-title">Copilot in Outlook &amp; Teams</h4>
+                        <span class="session-time">Day 2 · Afternoon</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">Email triage, replies, and tone control</div>
+                        <div class="topic-item">Meeting recap, action items, and catching up on what you missed</div>
+                        <div class="topic-item">Turning a Teams meeting into a briefing note</div>
+                        <div class="topic-item">Chat-based Copilot for quick workplace Q&amp;A</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">10</span>
+                        <h4 class="session-title">AI Workflows You'll Actually Use</h4>
+                        <span class="session-time">Day 2 · Afternoon</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">Report drafts from raw notes and data</div>
+                        <div class="topic-item">Plain-language translation of policy and technical content</div>
+                        <div class="topic-item">Research and synthesis across multiple documents</div>
+                        <div class="topic-item">Building your own repeatable workflow to take back to work</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <span class="session-number">11</span>
+                        <h4 class="session-title">Responsible Use, Privacy &amp; Policy</h4>
+                        <span class="session-time">Day 2 · Afternoon</span>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">What you should and shouldn't put into AI tools</div>
+                        <div class="topic-item">Personal, sensitive, and culturally-held information</div>
+                        <div class="topic-item">Aligning with NT Government and organisational AI policies</div>
+                        <div class="topic-item">Shadow AI and how to stay on the right side of it</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="takeaways">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg></div>
+                <h2 class="section-title">What You'll Take Away</h2>
+            </div>
+            <div class="section-text">
+                <p>A working command of the M365 apps your organisation already pays for, used the way they're designed to work together.</p>
+                <p>Confident, practical use of Copilot inside Word, Excel, PowerPoint, Outlook, and Teams, with judgement about when to lean on it and when not to.</p>
+                <p>A personal prompt library and at least one AI-assisted workflow tuned to your actual role.</p>
+                <p>A clear mental model of data, privacy, and policy, what's safe to put into which tool, and why.</p>
+                <p>A CDU TAFE attendance record and companion guides to keep on your desk afterwards.</p>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE · Microsoft Digital Skills &amp; AI for the Workplace · Delivered under the Barkly Workforce Grant</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

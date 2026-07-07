@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 9, Copilot in Outlook &amp; Teams</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.prompt-card):not(.prompt-card *):not(.checklist-box):not(.checklist-box *):not(.app-block):not(.app-block *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .prompt-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;padding:18px 20px!important;margin:14px 0!important}
+        .prompt-card h5{font-size:1rem!important;font-weight:600!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .prompt-card .prompt-text{font-family:'JetBrains Mono',monospace!important;font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-900)!important;background:var(--white)!important;padding:12px 14px!important;border:1px solid rgba(10,22,40,0.1)!important;margin:8px 0!important;white-space:pre-wrap!important;font-weight:400!important}
+        .prompt-card .note{font-size:0.85rem!important;color:var(--navy-400)!important;font-style:italic!important;line-height:1.6!important;margin-top:8px!important}
+        .app-block{background:rgba(10,22,40,0.02)!important;border:1px solid rgba(10,22,40,0.08)!important;padding:22px 24px!important;margin:20px 0!important;border-top:4px solid var(--accent)!important}
+        .app-block h3{font-family:'Fraunces',serif!important;font-size:1.3rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:6px!important}
+        .app-block .app-tag{font-size:0.7rem;color:var(--accent)!important;text-transform:uppercase;letter-spacing:0.12em;font-weight:600;margin-bottom:10px;display:block}
+        .app-block p{font-size:0.95rem!important;line-height:1.7!important;color:var(--navy-600)!important;margin-bottom:12px!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#where-it-earns" class="active">Where It Earns Its Keep</a></li>
+            <li><a href="#email-triage">Email Triage with Copilot</a></li>
+            <li><a href="#drafting-replies">Drafting Replies, with Tone Control</a></li>
+            <li><a href="#inbox-catchup">Catching Up on a Long Thread</a></li>
+            <li><a href="#meeting-recap">Meeting Recap and Action Items</a></li>
+            <li><a href="#missed-meeting">Catching Up on a Meeting You Missed</a></li>
+            <li><a href="#briefing-note">Turning a Meeting into a Briefing Note</a></li>
+            <li><a href="#chat-copilot">Chat-Based Copilot for Quick Q&amp;A</a></li>
+            <li><a href="#review-habit">The Review Habit for Comms</a></li>
+        </ul>
+        <div class="nav-section-label">Quick Links</div>
+        <ul>
+            <li><a href="https://outlook.office.com/" target="_blank">Outlook on the Web</a></li>
+            <li><a href="https://teams.microsoft.com/" target="_blank">Teams on the Web</a></li>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 9, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>Copilot in Outlook &amp; Teams</h1>
+            <p class="header-subtitle">The Copilot features that change how much of your day goes to email and meetings. Triage, drafting, thread summaries, meeting recaps, action items, and the chat-based Copilot for quick workplace questions.</p>
+        </div>
+
+        <section class="content-section" id="where-it-earns">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg></div>
+                <h2 class="section-title">Where It Earns Its Keep</h2>
+            </div>
+            <div class="section-text">
+                <p>For a lot of NT professionals, email and meetings are the work. Not the thing around the work, the work itself. An hour saved across email triage, meeting recap, and inbox catchup is an hour back on everything else.</p>
+                <p>Copilot in Outlook and Teams does three things well, reliably:</p>
+                <p><strong>Summarise.</strong> Long email threads, long meetings, days of backlog.</p>
+                <p><strong>Draft.</strong> Replies, meeting recaps, follow-up messages, status updates.</p>
+                <p><strong>Find.</strong> Answer "what was the decision on X" from meetings and threads, without you scrolling.</p>
+                <p class="pullquote">Outlook and Teams are where Copilot pays for itself fastest, because email and meetings are where time leaks fastest.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="email-triage">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z"/></svg></div>
+                <h2 class="section-title">Email Triage with Copilot</h2>
+            </div>
+            <div class="section-text">
+                <p>The first and best use. Instead of reading every email to figure out which ones matter, ask Copilot to do the triage.</p>
+
+                <div class="app-block">
+                    <span class="app-tag">Morning catchup</span>
+                    <h3>What's actually important in my inbox right now</h3>
+                    <p>Open Copilot in Outlook or ask it via the chat pane, and get a prioritised view of the morning's load.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Look at the emails I received since yesterday afternoon. Group them into three buckets: urgent (needs a reply today), important but not urgent (this week), and informational (no action needed from me). Tell me what each urgent one is asking for.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Back from leave</span>
+                    <h3>What happened while I was away</h3>
+                    <p>The return-from-holiday inbox, made manageable.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">I've been on leave for five days. Summarise what's happened in my inbox in that time. Highlight anything I need to act on, anything that was resolved without me, and any ongoing threads I should catch up on.</div>
+                    </div>
+                </div>
+
+                <div class="app-block">
+                    <span class="app-tag">Single sender</span>
+                    <h3>Catch up on one person's messages</h3>
+                    <p>Useful when one stakeholder has been active and you need to understand the whole conversation at once.</p>
+                    <div class="prompt-card">
+                        <h5>Example</h5>
+                        <div class="prompt-text">Summarise everything [person's name] has emailed me in the last two weeks. What's the current state of each topic, and what am I expected to do next?</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="drafting-replies">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z"/></svg></div>
+                <h2 class="section-title">Drafting Replies, with Tone Control</h2>
+            </div>
+            <div class="section-text">
+                <p>Copilot can draft a reply from the email thread you're looking at. The feature is built into Outlook's compose window. What makes the draft useful is telling Copilot the shape of the reply you want, not just "draft a reply".</p>
+
+                <div class="prompt-card">
+                    <h5>A short, positive confirmation</h5>
+                    <div class="prompt-text">Draft a reply confirming I can attend the 2 pm meeting on Thursday. Short, warm, one line asking whether a dial-in option will be available.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>A polite no</h5>
+                    <div class="prompt-text">Draft a reply declining this request. I can't take it on this month because I'm leading the digital rollout. Keep it professional, thank them for thinking of me, and suggest we revisit in July.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>A firm but fair pushback</h5>
+                    <div class="prompt-text">Draft a reply pushing back on the timeline. Explain that two weeks isn't workable given current staffing, propose four weeks as realistic, and offer a short call to talk through what's achievable in between. Firm but not combative.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>A complicated reply you've been putting off</h5>
+                    <div class="prompt-text">Draft a reply to this thread. The situation has changed since we last spoke, here's what's new [brief]. I need to explain the change, acknowledge it's frustrating, and propose two options for where to go from here.</div>
+                </div>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Iterate the tone before you send</h4>
+                        <p>First drafts almost always sound slightly too corporate or slightly too chipper. Don't just accept. Say "make it warmer", "less formal", "shorter", "drop the opening pleasantry". Third draft is usually the one to send.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="inbox-catchup">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M7,7H17V5H19V19H5V5H7V7M7.5,18L4.5,15L5.91,13.59L7.5,15.17L11.09,11.58L12.5,13L7.5,18Z"/></svg></div>
+                <h2 class="section-title">Catching Up on a Long Thread</h2>
+            </div>
+            <div class="section-text">
+                <p>You've been CC'd late on a long back-and-forth. Instead of scrolling and reading every reply, ask for the summary you actually need.</p>
+
+                <div class="prompt-card">
+                    <h5>Thread summary</h5>
+                    <div class="prompt-text">Summarise this email thread. Tell me: what was the original question, what positions have been put by whom, where is it up to now, and what (if anything) am I being asked to do. Keep it under 150 words.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Decision tracker</h5>
+                    <div class="prompt-text">Looking at this thread, list every decision that's been made or agreed, every action that was assigned, and anything that's still unresolved. Format as three short lists.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Who said what</h5>
+                    <div class="prompt-text">Summarise the position each person has taken in this thread. For each person, one sentence on what they said and what they want. Tell me if anyone's position shifted during the conversation.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="meeting-recap">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"/></svg></div>
+                <h2 class="section-title">Meeting Recap and Action Items</h2>
+            </div>
+            <div class="section-text">
+                <p>For this to work, the meeting needs to have been recorded and transcribed in Teams, a setting your organisation may have on by default, or may leave up to the organiser. Once the transcript exists, Copilot can work miracles with it.</p>
+
+                <div class="prompt-card">
+                    <h5>Standard recap after a meeting</h5>
+                    <div class="prompt-text">Generate a recap of this Teams meeting. Include: key discussion points (not every utterance), decisions made, actions with owners, and anything that was deferred. Plain bullet points, not a transcript. Under 300 words.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Action items only, for a follow-up email</h5>
+                    <div class="prompt-text">From this meeting transcript, pull out just the action items. For each one, tell me who owns it, what they said they'd do, and the timing if mentioned. Format it as a list I can paste into an email.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Quote-backed summary</h5>
+                    <div class="prompt-text">Summarise this meeting by decision, not by speaker. For each significant decision, include a one-sentence summary plus the direct quote where it was made. Useful for records.</div>
+                </div>
+
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Check before recording with external parties</h4>
+                        <p>Recording and transcription rules vary. In Australia, recording a conversation generally requires notice to the other participants. Teams notifies when recording starts, but for external attendees or sensitive conversations, confirm expectations up front. Your organisation may also have policies about which meetings can be transcribed.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="missed-meeting">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M11,15H13V17H11V15M12,2C17.35,2 19.68,7.62 16.5,11.67C15.67,12.67 14.33,13.33 13.67,14.17C13,15 13,16 13,17H10C10,15.33 10,13.92 10.67,12.92C11.33,11.92 12.67,11.33 13.5,10.67C15.92,8.43 15.32,5.26 12,5A3,3 0 0,0 9,8H6A6,6 0 0,1 12,2Z"/></svg></div>
+                <h2 class="section-title">Catching Up on a Meeting You Missed</h2>
+            </div>
+            <div class="section-text">
+                <p>The single best Copilot feature for remote and regional work. You didn't make the meeting, or the internet dropped halfway through, or it was early and you were asleep. Catch up fast.</p>
+
+                <div class="prompt-card">
+                    <h5>Quick catch-up</h5>
+                    <div class="prompt-text">I missed this meeting. In under 200 words, tell me: what it was about, the three most important things discussed, anything that requires action from me specifically, and whether there's anything I should follow up on with someone.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Ask a specific question of the meeting</h5>
+                    <div class="prompt-text">In this meeting, was there any discussion about the grant timeline? If so, summarise what was said and what conclusion (if any) was reached.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>First-ten-minutes catchup</h5>
+                    <div class="prompt-text">I joined this meeting 15 minutes late. Tell me what I missed in the first 15 minutes so I can pick up the thread without asking.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="briefing-note">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg></div>
+                <h2 class="section-title">Turning a Meeting into a Briefing Note</h2>
+            </div>
+            <div class="section-text">
+                <p>Decisions made in a meeting often need to end up in writing, briefing a manager, updating a team, recording in a project file. Copilot can take a meeting transcript and produce a first draft of the note.</p>
+
+                <div class="prompt-card">
+                    <h5>Briefing note from a transcript</h5>
+                    <div class="prompt-text">From this meeting transcript, draft a one-page briefing note for my manager. Include: purpose of the meeting, key issues discussed, decisions made, next steps with owners, and any risks or concerns raised. NT Gov style, plain language.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Team update from a meeting</h5>
+                    <div class="prompt-text">Draft a short team update email based on this meeting transcript. The audience is my team of five, who weren't in the meeting. Focus on what affects their work in the next fortnight. Under 200 words, warm but professional.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Status update for a project tracker</h5>
+                    <div class="prompt-text">Based on this meeting, update me on the current state of the [project]. Break it into: what's complete, what's in progress, what's new, and what's at risk. Short bullets, no fluff.</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="chat-copilot">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M17,12H7V10H17M17,16H7V14H17M17,8H7V6H17M3,22L7,18H21A2,2 0 0,0 23,16V4A2,2 0 0,0 21,2H3A2,2 0 0,0 1,4V22H3Z"/></svg></div>
+                <h2 class="section-title">Chat-Based Copilot for Quick Q&amp;A</h2>
+            </div>
+            <div class="section-text">
+                <p>The Copilot chat pane (accessible from within Teams, Outlook, or directly at copilot.microsoft.com signed in with your work account) is your go-to for questions that span your work, not just one document.</p>
+
+                <p><strong>Things it can do that Word/Excel/PowerPoint Copilot can't:</strong></p>
+                <p>Answer questions across multiple files, meetings, and emails at once.</p>
+                <p>Find things ("when did we last discuss the incident log? Who was in that meeting?").</p>
+                <p>Pull together information from different corners of your tenant.</p>
+                <p>Act as a general assistant for drafting, planning, research.</p>
+
+                <div class="prompt-card">
+                    <h5>Cross-source search</h5>
+                    <div class="prompt-text">Has our team discussed the new privacy policy anywhere in the last month? Search across emails, Teams chats, and meetings. Give me a short summary of what's been said and point me to where.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Project status across sources</h5>
+                    <div class="prompt-text">Based on recent emails, meetings, and documents, what's the current status of the incident log migration project? Include what's done, what's next, and any risks that have been raised.</div>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Prep for a conversation</h5>
+                    <div class="prompt-text">I have a meeting tomorrow with [person]. Based on our recent emails and any meetings we've had, what's the current state of our conversation, and what should I come prepared to discuss?</div>
+                </div>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Work Copilot vs Web Copilot</h4>
+                        <p>When signed in with your work account, the same Copilot chat interface can see your organisation's content. When signed in with a personal account, it's just a general chatbot like ChatGPT. Watch which account you're in. The little profile picture at the top right tells you.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="review-habit">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,15C12.81,15 13.5,14.7 14.11,14.11C14.7,13.5 15,12.81 15,12C15,11.19 14.7,10.5 14.11,9.89C13.5,9.3 12.81,9 12,9C11.19,9 10.5,9.3 9.89,9.89C9.3,10.5 9,11.19 9,12C9,12.81 9.3,13.5 9.89,14.11C10.5,14.7 11.19,15 12,15M12,2L3,7V10C3,15.5 6.84,20.74 12,22C17.16,20.74 21,15.5 21,10V7L12,2Z"/></svg></div>
+                <h2 class="section-title">The Review Habit for Communications</h2>
+            </div>
+            <div class="section-text">
+                <p>More important in comms than in documents, because emails and meeting recaps go out to real people, fast, and your name is on them.</p>
+                <div class="checklist-box">
+                    <h4>Before you hit send</h4>
+                    <p><strong>Tone check.</strong> Does this sound like me, or does it sound like a generic bot? Adjust until it's your voice.</p>
+                    <p><strong>Specifics check.</strong> Any names, dates, numbers, references. Verify the AI got them right, not plausible.</p>
+                    <p><strong>Commitment check.</strong> Did the AI promise something on your behalf that you haven't actually agreed to? Pull it back if so.</p>
+                    <p><strong>Discretion check.</strong> Does the message include anything that shouldn't be in writing, or shouldn't go to this audience?</p>
+                    <p><strong>Length check.</strong> Almost always cut by 20 percent. AI drafts tend toward padding.</p>
+                </div>
+                <p class="pullquote">Copilot writes quickly. You are what makes the message yours.</p>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 9</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

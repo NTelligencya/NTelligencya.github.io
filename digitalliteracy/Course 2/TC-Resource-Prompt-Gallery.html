@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Gallery, Real Things People Actually Use AI For</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.prompt-card):not(.prompt-card *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0!important;color:var(--navy-600)!important}
+        .prompt-card{background:rgba(10,22,40,0.02)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;border-radius:0!important;padding:20px 22px!important;margin:16px 0!important}
+        .prompt-card h5{font-size:1rem!important;font-weight:600!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .prompt-card .prompt-text{font-family:'JetBrains Mono',monospace!important;font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-900)!important;background:var(--white)!important;padding:14px 16px!important;border:1px solid rgba(10,22,40,0.08)!important;margin:8px 0 10px 0!important;white-space:pre-wrap!important;font-weight:400!important}
+        .prompt-card .prompt-why{font-size:0.85rem!important;color:var(--navy-400)!important;font-style:italic!important;margin:0!important;line-height:1.6!important}
+        .prompt-card .prompt-why strong{color:var(--navy-600)!important;font-style:normal!important}
+        .intro-block{font-family:'Fraunces',serif!important;font-size:1.2rem!important;line-height:1.55!important;color:var(--navy-900)!important;padding:18px 22px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:16px 0 22px 0!important;font-weight:400!important}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .prompt-card .prompt-text{font-size:0.8rem!important;padding:10px 12px!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE AI Training" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#how-to-use" class="active">How to Use This Gallery</a></li>
+            <li><a href="#understand">Understanding Confusing Things</a></li>
+            <li><a href="#cheap-alternatives">Finding Cheap or Free Alternatives</a></li>
+            <li><a href="#unstuck">Getting Unstuck at Home</a></li>
+            <li><a href="#writing">Writing Things You Have to Write</a></li>
+            <li><a href="#decisions">Thinking Through a Decision</a></li>
+            <li><a href="#study">Being Your Own Study Buddy</a></li>
+            <li><a href="#yourself">Talking About Yourself and Your Family</a></li>
+            <li><a href="#government">Government, Services, Rights</a></li>
+            <li><a href="#tips">Tips That Make Every Prompt Better</a></li>
+        </ul>
+        <div class="nav-section-label">Try These With</div>
+        <ul>
+            <li><a href="https://claude.ai/" target="_blank">Claude</a></li>
+            <li><a href="https://chatgpt.com/" target="_blank">ChatGPT</a></li>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+            <li><a href="https://gemini.google.com/app" target="_blank">Google Gemini</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Charles Darwin University TAFE, Resources</span>
+            <h1>Prompt Gallery</h1>
+            <p class="header-subtitle">A plain-English collection of prompts for the real things people actually need help with: explaining something confusing, finding cheaper tools, writing a letter you don't want to write, understanding a government form, or thinking through a decision. Copy any prompt, paste it in, change the details to suit you.</p>
+        </div>
+
+        <section class="content-section" id="how-to-use">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,17H11V11H13M13,9H11V7H13V9Z"/></svg></div>
+                <h2 class="section-title">How to Use This Gallery</h2>
+            </div>
+            <div class="section-text">
+                <p class="intro-block">Every prompt here is written in first person, the way you'd actually talk. Copy it, paste it into Claude, ChatGPT, Copilot or Gemini, and change the bits in your own words. The AI will do the rest, and ask you questions if it needs more from you.</p>
+                <p>You don't need to be a "prompt engineer" to use these. You just need to be willing to change a few words so they match your situation. If the answer isn't quite right, say so and ask for another go. That's how it works.</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>One rule worth remembering</h4>
+                        <p>Don't paste anything into a free public AI tool that you wouldn't want a stranger to read. That means: no tax file numbers, no Medicare numbers, no passwords, no full bank details. Names and addresses are usually fine, but think before you send.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="understand">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M11,18H13V16H11V18M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12C22,6.47 17.5,2 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,6A4,4 0 0,0 8,10H10A2,2 0 0,1 12,8A2,2 0 0,1 14,10C14,12 11,11.75 11,15H13C13,12.75 16,12.5 16,10A4,4 0 0,0 12,6Z"/></svg></div>
+                <h2 class="section-title">Understanding Confusing Things</h2>
+            </div>
+            <div class="section-text">
+                <p>Use the AI as a patient explainer. It won't get bored, it won't think your question is dumb, and you can ask it to say the same thing five different ways.</p>
+
+                <div class="prompt-card">
+                    <h5>Explain something technical in plain English</h5>
+                    <div class="prompt-text">Can you explain in plain English what the difference is between Wi-Fi, mobile data, and the NBN? Pretend I've never thought about it before. Keep it short and give me a real-life example for each.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> asking for "plain English" and "pretend I've never thought about it" lowers the AI's reading level automatically. Asking for an example forces it to be concrete.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Figure out what a mobile plan actually gives you</h5>
+                    <div class="prompt-text">I'm looking at a mobile plan that says "40 GB data, unlimited calls and texts, 5G access where available". I don't really know what 40 GB means in real life. Can you tell me what a normal month of phone use actually uses up, and whether 40 GB is a lot or a little for someone who watches some YouTube and uses WhatsApp?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> you gave the AI the exact plan wording, plus a description of your use. It can translate the marketing into real life.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Understand a letter, notice, or form</h5>
+                    <div class="prompt-text">I'm going to paste a letter I received. Can you read it and tell me in plain English what it's saying, what it wants me to do, and by when? Tell me if there's anything urgent or anything I should be worried about.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> it separates three different jobs (summarise, find the action, flag urgency) so the AI doesn't just give you a vague recap.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Understand a medical word or result</h5>
+                    <div class="prompt-text">I got a letter from my doctor with some words I don't understand. Can you explain what these mean in normal language, and tell me what sort of questions I should ask the doctor at my next appointment? Words: [paste words here]</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> it asks for both explanation and follow-up questions, so you walk into the appointment prepared, not just informed.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Understand a word or acronym at work</h5>
+                    <div class="prompt-text">In my workplace people keep using the words "stakeholder", "KPI" and "deliverable" and I nod along but I'm not 100 percent sure what they mean in this context. Can you give me a plain-English explanation and one example of each as it'd be used in a community services team?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> giving the AI the setting ("community services team") means the examples land in your world, not a corporate one.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="cheap-alternatives">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M5,6H23V18H5V6M14,9A3,3 0 0,1 17,12A3,3 0 0,1 14,15A3,3 0 0,1 11,12A3,3 0 0,1 14,9M9,8A2,2 0 0,1 7,10V14A2,2 0 0,1 9,16H19A2,2 0 0,1 21,14V10A2,2 0 0,1 19,8H9M1,10H3V20H19V22H1V10Z"/></svg></div>
+                <h2 class="section-title">Finding Cheap or Free Alternatives</h2>
+            </div>
+            <div class="section-text">
+                <p>If you're between jobs, on a tight budget, or trying to help a family member do something at home that they used to do at work, the AI is brilliant at finding free alternatives to paid software. It knows most of them.</p>
+
+                <div class="prompt-card">
+                    <h5>Find a free alternative to a paid program</h5>
+                    <div class="prompt-text">I used to use Microsoft Word at my last job. I don't have a work computer anymore and I can't pay for it. Can you list the best free alternatives I can use on my home laptop, how each one compares, and what to watch out for? I mostly need to write letters and open Word documents that people send me.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> you told the AI the specific task, not just the program. It can recommend the right alternative (e.g. Google Docs, LibreOffice, Office on the web) for what you actually do.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Replace a full Microsoft Office setup for free</h5>
+                    <div class="prompt-text">I need a free set of programs that can do what Microsoft Office does, so I can write documents, do spreadsheets, and make simple presentations on my home computer. Can you walk me through what to install, in what order, and how to make sure I can still open files people send me?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> asking for "in what order" gets you a step-by-step setup, not a list of names.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Find a free alternative for a specific creative task</h5>
+                    <div class="prompt-text">I want to design a simple flyer for a community event. I don't have Photoshop or anything like that. Can you recommend one free tool that's easy to learn and works in a web browser, and tell me what the first three steps would be to make a basic flyer?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "one free tool" stops the AI giving you a list to choose between. You want a recommendation, not homework.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Get a cheap way to learn a work skill</h5>
+                    <div class="prompt-text">I'd like to get better at Excel because most job ads mention it. I don't want to pay for a course. Can you put together a free self-study plan using YouTube videos and free websites, that I could do in about 30 minutes a day for two weeks? I'm starting from very basic.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> you gave the AI a time budget ("30 minutes a day for two weeks") and a starting level. It'll build a realistic plan rather than recommend a 40-hour course.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Find a free way to do something a paid app does</h5>
+                    <div class="prompt-text">I'd like to keep track of my money each month, but I don't want to pay for a budgeting app. Can you suggest a free way to do it, either with a free app or with a simple spreadsheet I could set up myself? Walk me through it like I've never done budgeting on a computer before.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> it invites the AI to propose two different paths (app or DIY) so you can pick the one that suits you.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="unstuck">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M22.7,19L13.6,9.9C14.5,7.6 14,4.9 12.1,3C10.1,1 7.1,0.6 4.7,1.7L9,6L6,9L1.6,4.7C0.4,7.1 0.9,10.1 2.9,12.1C4.8,14 7.5,14.5 9.8,13.6L18.9,22.7C19.3,23.1 19.9,23.1 20.3,22.7L22.6,20.4C23.1,20 23.1,19.3 22.7,19Z"/></svg></div>
+                <h2 class="section-title">Getting Unstuck at Home</h2>
+            </div>
+            <div class="section-text">
+                <p>Household tech problems, account trouble, broken things. The AI is often as good as phoning a help desk, and it's available at midnight.</p>
+
+                <div class="prompt-card">
+                    <h5>Fix a Wi-Fi or internet problem</h5>
+                    <div class="prompt-text">My home Wi-Fi keeps dropping out every couple of hours. It comes back by itself but it's driving me mad. Can you walk me through the most likely causes in order from simplest to hardest to fix, and ask me one question at a time so we can narrow it down? I'm not super technical.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "one question at a time" turns the AI into a real help desk instead of a wall of text.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Get back into an account you've been locked out of</h5>
+                    <div class="prompt-text">I'm locked out of my Gmail account. I don't remember the password and the phone number I used is not my current one. Can you walk me through every way Google lets you recover an account in this situation, starting with the easiest, and tell me what to expect at each step?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> you told the AI exactly what information you've lost. It can skip paths you can't use and go straight to ones that might work.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Set up a new device from scratch</h5>
+                    <div class="prompt-text">I just got a new Android phone and I need to move my photos, contacts, and WhatsApp chats from my old one. Can you give me a step-by-step checklist I can follow in order, and tell me which bits I should do on Wi-Fi instead of mobile data to save my data bill?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> the mention of Wi-Fi vs mobile data signals a remote or metered connection, and the AI will adjust the advice.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Back up phone photos somewhere safe and free</h5>
+                    <div class="prompt-text">I've got years of photos on my phone and I'm scared of losing them. I don't want to pay for cloud storage. What's the best free way to back them up, ideally in two places, so I'll still have them if my phone dies? Walk me through the first setup.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "ideally in two places" gets the AI to recommend a backup with a proper safety net, not just a single upload.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Work out why a device is slow</h5>
+                    <div class="prompt-text">My laptop has got really slow. It takes ages to start up and even a web browser feels sluggish. Can you give me a checklist of the most common causes and how to check each one, starting with the free and simple things before anything that costs money?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> ordering by "free and simple first" is a great default for almost any troubleshooting prompt.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="writing">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z"/></svg></div>
+                <h2 class="section-title">Writing Things You Have to Write</h2>
+            </div>
+            <div class="section-text">
+                <p>Letters of complaint, requests, references, messages you've been putting off. The AI drafts it, you read it, you change the bits that don't sound like you.</p>
+
+                <div class="prompt-card">
+                    <h5>Write a complaint or dispute letter</h5>
+                    <div class="prompt-text">I need to write a complaint letter to my electricity company. They charged me a late fee on a bill that was paid on time. I've got the receipt. I want the fee refunded and I want it on record that this happened. Can you draft a letter that's firm but polite, and leave spaces for the account number and dates so I can fill them in?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "firm but polite" gives the AI a tone to aim for, and "leave spaces" means you don't have to share account details with it.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Write a message to a landlord</h5>
+                    <div class="prompt-text">I need to send a message to my landlord about a broken hot water system. It's been out for four days. I want it fixed urgently but I don't want to sound angry. Can you write a short, clear message I can send by text or email, and suggest what to say if they don't respond within a day?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> it asks for the message and the follow-up. You're set up for both steps.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Write a reference or a supporting statement</h5>
+                    <div class="prompt-text">A friend has asked me to write a character reference for her for a rental application. She's honest, reliable, has two kids and has been renting for about six years. Can you help me write it so it sounds genuine, not copy-pasted, and is the right length, which I think is about half a page?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> you gave it the person, the purpose, and the length. That's usually enough to get a workable first draft.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Ask for a quote or a service</h5>
+                    <div class="prompt-text">I want to get a few quotes from local electricians to install an extra power point in my laundry. Can you write me a short message I can send to each one by text, that gives them enough information to quote but doesn't waffle? Include the questions I should ask back.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> asking for "questions I should ask back" is the bit people usually forget when they're just asking for a quote.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Write a hard message you've been avoiding</h5>
+                    <div class="prompt-text">I need to tell someone I can't keep lending them money. They're a family member. I want to be kind but clear. Can you help me write what to say, either as a text message or a conversation opener I could rehearse? Keep it short.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> giving the AI the emotional shape of the message ("kind but clear", "short") helps more than any formal brief.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="decisions">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11H15.5A1,1 0 0,1 16.5,12V16A1,1 0 0,1 15.5,17H8.5A1,1 0 0,1 7.5,16V12A1,1 0 0,1 8.5,11H9.2V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z"/></svg></div>
+                <h2 class="section-title">Thinking Through a Decision</h2>
+            </div>
+            <div class="section-text">
+                <p>The AI is a useful sounding board. It won't decide for you, but it's very good at laying out what you haven't thought about yet.</p>
+
+                <div class="prompt-card">
+                    <h5>Weigh up a big purchase</h5>
+                    <div class="prompt-text">I'm thinking of buying a second-hand 4WD for about fifteen thousand dollars. I mostly use a car for work trips on unsealed roads and occasionally for long drives with family. Can you list the pros and cons of this plan, the questions I should ask before I buy, and the warning signs of a dodgy sale?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> three outputs (pros/cons, questions, warning signs) in one prompt, which is much more useful than "should I buy a 4WD".</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Compare two options you're stuck between</h5>
+                    <div class="prompt-text">I'm trying to choose between two jobs. One pays more but is further from home and has longer hours. The other pays less but I could walk to work. I've got two young kids. Can you help me think through the tradeoffs, and ask me questions about what matters most to me before you give an opinion?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> asking it to ask you questions first stops it from jumping to a recommendation before it understands your situation.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Stress-test a plan you already have</h5>
+                    <div class="prompt-text">I'm planning to drive from Tennant Creek to Alice Springs for a family thing this weekend. I've never done this drive alone before. Can you tell me what could go wrong, what I should have in the car, and what a sensible plan looks like for fuel, water, and phone coverage? Be honest about the risks.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "be honest about the risks" is permission for the AI to be direct rather than cautious and hedgy.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Check what you should ask a tradie</h5>
+                    <div class="prompt-text">I'm getting a builder out to look at some water damage in the ceiling. I don't know much about building. Can you give me a list of questions to ask them on the day, so I don't get talked into work I don't need? Include warning signs that they might be overcharging.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> it puts you in a position to have a conversation with the tradie rather than sit through one.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Read a contract or agreement</h5>
+                    <div class="prompt-text">I'm about to sign a mobile phone contract. Can you tell me the three or four things I should always check in any contract like this, and the common traps people get caught by? I'll paste the contract after and you can tell me if any of those apply.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> asking for the general checklist first, then pasting the specific document, is a more thorough review than just "read this".</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="study">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z"/></svg></div>
+                <h2 class="section-title">Being Your Own Study Buddy</h2>
+            </div>
+            <div class="section-text">
+                <p>Whether you're doing TAFE, a driver's test, a licence, or just trying to understand a topic, the AI is a patient tutor. It'll change reading level on request.</p>
+
+                <div class="prompt-card">
+                    <h5>Get something explained at a level you can handle</h5>
+                    <div class="prompt-text">Can you explain how interest works on a loan, like you're explaining it to a friend who left school at 15? Use a real number example, like borrowing $5,000 at a real interest rate. No jargon.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> the reading-level framing and the worked example together produce a much more useful answer than "explain interest".</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Turn a topic into a quiz</h5>
+                    <div class="prompt-text">I'm studying for my heavy vehicle licence test and I keep struggling with the rules about load weights. Can you quiz me? Ask me one question at a time, tell me if I'm right, and explain the answer each time. Keep going until I get five in a row right.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "five in a row" sets a stopping point. You leave the session knowing you've got it, not just that you've practised.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Check your own understanding</h5>
+                    <div class="prompt-text">I've just finished reading a chapter on workplace safety for my Cert III. Can I explain the main idea to you in my own words, and you tell me what I've got right and what I've missed or misunderstood?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> this is called "teach-back", it's one of the strongest ways to learn. The AI is a perfect partner for it because it's never impatient.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Break a big topic into bite-sized pieces</h5>
+                    <div class="prompt-text">I need to learn the basics of first aid. I've got about 15 minutes a day for the next two weeks. Can you break it down into 14 short lessons I can read in that time, and at the end of each one, give me one thing to remember for life?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> giving a time budget and a length per lesson makes the plan realistic.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Make sense of a study resource you've been given</h5>
+                    <div class="prompt-text">My TAFE course sent me a reading that I don't really understand. I'll paste it in. Can you summarise the main points, tell me what I'm supposed to take away, and quiz me on three things that would likely come up in an assessment?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> it's three useful jobs in one, which saves re-reading the same material three times.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="yourself">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/></svg></div>
+                <h2 class="section-title">Talking About Yourself and Your Family</h2>
+            </div>
+            <div class="section-text">
+                <p>Resumes, cover letters, interviews, explaining gaps, telling your story. The AI is a gentle collaborator for the bits that feel awkward to write about yourself.</p>
+
+                <div class="prompt-card">
+                    <h5>Build a resume from a messy work history</h5>
+                    <div class="prompt-text">I want to put together a resume but my work history is a bit scattered. I've worked on and off in kitchens, done some contract work in community services, been out of work for a stretch when I was unwell, and recently done some volunteer driving for a community organisation. Can you help me turn this into a resume that's honest but shows the skills I've actually built? Ask me questions to fill in the gaps.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "honest but shows the skills" is a tone cue that stops the AI over-polishing or inventing things.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Write a cover letter without sounding fake</h5>
+                    <div class="prompt-text">I'm applying for a job as a youth support worker at a community organisation. I'll paste the job ad below. I've done some volunteer work with young people and I've lived in a small town all my life so I know the community. Can you help me write a cover letter that's honest, not full of buzzwords, and sounds like a real person?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "sounds like a real person" and "not full of buzzwords" are the two most useful guardrails for any AI-written job application.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Explain a gap in your work history</h5>
+                    <div class="prompt-text">I have a gap of about two years in my work history where I was caring for a family member. I feel awkward explaining it in job applications and interviews. Can you help me write one or two sentences I could use in a cover letter, and a slightly longer version I could say in an interview, in a way that's honest and doesn't sound defensive?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> giving it both a written and a spoken version means you're ready for either context.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Prepare for a job interview</h5>
+                    <div class="prompt-text">I've got a job interview next week. I'll paste the job ad. Can you act as the interviewer, ask me the five most likely questions they'd ask, one at a time, and after each answer give me feedback on what I did well and what I could tighten up?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> one at a time, with feedback, is a proper rehearsal. A list of 20 questions is not.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Write a funeral or eulogy speech</h5>
+                    <div class="prompt-text">My uncle passed away and I've been asked to say a few words at the service. I want to keep it honest and not too long. I'll tell you a few stories about him and what he meant to the family. Can you help me shape it into something I can read out in about three minutes, without losing my own voice?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "without losing my own voice" keeps the output from sounding generic. This is a task the AI genuinely helps with because the hard part is structure, not words.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="government">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,1L2,5V11C2,16.5 5.8,21.7 12,23C18.2,21.7 22,16.5 22,11V5L12,1M9,17L5,13L6.41,11.59L9,14.17L17.59,5.58L19,7L9,17Z"/></svg></div>
+                <h2 class="section-title">Government, Services, and Your Rights</h2>
+            </div>
+            <div class="section-text">
+                <p>Centrelink, MyGov, NDIS, tenancy, driver's licence, tax. These systems are written in a language of their own. The AI translates, but treat it as a starting point, not legal advice.</p>
+
+                <div class="prompt-card">
+                    <h5>Decode a MyGov or Centrelink message</h5>
+                    <div class="prompt-text">I got a message through MyGov that I don't fully understand. I'll paste it in. Can you tell me in plain English what it's saying, whether I need to do anything, and by when? Also tell me what would happen if I did nothing, so I know how serious it is.</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> "what happens if I do nothing" is the question that usually sorts urgent from non-urgent.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Understand a government form before you fill it in</h5>
+                    <div class="prompt-text">I need to fill in a form for [name of payment or service]. I'll paste the questions. Before I answer, can you explain in plain English what each question is actually asking, and warn me about any that people commonly get wrong?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> asking about "commonly get wrong" is a reliable way to catch traps, because forms are usually designed by people who've forgotten what it's like not to know.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Prepare for a meeting with a case worker or planner</h5>
+                    <div class="prompt-text">I have an NDIS planning meeting coming up. I'll tell you a bit about my situation. Can you help me figure out what to bring, what questions to ask, what language to use to describe what I actually need, and what to do if I feel rushed or unheard in the meeting?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> the last bit ("if I feel rushed or unheard") gives you a script for the awkward moment, which is where these meetings usually come off the rails.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Know your rights before you act</h5>
+                    <div class="prompt-text">My real estate agent has told me they want to do an inspection with 24 hours' notice. I'm not sure if that's allowed in the Northern Territory. Can you tell me what the rules are for residential tenancy notice periods in the NT, and point me to where I can check officially before I reply?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> asking for "where I can check officially" gets you to the primary source (NT Consumer Affairs or similar) rather than relying on the AI's summary.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>Understand a bill or invoice</h5>
+                    <div class="prompt-text">I've got a bill here that I don't really understand. I'll paste the line items. Can you explain each one in plain English, tell me if any of them look unusual or questionable, and suggest what to ask if I call to query it?</div>
+                    <p class="prompt-why"><strong>Why this works:</strong> bills are one of the few places where AI reading is genuinely faster and clearer than human reading, because the AI doesn't get bored.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="tips">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21Z"/></svg></div>
+                <h2 class="section-title">Tips That Make Every Prompt Better</h2>
+            </div>
+            <div class="section-text">
+                <p>Four small habits, and your prompts get sharper without any extra effort.</p>
+
+                <div class="prompt-card">
+                    <h5>1. Tell it who you are and what you're working with</h5>
+                    <p class="prompt-why"><strong>Example:</strong> "I'm a community support worker" or "I haven't done maths since school" or "I'm on a tight budget". One sentence of context changes the whole answer.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>2. Tell it what "good" looks like</h5>
+                    <p class="prompt-why"><strong>Example:</strong> "Keep it under a page", "use plain English", "sound friendly, not corporate", "give me three options, not a list of ten".</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>3. Ask it to ask you questions</h5>
+                    <p class="prompt-why"><strong>Example:</strong> "Ask me one question at a time until you've got enough to do a good job." Stops the AI from guessing at your situation.</p>
+                </div>
+
+                <div class="prompt-card">
+                    <h5>4. Push back when the answer isn't right</h5>
+                    <p class="prompt-why"><strong>Example:</strong> "No, that's not quite it. This part is wrong because X. Try again, and this time, Y." The AI won't be offended, and the second answer is almost always better than the first.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Prompt Gallery, Delivered under the Barkly Workforce Grant</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

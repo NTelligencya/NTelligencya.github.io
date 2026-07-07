@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 6, AI Foundations for the Workplace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--red:#b91c1c;--red-soft:rgba(185,28,28,0.06);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.tool-card):not(.tool-card *):not(.boundary-grid):not(.boundary-grid *):not(.checklist-box):not(.checklist-box *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .tool-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-top:3px solid var(--accent)!important;padding:18px 20px!important;margin:12px 0!important}
+        .tool-card h5{font-family:'Fraunces',serif!important;font-size:1.1rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:8px!important}
+        .tool-card p{font-size:0.9rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin-bottom:8px!important}
+        .tool-card p:last-child{margin-bottom:0!important}
+        .tool-card .tag{display:inline-block;font-size:0.7rem;color:var(--accent)!important;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;font-weight:600}
+        .boundary-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;margin:18px 0!important}
+        .boundary-grid .col{padding:18px 20px!important;border:1px solid rgba(10,22,40,0.08)!important;border-top:3px solid var(--green)!important;background:var(--green-soft)!important}
+        .boundary-grid .col.outside{border-top-color:var(--red)!important;background:var(--red-soft)!important}
+        .boundary-grid .col h5{font-family:'Fraunces',serif!important;font-size:1.05rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .boundary-grid .col p{font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin-bottom:6px!important}
+        .boundary-grid .col p:last-child{margin-bottom:0!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+            .boundary-grid{grid-template-columns:1fr!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#plain-english" class="active">AI in Plain English</a></li>
+            <li><a href="#the-four-tools">The Four Tools You'll Meet at Work</a></li>
+            <li><a href="#copilot-vs-others">Copilot vs ChatGPT, Claude, Gemini</a></li>
+            <li><a href="#data-boundary">Where Your Data Goes</a></li>
+            <li><a href="#good-at-work">What AI Is Good at in a Workplace</a></li>
+            <li><a href="#unreliable">Where AI Is Unreliable</a></li>
+            <li><a href="#human-in-loop">The Human in the Loop</a></li>
+            <li><a href="#sensible-defaults">Sensible Defaults for the Rest of the Course</a></li>
+        </ul>
+        <div class="nav-section-label">Tools Covered</div>
+        <ul>
+            <li><a href="https://copilot.cloud.microsoft/" target="_blank">Microsoft Copilot</a></li>
+            <li><a href="https://chatgpt.com/" target="_blank">ChatGPT</a></li>
+            <li><a href="https://claude.ai/" target="_blank">Claude</a></li>
+            <li><a href="https://gemini.google.com/app" target="_blank">Google Gemini</a></li>
+            <li><a href="https://notebooklm.google/" target="_blank">NotebookLM</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 6, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>AI Foundations for the Workplace</h1>
+            <p class="header-subtitle">What AI actually is, which tools you'll meet at work, how Copilot differs from the others, where your data goes, and where AI is genuinely useful versus genuinely unreliable. The mental model the rest of Day 2 runs on.</p>
+        </div>
+
+        <section class="content-section" id="plain-english">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,3C17.5,3 22,6.58 22,11A7,7 0 0,1 15,18C13.43,18 11.96,17.74 10.72,17.29L7,21V16.5C4.5,15.07 3,12.72 3,10C3,6.58 7.5,3 12,3Z"/></svg></div>
+                <h2 class="section-title">AI in Plain English</h2>
+            </div>
+            <div class="section-text">
+                <p>The AI tools you'll meet at work are called "large language models", or LLMs for short. You don't need to use that term out loud. What they actually are: programs that have read an enormous amount of text (most of the public internet, millions of books, vast amounts of technical writing) and have gotten very good at predicting what words should come next.</p>
+                <p>That sounds small. It isn't. To be good at predicting words, the model has to "understand" grammar, context, facts, tone, and the shape of an answer. The result feels like talking to a knowledgeable colleague, except it doesn't get tired, doesn't get offended, and doesn't remember you between conversations (unless you turn that on).</p>
+                <p class="pullquote">You don't need to know how it works to use it well. You do need to know where it's reliable and where it isn't.</p>
+                <p>That second part is what this session is really about. The tool is less important than your mental model of when to trust it.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="the-four-tools">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/></svg></div>
+                <h2 class="section-title">The Four Tools You'll Meet at Work</h2>
+            </div>
+            <div class="section-text">
+                <p>There are many AI tools. These are the four you'll actually bump into in an NT workplace.</p>
+
+                <div class="tool-card">
+                    <span class="tag">Built into M365</span>
+                    <h5>Microsoft Copilot</h5>
+                    <p>Microsoft's AI layer. Comes in several flavours. The free "Copilot chat" at copilot.microsoft.com. The paid "Microsoft 365 Copilot" that lives inside Word, Excel, Outlook, Teams and PowerPoint. An "Enterprise" version with stricter data protections. Which one your organisation has depends on your licence.</p>
+                    <p>The paid Copilot inside the M365 apps is the one this course leans on most, it can see your files, your emails, and your meetings (when permissioned), and act on them without the data leaving your tenant.</p>
+                </div>
+
+                <div class="tool-card">
+                    <span class="tag">Standalone chat</span>
+                    <h5>ChatGPT (OpenAI)</h5>
+                    <p>The best-known AI chatbot. Free tier is capable. Paid is better. Not tied into your M365 tenant, so it doesn't see your files unless you paste or upload them. Great for writing, summarising, research, anything that doesn't need live access to your workplace data.</p>
+                </div>
+
+                <div class="tool-card">
+                    <span class="tag">Standalone chat</span>
+                    <h5>Claude (Anthropic)</h5>
+                    <p>The closest competitor to ChatGPT. Often stronger on long documents, careful reasoning, and admitting uncertainty. Good default for reading and analysing documents you've uploaded. Also outside your M365 tenant.</p>
+                </div>
+
+                <div class="tool-card">
+                    <span class="tag">Standalone chat, Google</span>
+                    <h5>Google Gemini</h5>
+                    <p>Google's AI, built into Android and Google services. Voice mode is strong. Good for quick answers while you're doing something else. Outside your M365 tenant. Not a default choice for most Microsoft-based organisations, but you'll see it around.</p>
+                </div>
+
+                <p style="margin-top:14px"><strong>Honourable mention:</strong> NotebookLM. A Google product, different job. You upload documents, it answers questions grounded in those documents only. Very good for making sense of a stack of papers, reports, or policy docs. Available as a free web tool.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="copilot-vs-others">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" transform="scale(0.8) translate(3 3)"/></svg></div>
+                <h2 class="section-title">Copilot vs ChatGPT, Claude, Gemini, What's Actually Different</h2>
+            </div>
+            <div class="section-text">
+                <p>They all look like chatbots. The difference that matters is what they can see and what happens to what you type.</p>
+                <p><strong>Microsoft 365 Copilot (the paid one, built into Word, Excel, Outlook, Teams)</strong> can read the documents, emails, meetings, and files your account has access to. It answers grounded in your real work. Your prompts and the content it reads stay inside your organisation's Microsoft tenant, covered by Microsoft's enterprise agreements.</p>
+                <p><strong>Consumer ChatGPT, Claude, Gemini</strong> can't see anything unless you paste or upload it. Anything you put in could (depending on settings and licence) be used to improve the product, be seen by a human reviewer, or be stored indefinitely. Those are third-party services, not part of your workplace tenant.</p>
+                <p><strong>Enterprise or business versions of ChatGPT, Claude, Gemini</strong> exist with stronger data protections that start to resemble the Microsoft enterprise arrangement. If your organisation is licensed for one, you'll know.</p>
+                <div class="pullquote">Copilot sees your work. The consumer tools only see what you hand them. Both are useful. The difference decides what content each is safe for.</div>
+            </div>
+        </section>
+
+        <section class="content-section" id="data-boundary">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,11.99H19C18.47,16.11 15.72,19.78 12,20.93V12H5V6.3L12,3.19V11.99Z"/></svg></div>
+                <h2 class="section-title">Where Your Data Goes</h2>
+            </div>
+            <div class="section-text">
+                <p>The single most important thing to understand about AI at work: <strong>anything you type or upload is data that leaves your keyboard and goes somewhere</strong>. The question isn't whether data moves, it's <em>where</em>, and what happens when it gets there.</p>
+
+                <div class="boundary-grid">
+                    <div class="col">
+                        <h5>Inside your tenant (generally safe for work content)</h5>
+                        <p>Microsoft 365 Copilot inside Word, Excel, Outlook, Teams.</p>
+                        <p>Copilot chat when signed in with your work account and your org has the right licence.</p>
+                        <p>Teams chats and files within your organisation.</p>
+                        <p>OneDrive and SharePoint content your account has access to.</p>
+                    </div>
+                    <div class="col outside">
+                        <h5>Outside your tenant (be careful)</h5>
+                        <p>The free web ChatGPT, Claude, Gemini, Perplexity.</p>
+                        <p>Any AI tool you log into with a personal email.</p>
+                        <p>Free voice and image generators.</p>
+                        <p>Anywhere a sharing link is set to "anyone with the link".</p>
+                    </div>
+                </div>
+
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Rule of thumb</h4>
+                        <p>If you wouldn't be comfortable with a stranger on another continent reading a document, don't paste it into a free consumer AI. Use Copilot (if licensed) for anything work-sensitive. Use consumer tools for your own writing, your own research, and anything non-confidential.</p>
+                    </div>
+                </div>
+
+                <p>We'll come back to this in detail in Session 11 (Responsible Use, Privacy &amp; Policy). The mental model starts here.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="good-at-work">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg></div>
+                <h2 class="section-title">What AI Is Good at in a Workplace</h2>
+            </div>
+            <div class="section-text">
+                <p>The tasks where AI earns its keep in an NT office, community organisation, or government team.</p>
+                <p><strong>First drafts.</strong> Emails, briefing notes, meeting recaps, short reports, grant sections. You'll rewrite parts. The first draft saves the blank-page time.</p>
+                <p><strong>Summarising.</strong> A long policy document, a meeting transcript, a long email thread, a 40-page PDF. "What are the key points and what's being asked of me?"</p>
+                <p><strong>Rewriting for different audiences.</strong> Turning technical content into plain English. Adjusting tone (formal, direct, friendly). Making a long paragraph shorter.</p>
+                <p><strong>Translation.</strong> Both between languages and between registers (policy jargon to plain English).</p>
+                <p><strong>Research synthesis.</strong> "I've got five documents on this topic. What's the common thread? Where do they disagree?"</p>
+                <p><strong>Structured thinking.</strong> Pros and cons lists. Risk tables. Decision frameworks. Questions you should ask before signing something.</p>
+                <p><strong>Drafting formulas and data transformations.</strong> "Turn this messy list into a clean table." "Write an Excel formula that does X."</p>
+                <p><strong>Tutoring.</strong> "Explain this to me like I haven't done this kind of work before." "Quiz me on this policy until I know it."</p>
+                <p><strong>Meeting preparation.</strong> "Given these three documents, what questions should I expect?" "What background do I need to read before this conversation?"</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="unreliable">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/></svg></div>
+                <h2 class="section-title">Where AI Is Unreliable</h2>
+            </div>
+            <div class="section-text">
+                <p>The honest list of what AI gets wrong. Knowing this is the difference between a professional user and someone who gets caught out.</p>
+                <p><strong>It hallucinates.</strong> Makes up facts, quotes, references, court cases, policy clauses, phone numbers. Writes them with total confidence. If the specifics matter, verify them against a primary source.</p>
+                <p><strong>It's out of date.</strong> Most AIs are trained months or a year ago. They won't know last week's machinery-of-government change, yesterday's policy update, or a recent appointment, unless a live search feature is on.</p>
+                <p><strong>It's weak on local specifics.</strong> It will be confidently wrong about a specific NT program, a particular community organisation, a local bylaw, or a named person. The more local and niche, the less to trust.</p>
+                <p><strong>It struggles with arithmetic and counting.</strong> Bad at maths without a calculator tool. Will miscount words, dates, or items in a list. For anything numerical that matters, check.</p>
+                <p><strong>It doesn't know what it doesn't know.</strong> Unlike a thoughtful human, it will confidently answer questions outside its training rather than saying "I don't know."</p>
+                <p><strong>It can't see context you haven't given it.</strong> If you ask for a "short email" without saying who it's to, the tone will be generic. The AI fills in the blanks from averages, and averages usually aren't you.</p>
+                <p><strong>Session 7 covers how to prompt it in ways that reduce these failures.</strong> Session 11 covers how to review output before it goes out.</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Ask it when it's unsure</h4>
+                        <p>A reliable habit: "Before you answer, tell me how confident you are in this, and where I should look to verify." Most AI will give you a useful honesty check. Not perfect, but much better than assuming.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="human-in-loop">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,12A3,3 0 0,0 15,9A3,3 0 0,0 12,6A3,3 0 0,0 9,9A3,3 0 0,0 12,12M12,14C9.33,14 4,15.34 4,18V20H20V18C20,15.34 14.67,14 12,14Z"/></svg></div>
+                <h2 class="section-title">The Human in the Loop</h2>
+            </div>
+            <div class="section-text">
+                <p>The single most important idea for using AI at work: <strong>the AI drafts, the human decides</strong>. That's not a legal disclaimer, it's how the tool is actually designed to work. Copilot included.</p>
+                <p class="pullquote">AI output is the starting point of your work, never the ending point.</p>
+                <p>What "human in the loop" looks like in practice:</p>
+                <p><strong>Read before you send.</strong> Every AI-drafted email, memo, or paragraph gets a human read before it leaves you. Not a skim. A real read.</p>
+                <p><strong>Fact-check the specifics.</strong> Dates, names, numbers, quotes, statutory references. If the AI said it, and it matters, check it.</p>
+                <p><strong>Own the decision.</strong> The AI can lay out options. You choose. When something goes wrong, "Copilot wrote it" isn't a defence, your signature is on the work.</p>
+                <p><strong>Keep your judgement sharp.</strong> Using AI for first drafts doesn't mean your writing skills atrophy. Read the AI's work as a critic, not a consumer. Disagree with it. Rewrite parts. That's the work.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="sensible-defaults">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg></div>
+                <h2 class="section-title">Sensible Defaults for the Rest of the Course</h2>
+            </div>
+            <div class="section-text">
+                <p>The posture we'll use for the rest of Day 2. Not a policy, just a working stance.</p>
+                <div class="checklist-box">
+                    <h4>Your working stance</h4>
+                    <p>For work content, prefer Copilot (inside M365) over consumer tools.</p>
+                    <p>For your own research, writing, and learning, consumer tools are fine, just don't paste sensitive work content into them.</p>
+                    <p>Never put personal information about others, identifying details, or content you don't own into a free consumer AI.</p>
+                    <p>Treat AI output as a draft. Read before sending. Check specifics.</p>
+                    <p>When you're unsure, ask the AI: "how confident are you, and where should I verify?"</p>
+                    <p>Use AI most aggressively where the downside of getting it wrong is small (personal drafts, learning, brainstorming). Use it more carefully where the downside is large (external communications, policy, advice).</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 6</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 5, Deepfakes and AI-Generated Content</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--red:#b91c1c;--red-soft:rgba(185,28,28,0.06);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.activity-box):not(.activity-box *):not(.detect-card):not(.detect-card *):not(.checklist-box):not(.checklist-box *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .detect-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;padding:18px 20px!important;margin:14px 0!important}
+        .detect-card h5{font-family:'Fraunces',serif!important;font-size:1.05rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .detect-card p{font-size:0.9rem!important;line-height:1.65!important;color:var(--navy-600)!important;margin-bottom:8px!important}
+        .detect-card p:last-child{margin-bottom:0!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .activity-box{background:rgba(59,130,246,0.06)!important;border:1px solid rgba(59,130,246,0.25)!important;padding:20px 22px!important;margin:18px 0!important}
+        .activity-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .activity-box .label{display:inline-block;background:var(--accent);color:var(--white)!important;font-size:0.7rem;font-weight:600;padding:3px 10px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px}
+        .activity-box p{color:var(--navy-600)!important;margin-bottom:8px!important;font-size:0.92rem!important;line-height:1.65!important}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE AI Training" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#what-is-deepfake" class="active">What a Deepfake Is</a></li>
+            <li><a href="#how-they-work">How They're Made</a></li>
+            <li><a href="#where-you-see">Where You'll See Them</a></li>
+            <li><a href="#spot-images">Spotting AI-Generated Images</a></li>
+            <li><a href="#spot-video">Spotting AI Video</a></li>
+            <li><a href="#spot-audio">Spotting AI Voice</a></li>
+            <li><a href="#protect-yourself">Protecting Your Own Face, Voice, Name</a></li>
+            <li><a href="#misinfo">Misinformation and What to Trust</a></li>
+            <li><a href="#try-it">Try It Yourself</a></li>
+        </ul>
+        <div class="nav-section-label">Reference Links</div>
+        <ul>
+            <li><a href="https://www.esafety.gov.au/" target="_blank">eSafety Commissioner</a></li>
+            <li><a href="https://www.esafety.gov.au/key-topics/deepfakes" target="_blank">eSafety on Deepfakes</a></li>
+            <li><a href="https://www.rmit.edu.au/about/schools-colleges/media-and-communication/industry/factlab" target="_blank">RMIT FactLab</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 5, AI &amp; Online Cyber Safety Skills</span>
+            <h1>Deepfakes and AI-Generated Content</h1>
+            <p class="header-subtitle">AI can now make images, voices, and videos that look and sound real but aren't. This session is about what deepfakes are, how to spot them, how to protect your own likeness, and how to hold onto a sensible sense of what's true online.</p>
+        </div>
+
+        <section class="content-section" id="what-is-deepfake">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,9A3.02,3.02 0 0,0 9,12C9,13.68 10.32,15 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/></svg></div>
+                <h2 class="section-title">What a Deepfake Is</h2>
+            </div>
+            <div class="section-text">
+                <p>A "deepfake" is a piece of media (photo, video, audio) that's been generated or altered by AI to show something that didn't actually happen. The name comes from "deep learning" (a kind of AI) plus "fake". Five years ago, making a convincing fake video took a Hollywood budget. Today, teenagers can do it on a phone for free.</p>
+                <p>Deepfakes aren't all bad. The same technology that powers deepfakes is behind harmless fun like video filters, dubbing foreign films, and generating art. What's changed is that the cost has fallen to zero, and the skill required has fallen to near zero too.</p>
+                <p class="pullquote">You can't avoid deepfakes. You just need to adjust the trust you give to images and videos, the way you already did for emails.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="how-they-work">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z"/></svg></div>
+                <h2 class="section-title">How They're Made</h2>
+            </div>
+            <div class="section-text">
+                <p>You don't need to understand the technical details. You do need to know what's possible, so you're not fooled when you see it.</p>
+                <p><strong>AI-generated images</strong> come from tools like ChatGPT's image generator, Midjourney, or the image features inside Gemini. You type a description ("a photo of an older man sitting on a verandah holding a guitar") and the AI produces an image that looks like a photograph. The result can be indistinguishable from a real photo at a glance.</p>
+                <p><strong>AI-generated video</strong> comes from tools like Sora, Runway, and Google Veo. You type a short description and get a short video clip. The results are good enough to fool many people on a quick scroll, though they often fall apart on close inspection.</p>
+                <p><strong>AI voice cloning</strong> can copy someone's voice from as little as 3 to 10 seconds of audio. Facebook videos, voicemails, TikToks, anything with your voice can be used as a sample. The cloned voice can then say whatever the scammer types.</p>
+                <p><strong>Face swaps</strong> take a real video and replace one person's face with another. This is the classic "deepfake" people picture, though it's now only one of several techniques.</p>
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>It only takes a few seconds of your voice</h4>
+                        <p>If you've recorded a voicemail greeting, posted a TikTok, or left an Instagram video with you talking in it, there's already enough to clone your voice. This isn't cause for panic, it's cause for knowing about the "Hi Mum" scam we covered in Session 4, but now with Mum's voice on the phone, not just a text.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="where-you-see">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17Z"/></svg></div>
+                <h2 class="section-title">Where You'll See Them</h2>
+            </div>
+            <div class="section-text">
+                <p>Deepfakes are already part of everyday life online. Here's where they show up, and why.</p>
+                <p><strong>Scam ads on Facebook and Instagram.</strong> Fake videos of celebrities or news anchors "endorsing" an investment scheme, a crypto platform, or a miracle product. The faces are real people. The voices are cloned. The endorsement is fake.</p>
+                <p><strong>Political misinformation.</strong> Fake videos of politicians saying things they never said, timed around elections or major events. These spread fastest on WhatsApp, Facebook, and X.</p>
+                <p><strong>"Hi Mum" voice scams.</strong> The text-message version of this scam has now evolved. The voice on the phone really does sound like your child, because it's been cloned from their social media.</p>
+                <p><strong>Romance scams.</strong> The photos have been fake for years. Now the video calls are too, short clips generated in real time so the scammer can "prove" they're who they claim to be.</p>
+                <p><strong>Harassment and image-based abuse.</strong> Someone's face being put on content they never consented to, often sexual. This is illegal in Australia and reportable to eSafety.</p>
+                <p><strong>Harmless fun.</strong> Filters on Snapchat and TikTok. Movie dubbing. Music videos with surreal effects. Memes. The same technology.</p>
+                <p class="pullquote">The tech is neutral. How it's used is what matters. Your job is to know when it's being used against you.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="spot-images">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg></div>
+                <h2 class="section-title">Spotting AI-Generated Images</h2>
+            </div>
+            <div class="section-text">
+                <p>AI-generated images have gotten good fast, but they still have tells. The best images pass most casual inspection. The medium ones (which is still most of them) fail these checks.</p>
+
+                <div class="detect-card">
+                    <h5>Check the hands</h5>
+                    <p>Count the fingers. Look for weird bends, fused knuckles, or hands that don't quite match the wrist. Hands are still one of the hardest things for AI to get right.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Check the text in the image</h5>
+                    <p>Shop signs, book titles, product labels, name tags. AI images often render text as plausible-looking gibberish. If there's writing, zoom in and read it carefully.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Check the background</h5>
+                    <p>AI focuses on the main subject and loses quality on what's behind it. Look for warped buildings, duplicated cars, people with blurry faces, windows that don't quite align, trees that morph into each other.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Check the skin and teeth</h5>
+                    <p>AI skin is often too smooth, airbrushed-looking, even on older people. Teeth can look uncannily perfect, or the wrong count if you can see them clearly.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Check jewellery, glasses, and accessories</h5>
+                    <p>Earrings that don't match. Glasses with mismatched frames. Necklaces that disappear behind clothing and come out wrong on the other side. Watches with nonsense numbers.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Check the source</h5>
+                    <p>Where did you see it? A verified news outlet, a known person you follow, or a random account with no history? Source trumps appearance. A real photo from a real journalist is worth more than a convincing image from nowhere.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Reverse image search</h5>
+                    <p>Right-click on an image in a browser and choose "Search image with Google", or go to images.google.com and upload the file. You'll see where else the image has appeared, which often reveals it as AI-generated, or as a real photo taken from a different context years ago.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="spot-video">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"/></svg></div>
+                <h2 class="section-title">Spotting AI Video</h2>
+            </div>
+            <div class="section-text">
+                <p>Video deepfakes are harder to make than images, so they're not quite as common yet, and they fail in more obvious ways. But they're improving fast.</p>
+
+                <div class="detect-card">
+                    <h5>Watch the mouth</h5>
+                    <p>Lip-sync is one of the hardest things. Watch the mouth moving in slow motion or pause it. Does the shape of the mouth match the sound? Often you'll see the lips closed on a sound that should be open, or the other way round.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Watch the eyes</h5>
+                    <p>Blinking rates can be off. Eyes may not track objects naturally. Sometimes eyes look painted on rather than moving with the head.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Watch the edges of the face</h5>
+                    <p>In face-swap deepfakes, the jawline, ears, and hairline are where the swap struggles. Look for a slightly blurred edge, a weird colour change, or hair that "flickers" between frames.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Listen to the audio</h5>
+                    <p>AI voices often have a too-even rhythm. Real people pause, stumble, breathe, say "um". A voice with no imperfections, or with weirdly wrong emphasis ("today I went to the SHOP", stressed wrong), is suspicious.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Check the context</h5>
+                    <p>If a politician, celebrity, or public figure has "said" something surprising, check a major news outlet before believing it. Real news gets reported by multiple outlets within hours. Viral clips that never quite make the news are often fake.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="spot-audio">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"/></svg></div>
+                <h2 class="section-title">Spotting AI Voice, Especially on a Phone Call</h2>
+            </div>
+            <div class="section-text">
+                <p>Voice cloning is the trickiest one to spot in real time. When the "voice of a loved one" calls you in distress, your brain doesn't want to audit the audio.</p>
+
+                <div class="detect-card">
+                    <h5>Ask a question only the real person would know</h5>
+                    <p>"What's the name of the first dog we had?" "Where did we go camping that time you got stung?" A cloned voice can't improvise answers to personal memories, only the real person can.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Listen for emotional flatness</h5>
+                    <p>Cloned voices often get the words right and the emotion slightly wrong. A crying voice that sounds like a calm voice running a sad filter. A voice in a panic that has no ragged breath.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Call them back, on a number you have</h5>
+                    <p>If your daughter is calling from an unknown number claiming to be in trouble, hang up, then call her on the number you already have. If she doesn't answer, call someone who'd know where she is before you send any money.</p>
+                </div>
+                <div class="detect-card">
+                    <h5>Agree a family code word in advance</h5>
+                    <p>Pick a word that only your family knows. If anyone claims to be you or a family member in a phone emergency, they have to say the code word. This is the single most effective defence against voice cloning, and it takes five minutes at the dinner table.</p>
+                </div>
+
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>Tell the family about the code word</h4>
+                        <p>This one sounds silly until the day it matters. A family code word is the cheapest, simplest, strongest protection against every voice-cloning scam that exists. Pick it tonight.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="protect-yourself">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1Z"/></svg></div>
+                <h2 class="section-title">Protecting Your Own Face, Voice, and Name</h2>
+            </div>
+            <div class="section-text">
+                <p>You can't make yourself un-cloneable. But you can reduce the amount of raw material available to people who'd misuse it.</p>
+
+                <div class="checklist-box">
+                    <h4>Sensible defaults, not paranoia</h4>
+                    <p>Set your Facebook and Instagram profiles so only friends can see your posts. Public profiles are the richest source of voice and face samples.</p>
+                    <p>Be mindful of the videos you post that include your voice. You don't have to stop posting, just know what's out there.</p>
+                    <p>Photos of children, especially in school uniforms or named locations, are worth thinking about twice.</p>
+                    <p>The family code word (from the section above). The single highest-leverage thing on this list.</p>
+                    <p>If you're in a public role (government, teaching, community leadership), consider using a separate work-facing persona and a private family-facing one.</p>
+                </div>
+
+                <p><strong>If someone makes a deepfake of you.</strong> This is harassment or image-based abuse, and Australia has strong laws against it.</p>
+                <p>Report to the platform (Facebook, Instagram, TikTok) using their "report" function.</p>
+                <p>Report to the <a href="https://www.esafety.gov.au/" target="_blank">eSafety Commissioner</a> (esafety.gov.au). They have the power to order platforms to take content down.</p>
+                <p>If it's sexual or intimate, report to police as well. It's a criminal offence in Australia.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="misinfo">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M11,11H13V13H11M11,7H13V9H11M15,11H17V13H15M7,7H9V9H7M7,11H9V13H7M15,7H17V9H15Z"/></svg></div>
+                <h2 class="section-title">Misinformation and What to Trust Online</h2>
+            </div>
+            <div class="section-text">
+                <p>Step back for a minute. Deepfakes are just one tool in a much older problem: people sharing things online that aren't true. Most of what spreads on social media isn't deepfake, it's real images taken out of context, real videos from years ago being reposted as today's news, or confident posts by people who got something wrong and never corrected it.</p>
+                <p class="pullquote">The question isn't "is this image real?". The question is "is this image telling the truth?"</p>
+                <p><strong>A three-step sanity check</strong> for anything that makes you angry, scared, or triumphant within five seconds of seeing it:</p>
+                <p><strong>1. Slow down.</strong> The emotion is the hook, same as with scams. Notice the feeling. Don't share yet.</p>
+                <p><strong>2. Check another source.</strong> Is a real news outlet (ABC, Guardian, SBS, a major regional paper) reporting this? If the story is real and significant, yes. If only social media is carrying it, be cautious.</p>
+                <p><strong>3. Check the date.</strong> How old is this image or video? Old photos get recirculated constantly with new captions. Look for publication dates and reverse-image-search to check.</p>
+                <p>You don't have to do this for every meme. You do have to do it for anything before you share, because sharing is how misinformation spreads.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="try-it">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.59,7.58L10,14.17L7.41,11.59L6,13L10,17L18,9"/></svg></div>
+                <h2 class="section-title">Try It Yourself</h2>
+            </div>
+            <div class="section-text">
+                <div class="activity-box">
+                    <span class="label">Activity, 10 minutes</span>
+                    <h4>Put your detection skills to the test.</h4>
+                    <p><strong>1. Generate an image.</strong> Open ChatGPT, Gemini, or Copilot and ask it: "Make me a realistic photo of an older Aussie woman at a community market in the Northern Territory." Look at the result. What's wrong with it? What would give it away if someone claimed it was a real photo?</p>
+                    <p><strong>2. Reverse image search.</strong> Save that image. Then upload it to images.google.com and see what comes back. Try the same with a real photo from your own phone. Compare the difference.</p>
+                    <p><strong>3. Discuss a family code word.</strong> Before you leave the room, decide on the word you'd use with your family. Write it down. Tell them tonight.</p>
+                    <p style="margin-top:10px"><strong>The lesson.</strong> Deepfakes look more real than you might expect, but they still have tells. Your eyes and your common sense, plus a reverse image search, will catch most of what you see in the wild. And one family code word will protect you from the scam that matters most.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, AI &amp; Online Cyber Safety Skills, Session 5</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>

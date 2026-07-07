@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session 3, Teams, Outlook &amp; Working Together</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--navy-900:#0a1628;--navy-800:#111d35;--navy-700:#1a2a4a;--navy-600:#2a3f5f;--navy-400:#4a6a94;--navy-200:#8fa4c4;--white:#ffffff;--off-white:#f8fafc;--cream:#fafbfd;--accent:#3b82f6;--accent-soft:rgba(59,130,246,0.1);--green:#059669;--green-soft:rgba(5,150,105,0.08);--amber:#d97706;--amber-soft:rgba(217,119,6,0.08);--shadow-lg:0 20px 50px rgba(0,0,0,.35);--shadow-md:0 4px 20px rgba(10,22,40,0.1)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important;font-size:16px!important;line-height:1.7!important;color:var(--off-white)!important;background:linear-gradient(180deg,var(--navy-900) 0%,var(--navy-800) 100%)!important;min-height:100vh;-webkit-font-smoothing:antialiased}
+        h1,h2,h3,h4,h5,h6{font-family:'Fraunces',serif!important;font-weight:400!important;color:var(--white)!important}
+        p,li,a,span{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:300!important}
+        nav,.navigation,[class*="nav"],[class*="menu"],[class*="dropdown"]{z-index:99999!important}
+        [class*="dropdown"]>*,nav ul,nav li{z-index:100000!important}
+        .topic-list,.topic-list li,.content-section ul,.content-section li{all:unset!important;display:block!important;list-style:none!important;margin-left:0!important;padding-left:0!important}
+        .host-bg-cover{position:fixed!important;top:0!important;left:0!important;width:100%!important;height:155px!important;background:#1a1a2e!important;margin:0!important;padding:0!important;display:block!important;z-index:1!important;pointer-events:none!important}
+        .banner-image{width:100%!important;height:auto!important;display:block!important;z-index:1!important;margin-top:-90px!important}
+        .container{display:flex!important;width:100%!important}
+        .nav-sidebar{position:sticky!important;top:20px!important;width:280px!important;min-width:280px!important;height:calc(100vh - 40px)!important;overflow-y:auto!important;background:var(--navy-900)!important;border:1px solid rgba(59,130,246,.2)!important;padding:20px!important;margin:20px 0 20px 20px!important;border-radius:0!important;box-shadow:var(--shadow-md)!important;z-index:40!important}
+        .nav-sidebar::-webkit-scrollbar{width:4px}
+        .nav-sidebar::-webkit-scrollbar-thumb{background:var(--navy-600);border-radius:2px}
+        .nav-sidebar h3{margin:0 0 16px 0!important;font-size:1.1em!important;padding-bottom:10px!important;border-bottom:2px solid var(--accent)!important;font-weight:400!important;color:var(--white)!important}
+        .nav-sidebar ul{list-style:none!important;padding:0!important;margin:0!important}
+        .nav-sidebar li{margin:0!important;padding:0!important;list-style:none!important}
+        .nav-sidebar li::before{content:none!important}
+        .nav-sidebar a{display:block!important;padding:8px 12px!important;color:rgba(255,255,255,0.7)!important;text-decoration:none!important;font-size:0.85rem!important;font-weight:300!important;border-left:2px solid transparent!important;transition:all 0.2s ease!important;border-radius:0!important}
+        .nav-sidebar a:link,.nav-sidebar a:visited{color:rgba(255,255,255,0.7)!important}
+        .nav-sidebar a:hover{background:rgba(59,130,246,.15)!important;border-left-color:var(--accent)!important;color:var(--white)!important}
+        .nav-sidebar a.active{background:rgba(59,130,246,.2)!important;border-left-color:var(--accent)!important;color:var(--white)!important;font-weight:500!important}
+        .nav-section-label{font-size:0.65rem!important;text-transform:uppercase!important;letter-spacing:0.12em!important;color:var(--navy-400)!important;margin:16px 0 6px 12px!important;font-weight:500!important}
+        .main-content{flex:1!important;padding:20px!important;min-width:0!important}
+        .page-header{background:linear-gradient(135deg,var(--navy-800) 0%,var(--navy-900) 100%)!important;border:1px solid rgba(59,130,246,.2)!important;border-radius:0!important;padding:40px 32px!important;margin-bottom:24px!important;position:relative!important;overflow:hidden!important}
+        .page-header::before{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:linear-gradient(45deg,transparent 30%,rgba(59,130,246,0.05) 100%)}
+        .header-eyebrow{font-size:0.75rem!important;font-weight:500!important;color:var(--accent)!important;text-transform:uppercase!important;letter-spacing:0.12em!important;margin-bottom:12px!important}
+        .page-header h1{font-size:2.2rem!important;margin-bottom:12px!important;font-weight:300!important;letter-spacing:-0.02em!important;position:relative;z-index:2}
+        .header-subtitle{color:rgba(255,255,255,0.7)!important;font-size:1.05rem!important;line-height:1.7!important;max-width:680px!important;position:relative;z-index:2}
+        .content-section{background:var(--white)!important;background-color:#ffffff!important;border:1px solid rgba(10,22,40,0.06)!important;border-radius:0!important;padding:28px!important;margin-bottom:20px!important;box-shadow:0 1px 3px rgba(10,22,40,0.04)!important}
+        .content-section,.content-section *:not(.section-icon):not(.section-icon *):not(.callout):not(.callout *):not(.tip-card):not(.tip-card *):not(.checklist-box):not(.checklist-box *):not(.compare-two):not(.compare-two *){color:var(--navy-600)!important}
+        .content-section h2,.content-section h3,.content-section h4,.content-section .section-title{color:var(--navy-900)!important}
+        .content-section p,.content-section li,.content-section span{color:var(--navy-600)!important}
+        .section-header{display:flex!important;align-items:center!important;gap:16px!important;margin-bottom:20px!important;padding-bottom:14px!important;border-bottom:1px solid rgba(10,22,40,0.06)!important}
+        .section-icon{flex-shrink:0!important;width:50px!important;height:50px!important;background:linear-gradient(135deg,var(--accent),#2563eb)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-shadow:0 6px 18px rgba(59,130,246,.25)!important}
+        .section-icon svg{width:24px!important;height:24px!important;fill:var(--white)!important}
+        .section-title{font-size:1.5rem!important;margin:0!important;font-weight:400!important;color:var(--navy-900)!important}
+        .section-text{font-size:1rem!important;line-height:1.8!important;color:var(--navy-600)!important}
+        .section-text p{margin-bottom:16px!important;color:var(--navy-600)!important}
+        .callout{display:flex!important;gap:14px!important;padding:18px 20px!important;border-radius:0!important;margin:20px 0!important;background:var(--accent-soft)!important;border-left:3px solid var(--accent)!important}
+        .callout-icon{width:24px!important;height:24px!important;flex-shrink:0!important;margin-top:2px!important;fill:var(--accent)!important}
+        .callout h4{font-size:0.95rem!important;font-weight:600!important;margin-bottom:6px!important;color:var(--accent)!important}
+        .callout p{font-size:0.9rem!important;line-height:1.6!important;margin:0 0 8px 0!important;color:var(--navy-600)!important}
+        .callout p:last-child{margin-bottom:0!important}
+        .callout.warning{background:var(--amber-soft)!important;border-left-color:var(--amber)!important}
+        .callout.warning .callout-icon{fill:var(--amber)!important}
+        .callout.warning h4{color:var(--amber)!important}
+        .pullquote{font-family:'Fraunces',serif!important;font-size:1.3rem!important;line-height:1.5!important;color:var(--navy-900)!important;padding:20px 24px!important;border-left:4px solid var(--accent)!important;background:rgba(59,130,246,0.04)!important;margin:18px 0!important;font-weight:400!important}
+        .tip-card{background:rgba(10,22,40,0.03)!important;border:1px solid rgba(10,22,40,0.08)!important;border-left:3px solid var(--accent)!important;padding:16px 18px!important;margin:12px 0!important}
+        .tip-card h5{font-size:0.98rem!important;font-weight:600!important;color:var(--navy-900)!important;margin-bottom:8px!important}
+        .tip-card p{font-size:0.89rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin-bottom:6px!important}
+        .tip-card p:last-child{margin-bottom:0!important}
+        .checklist-box{background:rgba(59,130,246,0.05)!important;border:1px solid rgba(59,130,246,0.2)!important;padding:20px 22px!important;margin:18px 0!important}
+        .checklist-box h4{color:var(--navy-900)!important;font-size:1.05rem!important;margin-bottom:10px!important}
+        .checklist-box p{color:var(--navy-600)!important;margin-bottom:8px!important;padding-left:24px!important;position:relative!important;font-size:0.92rem!important;line-height:1.6!important}
+        .checklist-box p::before{content:'\2713';position:absolute;left:0;top:0;color:var(--accent);font-weight:700;font-size:1.05rem}
+        .compare-two{display:grid!important;grid-template-columns:1fr 1fr!important;gap:14px!important;margin:18px 0!important}
+        .compare-two .col{padding:18px 20px!important;border:1px solid rgba(10,22,40,0.08)!important;border-top:3px solid var(--accent)!important;background:rgba(10,22,40,0.02)!important}
+        .compare-two .col h5{font-family:'Fraunces',serif!important;font-size:1.1rem!important;font-weight:500!important;color:var(--navy-900)!important;margin-bottom:10px!important}
+        .compare-two .col p{font-size:0.88rem!important;line-height:1.6!important;color:var(--navy-600)!important;margin-bottom:8px!important}
+        .compare-two .col p:last-child{margin-bottom:0!important}
+        .compliance-footer{background:var(--navy-900)!important;border-top:1px solid rgba(255,255,255,.08)!important;padding:30px 20px!important;margin-top:30px!important;text-align:center!important}
+        .footer-text{color:var(--navy-400)!important;font-size:0.85rem!important}
+        .nav-toggle{display:none;position:fixed;bottom:20px;right:20px;z-index:1001;background:var(--accent);color:#fff;border:none;border-radius:50%;width:50px;height:50px;font-size:22px;cursor:pointer;box-shadow:var(--shadow-lg)}
+        @media(max-width:1024px){
+            .nav-sidebar{position:fixed!important;left:-300px!important;top:0!important;height:100vh!important;margin:0!important;z-index:1000!important;transition:left 0.3s ease!important;border-radius:0!important}
+            .nav-sidebar.active{left:0!important}
+            .nav-toggle{display:block!important}
+            .container{flex-direction:column!important}
+            .main-content{width:100%!important;padding:14px!important}
+        }
+        @media(max-width:768px){
+            .page-header{padding:28px 20px!important}
+            .page-header h1{font-size:1.6rem!important}
+            .content-section{padding:20px!important}
+            .section-header{flex-direction:column!important;align-items:flex-start!important;gap:12px!important}
+            .pullquote{font-size:1.1rem!important;padding:16px 18px!important}
+            .compare-two{grid-template-columns:1fr!important}
+        }
+        @media print{
+            .nav-sidebar,.nav-toggle,.host-bg-cover{display:none!important}
+            body{background:#fff!important;color:#000!important}
+            .main-content{width:100%!important;padding:0!important}
+        }
+    </style>
+</head>
+<body>
+<div class="host-bg-cover"></div>
+<img src="https://shortcourses.brambling.cdu.edu.au/uploads/bannerAI.png" alt="CDU TAFE Microsoft Digital Skills &amp; AI" class="banner-image">
+<div class="container">
+    <nav class="nav-sidebar" id="navSidebar">
+        <h3>On This Page</h3>
+        <ul>
+            <li><a href="#two-apps-one-job" class="active">Two Apps, One Job</a></li>
+            <li><a href="#teams-basics">Teams, in the Right Shape</a></li>
+            <li><a href="#channels-vs-chats">Channels vs Chats</a></li>
+            <li><a href="#better-meetings">Meetings That Don't Waste Time</a></li>
+            <li><a href="#outlook-inbox">Outlook, Taming the Inbox</a></li>
+            <li><a href="#calendar-craft">Calendar Craft</a></li>
+            <li><a href="#planner-todo">Planner, To Do, and OneNote</a></li>
+            <li><a href="#etiquette">Small Etiquette That Reduces Noise</a></li>
+        </ul>
+        <div class="nav-section-label">Quick Links</div>
+        <ul>
+            <li><a href="https://teams.microsoft.com/" target="_blank">Teams on the Web</a></li>
+            <li><a href="https://outlook.office.com/" target="_blank">Outlook on the Web</a></li>
+            <li><a href="https://tasks.office.com/" target="_blank">Planner</a></li>
+            <li><a href="https://to-do.office.com/" target="_blank">To Do</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="page-header">
+            <span class="header-eyebrow">Session 3, Microsoft Digital Skills &amp; AI for the Workplace</span>
+            <h1>Teams, Outlook &amp; Working Together</h1>
+            <p class="header-subtitle">How to use Teams and Outlook the way they're built to work, together. Channels vs chats, meetings that respect the room, an inbox you can actually close, and a bit of calendar craft. Plus Planner, To Do, and OneNote for the work around the work.</p>
+        </div>
+
+        <section class="content-section" id="two-apps-one-job">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M16,4C18.2,4 20,5.8 20,8C20,10.2 18.2,12 16,12C13.8,12 12,10.2 12,8C12,5.8 13.8,4 16,4M16,14C20.4,14 24,15.8 24,18V20H8V18C8,15.8 11.6,14 16,14M6,6H2V4H6V6M6,10H2V8H6V10M8,10V8H10V10H8M8,6V4H10V6H8Z"/></svg></div>
+                <h2 class="section-title">Two Apps, One Job</h2>
+            </div>
+            <div class="section-text">
+                <p>Teams and Outlook look like two different tools. They're really two front doors into the same job: talking to the people you work with. Email is asynchronous (I send, you reply when you can). Chat and meetings are synchronous (we talk, now or in a scheduled window). Getting a sense of which to use when is most of the skill.</p>
+                <p class="pullquote">Teams for the work happening now, Outlook for the work that needs a record or a reply by Tuesday.</p>
+                <p>Confusion between the two is the single biggest cause of noise in a modern workplace. A quick email turns into a Teams chat that needs three meetings to resolve. A decision that belonged in a channel ends up buried in five people's inboxes. The rest of this session is about picking the right door.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="teams-basics">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z"/></svg></div>
+                <h2 class="section-title">Teams, in the Right Shape</h2>
+            </div>
+            <div class="section-text">
+                <p>Teams has three kinds of spaces, and the first time you use it they can all look the same.</p>
+                <p><strong>Teams</strong> are the big container, usually for a whole branch, project, or working group. A Team has members, files, and at least one channel. Behind every Team is a SharePoint site (covered in Session 2).</p>
+                <p><strong>Channels</strong> are rooms inside a Team, usually for a particular topic or stream of work. A "Communications" channel, a "Weekly Sync" channel, a "Client X" channel. Posts in a channel are visible to everyone in the Team.</p>
+                <p><strong>Chats</strong> are private conversations, one-on-one or small group, outside any Team. Nobody else can see them. Chat files go to your OneDrive, not SharePoint.</p>
+                <div class="callout">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+                    <div>
+                        <h4>The handover rule</h4>
+                        <p>If a decision or a file needs to survive when someone leaves, it belongs in a channel, not a chat. Chats disappear with the sender's account. Channels stay with the Team.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="channels-vs-chats">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M17,12H7V10H17M17,16H7V14H17M17,8H7V6H17M3,22L7,18H21A2,2 0 0,0 23,16V4A2,2 0 0,0 21,2H3A2,2 0 0,0 1,4V22H3Z"/></svg></div>
+                <h2 class="section-title">Channels vs Chats, When to Use Which</h2>
+            </div>
+            <div class="section-text">
+                <div class="compare-two">
+                    <div class="col">
+                        <h5>Use a channel</h5>
+                        <p>When more than two or three people need to see the conversation.</p>
+                        <p>When the decision matters later and someone might need to find it.</p>
+                        <p>For project updates, status notes, and shared questions.</p>
+                        <p>For files the team needs access to.</p>
+                        <p>When you want new team members to catch up without re-sending everything.</p>
+                    </div>
+                    <div class="col">
+                        <h5>Use a chat</h5>
+                        <p>For a quick question to one person.</p>
+                        <p>For sensitive or personal conversations.</p>
+                        <p>For small-group coordination that doesn't need a record.</p>
+                        <p>For ad-hoc work that doesn't belong to a formal Team.</p>
+                        <p>When you genuinely don't want it searchable by the whole team.</p>
+                    </div>
+                </div>
+                <p style="margin-top:18px"><strong>A rough question to ask yourself:</strong> "If I got hit by a bus, would anyone else in the team need to find this conversation?" If yes, channel. If no, chat is fine.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="better-meetings">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"/></svg></div>
+                <h2 class="section-title">Meetings That Don't Waste Time</h2>
+            </div>
+            <div class="section-text">
+                <p>Meeting fatigue is a real cost. Some meetings genuinely need to happen. Many don't. A few Teams habits make the ones that do happen work better.</p>
+                <div class="tip-card">
+                    <h5>Put an agenda in the invite</h5>
+                    <p>Even three bullet points. It tells people whether they need to attend, what to prepare, and where the conversation should go. A meeting without an agenda is a meeting that runs long.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Use the meeting chat for links and side threads</h5>
+                    <p>Drop relevant files, links, and "I'll follow up on that" notes into the meeting chat during the call. Everyone has them afterwards. Saves the awkward "can someone send that thing?" email.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Turn on transcription for long meetings</h5>
+                    <p>Transcription (and recording, if your policy allows it) means the meeting's decisions and details survive. Copilot in Day 2 can then summarise the transcript, pull out action items, and even catch you up if you missed the first ten minutes.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Make "channel meetings" your default for team meetings</h5>
+                    <p>A channel meeting is visible to the whole channel, and the chat and recording live in the channel afterwards. Much better than a private meeting that only the attendees can later find.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>If the meeting could be an email, send the email</h5>
+                    <p>The hardest and best habit. Before you schedule, ask: "could this be a paragraph in the channel instead?" Often yes.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="outlook-inbox">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,15L13,21L11.6,19.6L15.2,16H4V4H6V14H15.2L11.6,10.4L13,9L19,15Z" transform="rotate(-90 12 12)"/></svg></div>
+                <h2 class="section-title">Outlook, Taming the Inbox</h2>
+            </div>
+            <div class="section-text">
+                <p>Email isn't going away. It's still the default for formal records, external contact, and anything that needs to be found in three years. The goal isn't zero email. The goal is an inbox that doesn't own you.</p>
+                <p class="pullquote">An inbox is a to-do list written by other people. Your job is to triage, not to read everything.</p>
+                <div class="tip-card">
+                    <h5>Process in batches, not continuously</h5>
+                    <p>Checking email every two minutes is a productivity killer. Three or four deliberate triage passes a day, with Outlook closed in between, is almost always more effective.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Use the four D's</h5>
+                    <p>For each email: <strong>Delete</strong> (or archive), <strong>Do</strong> (if under two minutes), <strong>Delegate</strong> (forward with a clear ask), or <strong>Defer</strong> (schedule a time to handle it, don't just let it sit).</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Rules for newsletters and notifications</h5>
+                    <p>Anything automated (build notifications, newsletters, system emails) should land in its own folder, not your inbox. Five minutes setting up rules, hours saved over the year.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Focused Inbox, on or off, pick one</h5>
+                    <p>Focused Inbox hides less-important mail. Some people love it, some find it confusing. Decide and stick with it. Don't leave it on by accident.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Shared mailboxes, not CC-everyone</h5>
+                    <p>If a team needs to share an inbox (enquiries@, info@), use a shared mailbox. Everyone sees it, nobody owns it alone, and replies are logged for the team. Much cleaner than CC chains.</p>
+                </div>
+                <div class="callout warning">
+                    <svg class="callout-icon" viewBox="0 0 24 24"><path d="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16"/></svg>
+                    <div>
+                        <h4>Before you write an email, ask: is this a channel post?</h4>
+                        <p>If more than two of the recipients are in the same Teams channel, the channel is probably a better home for it. Email it when you need a record, use a channel when you need a conversation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="calendar-craft">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3H18V1M17,12H12V17H17V12Z"/></svg></div>
+                <h2 class="section-title">Calendar Craft</h2>
+            </div>
+            <div class="section-text">
+                <p>Your calendar shapes your week more than any to-do list. A few habits keep it honest.</p>
+                <div class="tip-card">
+                    <h5>Block focus time</h5>
+                    <p>Put real work on your calendar, not just meetings. A two-hour "deep work, do not disturb" block is more useful than hoping for time between meetings. Set yourself to Do Not Disturb in Teams during those blocks.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Default meetings to 25 or 50 minutes</h5>
+                    <p>Outlook has a setting to make 30-minute meetings actually 25 minutes, and 60-minute meetings 50. That gives everyone 5-10 minutes between calls, which is the difference between a manageable day and a fried one.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Decline or propose new time without guilt</h5>
+                    <p>Meetings that don't need you are meetings that don't need you. "Unable to make it, would love the summary" is a complete sentence.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Use categories and colours</h5>
+                    <p>Colour-code by type (meetings, focus time, admin, external). A glance at the week tells you how it's shaping up.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Keep working hours set correctly</h5>
+                    <p>Outlook's "working hours" setting tells other people when you're available. If you don't work Fridays, say so. If you start at 7, say so. Stops people scheduling into the wrong times.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="planner-todo">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M7,7H17V5H19V19H5V5H7V7M7.5,18L4.5,15L5.91,13.59L7.5,15.17L11.09,11.58L12.5,13L7.5,18Z"/></svg></div>
+                <h2 class="section-title">Planner, To Do, and OneNote</h2>
+            </div>
+            <div class="section-text">
+                <p>Three smaller apps that do a lot of the quiet heavy lifting in a team.</p>
+                <div class="tip-card">
+                    <h5>Planner, for team tasks on a board</h5>
+                    <p>A simple Kanban-style board (To do, In progress, Done). Add it as a tab in a Teams channel and the whole team sees the work in one place. Good for projects with clear tasks and owners, less good for freeform idea work.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>To Do, for your personal list</h5>
+                    <p>Your own list of things to do. Flags email messages land here automatically, and Planner tasks assigned to you appear here too. A useful "single pane" of everything waiting on you.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>OneNote, for the work around the work</h5>
+                    <p>A digital notebook. Meeting notes, project journals, shared team knowledge. Searchable across everything. Under-used because people don't know where to start. Start with one notebook per project, one section per theme, and trust search.</p>
+                </div>
+                <div class="tip-card">
+                    <h5>Forms, when you need structured input</h5>
+                    <p>A quick form for intake, surveys, or event registration. Results land in Excel for you automatically. Much better than chasing replies in a chat thread.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="etiquette">
+            <div class="section-header">
+                <div class="section-icon"><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11M11,9H13V7H11"/></svg></div>
+                <h2 class="section-title">Small Etiquette That Reduces Noise</h2>
+            </div>
+            <div class="section-text">
+                <div class="checklist-box">
+                    <h4>Habits that reduce noise for everyone</h4>
+                    <p>Use @mentions sparingly. @channel wakes everyone up; @person wakes one person. Match the ping to the need.</p>
+                    <p>Don't send "hi" and wait. Put the whole question in the first message, so the other person can answer on their time.</p>
+                    <p>React with an emoji to acknowledge, rather than replying "OK" eight times in a thread.</p>
+                    <p>Status matters. Set "Do not disturb" when you mean it. Set "Away" when you're actually away. Colleagues can then make sensible decisions without asking.</p>
+                    <p>Reply-all with care. Usually only a quarter of the recipients need your reply. Pick them.</p>
+                    <p>Long threads belong in a channel post, not a chat. Easier to find, easier to skim.</p>
+                    <p>If you're the organiser of a recurring meeting, cancel the ones that aren't needed. Nobody will object.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="compliance-footer">
+            <p class="footer-text">Charles Darwin University TAFE, Microsoft Digital Skills &amp; AI for the Workplace, Session 3</p>
+        </div>
+    </div>
+</div>
+
+<button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+<script>
+function toggleNav(){document.getElementById('navSidebar').classList.toggle('active')}
+document.addEventListener('click',function(e){const s=document.getElementById('navSidebar'),t=document.querySelector('.nav-toggle');if(window.innerWidth<=1024&&!s.contains(e.target)&&!t.contains(e.target)&&s.classList.contains('active'))s.classList.remove('active')});
+</script>
+</body>
+</html>
