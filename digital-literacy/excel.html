@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel: Structured Data &amp; Useful Formulas · Digital Literacy · NTell World Ink</title>
+<meta name="description" content="How to set up a spreadsheet that's actually useful. Tables, named ranges, the handful of formulas you'll use every week, and why the shape of your data decides what you can do with it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS; reuses tokens from styles.css */
+  .pullquote { font-family:'Cormorant Garamond', Georgia, serif; font-size:22px; line-height:1.5; color:var(--text); padding:22px 26px; border-left:3px solid var(--accent); background:rgba(26,201,201,0.04); margin:22px 0; font-style:italic; font-weight:400; }
+  @media (max-width:720px){ .pullquote{ font-size:18px; padding:16px 20px; } }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- =============== HEADER =============== -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- =============== BREADCRUMB =============== -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="index.html">Digital Literacy: Workplace Skills</a>
+    <span class="sep">/</span>
+    <span>Excel</span>
+  </nav>
+</div>
+
+<!-- =============== PAGE MASTHEAD =============== -->
+<section class="page-masthead container">
+  <div class="series-label">Digital Literacy: Workplace Skills</div>
+  <h1>Excel: Structured Data &amp; Useful Formulas</h1>
+  <p class="subtitle">How to set up a spreadsheet that's actually useful. Tables, named ranges, the handful of formulas you'll use every week, and why the shape of your data decides what you can do with it. Also the groundwork for Copilot to make sense of your sheet in the Working with AI strand.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">STRAND · <strong>Digital Foundations</strong></span>
+    <span class="page-meta-item">LEVEL · <strong>Beginner-friendly</strong></span>
+    <span class="page-meta-item">FORMAT · <strong>Hands-on session</strong></span>
+  </div>
+</section>
+
+<!-- =============== CONTENT =============== -->
+<main class="content-body">
+
+  <!-- WHY CLEAN DATA WINS -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// clean data</div>
+    <h2>Why Clean Data Wins</h2>
+    <p>Excel is the most abused program in any office. People use it as a document, a database, a presentation, a calculator, and a to-do list. Often all at once, in the same file. That's why half the spreadsheets in any organisation are fighting the person trying to use them.</p>
+    <p class="pullquote">Excel rewards structure ruthlessly. Give it structured data, you get superpowers. Give it a mess, you get a mess back.</p>
+    <p>This session isn't about advanced Excel. It's about the handful of habits that turn a messy sheet into a sheet formulas, filters, charts and (later, in the Working with AI strand) Copilot can work with. Once the foundation is right, everything else gets easier.</p>
+  </section>
+
+  <!-- GOOD SHEETS VS BAD SHEETS -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// sheet shape</div>
+    <h2>Good Sheets vs Bad Sheets</h2>
+    <p>Most of what makes a spreadsheet usable comes down to its shape. A "good" sheet has one row per record, one column per attribute, no merged cells, no blank rows in the middle, no titles taking up the top ten rows.</p>
+
+    <div class="compare-grid">
+      <div class="compare-col col-yes">
+        <div class="compare-col-label">// A good shape</div>
+        <ul>
+          <li>Row 1 is a single header row (column names).</li>
+          <li>Row 2 onwards is data, one record per row.</li>
+          <li>One fact per column. Dates in a Date column, names in a Name column.</li>
+          <li>No merged cells. No blank rows.</li>
+          <li>Numbers are numbers. Dates are dates. Not text that looks like a number.</li>
+          <li>Anything "about" the sheet (notes, title, instructions) lives on a separate tab.</li>
+        </ul>
+      </div>
+      <div class="compare-col col-no">
+        <div class="compare-col-label">// A bad shape</div>
+        <ul>
+          <li>The "title" of the sheet is merged across row 1 through row 5.</li>
+          <li>Multiple header rows, or headers repeated halfway down.</li>
+          <li>Data broken up by blank rows as visual separators.</li>
+          <li>One column mixes types ("$500 or TBC").</li>
+          <li>Dates stored as text (15/4/2026 as a string).</li>
+          <li>Totals in the middle of the data, not at the bottom or on a separate sheet.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p><strong>The test.</strong> Can you sort and filter the data without breaking anything? If yes, the shape is probably good. If the whole sheet falls apart the moment you sort by one column, the shape is wrong.</p>
+  </section>
+
+  <!-- TABLES, NOT JUST RANGES -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// tables</div>
+    <h2>Tables, Not Just Ranges</h2>
+    <p>Excel has a feature called <strong>Tables</strong> that's one of the most under-used things in the product. Select your data, Insert, Table (or Ctrl+T), and Excel converts your range into a proper Table. Suddenly you get:</p>
+    <ul>
+      <li><strong>Filter dropdowns on every column,</strong> automatically.</li>
+      <li><strong>Auto-expand.</strong> Add a row at the bottom, it's in the Table. Add a column to the right, it's in the Table.</li>
+      <li><strong>Formulas that use column names,</strong> like <code>=SUM(Sales[Amount])</code> instead of <code>=SUM(C2:C847)</code>. Easier to read, and it adjusts when the Table grows.</li>
+      <li><strong>Banded rows</strong> and a cleaner look, for free.</li>
+      <li><strong>A name</strong> so you can refer to the whole table in formulas across sheets.</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Name the table sensibly</div>
+      <p>When you create a Table, Excel calls it "Table1". Click into it, Table Design ribbon, rename to something real (Sales, Registrations, Incidents). Formulas then read as <code>Sales[Amount]</code>, which is much easier than decoding what Table3 refers to six months later.</p>
+    </div>
+  </section>
+
+  <!-- NAMED RANGES -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// named ranges</div>
+    <h2>Named Ranges</h2>
+    <p>Similar idea, different use case. A <strong>named range</strong> is a name you give to a specific cell or range of cells. Then you can refer to it by name instead of by cell reference.</p>
+    <p>Select a cell or range, click in the Name Box (top-left, where the cell reference shows), type a name, Enter. Done. Now you can use that name in any formula: <code>=A2*TaxRate</code> is friendlier than <code>=A2*Sheet2!$B$4</code>.</p>
+    <p>Good for: tax rates, conversion factors, thresholds, anything you might change later and have referenced in 20 places. Change the named range's value, every formula updates.</p>
+  </section>
+
+  <!-- THE EVERYDAY FORMULAS -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// core formulas</div>
+    <h2>The Everyday Formulas</h2>
+    <p>You don't need to know 200 Excel functions. You need maybe 10, cold. These are the ones.</p>
+
+    <h3>SUM, AVERAGE, COUNT, COUNTA, MIN, MAX</h3>
+    <p>The basics. SUM adds, AVERAGE averages, COUNT counts numbers, COUNTA counts non-empty cells, MIN and MAX find the smallest and largest.</p>
+    <pre>=SUM(Sales[Amount])
+=AVERAGE(Ages)
+=COUNTA(Sales[Customer])</pre>
+
+    <h3>IF</h3>
+    <p>Returns one thing if a condition is true, another if not. The building block of conditional logic.</p>
+    <p><code>=IF(B2&gt;1000, "Review", "OK")</code></p>
+    <p><em>Reads as: if B2 is greater than 1000, say "Review", otherwise say "OK".</em></p>
+
+    <h3>SUMIFS, COUNTIFS, AVERAGEIFS</h3>
+    <p>Sum / count / average, but only the rows that match one or more conditions. The workhorses of any reporting sheet.</p>
+    <pre>=SUMIFS(Sales[Amount], Sales[Region], "NT")
+=COUNTIFS(Sales[Region], "NT", Sales[Month], "April")</pre>
+    <p><em>Reads as: sum the Amount column, only where Region is "NT".</em></p>
+
+    <h3>TEXTJOIN, CONCAT</h3>
+    <p>Glue multiple pieces of text together. TEXTJOIN is the modern version, with a separator.</p>
+    <p><code>=TEXTJOIN(", ", TRUE, A2:A10)</code></p>
+    <p><em>Joins everything in A2 to A10 with a comma between, ignoring blanks.</em></p>
+
+    <h3>LEFT, RIGHT, MID, LEN, TRIM</h3>
+    <p>For pulling bits out of text. LEFT takes the first N characters, RIGHT the last N, MID a chunk in the middle, LEN gives the length, TRIM strips extra spaces.</p>
+    <pre>=LEFT(A2, 3)
+=TRIM(A2)</pre>
+
+    <h3>TODAY, NOW, DATEDIF</h3>
+    <p>Date arithmetic. TODAY() gives today's date. DATEDIF calculates the difference between two dates in years, months, or days.</p>
+    <pre>=TODAY()
+=DATEDIF(StartDate, TODAY(), "d")</pre>
+    <p><em>Second one gives the number of days between StartDate and today.</em></p>
+
+    <h3>IFERROR</h3>
+    <p>Wrap any formula in IFERROR to return a clean fallback if it fails. Stops #N/A and #DIV/0 showing all over the sheet.</p>
+    <p><code>=IFERROR(A2/B2, "")</code></p>
+
+    <p>Those are the ones. Combine them and you can do 80 percent of what anyone ever needs in Excel. The one worth its own section is XLOOKUP.</p>
+  </section>
+
+  <!-- XLOOKUP -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// lookups</div>
+    <h2>XLOOKUP, the One to Learn</h2>
+    <p>If you've ever been scared of VLOOKUP, good news, it's been retired by Microsoft's own newer function, XLOOKUP. Same idea, better in every way.</p>
+    <p><strong>What it does.</strong> Looks up a value in one column, returns a related value from another column. "Find this customer's ID, give me their suburb."</p>
+
+    <h3>XLOOKUP syntax</h3>
+    <p>Three required arguments. Two optional.</p>
+    <p><code>=XLOOKUP(what_to_find, where_to_look, what_to_return)</code></p>
+    <p><em>Concrete example: <code>=XLOOKUP("NT-100", Customers[ID], Customers[Suburb])</code></em></p>
+
+    <p>Find "NT-100" in the Customers table's ID column, return the Suburb from the same row. Clean. Readable. Works left to right, right to left, up, or down. Returns "#N/A" if not found, or whatever you tell it to with the optional fourth argument:</p>
+
+    <h3>XLOOKUP with a fallback</h3>
+    <p><code>=XLOOKUP("NT-100", Customers[ID], Customers[Suburb], "Not found")</code></p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">You'll still see VLOOKUP in old sheets</div>
+      <p>Plenty of inherited spreadsheets use VLOOKUP, INDEX/MATCH, or HLOOKUP. They still work, you don't need to rewrite them. For anything new, XLOOKUP is simpler and more forgiving. Learn it once.</p>
+    </div>
+  </section>
+
+  <!-- CONDITIONAL FORMATTING AND FILTERS -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// formatting</div>
+    <h2>Conditional Formatting and Filters</h2>
+    <p>Two features that turn a wall of numbers into something your eye can actually scan.</p>
+    <p><strong>Filters.</strong> If you're using a Table (see above), filters are already on. Otherwise, select your data and Home, Sort &amp; Filter, Filter. The arrow in each column header lets you filter, sort, and search. The most-used feature in any reporting sheet.</p>
+    <p><strong>Conditional formatting.</strong> Home, Conditional Formatting. Highlight cells above a threshold, colour-scale a column from low to high, put data bars in cells to show relative size. Three uses that pay for themselves:</p>
+    <ul>
+      <li>Highlight cells greater than, less than, or between given values. "Any amount over $10,000 in red."</li>
+      <li>Top/bottom rules. "Highlight the top 10 percent."</li>
+      <li>Colour scales. For a column of numbers, green at the bottom, red at the top (or vice versa). Immediate visual sense of the distribution.</li>
+    </ul>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Don't over-format</div>
+      <p>Two or three conditional formats on the columns that matter is useful. Twelve different colour rules make the sheet harder to read, not easier. Less is more.</p>
+    </div>
+  </section>
+
+  <!-- CHARTS THAT COMMUNICATE -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// charts</div>
+    <h2>Charts That Communicate</h2>
+    <p>Excel will let you make any chart you want. Most of them you shouldn't. Four chart types do about 95 percent of real work:</p>
+    <ul>
+      <li><strong>Bar or column,</strong> for comparing amounts across categories. "Visits per region."</li>
+      <li><strong>Line,</strong> for something changing over time. "Monthly visits over the year."</li>
+      <li><strong>Stacked bar or column,</strong> for breaking a total into parts. "Visits by region, with each region split by program."</li>
+      <li><strong>Scatter,</strong> for relationships between two numbers. Less common, but the right one when you need it.</li>
+    </ul>
+    <p class="pullquote">3D, pie with 14 slices, doughnut, radar, and "stock" charts, almost always wrong. Stick to the boring ones.</p>
+    <p><strong>Rules that make charts clearer:</strong></p>
+    <ul>
+      <li>One idea per chart. If you're comparing three things, don't also add a fourth dimension with colour.</li>
+      <li>Label axes. "Amount ($)" not just "Amount".</li>
+      <li>Start y-axis at zero for bar charts. Zoomed-in axes exaggerate differences misleadingly.</li>
+      <li>Title says the point, not the subject. "Visits up 30 percent in Q2" tells the story. "Visits by quarter" describes the data.</li>
+    </ul>
+  </section>
+
+  <!-- SAMPLE DATASET -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// sample data</div>
+    <h2>A Sample Dataset to Work From</h2>
+    <p>To make the ideas in this session concrete, here's a small sample dataset, a fictional regional program register. A realistic shape, small enough to read, structured the way a "good" sheet should be.</p>
+
+    <table>
+      <thead>
+        <tr><th>Program ID</th><th>Program Name</th><th>Region</th><th>Start Date</th><th>Participants</th><th>Budget</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>PG-001</strong></td><td>Digital Literacy, Evenings</td><td>Barkly</td><td>2026-03-04</td><td>12</td><td>$8,400</td><td>Active</td></tr>
+        <tr><td><strong>PG-002</strong></td><td>Youth Skills Workshop</td><td>Top End</td><td>2026-02-18</td><td>18</td><td>$12,000</td><td>Active</td></tr>
+        <tr><td><strong>PG-003</strong></td><td>Elder Digital Outreach</td><td>Central</td><td>2026-01-20</td><td>9</td><td>$5,600</td><td>Completed</td></tr>
+        <tr><td><strong>PG-004</strong></td><td>Cyber Safety Awareness</td><td>Barkly</td><td>2026-04-02</td><td>15</td><td>$7,200</td><td>Planning</td></tr>
+        <tr><td><strong>PG-005</strong></td><td>Remote Worker Training</td><td>Big Rivers</td><td>2026-03-11</td><td>11</td><td>$9,800</td><td>Active</td></tr>
+        <tr><td><strong>PG-006</strong></td><td>Community IT Support</td><td>Central</td><td>2026-02-05</td><td>22</td><td>$14,500</td><td>Active</td></tr>
+        <tr><td><strong>PG-007</strong></td><td>Basic Excel for Admin</td><td>Top End</td><td>2026-04-22</td><td>14</td><td>$6,400</td><td>Planning</td></tr>
+        <tr><td><strong>PG-008</strong></td><td>Women in Digital Skills</td><td>Barkly</td><td>2026-03-18</td><td>10</td><td>$7,900</td><td>Active</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>What this dataset demonstrates:</strong></p>
+    <ul>
+      <li>One row per record (one program). One column per attribute.</li>
+      <li>Dates in ISO format (YYYY-MM-DD) so they sort correctly and Excel treats them as real dates.</li>
+      <li>Numbers as numbers, not text.</li>
+      <li>A clear status column with a limited set of values (Active, Completed, Planning), which makes filtering and counting easy.</li>
+      <li>Regional names drawn from NT context, so examples later in the course can use realistic data.</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">Questions you could answer with formulas on a set like this</div>
+      <p>Total budget across all Active programs: <code>=SUMIFS(Budget, Status, "Active")</code></p>
+      <p>Count of programs in the Barkly region: <code>=COUNTIFS(Region, "Barkly")</code></p>
+      <p>Average participants per program: <code>=AVERAGE(Participants)</code></p>
+      <p>Look up a specific program's status: <code>=XLOOKUP("PG-005", ID, Status)</code></p>
+    </div>
+
+    <p>When we come back to Excel in the <a href="copilot-in-office.html">Copilot in Word, Excel &amp; PowerPoint session</a>, this is roughly the shape of sheet Copilot can actually do useful work on. Structured data in, useful answers out.</p>
+  </section>
+
+</main>
+
+<!-- =============== SESSION NAV =============== -->
+<div class="container">
+  <nav class="session-nav">
+    <a class="session-nav-item prev" href="word.html">
+      <span class="session-nav-label">← Previous session</span>
+      <span class="session-nav-title">Word: Faster, Cleaner Documents</span>
+    </a>
+    <a class="session-nav-item next" href="ai-foundations.html">
+      <span class="session-nav-label">Next session →</span>
+      <span class="session-nav-title">AI Foundations for the Workplace</span>
+    </a>
+  </nav>
+</div>
+
+<!-- =============== FOOTER =============== -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. No paywall; no email harvesting; no nonsense.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="index.html">Digital Literacy: Workplace Skills</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About this site</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

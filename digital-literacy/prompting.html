@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompting Skills That Work · Digital Literacy · NTell World Ink</title>
+<meta name="description" content="The single skill that turns AI from 'a bit useful' into 'genuinely valuable at work'. How to ask for what you want, feed the AI your actual content, iterate when the first answer misses, and build a reusable prompt library.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS; reuses tokens from styles.css */
+  .pullquote { font-family:'Cormorant Garamond', Georgia, serif; font-size:22px; line-height:1.5; color:var(--text); padding:22px 26px; border-left:3px solid var(--accent); background:rgba(26,201,201,0.04); margin:22px 0; font-style:italic; font-weight:400; }
+  @media (max-width:720px){ .pullquote{ font-size:18px; padding:16px 20px; } }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- =============== HEADER =============== -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- =============== BREADCRUMB =============== -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <a href="index.html">Digital Literacy: Workplace Skills</a>
+    <span class="sep">/</span>
+    <span>Prompting</span>
+  </nav>
+</div>
+
+<!-- =============== PAGE MASTHEAD =============== -->
+<section class="page-masthead container">
+  <div class="series-label">Digital Literacy: Workplace Skills</div>
+  <h1>Prompting Skills That Work</h1>
+  <p class="subtitle">The single skill that turns AI from "a bit useful" into "genuinely valuable at work". How to ask for what you want, feed the AI your actual content, iterate when the first answer misses, and build a small personal library of prompts you can reach for again.</p>
+  <div class="page-meta">
+    <span class="page-meta-item">STRAND · <strong>Working with AI</strong></span>
+    <span class="page-meta-item">LEVEL · <strong>Beginner-friendly</strong></span>
+    <span class="page-meta-item">FORMAT · <strong>Hands-on session</strong></span>
+  </div>
+</section>
+
+<!-- =============== CONTENT =============== -->
+<main class="content-body">
+
+  <!-- WHAT A PROMPT IS -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// definitions</div>
+    <h2>What a Prompt Is</h2>
+    <p>A "prompt" is the message you type to an AI. That's the whole definition. You'll see the phrase "prompt engineering" thrown around, but for everyday work use it's not engineering at all. It's writing clearly to a capable new colleague who has no context yet.</p>
+    <p class="pullquote">If you could brief a new staff member on a task clearly, you already know how to prompt an AI. The rest is small adjustments.</p>
+    <p>Everything in this session is about making those small adjustments reliable, so you get useful work out of an AI the first or second time, not the sixth or seventh.</p>
+  </section>
+
+  <!-- THE ANATOMY OF A WORKING PROMPT -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// anatomy</div>
+    <h2>The Anatomy of a Working Prompt</h2>
+    <p>The same information, asked two ways. One produces a generic answer, the other produces something you can use.</p>
+
+    <div class="compare-grid">
+      <div class="compare-col col-no">
+        <div class="compare-col-label">// Weak prompt</div>
+        <pre>Write me a briefing note.</pre>
+        <p><em>The AI knows nothing about the topic, audience, length, tone, or format. You'll get a generic template.</em></p>
+      </div>
+      <div class="compare-col col-yes">
+        <div class="compare-col-label">// Working prompt</div>
+        <pre>Write a one-page briefing note for my manager on options for replacing our paper-based incident log with a digital system. Audience is a senior manager who's not technical. Keep it to three options (low cost, moderate, full replacement), one paragraph each, with a clear recommendation at the end.</pre>
+        <p><em>Task, audience, length, structure, and the shape of the decision all in one message.</em></p>
+      </div>
+    </div>
+
+    <p><strong>The pattern.</strong> The weak prompt asks for a thing. The working prompt tells the AI enough that it can do the thing properly. The difference is usually two or three extra sentences.</p>
+  </section>
+
+  <!-- ROLE, TASK, CONTEXT, FORMAT -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// four ingredients</div>
+    <h2>Role, Task, Context, Format</h2>
+    <p>Four ingredients. Not every prompt needs all four, but once you know them you'll notice when one is missing and the answer suffers for it.</p>
+    <p><strong>Role.</strong> Who the AI should pretend to be. "Act as a cautious policy writer." "You're a data analyst reviewing this sheet." Useful when you want a particular perspective or tone.</p>
+    <p><strong>Task.</strong> What you want it to do. "Draft this", "summarise that", "compare these", "find the gaps".</p>
+    <p><strong>Context.</strong> What the AI needs to know to do the job well. The audience, the setting, what's happened already, any constraints.</p>
+    <p><strong>Format.</strong> What the answer should look like. Length, structure, tone. "Three bullet points." "Under 200 words." "Keep it plain English."</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">You don't label them</div>
+      <p>You don't write "Role:" and "Task:" like filling in a form. You write one or two normal sentences that happen to include those ingredients. The AI picks them up without prompting.</p>
+    </div>
+  </section>
+
+  <!-- FEEDING THE AI YOUR CONTENT -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// your content</div>
+    <h2>Feeding the AI Your Content</h2>
+    <p>Here's where working AI gets properly powerful. The AI can work on <em>your</em> documents, <em>your</em> data, <em>your</em> draft. You just have to give it to them.</p>
+    <p>In Copilot inside Word, Excel, Outlook, the current document or email is already the context. You don't need to paste it.</p>
+    <p>In consumer ChatGPT or Claude, you paste the content into the chat, or you upload the file. Then you ask what you want done with it.</p>
+
+    <h3>Prompt with pasted content</h3>
+    <pre>I'm going to paste a report below. Read it, then tell me in plain English: what the three main findings are, who the recommendations are aimed at, and what I personally need to act on if I'm the manager of a small team in the NT public sector.
+
+[paste report]</pre>
+    <p><em>This prompt works for anything from a 5-page policy update to a 50-page consultant report.</em></p>
+
+    <h3>Prompt with uploaded file</h3>
+    <pre>Attached is our team's monthly stats spreadsheet. Can you give me a short summary of what changed compared to last month's trends, flag anything unusual, and suggest one or two questions the leadership team might ask about the numbers?</pre>
+    <p><em>Works in Claude, ChatGPT (with file upload), and Copilot inside Excel.</em></p>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Mind where you paste</div>
+      <p>The rule from the <a href="ai-foundations.html">AI Foundations for the Workplace session</a> still applies. Copilot inside M365 keeps content within your tenant. Consumer ChatGPT or Claude on the free tier does not. For anything sensitive, prefer Copilot. For your own research and drafts, consumer tools are fine.</p>
+    </div>
+  </section>
+
+  <!-- ITERATING, NOT RESTARTING -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// iteration</div>
+    <h2>Iterating, Not Restarting</h2>
+    <p>The biggest mistake beginners make is abandoning a chat after a weak first answer. Don't. The AI remembers everything in the conversation, and it's good at fixing its own output when you tell it what to change.</p>
+    <p class="pullquote">If the first answer misses, say what's wrong. The second answer is almost always better.</p>
+    <p><strong>Useful things to say back to the AI:</strong></p>
+    <p>"That's too long. Tighten to half the length, same points."</p>
+    <p>"Too formal. Rewrite so it sounds like a real person, not a press release."</p>
+    <p>"Keep paragraph two. Rewrite the others to match that tone."</p>
+    <p>"The third recommendation doesn't quite fit because [reason]. Try it again with that in mind."</p>
+    <p>"Give me three more options, different from these."</p>
+    <p>"Pretend I'm my manager reviewing this. What would they push back on?"</p>
+    <p>Iteration is where AI becomes useful. The first pass is rarely good enough. The third pass often is.</p>
+  </section>
+
+  <!-- HONESTY CHECKS -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// honesty checks</div>
+    <h2>Honesty Checks</h2>
+    <p>AI answers sound confident whether they're right or wrong. A short habit of asking for honesty catches a lot of errors that would otherwise go out the door.</p>
+
+    <h3>The confidence check</h3>
+    <pre>Before I use this, tell me honestly: how confident are you in this answer? Where are the parts you're less sure about? And if I wanted to verify this, where should I look?</pre>
+    <p><em>Works on almost any AI. Not infallible, but most will acknowledge the soft spots in their answer.</em></p>
+
+    <h3>The devil's advocate check</h3>
+    <pre>Now argue against what you just wrote. What's weak about this recommendation? What would a thoughtful colleague push back on?</pre>
+    <p><em>A surprisingly good way to stress-test the AI's own work. Often surfaces issues you'd have missed.</em></p>
+
+    <h3>The source check</h3>
+    <pre>Did any of the facts or figures in this answer come from specific sources you can name? Which parts are from training data and which are things you're likely to have made up? Flag anything I should double-check.</pre>
+    <p><em>Most AIs will admit when they've generated specifics (dates, figures, quotes) rather than drawing from reliable memory. Catches hallucinations before they leave you.</em></p>
+  </section>
+
+  <!-- PATTERNS FOR COMMON WORK TASKS -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// patterns</div>
+    <h2>Patterns for Common Work Tasks</h2>
+    <p>A short set of reusable prompt patterns for the kinds of work most NT professionals do often. Copy, adjust, use.</p>
+
+    <h3>Summarise a long document for a specific audience</h3>
+    <pre>I'll paste a document below. Please summarise it in plain English for someone in [role, e.g. a community services manager], in about 200 words, with three key takeaways and any action items flagged clearly. Highlight anything that would change how my team does things.
+
+[paste content]</pre>
+
+    <h3>Draft a stakeholder email</h3>
+    <pre>Please draft a short email to [stakeholder type, e.g. a community partner organisation] on behalf of a [your role]. The email needs to [purpose, e.g. confirm dates for an upcoming workshop and ask for their preferred format]. Tone should be warm but professional. Leave placeholders I can fill in. About 120 words.</pre>
+
+    <h3>Turn notes into a briefing</h3>
+    <pre>Below are my raw notes from a meeting. Please turn these into a short briefing note in a standard public-sector style, with a purpose statement, background, key issues, and recommendations. Flag any points where my notes look ambiguous or incomplete.
+
+[paste notes]</pre>
+
+    <h3>Compare options</h3>
+    <pre>I'm deciding between three options for [problem]. They are A [describe], B [describe], and C [describe]. Please lay them out in a table with columns for pros, cons, cost (relative), time required, and main risk. At the end, tell me which one you'd lean toward and why.</pre>
+
+    <h3>Explain something technical</h3>
+    <pre>Please explain [concept] in plain English, assuming I understand [related thing they already know] but have never worked with this before. Keep it under 300 words and use one real-world analogy.</pre>
+
+    <h3>Prepare for a meeting</h3>
+    <pre>I have a meeting with [who] to discuss [topic]. Here's the background [short description]. What questions should I expect? What questions should I come prepared to ask? What's a sensible outcome I should aim for? Keep it practical.</pre>
+
+    <h3>Review a draft before it goes out</h3>
+    <pre>Below is a [document type] I'm about to send to [audience]. Please read it as if you were the recipient. What's unclear? What would you push back on? What's missing? Suggest three specific edits that would improve it.
+
+[paste draft]</pre>
+
+    <h3>Plain-language translation of policy</h3>
+    <pre>Below is a policy document. I need to explain what it actually means for day-to-day team operations, in language my team can understand. Please give me a plain-English summary of the key rules, a "what this means for us" paragraph, and any grey areas where we'd need to check with our manager.
+
+[paste policy]</pre>
+  </section>
+
+  <!-- BUILDING A REUSABLE PROMPT LIBRARY -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// prompt library</div>
+    <h2>Building a Reusable Prompt Library</h2>
+    <p>You'll reach for the same five or six prompts over and over. Save them. A personal prompt library turns AI from a tool you reinvent daily into a tool that starts faster every time.</p>
+    <p><strong>Where to keep it.</strong> A OneNote page called "My Prompts". A Word document in OneDrive. A note in your team's SharePoint site if they'd find it useful too. Not a scattered mess of bookmarked chats.</p>
+    <p><strong>What to save.</strong></p>
+    <p>The prompts that have genuinely worked for you, with a note on what you used them for.</p>
+    <p>Any context block you find yourself retyping often ("I'm a [role] in the [team], we work on [scope]"). Save the context, paste it at the start of new chats.</p>
+    <p>A handful of "universal closers": the confidence check, the devil's advocate check, "tighten this to half the length, same points".</p>
+    <p class="pullquote">A good prompt is a small piece of intellectual property. Treat it like one.</p>
+    <p><strong>What not to save.</strong> Prompts full of sensitive specifics. Keep the template general and fill in the specifics at the time. That way you can share your library with a colleague, or with your future self, without worrying about what's in it.</p>
+  </section>
+
+  <!-- FOUR HABITS -->
+  <section class="content-section container-content">
+    <div class="section-eyebrow">// four habits</div>
+    <h2>Four Habits That Make Every Prompt Better</h2>
+
+    <ul class="checklist checklist-interactive">
+      <li><strong>1. Tell it who you are and what you're working with.</strong> "I'm a program manager in the NT public sector", "I haven't done a grant application in five years", "This is for an internal audience". One sentence of context changes the whole answer.</li>
+      <li><strong>2. Tell it what "good" looks like.</strong> "Under 200 words", "plain English, no jargon", "three options, not a list of ten", "a tone that's warm but not casual".</li>
+      <li><strong>3. Ask it to ask you questions.</strong> "Before you draft, ask me any questions you need answers to." Stops the AI from guessing.</li>
+      <li><strong>4. Push back when the answer isn't right.</strong> "That's not quite it, this bit is wrong because X, try again with that in mind." The second answer is almost always better than the first.</li>
+    </ul>
+
+    <p>That's the session. The <a href="copilot-in-office.html">Copilot in Word, Excel &amp; PowerPoint</a>, <a href="copilot-outlook-teams.html">Copilot in Outlook &amp; Teams</a> and <a href="ai-workflows.html">AI workflows</a> sessions put these habits to work inside Word, Excel, PowerPoint, Outlook, Teams, and the real workflows they enable.</p>
+  </section>
+
+</main>
+
+<!-- =============== SESSION NAV =============== -->
+<div class="container">
+  <nav class="session-nav">
+    <a class="session-nav-item prev" href="ai-foundations.html">
+      <span class="session-nav-label">← Previous session</span>
+      <span class="session-nav-title">AI Foundations for the Workplace</span>
+    </a>
+    <a class="session-nav-item next" href="copilot-in-office.html">
+      <span class="session-nav-label">Next session →</span>
+      <span class="session-nav-title">Copilot in Word, Excel &amp; PowerPoint</span>
+    </a>
+  </nav>
+</div>
+
+<!-- =============== FOOTER =============== -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. No paywall; no email harvesting; no nonsense.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="index.html">Digital Literacy: Workplace Skills</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About this site</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* Interactive checklist — click to tick */
+  document.querySelectorAll('.checklist-interactive li').forEach(li => {
+    li.addEventListener('click', () => li.classList.toggle('done'));
+  });
+</script>
+
+</body>
+</html>
