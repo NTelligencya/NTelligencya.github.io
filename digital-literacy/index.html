@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Literacy: Workplace Skills &middot; NTell World Ink</title>
+<meta name="description" content="A modular, hands-on digital literacy course for regional and remote Australian workplaces. Microsoft 365 foundations — files, email, Teams, Word, Excel — plus a Working with AI strand covering prompting, Copilot, and responsible use.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* PAGE-SCOPED ADDITIONS, Digital Literacy: Workplace Skills; reuses tokens from styles.css */
+
+  .container-content { max-width: 920px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  .pullquote {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px; line-height: 1.5; color: var(--text);
+    padding: 22px 26px; border-left: 3px solid var(--accent);
+    background: rgba(26,201,201,0.04); margin: 22px 0;
+    font-style: italic; font-weight: 400;
+  }
+
+  .strand-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.14em;
+    margin: 34px 0 4px;
+  }
+  .strand-note { color: var(--text-2); font-size: 14.5px; line-height: 1.6; margin: 0 0 16px; }
+
+  .session-list { display: grid; gap: 14px; margin: 12px 0 10px; }
+  .session-list-item {
+    display: block;
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none; transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .session-list-item:hover { border-color: var(--accent); background: rgba(26,201,201,0.03); }
+  .session-list-body h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .session-list-body .when {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px;
+  }
+  .session-list-body ul { margin: 6px 0 0 0; padding-left: 18px; color: var(--text-2); }
+  .session-list-body ul li { font-size: 14.5px; line-height: 1.6; margin-bottom: 3px; }
+
+  .resource-list { display: grid; gap: 12px; margin: 12px 0 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .resource-list-item {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--warm);
+    border-radius: 10px; padding: 18px 22px;
+    text-decoration: none;
+  }
+  .resource-list-item h4 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px;
+    color: var(--text); margin: 0 0 6px; font-weight: 500;
+  }
+  .resource-list-item p { color: var(--text-2); font-size: 14px; line-height: 1.55; margin: 0; }
+
+  .back-strip { margin: 24px 0 0; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-3); text-decoration: none;
+    text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--accent-2); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .jump-nav {
+    background: var(--bg-2); border: 1px solid var(--rule-2);
+    border-radius: 10px; padding: 18px 22px; margin: 0 0 32px;
+  }
+  .jump-nav .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .jump-nav ul {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 4px 18px;
+  }
+  .jump-nav li { padding: 0; }
+  .jump-nav a {
+    color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.7;
+    border-left: 2px solid transparent; padding-left: 10px; display: block;
+  }
+  .jump-nav a:hover { color: var(--accent-2); border-left-color: var(--accent); }
+
+  .content-section { padding-top: 32px; padding-bottom: 32px; }
+  .content-section h2 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px;
+    margin: 0 0 18px; color: var(--text); font-weight: 500; border: none; padding: 0;
+  }
+  .content-section h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif; font-size: 22px;
+    color: var(--text); margin: 22px 0 10px; font-weight: 500;
+  }
+  .content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+  .content-section ul, .content-section ol { color: var(--text-2); line-height: 1.7; padding-left: 22px; }
+  .content-section ul li, .content-section ol li { margin-bottom: 6px; }
+  .content-section strong { color: var(--text); font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .container-content { padding: 0 20px; }
+    .jump-nav ul { grid-template-columns: 1fr; }
+    .content-section h2 { font-size: 24px; }
+    .pullquote { font-size: 18px; padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="sep">/</span>
+    <a href="/#library">Library</a>
+    <span class="sep">/</span>
+    <span>Digital Literacy: Workplace Skills</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container">
+  <div class="series-label">Digital Literacy &middot; Course 5</div>
+  <h1>Digital Literacy: Workplace Skills</h1>
+  <p class="subtitle">A modular, hands-on digital literacy course for people doing real work in regional and remote Australia. It starts with the Microsoft 365 tools most workplaces already pay for — files, email, Teams, Word, Excel — and builds up to working confidently and responsibly with AI. First written for face-to-face delivery in Tennant Creek, and shaped by the realities of mixed connectivity, shared devices, and multi-site teams.</p>
+  <div class="page-meta">
+    <span class="page-meta-item"><strong>11 hands-on sessions</strong> &middot; in two strands</span>
+    <span class="page-meta-item"><strong>Modular</strong> &middot; run all of it, or just what your mob needs</span>
+    <span class="page-meta-item"><strong>Beginner&ndash;intermediate</strong> &middot; no IT background assumed</span>
+    <span class="page-meta-item">Built for <strong>regional &amp; remote delivery</strong></span>
+  </div>
+  <div class="back-strip">
+    <a class="back-link" href="/#library">
+      <svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to library
+    </a>
+  </div>
+</section>
+
+<div class="container-content">
+  <div class="jump-nav">
+    <div class="label">// on this page</div>
+    <ul>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#who-its-for">Who It's For</a></li>
+    <li><a href="#how-it-runs">How It Runs</a></li>
+    <li><a href="#sessions">The Sessions</a></li>
+    <li><a href="#takeaways">What You'll Take Away</a></li>
+    <li><a href="#resources">Resources</a></li>
+    </ul>
+  </div>
+</div>
+
+<main class="content-body">
+
+  <section class="content-section container-content" id="overview">
+    <div class="section-eyebrow">// overview</div>
+    <h2>Overview</h2>
+    <p>Most people were handed a work laptop, pointed at their inbox, and told to get on with it. Nobody ever spent half an hour explaining how the pieces fit together — so files end up in seventeen places, email eats the day, and the tools that could carry half the load sit unused.</p>
+    <p>This course fixes that. It moves from the core Microsoft 365 apps most workplaces already have, into AI-assisted ways of working that save genuine time on the tasks you actually do: emails, meetings, reports, documents, spreadsheets, and presentations.</p>
+    <p>Examples and scenarios are drawn from NT workplaces, regional program delivery, multi-site teams, and the realities of working where the internet is sometimes patchy. What we cover should look like the work on your desk next week.</p>
+    <p class="pullquote">Before we add AI on top, we make sure the foundation underneath it is solid.</p>
+  </section>
+
+  <section class="content-section container-content" id="who-its-for">
+    <div class="section-eyebrow">// who its for</div>
+    <h2>Who It's For</h2>
+    <p>People entering or already in the workforce who use — or are about to use — Microsoft 365 in their day-to-day role: government staff, community-controlled organisation workers, health and social-service staff, educators, program staff, rangers, and admin teams.</p>
+    <p>No deep IT background is assumed. If you log into a work computer and want your tools to do more of the heavy lifting, this course is built for you. The language is plain, and where a technical word is unavoidable it's explained in everyday terms the first time it appears.</p>
+  </section>
+
+  <section class="content-section container-content" id="how-it-runs">
+    <div class="section-eyebrow">// how it runs</div>
+    <h2>How It Runs</h2>
+    <p>The course is deliberately modular. The sessions aren't numbered, because no two groups need the same course: a trainer can run the whole thing over two days, spread it across weekly sessions, or pull out just the sessions a workplace needs. Each session stands on its own.</p>
+    <p>The sessions fall into two strands:</p>
+    <ul>
+      <li><strong>Digital Foundations</strong> — the Microsoft 365 core: getting oriented, files and sharing, email and Teams, Word, and Excel. If a group is new to workplace computing, start here and stay here.</li>
+      <li><strong>Working with AI</strong> — what AI actually is, how to prompt it well, Copilot in the Office apps, practical AI workflows, and the responsible-use guardrails that matter for government and community-sector work.</li>
+    </ul>
+    <div class="callout callout-tip">
+      <div class="callout-title">Built for remote and regional delivery</div>
+      <p>Every page on this site is light enough to load on a patchy connection and readable on a phone. The Foundations sessions work fine with intermittent internet — files sync when you reconnect. The Copilot sessions are the exception: Copilot needs a live connection and a licence, so check both before planning that part of a delivery.</p>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="sessions">
+    <div class="section-eyebrow">// the sessions</div>
+    <h2>The Sessions</h2>
+
+    <div class="strand-label">Strand one — Digital Foundations</div>
+    <p class="strand-note">The Microsoft 365 core. Good habits for files, communication, and documents, before any AI is added on top.</p>
+
+    <div class="session-list">
+      <a class="session-list-item" href="orientation.html">
+        <div class="session-list-body">
+          <div class="when">Start here</div>
+          <h4>Orientation &amp; Your Digital Workspace</h4>
+          <ul>
+            <li>How Microsoft 365 fits together: apps, accounts, and the cloud</li>
+            <li>Working across devices, and on shared machines, safely</li>
+            <li>What's inside your organisation's tenant vs what isn't</li>
+            <li>Two-factor authentication and the settings worth five minutes</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="files-and-folders.html">
+        <div class="session-list-body">
+          <div class="when">Files</div>
+          <h4>OneDrive, SharePoint &amp; File Sense</h4>
+          <ul>
+            <li>Where your files actually live, and why it matters</li>
+            <li>Sharing, permissions, and version history</li>
+            <li>Working offline and syncing when you're back in range</li>
+            <li>Team sites vs personal storage, and habits that save hours</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="teams-outlook.html">
+        <div class="session-list-body">
+          <div class="when">Communication</div>
+          <h4>Teams, Outlook &amp; Working Together</h4>
+          <ul>
+            <li>Channels, chats, and meetings that don't waste time</li>
+            <li>Taming the inbox, and calendar craft</li>
+            <li>Planner, To Do, and OneNote for tracking real work</li>
+            <li>Small etiquette that reduces noise for everyone</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="word.html">
+        <div class="session-list-body">
+          <div class="when">Documents</div>
+          <h4>Word: Faster, Cleaner Documents</h4>
+          <ul>
+            <li>Styles, headings, and tables of contents that actually work</li>
+            <li>Templates for the documents you make again and again</li>
+            <li>Track changes, comments, and review workflows</li>
+            <li>Setting up for AI-assisted drafting later in the course</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="excel.html">
+        <div class="session-list-body">
+          <div class="when">Spreadsheets</div>
+          <h4>Excel: Structured Data &amp; Useful Formulas</h4>
+          <ul>
+            <li>Tables, named ranges, and clean data habits</li>
+            <li>The everyday formulas, and XLOOKUP — the one to learn</li>
+            <li>Conditional formatting, filters, and charts that communicate</li>
+            <li>A sample dataset: a regional program register to work from</li>
+          </ul>
+        </div>
+      </a>
+    </div>
+
+    <div class="strand-label">Strand two — Working with AI</div>
+    <p class="strand-note">From "what actually is AI?" to practical, responsible AI-assisted work. Pairs with our <a href="/ai-literacy/">AI Literacy</a> course, which covers the community-safety side.</p>
+
+    <div class="session-list">
+      <a class="session-list-item" href="ai-foundations.html">
+        <div class="session-list-body">
+          <div class="when">AI basics</div>
+          <h4>AI Foundations for the Workplace</h4>
+          <ul>
+            <li>AI in plain English, and the four tools you'll meet at work</li>
+            <li>Copilot vs ChatGPT, Claude, and Gemini: what's actually different</li>
+            <li>Where your data goes, and where AI is unreliable</li>
+            <li>The human in the loop, and sensible defaults</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="prompting.html">
+        <div class="session-list-body">
+          <div class="when">Prompting</div>
+          <h4>Prompting Skills That Work</h4>
+          <ul>
+            <li>The anatomy of a working prompt: role, task, context, format</li>
+            <li>Feeding the AI your content, and iterating instead of restarting</li>
+            <li>Honesty checks on what comes back</li>
+            <li>Building a reusable prompt library for your team</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="copilot-in-office.html">
+        <div class="session-list-body">
+          <div class="when">Copilot</div>
+          <h4>Copilot in Word, Excel &amp; PowerPoint</h4>
+          <ul>
+            <li>What Copilot can see in each app, and a note on licensing</li>
+            <li>Drafting in Word, analysing in Excel, building in PowerPoint</li>
+            <li>Reviewing what Copilot produces before it goes anywhere</li>
+            <li>When to reach for Copilot, and when not to</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="copilot-outlook-teams.html">
+        <div class="session-list-body">
+          <div class="when">Copilot</div>
+          <h4>Copilot in Outlook &amp; Teams</h4>
+          <ul>
+            <li>Email triage, and drafting replies with tone control</li>
+            <li>Catching up on long threads and meetings you missed</li>
+            <li>Meeting recaps, action items, and briefing notes</li>
+            <li>The review habit for anything AI writes in your name</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="ai-workflows.html">
+        <div class="session-list-body">
+          <div class="when">Putting it together</div>
+          <h4>AI Workflows You'll Actually Use</h4>
+          <ul>
+            <li>Raw notes to report draft; policy to plain language</li>
+            <li>Multi-document research synthesis, and data to story</li>
+            <li>The meeting chain: agenda to follow-up</li>
+            <li>Grant application support, and building your own workflow</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="session-list-item" href="responsible-use.html">
+        <div class="session-list-body">
+          <div class="when">The guardrails</div>
+          <h4>Responsible Use, Privacy &amp; Policy</h4>
+          <ul>
+            <li>What you can and can't put into AI tools</li>
+            <li>Personal, sensitive, culturally held and community information</li>
+            <li>Australia's AI Ethics Principles, and organisational policy</li>
+            <li>Shadow AI, attribution, and record-keeping</li>
+          </ul>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="content-section container-content" id="takeaways">
+    <div class="section-eyebrow">// what youll take away</div>
+    <h2>What You'll Take Away</h2>
+    <p>A working mental map of Microsoft 365 — where files live, how sharing and permissions work, and how the apps fit together — so the tools stop fighting you.</p>
+    <p>Cleaner documents and spreadsheets: styles and templates in Word, tables and everyday formulas in Excel, and charts that communicate rather than decorate.</p>
+    <p>A calmer inbox and better meetings, with Teams and Outlook doing the coordinating instead of your memory.</p>
+    <p>The ability to use AI tools well: prompts that get useful answers, Copilot doing the first drafts, and the judgement to review everything before it goes out in your name.</p>
+    <p>A clear rule for what never goes into an AI tool, grounded in Australian privacy law, cultural protocols, and your own organisation's policies.</p>
+  </section>
+
+  <section class="content-section container-content" id="resources">
+    <div class="section-eyebrow">// resources</div>
+    <h2>Resources</h2>
+    <p>These companion pages from our AI Literacy course pair well with the Working with AI strand, and were written for the same regional and remote audience.</p>
+    <div class="resource-list">
+      <a class="resource-list-item" href="/ai-literacy/just-ask-it.html">
+        <h4>Resource &middot; Just Ask It</h4>
+        <p>The habit of asking an AI tool your "silly questions" first — with examples of what that looks like in real workplaces.</p>
+      </a>
+      <a class="resource-list-item" href="/ai-literacy/remote-ai-use.html">
+        <h4>Resource &middot; Using AI Remotely</h4>
+        <p>Bandwidth, data use, and practical tips for using AI tools where the internet is slow, metered, or intermittent.</p>
+      </a>
+      <a class="resource-list-item" href="/ai-literacy/prompt-gallery.html">
+        <h4>Resource &middot; Prompt Gallery</h4>
+        <p>A gallery of ready-to-adapt prompts for everyday work and community tasks.</p>
+      </a>
+      <a class="resource-list-item" href="/cybersecurity/" style="border-left-color:var(--accent);">
+        <h4>Related course &middot; Cyber Security Awareness</h4>
+        <p>Four sessions on scams, phishing, deepfakes, and what to do when something goes wrong. The safety companion to this course.</p>
+      </a>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/ai-literacy/">AI Literacy</a></li>
+          <li><a href="/cybersecurity/">Cyber Security Awareness</a></li>
+          <li><a href="/#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 NT World Ink. Made for the Northern Territory.</span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
