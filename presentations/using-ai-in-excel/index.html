@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Using AI in Excel — From Copilot Chat to Add-ins</title>
+
+<!-- ===========================================
+     FONTS — Ledger Green × Cobalt Grid typography
+     Newsreader (display serif) · Hanken Grotesk (body) · DM Mono (formula chrome)
+     =========================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ===========================================
+   THEME — LEDGER GREEN
+   A spreadsheet-native design system: paper canvas,
+   faint cell grid, formula-bar chrome, selected-cell
+   panels. Change these variables to retheme the deck.
+   =========================================== */
+:root {
+    /* Colors */
+    --paper: #F7F4EC;          /* warm paper canvas */
+    --ink: #12281E;            /* near-black green ink */
+    --green: #17A05E;          /* vivid accent — selection borders, chips */
+    --green-deep: #0E7A45;     /* deep green — accent text (readable on paper) */
+    --green-wash: #E4F0E7;     /* pale green fill for highlighted cells */
+    --cell: #DDD8C9;           /* faint gridline color */
+    --card: #FFFFFF;           /* white cell/card surface */
+    --muted: #6E7A70;          /* secondary text */
+    --chrome: #8D8875;         /* row/column header text */
+    --warn-wash: #FBEFDF;      /* warm wash for caution strips */
+    --warn-edge: #C97B2D;      /* caution accent */
+
+    /* Stage background (letterbox color) */
+    --stage-bg: #0D1F16;
+    --slide-bg: var(--paper);
+
+    /* Typography — authored at 1920×1080 stage size */
+    --font-display: 'Newsreader', Georgia, serif;
+    --font-body: 'Hanken Grotesk', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+
+    /* Animation */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-normal: 0.7s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================
+   FIXED 16:9 STAGE: MANDATORY BASE STYLES
+   Include this ENTIRE file in every presentation.
+   Slides are authored at 1920×1080 and scaled as a whole.
+   =========================================== */
+
+/* 1. Lock the browser viewport */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+/* 2. Full-window deck viewport */
+.deck-viewport {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+/* 3. Fixed 16:9 design canvas.
+   JavaScript sets transform: translate(...) scale(...). */
+.deck-stage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform-origin: 0 0;
+    background: var(--slide-bg, #fff);
+}
+
+/* 4. Slides stack inside the fixed stage.
+   Content must be laid out at 1920×1080, not reflowed per device. */
+.slide {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    background: var(--slide-bg, #fff);
+}
+
+.slide.active,
+.slide.visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+/* 5. Keep media inside authored slide bounds */
+img,
+video,
+canvas,
+svg {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* 6. Presentation chrome stays outside the slide design system */
+.deck-controls {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+/* 7. Print one fixed-size slide per page */
+@media print {
+    html,
+    body {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+    }
+
+    .deck-viewport {
+        position: static;
+        overflow: visible;
+        background: #fff;
+    }
+
+    .deck-stage {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none !important;
+        background: none;
+    }
+
+    .slide {
+        position: relative;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 1920px;
+        height: 1080px;
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .deck-controls {
+        display: none !important;
+    }
+}
+
+/* 8. Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+    }
+}
+
+/* ===========================================
+   SLIDE SCAFFOLD — every slide carries:
+   1. a faint spreadsheet cell grid (::before)
+   2. a formula bar across the top (.fbar)
+   3. a sheet-tab footer (.foot)
+   =========================================== */
+
+/* Faint cell grid behind everything, below the formula bar */
+.slide::before {
+    content: '';
+    position: absolute;
+    inset: 64px 0 0 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(to right, var(--cell) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--cell) 1px, transparent 1px);
+    background-size: 192px 96px;
+    opacity: .55;
+}
+
+/* Formula bar — dark strip with a cell reference and a per-slide "formula" */
+.fbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    background: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    padding: 0 40px;
+    font: 500 21px var(--font-mono);
+    color: #E9F5EE;
+    z-index: 3;
+}
+.fbar .ref {
+    background: var(--green);
+    color: #08130D;
+    padding: 5px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: .04em;
+}
+.fbar .fx { color: var(--green); font-style: italic; }
+.fbar .formula { opacity: .92; }
+
+/* Sheet-tab footer — section tab left, page counter right */
+.foot {
+    position: absolute;
+    left: 40px; right: 46px; bottom: 0;
+    height: 58px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font: 500 18px var(--font-mono);
+    letter-spacing: .1em;
+    color: var(--chrome);
+    z-index: 3;
+}
+.foot .sheet {
+    background: var(--ink);
+    color: #E9F5EE;
+    padding: 9px 24px 12px;
+    border-radius: 6px 6px 0 0;
+    align-self: flex-end;
+    text-transform: uppercase;
+}
+
+/* ===========================================
+   CONTENT PRIMITIVES
+   =========================================== */
+
+/* Standard content area between formula bar and footer */
+.body {
+    position: absolute;
+    inset: 64px 110px 76px 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 2;
+}
+
+/* Small uppercase mono kicker above titles */
+.kicker {
+    font: 500 20px var(--font-mono);
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+    margin-bottom: 26px;
+}
+
+/* Slide titles — Newsreader 400, per Cobalt Grid type spec */
+h2 {
+    font: 400 82px/1.06 var(--font-display);
+    letter-spacing: -0.015em;
+    color: var(--ink);
+}
+h2 em { font-style: italic; color: var(--green-deep); }
+
+/* Body copy */
+.lede {
+    font: 400 30px/1.55 var(--font-body);
+    color: var(--ink);
+    max-width: 1240px;
+}
+.lede b { font-weight: 600; }
+.muted { color: var(--muted); }
+
+/* Selected-cell panel — white card with green selection border + handle */
+.sel {
+    position: relative;
+    background: var(--card);
+    border: 4px solid var(--green);
+    box-shadow: 10px 10px 0 rgba(23, 160, 94, .15);
+}
+.sel::after {  /* the little drag-handle square */
+    content: '';
+    position: absolute;
+    right: -10px; bottom: -10px;
+    width: 15px; height: 15px;
+    background: var(--green);
+    border: 3px solid var(--card);
+}
+.sel .tag {  /* cell-reference label pinned above the panel */
+    position: absolute;
+    top: -40px; left: -4px;
+    background: var(--green);
+    color: #08130D;
+    font: 500 18px var(--font-mono);
+    letter-spacing: .06em;
+    padding: 6px 14px;
+}
+
+/* Plain white cell card (no selection border) */
+.cellcard {
+    background: var(--card);
+    border: 1.5px solid var(--cell);
+    box-shadow: 0 2px 0 rgba(18, 40, 30, .05);
+}
+
+/* Prompt chip — a "what you type" block */
+.prompt {
+    background: var(--ink);
+    color: #E9F5EE;
+    padding: 30px 40px;
+    font: 400 27px/1.5 var(--font-mono);
+    border-radius: 6px;
+    position: relative;
+}
+.prompt::before {
+    content: 'YOU ASK';
+    position: absolute;
+    top: -14px; left: 28px;
+    background: var(--green);
+    color: #08130D;
+    font: 500 15px var(--font-mono);
+    letter-spacing: .18em;
+    padding: 4px 12px;
+}
+.prompt i { color: #8FD4B2; font-style: normal; }
+
+/* Formula output block — "what you get" */
+.output {
+    background: var(--green-wash);
+    border-left: 6px solid var(--green);
+    padding: 26px 36px;
+    font: 500 30px/1.6 var(--font-mono);
+    color: var(--green-deep);
+}
+
+/* Caution strip */
+.caution {
+    background: var(--warn-wash);
+    border-left: 6px solid var(--warn-edge);
+    padding: 24px 34px;
+    font: 400 25px/1.5 var(--font-body);
+    color: #5A431F;
+}
+.caution b { font-weight: 700; }
+
+/* Numbered ledger rows (for step lists) */
+.rows-list { display: flex; flex-direction: column; }
+.rowitem {
+    display: flex;
+    align-items: baseline;
+    gap: 34px;
+    padding: 26px 10px;
+    border-bottom: 1px solid var(--cell);
+    font: 400 29px/1.45 var(--font-body);
+    color: var(--ink);
+}
+.rowitem:last-child { border-bottom: none; }
+.rowitem .n {
+    font: 500 22px var(--font-mono);
+    color: var(--green-deep);
+    min-width: 56px;
+}
+.rowitem b { font-weight: 600; }
+
+/* ===========================================
+   ENTRANCE ANIMATIONS
+   .reveal children animate when slide gains .visible
+   =========================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity var(--duration-normal) var(--ease-out-expo),
+                transform var(--duration-normal) var(--ease-out-expo);
+}
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+
+/* Stagger — applies within any parent */
+.reveal:nth-of-type(1), .r1 { transition-delay: .08s; }
+.reveal:nth-of-type(2), .r2 { transition-delay: .2s; }
+.reveal:nth-of-type(3), .r3 { transition-delay: .32s; }
+.reveal:nth-of-type(4), .r4 { transition-delay: .44s; }
+.reveal:nth-of-type(5), .r5 { transition-delay: .56s; }
+.reveal:nth-of-type(6), .r6 { transition-delay: .68s; }
+.reveal:nth-of-type(7), .r7 { transition-delay: .8s; }
+
+/* Blinking cursor for formula-bar typing feel */
+.cursor::after {
+    content: '';
+    display: inline-block;
+    width: 10px; height: 24px;
+    background: var(--green);
+    vertical-align: -3px;
+    margin-left: 5px;
+    animation: blink 1.1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ===========================================
+   SLIDE 1 — TITLE
+   Full spreadsheet chrome: column letters, row numbers,
+   title inside a selected cell range.
+   =========================================== */
+.title-cols {
+    position: absolute;
+    top: 76px; left: 96px; right: 0;
+    display: flex;
+    font: 500 19px var(--font-mono);
+    color: var(--chrome);
+    z-index: 2;
+}
+.title-cols span { width: 192px; text-align: center; }
+.title-rows {
+    position: absolute;
+    top: 112px; left: 0; bottom: 58px;
+    width: 96px;
+    display: flex;
+    flex-direction: column;
+    font: 500 19px var(--font-mono);
+    color: var(--chrome);
+    z-index: 2;
+}
+.title-rows span { height: 96px; display: flex; align-items: center; justify-content: center; }
+
+.title-sel {
+    position: absolute;
+    left: 288px; top: 328px;
+    width: 1344px;
+    padding: 66px 78px;
+    z-index: 2;
+}
+.title-sel h1 {
+    font: 400 138px/1.02 var(--font-display);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+}
+.title-sel h1 .g { color: var(--green-deep); font-style: italic; }
+.title-sel .subtitle {
+    font: 400 30px/1.5 var(--font-body);
+    color: var(--muted);
+    margin-top: 36px;
+}
+.title-sel .subtitle code {
+    font: 500 27px var(--font-mono);
+    color: var(--green-deep);
+}
+
+/* ===========================================
+   SLIDE 2 — AGENDA GRID
+   Six cells, two columns, like a named range.
+   =========================================== */
+.agenda-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+    margin-top: 56px;
+}
+.agenda-cell {
+    padding: 34px 40px;
+    display: flex;
+    align-items: baseline;
+    gap: 26px;
+}
+.agenda-cell .n { font: 500 21px var(--font-mono); color: var(--green-deep); }
+.agenda-cell .t { font: 500 28px/1.35 var(--font-body); color: var(--ink); }
+
+/* ===========================================
+   SLIDE 3 — TWO PANEL SPLIT (Copilot vs Add-ins)
+   =========================================== */
+.duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 54px;
+}
+.duo-card { padding: 52px 54px; }
+.duo-card .dk {
+    font: 500 19px var(--font-mono);
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+    margin-bottom: 20px;
+}
+.duo-card h3 {
+    font: 500 56px/1.05 var(--font-display);
+    color: var(--ink);
+    margin-bottom: 24px;
+}
+.duo-card p { font: 400 27px/1.5 var(--font-body); color: var(--muted); }
+.duo-card p b { color: var(--ink); font-weight: 600; }
+
+/* ===========================================
+   SLIDE 8 — GRID → FLATTENED TOKENS VISUAL
+   =========================================== */
+.flatten {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    margin-top: 60px;
+}
+.mini-table {
+    border-collapse: collapse;
+    font: 400 22px var(--font-mono);
+    background: var(--card);
+}
+.mini-table td, .mini-table th {
+    border: 1.5px solid var(--cell);
+    padding: 14px 26px;
+    color: var(--ink);
+    text-align: left;
+}
+.mini-table th { background: var(--green-wash); color: var(--green-deep); font-weight: 500; }
+.flat-arrow { font: 400 64px var(--font-display); color: var(--green-deep); }
+.token-stream {
+    font: 400 23px/2 var(--font-mono);
+    color: var(--muted);
+    max-width: 660px;
+    word-spacing: .3em;
+}
+.token-stream span {
+    background: var(--card);
+    border: 1.5px solid var(--cell);
+    padding: 3px 10px;
+    display: inline-block;
+    margin: 4px 2px;
+}
+
+/* ===========================================
+   SLIDE 9 — THREE FAILURE CARDS
+   =========================================== */
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 52px; }
+.trio-card { padding: 40px 38px; }
+.trio-card .big {
+    font: 500 40px/1.1 var(--font-display);
+    color: var(--ink);
+    margin-bottom: 18px;
+}
+.trio-card p { font: 400 24px/1.5 var(--font-body); color: var(--muted); }
+
+/* ===========================================
+   SLIDE 10 — VERIFY LOOP
+   =========================================== */
+.loop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin: 54px 0 50px;
+}
+.loop .step {
+    background: var(--ink);
+    color: #E9F5EE;
+    font: 500 24px var(--font-mono);
+    padding: 20px 30px;
+    border-radius: 6px;
+}
+.loop .step.hl { background: var(--green); color: #08130D; }
+.loop .arrow { font: 400 34px var(--font-mono); color: var(--green-deep); }
+
+/* ===========================================
+   SLIDE 14 — COMPARISON TABLE
+   =========================================== */
+.compare {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 48px;
+    background: var(--card);
+    font: 400 26px/1.4 var(--font-body);
+}
+.compare th, .compare td {
+    border: 1.5px solid var(--cell);
+    padding: 26px 34px;
+    text-align: left;
+    vertical-align: top;
+    color: var(--ink);
+}
+.compare thead th {
+    background: var(--ink);
+    color: #E9F5EE;
+    font: 500 24px var(--font-mono);
+    letter-spacing: .08em;
+    border-color: var(--ink);
+}
+.compare td:first-child {
+    background: var(--green-wash);
+    font: 500 22px var(--font-mono);
+    color: var(--green-deep);
+    width: 300px;
+}
+
+/* ===========================================
+   SLIDE 17 — TAKEAWAY CHECKLIST
+   =========================================== */
+.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 52px; }
+.check {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 30px 36px;
+}
+.check .box {
+    font: 500 26px var(--font-mono);
+    color: var(--green-deep);
+    background: var(--green-wash);
+    border: 2px solid var(--green);
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    border-radius: 4px;
+}
+.check p { font: 400 26px/1.45 var(--font-body); color: var(--ink); }
+.check p b { font-weight: 600; }
+
+/* ===========================================
+   INLINE EDITING CHROME (outside the stage)
+   =========================================== */
+.edit-hotzone {
+    position: fixed; top: 0; left: 0;
+    width: 80px; height: 80px;
+    z-index: 10000;
+    cursor: pointer;
+}
+.edit-toggle {
+    position: fixed; top: 18px; left: 18px;
+    z-index: 10001;
+    font-size: 22px;
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    border: 2px solid var(--green);
+    background: var(--ink);
+    color: #E9F5EE;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { background: var(--green); }
+body.editing .slide.active { outline: 4px dashed var(--green); outline-offset: -4px; }
+[contenteditable="true"]:focus { outline: 2px solid var(--green); outline-offset: 4px; }
+
+</style>
+</head>
+<body>
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+    <!-- ============ SLIDE 1 — TITLE ============ -->
+    <section class="slide active visible" aria-label="Title">
+        <div class="fbar">
+            <span class="ref">B4</span><span class="fx">fx</span>
+            <span class="formula cursor">=PRESENT("Using AI in Excel", verify_everything:=TRUE)</span>
+        </div>
+        <div class="title-cols"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span></div>
+        <div class="title-rows"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+        <div class="title-sel sel">
+            <div class="tag">B4:H7</div>
+            <h1 class="reveal r1">Using <span class="g">AI</span> in Excel</h1>
+            <p class="subtitle reveal r2">From Copilot chat to add-ins — getting real work done, and knowing when to <code>=VERIFY()</code> the machine's work.</p>
+        </div>
+        <div class="foot"><span class="sheet">Training Session</span><span>JULY 2026 · 001 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 2 — AGENDA ============ -->
+    <section class="slide" aria-label="What we'll cover">
+        <div class="fbar">
+            <span class="ref">S2</span><span class="fx">fx</span>
+            <span class="formula">=AGENDA(6)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">On the worksheet today</div>
+            <h2 class="reveal r2">What we'll <em>cover</em></h2>
+            <div class="agenda-grid">
+                <div class="agenda-cell cellcard reveal r3"><span class="n">01</span><span class="t">Free Copilot chat as a "syntax helper"</span></div>
+                <div class="agenda-cell cellcard reveal r4"><span class="n">02</span><span class="t">Natural language → working formulas</span></div>
+                <div class="agenda-cell cellcard reveal r5"><span class="n">03</span><span class="t">Where AI struggles: tables &amp; hallucination</span></div>
+                <div class="agenda-cell cellcard reveal r6"><span class="n">04</span><span class="t">Add-ins (Claude, ChatGPT) vs Copilot</span></div>
+                <div class="agenda-cell cellcard reveal r7"><span class="n">05</span><span class="t">AI can build your PowerPoint deck too</span></div>
+                <div class="agenda-cell cellcard reveal r7"><span class="n">06</span><span class="t">The golden rule: verify everything</span></div>
+            </div>
+        </div>
+        <div class="foot"><span class="sheet">Overview</span><span>002 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 3 — TWO THINGS CALLED "AI IN EXCEL" ============ -->
+    <section class="slide" aria-label="Copilot vs add-ins">
+        <div class="fbar">
+            <span class="ref">S3</span><span class="fx">fx</span>
+            <span class="formula">=IF(built_into_365, "Copilot", "Add-in")</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">First, some vocabulary</div>
+            <h2 class="reveal r2">Two different things people call <em>"AI in Excel"</em></h2>
+            <div class="duo">
+                <div class="duo-card sel reveal r3">
+                    <div class="tag">A1</div>
+                    <div class="dk">Built in</div>
+                    <h3>Copilot</h3>
+                    <p><b>Microsoft's own assistant</b>, baked into the Microsoft 365 environment. It's part of the house.</p>
+                </div>
+                <div class="duo-card sel reveal r4">
+                    <div class="tag">B1</div>
+                    <div class="dk">Bolted on</div>
+                    <h3>Add-ins</h3>
+                    <p><b>Third-party tools you install</b> into Excel — Claude, ChatGPT and others. External software, invited in.</p>
+                </div>
+            </div>
+            <p class="lede reveal r5" style="margin-top:48px"><b>They work differently — and it matters.</b></p>
+        </div>
+        <div class="foot"><span class="sheet">Overview</span><span>003 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 4 — FREE COPILOT AS SYNTAX HELPER ============ -->
+    <section class="slide" aria-label="Free Copilot chat">
+        <div class="fbar">
+            <span class="ref">S4</span><span class="fx">fx</span>
+            <span class="formula">=TRANSLATE("plain English", "Excel syntax")</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part one · The syntax helper</div>
+            <h2 class="reveal r2" style="max-width:1500px">You don't need a paid licence<br>to get <em>formula help</em></h2>
+            <p class="lede reveal r3" style="margin-top:52px">The free Copilot chat — in the browser or the Windows app — acts as a <b>translator from plain English into Excel syntax</b>.</p>
+            <p class="lede reveal r4" style="margin-top:30px"><b>You</b> write the formula. <b>It</b> tells you how.</p>
+        </div>
+        <div class="foot"><span class="sheet">Copilot Chat</span><span>004 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 5 — EXAMPLE: JOINING TEXT ============ -->
+    <section class="slide" aria-label="Example: joining text">
+        <div class="fbar">
+            <span class="ref">S5</span><span class="fx">fx</span>
+            <span class="formula">=TEXTJOIN(" ", TRUE, A2, B2)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Example 01 · Joining text</div>
+            <h2 class="reveal r2">Ask in English, get the <em>syntax</em></h2>
+            <div class="prompt reveal r3" style="margin-top:64px;max-width:1300px">
+                <i>"Join the text in these two cells into one cell"</i>
+            </div>
+            <div class="output reveal r4" style="margin-top:44px;max-width:1300px">
+                =A2&amp;" "&amp;B2<br>
+                =TEXTJOIN(" ", TRUE, A2, B2)
+            </div>
+            <p class="lede reveal r5" style="margin-top:44px">It gives you <b>the tool and the reasoning</b> — not just something to paste.</p>
+        </div>
+        <div class="foot"><span class="sheet">Copilot Chat</span><span>005 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 6 — EXAMPLE: VLOOKUP TUTOR ============ -->
+    <section class="slide" aria-label="Example: learning not just doing">
+        <div class="fbar">
+            <span class="ref">S6</span><span class="fx">fx</span>
+            <span class="formula">=VLOOKUP(the_why, patient_tutor, 4, FALSE)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Example 02 · Learning, not just doing</div>
+            <h2 class="reveal r2">A patient tutor for <em>broken formulas</em></h2>
+            <div class="prompt reveal r3" style="margin-top:56px;max-width:1300px">
+                <i>"Explain why my VLOOKUP isn't working — and teach me"</i>
+            </div>
+            <div class="trio" style="margin-top:56px">
+                <div class="trio-card cellcard reveal r4">
+                    <div class="big">Match type</div>
+                    <p>Exact vs approximate match — the fourth argument most people never set.</p>
+                </div>
+                <div class="trio-card cellcard reveal r5">
+                    <div class="big">Column index</div>
+                    <p>Counting to the wrong column in the lookup range.</p>
+                </div>
+                <div class="trio-card cellcard reveal r6">
+                    <div class="big">First column</div>
+                    <p>The lookup value has to live in the first column of the range.</p>
+                </div>
+            </div>
+            <p class="lede reveal r7" style="margin-top:48px"><b>Learn the why, not just the fix.</b></p>
+        </div>
+        <div class="foot"><span class="sheet">Copilot Chat</span><span>006 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 7 — EXAMPLE: PRACTICE DATA ============ -->
+    <section class="slide" aria-label="Example: generating practice data">
+        <div class="fbar">
+            <span class="ref">S7</span><span class="fx">fx</span>
+            <span class="formula">=RANDARRAY(rows, columns, realistic:=TRUE)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Example 03 · Practice data</div>
+            <h2 class="reveal r2">AI is great at <em>fake data</em></h2>
+            <div class="prompt reveal r3" style="margin-top:52px;max-width:1300px">
+                <i>"Make a synthetic dataset for me to practise sorting and pivot tables"</i>
+            </div>
+            <div style="display:flex;gap:60px;align-items:flex-start;margin-top:52px">
+                <table class="mini-table reveal r4">
+                    <tr><th>Region</th><th>Rep</th><th>Units</th><th>Revenue</th></tr>
+                    <tr><td>North</td><td>Amara</td><td>142</td><td>$8,520</td></tr>
+                    <tr><td>South</td><td>Ben</td><td>98</td><td>$5,880</td></tr>
+                    <tr><td>East</td><td>Chloe</td><td>211</td><td>$12,660</td></tr>
+                    <tr><td>West</td><td>Dev</td><td>167</td><td>$10,020</td></tr>
+                </table>
+                <div style="max-width:760px">
+                    <p class="lede reveal r5">Realistic-but-fake sales, staff, dates and categories — <b>ideal for training</b>.</p>
+                    <p class="lede reveal r6" style="margin-top:26px"><b>No privacy risk</b>, and you control the shape of the data.</p>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><span class="sheet">Copilot Chat</span><span>007 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 8 — THE CATCH: LLMs AND TABLES ============ -->
+    <section class="slide" aria-label="The catch: tabulated data">
+        <div class="fbar">
+            <span class="ref">S8</span><span class="fx">fx</span>
+            <span class="formula">=FLATTEN(your_table)  ⚠ structure lost</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part two · The catch</div>
+            <h2 class="reveal r2">LLMs read <em>text</em>, not grids</h2>
+            <div class="flatten">
+                <table class="mini-table reveal r3">
+                    <tr><th>A</th><th>B</th></tr>
+                    <tr><td>Jan</td><td>120</td></tr>
+                    <tr><td>Feb</td><td>95</td></tr>
+                    <tr><td>Mar</td><td>143</td></tr>
+                </table>
+                <div class="flat-arrow reveal r4">→</div>
+                <div class="token-stream reveal r5">
+                    <span>Jan</span><span>120</span><span>Feb</span><span>95</span><span>Mar</span><span>143</span>
+                </div>
+            </div>
+            <p class="lede reveal r6" style="margin-top:56px">Rows, columns and cell relationships get <b>flattened into a sequence</b> — and can be misread. The very structure that makes it a spreadsheet is <b>what the model handles worst</b>.</p>
+        </div>
+        <div class="foot"><span class="sheet">The Catch</span><span>008 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 9 — WHY IT HALLUCINATES ============ -->
+    <section class="slide" aria-label="Why it hallucinates">
+        <div class="fbar">
+            <span class="ref">S9</span><span class="fx">fx</span>
+            <span class="formula">=PLAUSIBLE(answer) &lt;&gt; CORRECT(answer)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part two · The catch</div>
+            <h2 class="reveal r2">Why it <em>hallucinates</em> in Excel tasks</h2>
+            <div class="trio">
+                <div class="trio-card cellcard reveal r3">
+                    <div class="big">It predicts</div>
+                    <p>It generates plausible text — so it can invent numbers that "look right."</p>
+                </div>
+                <div class="trio-card cellcard reveal r4">
+                    <div class="big">It miscounts</div>
+                    <p>Rows miscounted, columns misaligned, totals fabricated.</p>
+                </div>
+                <div class="trio-card cellcard reveal r5">
+                    <div class="big">It's confident</div>
+                    <p>Even when wrong. Tone is not a reliability signal.</p>
+                </div>
+            </div>
+            <div class="caution reveal r6" style="margin-top:52px;max-width:1500px">
+                Even the vendors say so: <b>OpenAI's own guidance</b> is that ChatGPT predicts text, not math — every output is a draft until you verify the logic yourself.
+            </div>
+        </div>
+        <div class="foot"><span class="sheet">The Catch</span><span>009 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 10 — ALWAYS VERIFY ============ -->
+    <section class="slide" aria-label="Always verify">
+        <div class="fbar">
+            <span class="ref">S10</span><span class="fx">fx</span>
+            <span class="formula">=VERIFY(everything)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part two · The golden rule</div>
+            <h2 class="reveal r2">So — <em>always verify</em></h2>
+            <div class="loop reveal r3">
+                <span class="step">generate</span><span class="arrow">→</span>
+                <span class="step">explain</span><span class="arrow">→</span>
+                <span class="step">test on a copy</span><span class="arrow">→</span>
+                <span class="step hl">verify manually</span><span class="arrow">→</span>
+                <span class="step">scale</span>
+            </div>
+            <div class="rows-list" style="max-width:1440px">
+                <div class="rowitem reveal r4"><span class="n">01</span><span>Re-run the AI's formula on <b>a small sample you can eyeball</b></span></div>
+                <div class="rowitem reveal r5"><span class="n">02</span><span><b>Cross-check totals and counts</b> manually</span></div>
+                <div class="rowitem reveal r6"><span class="n">03</span><span>Ask <b>"how did you get that?"</b> and inspect the logic</span></div>
+                <div class="rowitem reveal r7"><span class="n">04</span><span><b>Never</b> let AI-reported numbers go into a report unchecked</span></div>
+            </div>
+        </div>
+        <div class="foot"><span class="sheet">The Catch</span><span>010 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 11 — WHAT IS AN ADD-IN ============ -->
+    <section class="slide" aria-label="What is an add-in">
+        <div class="fbar">
+            <span class="ref">S11</span><span class="fx">fx</span>
+            <span class="formula">=INSTALL("add-in", from:="Insert › Get Add-ins")</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part three · Add-ins</div>
+            <h2 class="reveal r2">What is an <em>add-in?</em></h2>
+            <p class="lede reveal r3" style="margin-top:48px">A third-party tool you install <b>into Excel itself</b>, from <b>Insert&nbsp;›&nbsp;Get&nbsp;Add-ins</b> (or Home&nbsp;›&nbsp;Add-ins on newer builds). It appears as a <b>sidebar panel</b> inside your workbook.</p>
+            <div class="duo" style="margin-top:56px">
+                <div class="duo-card cellcard reveal r4">
+                    <div class="dk">Copilot</div>
+                    <p style="font-size:28px"><b>Baked in.</b> Microsoft's own assistant, part of 365, uses your Microsoft account.</p>
+                </div>
+                <div class="duo-card cellcard reveal r5">
+                    <div class="dk">Add-in</div>
+                    <p style="font-size:28px"><b>Bolted on.</b> External software you install, signed into its own account.</p>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><span class="sheet">Add-ins</span><span>011 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 12 — THE MAIN ADD-INS NOW ============ -->
+    <section class="slide" aria-label="The main add-ins available now">
+        <div class="fbar">
+            <span class="ref">S12</span><span class="fx">fx</span>
+            <span class="formula">=AVAILABLE(NOW())</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part three · Add-ins</div>
+            <h2 class="reveal r2">The main add-ins <em>available now</em></h2>
+            <div class="rows-list" style="margin-top:44px;max-width:1560px">
+                <div class="rowitem reveal r3">
+                    <span class="n">01</span>
+                    <span><b>Claude</b> — officially launched 7 May 2026 as add-ins for Excel, Word and PowerPoint. Generally available on paid Claude plans, via the Microsoft Marketplace.</span>
+                </div>
+                <div class="rowitem reveal r4">
+                    <span class="n">02</span>
+                    <span><b>ChatGPT for Excel</b> — generally available, powered by GPT-5.5, across free and paid tiers (with some regional and plan limits).</span>
+                </div>
+                <div class="rowitem reveal r5">
+                    <span class="n">03</span>
+                    <span><b>Aggregators</b> — third-party add-ins (e.g. GPT for Work) let you pick between Claude, GPT and other models in one panel.</span>
+                </div>
+            </div>
+            <p class="lede reveal r6" style="margin-top:44px"><b>Both major AI companies</b> now ship official Excel add-ins.</p>
+        </div>
+        <div class="foot"><span class="sheet">Add-ins</span><span>012 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 13 — HOW THE ADD-INS WORK ============ -->
+    <section class="slide" aria-label="How the add-ins work">
+        <div class="fbar">
+            <span class="ref">S13</span><span class="fx">fx</span>
+            <span class="formula">=SIDEBAR(read_sheet, write_sheet)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part three · Add-ins</div>
+            <h2 class="reveal r2">How the Claude / ChatGPT <em>add-ins work</em></h2>
+            <div class="rows-list" style="margin-top:40px;max-width:1560px">
+                <div class="rowitem reveal r3"><span class="n">01</span><span><b>Install</b> from the Microsoft Marketplace / AppSource, sign in with your AI account</span></div>
+                <div class="rowitem reveal r4"><span class="n">02</span><span>They open as a <b>sidebar</b> — and can <b>read from and write to</b> the sheet</span></div>
+                <div class="rowitem reveal r5"><span class="n">03</span><span><b>Claude</b> reads multi-tab workbooks, understands nested formulas, and gives <b>cell-level citations</b> for its explanations</span></div>
+            </div>
+            <div class="caution reveal r6" style="margin-top:44px;max-width:1560px">
+                <b>They can edit your workbook.</b> Be specific about what to update, and double-check what changed so you can revert. They can still mishandle tables and hallucinate — <b>the verify rule doesn't change</b>.
+            </div>
+        </div>
+        <div class="foot"><span class="sheet">Add-ins</span><span>013 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 14 — COPILOT VS ADD-INS TABLE ============ -->
+    <section class="slide" aria-label="Copilot vs add-ins comparison">
+        <div class="fbar">
+            <span class="ref">S14</span><span class="fx">fx</span>
+            <span class="formula">=COMPARE(copilot, add_ins)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part three · Quick comparison</div>
+            <h2 class="reveal r2">Copilot vs add-ins</h2>
+            <table class="compare reveal r3">
+                <thead>
+                    <tr><th></th><th>COPILOT</th><th>ADD-INS</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Who makes it</td><td>Microsoft</td><td>Anthropic / OpenAI</td></tr>
+                    <tr><td>How you access it</td><td>Built into Microsoft 365</td><td>Installed sidebar panel</td></tr>
+                    <tr><td>Model</td><td>Microsoft's Copilot models</td><td>Claude / GPT-5.5 — same model across apps</td></tr>
+                    <tr><td>Home advantage</td><td>Office Scripts, Power Query, Pivot depth</td><td>One consistent model in Excel, Word &amp; PowerPoint</td></tr>
+                </tbody>
+            </table>
+            <p class="lede reveal r4" style="margin-top:40px;font-size:27px">The honest trade-off — and <b>neither escapes the "check the work" rule</b>.</p>
+        </div>
+        <div class="foot"><span class="sheet">Add-ins</span><span>014 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 15 — AI BUILDS YOUR DECK ============ -->
+    <section class="slide" aria-label="AI can build your PowerPoint deck">
+        <div class="fbar">
+            <span class="ref">S15</span><span class="fx">fx</span>
+            <span class="formula">=SLIDES(from_your_analysis)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part four · The payoff</div>
+            <h2 class="reveal r2">AI can build your <em>PowerPoint deck</em> too</h2>
+            <div class="rows-list" style="margin-top:44px;max-width:1560px">
+                <div class="rowitem reveal r3"><span class="n">01</span><span>Claude and ChatGPT both ship <b>PowerPoint add-ins</b> alongside the Excel ones</span></div>
+                <div class="rowitem reveal r4"><span class="n">02</span><span>Claude works <b>inside your template</b> — your layouts, fonts, colours — and produces <b>native charts you can edit</b></span></div>
+                <div class="rowitem reveal r5"><span class="n">03</span><span><b>Context carries across apps</b>: analyse in Excel, build slides in PowerPoint, draft the report in Word — the AI holds the thread</span></div>
+            </div>
+        </div>
+        <div class="foot"><span class="sheet">Excel → Slides</span><span>015 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 16 — THE WORKFLOW ============ -->
+    <section class="slide" aria-label="Excel to PowerPoint workflow">
+        <div class="fbar">
+            <span class="ref">S16</span><span class="fx">fx</span>
+            <span class="formula">=WORKFLOW(excel → powerpoint)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Part four · A worked example</div>
+            <h2 class="reveal r2">The Excel-to-PowerPoint <em>workflow</em></h2>
+            <div class="rows-list" style="margin-top:40px;max-width:1560px">
+                <div class="rowitem reveal r3"><span class="n">01</span><span>In Excel, ask the AI to <b>analyse last quarter's data</b> and build charts</span></div>
+                <div class="rowitem reveal r4"><span class="n">02</span><span>Open <b>your PowerPoint template</b></span></div>
+                <div class="rowitem reveal r5"><span class="n">03</span><span>Ask it to <b>create a deck from that same analysis</b> — it pulls the numbers automatically</span></div>
+                <div class="rowitem reveal r6"><span class="n">04</span><span><b>Refine slide by slide</b></span></div>
+            </div>
+            <div class="caution reveal r7" style="margin-top:40px;max-width:1560px">
+                It generates a <b>first draft</b>, not a finished deck — check every figure that lands on a slide against the source.
+            </div>
+        </div>
+        <div class="foot"><span class="sheet">Excel → Slides</span><span>016 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 17 — KEY TAKEAWAYS ============ -->
+    <section class="slide" aria-label="Key takeaways">
+        <div class="fbar">
+            <span class="ref">S17</span><span class="fx">fx</span>
+            <span class="formula">=SUM(takeaways)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Wrapping up</div>
+            <h2 class="reveal r2">Key <em>takeaways</em></h2>
+            <div class="checks">
+                <div class="check cellcard reveal r3"><span class="box">✓</span><p>Free Copilot chat is a brilliant syntax tutor — <b>use it to learn the why</b></p></div>
+                <div class="check cellcard reveal r4"><span class="box">✓</span><p>AI is great at <b>generating practice data</b></p></div>
+                <div class="check cellcard reveal r5"><span class="box">✓</span><p>LLMs are <b>weak with grid-structured data</b> — and hallucinate confidently</p></div>
+                <div class="check cellcard reveal r6"><span class="box">✓</span><p>Add-ins differ from Copilot: <b>third-party, installed, their own model</b></p></div>
+                <div class="check cellcard reveal r7"><span class="box">✓</span><p>AI can <b>build decks from your data</b> — but the draft needs checking</p></div>
+                <div class="check cellcard reveal r7"><span class="box">✓</span><p><b>Verify everything</b> before it counts</p></div>
+            </div>
+        </div>
+        <div class="foot"><span class="sheet">Takeaways</span><span>017 / 018</span></div>
+    </section>
+
+    <!-- ============ SLIDE 18 — PRACTICE / NEXT STEPS ============ -->
+    <section class="slide" aria-label="Practice and next steps">
+        <div class="fbar">
+            <span class="ref">S18</span><span class="fx">fx</span>
+            <span class="formula cursor">=PRACTICE(hands_on:=TRUE)</span>
+        </div>
+        <div class="body">
+            <div class="kicker reveal r1">Over to you</div>
+            <h2 class="reveal r2">Practice / <em>next steps</em></h2>
+            <div class="rows-list" style="margin-top:44px;max-width:1560px">
+                <div class="rowitem reveal r3"><span class="n">01</span><span><b>Generate a synthetic dataset</b>, then build a pivot table from it</span></div>
+                <div class="rowitem reveal r4"><span class="n">02</span><span>Ask Copilot to <b>explain one formula you don't understand</b></span></div>
+                <div class="rowitem reveal r5"><span class="n">03</span><span>Then <b>deliberately check its answer</b> — practise the verify loop</span></div>
+                <div class="rowitem reveal r6"><span class="n">04</span><span>If you have an add-in: turn a small analysis into a <b>three-slide deck</b></span></div>
+            </div>
+            <p class="lede reveal r7" style="margin-top:48px;font-family:var(--font-mono);font-size:27px;color:var(--green-deep)">=TRUST(BUT_VERIFY)</p>
+        </div>
+        <div class="foot"><span class="sheet">Practice</span><span>018 / 018</span></div>
+    </section>
+
+</main>
+</div>
+
+<!-- Fixed chrome: edit affordance (slide footers carry the page counter) -->
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   Keyboard (arrows / space / PgUp / PgDn / Home / End),
+   mouse wheel, and touch-swipe navigation.
+   =========================================== */
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.wheelLock = false;
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupWheelNav();
+        this.setupTouchNav();
+        this.showSlide(0);
+    }
+
+    /* Scale the 1920×1080 stage uniformly to the window (letterbox as needed) */
+    setupStageScale() {
+        const scale = () => {
+            const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * factor) / 2;
+            const y = (window.innerHeight - 1080 * factor) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+    }
+
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            // Don't navigate while typing in edit mode
+            if (document.body.classList.contains('editing') || e.target.isContentEditable) return;
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+                    e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+                    e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.showSlide(0); break;
+                case 'End': e.preventDefault(); this.showSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+
+    /* Wheel navigation with a short lock so one scroll = one slide */
+    setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (this.wheelLock || Math.abs(e.deltaY) < 12) return;
+            this.wheelLock = true;
+            e.deltaY > 0 ? this.next() : this.prev();
+            setTimeout(() => { this.wheelLock = false; }, 650);
+        }, { passive: true });
+    }
+
+    /* Touch swipe: left/right to change slides */
+    setupTouchNav() {
+        let startX = 0, startY = 0;
+        window.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+        window.addEventListener('touchend', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            const dx = e.changedTouches[0].clientX - startX;
+            const dy = e.changedTouches[0].clientY - startY;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+                dx < 0 ? this.next() : this.prev();
+            }
+        }, { passive: true });
+    }
+
+    next() { this.showSlide(this.currentSlide + 1); }
+    prev() { this.showSlide(this.currentSlide - 1); }
+
+    showSlide(index) {
+        this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+        this.slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === this.currentSlide);
+            slide.classList.toggle('visible', i === this.currentSlide);
+        });
+    }
+}
+
+/* ===========================================
+   INLINE EDITOR
+   Hover top-left corner or press E to toggle.
+   Edits auto-save to localStorage; Ctrl+S downloads
+   an HTML copy with your edits baked in.
+   =========================================== */
+class InlineEditor {
+    constructor(presentation) {
+        this.presentation = presentation;
+        this.isActive = false;
+        this.storeKey = 'ai-excel-deck-edits-v1';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.hotzone = document.getElementById('editHotzone');
+        this.restore();
+        this.wire();
+    }
+
+    wire() {
+        let hideTimeout = null;
+        const showBtn = () => { clearTimeout(hideTimeout); this.toggleBtn.classList.add('show'); };
+        const hideBtn = () => {
+            hideTimeout = setTimeout(() => {
+                if (!this.isActive) this.toggleBtn.classList.remove('show');
+            }, 400);
+        };
+        this.hotzone.addEventListener('mouseenter', showBtn);
+        this.hotzone.addEventListener('mouseleave', hideBtn);
+        this.toggleBtn.addEventListener('mouseenter', showBtn);
+        this.toggleBtn.addEventListener('mouseleave', hideBtn);
+        this.hotzone.addEventListener('click', () => this.toggleEditMode());
+        this.toggleBtn.addEventListener('click', () => this.toggleEditMode());
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable &&
+                !e.metaKey && !e.ctrlKey) {
+                this.toggleEditMode();
+            }
+            // Ctrl/Cmd+S: download the deck with edits baked in
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                this.download();
+            }
+        });
+
+        // Persist edits as you type
+        document.getElementById('deckStage').addEventListener('input', () => this.save());
+    }
+
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('show', true);
+        // Make text blocks editable only while edit mode is on
+        document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide span.t, .slide .rowitem span:not(.n), .slide .formula, .slide .prompt, .slide .output, .slide td, .slide th, .slide .caution')
+            .forEach(el => {
+                if (this.isActive) el.setAttribute('contenteditable', 'true');
+                else el.removeAttribute('contenteditable');
+            });
+    }
+
+    save() {
+        const data = [...document.querySelectorAll('.slide')].map(s => s.innerHTML);
+        try { localStorage.setItem(this.storeKey, JSON.stringify(data)); } catch (e) {}
+    }
+
+    restore() {
+        try {
+            const data = JSON.parse(localStorage.getItem(this.storeKey) || 'null');
+            if (!data) return;
+            const slides = document.querySelectorAll('.slide');
+            if (data.length === slides.length) {
+                slides.forEach((s, i) => { s.innerHTML = data[i]; });
+            }
+        } catch (e) {}
+    }
+
+    download() {
+        // Serialize the document with edits, minus editing attributes
+        const clone = document.documentElement.cloneNode(true);
+        clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        clone.querySelectorAll('body').forEach(b => b.classList.remove('editing'));
+        const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'using-ai-in-excel.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+
+const presentation = new SlidePresentation();
+const editor = new InlineEditor(presentation);
+</script>
+</body>
+</html>
