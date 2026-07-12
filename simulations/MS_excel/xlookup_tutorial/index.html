@@ -1,0 +1,2153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VLOOKUP → XLOOKUP — an interactive self-study deck</title>
+
+<!-- === FONTS: Clash Display (display), General Sans (body) via Fontshare; JetBrains Mono (formulas) via Google === -->
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=general-sans@400,500,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+
+<style>
+/* ===========================================
+   THEME TOKENS — change these to retheme the deck
+   =========================================== */
+:root {
+    --bg:          #F7F8FA;   /* sheet off-white */
+    --panel:       #FFFFFF;
+    --grid-line:   #E3E6EA;
+    --header-grey: #EEF1F4;   /* Excel column-header fill */
+    --text:        #1A1D21;
+    --text-dim:    #6B7280;
+    --excel-green: #107C41;   /* primary accent */
+    --green-soft:  rgba(16,124,65,0.10);
+    --hl-lookup:   #F4B740;   /* amber  — lookup_array / lookup_value */
+    --hl-return:   #22A559;   /* green  — return_array */
+    --hl-result:   #2D7FF9;   /* blue   — result / spill anchor */
+    --spill-halo:  rgba(45,127,249,0.35);
+    --danger:      #E5484D;   /* #SPILL! / #N/A */
+
+    --stage-bg:    #D9DDE3;   /* letterbox colour around the 16:9 stage */
+    --slide-bg:    var(--bg);
+
+    --font-display: 'Clash Display', 'General Sans', sans-serif;
+    --font-title:   Baskerville, 'Times New Roman', Georgia, serif;   /* slide headings */
+    --font-body:    'General Sans', 'PingFang SC', 'Hiragino Sans GB', 'Geeza Pro', sans-serif;
+    --font-mono:    'JetBrains Mono', 'PingFang SC', 'Geeza Pro', monospace;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================
+   FIXED 16:9 STAGE: MANDATORY BASE STYLES
+   (viewport-base.css — included in full)
+   Slides are authored at 1920×1080 and scaled as a whole.
+   =========================================== */
+
+/* 1. Lock the browser viewport */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+/* 2. Full-window deck viewport */
+.deck-viewport {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+/* 3. Fixed 16:9 design canvas.
+   JavaScript sets transform: translate(...) scale(...). */
+.deck-stage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform-origin: 0 0;
+    background: var(--slide-bg, #fff);
+}
+
+/* 4. Slides stack inside the fixed stage.
+   Content must be laid out at 1920×1080, not reflowed per device. */
+.slide {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    background: var(--slide-bg, #fff);
+}
+
+.slide.active,
+.slide.visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+/* 5. Keep media inside authored slide bounds */
+img,
+video,
+canvas,
+svg {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* 6. Presentation chrome stays outside the slide design system */
+.deck-controls {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+/* 7. Print one fixed-size slide per page */
+@media print {
+    html,
+    body {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+    }
+
+    .deck-viewport {
+        position: static;
+        overflow: visible;
+        background: #fff;
+    }
+
+    .deck-stage {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none !important;
+        background: none;
+    }
+
+    .slide {
+        position: relative;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 1920px;
+        height: 1080px;
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .deck-controls {
+        display: none !important;
+    }
+}
+
+/* 8. Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+    }
+}
+
+/* ===========================================
+   BASE TYPOGRAPHY & SLIDE SCAFFOLD
+   =========================================== */
+body { font-family: var(--font-body); color: var(--text); }
+
+.wrap {                       /* inner layout container of every slide */
+    position: absolute;
+    inset: 0;
+    padding: 60px 96px 52px;
+    display: flex;
+    flex-direction: column;
+}
+
+.shead { margin-bottom: 24px; flex: 0 0 auto; }
+.kicker {
+    font-family: var(--font-mono);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--excel-green);
+}
+.shead h2 {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 58px;
+    line-height: 1.08;
+    letter-spacing: 0;
+    margin-top: 8px;
+}
+.lede { font-size: 25px; color: var(--text-dim); margin-top: 10px; max-width: 1350px; line-height: 1.45; }
+
+.sbody { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 24px; }
+
+/* ===========================================
+   ENTRANCE REVEALS (auto, on slide show)
+   =========================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.reveal:nth-child(1) { transition-delay: 0.05s; }
+.reveal:nth-child(2) { transition-delay: 0.15s; }
+.reveal:nth-child(3) { transition-delay: 0.25s; }
+.reveal:nth-child(4) { transition-delay: 0.35s; }
+.reveal:nth-child(5) { transition-delay: 0.45s; }
+.reveal:nth-child(6) { transition-delay: 0.55s; }
+
+/* ===========================================
+   STEP ENGINE — click-to-build fragments
+   Elements with data-step="k" appear once the slide's
+   step counter reaches k. `.step-alt` elements opt out of
+   the default hide and style their own .on state (e.g. strikes).
+   =========================================== */
+[data-step]:not(.step-alt):not(.cap) {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+[data-step]:not(.step-alt):not(.cap).on { opacity: 1; transform: none; }
+
+/* Strike-through targets: visible from the start, struck when their step lands */
+.zap { transition: color 0.4s, opacity 0.4s; }
+.zap.on { color: var(--danger); text-decoration: line-through; text-decoration-thickness: 3px; opacity: 0.45; }
+
+/* Captions: one line under a formula; only the CURRENT step's caption shows */
+.capbox { position: relative; height: 40px; flex: 0 0 auto; }
+.cap {
+    position: absolute; left: 4px; top: 0;
+    font-size: 23px; color: var(--text-dim); font-style: italic;
+    opacity: 0; transition: opacity 0.35s 0.1s;
+}
+.cap.now { opacity: 1; }
+.cap b { color: var(--text); font-style: normal; }
+
+/* ===========================================
+   <SheetGrid> — spreadsheet component
+   JS renders: column letters, row numbers, header row, data cells.
+   Cells carry data-col / data-row for the FX engine.
+   =========================================== */
+.sheet {
+    display: grid;
+    width: max-content;
+    max-width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 25px;
+    box-shadow: 0 1px 3px rgba(26,29,33,0.06);
+    flex: 0 0 auto;
+}
+.sc {
+    padding: 9px 20px;
+    border-right: 1px solid var(--grid-line);
+    border-bottom: 1px solid var(--grid-line);
+    white-space: nowrap;
+    transition: background 0.35s, box-shadow 0.35s, opacity 0.35s, color 0.35s;
+    transition-delay: var(--d, 0s);
+}
+.sheet .cl, .sheet .rn {          /* column letters + row numbers */
+    background: var(--header-grey);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 6px 10px;
+}
+.sheet .rn { min-width: 52px; }
+.sheet .h {                        /* table header row */
+    background: var(--header-grey);
+    font-weight: 600;
+    font-size: 22px;
+}
+.sheet.small { font-size: 21px; }
+.sheet.small .sc { padding: 7px 16px; }
+.sheet.small .h { font-size: 19px; }
+
+/* VLOOKUP column-count badges (extra row injected when data-count="1") */
+.sheet .cnt {
+    background: #FFF7E8;
+    color: #8A5B00;
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+    padding: 4px 10px;
+    opacity: 0;
+    transition: opacity 0.4s;
+    transition-delay: var(--d, 0s);
+}
+.sheet .cnt.show { opacity: 1; }
+
+/* Cell highlight states (the colour legend) */
+/* The pop keyframe makes each newly-lit cell visibly "land" */
+@keyframes cellpop {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.07); }
+    100% { transform: scale(1); }
+}
+.hl-lookup  { background: rgba(244,183,64,0.16); box-shadow: inset 0 0 0 2.5px var(--hl-lookup); animation: cellpop 0.45s var(--ease) var(--d, 0s); }
+.hl-return  { background: var(--green-soft);      box-shadow: inset 0 0 0 2.5px var(--hl-return); }
+.hl-result  { background: rgba(45,127,249,0.10);  box-shadow: inset 0 0 0 3px var(--hl-result); color: #1D57B0; font-weight: 600; animation: cellpop 0.45s var(--ease) var(--d, 0s); }
+.hl-band    { background: var(--green-soft);      box-shadow: inset 0 0 0 2.5px var(--hl-return); }
+.strong     { font-weight: 700; }
+.sc.strong.hl-lookup { background: rgba(244,183,64,0.32); }
+.dim        { opacity: 0.3; }
+.spill-anchor {
+    box-shadow: inset 0 0 0 3px var(--hl-result);
+    background: rgba(45,127,249,0.08);
+    font-weight: 600; color: #1D57B0;
+}
+.spilled {
+    outline: 2px dashed var(--spill-halo);
+    outline-offset: -3px;
+    background: rgba(45,127,249,0.05);
+    color: #3B5B8C;
+}
+.blocked {
+    background: rgba(229,72,77,0.14);
+    box-shadow: inset 0 0 0 2.5px var(--danger);
+    color: var(--danger); font-weight: 600;
+}
+.prefill { color: var(--text-dim); font-style: italic; }
+.err { color: var(--danger); font-weight: 700; }
+.ok  { color: var(--excel-green); font-weight: 600; }
+.tbl-outline { box-shadow: 0 0 0 3px var(--excel-green); }
+.sheet.spillrange [data-col='X1'] { background: rgba(45,127,249,0.10); }
+
+/* ===========================================
+   <FormulaBuilder> — monospace formula line
+   Arguments are chips that reveal per step; a comma travels
+   with its chip inside a .seg so half-built formulas stay clean.
+   =========================================== */
+.fml {
+    font-family: var(--font-mono);
+    font-size: 29px;
+    line-height: 2.05;
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-left: 5px solid var(--excel-green);
+    border-radius: 10px;
+    padding: 16px 26px;
+    flex: 0 0 auto;
+}
+.fml.small { font-size: 23px; }
+.fml .m { color: var(--text); }
+.fml .cellref { color: var(--text-dim); margin-right: 18px; font-size: 0.8em; }
+.seg { display: inline; }
+.chip {
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 8px;
+    border: 1.5px solid;
+    font-size: 0.92em;
+    white-space: nowrap;
+    margin: 0 2px;
+}
+.c-look { background: rgba(244,183,64,0.15); border-color: var(--hl-lookup); color: #7A5200; }
+.c-ret  { background: var(--green-soft);      border-color: var(--hl-return);  color: #0C5A32; }
+.c-res  { background: rgba(45,127,249,0.12);  border-color: var(--hl-result);  color: #1D57B0; }
+.c-opt  { background: #F3F4F6; border-style: dashed; border-color: #C3C8CF; color: var(--text-dim); }
+.c-bad  { background: rgba(229,72,77,0.08); border-color: var(--danger); color: #B4232F; }
+.fml.glow { border-color: var(--excel-green); box-shadow: 0 0 0 3px var(--green-soft); }
+.fml.dim  { opacity: 0.38; }
+
+/* Answer cells (result of a formula) */
+.ansrow { display: flex; align-items: center; gap: 16px; font-family: var(--font-mono); flex: 0 0 auto; }
+.anslabel { font-size: 19px; color: var(--text-dim); }
+.anscell {
+    min-width: 240px; min-height: 54px;
+    display: inline-flex; align-items: center;
+    padding: 8px 20px;
+    background: var(--panel);
+    border: 1.5px solid var(--grid-line);
+    border-radius: 8px;
+    font-size: 27px;
+    transition: background 0.35s, box-shadow 0.35s, color 0.35s;
+    transition-delay: var(--d, 0s);
+}
+.spillcells { display: flex; }
+.spillcells .anscell { border-radius: 0; min-width: 200px; margin-left: -1.5px; }
+.spillcells .anscell:first-child { border-radius: 8px 0 0 8px; margin-left: 0; }
+.spillcells .anscell:last-child { border-radius: 0 8px 8px 0; }
+
+/* ===========================================
+   CARDS, CALLOUTS, TAGS
+   =========================================== */
+.card {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 14px;
+    padding: 26px 30px;
+    box-shadow: 0 1px 2px rgba(26,29,33,0.04);
+}
+.card h3 { font-family: var(--font-display); font-weight: 600; font-size: 30px; margin-bottom: 10px; }
+.card p  { font-size: 22px; color: var(--text-dim); line-height: 1.45; }
+.card .mono { font-family: var(--font-mono); font-size: 21px; color: var(--text); }
+
+.callout {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-left: 6px solid var(--excel-green);
+    border-radius: 10px;
+    padding: 18px 26px;
+    font-size: 24px;
+    line-height: 1.45;
+    flex: 0 0 auto;
+}
+.callout.warn   { border-left-color: var(--hl-lookup); }
+.callout.danger { border-left-color: var(--danger); }
+.callout.big    { font-size: 30px; font-family: var(--font-display); font-weight: 600; }
+
+.tag {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--excel-green);
+    background: var(--green-soft);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--excel-green); color: #fff;
+    font-family: var(--font-display); font-weight: 700; font-size: 22px;
+    flex: 0 0 auto;
+}
+.badge.amber { background: var(--hl-lookup); color: #5C3D00; }
+.badge.blue  { background: var(--hl-result); }
+
+/* Colour-legend key rows (slide 2 + cheat sheet) */
+.keyrow { display: flex; align-items: center; gap: 16px; font-size: 23px; }
+.swatch { width: 40px; height: 40px; border-radius: 8px; flex: 0 0 auto; }
+.swatch.amber { background: rgba(244,183,64,0.25); box-shadow: inset 0 0 0 2.5px var(--hl-lookup); }
+.swatch.green { background: var(--green-soft); box-shadow: inset 0 0 0 2.5px var(--hl-return); }
+.swatch.blue  { background: rgba(45,127,249,0.12); box-shadow: inset 0 0 0 2.5px var(--hl-result); }
+
+/* Layout helpers */
+.two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.row       { display: flex; gap: 32px; align-items: flex-start; }
+.grow      { flex: 1 1 auto; min-width: 0; }
+.center-v  { display: flex; flex-direction: column; justify-content: center; }
+
+/* Reference tables (match_mode / search_mode) */
+.reftable { display: flex; flex-direction: column; gap: 14px; }
+.refrow {
+    display: grid;
+    grid-template-columns: 150px 1fr 460px;
+    gap: 28px; align-items: center;
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 12px;
+    padding: 20px 30px;
+}
+.refrow .val {
+    font-family: var(--font-mono); font-size: 34px; font-weight: 700;
+    color: var(--excel-green); text-align: center;
+    background: var(--green-soft); border-radius: 10px; padding: 8px 0;
+}
+.refrow .what { font-size: 26px; font-weight: 500; }
+.refrow .use  { font-size: 21px; color: var(--text-dim); }
+.refrow .def  {
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+    color: var(--text-dim); background: var(--header-grey);
+    border-radius: 12px; padding: 3px 10px; margin-left: 12px;
+    vertical-align: middle; letter-spacing: 0.06em;
+}
+
+/* ===========================================
+   TITLE SLIDE (slide 1)
+   =========================================== */
+.title-slide .gridpaper,
+.gridpaper {                       /* faint spreadsheet-paper backdrop */
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 96px 64px;
+    opacity: 0.45;
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 30%, transparent 100%);
+            mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 30%, transparent 100%);
+}
+.t-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 30px;
+    padding: 0 120px;
+}
+.morph { position: relative; height: 110px; width: 100%; font-family: var(--font-mono); font-size: 84px; font-weight: 500; }
+.morph span { position: absolute; left: 50%; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.m-old { color: var(--text-dim); }
+.m-new { color: var(--excel-green); opacity: 0; font-weight: 700; }
+.slide.visible .m-old { animation: mOut 0.9s var(--ease) 1.3s forwards; }
+.slide.visible .m-new { animation: mIn  0.9s var(--ease) 1.7s forwards; }
+@keyframes mOut { to { opacity: 0; filter: blur(8px); transform: translateX(-50%) translateY(-18px); } }
+@keyframes mIn  { from { opacity: 0; filter: blur(8px); transform: translateX(-50%) translateY(18px); }
+                  to   { opacity: 1; filter: none;      transform: translateX(-50%) translateY(0); } }
+.title-slide h1 {
+    font-family: var(--font-title);
+    font-weight: 600; font-size: 108px; letter-spacing: 0; line-height: 1.05;
+}
+.title-slide h1 .arrow { color: var(--excel-green); }
+.title-slide .sub { font-size: 32px; color: var(--text-dim); }
+.fchips { display: flex; gap: 20px; }
+.fchip {
+    font-size: 23px; background: var(--panel);
+    border: 1px solid var(--grid-line); border-radius: 30px;
+    padding: 10px 26px; box-shadow: 0 1px 3px rgba(26,29,33,0.05);
+}
+
+/* ===========================================
+   PER-SLIDE LAYOUTS
+   =========================================== */
+/* s6 — five pains */
+.pains { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; flex: 1; align-content: start; }
+.pains .card { display: flex; flex-direction: column; }
+.pains .card h3 { font-size: 25px; }
+.pains .card p { font-size: 19px; flex: 1; }
+.pains .num { font-family: var(--font-display); font-size: 40px; font-weight: 700; color: var(--danger); margin-bottom: 8px; }
+
+/* s9 — mental model chunks */
+.chunks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; flex: 1; align-content: center; }
+.chunk { text-align: center; padding: 48px 30px; }
+.chunk .word { font-family: var(--font-display); font-size: 46px; font-weight: 700; line-height: 1.1; }
+.chunk .argname { font-family: var(--font-mono); font-size: 20px; color: var(--text-dim); margin-top: 16px; display: block; }
+.chunk.a1 { border-top: 6px solid var(--hl-lookup); }
+.chunk.a2 { border-top: 6px solid var(--hl-lookup); }
+.chunk.a3 { border-top: 6px solid var(--hl-return); }
+
+/* s15/s16 — spill anatomy: sheet + term cards side by side */
+.spillwrap { display: flex; gap: 44px; align-items: flex-start; flex: 1; min-height: 0; }
+.terms { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+.terms .card h3 { font-size: 26px; display: flex; align-items: center; gap: 14px; }
+.terms .card p { font-size: 20px; }
+
+/* s28 — cheat sheet */
+.cheat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; flex: 1; align-content: start; }
+.cheat .span3 { grid-column: 1 / -1; }
+.cheat h3 { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 12px; }
+.minitable { width: 100%; border-collapse: collapse; font-size: 19px; }
+.minitable td { border: 1px solid var(--grid-line); padding: 7px 14px; }
+.minitable td:first-child { font-family: var(--font-mono); font-weight: 700; color: var(--excel-green); text-align: center; width: 74px; }
+.checklist { list-style: none; font-size: 19px; line-height: 1.5; }
+.checklist li { padding: 5px 0 5px 34px; position: relative; }
+.checklist li::before { content: "✓"; position: absolute; left: 4px; color: var(--excel-green); font-weight: 700; }
+
+/* s29 — gotcha cards */
+.gotchas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; flex: 1; align-content: start; }
+.gotchas .card h3 { font-family: var(--font-mono); font-size: 26px; color: var(--danger); }
+.gotchas .card .fix { color: var(--excel-green); font-weight: 600; margin-top: 10px; font-size: 20px; }
+
+/* s30 — teach it */
+.teach { display: grid; grid-template-columns: 1fr 1.15fr; gap: 32px; flex: 1; min-height: 0; }
+.points { list-style: none; counter-reset: pt; display: flex; flex-direction: column; gap: 13px; }
+.points li { counter-increment: pt; display: flex; gap: 16px; font-size: 21.5px; line-height: 1.35; align-items: baseline; }
+.points li::before {
+    content: counter(pt);
+    font-family: var(--font-display); font-weight: 700; font-size: 22px;
+    color: var(--excel-green); background: var(--green-soft);
+    border-radius: 50%; min-width: 38px; height: 38px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: 0 0 auto; align-self: flex-start;
+}
+.points b { font-weight: 600; }
+.challenge { margin-bottom: 14px; }
+.challenge .q { font-size: 21px; font-weight: 500; margin-bottom: 8px; }
+.challenge .ansf { font-family: var(--font-mono); font-size: 18.5px; background: var(--header-grey); border-radius: 8px; padding: 10px 16px; }
+.challenge .ansf .res { color: var(--excel-green); font-weight: 700; }
+.closing { font-family: var(--font-display); font-size: 33px; font-weight: 600; text-align: center; margin-top: 6px; flex: 0 0 auto; }
+.closing em { color: var(--excel-green); font-style: normal; }
+
+/* Floating annotation labels beside grids */
+.floatlabel {
+    font-size: 20px; font-weight: 600; color: var(--text);
+    background: var(--panel); border: 1.5px solid var(--grid-line);
+    border-radius: 10px; padding: 10px 18px;
+    box-shadow: 0 4px 14px rgba(26,29,33,0.08);
+    display: inline-block;
+}
+.floatlabel .mono { font-family: var(--font-mono); }
+
+/* ===========================================
+   SECTION RAIL (chrome, lives OUTSIDE the stage)
+   =========================================== */
+.rail {
+    position: fixed; left: 16px; top: 50%;
+    transform: translateY(-50%);
+    z-index: 900;
+    width: 208px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--grid-line);
+    border-radius: 14px;
+    padding: 16px 12px 12px;
+    box-shadow: 0 10px 34px rgba(26,29,33,0.10);
+    font-family: var(--font-body);
+}
+.railtitle {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.16em; color: var(--excel-green);
+    padding: 0 10px 10px; text-transform: uppercase;
+}
+.rail .sec {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 15px; color: var(--text-dim);
+    padding: 8px 10px; border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+.rail .sec:hover { background: var(--header-grey); }
+.rail .sec.cur { background: var(--green-soft); color: var(--excel-green); font-weight: 600; }
+.rail .sec .n { font-family: var(--font-mono); font-size: 11px; opacity: 0.75; min-width: 14px; }
+.railfoot {
+    margin-top: 10px; border-top: 1px solid var(--grid-line);
+    padding: 10px 10px 2px;
+    font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);
+    display: flex; flex-direction: column; gap: 5px;
+}
+#railStep { color: var(--excel-green); min-height: 16px; }
+.railhint { font-size: 11px; opacity: 0.75; }
+@media (max-width: 1080px) { .rail { display: none; } }
+
+/* ===========================================
+   INLINE EDIT CHROME (hotzone + pencil, JS-controlled)
+   =========================================== */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+.edit-toggle {
+    position: fixed; top: 14px; left: 14px; z-index: 10001;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 1px solid var(--grid-line); background: var(--panel);
+    font-size: 20px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(26,29,33,0.12);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { background: var(--excel-green); color: #fff; }
+body.editing [contenteditable="true"] { outline: 2px dashed var(--hl-result); outline-offset: 2px; border-radius: 4px; cursor: text; }
+.edit-note {
+    position: fixed; top: 20px; left: 72px; z-index: 10001;
+    font-family: var(--font-mono); font-size: 13px;
+    background: var(--excel-green); color: #fff;
+    border-radius: 8px; padding: 8px 14px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+body.editing .edit-note { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+<!-- ================= § INTRO ================= -->
+
+<!-- 1 · Title -->
+<section class="slide title-slide" id="s01" data-steps="0">
+    <div class="gridpaper"></div>
+    <div class="t-center">
+        <div class="morph" aria-hidden="true">
+            <span class="m-old">=VLOOKUP(</span>
+            <span class="m-new">=XLOOKUP(</span>
+        </div>
+        <h1 class="reveal">VLOOKUP <span class="arrow">→</span> XLOOKUP</h1>
+        <p class="reveal sub">A self-study lesson you can turn around and teach.</p>
+        <div class="reveal fchips">
+            <span class="fchip">🏑 Australian Field Hockey</span>
+            <span class="fchip">🗣️ Language Learning</span>
+        </div>
+    </div>
+</section>
+
+<!-- 2 · How this deck works -->
+<section class="slide" id="s02" data-steps="1">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>How this deck works</h2>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow">
+                <div class="card reveal">
+                    <h3>Driving it</h3>
+                    <p style="font-size:23px; line-height:1.7;">
+                        <b style="color:var(--text)">Click</b> (or <span class="mono">→</span> / <span class="mono">Space</span>) — build the current slide one step at a time, then move on<br>
+                        <b style="color:var(--text)">←</b> — undo one step, then one slide<br>
+                        <b style="color:var(--text)">E</b> — edit any text in place (Ctrl+S saves a copy)<br>
+                        <b style="color:var(--text)">Rail</b> (left) — jump between the 7 sections
+                    </p>
+                </div>
+                <div class="card reveal">
+                    <h3>The colour key — memorise this</h3>
+                    <div style="display:flex; flex-direction:column; gap:16px; margin-top:12px;">
+                        <div class="keyrow"><span class="swatch amber"></span><span><b>Amber</b> — the value we're looking up / the lookup array</span></div>
+                        <div class="keyrow"><span class="swatch green"></span><span><b>Green</b> — the return array (what we bring back)</span></div>
+                        <div class="keyrow"><span class="swatch blue"></span><span><b>Blue</b> — the result cell / a spill anchor</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="align-items:center;">
+                <div class="sheet small" data-table="demo"></div>
+                <div class="grow">
+                    <div class="floatlabel reveal">Try it now — <b>click anywhere</b> to light up a cell ▸</div>
+                    <div class="capbox" style="margin-top:14px;">
+                        <span class="cap" data-step="1">One click = one build step. That's the whole trick.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .d[data-col='Qty'][data-row='2']","cls":"hl-lookup strong"}
+    ]</script>
+</section>
+
+<!-- 3 · What you already know -->
+<section class="slide" id="s03" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>Prerequisite knowledge</h2>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow" style="align-content:center;">
+                <div class="card reveal" style="padding:36px 40px;">
+                    <h3>✔ VLOOKUP</h3>
+                    <p class="mono" style="margin:14px 0; font-size:24px;">=VLOOKUP(value, table, col_index, FALSE)</p>
+                    <p>This lesson assumes basic VLOOKUP — find a value, bring something back. XLOOKUP keeps that mental move and removes the traps around it.</p>
+                </div>
+                <div class="card reveal" style="padding:36px 40px;">
+                    <h3>✔ Named ranges &amp; tables</h3>
+                    <p class="mono" style="margin:14px 0; font-size:24px;"><span style="color:var(--excel-green); font-weight:700;">Players[Goals]</span> &nbsp;beats&nbsp; <span style="color:var(--text-dim);">F2:F200</span></p>
+                    <p>This deck writes lookups against named table columns like the one above. You'll need to know how to use Excel tables and the Name Manager for this part — if that's unfamiliar, pause here, look it up, and come back.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4 · Meet your two datasets -->
+<section class="slide" id="s04" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>Meet your two datasets</h2>
+            <p class="lede">One skill, two worlds. If you can make a formula work in <b>both</b>, you actually understand it — that's transfer, and transfer is what lets you teach it.</p>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow">
+                <div class="reveal">
+                    <div class="floatlabel" style="margin-bottom:14px;">🏑 <b>tblPlayers</b> — Australian field hockey roster</div>
+                    <div class="sheet small" data-table="players" data-cols="PlayerID,Player,State,Goals" data-rows="5"></div>
+                    <p style="font-size:19px; color:var(--text-dim); margin-top:10px;">7 players · 6 fields — plus state, match and award tables we'll meet later.</p>
+                </div>
+                <div class="reveal">
+                    <div class="floatlabel" style="margin-bottom:14px;">🗣️ <b>tblVocab</b> — a personal phrasebook in three scripts</div>
+                    <div class="sheet small" data-table="vocab" data-cols="English,Arabic,Chinese,Mastery" data-rows="5"></div>
+                    <p style="font-size:19px; color:var(--text-dim); margin-top:10px;">5 words · Arabic, Russian &amp; Chinese columns, with a mastery score per word.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= § WHY MOVE ON FROM VLOOKUP ================= -->
+
+<!-- 5 · VLOOKUP anatomy -->
+<section class="slide" id="s05" data-steps="5">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Why move on from VLOOKUP</span>
+            <h2>VLOOKUP anatomy — a quick refresher</h2>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=VLOOKUP(</span><span class="seg" data-step="1"><span class="chip c-look">"HR-107"</span></span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-opt">Players</span></span><span class="seg" data-step="3"><span class="m">, </span><span class="chip c-bad">6</span></span><span class="seg" data-step="4"><span class="m">, </span><span class="chip c-bad">FALSE</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">the ID we're hunting for</span>
+                <span class="cap" data-step="2">the whole table — and it <b>must</b> start at the lookup column</span>
+                <span class="cap" data-step="3">count the columns by hand: 1… 2… 3… 4… 5… <b>6</b> — every single time</span>
+                <span class="cap" data-step="4"><b>FALSE</b> = exact match — forget it, and Excel quietly guesses</span>
+                <span class="cap" data-step="5">landed: Talia's goal count</span>
+            </div>
+            <div class="sheet" data-table="players" data-count="1"></div>
+            <div class="ansrow">
+                <span class="anslabel">result →</span>
+                <span class="anscell" id="a05"></span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .d[data-col='PlayerID'][data-row='6']","cls":"hl-lookup strong"},
+        {"s":2,"sel":".sheet","cls":"tbl-outline"},
+        {"s":3,"sel":".sheet .cnt","cls":"show"},
+        {"s":3,"sel":".sheet .h[data-col='Goals'], .sheet .d[data-col='Goals']","cls":"hl-return"},
+        {"s":5,"sel":"#a05","cls":"hl-result","text":"41"}
+    ]</script>
+</section>
+
+<!-- 6 · The 5 pains of VLOOKUP -->
+<section class="slide" id="s06" data-steps="5">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Why move on from VLOOKUP</span>
+            <h2>The five pains of VLOOKUP</h2>
+            <p class="lede">You've probably hit every one of these. None of them are your fault — they're baked into the function.</p>
+        </header>
+        <div class="sbody">
+            <div class="pains">
+                <div class="card" data-step="1">
+                    <div class="num">①</div>
+                    <h3>Can't look left</h3>
+                    <p>The lookup column must be column 1 of the table. Need an ID from a name? Rearrange your data or give up.</p>
+                    <span class="tag">→ XLOOKUP fixes this</span>
+                </div>
+                <div class="card" data-step="2">
+                    <div class="num">②</div>
+                    <h3>Breaks on insert</h3>
+                    <p>Insert one column and your hard-counted index goes stale: <span class="mono" style="font-size:19px;">6&nbsp;→&nbsp;<b style="color:var(--danger)">?</b></span> — silently pointing at the wrong field.</p>
+                    <span class="tag">→ XLOOKUP fixes this</span>
+                </div>
+                <div class="card" data-step="3">
+                    <div class="num">③</div>
+                    <h3>Guesses by default</h3>
+                    <p>Omit <span class="mono" style="font-size:19px;">FALSE</span> and you get approximate matching — near-misses that look like real answers.</p>
+                    <span class="tag">→ XLOOKUP fixes this</span>
+                </div>
+                <div class="card" data-step="4">
+                    <div class="num">④</div>
+                    <h3>Fails ugly</h3>
+                    <p>No match means <span class="mono" style="font-size:19px; color:var(--danger)">#N/A</span> — unless you wrap the whole thing in an IFERROR bandage.</p>
+                    <span class="tag">→ XLOOKUP fixes this</span>
+                </div>
+                <div class="card" data-step="5">
+                    <div class="num">⑤</div>
+                    <h3>One cell at a time</h3>
+                    <p>One formula returns one value from one column. Need three fields? Write three formulas.</p>
+                    <span class="tag">→ XLOOKUP fixes this</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= § XLOOKUP CORE ================= -->
+
+<!-- 7 · XLOOKUP syntax anatomy -->
+<section class="slide" id="s07" data-steps="6">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ XLOOKUP core</span>
+            <h2>XLOOKUP, one argument at a time</h2>
+        </header>
+        <div class="sbody" style="justify-content:center;">
+            <div class="fml" style="font-size:33px; padding:30px 36px;">
+                <span class="m">=XLOOKUP(</span><span class="seg" data-step="1"><span class="chip c-look">lookup_value</span></span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-look">lookup_array</span></span><span class="seg" data-step="3"><span class="m">, </span><span class="chip c-ret">return_array</span></span><span class="seg" data-step="4"><span class="m">, </span><span class="chip c-opt">[if_not_found]</span></span><span class="seg" data-step="5"><span class="m">, </span><span class="chip c-opt">[match_mode]</span></span><span class="seg" data-step="6"><span class="m">, </span><span class="chip c-opt">[search_mode]</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox" style="height:48px;">
+                <span class="cap" data-step="1"><b>required</b> — the value</span>
+                <span class="cap" data-step="2"><b>required</b> — where to look</span>
+                <span class="cap" data-step="3"><b>required</b> — what to bring back</span>
+                <span class="cap" data-step="4">optional — friendly text instead of #N/A</span>
+                <span class="cap" data-step="5">optional — how to match (exact by default)</span>
+                <span class="cap" data-step="6">optional — which direction to search</span>
+            </div>
+            <div class="callout big" data-step="6" style="align-self:flex-start;">Only <em style="color:var(--excel-green); font-style:normal;">three</em> things are required: the value · where to look · what to bring back.</div>
+            <div class="row" style="gap:20px;">
+                <span class="floatlabel"><span class="chip c-opt" style="font-size:19px;">grey boxes</span> = safe to omit</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 8 · Head-to-head -->
+<section class="slide" id="s08" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ XLOOKUP core</span>
+            <h2>Head-to-head: same task, fewer traps</h2>
+            <p class="lede">The task: Talia Rourke's goal count, from her ID.</p>
+        </header>
+        <div class="sbody">
+            <div class="fml"><span class="cellref">old</span><span class="m">=VLOOKUP("HR-107", A2:F8, </span><span class="zap" data-step="1">6</span><span class="m">, </span><span class="zap" data-step="2">FALSE</span><span class="m">)</span><span class="m" style="color:var(--text-dim)">&nbsp;&nbsp;→ 41</span></div>
+            <div class="fml glow"><span class="cellref">new</span><span class="m">=XLOOKUP("HR-107", </span><span class="chip c-look">Players[PlayerID]</span><span class="m">, </span><span class="chip c-ret">Players[Goals]</span><span class="m">)</span><span class="m" style="color:var(--excel-green); font-weight:700;">&nbsp;&nbsp;→ 41</span></div>
+            <div class="capbox">
+                <span class="cap" data-step="1">the hand-counted <b>6</b> is gone — you point at the column by name</span>
+                <span class="cap" data-step="2">the <b>FALSE</b> ritual is gone — exact match is the default</span>
+            </div>
+            <div class="sheet small" data-table="players" data-cols="PlayerID,Player,Goals"></div>
+            <div class="callout" data-step="2"><b>No counting. No match-type gotcha.</b> Same answer, and the formula says what it means.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".sheet .d[data-col='PlayerID'][data-row='6']","cls":"hl-lookup"},
+        {"s":0,"sel":".sheet .d[data-col='Goals'][data-row='6']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- 9 · The mental model -->
+<section class="slide" id="s09" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ XLOOKUP core</span>
+            <h2>The sentence you'll teach</h2>
+            <p class="lede">Every XLOOKUP — no matter how fancy — is these three plain-English chunks:</p>
+        </header>
+        <div class="sbody">
+            <div class="chunks">
+                <div class="card chunk a1" data-step="1">
+                    <div class="word">the value</div>
+                    <span class="argname">lookup_value</span>
+                </div>
+                <div class="card chunk a2" data-step="2">
+                    <div class="word">where to look</div>
+                    <span class="argname">lookup_array</span>
+                </div>
+                <div class="card chunk a3" data-step="3">
+                    <div class="word">what to bring back</div>
+                    <span class="argname">return_array</span>
+                </div>
+            </div>
+            <div class="callout big" data-step="3">Say it out loud when you teach: <em>"find this, in here, bring back that."</em></div>
+        </div>
+    </div>
+</section>
+
+<!-- 10 · Named ranges read like English -->
+<section class="slide" id="s10" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ XLOOKUP core</span>
+            <h2>Named ranges read like English</h2>
+            <p class="lede">Both formulas below give the same answer. One of them you can read over the phone.</p>
+        </header>
+        <div class="sbody">
+            <div class="fml" id="f10raw"><span class="cellref">raw</span><span class="m">=XLOOKUP("Indi Fraser", B2:B8, F2:F8)</span></div>
+            <div class="fml" id="f10named"><span class="cellref">named</span><span class="m">=XLOOKUP("Indi Fraser", </span><span class="chip c-look">Players[Player]</span><span class="m">, </span><span class="chip c-ret">Players[Goals]</span><span class="m">)</span></div>
+            <div class="capbox">
+                <span class="cap" data-step="1">same result — but only one of these survives a column insert <b>and</b> explains itself</span>
+                <span class="cap" data-step="2">Indi Fraser → 31 goals</span>
+            </div>
+            <div class="sheet small" data-table="players"></div>
+            <div class="ansrow"><span class="anslabel">result →</span><span class="anscell" id="a10"></span></div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#f10raw","cls":"dim"},
+        {"s":1,"sel":"#f10named","cls":"glow"},
+        {"s":1,"sel":".sheet .d[data-col='Player'][data-row='5']","cls":"hl-lookup strong"},
+        {"s":2,"sel":".sheet .d[data-col='Goals'][data-row='5']","cls":"hl-return"},
+        {"s":2,"sel":"#a10","cls":"hl-result","text":"31"}
+    ]</script>
+</section>
+
+<!-- ================= § EXACT MATCH MASTERY — HOCKEY ================= -->
+
+<!-- 11 · Worked example 1 -->
+<section class="slide" id="s11" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Exact match mastery — hockey</span>
+            <h2>Worked example: ID → name</h2>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=XLOOKUP(</span><span class="seg" data-step="1"><span class="chip c-look">"HR-107"</span></span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-look">Players[PlayerID]</span></span><span class="seg" data-step="3"><span class="m">, </span><span class="chip c-ret">Players[Player]</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1"><b>the value</b> — the ID we're hunting for</span>
+                <span class="cap" data-step="2"><b>where to look</b> — the whole PlayerID column lights up</span>
+                <span class="cap" data-step="3"><b>what to bring back</b> — the Player column</span>
+                <span class="cap" data-step="4">match found on row 7 → the name comes back</span>
+            </div>
+            <div class="sheet" data-table="players" data-cols="PlayerID,Player,State,Position,Goals"></div>
+            <div class="ansrow"><span class="anslabel">result →</span><span class="anscell" id="a11"></span></div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .d[data-col='PlayerID'][data-row='6']","cls":"hl-lookup strong"},
+        {"s":2,"sel":".sheet .h[data-col='PlayerID'], .sheet .d[data-col='PlayerID']","cls":"hl-lookup"},
+        {"s":3,"sel":".sheet .h[data-col='Player'], .sheet .d[data-col='Player']","cls":"hl-return"},
+        {"s":4,"sel":"#a11","cls":"hl-result","text":"Talia Rourke"}
+    ]</script>
+</section>
+
+<!-- 12 · Look LEFT -->
+<section class="slide" id="s12" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Exact match mastery — hockey</span>
+            <h2>Now reverse it — look <em style="color:var(--excel-green); font-style:normal;">left</em></h2>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=XLOOKUP(</span><span class="seg" data-step="1"><span class="chip c-look">"Talia Rourke"</span></span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-look">Players[Player]</span></span><span class="seg" data-step="3"><span class="m">, </span><span class="chip c-ret">Players[PlayerID]</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">this time we start from the <b>name</b>…</span>
+                <span class="cap" data-step="2">…searching column B…</span>
+                <span class="cap" data-step="3">…and bring back column A — <b>one column to the left</b></span>
+                <span class="cap" data-step="4">the ID comes back, no data rearranging, no helper column</span>
+            </div>
+            <div class="sheet" data-table="players" data-cols="PlayerID,Player,State,Position,Goals"></div>
+            <div class="row" style="align-items:center;">
+                <div class="ansrow"><span class="anslabel">result →</span><span class="anscell" id="a12"></span></div>
+                <div class="callout danger big grow" data-step="4">VLOOKUP literally cannot do this.</div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .d[data-col='Player'][data-row='6']","cls":"hl-lookup strong"},
+        {"s":2,"sel":".sheet .h[data-col='Player'], .sheet .d[data-col='Player']","cls":"hl-lookup"},
+        {"s":3,"sel":".sheet .h[data-col='PlayerID'], .sheet .d[data-col='PlayerID']","cls":"hl-return"},
+        {"s":4,"sel":"#a12","cls":"hl-result","text":"HR-107"}
+    ]</script>
+</section>
+
+<!-- 13 · if_not_found -->
+<section class="slide" id="s13" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Exact match mastery — hockey</span>
+            <h2>Fail gracefully: <span style="font-family:var(--font-mono); font-size:0.85em;">if_not_found</span></h2>
+            <p class="lede">Look up an ID that doesn't exist — HR-999 — and watch the fourth argument earn its keep.</p>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=XLOOKUP(</span><span class="chip c-look">"HR-999"</span><span class="m">, </span><span class="chip c-look">Players[PlayerID]</span><span class="m">, </span><span class="chip c-ret">Players[Player]</span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-opt">"Not on roster"</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">no HR-999 anywhere → the raw error surfaces</span>
+                <span class="cap" data-step="2">add one argument → a clean, human answer. <b>No IFERROR wrapper needed.</b></span>
+            </div>
+            <div class="sheet small" data-table="players" data-cols="PlayerID,Player,State"></div>
+            <div class="ansrow"><span class="anslabel">result →</span><span class="anscell" id="a13"></span></div>
+            <div class="callout" data-step="2">Teach it as a habit: any XLOOKUP a colleague will see gets an <b>if_not_found</b>.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#a13","cls":"err","text":"#N/A"},
+        {"s":2,"sel":"#a13","rm":"err","cls":"ok","text":"Not on roster"}
+    ]</script>
+</section>
+
+<!-- ================= § SPILL MINI-ARC ================= -->
+
+<!-- 14 · What is a dynamic array? -->
+<section class="slide" id="s14" data-steps="1">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Spill — the mini-arc</span>
+            <h2>First, a new law of physics: the dynamic array</h2>
+        </header>
+        <div class="sbody">
+            <div class="two-col">
+                <div class="card">
+                    <h3 style="color:var(--text-dim);">The old world</h3>
+                    <p style="font-size:22px;">One formula lives in one cell and returns <b>one value</b>. Want seven names? Write seven formulas.</p>
+                </div>
+                <div class="card" style="border-color:var(--hl-result);">
+                    <h3 style="color:#1D57B0;">The new world</h3>
+                    <p style="font-size:22px;">One formula can return a <b>whole block</b> — and Excel <b>spills</b> the answers into the empty cells next door. Automatically.</p>
+                </div>
+            </div>
+            <div class="row" style="align-items:flex-start;">
+                <div>
+                    <div class="fml small" style="margin-bottom:14px;"><span class="cellref">B2</span><span class="m">=Players[Player]</span></div>
+                    <div class="sheet small" data-table="players" data-cols="PlayerID" data-extra="1"></div>
+                </div>
+                <div class="center-v grow" style="padding-top:80px; gap:16px;">
+                    <div class="floatlabel">One formula, typed <b>once</b>, in one cell ▸ <b>click</b></div>
+                    <div class="floatlabel" data-step="1" style="border-color:var(--hl-result);">…and seven answers cascade out. That's a <b>spill</b>.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='1']","cls":"spill-anchor","text":"Kaja Adams"},
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='2']","cls":"spilled","text":"Mara Nguyen","d":"0.10"},
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='3']","cls":"spilled","text":"Tess Okafor","d":"0.20"},
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='4']","cls":"spilled","text":"Bree Sullivan","d":"0.30"},
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='5']","cls":"spilled","text":"Indi Fraser","d":"0.40"},
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='6']","cls":"spilled","text":"Talia Rourke","d":"0.50"},
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='7']","cls":"spilled","text":"Noor Haddad","d":"0.60"}
+    ]</script>
+</section>
+
+<!-- 15 · Anatomy of a spill -->
+<section class="slide" id="s15" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Spill — the mini-arc</span>
+            <h2>Anatomy of a spill — four words to own</h2>
+        </header>
+        <div class="sbody">
+            <div class="spillwrap">
+                <div class="sheet small" data-table="players" data-cols="PlayerID" data-extra="1"></div>
+                <div class="terms">
+                    <div class="card" data-step="1">
+                        <h3><span class="badge blue">1</span> Anchor cell</h3>
+                        <p>Solid blue border — the <b>only</b> cell that really contains the formula. Edit happens here, and only here.</p>
+                    </div>
+                    <div class="card" data-step="2">
+                        <h3><span class="badge blue">2</span> Spilled cells</h3>
+                        <p>Dashed halo, greyed formula in the bar. They display values but <b>can't be edited directly</b> — they belong to the anchor.</p>
+                    </div>
+                    <div class="card" data-step="3">
+                        <h3><span class="badge blue">3</span> Spill range</h3>
+                        <p>The whole block, anchor + spilled cells, treated as one unit.</p>
+                    </div>
+                    <div class="card" data-step="4">
+                        <h3><span class="badge blue">4</span> The <span style="font-family:var(--font-mono);">#</span> operator</h3>
+                        <p><span class="mono">=B2#</span> means <i>"the entire spilled range that starts at B2"</i> — however big it happens to be today.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".sheet .d[data-col='X1'][data-row='1']","text":"Kaja Adams"},
+        {"s":0,"sel":".sheet .d[data-col='X1'][data-row='2']","text":"Mara Nguyen"},
+        {"s":0,"sel":".sheet .d[data-col='X1'][data-row='3']","text":"Tess Okafor"},
+        {"s":0,"sel":".sheet .d[data-col='X1'][data-row='4']","text":"Bree Sullivan"},
+        {"s":0,"sel":".sheet .d[data-col='X1'][data-row='5']","text":"Indi Fraser"},
+        {"s":0,"sel":".sheet .d[data-col='X1'][data-row='6']","text":"Talia Rourke"},
+        {"s":0,"sel":".sheet .d[data-col='X1'][data-row='7']","text":"Noor Haddad"},
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='1']","cls":"spill-anchor"},
+        {"s":2,"sel":".sheet .d[data-col='X1']:not([data-row='1'])","cls":"spilled"},
+        {"s":3,"sel":".sheet","cls":"spillrange"}
+    ]</script>
+</section>
+
+<!-- 16 · When spill breaks: #SPILL! -->
+<section class="slide" id="s16" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Spill — the mini-arc</span>
+            <h2>When spill breaks: <span style="font-family:var(--font-mono); color:var(--danger); font-size:0.85em;">#SPILL!</span></h2>
+            <p class="lede">The #1 spill confusion, fully unpacked: <b>something is sitting in the way</b> of where the answers need to go.</p>
+        </header>
+        <div class="sbody">
+            <div class="row">
+                <div>
+                    <div class="fml small" style="margin-bottom:14px;"><span class="cellref">B2</span><span class="m">=Players[Player]</span></div>
+                    <div class="sheet small" data-table="players" data-cols="PlayerID" data-extra="1"></div>
+                </div>
+                <div class="center-v grow" style="gap:16px; padding-top:64px;">
+                    <div class="floatlabel">A stray note is parked in the spill path…</div>
+                    <div class="floatlabel" data-step="1" style="border-color:var(--danger);">The formula needs B2:B8 — but B5 is occupied → <b style="color:var(--danger)">#SPILL!</b></div>
+                    <div class="floatlabel" data-step="2" style="border-color:var(--excel-green);">Clear the blocker → the answers flow in. <b>That's the whole fix.</b></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".sheet .d[data-col='X1'][data-row='4']","cls":"prefill","text":"coach notes"},
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='1']","cls":"err","text":"#SPILL!"},
+        {"s":1,"sel":".sheet .d[data-col='X1'][data-row='4']","cls":"blocked"},
+        {"s":2,"sel":".sheet .d[data-col='X1'][data-row='4']","rm":"blocked prefill","text":" "},
+        {"s":2,"sel":".sheet .d[data-col='X1'][data-row='1']","rm":"err","cls":"spill-anchor","text":"Kaja Adams"},
+        {"s":2,"sel":".sheet .d[data-col='X1'][data-row='2']","cls":"spilled","text":"Mara Nguyen","d":"0.10"},
+        {"s":2,"sel":".sheet .d[data-col='X1'][data-row='3']","cls":"spilled","text":"Tess Okafor","d":"0.20"},
+        {"s":2,"sel":".sheet .d[data-col='X1'][data-row='4']","cls":"spilled","text":"Bree Sullivan","d":"0.30"},
+        {"s":2,"sel":".sheet .d[data-col='X1'][data-row='5']","cls":"spilled","text":"Indi Fraser","d":"0.40"},
+        {"s":2,"sel":".sheet .d[data-col='X1'][data-row='6']","cls":"spilled","text":"Talia Rourke","d":"0.50"},
+        {"s":2,"sel":".sheet .d[data-col='X1'][data-row='7']","cls":"spilled","text":"Noor Haddad","d":"0.60"}
+    ]</script>
+</section>
+
+<!-- ================= § SPILL PAYOFFS + LANGUAGE ================= -->
+
+<!-- 17 · Hockey spill payoff -->
+<section class="slide" id="s17" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Spill payoffs + language</span>
+            <h2>The payoff: three answers from one formula</h2>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=XLOOKUP(</span><span class="seg" data-step="1"><span class="chip c-look">"HR-107"</span><span class="m">, </span><span class="chip c-look">Players[PlayerID]</span></span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-ret">Players[[Position]:[Goals]]</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">find Talia's row, as usual…</span>
+                <span class="cap" data-step="2">…but return <b>three columns at once</b>: Position through Goals</span>
+                <span class="cap" data-step="3">one anchor + two spilled cells — remember pain ⑤? Gone.</span>
+            </div>
+            <div class="sheet small" data-table="players" data-cols="PlayerID,Player,Position,Caps,Goals"></div>
+            <div class="ansrow">
+                <span class="anslabel">spills →</span>
+                <div class="spillcells">
+                    <span class="anscell" id="a17-1" style="min-width:220px;"></span><span class="anscell" id="a17-2"></span><span class="anscell" id="a17-3"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .h[data-col='PlayerID'], .sheet .d[data-col='PlayerID']","cls":"hl-lookup"},
+        {"s":1,"sel":".sheet .d[data-col='PlayerID'][data-row='6']","cls":"strong"},
+        {"s":2,"sel":".sheet .h[data-col='Position'], .sheet .d[data-col='Position'], .sheet .h[data-col='Caps'], .sheet .d[data-col='Caps'], .sheet .h[data-col='Goals'], .sheet .d[data-col='Goals']","cls":"hl-return"},
+        {"s":3,"sel":"#a17-1","cls":"spill-anchor","text":"Forward"},
+        {"s":3,"sel":"#a17-2","cls":"spilled","text":"58","d":"0.15"},
+        {"s":3,"sel":"#a17-3","cls":"spilled","text":"41","d":"0.30"}
+    ]</script>
+</section>
+
+<!-- 18 · Meet the vocab schema -->
+<section class="slide" id="s18" data-steps="1">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Spill payoffs + language</span>
+            <h2>Context switch: the phrasebook</h2>
+            <p class="lede">Same skill, new world. <b>tblVocab</b> holds five words with translations in three scripts — plus pinyin, a category, and a mastery score out of 100.</p>
+        </header>
+        <div class="sbody">
+            <div class="sheet" data-table="vocab"></div>
+            <div class="row">
+                <div class="floatlabel" data-step="1" style="border-color:var(--hl-return);">Three <b>script columns</b> — Arabic reads right-to-left, Chinese uses hanzi, Russian uses Cyrillic. XLOOKUP doesn't care: text is text.</div>
+                <div class="floatlabel" data-step="1">Watch the <b>Mastery</b> column — it comes back for approximate matching.</div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .h[data-col='Arabic'], .sheet .d[data-col='Arabic'], .sheet .h[data-col='Russian'], .sheet .d[data-col='Russian'], .sheet .h[data-col='Chinese'], .sheet .d[data-col='Chinese']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- 19 · One word, three scripts -->
+<section class="slide" id="s19" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Spill payoffs + language</span>
+            <h2>One word, three scripts, one formula</h2>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=XLOOKUP(</span><span class="seg" data-step="1"><span class="chip c-look">"Hello"</span><span class="m">, </span><span class="chip c-look">Vocab[English]</span></span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-ret">Vocab[[Arabic]:[Chinese]]</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">find "Hello" in the English column…</span>
+                <span class="cap" data-step="2">…return the whole Arabic-to-Chinese stretch — three columns</span>
+                <span class="cap" data-step="3">three writing systems spill out of one formula</span>
+            </div>
+            <div class="sheet" data-table="vocab" data-cols="English,Arabic,Russian,Chinese,Pinyin"></div>
+            <div class="ansrow">
+                <span class="anslabel">spills →</span>
+                <div class="spillcells">
+                    <span class="anscell" id="a19-1" dir="auto"></span><span class="anscell" id="a19-2" dir="auto"></span><span class="anscell" id="a19-3" dir="auto"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .h[data-col='English'], .sheet .d[data-col='English']","cls":"hl-lookup"},
+        {"s":1,"sel":".sheet .d[data-col='English'][data-row='1']","cls":"strong"},
+        {"s":2,"sel":".sheet .h[data-col='Arabic'], .sheet .d[data-col='Arabic'], .sheet .h[data-col='Russian'], .sheet .d[data-col='Russian'], .sheet .h[data-col='Chinese'], .sheet .d[data-col='Chinese']","cls":"hl-return"},
+        {"s":3,"sel":"#a19-1","cls":"spill-anchor","text":"مرحبا"},
+        {"s":3,"sel":"#a19-2","cls":"spilled","text":"Привет","d":"0.15"},
+        {"s":3,"sel":"#a19-3","cls":"spilled","text":"你好","d":"0.30"}
+    ]</script>
+</section>
+
+<!-- 20 · Reverse / look-left across scripts -->
+<section class="slide" id="s20" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Spill payoffs + language</span>
+            <h2>It works in any direction — even across scripts</h2>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=XLOOKUP(</span><span class="seg" data-step="1"><span class="chip c-look">"水"</span><span class="m">, </span><span class="chip c-look">Vocab[Chinese]</span></span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-ret">Vocab[English]</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">start from the <b>Chinese</b> column, three columns to the right…</span>
+                <span class="cap" data-step="2">…and look <b>left</b> all the way back to English</span>
+                <span class="cap" data-step="3">水 → Water. Direction is simply not a thing you think about anymore.</span>
+            </div>
+            <div class="sheet" data-table="vocab" data-cols="English,Arabic,Russian,Chinese,Pinyin"></div>
+            <div class="ansrow"><span class="anslabel">result →</span><span class="anscell" id="a20"></span></div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .h[data-col='Chinese'], .sheet .d[data-col='Chinese']","cls":"hl-lookup"},
+        {"s":1,"sel":".sheet .d[data-col='Chinese'][data-row='3']","cls":"strong"},
+        {"s":2,"sel":".sheet .h[data-col='English'], .sheet .d[data-col='English']","cls":"hl-return"},
+        {"s":3,"sel":"#a20","cls":"hl-result","text":"Water"}
+    ]</script>
+</section>
+
+<!-- ================= § MATCH_MODE & SEARCH_MODE ================= -->
+
+<!-- 21 · Wildcard match -->
+<section class="slide" id="s21" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ match_mode &amp; search_mode</span>
+            <h2>Wildcards: <span style="font-family:var(--font-mono); font-size:0.85em;">match_mode 2</span></h2>
+            <p class="lede">Everything so far needed the <b>exact</b> text. Meet <b>match_mode</b> — XLOOKUP's fifth argument, which sets <i>how strictly</i> the value has to match. Mode <b>2</b> switches on wildcards: you only remember the word starts with "hel…"? Good enough.</p>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=XLOOKUP(</span><span class="chip c-look">"hel*"</span><span class="m">, </span><span class="chip c-look">Vocab[English]</span><span class="m">, </span><span class="chip c-ret">Vocab[Chinese]</span><span class="m">, , </span><span class="chip c-opt">2</span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1"><b>hel*</b> = "starts with hel" → matches <b>Hello</b> (note the skipped if_not_found slot: two commas)</span>
+                <span class="cap" data-step="2">partial text in, exact answer out</span>
+            </div>
+            <div class="sheet" data-table="vocab" data-cols="English,Chinese,Pinyin,Category"></div>
+            <div class="row" style="align-items:center;">
+                <div class="ansrow"><span class="anslabel">result →</span><span class="anscell" id="a21" dir="auto"></span></div>
+                <div class="floatlabel grow" data-step="2"><span class="mono">*</span> any characters · <span class="mono">?</span> one character · <span class="mono">~</span> escapes a literal * or ?</div>
+            </div>
+            <div class="callout">Why two commas in a row? Arguments live in <b>fixed positions</b>: slot 4 is if_not_found, which we're skipping — its comma stays behind so the <b>2</b> lands in slot 5, match_mode. This comma-counting shows up again over the next few slides.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .h[data-col='English'], .sheet .d[data-col='English']","cls":"hl-lookup"},
+        {"s":1,"sel":".sheet .d[data-col='English'][data-row='1']","cls":"strong"},
+        {"s":2,"sel":".sheet .h[data-col='Chinese'], .sheet .d[data-col='Chinese']","cls":"hl-return"},
+        {"s":2,"sel":"#a21","cls":"hl-result","text":"你好"}
+    ]</script>
+</section>
+
+<!-- 22 · match_mode reference -->
+<section class="slide" id="s22" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ match_mode &amp; search_mode</span>
+            <h2><span style="font-family:var(--font-mono);">match_mode</span> — how to match</h2>
+            <p class="lede">You just used mode 2 — here's the whole menu. One question decides which you need: <b>what should count as a match when the exact value isn't in the list?</b> Leave the argument out for exact; reach for the others when "close" is the point.</p>
+        </header>
+        <div class="sbody">
+            <div class="reftable grow" style="justify-content:center;">
+                <div class="refrow" data-step="1">
+                    <div class="val">0</div>
+                    <div class="what">Exact match<span class="def">DEFAULT</span></div>
+                    <div class="use">#N/A (or if_not_found) when missing — what you want 95% of the time</div>
+                </div>
+                <div class="refrow" data-step="2">
+                    <div class="val">-1</div>
+                    <div class="what">Exact, or next <b>smaller</b></div>
+                    <div class="use">banded lookups: grades, tiers, tax brackets, CEFR levels</div>
+                </div>
+                <div class="refrow" data-step="3">
+                    <div class="val">1</div>
+                    <div class="what">Exact, or next <b>larger</b></div>
+                    <div class="use">ceilings and minimum thresholds: "the first band above this"</div>
+                </div>
+                <div class="refrow" data-step="4">
+                    <div class="val">2</div>
+                    <div class="what">Wildcard <span style="font-family:var(--font-mono);">* ? ~</span></div>
+                    <div class="use">partial text — the "hel*" trick from the last slide</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 23 · Approximate match done right -->
+<section class="slide" id="s23" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ match_mode &amp; search_mode</span>
+            <h2>Approximate match, done right</h2>
+            <p class="lede">Score → band, in both worlds. A band table lists the <b>minimum</b> score for each band, so your exact score is usually not in it — and an exact match would fail. <b>match_mode -1</b> says what VLOOKUP's fragile <span style="font-family:var(--font-mono); font-size:0.9em;">TRUE</span> only implied: <i>exact, or the next smaller value</i> — which lands you in the band you're inside.</p>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow">
+                <div data-step="1">
+                    <div class="fml small" style="margin-bottom:14px;"><span class="m">=XLOOKUP(</span><span class="chip c-look">78</span><span class="m">, Levels[MinScore], </span><span class="chip c-ret">Levels[Level]</span><span class="m">, , </span><span class="chip c-opt">-1</span><span class="m">)</span></div>
+                    <div class="row" style="align-items:center; gap:24px;">
+                        <div class="sheet small lv" data-table="levels"></div>
+                        <div>
+                            <p style="font-size:20px; color:var(--text-dim); max-width:320px; margin-bottom:12px;">Mastery <b>78</b> isn't in the table → slide down to <b>70</b>.</p>
+                            <div class="ansrow"><span class="anscell" id="a23a" style="min-width:130px;"></span></div>
+                        </div>
+                    </div>
+                </div>
+                <div data-step="2">
+                    <div class="fml small" style="margin-bottom:14px;"><span class="m">=XLOOKUP(</span><span class="chip c-look">41</span><span class="m">, Tiers[MinGoals], </span><span class="chip c-ret">Tiers[Award]</span><span class="m">, , </span><span class="chip c-opt">-1</span><span class="m">)</span></div>
+                    <div class="row" style="align-items:center; gap:24px;">
+                        <div class="sheet small tr23" data-table="tiers"></div>
+                        <div>
+                            <p style="font-size:20px; color:var(--text-dim); max-width:320px; margin-bottom:12px;">Talia's <b>41</b> goals → next smaller band is <b>40</b>.</p>
+                            <div class="ansrow"><span class="anscell" id="a23b" style="min-width:130px;"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="callout warn" data-step="2">⚠ One rule survives from the old world: <b>band tables must be sorted ascending.</b></div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".lv .d[data-row='4']","cls":"hl-band strong"},
+        {"s":1,"sel":"#a23a","cls":"hl-result","text":"B2"},
+        {"s":2,"sel":".tr23 .d[data-row='3']","cls":"hl-band strong"},
+        {"s":2,"sel":"#a23b","cls":"hl-result","text":"Cap"}
+    ]</script>
+</section>
+
+<!-- 24 · search_mode reference -->
+<section class="slide" id="s24" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ match_mode &amp; search_mode</span>
+            <h2><span style="font-family:var(--font-mono);">search_mode</span> — where to start looking</h2>
+            <p class="lede">The sixth and final argument does a different job: it changes nothing about <i>what</i> counts as a match, only <b>where Excel starts reading the column</b>. That matters exactly when a value appears more than once — XLOOKUP returns the first match it meets, so direction decides <i>which</i> one wins.</p>
+        </header>
+        <div class="sbody">
+            <div class="reftable grow" style="justify-content:center;">
+                <div class="refrow" data-step="1">
+                    <div class="val">1</div>
+                    <div class="what">First → last<span class="def">DEFAULT</span></div>
+                    <div class="use">top-down scan; returns the <b>first</b> match it meets</div>
+                </div>
+                <div class="refrow" data-step="2">
+                    <div class="val">-1</div>
+                    <div class="what">Last → first</div>
+                    <div class="use">the killer feature: "the <b>most recent</b> record" — next slide</div>
+                </div>
+                <div class="refrow" data-step="3">
+                    <div class="val">2</div>
+                    <div class="what">Binary, ascending</div>
+                    <div class="use">huge sorted data, blazing fast — data must be sorted ascending</div>
+                </div>
+                <div class="refrow" data-step="4">
+                    <div class="val">-2</div>
+                    <div class="what">Binary, descending</div>
+                    <div class="use">same speed trick for descending-sorted data</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 25 · Last-to-first in action -->
+<section class="slide" id="s25" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ match_mode &amp; search_mode</span>
+            <h2>"How did we go <em style="font-style:normal; color:var(--excel-green);">last time</em> against New Zealand?"</h2>
+            <p class="lede">We've played New Zealand <b>twice</b>, so the Opponent column holds two matches. A normal top-down search stops at the March game and never sees June's. Scanning bottom-up with <b>search_mode -1</b> makes the last matching row win — and in any log that grows downwards, the last row is the most recent.</p>
+        </header>
+        <div class="sbody">
+            <div class="fml small">
+                <span class="m">=XLOOKUP("New Zealand", </span><span class="chip c-look">Matches[Opponent]</span><span class="m">, </span><span class="chip c-ret">Matches[Result]</span><span class="seg" data-step="2"><span class="m">, , , </span><span class="chip c-opt">-1</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">default search runs top-down → stops at the <b>first</b> NZ match it finds: March in Perth</span>
+                <span class="cap" data-step="2"><b>search_mode -1</b> scans bottom-up → finds the <b>June</b> match. That's why direction matters.</span>
+            </div>
+            <div class="sheet small" data-table="matches"></div>
+            <div class="ansrow"><span class="anslabel">result →</span><span class="anscell" id="a25" style="min-width:420px;"></span></div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .h[data-col='Opponent'], .sheet .d[data-col='Opponent']","cls":"hl-lookup"},
+        {"s":1,"sel":".sheet .d[data-col='Opponent'][data-row='1']","cls":"strong"},
+        {"s":1,"sel":"#a25","cls":"hl-result","text":"W 3–1 · M-01, Perth"},
+        {"s":2,"sel":".sheet .d[data-row='1']","cls":"dim"},
+        {"s":2,"sel":".sheet .d[data-col='Opponent'][data-row='4']","cls":"strong"},
+        {"s":2,"sel":"#a25","text":"W 4–0 · M-04, Melbourne"}
+    ]</script>
+</section>
+
+<!-- ================= § ADVANCED + WRAP ================= -->
+
+<!-- 26 · Two-way lookup -->
+<section class="slide" id="s26" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Advanced + wrap</span>
+            <h2>The party trick: nested, two-table lookup</h2>
+            <p class="lede">Where is Talia's home base? Her row says <b>NT</b> — but "Darwin" lives in a different table. Chain two XLOOKUPs: the inner answer becomes the outer question.</p>
+        </header>
+        <div class="sbody">
+            <div class="fml small">
+                <span class="m">=XLOOKUP(</span><span class="seg" data-step="1"><span class="chip c-res">XLOOKUP("Talia Rourke", Players[Player], Players[State])</span></span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-look">States[State]</span><span class="m">, </span><span class="chip c-ret">States[HomeBase]</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">the <b>inner</b> XLOOKUP runs first: Talia → <b>"NT"</b></span>
+                <span class="cap" data-step="2">"NT" becomes the <b>outer</b> lookup_value against the States table</span>
+                <span class="cap" data-step="3">two hops, one formula → <b>Darwin</b></span>
+            </div>
+            <div class="two-col">
+                <div>
+                    <div class="floatlabel" style="margin-bottom:12px;">hop 1 · tblPlayers</div>
+                    <div class="sheet small p26" data-table="players" data-cols="Player,State" data-rows="7"></div>
+                </div>
+                <div>
+                    <div class="floatlabel" style="margin-bottom:12px;">hop 2 · tblStates</div>
+                    <div class="sheet small st26" data-table="states"></div>
+                </div>
+            </div>
+            <div class="ansrow"><span class="anslabel">result →</span><span class="anscell" id="a26"></span></div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".p26 .h[data-col='Player'], .p26 .d[data-col='Player']","cls":"hl-lookup"},
+        {"s":1,"sel":".p26 .d[data-col='Player'][data-row='6']","cls":"strong"},
+        {"s":1,"sel":".p26 .d[data-col='State'][data-row='6']","cls":"hl-result"},
+        {"s":2,"sel":".st26 .h[data-col='State'], .st26 .d[data-col='State']","cls":"hl-lookup"},
+        {"s":2,"sel":".st26 .d[data-col='State'][data-row='2']","cls":"strong"},
+        {"s":2,"sel":".st26 .h[data-col='HomeBase'], .st26 .d[data-col='HomeBase']","cls":"hl-return"},
+        {"s":3,"sel":".st26 .d[data-col='HomeBase'][data-row='2']","cls":"strong"},
+        {"s":3,"sel":"#a26","cls":"hl-result","text":"Darwin"}
+    ]</script>
+</section>
+
+<!-- 27 · XLOOKUP replaces HLOOKUP too -->
+<section class="slide" id="s27" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Advanced + wrap</span>
+            <h2>It replaces HLOOKUP too</h2>
+            <p class="lede">Point the arrays at <b>rows</b> instead of columns and the same three-chunk sentence works sideways. You can retire a second function today.</p>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=XLOOKUP("NT", </span><span class="chip c-look">B1:G1</span><span class="m">, </span><span class="chip c-ret">B2:G2</span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">lookup_array is a <b>row</b> this time — scan the state codes left-to-right</span>
+                <span class="cap" data-step="2">return_array is the row beneath → <b>Darwin</b>. Vertical, horizontal — same function.</span>
+            </div>
+            <div class="sheet" data-table="hstates"></div>
+            <div class="row" style="align-items:center;">
+                <div class="ansrow"><span class="anslabel">result →</span><span class="anscell" id="a27"></span></div>
+                <div class="callout grow" data-step="2">One function now covers <b>VLOOKUP, HLOOKUP and LOOKUP</b>. That's three old tools off your belt.</div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .h:not([data-col='State'])","cls":"hl-lookup"},
+        {"s":1,"sel":".sheet .h[data-col='NT']","cls":"strong"},
+        {"s":2,"sel":".sheet .d:not([data-col='State'])","cls":"hl-return"},
+        {"s":2,"sel":".sheet .d[data-col='NT'][data-row='1']","cls":"strong"},
+        {"s":2,"sel":"#a27","cls":"hl-result","text":"Darwin"}
+    ]</script>
+</section>
+
+<!-- 28 · Cheat-sheet reference card -->
+<section class="slide" id="s28" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Advanced + wrap</span>
+            <h2>The cheat sheet — screenshot this one 📸</h2>
+        </header>
+        <div class="sbody">
+            <div class="cheat">
+                <div class="card span3" style="padding:20px 30px;">
+                    <div style="font-family:var(--font-mono); font-size:26px; line-height:1.9;">
+                        <span class="m">=XLOOKUP(</span><span class="chip c-look">lookup_value</span><span class="m">, </span><span class="chip c-look">lookup_array</span><span class="m">, </span><span class="chip c-ret">return_array</span><span class="m">, </span><span class="chip c-opt">[if_not_found]</span><span class="m">, </span><span class="chip c-opt">[match_mode]</span><span class="m">, </span><span class="chip c-opt">[search_mode]</span><span class="m">)</span>
+                    </div>
+                    <p style="font-size:18px; margin-top:8px;">the value · where to look · what to bring back — <b>only the first three are required</b></p>
+                </div>
+                <div class="card">
+                    <h3>match_mode</h3>
+                    <table class="minitable">
+                        <tr><td>0</td><td>exact (default)</td></tr>
+                        <tr><td>-1</td><td>exact or next smaller — bands</td></tr>
+                        <tr><td>1</td><td>exact or next larger</td></tr>
+                        <tr><td>2</td><td>wildcard&nbsp; * ? ~</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>search_mode</h3>
+                    <table class="minitable">
+                        <tr><td>1</td><td>first → last (default)</td></tr>
+                        <tr><td>-1</td><td>last → first — most recent</td></tr>
+                        <tr><td>2</td><td>binary, sorted ascending</td></tr>
+                        <tr><td>-2</td><td>binary, sorted descending</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>Remember</h3>
+                    <ul class="checklist">
+                        <li>Looks left, right, up, down — anywhere</li>
+                        <li>Exact match by default</li>
+                        <li><span style="font-family:var(--font-mono);">if_not_found</span> beats IFERROR</li>
+                        <li>Multi-column return_array → <b>spill</b></li>
+                        <li><span style="font-family:var(--font-mono);">=B2#</span> refers to a whole spill range</li>
+                        <li>Band tables sorted <b>ascending</b></li>
+                    </ul>
+                </div>
+                <div class="card span3" style="display:flex; gap:44px; align-items:center; padding:16px 30px;">
+                    <div class="keyrow" style="font-size:19px;"><span class="swatch amber" style="width:30px;height:30px;"></span>lookup value / array</div>
+                    <div class="keyrow" style="font-size:19px;"><span class="swatch green" style="width:30px;height:30px;"></span>return array</div>
+                    <div class="keyrow" style="font-size:19px;"><span class="swatch blue" style="width:30px;height:30px;"></span>result / spill anchor</div>
+                    <div style="font-family:var(--font-mono); font-size:17px; color:var(--text-dim); margin-left:auto;">requires Excel 2021+ / Microsoft 365</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 29 · Common errors & gotchas -->
+<section class="slide" id="s29" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Advanced + wrap</span>
+            <h2>When it goes wrong — the five usual suspects</h2>
+        </header>
+        <div class="sbody">
+            <div class="gotchas">
+                <div class="card reveal">
+                    <h3>#SPILL!</h3>
+                    <p>Something is parked in the spill path.</p>
+                    <p class="fix">Fix: clear the blocking cells — nothing is wrong with the formula.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>#N/A</h3>
+                    <p>No match found and no fallback provided.</p>
+                    <p class="fix">Fix: add an if_not_found — argument 4, plain text.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>#VALUE!</h3>
+                    <p>lookup_array and return_array are different sizes — 7 rows vs 6, say.</p>
+                    <p class="fix">Fix: make both arrays span the same rows (tables do this for free).</p>
+                </div>
+                <div class="card reveal">
+                    <h3>Wrong band</h3>
+                    <p>Approximate match over a table that isn't sorted ascending returns plausible nonsense.</p>
+                    <p class="fix">Fix: sort the band column ascending. Always.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>Mode in wrong slot</h3>
+                    <p>match_mode is argument <b>5</b>, search_mode is <b>6</b>. A misplaced -1 changes meaning silently.</p>
+                    <p class="fix">Fix: count your commas — skipped slots stay empty: &nbsp;<span style="font-family:var(--font-mono); font-size:17px;">, , -1</span></p>
+                </div>
+                <div class="card reveal" style="background:var(--green-soft); border-color:var(--excel-green);">
+                    <h3 style="color:var(--excel-green);">Golden rule</h3>
+                    <p style="color:var(--text);">Every error above is diagnosable with the three-chunk sentence: <b>the value, where to look, what to bring back.</b> Check them in that order.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 30 · Now teach it -->
+<section class="slide" id="s30" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Advanced + wrap</span>
+            <h2>Now teach it</h2>
+        </header>
+        <div class="sbody">
+            <div class="teach">
+                <div class="card">
+                    <h3 style="margin-bottom:16px;">Your six talking points</h3>
+                    <ol class="points">
+                        <li><b>The sentence:</b> the value · where to look · what to bring back.</li>
+                        <li><b>It looks anywhere</b> — left, right, up, down. No more column-1 rule.</li>
+                        <li><b>Exact match by default</b> — the FALSE ritual is gone.</li>
+                        <li><b>if_not_found</b> replaces the IFERROR wrapper with one friendly argument.</li>
+                        <li><b>Spill:</b> a multi-column return spills; the anchor owns the formula; #SPILL! just means "something's in the way".</li>
+                        <li><b>Modes:</b> match_mode -1 for bands (sorted ascending), search_mode -1 for "most recent".</li>
+                    </ol>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:16px;">Three challenges — click to reveal each answer</h3>
+                    <div class="challenge">
+                        <div class="q">① Hockey · How many caps does Indi Fraser have?</div>
+                        <div class="ansf" data-step="1">=XLOOKUP("Indi Fraser", Players[Player], Players[Caps]) <span class="res">→ 47</span></div>
+                    </div>
+                    <div class="challenge">
+                        <div class="q">② Language · Spill "Thank you" into all three scripts with one formula.</div>
+                        <div class="ansf" data-step="2">=XLOOKUP("Thank you", Vocab[English], Vocab[[Arabic]:[Chinese]]) <span class="res">→ شكرا · Спасибо · 谢谢</span></div>
+                    </div>
+                    <div class="challenge">
+                        <div class="q">③ Two-way · What is Noor Haddad's home base city?</div>
+                        <div class="ansf" data-step="3">=XLOOKUP(XLOOKUP("Noor Haddad", Players[Player], Players[State]),<br>&nbsp;&nbsp;States[State], States[HomeBase]) <span class="res">→ Perth</span></div>
+                    </div>
+                </div>
+            </div>
+            <p class="closing">If you can walk someone through these three, <em>you own it.</em></p>
+        </div>
+    </div>
+</section>
+
+</main>
+</div>
+
+<!-- ===========================================
+     SECTION RAIL (chrome, outside the stage)
+     =========================================== -->
+<nav class="rail" aria-label="Deck sections">
+    <div class="railtitle">VLOOKUP → XLOOKUP</div>
+    <div id="railSecs"></div>
+    <div class="railfoot">
+        <span id="railCount">1 / 30</span>
+        <span id="railStep"></span>
+        <span class="railhint">click / → build · ← back · E edit</span>
+    </div>
+</nav>
+
+<!-- Inline-edit chrome -->
+<div class="edit-hotzone" aria-hidden="true"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+<div class="edit-note">editing — click any text · Ctrl+S saves a copy · E to exit</div>
+<script>
+/* ===========================================
+   LOCKED DATASETS
+   Single source of truth for every <SheetGrid> in the deck.
+   Row order matters: fx selectors address cells by data-row.
+   =========================================== */
+const TABLES = {
+    demo: {
+        headers: ['Item', 'Qty'],
+        rows: [['Sticks', '12'], ['Balls', '48'], ['Cones', '30']]
+    },
+    players: {   /* tblPlayers — Talia Rourke (NT) is data-row 6 */
+        headers: ['PlayerID', 'Player', 'State', 'Position', 'Caps', 'Goals'],
+        rows: [
+            ['HR-101', 'Kaja Adams',    'WA',  'Forward',    '142', '68'],
+            ['HR-102', 'Mara Nguyen',   'NSW', 'Midfielder', '98',  '24'],
+            ['HR-103', 'Tess Okafor',   'QLD', 'Defender',   '210', '12'],
+            ['HR-104', 'Bree Sullivan', 'VIC', 'Goalkeeper', '165', '0'],
+            ['HR-105', 'Indi Fraser',   'SA',  'Forward',    '47',  '31'],
+            ['HR-107', 'Talia Rourke',  'NT',  'Forward',    '58',  '41'],
+            ['HR-106', 'Noor Haddad',   'WA',  'Midfielder', '76',  '19']
+        ]
+    },
+    states: {    /* tblStates — NT/Darwin is data-row 2 */
+        headers: ['State', 'HomeBase', 'Region'],
+        rows: [
+            ['WA',  'Perth',     'West'],
+            ['NT',  'Darwin',    'North'],
+            ['QLD', 'Brisbane',  'North-East'],
+            ['NSW', 'Sydney',    'East'],
+            ['VIC', 'Melbourne', 'South-East'],
+            ['SA',  'Adelaide',  'South']
+        ]
+    },
+    matches: {   /* tblMatches — for search_mode -1 */
+        headers: ['MatchID', 'Date', 'Opponent', 'Venue', 'Result'],
+        rows: [
+            ['M-01', '2026-03-02', 'New Zealand', 'Perth',     'W 3–1'],
+            ['M-02', '2026-04-14', 'Argentina',   'Sydney',    'L 1–2'],
+            ['M-03', '2026-05-20', 'Netherlands', 'Perth',     'D 2–2'],
+            ['M-04', '2026-06-08', 'New Zealand', 'Melbourne', 'W 4–0']
+        ]
+    },
+    tiers: {     /* tblTiers — ascending bands, match_mode -1 */
+        headers: ['MinGoals', 'Award'],
+        rows: [['0', 'Rookie'], ['20', 'Squad'], ['40', 'Cap'], ['60', 'Legend']]
+    },
+    vocab: {     /* tblVocab — Dataset B */
+        headers: ['WordID', 'English', 'Arabic', 'Russian', 'Chinese', 'Pinyin', 'Category', 'Mastery'],
+        rows: [
+            ['V-001', 'Hello',     'مرحبا', 'Привет',  '你好', 'nǐ hǎo',  'Greetings', '92'],
+            ['V-002', 'Thank you', 'شكرا',  'Спасибо', '谢谢', 'xièxie',  'Greetings', '78'],
+            ['V-003', 'Water',     'ماء',   'Вода',    '水',   'shuǐ',    'Food',      '55'],
+            ['V-004', 'One',       'واحد',  'Один',    '一',   'yī',      'Numbers',   '40'],
+            ['V-005', 'Friend',    'صديق',  'Друг',    '朋友', 'péngyou', 'People',    '18']
+        ]
+    },
+    levels: {    /* tblLevels — ascending CEFR bands */
+        headers: ['MinScore', 'Level'],
+        rows: [['0', 'A1'], ['30', 'A2'], ['50', 'B1'], ['70', 'B2'], ['90', 'C1']]
+    },
+    hstates: {   /* horizontal layout for the HLOOKUP-replacement slide */
+        headers: ['State', 'WA', 'NT', 'QLD', 'NSW', 'VIC', 'SA'],
+        rows: [['HomeBase', 'Perth', 'Darwin', 'Brisbane', 'Sydney', 'Melbourne', 'Adelaide']]
+    }
+};
+
+/* ===========================================
+   <SheetGrid> RENDERER
+   Turns every  <div class="sheet" data-table="...">  into a
+   spreadsheet: column letters, row numbers, header row, data cells.
+   Options: data-cols (subset), data-rows (limit), data-extra (blank
+   columns named X1…), data-count (VLOOKUP count-badge row).
+   =========================================== */
+function buildSheets() {
+    document.querySelectorAll('.sheet[data-table]').forEach(sh => {
+        const t = TABLES[sh.dataset.table];
+        if (!t) return;
+        const cols  = sh.dataset.cols ? sh.dataset.cols.split(',') : t.headers.slice();
+        const idx   = cols.map(c => t.headers.indexOf(c));
+        const extra = +(sh.dataset.extra || 0);
+        const rows  = t.rows.slice(0, +(sh.dataset.rows || t.rows.length));
+        const nCols = cols.length + extra;
+        sh.style.gridTemplateColumns = `52px repeat(${nCols}, auto)`;
+
+        let html = '<div class="sc cl"></div>';                       /* corner */
+        for (let c = 0; c < nCols; c++)
+            html += `<div class="sc cl">${String.fromCharCode(65 + c)}</div>`;
+
+        if (sh.dataset.count) {                                       /* VLOOKUP count badges */
+            html += '<div class="sc cnt"></div>';
+            for (let c = 0; c < nCols; c++)
+                html += `<div class="sc cnt" style="--d:${(c * 0.09).toFixed(2)}s">${c + 1}</div>`;
+        }
+
+        html += '<div class="sc rn">1</div>';                         /* header row */
+        cols.forEach(c => html += `<div class="sc h" data-col="${c}" dir="auto">${c === 'WordID' ? 'ID' : c}</div>`);
+        for (let e = 0; e < extra; e++) html += `<div class="sc h" data-col="X${e + 1}"></div>`;
+
+        rows.forEach((r, ri) => {                                     /* data rows */
+            html += `<div class="sc rn">${ri + 2}</div>`;
+            idx.forEach((ci, k) =>
+                html += `<div class="sc d" data-col="${cols[k]}" data-row="${ri + 1}" dir="auto">${r[ci]}</div>`);
+            for (let e = 0; e < extra; e++)
+                html += `<div class="sc d" data-col="X${e + 1}" data-row="${ri + 1}"></div>`;
+        });
+        sh.innerHTML = html;
+    });
+}
+
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER + STEP/FX ENGINE
+   Click / → advance build-steps within the slide first, then move
+   to the next slide. ← reverses one step, then one slide (arriving
+   at the previous slide fully built). Layered on the skill's base
+   SlidePresentation pattern — slide-level nav is unchanged.
+   =========================================== */
+const SECTIONS = [
+    ['Intro',            0, 3],
+    ["VLOOKUP's limits", 4, 5],
+    ['XLOOKUP core',     6, 9],
+    ['Exact match',     10, 12],
+    ['Spill',           13, 19],
+    ['Modes',           20, 24],
+    ['Teach it',        25, 29]
+];
+
+class SlidePresentation {
+    constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.stage  = document.getElementById('deckStage');
+        this.cur    = 0;
+        this.step   = this.slides.map(() => 0);          /* per-slide build progress */
+        this.fx     = this.slides.map(sl => this.resolveFx(sl));
+
+        this.buildRail();
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupPointerNav();
+        this.setupPrint();
+
+        const fromHash = parseInt((location.hash || '').slice(1), 10);
+        this.show(isNaN(fromHash) ? 0 : Math.min(Math.max(fromHash - 1, 0), this.slides.length - 1));
+    }
+
+    /* --- FX: parse each slide's <script type="text/fx"> into resolved entries --- */
+    resolveFx(slide) {
+        const tag = slide.querySelector('script[type="text/fx"]');
+        if (!tag) return [];
+        let entries;
+        try { entries = JSON.parse(tag.textContent); }
+        catch (err) { console.error('Bad fx JSON on', slide.id, err); return []; }
+        return entries.map(e => {
+            const els = Array.from(slide.querySelectorAll(e.sel));
+            els.forEach(el => {
+                if (e.text !== undefined && el.dataset.orig === undefined)
+                    el.dataset.orig = el.textContent;
+            });
+            return { ...e, els };
+        });
+    }
+
+    maxSteps(i) { return +(this.slides[i].dataset.steps || 0); }
+
+    /* --- apply a slide's visual state for step k (idempotent recompute) --- */
+    applyState(i, k) {
+        const slide = this.slides[i];
+        slide.querySelectorAll('[data-step]').forEach(el => {
+            const v = +el.dataset.step;
+            el.classList.toggle('on',  v <= k);
+            el.classList.toggle('now', v === k);
+        });
+        const fx = this.fx[i];
+        fx.forEach(e => e.els.forEach(el => {              /* clear everything first */
+            if (e.cls) el.classList.remove(...e.cls.split(' '));
+            if (e.text !== undefined) el.textContent = el.dataset.orig;
+            el.style.transitionDelay = '';
+        }));
+        fx.forEach(e => {                                  /* re-apply steps 0..k in order */
+            if (e.s > k) return;
+            e.els.forEach(el => {
+                if (e.d)   el.style.transitionDelay = e.d + 's';
+                if (e.cls) el.classList.add(...e.cls.split(' '));
+                if (e.rm)  el.classList.remove(...e.rm.split(' '));
+                if (e.text !== undefined) el.textContent = e.text;
+            });
+        });
+    }
+
+    show(i, step = 0) {
+        this.cur = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.step[this.cur] = Math.min(step, this.maxSteps(this.cur));
+        this.slides.forEach((sl, j) => {
+            sl.classList.toggle('active',  j === this.cur);
+            sl.classList.toggle('visible', j === this.cur);
+        });
+        this.applyState(this.cur, this.step[this.cur]);
+        try { history.replaceState(null, '', '#' + (this.cur + 1)); } catch (e) { /* file:// quirks in some browsers */ }
+        this.updateRail();
+    }
+
+    advance() {
+        if (this.step[this.cur] < this.maxSteps(this.cur)) {
+            this.step[this.cur]++;
+            this.applyState(this.cur, this.step[this.cur]);
+            this.updateRail();
+        } else if (this.cur < this.slides.length - 1) {
+            this.show(this.cur + 1, 0);
+        }
+    }
+
+    back() {
+        if (this.step[this.cur] > 0) {
+            this.step[this.cur]--;
+            this.applyState(this.cur, this.step[this.cur]);
+            this.updateRail();
+        } else if (this.cur > 0) {
+            this.show(this.cur - 1, this.maxSteps(this.cur - 1));   /* arrive fully built */
+        }
+    }
+
+    /* --- fixed 16:9 stage scaling: scale the whole stage, never reflow.
+           When the section rail is visible it reserves a strip on the
+           left, so deck chrome never overlaps slide content. --- */
+    setupStageScale() {
+        const scale = () => {
+            const railW  = window.matchMedia('(max-width: 1080px)').matches ? 0 : 248;
+            const availW = window.innerWidth - railW;
+            const f = Math.min(availW / 1920, window.innerHeight / 1080);
+            const x = railW + (availW - 1920 * f) / 2;
+            const y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+    }
+
+    setupKeyboardNav() {
+        document.addEventListener('keydown', e => {
+            if (e.target.getAttribute && e.target.getAttribute('contenteditable')) return;
+            if (window.editor && window.editor.isActive) return;
+            switch (e.key) {
+                case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); this.advance(); break;
+                case 'ArrowLeft':  case 'PageUp':             e.preventDefault(); this.back();    break;
+                case 'Home': e.preventDefault(); this.show(0); break;
+                case 'End':  e.preventDefault(); this.show(this.slides.length - 1); break;
+            }
+        });
+    }
+
+    /* --- click = advance; touch: tap advances, horizontal swipe navigates.
+           A short debounce stops an accidental double-click from blowing
+           past a build step before it can be seen. --- */
+    setupPointerNav() {
+        const vp = document.querySelector('.deck-viewport');
+        let lastTouch = 0, lastAdvance = 0, tx = 0, ty = 0;
+        const debouncedAdvance = () => {
+            const now = Date.now();
+            if (now - lastAdvance < 350) return;
+            lastAdvance = now;
+            this.advance();
+        };
+        vp.addEventListener('click', e => {
+            if (window.editor && window.editor.isActive) return;
+            if (Date.now() - lastTouch < 500) return;      /* touch already handled */
+            if (e.target.closest('a, button')) return;
+            debouncedAdvance();
+        });
+        vp.addEventListener('touchstart', e => {
+            tx = e.changedTouches[0].clientX;
+            ty = e.changedTouches[0].clientY;
+        }, { passive: true });
+        vp.addEventListener('touchend', e => {
+            if (window.editor && window.editor.isActive) return;
+            lastTouch = Date.now();
+            const dx = e.changedTouches[0].clientX - tx;
+            const dy = e.changedTouches[0].clientY - ty;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+                dx < 0 ? this.advance() : this.back();
+            } else if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+                debouncedAdvance();                        /* plain tap */
+            }
+        }, { passive: true });
+    }
+
+    /* --- section rail --- */
+    buildRail() {
+        const box = document.getElementById('railSecs');
+        SECTIONS.forEach(([name, start], si) => {
+            const b = document.createElement('button');
+            b.className = 'sec';
+            b.innerHTML = `<span class="n">${si + 1}</span><span>${name}</span>`;
+            b.addEventListener('click', e => { e.stopPropagation(); this.show(start, 0); });
+            box.appendChild(b);
+        });
+    }
+
+    updateRail() {
+        const secs = document.querySelectorAll('.rail .sec');
+        SECTIONS.forEach(([, start, end], si) =>
+            secs[si].classList.toggle('cur', this.cur >= start && this.cur <= end));
+        document.getElementById('railCount').textContent = `${this.cur + 1} / ${this.slides.length}`;
+        const n = this.maxSteps(this.cur);
+        document.getElementById('railStep').textContent =
+            n ? `build ${this.step[this.cur]}/${n} ▸` : '';
+    }
+
+    /* --- print: render every slide fully built, restore after --- */
+    setupPrint() {
+        window.addEventListener('beforeprint', () =>
+            this.slides.forEach((sl, i) => this.applyState(i, this.maxSteps(i))));
+        window.addEventListener('afterprint', () =>
+            this.slides.forEach((sl, i) => this.applyState(i, this.step[i])));
+    }
+}
+
+/* ===========================================
+   INLINE EDITOR
+   Hover the top-left corner (or press E) → pencil → edit mode.
+   Edits persist to localStorage; Ctrl+S downloads an edited copy.
+   =========================================== */
+const EDIT_SEL = 'h1, h2, h3, p, li, .sc.d, .sc.h, .anscell, .cap, .kicker, .floatlabel, .fchip, .ansf, .closing, .chip, .fml .m, .keyrow span:last-child, .chunk .word, .refrow .what, .refrow .use, .minitable td';
+const STORE_KEY = 'xlookup-deck-edits-v1';
+
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.els = Array.from(document.querySelectorAll(EDIT_SEL))
+            .filter(el => !el.closest('.rail'));
+        this.els.forEach((el, i) => el.dataset.eid = 'e' + i);
+        this.restore();
+        this.bindChrome();
+    }
+
+    restore() {
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { saved = {}; }
+        this.els.forEach(el => {
+            if (saved[el.dataset.eid] !== undefined) el.innerHTML = saved[el.dataset.eid];
+        });
+    }
+
+    persist() {
+        const out = {};
+        this.els.forEach(el => { if (el.dataset.dirty) out[el.dataset.eid] = el.innerHTML; });
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { saved = {}; }
+        localStorage.setItem(STORE_KEY, JSON.stringify({ ...saved, ...out }));
+    }
+
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        document.getElementById('editToggle').classList.toggle('active', this.isActive);
+        this.els.forEach(el => {
+            if (this.isActive) {
+                el.setAttribute('contenteditable', 'true');
+                el.addEventListener('input', this.markDirty);
+            } else {
+                el.removeAttribute('contenteditable');
+                el.removeEventListener('input', this.markDirty);
+            }
+        });
+        if (!this.isActive) this.persist();
+    }
+
+    markDirty(e) { e.currentTarget.dataset.dirty = '1'; }
+
+    downloadCopy() {
+        this.persist();
+        const clone = document.documentElement.cloneNode(true);
+        clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        const body = clone.querySelector('body');
+        if (body) body.classList.remove('editing');
+        const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'xlookup-tutorial-edited.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    /* pencil hotzone: JS-based hover with a 400ms grace period */
+    bindChrome() {
+        const hotzone = document.querySelector('.edit-hotzone');
+        const toggle  = document.getElementById('editToggle');
+        let hideTimeout = null;
+        const scheduleHide = () => {
+            hideTimeout = setTimeout(() => {
+                if (!this.isActive) toggle.classList.remove('show');
+            }, 400);
+        };
+        hotzone.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); toggle.classList.add('show'); });
+        hotzone.addEventListener('mouseleave', scheduleHide);
+        toggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        toggle.addEventListener('mouseleave', scheduleHide);
+        hotzone.addEventListener('click', e => { e.stopPropagation(); this.toggleEditMode(); });
+        toggle.addEventListener('click',  e => { e.stopPropagation(); this.toggleEditMode(); });
+
+        document.addEventListener('keydown', e => {
+            if ((e.key === 'e' || e.key === 'E') && !e.ctrlKey && !e.metaKey
+                && !(e.target.getAttribute && e.target.getAttribute('contenteditable'))) {
+                this.toggleEditMode();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's' && this.isActive) {
+                e.preventDefault();
+                this.downloadCopy();
+            }
+        });
+    }
+}
+
+/* ===========================================
+   BOOT — order matters:
+   sheets first, then saved edits, then the controller (fx selectors
+   must resolve against the fully-rendered, edit-restored DOM).
+   =========================================== */
+buildSheets();
+window.editor = new InlineEditor();
+window.deck = new SlidePresentation();
+</script>
+</body>
+</html>
