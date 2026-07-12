@@ -1,0 +1,2404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Group &amp; Outline — an interactive self-study deck</title>
+
+<!-- === FONTS: Clash Display (display), General Sans (body) via Fontshare; JetBrains Mono (formulas) via Google === -->
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=general-sans@400,500,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+
+<style>
+/* ===========================================
+   THEME TOKENS — change these to retheme the deck
+   =========================================== */
+:root {
+    --bg:          #F7F8FA;   /* sheet off-white */
+    --panel:       #FFFFFF;
+    --grid-line:   #E3E6EA;
+    --header-grey: #EEF1F4;   /* Excel column-header fill */
+    --text:        #1A1D21;
+    --text-dim:    #6B7280;
+    --excel-green: #107C41;   /* primary accent */
+    --green-soft:  rgba(16,124,65,0.10);
+    --hl-lookup:   #F4B740;   /* amber  — rows/columns/fields we select */
+    --hl-return:   #22A559;   /* green  — subtotal & summary rows that come back */
+    --hl-result:   #2D7FF9;   /* blue   — results, buttons, level controls */
+    --spill-halo:  rgba(45,127,249,0.35);
+    --danger:      #E5484D;
+
+    --stage-bg:    #D9DDE3;   /* letterbox colour around the 16:9 stage */
+    --slide-bg:    var(--bg);
+
+    --font-display: 'Clash Display', 'General Sans', sans-serif;
+    --font-title:   Baskerville, 'Times New Roman', Georgia, serif;   /* slide headings */
+    --font-body:    'General Sans', 'PingFang SC', 'Hiragino Sans GB', 'Geeza Pro', sans-serif;
+    --font-mono:    'JetBrains Mono', 'PingFang SC', 'Geeza Pro', monospace;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================
+   FIXED 16:9 STAGE: MANDATORY BASE STYLES
+   (viewport-base.css — included in full)
+   Slides are authored at 1920×1080 and scaled as a whole.
+   =========================================== */
+
+/* 1. Lock the browser viewport */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+/* 2. Full-window deck viewport */
+.deck-viewport {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+/* 3. Fixed 16:9 design canvas.
+   JavaScript sets transform: translate(...) scale(...). */
+.deck-stage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform-origin: 0 0;
+    background: var(--slide-bg, #fff);
+}
+
+/* 4. Slides stack inside the fixed stage.
+   Content must be laid out at 1920×1080, not reflowed per device. */
+.slide {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    background: var(--slide-bg, #fff);
+}
+
+.slide.active,
+.slide.visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+/* 5. Keep media inside authored slide bounds */
+img,
+video,
+canvas,
+svg {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* 6. Presentation chrome stays outside the slide design system */
+.deck-controls {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+/* 7. Print one fixed-size slide per page */
+@media print {
+    html,
+    body {
+        width: 1920px;
+        height: auto;
+        overflow: visible;
+        background: #fff;
+    }
+
+    .deck-viewport {
+        position: static;
+        overflow: visible;
+        background: #fff;
+    }
+
+    .deck-stage {
+        position: static;
+        width: auto;
+        height: auto;
+        transform: none !important;
+        background: none;
+    }
+
+    .slide {
+        position: relative;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 1920px;
+        height: 1080px;
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+    }
+
+    .deck-controls {
+        display: none !important;
+    }
+}
+
+/* 8. Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+    }
+}
+
+/* ===========================================
+   BASE TYPOGRAPHY & SLIDE SCAFFOLD
+   =========================================== */
+body { font-family: var(--font-body); color: var(--text); }
+
+.wrap {                       /* inner layout container of every slide */
+    position: absolute;
+    inset: 0;
+    padding: 60px 96px 52px;
+    display: flex;
+    flex-direction: column;
+}
+
+.shead { margin-bottom: 24px; flex: 0 0 auto; }
+.kicker {
+    font-family: var(--font-mono);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--excel-green);
+}
+.shead h2 {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 58px;
+    line-height: 1.08;
+    letter-spacing: 0;
+    margin-top: 8px;
+}
+.lede { font-size: 25px; color: var(--text-dim); margin-top: 10px; max-width: 1450px; line-height: 1.45; }
+
+.sbody { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 24px; }
+
+/* ===========================================
+   ENTRANCE REVEALS (auto, on slide show)
+   =========================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.reveal:nth-child(1) { transition-delay: 0.05s; }
+.reveal:nth-child(2) { transition-delay: 0.15s; }
+.reveal:nth-child(3) { transition-delay: 0.25s; }
+.reveal:nth-child(4) { transition-delay: 0.35s; }
+.reveal:nth-child(5) { transition-delay: 0.45s; }
+.reveal:nth-child(6) { transition-delay: 0.55s; }
+
+/* ===========================================
+   STEP ENGINE — click-to-build fragments
+   =========================================== */
+[data-step]:not(.step-alt):not(.cap) {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+[data-step]:not(.step-alt):not(.cap).on { opacity: 1; transform: none; }
+
+/* Strike-through targets: visible from the start, struck when their step lands */
+.zap { transition: color 0.4s, opacity 0.4s; }
+.zap.on { color: var(--danger); text-decoration: line-through; text-decoration-thickness: 3px; opacity: 0.45; }
+
+/* Captions: one line under a formula; only the CURRENT step's caption shows */
+.capbox { position: relative; height: 40px; flex: 0 0 auto; }
+.cap {
+    position: absolute; left: 4px; top: 0;
+    font-size: 23px; color: var(--text-dim); font-style: italic;
+    opacity: 0; transition: opacity 0.35s 0.1s;
+}
+.cap.now { opacity: 1; }
+.cap b { color: var(--text); font-style: normal; }
+
+/* ===========================================
+   <SheetGrid> — spreadsheet component
+   =========================================== */
+.sheet {
+    display: grid;
+    width: max-content;
+    max-width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 25px;
+    box-shadow: 0 1px 3px rgba(26,29,33,0.06);
+    flex: 0 0 auto;
+}
+.sc {
+    padding: 9px 20px;
+    border-right: 1px solid var(--grid-line);
+    border-bottom: 1px solid var(--grid-line);
+    white-space: nowrap;
+    transition: background 0.35s, box-shadow 0.35s, opacity 0.35s, color 0.35s;
+    transition-delay: var(--d, 0s);
+}
+.sheet .cl, .sheet .rn {          /* column letters + row numbers */
+    background: var(--header-grey);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 6px 10px;
+}
+.sheet .rn { min-width: 52px; }
+.sheet .h {                        /* table header row */
+    background: var(--header-grey);
+    font-weight: 600;
+    font-size: 22px;
+}
+.sheet.small { font-size: 21px; }
+.sheet.small .sc { padding: 7px 16px; }
+.sheet.small .h { font-size: 19px; }
+.sheet.tiny { font-size: 18px; }
+.sheet.tiny .sc { padding: 5px 13px; }
+.sheet.tiny .h { font-size: 16.5px; }
+
+/* Cell highlight states (the colour legend) */
+@keyframes cellpop {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.07); }
+    100% { transform: scale(1); }
+}
+.hl-lookup  { background: rgba(244,183,64,0.16); box-shadow: inset 0 0 0 2.5px var(--hl-lookup); animation: cellpop 0.45s var(--ease) var(--d, 0s); }
+.hl-return  { background: var(--green-soft);      box-shadow: inset 0 0 0 2.5px var(--hl-return); }
+.hl-result  { background: rgba(45,127,249,0.10);  box-shadow: inset 0 0 0 3px var(--hl-result); color: #1D57B0; font-weight: 600; animation: cellpop 0.45s var(--ease) var(--d, 0s); }
+.hl-band    { background: var(--green-soft);      box-shadow: inset 0 0 0 2.5px var(--hl-return); }
+.strong     { font-weight: 700; }
+.sc.strong.hl-lookup { background: rgba(244,183,64,0.32); }
+.dim        { opacity: 0.3; }
+.blocked {
+    background: rgba(229,72,77,0.14);
+    box-shadow: inset 0 0 0 2.5px var(--danger);
+    color: var(--danger); font-weight: 600;
+}
+.prefill { color: var(--text-dim); font-style: italic; }
+.err { color: var(--danger); font-weight: 700; }
+.ok  { color: var(--excel-green); font-weight: 600; }
+.tbl-outline { box-shadow: 0 0 0 3px var(--excel-green); }
+
+/* Whole-row tints — softer than per-cell boxes */
+.sc.selrow   { background: rgba(244,183,64,0.20); }              /* amber: rows we selected */
+.sc.sumrow   { background: var(--green-soft); font-weight: 600; } /* green: summary rows */
+.sc.grandrow { background: rgba(45,127,249,0.10); font-weight: 700; color: #1D57B0; } /* blue: grand total */
+
+/* Fold mechanics: hidden rows keep their numbers, like Excel */
+.sheet .rowhide { display: none !important; }
+.sheet .csq {                                     /* squeeze a column to zero width */
+    padding: 0 !important;
+    border-right-width: 0 !important;
+    font-size: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden;
+}
+
+/* ===========================================
+   OUTLINE GUTTER — level buttons, brackets, fold buttons
+   =========================================== */
+.sheet .og {                      /* row-outline gutter cell */
+    background: var(--header-grey);
+    min-width: 46px;
+    position: relative;
+    padding: 0;
+    border-right: 1px solid var(--grid-line);
+    border-bottom: 1px solid var(--grid-line);
+}
+.sheet .og.corner, .sheet .ogh.corner {
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px; padding: 4px 6px;
+}
+.lb {                             /* level buttons: 1 2 3 */
+    width: 27px; height: 27px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+    background: var(--panel); border: 1.5px solid #B7BEC7; border-radius: 5px;
+    color: var(--text-dim);
+    transition: background 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
+}
+.lb.cur {
+    background: rgba(45,127,249,0.12); border-color: var(--hl-result);
+    color: #1D57B0; box-shadow: 0 0 0 3px rgba(45,127,249,0.18);
+}
+.og.bar::before {                 /* bracket bar spanning a group's detail rows */
+    content: '';
+    position: absolute; left: 50%; transform: translateX(-50%);
+    top: -1px; bottom: -1px; width: 3px;
+    background: #98A1AA;
+}
+.og.minus, .og.plus { animation: cellpop 0.45s var(--ease) var(--d, 0s); }
+.og.minus::after, .og.plus::after {   /* fold button at the summary row */
+    content: '−';
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 29px; height: 29px;
+    background: var(--panel); border: 1.5px solid #98A1AA; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 19px; font-weight: 700;
+    color: var(--text);
+}
+.og.plus::after { content: '+'; color: var(--excel-green); }
+.og.hotbtn::after { border-color: var(--hl-result); box-shadow: 0 0 0 3px rgba(45,127,249,0.22); }
+
+/* Column-outline gutter: a row ABOVE the column letters */
+.sheet .ogh {
+    background: var(--header-grey);
+    height: 40px;
+    position: relative;
+    padding: 0;
+    border-right: 1px solid var(--grid-line);
+    border-bottom: 1px solid var(--grid-line);
+}
+.ogh.hbar::before {
+    content: '';
+    position: absolute; top: 50%; transform: translateY(-50%);
+    left: -1px; right: -1px; height: 3px;
+    background: #98A1AA;
+}
+.ogh.minus, .ogh.plus { animation: cellpop 0.45s var(--ease) var(--d, 0s); }
+.ogh.minus::after, .ogh.plus::after {
+    content: '−';
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 29px; height: 29px;
+    background: var(--panel); border: 1.5px solid #98A1AA; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 19px; font-weight: 700;
+    color: var(--text);
+}
+.ogh.plus::after { content: '+'; color: var(--excel-green); }
+
+/* ===========================================
+   RIBBON MOCK — Data tab › Outline group
+   =========================================== */
+.ribbon {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 12px;
+    overflow: hidden;
+    width: max-content;
+    flex: 0 0 auto;
+    box-shadow: 0 1px 3px rgba(26,29,33,0.06);
+}
+.rtabs { display: flex; gap: 2px; background: var(--header-grey); padding: 8px 12px 0; font-size: 17px; }
+.rtab { padding: 7px 18px; border-radius: 8px 8px 0 0; color: var(--text-dim); }
+.rtab.on { background: var(--panel); color: var(--excel-green); font-weight: 600; }
+.rbody { display: flex; align-items: stretch; padding: 10px 18px 8px; gap: 4px; }
+.rgroup {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 0 18px;
+    border-right: 1px dashed var(--grid-line);
+}
+.rgroup:last-child { border-right: none; }
+.rbtns { display: flex; gap: 8px; }
+.rbtn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font-size: 16px; padding: 8px 14px; border-radius: 8px;
+    border: 1.5px solid transparent;
+    color: var(--text);
+    transition: background 0.35s, border-color 0.35s;
+}
+.rbtn .ic { font-size: 24px; line-height: 1; color: var(--excel-green); }
+.rbtn.hot { border-color: var(--excel-green); background: var(--green-soft); animation: cellpop 0.45s var(--ease); }
+.rbtn.dimmed { opacity: 0.35; }
+.rgname { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+/* Dropdown / submenu card (Group ▾, Go To Special path) */
+.menucard {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 10px 30px rgba(26,29,33,0.12);
+    font-size: 20px;
+    width: max-content;
+}
+.menucard .mi { padding: 6px 14px; border-radius: 8px; color: var(--text-dim); }
+.menucard .mi.sel { background: var(--green-soft); color: var(--excel-green); font-weight: 600; }
+
+/* ===========================================
+   SUBTOTAL DIALOG MOCK
+   =========================================== */
+.xldialog {
+    background: var(--panel);
+    border: 1px solid #B7BEC7;
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(26,29,33,0.18);
+    width: 470px;
+    font-size: 19px;
+    overflow: hidden;
+    flex: 0 0 auto;
+}
+.xldialog.smalld { width: 420px; font-size: 17.5px; }
+.xdtitle {
+    background: var(--header-grey);
+    padding: 10px 18px;
+    font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.xdtitle .x { color: var(--text-dim); font-size: 17px; }
+.xdbody { padding: 16px 22px; display: flex; flex-direction: column; gap: 11px; }
+.xdlabel { font-size: 16.5px; color: var(--text-dim); }
+.xdselect {
+    border: 1.5px solid #B7BEC7; border-radius: 7px;
+    padding: 7px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 19px; background: #fff;
+    transition: border-color 0.35s, box-shadow 0.35s;
+}
+.xdselect .car { color: var(--text-dim); font-size: 14px; }
+.xdselect.hot { border-color: var(--hl-lookup); box-shadow: 0 0 0 3px rgba(244,183,64,0.25); animation: cellpop 0.45s var(--ease); }
+.xdlist {
+    border: 1.5px solid #B7BEC7; border-radius: 7px;
+    padding: 8px 12px;
+    display: flex; flex-direction: column; gap: 3px;
+    font-size: 18px; background: #fff;
+    transition: border-color 0.35s, box-shadow 0.35s;
+}
+.xdlist.hot { border-color: var(--hl-return); box-shadow: 0 0 0 3px var(--green-soft); animation: cellpop 0.45s var(--ease); }
+.xdchk { display: flex; gap: 10px; align-items: center; }
+.xdchk .bx {
+    width: 19px; height: 19px; flex: 0 0 auto;
+    border: 1.5px solid #9AA2AC; border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: var(--excel-green); background: #fff;
+}
+.xdchk.on .bx::after { content: '✓'; }
+.xdchk.on { font-weight: 600; }
+.xdchk.hot { background: rgba(244,183,64,0.20); border-radius: 6px; box-shadow: 0 0 0 3px rgba(244,183,64,0.25); animation: cellpop 0.45s var(--ease); }
+.xdbtns { display: flex; justify-content: flex-end; gap: 10px; padding: 6px 22px 18px; }
+.xdbtn {
+    border: 1.5px solid #B7BEC7; border-radius: 7px;
+    padding: 7px 22px; font-size: 18px;
+    background: var(--header-grey); color: var(--text);
+    transition: background 0.35s, border-color 0.35s, color 0.35s;
+}
+.xdbtn.left { margin-right: auto; }
+.xdbtn.hot {
+    border-color: var(--hl-result); background: rgba(45,127,249,0.12);
+    color: #1D57B0; font-weight: 600;
+    animation: cellpop 0.45s var(--ease);
+}
+.xdbtn.hotgreen { border-color: var(--excel-green); background: var(--green-soft); color: var(--excel-green); font-weight: 600; animation: cellpop 0.45s var(--ease); }
+
+/* Keyboard keys */
+.kbd {
+    font-family: var(--font-mono); font-size: 0.85em;
+    background: var(--header-grey);
+    border: 1px solid #C3C8CF; border-bottom-width: 2.5px;
+    border-radius: 6px;
+    padding: 2px 9px;
+    white-space: nowrap;
+}
+
+/* ===========================================
+   <FormulaBuilder> — monospace formula line
+   =========================================== */
+.fml {
+    font-family: var(--font-mono);
+    font-size: 29px;
+    line-height: 2.05;
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-left: 5px solid var(--excel-green);
+    border-radius: 10px;
+    padding: 16px 26px;
+    flex: 0 0 auto;
+}
+.fml.small { font-size: 23px; }
+.fml .m { color: var(--text); }
+.fml .cellref { color: var(--text-dim); margin-right: 18px; font-size: 0.8em; }
+.seg { display: inline; }
+.chip {
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 8px;
+    border: 1.5px solid;
+    font-size: 0.92em;
+    white-space: nowrap;
+    margin: 0 2px;
+}
+.c-look { background: rgba(244,183,64,0.15); border-color: var(--hl-lookup); color: #7A5200; }
+.c-ret  { background: var(--green-soft);      border-color: var(--hl-return);  color: #0C5A32; }
+.c-res  { background: rgba(45,127,249,0.12);  border-color: var(--hl-result);  color: #1D57B0; }
+.c-opt  { background: #F3F4F6; border-style: dashed; border-color: #C3C8CF; color: var(--text-dim); }
+.c-bad  { background: rgba(229,72,77,0.08); border-color: var(--danger); color: #B4232F; }
+.fml.glow { border-color: var(--excel-green); box-shadow: 0 0 0 3px var(--green-soft); }
+.fml.dim  { opacity: 0.38; }
+
+/* Answer cells (result of a formula) */
+.ansrow { display: flex; align-items: center; gap: 16px; font-family: var(--font-mono); flex: 0 0 auto; }
+.anslabel { font-size: 19px; color: var(--text-dim); }
+.anscell {
+    min-width: 240px; min-height: 54px;
+    display: inline-flex; align-items: center;
+    padding: 8px 20px;
+    background: var(--panel);
+    border: 1.5px solid var(--grid-line);
+    border-radius: 8px;
+    font-size: 27px;
+    transition: background 0.35s, box-shadow 0.35s, color 0.35s;
+    transition-delay: var(--d, 0s);
+}
+
+/* ===========================================
+   CARDS, CALLOUTS, TAGS
+   =========================================== */
+.card {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 14px;
+    padding: 26px 30px;
+    box-shadow: 0 1px 2px rgba(26,29,33,0.04);
+}
+.card h3 { font-family: var(--font-display); font-weight: 600; font-size: 30px; margin-bottom: 10px; }
+.card p  { font-size: 22px; color: var(--text-dim); line-height: 1.45; }
+.card .mono { font-family: var(--font-mono); font-size: 21px; color: var(--text); }
+
+.callout {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-left: 6px solid var(--excel-green);
+    border-radius: 10px;
+    padding: 18px 26px;
+    font-size: 24px;
+    line-height: 1.45;
+    flex: 0 0 auto;
+}
+.callout.warn   { border-left-color: var(--hl-lookup); }
+.callout.danger { border-left-color: var(--danger); }
+.callout.big    { font-size: 30px; font-family: var(--font-display); font-weight: 600; }
+
+.tag {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--excel-green);
+    background: var(--green-soft);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--excel-green); color: #fff;
+    font-family: var(--font-display); font-weight: 700; font-size: 22px;
+    flex: 0 0 auto;
+}
+.badge.amber { background: var(--hl-lookup); color: #5C3D00; }
+.badge.blue  { background: var(--hl-result); }
+
+/* Colour-legend key rows (slide 2 + cheat sheet) */
+.keyrow { display: flex; align-items: center; gap: 16px; font-size: 23px; }
+.swatch { width: 40px; height: 40px; border-radius: 8px; flex: 0 0 auto; }
+.swatch.amber { background: rgba(244,183,64,0.25); box-shadow: inset 0 0 0 2.5px var(--hl-lookup); }
+.swatch.green { background: var(--green-soft); box-shadow: inset 0 0 0 2.5px var(--hl-return); }
+.swatch.blue  { background: rgba(45,127,249,0.12); box-shadow: inset 0 0 0 2.5px var(--hl-result); }
+
+/* Layout helpers */
+.two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.row       { display: flex; gap: 32px; align-items: flex-start; }
+.grow      { flex: 1 1 auto; min-width: 0; }
+.center-v  { display: flex; flex-direction: column; justify-content: center; }
+
+/* Reference tables (function_num) */
+.reftable { display: flex; flex-direction: column; gap: 14px; }
+.refrow {
+    display: grid;
+    grid-template-columns: 150px 1fr 560px;
+    gap: 28px; align-items: center;
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 12px;
+    padding: 18px 30px;
+}
+.refrow .val {
+    font-family: var(--font-mono); font-size: 32px; font-weight: 700;
+    color: var(--excel-green); text-align: center;
+    background: var(--green-soft); border-radius: 10px; padding: 8px 0;
+}
+.refrow .what { font-size: 26px; font-weight: 500; }
+.refrow .use  { font-size: 21px; color: var(--text-dim); }
+.refrow .def  {
+    font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+    color: var(--text-dim); background: var(--header-grey);
+    border-radius: 12px; padding: 3px 10px; margin-left: 12px;
+    vertical-align: middle; letter-spacing: 0.06em;
+}
+
+/* ===========================================
+   TITLE SLIDE (slide 1)
+   =========================================== */
+.title-slide .gridpaper,
+.gridpaper {
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 96px 64px;
+    opacity: 0.45;
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 30%, transparent 100%);
+            mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 30%, transparent 100%);
+}
+.t-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 30px;
+    padding: 0 120px;
+}
+.morph { position: relative; height: 110px; width: 100%; font-family: var(--font-mono); font-size: 76px; font-weight: 500; }
+.morph span { position: absolute; left: 50%; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.m-old { color: var(--text-dim); }
+.m-new { color: var(--excel-green); opacity: 0; font-weight: 700; }
+.slide.visible .m-old { animation: mOut 0.9s var(--ease) 1.3s forwards; }
+.slide.visible .m-new { animation: mIn  0.9s var(--ease) 1.7s forwards; }
+@keyframes mOut { to { opacity: 0; filter: blur(8px); transform: translateX(-50%) translateY(-18px); } }
+@keyframes mIn  { from { opacity: 0; filter: blur(8px); transform: translateX(-50%) translateY(18px); }
+                  to   { opacity: 1; filter: none;      transform: translateX(-50%) translateY(0); } }
+.title-slide h1 {
+    font-family: var(--font-title);
+    font-weight: 600; font-size: 108px; letter-spacing: 0; line-height: 1.05;
+}
+.title-slide h1 .arrow { color: var(--excel-green); }
+.title-slide .sub { font-size: 32px; color: var(--text-dim); }
+.fchips { display: flex; gap: 20px; }
+.fchip {
+    font-size: 23px; background: var(--panel);
+    border: 1px solid var(--grid-line); border-radius: 30px;
+    padding: 10px 26px; box-shadow: 0 1px 3px rgba(26,29,33,0.05);
+}
+
+/* ===========================================
+   PER-SLIDE LAYOUTS
+   =========================================== */
+/* s06 — five pains */
+.pains { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; flex: 1; align-content: start; }
+.pains .card { display: flex; flex-direction: column; }
+.pains .card h3 { font-size: 25px; }
+.pains .card p { font-size: 19px; flex: 1; }
+.pains .num { font-family: var(--font-display); font-size: 40px; font-weight: 700; color: var(--danger); margin-bottom: 8px; }
+
+/* s07 — anatomy: sheet + term cards side by side */
+.anwrap { display: flex; gap: 44px; align-items: flex-start; flex: 1; min-height: 0; }
+.terms { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+.terms .card h3 { font-size: 26px; display: flex; align-items: center; gap: 14px; }
+.terms .card p { font-size: 20px; }
+
+/* s15 — headline stats */
+.statrow { display: flex; gap: 26px; flex: 0 0 auto; }
+.stat {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-top: 6px solid var(--danger);
+    border-radius: 14px;
+    padding: 20px 34px;
+    text-align: center;
+}
+.stat .big { font-family: var(--font-display); font-size: 54px; font-weight: 700; color: var(--danger); line-height: 1.1; }
+.stat .lab { font-size: 19px; color: var(--text-dim); margin-top: 6px; max-width: 260px; }
+
+/* s22 — cheat sheet */
+.cheat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; flex: 1; align-content: start; }
+.cheat .span3 { grid-column: 1 / -1; }
+.cheat h3 { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 12px; }
+.minitable { width: 100%; border-collapse: collapse; font-size: 19px; }
+.minitable td { border: 1px solid var(--grid-line); padding: 7px 14px; }
+.minitable td:first-child { font-family: var(--font-mono); font-weight: 700; color: var(--excel-green); text-align: center; width: 74px; }
+.minitable.wide td:first-child { width: 190px; font-size: 16px; }
+.checklist { list-style: none; font-size: 19px; line-height: 1.5; }
+.checklist li { padding: 5px 0 5px 34px; position: relative; }
+.checklist li::before { content: "✓"; position: absolute; left: 4px; color: var(--excel-green); font-weight: 700; }
+.numlist { list-style: none; counter-reset: nl; font-size: 19px; line-height: 1.5; }
+.numlist li { counter-increment: nl; padding: 5px 0 5px 36px; position: relative; }
+.numlist li::before {
+    content: counter(nl); position: absolute; left: 0; top: 6px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--green-soft); color: var(--excel-green);
+    font-family: var(--font-display); font-weight: 700; font-size: 16px;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+
+/* s23 — gotcha cards */
+.gotchas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; flex: 1; align-content: start; }
+.gotchas .card h3 { font-family: var(--font-mono); font-size: 24px; color: var(--danger); }
+.gotchas .card .fix { color: var(--excel-green); font-weight: 600; margin-top: 10px; font-size: 20px; }
+
+/* s24 — teach it */
+.teach { display: grid; grid-template-columns: 1fr 1.15fr; gap: 32px; flex: 1; min-height: 0; }
+.points { list-style: none; counter-reset: pt; display: flex; flex-direction: column; gap: 13px; }
+.points li { counter-increment: pt; display: flex; gap: 16px; font-size: 21.5px; line-height: 1.35; align-items: baseline; }
+.points li::before {
+    content: counter(pt);
+    font-family: var(--font-display); font-weight: 700; font-size: 22px;
+    color: var(--excel-green); background: var(--green-soft);
+    border-radius: 50%; min-width: 38px; height: 38px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: 0 0 auto; align-self: flex-start;
+}
+.points b { font-weight: 600; }
+.challenge { margin-bottom: 14px; }
+.challenge .q { font-size: 21px; font-weight: 500; margin-bottom: 8px; }
+.challenge .ansf { font-family: var(--font-mono); font-size: 18.5px; background: var(--header-grey); border-radius: 8px; padding: 10px 16px; }
+.challenge .ansf .res { color: var(--excel-green); font-weight: 700; }
+.closing { font-family: var(--font-display); font-size: 33px; font-weight: 600; text-align: center; margin-top: 6px; flex: 0 0 auto; }
+.closing em { color: var(--excel-green); font-style: normal; }
+
+/* Floating annotation labels beside grids */
+.floatlabel {
+    font-size: 20px; font-weight: 600; color: var(--text);
+    background: var(--panel); border: 1.5px solid var(--grid-line);
+    border-radius: 10px; padding: 10px 18px;
+    box-shadow: 0 4px 14px rgba(26,29,33,0.08);
+    display: inline-block;
+}
+.floatlabel .mono { font-family: var(--font-mono); }
+
+/* ===========================================
+   SECTION RAIL (chrome, lives OUTSIDE the stage)
+   =========================================== */
+.rail {
+    position: fixed; left: 16px; top: 50%;
+    transform: translateY(-50%);
+    z-index: 900;
+    width: 208px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--grid-line);
+    border-radius: 14px;
+    padding: 16px 12px 12px;
+    box-shadow: 0 10px 34px rgba(26,29,33,0.10);
+    font-family: var(--font-body);
+}
+.railtitle {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.16em; color: var(--excel-green);
+    padding: 0 10px 10px; text-transform: uppercase;
+}
+.rail .sec {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 15px; color: var(--text-dim);
+    padding: 8px 10px; border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+.rail .sec:hover { background: var(--header-grey); }
+.rail .sec.cur { background: var(--green-soft); color: var(--excel-green); font-weight: 600; }
+.rail .sec .n { font-family: var(--font-mono); font-size: 11px; opacity: 0.75; min-width: 14px; }
+.railfoot {
+    margin-top: 10px; border-top: 1px solid var(--grid-line);
+    padding: 10px 10px 2px;
+    font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);
+    display: flex; flex-direction: column; gap: 5px;
+}
+#railStep { color: var(--excel-green); min-height: 16px; }
+.railhint { font-size: 11px; opacity: 0.75; }
+@media (max-width: 1080px) { .rail { display: none; } }
+
+/* ===========================================
+   INLINE EDIT CHROME (hotzone + pencil, JS-controlled)
+   =========================================== */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+.edit-toggle {
+    position: fixed; top: 14px; left: 14px; z-index: 10001;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 1px solid var(--grid-line); background: var(--panel);
+    font-size: 20px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(26,29,33,0.12);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { background: var(--excel-green); color: #fff; }
+body.editing [contenteditable="true"] { outline: 2px dashed var(--hl-result); outline-offset: 2px; border-radius: 4px; cursor: text; }
+.edit-note {
+    position: fixed; top: 20px; left: 72px; z-index: 10001;
+    font-family: var(--font-mono); font-size: 13px;
+    background: var(--excel-green); color: #fff;
+    border-radius: 8px; padding: 8px 14px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+body.editing .edit-note { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+<!-- ================= § INTRO ================= -->
+
+<!-- 1 · Title -->
+<section class="slide title-slide" id="s01" data-steps="0">
+    <div class="gridpaper"></div>
+    <div class="t-center">
+        <div class="morph" aria-hidden="true">
+            <span class="m-old">2,995 rows of detail</span>
+            <span class="m-new">3 clicks to the story</span>
+        </div>
+        <h1 class="reveal">Group <span class="arrow">&amp;</span> Outline</h1>
+        <p class="reveal sub">Fold a big worksheet into its story — a self-study lesson you can turn around and teach.</p>
+        <div class="reveal fchips">
+            <span class="fchip">🌏 Top End Cyber Pulse</span>
+            <span class="fchip">🏜️ Alice Springs Cyber Pulse</span>
+        </div>
+    </div>
+</section>
+
+<!-- 2 · How this deck works -->
+<section class="slide" id="s02" data-steps="1">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>How this deck works</h2>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow">
+                <div class="card reveal">
+                    <h3>Driving it</h3>
+                    <p style="font-size:23px; line-height:1.7;">
+                        <b style="color:var(--text)">Click</b> (or <span class="mono">→</span> / <span class="mono">Space</span>) — build the current slide one step at a time, then move on<br>
+                        <b style="color:var(--text)">←</b> — undo one step, then one slide<br>
+                        <b style="color:var(--text)">E</b> — edit any text in place (Ctrl+S saves a copy)<br>
+                        <b style="color:var(--text)">Rail</b> (left) — jump between the 7 sections
+                    </p>
+                </div>
+                <div class="card reveal">
+                    <h3>The colour key — memorise this</h3>
+                    <div style="display:flex; flex-direction:column; gap:16px; margin-top:12px;">
+                        <div class="keyrow"><span class="swatch amber"></span><span><b>Amber</b> — the rows, columns or dialog fields we're selecting</span></div>
+                        <div class="keyrow"><span class="swatch green"></span><span><b>Green</b> — the subtotal and summary rows that come back</span></div>
+                        <div class="keyrow"><span class="swatch blue"></span><span><b>Blue</b> — results, grand totals and the level buttons</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="align-items:center;">
+                <div class="sheet small" data-table="demo"></div>
+                <div class="grow">
+                    <div class="floatlabel reveal">Try it now — <b>click anywhere</b> to light up a cell ▸</div>
+                    <div class="capbox" style="margin-top:14px;">
+                        <span class="cap" data-step="1">One click = one build step. That's the whole trick.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".sheet .d[data-col='Count'][data-row='2']","cls":"hl-lookup strong"}
+    ]</script>
+</section>
+
+<!-- 3 · Prerequisite knowledge -->
+<section class="slide" id="s03" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>Prerequisite knowledge</h2>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow" style="align-content:center;">
+                <div class="card reveal" style="padding:36px 40px;">
+                    <h3>✔ SUM and cell ranges</h3>
+                    <p class="mono" style="margin:14px 0; font-size:24px;">=SUM(C2:C4)</p>
+                    <p>This lesson assumes you can write a basic SUM over a range of cells, and read a reference like C2:C4 — "column C, rows 2 to 4".</p>
+                </div>
+                <div class="card reveal" style="padding:36px 40px;">
+                    <h3>✔ Sorting with Data ▸ Sort</h3>
+                    <p class="mono" style="margin:14px 0; font-size:24px;">Data ▸ Sort &amp; Filter ▸ A→Z</p>
+                    <p>Subtotals only work on data sorted by the grouping column. You'll need to know how to sort a table by one column for this part — if that's unfamiliar, pause here, look it up, and come back.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4 · Meet the two datasets -->
+<section class="slide" id="s04" data-steps="1">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>Meet the two datasets</h2>
+            <p class="lede"><b>NT Cyber Pulse 2026</b> — a door-to-door survey of 3,895 Territorians: what device they carry, and how they look after their accounts. One skill, two worlds — if you can fold <b>both</b> sheets, you actually understand it. (All numbers are synthetic, built for practice.)</p>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow">
+                <div class="reveal">
+                    <div class="floatlabel" style="margin-bottom:14px;">🌏 <b>Top End</b> — 9 suburbs, 3 councils, 2,995 people</div>
+                    <div class="sheet small te4" data-table="topend" data-cols="Council,Suburb,Surveyed,Shares pwd,No MFA"></div>
+                </div>
+                <div class="reveal">
+                    <div class="floatlabel" style="margin-bottom:14px;">🏜️ <b>Alice Springs</b> — 3 suburbs × 3 age bands, 900 people</div>
+                    <div class="sheet small al4" data-table="alice" data-cols="Suburb,Age band,Surveyed,No MFA"></div>
+                    <p style="font-size:19px; color:var(--text-dim); margin-top:12px;">Full sheet also counts Android / iPhone / no-device owners and low cyber-awareness scores.</p>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">Keep an eye on <b>Shares pwd</b> and <b>No MFA</b> — those columns are hiding a worrying story we'll surface later.</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".te4 .h[data-col='Shares pwd'], .te4 .d[data-col='Shares pwd'], .te4 .h[data-col='No MFA'], .te4 .d[data-col='No MFA']","cls":"hl-lookup"},
+        {"s":1,"sel":".al4 .h[data-col='No MFA'], .al4 .d[data-col='No MFA']","cls":"hl-lookup"}
+    ]</script>
+</section>
+
+<!-- ================= § THE OLD WAY ================= -->
+
+<!-- 5 · The old way, dissected -->
+<section class="slide" id="s05" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The old way</span>
+            <h2>The old way: build every total by hand</h2>
+            <p class="lede">Before outlines, a "summary" meant this: insert a blank row after each council block, label it, and type a SUM for every column. Watch how much typing that is — for just 9 rows of data.</p>
+        </header>
+        <div class="sbody">
+            <div class="sheet small tiny old5" data-table="topend_blank"></div>
+            <div class="capbox">
+                <span class="cap" data-step="1">insert a blank row after the block, and label it by hand</span>
+                <span class="cap" data-step="2">type a SUM for the block above — count the row numbers carefully</span>
+                <span class="cap" data-step="3">now repeat for <b>every column of every block</b> — twelve formulas, each with its own hand-picked range</span>
+                <span class="cap" data-step="4">and it's all fragile: insert one row and the ranges go stale — plus nothing folds away</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".old5 .d[data-row='4']","cls":"hl-lookup"},
+        {"s":1,"sel":".old5 .d[data-col='Council'][data-row='4']","cls":"strong","text":"Darwin Total"},
+        {"s":2,"sel":".old5 .d[data-col='Surveyed'][data-row='4']","cls":"strong","text":"=SUM(C2:C4)"},
+        {"s":3,"sel":".old5 .d[data-col='Shares pwd'][data-row='4']","text":"=SUM(D2:D4)"},
+        {"s":3,"sel":".old5 .d[data-col='No MFA'][data-row='4']","text":"=SUM(E2:E4)"},
+        {"s":3,"sel":".old5 .d[data-col='Council'][data-row='8']","text":"Litchfield Total"},
+        {"s":3,"sel":".old5 .d[data-col='Surveyed'][data-row='8']","text":"=SUM(C6:C8)"},
+        {"s":3,"sel":".old5 .d[data-col='Shares pwd'][data-row='8']","text":"=SUM(D6:D8)"},
+        {"s":3,"sel":".old5 .d[data-col='No MFA'][data-row='8']","text":"=SUM(E6:E8)"},
+        {"s":3,"sel":".old5 .d[data-col='Council'][data-row='12']","text":"Palmerston Total"},
+        {"s":3,"sel":".old5 .d[data-col='Surveyed'][data-row='12']","text":"=SUM(C10:C12)"},
+        {"s":3,"sel":".old5 .d[data-col='Shares pwd'][data-row='12']","text":"=SUM(D10:D12)"},
+        {"s":3,"sel":".old5 .d[data-col='No MFA'][data-row='12']","text":"=SUM(E10:E12)"},
+        {"s":3,"sel":".old5 .d[data-col='Council'][data-row='13']","text":"Grand Total"},
+        {"s":3,"sel":".old5 .d[data-col='Surveyed'][data-row='13']","text":"=C5+C9+C13"},
+        {"s":3,"sel":".old5 .d[data-col='Shares pwd'][data-row='13']","text":"=D5+D9+D13"},
+        {"s":3,"sel":".old5 .d[data-col='No MFA'][data-row='13']","text":"=E5+E9+E13"},
+        {"s":4,"sel":".old5 .d[data-col='Surveyed'][data-row='4'], .old5 .d[data-col='Surveyed'][data-row='8'], .old5 .d[data-col='Surveyed'][data-row='12'], .old5 .d[data-col='Surveyed'][data-row='13']","cls":"err"}
+    ]</script>
+</section>
+
+<!-- 6 · The five pains -->
+<section class="slide" id="s06" data-steps="5">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The old way</span>
+            <h2>The five pains of the hand-built summary</h2>
+            <p class="lede">Every one of these is familiar to anyone who has wrangled a long sheet. None of them are your fault — and every one has a fix waiting in this deck.</p>
+        </header>
+        <div class="sbody">
+            <div class="pains">
+                <div class="card" data-step="1">
+                    <div class="num">①</div>
+                    <h3>Buried summary</h3>
+                    <p>The totals live somewhere in a sea of detail rows. Scrolling and squinting is the interface.</p>
+                    <span class="tag">→ Collapse fixes this</span>
+                </div>
+                <div class="card" data-step="2">
+                    <div class="num">②</div>
+                    <h3>Hand-rolled ranges</h3>
+                    <p>Every <span class="mono" style="font-size:18px;">=SUM(C2:C4)</span> was counted by eye — and goes stale the moment rows move.</p>
+                    <span class="tag">→ The Subtotal dialog fixes this</span>
+                </div>
+                <div class="card" data-step="3">
+                    <div class="num">③</div>
+                    <h3>Double counting</h3>
+                    <p>Sum a whole column that already contains total rows and everything is counted twice.</p>
+                    <span class="tag">→ SUBTOTAL fixes this</span>
+                </div>
+                <div class="card" data-step="4">
+                    <div class="num">④</div>
+                    <h3>Invisible hiding</h3>
+                    <p>Hiding rows by hand leaves no visible trace of what's hidden, or where, or how to bring it back.</p>
+                    <span class="tag">→ Outline symbols fix this</span>
+                </div>
+                <div class="card" data-step="5">
+                    <div class="num">⑤</div>
+                    <h3>Copy grabs everything</h3>
+                    <p>Copy your tidy collapsed "summary" and the hidden detail rows ride along into the paste.</p>
+                    <span class="tag">→ Go To Special fixes this</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= § GROUP & FOLD ================= -->
+
+<!-- 7 · Anatomy of an outline -->
+<section class="slide" id="s07" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Group &amp; fold</span>
+            <h2>Anatomy of an outline</h2>
+            <p class="lede">An outline is Excel folding your rows into <b>levels</b>, like a paper map: level 1 is the whole Territory in one line, level 2 shows a line per council, level 3 opens the full detail. The controls live in a strip down the left edge of the grid — here's every part of it.</p>
+        </header>
+        <div class="sbody">
+            <div class="anwrap">
+                <div class="sheet small an7" data-table="topend_sub" data-cols="Council,Suburb,Surveyed,No MFA" data-outline="1"></div>
+                <div class="terms">
+                    <div class="card" data-step="1">
+                        <h3><span class="badge blue">1</span> Level buttons</h3>
+                        <p><b>1</b> = grand total only · <b>2</b> = council totals · <b>3</b> = every row. One click sets the whole sheet's zoom level.</p>
+                    </div>
+                    <div class="card" data-step="2">
+                        <h3><span class="badge amber">2</span> Brackets</h3>
+                        <p>Each vertical bar spans one group's detail rows — you can <b>see</b> what belongs together, and what's currently folded.</p>
+                    </div>
+                    <div class="card" data-step="3">
+                        <h3><span class="badge">3</span> Fold buttons</h3>
+                        <p>The <b>−</b> sits beside each group's summary row. Click it to fold that group; it becomes a <b>+</b> that unfolds it.</p>
+                    </div>
+                    <div class="card" data-step="4">
+                        <h3><span class="badge blue">4</span> A folded view</h3>
+                        <p>Level 2: three council lines and a grand total. The 9 detail rows are hidden, <b>not deleted</b> — the row numbers still jump 2 → 6.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".an7 .sc[data-row='4']:not(.og), .an7 .sc[data-row='8']:not(.og), .an7 .sc[data-row='12']:not(.og)","cls":"sumrow"},
+        {"s":0,"sel":".an7 .sc[data-row='13']:not(.og)","cls":"grandrow"},
+        {"s":1,"sel":".an7 .lb","cls":"cur"},
+        {"s":2,"sel":".an7 .og[data-row='1'], .an7 .og[data-row='2'], .an7 .og[data-row='3'], .an7 .og[data-row='5'], .an7 .og[data-row='6'], .an7 .og[data-row='7'], .an7 .og[data-row='9'], .an7 .og[data-row='10'], .an7 .og[data-row='11']","cls":"bar"},
+        {"s":3,"sel":".an7 .og[data-row='4'], .an7 .og[data-row='8'], .an7 .og[data-row='12']","cls":"minus"},
+        {"s":4,"sel":".an7 .sc[data-row='1'], .an7 .sc[data-row='2'], .an7 .sc[data-row='3'], .an7 .sc[data-row='5'], .an7 .sc[data-row='6'], .an7 .sc[data-row='7'], .an7 .sc[data-row='9'], .an7 .sc[data-row='10'], .an7 .sc[data-row='11']","cls":"rowhide"},
+        {"s":4,"sel":".an7 .og[data-row='4'], .an7 .og[data-row='8'], .an7 .og[data-row='12']","rm":"minus","cls":"plus"},
+        {"s":4,"sel":".an7 .lb","rm":"cur"},
+        {"s":4,"sel":".an7 .lb[data-lvl='2']","cls":"cur"}
+    ]</script>
+</section>
+
+<!-- 8 · Group, one action at a time -->
+<section class="slide" id="s08" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Group &amp; fold</span>
+            <h2>Group, one action at a time</h2>
+            <p class="lede">Grouping draws one bracket. You pick the detail rows — <b>not</b> their summary row, and not the header — and tell Excel they belong together. We've already added the summary rows here; the smart way to fill them comes next section.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="sheet small sh8" data-table="topend_sub" data-cols="Council,Suburb,Surveyed" data-rows="8" data-outline="1"></div>
+                <div class="center-v grow" style="gap:20px;">
+                    <div class="ribbon">
+                        <div class="rtabs">
+                            <span class="rtab">File</span><span class="rtab">Home</span><span class="rtab">Insert</span><span class="rtab">Formulas</span><span class="rtab on">Data</span><span class="rtab">Review</span><span class="rtab">View</span>
+                        </div>
+                        <div class="rbody">
+                            <div class="rgroup">
+                                <div class="rbtns">
+                                    <div class="rbtn" id="rb8-group"><span class="ic">▦</span>Group ▾</div>
+                                    <div class="rbtn"><span class="ic">▧</span>Ungroup ▾</div>
+                                    <div class="rbtn"><span class="ic">∑</span>Subtotal</div>
+                                </div>
+                                <span class="rgname">Outline</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menucard" data-step="3" style="align-self:flex-start;">
+                        <div style="font-weight:600; margin-bottom:8px;">Group</div>
+                        <div class="mi sel">◉ Rows</div>
+                        <div class="mi">○ Columns</div>
+                        <div class="mi" style="text-align:right; margin-top:8px;"><span class="kbd" style="font-size:15px;">OK</span></div>
+                    </div>
+                    <div class="floatlabel" data-step="4">Keyboard: <span class="kbd">Alt</span>+<span class="kbd">Shift</span>+<span class="kbd">→</span> groups the selected rows in one hit</div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">select the three Darwin <b>detail</b> rows — leave the Darwin Total row out of it</span>
+                <span class="cap" data-step="2">one command: <b>Data ▸ Outline ▸ Group</b></span>
+                <span class="cap" data-step="3">asked Rows or Columns? <b>Rows</b>. (Select entire rows first and this dialog never appears)</span>
+                <span class="cap" data-step="4">the bracket lands: a bar over the details, a <b>−</b> beside their summary row</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".sh8 .sc[data-row='4']:not(.og), .sh8 .sc[data-row='8']:not(.og)","cls":"sumrow"},
+        {"s":1,"sel":".sh8 .d[data-row='1'], .sh8 .d[data-row='2'], .sh8 .d[data-row='3'], .sh8 .rn[data-row='1'], .sh8 .rn[data-row='2'], .sh8 .rn[data-row='3']","cls":"selrow"},
+        {"s":2,"sel":"#rb8-group","cls":"hot"},
+        {"s":4,"sel":".sh8 .og[data-row='1'], .sh8 .og[data-row='2'], .sh8 .og[data-row='3']","cls":"bar"},
+        {"s":4,"sel":".sh8 .og[data-row='4']","cls":"minus"}
+    ]</script>
+</section>
+
+<!-- 9 · Fold, unfold, level buttons -->
+<section class="slide" id="s09" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Group &amp; fold</span>
+            <h2>Fold, unfold, and the level buttons</h2>
+            <p class="lede">All three councils are grouped now. This is where the outline pays rent: the same sheet can be a one-line answer, a three-line report, or the full detail — and switching between them is one click, not ten minutes of hiding rows.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="sheet small sh9" data-table="topend_sub" data-cols="Council,Suburb,Surveyed,Shares pwd,No MFA" data-outline="1"></div>
+                <div class="center-v grow" style="gap:18px;">
+                    <div class="floatlabel" data-step="3" style="border-color:var(--hl-result);">Level buttons work the <b>whole sheet</b> at once — no hunting for individual <b>−</b> buttons.</div>
+                    <div class="floatlabel" data-step="4">Per group, the keyboard does it too: <span class="kbd">Alt</span>+<span class="kbd">Shift</span>+<span class="kbd">=</span> show detail · <span class="kbd">Alt</span>+<span class="kbd">Shift</span>+<span class="kbd">−</span> hide detail</div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">click the <b>−</b> beside Darwin Total → three rows fold into one. Hidden, not gone</span>
+                <span class="cap" data-step="2">the <b>−</b> became a <b>+</b> — click it and the detail comes straight back</span>
+                <span class="cap" data-step="3">press level button <b>2</b> → every group folds at once: totals only</span>
+                <span class="cap" data-step="4">press <b>3</b> → the full detail returns. Flip views as fast as you can click</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".sh9 .sc[data-row='4']:not(.og), .sh9 .sc[data-row='8']:not(.og), .sh9 .sc[data-row='12']:not(.og)","cls":"sumrow"},
+        {"s":0,"sel":".sh9 .sc[data-row='13']:not(.og)","cls":"grandrow"},
+        {"s":0,"sel":".sh9 .og[data-row='1'], .sh9 .og[data-row='2'], .sh9 .og[data-row='3'], .sh9 .og[data-row='5'], .sh9 .og[data-row='6'], .sh9 .og[data-row='7'], .sh9 .og[data-row='9'], .sh9 .og[data-row='10'], .sh9 .og[data-row='11']","cls":"bar"},
+        {"s":0,"sel":".sh9 .og[data-row='4'], .sh9 .og[data-row='8'], .sh9 .og[data-row='12']","cls":"minus"},
+        {"s":0,"sel":".sh9 .lb[data-lvl='3']","cls":"cur"},
+        {"s":1,"sel":".sh9 .sc[data-row='1'], .sh9 .sc[data-row='2'], .sh9 .sc[data-row='3']","cls":"rowhide"},
+        {"s":1,"sel":".sh9 .og[data-row='4']","rm":"minus","cls":"plus hotbtn"},
+        {"s":2,"sel":".sh9 .sc[data-row='1'], .sh9 .sc[data-row='2'], .sh9 .sc[data-row='3']","rm":"rowhide"},
+        {"s":2,"sel":".sh9 .og[data-row='4']","rm":"plus hotbtn","cls":"minus"},
+        {"s":3,"sel":".sh9 .sc[data-row='1'], .sh9 .sc[data-row='2'], .sh9 .sc[data-row='3'], .sh9 .sc[data-row='5'], .sh9 .sc[data-row='6'], .sh9 .sc[data-row='7'], .sh9 .sc[data-row='9'], .sh9 .sc[data-row='10'], .sh9 .sc[data-row='11']","cls":"rowhide"},
+        {"s":3,"sel":".sh9 .og[data-row='4'], .sh9 .og[data-row='8'], .sh9 .og[data-row='12']","rm":"minus","cls":"plus"},
+        {"s":3,"sel":".sh9 .lb[data-lvl='3']","rm":"cur"},
+        {"s":3,"sel":".sh9 .lb[data-lvl='2']","cls":"cur"},
+        {"s":4,"sel":".sh9 .sc[data-row='1'], .sh9 .sc[data-row='2'], .sh9 .sc[data-row='3'], .sh9 .sc[data-row='5'], .sh9 .sc[data-row='6'], .sh9 .sc[data-row='7'], .sh9 .sc[data-row='9'], .sh9 .sc[data-row='10'], .sh9 .sc[data-row='11']","rm":"rowhide"},
+        {"s":4,"sel":".sh9 .og[data-row='4'], .sh9 .og[data-row='8'], .sh9 .og[data-row='12']","rm":"plus","cls":"minus"},
+        {"s":4,"sel":".sh9 .lb[data-lvl='2']","rm":"cur"},
+        {"s":4,"sel":".sh9 .lb[data-lvl='3']","cls":"cur"}
+    ]</script>
+</section>
+
+<!-- ================= § SUBTOTAL() ================= -->
+
+<!-- 10 · SUBTOTAL, one argument at a time -->
+<section class="slide" id="s10" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ SUBTOTAL()</span>
+            <h2>SUBTOTAL, one argument at a time</h2>
+            <p class="lede">The summary rows need formulas, and there's a purpose-built function for the job. It takes just two things: <b>what to do</b>, and <b>which rows to do it to</b>.</p>
+        </header>
+        <div class="sbody">
+            <div class="fml">
+                <span class="m">=SUBTOTAL(</span><span class="seg" data-step="1"><span class="chip c-ret">9</span></span><span class="seg" data-step="2"><span class="m">, </span><span class="chip c-look">C2:C4</span></span><span class="m">)</span>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1"><b>what to do</b> — 9 means SUM. (The full menu of numbers comes in two slides)</span>
+                <span class="cap" data-step="2"><b>which rows</b> — just this block's detail: Casuarina down to Nightcliff</span>
+                <span class="cap" data-step="3">the block's total lands in the summary row</span>
+                <span class="cap" data-step="4">drag it across and label the row — every column gets a live block total</span>
+            </div>
+            <div class="sheet small st10" data-table="topend_blank" data-rows="4"></div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":2,"sel":".st10 .d[data-col='Surveyed'][data-row='1'], .st10 .d[data-col='Surveyed'][data-row='2'], .st10 .d[data-col='Surveyed'][data-row='3']","cls":"hl-lookup"},
+        {"s":3,"sel":".st10 .d[data-col='Surveyed'][data-row='4']","cls":"hl-result","text":"1,315"},
+        {"s":4,"sel":".st10 .d[data-col='Shares pwd'][data-row='4']","text":"540"},
+        {"s":4,"sel":".st10 .d[data-col='No MFA'][data-row='4']","text":"723"},
+        {"s":4,"sel":".st10 .d[data-col='Council'][data-row='4']","cls":"strong","text":"Darwin Total"},
+        {"s":4,"sel":".st10 .d[data-row='4']","cls":"sumrow"}
+    ]</script>
+</section>
+
+<!-- 11 · The grand-total trick -->
+<section class="slide" id="s11" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ SUBTOTAL()</span>
+            <h2>Why not SUM? The grand-total trick</h2>
+            <p class="lede">The grand total has a problem: the range under it now holds detail rows <b>and</b> three council totals. Point a formula at the whole column and here's what each function does with it.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="center-v" style="gap:18px; flex:1; min-width:0;">
+                    <div class="fml small" id="f11sum"><span class="cellref">C15</span><span class="m">=SUM(C2:C13)&nbsp;&nbsp;→ </span><span class="err" id="a11sum"></span></div>
+                    <div class="fml small" id="f11sub"><span class="cellref">C15</span><span class="m">=SUBTOTAL(9, C2:C13)&nbsp;&nbsp;→ </span><span class="ok" id="a11sub"></span></div>
+                    <div class="capbox" style="height:76px;">
+                        <span class="cap" data-step="1">SUM counts the detail rows <b>and</b> the subtotal rows — every person twice</span>
+                        <span class="cap" data-step="2">SUBTOTAL quietly <b>skips any other SUBTOTALs</b> inside its range…</span>
+                        <span class="cap" data-step="3">…so the grand total is right: 2,995 people, counted once</span>
+                    </div>
+                    <div class="callout" data-step="3"><b>One habit to build:</b> inside grouped data, totals are always <span class="mono" style="font-family:var(--font-mono);">SUBTOTAL</span>, never SUM. Bonus: it also ignores rows hidden by filtering.</div>
+                </div>
+                <div class="sheet tiny sh11" data-table="topend_sub" data-cols="Council,Suburb,Surveyed"></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".sh11 .sc[data-row='4']:not(.og), .sh11 .sc[data-row='8']:not(.og), .sh11 .sc[data-row='12']:not(.og)","cls":"sumrow"},
+        {"s":0,"sel":".sh11 .sc[data-row='13']:not(.og)","cls":"grandrow"},
+        {"s":1,"sel":".sh11 .d[data-col='Surveyed']:not([data-row='13'])","cls":"hl-lookup"},
+        {"s":1,"sel":"#a11sum","text":"5,990 ✗"},
+        {"s":2,"sel":"#f11sum","cls":"dim"},
+        {"s":2,"sel":"#f11sub","cls":"glow"},
+        {"s":2,"sel":".sh11 .d[data-col='Surveyed'][data-row='4'], .sh11 .d[data-col='Surveyed'][data-row='8'], .sh11 .d[data-col='Surveyed'][data-row='12']","cls":"dim"},
+        {"s":3,"sel":".sh11 .d[data-col='Surveyed'][data-row='13']","cls":"hl-result"},
+        {"s":3,"sel":"#a11sub","text":"2,995 ✓"}
+    ]</script>
+</section>
+
+<!-- 12 · function_num reference -->
+<section class="slide" id="s12" data-steps="5">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ SUBTOTAL()</span>
+            <h2><span style="font-family:var(--font-mono);">function_num</span> — what to do at each cut</h2>
+            <p class="lede">The first argument picks the calculation. Same formula shape every time — only the number changes. These are the ones worth memorising:</p>
+        </header>
+        <div class="sbody">
+            <div class="reftable grow" style="justify-content:center;">
+                <div class="refrow" data-step="1">
+                    <div class="val">9</div>
+                    <div class="what">SUM<span class="def">THE WORKHORSE</span></div>
+                    <div class="use">how many people, how many passwords shared — most totals are this</div>
+                </div>
+                <div class="refrow" data-step="2">
+                    <div class="val">1</div>
+                    <div class="what">AVERAGE</div>
+                    <div class="use">the mean per suburb — e.g. average respondents per age band</div>
+                </div>
+                <div class="refrow" data-step="3">
+                    <div class="val">2</div>
+                    <div class="what">COUNT</div>
+                    <div class="use">how many numeric entries a block has — a quick row-tally per group</div>
+                </div>
+                <div class="refrow" data-step="4">
+                    <div class="val">4</div>
+                    <div class="what">MAX <span style="color:var(--text-dim); font-size:0.75em;">(5 = MIN)</span></div>
+                    <div class="use">the worst suburb in the block — the biggest No-MFA count</div>
+                </div>
+                <div class="refrow" data-step="5">
+                    <div class="val">+100</div>
+                    <div class="what">109, 101, 102…</div>
+                    <div class="use">same jobs, but they also ignore rows you've hidden by hand — not just filtered ones</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= § THE SUBTOTAL DIALOG ================= -->
+
+<!-- 13 · Sort first -->
+<section class="slide" id="s13" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The Subtotal dialog</span>
+            <h2>Before the shortcut: sort first</h2>
+            <p class="lede">Everything so far, Excel can do <b>for</b> you — one dialog inserts every summary row, every formula and the whole outline. But it cuts a new subtotal <b>every time the grouping value changes</b>, so the same council scattered through the sheet gets several totals. One rule protects you.</p>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow">
+                <div data-step="1">
+                    <div class="floatlabel" style="margin-bottom:14px; border-color:var(--danger);">✗ unsorted — Darwin appears twice, so Darwin gets <b>two totals</b></div>
+                    <div class="sheet small frag13" data-table="topend_frag"></div>
+                </div>
+                <div data-step="2">
+                    <div class="floatlabel" style="margin-bottom:14px; border-color:var(--excel-green);">✓ sorted by Council — one block, one total</div>
+                    <div class="sheet small ok13" data-table="topend_ok"></div>
+                </div>
+            </div>
+            <div class="callout warn"><b>The rule:</b> sort by the grouping column (<span class="kbd">Data</span> ▸ <span class="kbd">Sort</span>) <b>before</b> opening the Subtotal dialog.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".frag13 .sc[data-row='2']:not(.og), .frag13 .sc[data-row='4']:not(.og), .frag13 .sc[data-row='6']:not(.og)","cls":"sumrow"},
+        {"s":1,"sel":".frag13 .d[data-col='Council'][data-row='2'], .frag13 .d[data-col='Council'][data-row='6']","cls":"blocked"},
+        {"s":2,"sel":".ok13 .sc[data-row='3']:not(.og), .ok13 .sc[data-row='5']:not(.og)","cls":"sumrow"},
+        {"s":2,"sel":".ok13 .d[data-col='Council'][data-row='3'], .ok13 .d[data-col='Council'][data-row='5']","cls":"ok"}
+    ]</script>
+</section>
+
+<!-- 14 · The Subtotal dialog, one field at a time -->
+<section class="slide" id="s14" data-steps="5">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The Subtotal dialog</span>
+            <h2>The Subtotal dialog, one field at a time</h2>
+            <p class="lede"><span class="kbd">Data</span> ▸ Outline ▸ <span class="kbd">Subtotal</span> opens one small dialog. Three questions — where to cut, what to calculate, which columns — and it does everything from the last three sections in one hit.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="xldialog">
+                    <div class="xdtitle">Subtotal <span class="x">✕</span></div>
+                    <div class="xdbody">
+                        <span class="xdlabel">At each change in:</span>
+                        <div class="xdselect" id="xd14-change"><span>Council</span><span class="car">▾</span></div>
+                        <span class="xdlabel">Use function:</span>
+                        <div class="xdselect" id="xd14-func"><span>Sum</span><span class="car">▾</span></div>
+                        <span class="xdlabel">Add subtotal to:</span>
+                        <div class="xdlist" id="xd14-list">
+                            <div class="xdchk" id="xd14-c1"><span class="bx"></span>Surveyed</div>
+                            <div class="xdchk"><span class="bx"></span>Android</div>
+                            <div class="xdchk"><span class="bx"></span>iPhone</div>
+                            <div class="xdchk"><span class="bx"></span>No device</div>
+                            <div class="xdchk" id="xd14-c2"><span class="bx"></span>Shares pwd</div>
+                            <div class="xdchk" id="xd14-c3"><span class="bx"></span>No MFA</div>
+                        </div>
+                        <div class="xdchk"><span class="bx"></span>Replace current subtotals</div>
+                        <div class="xdchk"><span class="bx"></span>Page break between groups</div>
+                        <div class="xdchk on" id="xd14-below"><span class="bx"></span>Summary below data</div>
+                    </div>
+                    <div class="xdbtns">
+                        <button class="xdbtn left">Remove All</button>
+                        <button class="xdbtn" id="xd14-ok">OK</button>
+                        <button class="xdbtn">Cancel</button>
+                    </div>
+                </div>
+                <div class="grow">
+                    <div class="sheet tiny sh14" data-table="topend_sub" data-cols="Council,Suburb,Surveyed,Shares pwd,No MFA" data-outline="1"></div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1"><b>where to cut</b> — every time the Council value changes, insert a subtotal</span>
+                <span class="cap" data-step="2"><b>what to calculate</b> at each cut — Sum</span>
+                <span class="cap" data-step="3"><b>which columns</b> get a total — tick the three we care about</span>
+                <span class="cap" data-step="4">totals go <b>below</b> each block — then OK</span>
+                <span class="cap" data-step="5">summary rows, formulas, grand total, brackets, level buttons — <b>one dialog did all of it</b></span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".sh14 .sc[data-row='4'], .sh14 .sc[data-row='8'], .sh14 .sc[data-row='12'], .sh14 .sc[data-row='13']","cls":"rowhide"},
+        {"s":1,"sel":"#xd14-change","cls":"hot"},
+        {"s":1,"sel":".sh14 .h[data-col='Council'], .sh14 .d[data-col='Council']","cls":"hl-lookup"},
+        {"s":2,"sel":"#xd14-change","rm":"hot"},
+        {"s":2,"sel":"#xd14-func","cls":"hot"},
+        {"s":3,"sel":"#xd14-func","rm":"hot"},
+        {"s":3,"sel":"#xd14-list","cls":"hot"},
+        {"s":3,"sel":"#xd14-c1, #xd14-c2, #xd14-c3","cls":"on"},
+        {"s":3,"sel":".sh14 .h[data-col='Surveyed'], .sh14 .d[data-col='Surveyed'], .sh14 .h[data-col='Shares pwd'], .sh14 .d[data-col='Shares pwd'], .sh14 .h[data-col='No MFA'], .sh14 .d[data-col='No MFA']","cls":"hl-return"},
+        {"s":4,"sel":"#xd14-list","rm":"hot"},
+        {"s":4,"sel":"#xd14-ok","cls":"hot"},
+        {"s":5,"sel":".sh14 .h[data-col='Council'], .sh14 .d[data-col='Council']","rm":"hl-lookup"},
+        {"s":5,"sel":".sh14 .h[data-col='Surveyed'], .sh14 .d[data-col='Surveyed'], .sh14 .h[data-col='Shares pwd'], .sh14 .d[data-col='Shares pwd'], .sh14 .h[data-col='No MFA'], .sh14 .d[data-col='No MFA']","rm":"hl-return"},
+        {"s":5,"sel":".sh14 .sc[data-row='4'], .sh14 .sc[data-row='8'], .sh14 .sc[data-row='12'], .sh14 .sc[data-row='13']","rm":"rowhide"},
+        {"s":5,"sel":".sh14 .sc[data-row='4']:not(.og), .sh14 .sc[data-row='8']:not(.og), .sh14 .sc[data-row='12']:not(.og)","cls":"sumrow"},
+        {"s":5,"sel":".sh14 .sc[data-row='13']:not(.og)","cls":"grandrow"},
+        {"s":5,"sel":".sh14 .og[data-row='1'], .sh14 .og[data-row='2'], .sh14 .og[data-row='3'], .sh14 .og[data-row='5'], .sh14 .og[data-row='6'], .sh14 .og[data-row='7'], .sh14 .og[data-row='9'], .sh14 .og[data-row='10'], .sh14 .og[data-row='11']","cls":"bar"},
+        {"s":5,"sel":".sh14 .og[data-row='4'], .sh14 .og[data-row='8'], .sh14 .og[data-row='12']","cls":"minus"},
+        {"s":5,"sel":".sh14 .lb[data-lvl='3']","cls":"cur"}
+    ]</script>
+</section>
+
+<!-- 15 · The story at level 2 -->
+<section class="slide" id="s15" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The Subtotal dialog</span>
+            <h2>Press 2. Read the Territory's story.</h2>
+            <p class="lede">Collapsed to level 2, the 2,995-person survey becomes four lines — and the folded sheet says something the full detail never could say this clearly.</p>
+        </header>
+        <div class="sbody" style="justify-content:center;">
+            <div class="row grow" style="align-items:center; flex:0 1 auto;">
+                <div class="sheet small sh15" data-table="topend_sub" data-cols="Council,Suburb,Surveyed,Shares pwd,No MFA" data-outline="1"></div>
+                <div class="center-v grow" style="gap:22px;">
+                    <div class="statrow">
+                        <div class="stat" data-step="1">
+                            <div class="big">42%</div>
+                            <div class="lab">of respondents share a password with someone else — 1,260 of 2,995</div>
+                        </div>
+                        <div class="stat" data-step="2">
+                            <div class="big">56%</div>
+                            <div class="lab">have no multi-factor authentication on a single account — 1,689 people</div>
+                        </div>
+                    </div>
+                    <div class="callout danger big" data-step="3">More than half the Top End sample could be phished with one stolen password. <em style="font-style:normal; color:var(--danger);">That's</em> what a folded worksheet is for.</div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">read down Shares pwd: 540 + 337 + 383 — <b>1,260 people</b> share passwords</span>
+                <span class="cap" data-step="2">read down No MFA: <b>1,689 people</b> — and every council is over half</span>
+                <span class="cap" data-step="3">four rows, one headline. Show this view to a room, not the 2,995-row one</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".sh15 .sc[data-row='1'], .sh15 .sc[data-row='2'], .sh15 .sc[data-row='3'], .sh15 .sc[data-row='5'], .sh15 .sc[data-row='6'], .sh15 .sc[data-row='7'], .sh15 .sc[data-row='9'], .sh15 .sc[data-row='10'], .sh15 .sc[data-row='11']","cls":"rowhide"},
+        {"s":0,"sel":".sh15 .og[data-row='4'], .sh15 .og[data-row='8'], .sh15 .og[data-row='12']","cls":"plus"},
+        {"s":0,"sel":".sh15 .sc[data-row='4']:not(.og), .sh15 .sc[data-row='8']:not(.og), .sh15 .sc[data-row='12']:not(.og)","cls":"sumrow"},
+        {"s":0,"sel":".sh15 .sc[data-row='13']:not(.og)","cls":"grandrow"},
+        {"s":0,"sel":".sh15 .lb[data-lvl='2']","cls":"cur"},
+        {"s":1,"sel":".sh15 .d[data-col='Shares pwd'][data-row='4'], .sh15 .d[data-col='Shares pwd'][data-row='8'], .sh15 .d[data-col='Shares pwd'][data-row='12']","cls":"hl-lookup strong"},
+        {"s":1,"sel":".sh15 .d[data-col='Shares pwd'][data-row='13']","cls":"hl-result"},
+        {"s":2,"sel":".sh15 .d[data-col='No MFA'][data-row='4'], .sh15 .d[data-col='No MFA'][data-row='8'], .sh15 .d[data-col='No MFA'][data-row='12']","cls":"blocked"},
+        {"s":2,"sel":".sh15 .d[data-col='No MFA'][data-row='13']","cls":"blocked strong"}
+    ]</script>
+</section>
+
+<!-- 16 · Transfer: Alice Springs -->
+<section class="slide" id="s16" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The Subtotal dialog</span>
+            <h2>Same move, new world: Alice Springs</h2>
+            <p class="lede">The Alice sheet is shaped differently — each suburb has three <b>age-band</b> rows. The dialog doesn't care. Sort by Suburb, cut at each change in Suburb, and the outline appears. Then look <b>inside</b> the blocks.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="sheet tiny al16" data-table="alice_sub" data-outline="1"></div>
+                <div class="center-v grow" style="gap:18px;">
+                    <div class="floatlabel" data-step="1" style="border-color:var(--hl-lookup);">Subtotal dialog: at each change in <b>Suburb</b> · use <b>Sum</b> · add to all four number columns</div>
+                    <div class="floatlabel" data-step="3">Every suburb tells the same story — now read just the <b>60+</b> rows…</div>
+                    <div class="callout danger" data-step="4" style="font-size:26px;"><b>206 of the 250 respondents aged 60+ have no MFA — 82%.</b> The over-60s are the survey's most exposed group, in every suburb. This is the slide-ready finding.</div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">same dialog, one change: cut at each change in <b>Suburb</b></span>
+                <span class="cap" data-step="2">three suburb totals and a grand total — outline included, as always</span>
+                <span class="cap" data-step="3">the outline groups by suburb, but the detail rows still carry the age bands</span>
+                <span class="cap" data-step="4">read across the 60+ rows: 69, 78, 59 without MFA — out of just 250 older respondents</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".al16 .sc[data-row='4'], .al16 .sc[data-row='8'], .al16 .sc[data-row='12'], .al16 .sc[data-row='13']","cls":"rowhide"},
+        {"s":1,"sel":".al16 .h[data-col='Suburb'], .al16 .d[data-col='Suburb']","cls":"hl-lookup"},
+        {"s":2,"sel":".al16 .sc[data-row='4'], .al16 .sc[data-row='8'], .al16 .sc[data-row='12'], .al16 .sc[data-row='13']","rm":"rowhide"},
+        {"s":2,"sel":".al16 .sc[data-row='4']:not(.og), .al16 .sc[data-row='8']:not(.og), .al16 .sc[data-row='12']:not(.og)","cls":"sumrow"},
+        {"s":2,"sel":".al16 .sc[data-row='13']:not(.og)","cls":"grandrow"},
+        {"s":2,"sel":".al16 .og[data-row='1'], .al16 .og[data-row='2'], .al16 .og[data-row='3'], .al16 .og[data-row='5'], .al16 .og[data-row='6'], .al16 .og[data-row='7'], .al16 .og[data-row='9'], .al16 .og[data-row='10'], .al16 .og[data-row='11']","cls":"bar"},
+        {"s":2,"sel":".al16 .og[data-row='4'], .al16 .og[data-row='8'], .al16 .og[data-row='12']","cls":"minus"},
+        {"s":2,"sel":".al16 .lb[data-lvl='3']","cls":"cur"},
+        {"s":2,"sel":".al16 .h[data-col='Suburb'], .al16 .d[data-col='Suburb']","rm":"hl-lookup"},
+        {"s":3,"sel":".al16 .d[data-row='3'], .al16 .d[data-row='7'], .al16 .d[data-row='11']","cls":"selrow"},
+        {"s":4,"sel":".al16 .d[data-col='No MFA'][data-row='3'], .al16 .d[data-col='No MFA'][data-row='7'], .al16 .d[data-col='No MFA'][data-row='11']","cls":"blocked"}
+    ]</script>
+</section>
+
+<!-- 17 · Layers, replace, remove -->
+<section class="slide" id="s17" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The Subtotal dialog</span>
+            <h2>Layer it, replace it, remove it</h2>
+            <p class="lede">Three checkboxes and one button control the dialog's whole life cycle. Run it more than once and this is what decides what happens to the subtotals you already have.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow" style="align-items:center;">
+                <div class="terms grow">
+                    <div class="card" data-step="1">
+                        <h3><span class="badge">1</span> Layer another level</h3>
+                        <p>Run Subtotal <b>again</b> with <b>Replace current subtotals</b> unticked — e.g. cut Alice by Suburb, then again by Age band. The new totals nest inside the old ones: a four-level outline, with level buttons 1–4.</p>
+                    </div>
+                    <div class="card" data-step="2">
+                        <h3><span class="badge amber">2</span> Start over</h3>
+                        <p>Leave <b>Replace current subtotals</b> ticked and the new pass swaps out the old one — handy when you picked the wrong column or function.</p>
+                    </div>
+                    <div class="card" data-step="3">
+                        <h3><span class="badge blue">3</span> Take it all away</h3>
+                        <p><b>Remove All</b> deletes the inserted subtotal rows and clears the outline. Your original data comes back untouched — the whole thing was always just a layer on top.</p>
+                    </div>
+                </div>
+                <div class="xldialog smalld">
+                    <div class="xdtitle">Subtotal <span class="x">✕</span></div>
+                    <div class="xdbody">
+                        <span class="xdlabel">At each change in:</span>
+                        <div class="xdselect"><span>Age band</span><span class="car">▾</span></div>
+                        <div class="xdchk" id="xd17-replace"><span class="bx"></span>Replace current subtotals</div>
+                        <div class="xdchk on"><span class="bx"></span>Summary below data</div>
+                    </div>
+                    <div class="xdbtns">
+                        <button class="xdbtn left" id="xd17-remove">Remove All</button>
+                        <button class="xdbtn">OK</button>
+                        <button class="xdbtn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#xd17-replace","cls":"hot"},
+        {"s":2,"sel":"#xd17-replace","rm":"hot","cls":"on"},
+        {"s":3,"sel":"#xd17-remove","cls":"hotgreen"}
+    ]</script>
+</section>
+
+<!-- ================= § BEYOND ROWS ================= -->
+
+<!-- 18 · Group columns too -->
+<section class="slide" id="s18" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Beyond rows</span>
+            <h2>Columns fold too</h2>
+            <p class="lede">Rows aren't special. Here's a different cut of the survey world: <b>phishing reports</b> logged in each regional hub, month by month, with a quarterly total column after each block of months. Group the month columns and the bracket appears <b>above</b> the letters.</p>
+        </header>
+        <div class="sbody">
+            <div class="sheet small hb18" data-table="hubs" data-coutline="1"></div>
+            <div class="capbox">
+                <span class="cap" data-step="1">select the January–March columns — entire columns, from the letters</span>
+                <span class="cap" data-step="2"><b>Data ▸ Outline ▸ Group</b> → the bracket runs above the columns. Same again for April–June</span>
+                <span class="cap" data-step="3">fold both → a quarter view, and the folded sheet makes the trend impossible to miss</span>
+            </div>
+            <div class="row">
+                <div class="floatlabel" data-step="3" style="border-color:var(--danger);">Q1 → Q2: phishing reports up <b>41%</b> Territory-wide — and rising in <b>every</b> hub.</div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".hb18 .h[data-col='Q1'], .hb18 .d[data-col='Q1'], .hb18 .h[data-col='Q2'], .hb18 .d[data-col='Q2']","cls":"sumrow"},
+        {"s":1,"sel":".hb18 .cl[data-col='Jan'], .hb18 .h[data-col='Jan'], .hb18 .d[data-col='Jan'], .hb18 .cl[data-col='Feb'], .hb18 .h[data-col='Feb'], .hb18 .d[data-col='Feb'], .hb18 .cl[data-col='Mar'], .hb18 .h[data-col='Mar'], .hb18 .d[data-col='Mar']","cls":"hl-lookup"},
+        {"s":2,"sel":".hb18 .ogh[data-col='Jan'], .hb18 .ogh[data-col='Feb'], .hb18 .ogh[data-col='Mar']","cls":"hbar"},
+        {"s":2,"sel":".hb18 .ogh[data-col='Q1']","cls":"minus"},
+        {"s":2,"sel":".hb18 .ogh[data-col='Apr'], .hb18 .ogh[data-col='May'], .hb18 .ogh[data-col='Jun']","cls":"hbar","d":"0.25"},
+        {"s":2,"sel":".hb18 .ogh[data-col='Q2']","cls":"minus","d":"0.25"},
+        {"s":3,"sel":".hb18 .sc[data-col='Jan'], .hb18 .sc[data-col='Feb'], .hb18 .sc[data-col='Mar'], .hb18 .sc[data-col='Apr'], .hb18 .sc[data-col='May'], .hb18 .sc[data-col='Jun']","cls":"csq"},
+        {"s":3,"sel":".hb18 .ogh[data-col='Q1'], .hb18 .ogh[data-col='Q2']","rm":"minus","cls":"plus"}
+    ]</script>
+</section>
+
+<!-- 19 · Auto Outline -->
+<section class="slide" id="s19" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Beyond rows</span>
+            <h2>Auto Outline: one click, whole structure</h2>
+            <p class="lede">If your summary rows already contain formulas — SUBTOTAL or SUM pointing at the detail above them — Excel can <b>read</b> that structure. It follows the formulas to work out which rows belong to which total, and draws every bracket for you.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="sheet small ao19" data-table="topend_sub" data-cols="Council,Suburb,Surveyed,No MFA" data-outline="1"></div>
+                <div class="center-v grow" style="gap:20px;">
+                    <div class="ribbon">
+                        <div class="rtabs">
+                            <span class="rtab">Home</span><span class="rtab">Insert</span><span class="rtab">Formulas</span><span class="rtab on">Data</span><span class="rtab">Review</span>
+                        </div>
+                        <div class="rbody">
+                            <div class="rgroup">
+                                <div class="rbtns">
+                                    <div class="rbtn" id="rb19-group"><span class="ic">▦</span>Group ▾</div>
+                                    <div class="rbtn"><span class="ic">▧</span>Ungroup ▾</div>
+                                    <div class="rbtn"><span class="ic">∑</span>Subtotal</div>
+                                </div>
+                                <span class="rgname">Outline</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menucard" data-step="1" style="align-self:flex-start;">
+                        <div class="mi">Group…</div>
+                        <div class="mi sel">Auto Outline</div>
+                    </div>
+                    <div class="callout" data-step="2" style="font-size:21px;">Auto Outline works when the formulas point <b>consistently</b> at their own detail block — which SUBTOTAL rows from the Subtotal dialog always do. Formula columns get column outlines the same way.</div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">the summary rows hold <b>=SUBTOTAL(9,…)</b> formulas — so choose <b>Group ▾ ▸ Auto Outline</b></span>
+                <span class="cap" data-step="2">every bracket, every button, all three levels — from one click and zero selecting</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".ao19 .sc[data-row='4']:not(.og), .ao19 .sc[data-row='8']:not(.og), .ao19 .sc[data-row='12']:not(.og)","cls":"sumrow"},
+        {"s":0,"sel":".ao19 .sc[data-row='13']:not(.og)","cls":"grandrow"},
+        {"s":1,"sel":"#rb19-group","cls":"hot"},
+        {"s":2,"sel":".ao19 .og[data-row='1'], .ao19 .og[data-row='2'], .ao19 .og[data-row='3'], .ao19 .og[data-row='5'], .ao19 .og[data-row='6'], .ao19 .og[data-row='7'], .ao19 .og[data-row='9'], .ao19 .og[data-row='10'], .ao19 .og[data-row='11']","cls":"bar"},
+        {"s":2,"sel":".ao19 .og[data-row='4'], .ao19 .og[data-row='8'], .ao19 .og[data-row='12']","cls":"minus"},
+        {"s":2,"sel":".ao19 .lb","cls":"cur"}
+    ]</script>
+</section>
+
+<!-- 20 · Copy only what you see -->
+<section class="slide" id="s20" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Beyond rows</span>
+            <h2>Copy only what you see</h2>
+            <p class="lede">The folded view looks like four rows — but a normal copy takes the <b>hidden</b> detail rows along with it, and your tidy summary arrives with 9 stowaways. One old dialog fixes it.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="sheet small cv20" data-table="topend_sub" data-cols="Council,Suburb,Surveyed,No MFA" data-outline="1"></div>
+                <div class="center-v grow" style="gap:18px;">
+                    <div class="menucard" data-step="2">
+                        <div class="mi">Home ▸ Find &amp; Select ▸ <b>Go To Special…</b></div>
+                        <div class="mi sel">◉ Visible cells only</div>
+                        <div class="mi" style="text-align:right;"><span class="kbd" style="font-size:15px;">OK</span></div>
+                    </div>
+                    <div data-step="3">
+                        <div class="floatlabel" style="margin-bottom:12px; border-color:var(--excel-green);">…then copy and paste: <b>clean summary, no stowaways</b></div>
+                        <div class="sheet tiny" data-table="summary"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">select the visible summary rows — remember, 9 hidden rows are lurking inside this selection</span>
+                <span class="cap" data-step="2"><b>Go To Special ▸ Visible cells only</b> trims the selection to what's on screen</span>
+                <span class="cap" data-step="3">the paste holds exactly the four rows you could see. This trick works on any sheet with hidden rows</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".cv20 .sc[data-row='1'], .cv20 .sc[data-row='2'], .cv20 .sc[data-row='3'], .cv20 .sc[data-row='5'], .cv20 .sc[data-row='6'], .cv20 .sc[data-row='7'], .cv20 .sc[data-row='9'], .cv20 .sc[data-row='10'], .cv20 .sc[data-row='11']","cls":"rowhide"},
+        {"s":0,"sel":".cv20 .og[data-row='4'], .cv20 .og[data-row='8'], .cv20 .og[data-row='12']","cls":"plus"},
+        {"s":0,"sel":".cv20 .sc[data-row='4']:not(.og), .cv20 .sc[data-row='8']:not(.og), .cv20 .sc[data-row='12']:not(.og)","cls":"sumrow"},
+        {"s":0,"sel":".cv20 .sc[data-row='13']:not(.og)","cls":"grandrow"},
+        {"s":0,"sel":".cv20 .lb[data-lvl='2']","cls":"cur"},
+        {"s":1,"sel":".cv20 .d[data-row='4'], .cv20 .d[data-row='8'], .cv20 .d[data-row='12'], .cv20 .d[data-row='13'], .cv20 .rn[data-row='4'], .cv20 .rn[data-row='8'], .cv20 .rn[data-row='12'], .cv20 .rn[data-row='13']","cls":"selrow"}
+    ]</script>
+</section>
+
+<!-- 21 · Ungroup, clear, remove -->
+<section class="slide" id="s21" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Beyond rows</span>
+            <h2>Taking it apart again</h2>
+            <p class="lede">Three exits, from gentlest to most thorough. The thing to hold onto: an outline is a <b>view</b> laid over your data — none of these delete a single survey answer.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow" style="align-items:center;">
+                <div class="terms grow">
+                    <div class="card" data-step="1">
+                        <h3><span class="badge">1</span> Ungroup one bracket</h3>
+                        <p>Select the grouped rows ▸ <b>Data ▸ Outline ▸ Ungroup</b> (or <span class="kbd">Alt</span>+<span class="kbd">Shift</span>+<span class="kbd">←</span>). Removes that bracket only — totals and other groups stay.</p>
+                    </div>
+                    <div class="card" data-step="2">
+                        <h3><span class="badge amber">2</span> Clear Outline</h3>
+                        <p><b>Ungroup ▾ ▸ Clear Outline</b> wipes every bracket and level button at once. Careful: clear while groups are <b>folded</b> and those rows stay hidden — fix with Home ▸ Format ▸ Hide &amp; Unhide ▸ <b>Unhide Rows</b>.</p>
+                    </div>
+                    <div class="card" data-step="3">
+                        <h3><span class="badge blue">3</span> Subtotal ▸ Remove All</h3>
+                        <p>The deepest reset: clears the outline <b>and</b> deletes the subtotal rows the dialog inserted. The sheet returns to the raw 9 rows you started with.</p>
+                    </div>
+                </div>
+                <div class="ribbon" style="align-self:flex-start; margin-top:20px;">
+                    <div class="rtabs">
+                        <span class="rtab">Home</span><span class="rtab">Insert</span><span class="rtab">Formulas</span><span class="rtab on">Data</span><span class="rtab">Review</span>
+                    </div>
+                    <div class="rbody">
+                        <div class="rgroup">
+                            <div class="rbtns">
+                                <div class="rbtn"><span class="ic">▦</span>Group ▾</div>
+                                <div class="rbtn" id="rb21-ungroup"><span class="ic">▧</span>Ungroup ▾</div>
+                                <div class="rbtn" id="rb21-subtotal"><span class="ic">∑</span>Subtotal</div>
+                            </div>
+                            <span class="rgname">Outline</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#rb21-ungroup","cls":"hot"},
+        {"s":3,"sel":"#rb21-ungroup","rm":"hot"},
+        {"s":3,"sel":"#rb21-subtotal","cls":"hot"}
+    ]</script>
+</section>
+
+<!-- ================= § TEACH IT ================= -->
+
+<!-- 22 · Cheat sheet -->
+<section class="slide" id="s22" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Teach it</span>
+            <h2>The cheat sheet — screenshot this one 📸</h2>
+        </header>
+        <div class="sbody">
+            <div class="cheat">
+                <div class="card span3" style="display:flex; gap:18px; align-items:center; padding:18px 30px;">
+                    <span style="font-family:var(--font-display); font-weight:600; font-size:22px; flex:0 0 auto;">The workflow</span>
+                    <span style="font-size:20px;"><b style="color:var(--excel-green);">1</b> Sort by the grouping column&nbsp;&nbsp;→&nbsp;&nbsp;<b style="color:var(--excel-green);">2</b> Data ▸ Outline ▸ <b>Subtotal</b>&nbsp;&nbsp;→&nbsp;&nbsp;<b style="color:var(--excel-green);">3</b> Fold with the level buttons&nbsp;&nbsp;→&nbsp;&nbsp;<b style="color:var(--excel-green);">4</b> Go To Special ▸ Visible cells only ▸ copy</span>
+                </div>
+                <div class="card">
+                    <h3>SUBTOTAL(<span style="color:var(--excel-green);">n</span>, range)</h3>
+                    <table class="minitable">
+                        <tr><td>9</td><td>SUM — the workhorse</td></tr>
+                        <tr><td>1</td><td>AVERAGE</td></tr>
+                        <tr><td>2</td><td>COUNT</td></tr>
+                        <tr><td>4·5</td><td>MAX · MIN</td></tr>
+                        <tr><td>+100</td><td>also skip hand-hidden rows</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>Keyboard</h3>
+                    <table class="minitable wide">
+                        <tr><td>Alt+Shift+→</td><td>Group selection</td></tr>
+                        <tr><td>Alt+Shift+←</td><td>Ungroup selection</td></tr>
+                        <tr><td>Alt+Shift+=</td><td>Show a group's detail</td></tr>
+                        <tr><td>Alt+Shift+−</td><td>Hide a group's detail</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3>Remember</h3>
+                    <ul class="checklist">
+                        <li>Sort <b>before</b> the Subtotal dialog</li>
+                        <li>Inside grouped data: SUBTOTAL, never SUM</li>
+                        <li>The − button sits at the summary row</li>
+                        <li>Level 1 grand · 2 groups · 3 detail</li>
+                        <li>Remove All undoes everything, safely</li>
+                        <li>Folding hides rows — never deletes them</li>
+                    </ul>
+                </div>
+                <div class="card span3" style="display:flex; gap:44px; align-items:center; padding:16px 30px;">
+                    <div class="keyrow" style="font-size:19px;"><span class="swatch amber" style="width:30px;height:30px;"></span>rows / fields we select</div>
+                    <div class="keyrow" style="font-size:19px;"><span class="swatch green" style="width:30px;height:30px;"></span>subtotal rows that come back</div>
+                    <div class="keyrow" style="font-size:19px;"><span class="swatch blue" style="width:30px;height:30px;"></span>results &amp; level buttons</div>
+                    <div style="font-family:var(--font-mono); font-size:17px; color:var(--text-dim); margin-left:auto;">works in every desktop Excel · Subtotal needs a plain range, not a Table</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 23 · Gotchas -->
+<section class="slide" id="s23" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Teach it</span>
+            <h2>When it goes wrong — the six usual suspects</h2>
+        </header>
+        <div class="sbody">
+            <div class="gotchas">
+                <div class="card reveal">
+                    <h3>Subtotal is greyed out</h3>
+                    <p>Your data is formatted as an Excel Table — the Subtotal command refuses to run on one.</p>
+                    <p class="fix">Fix: Table Design ▸ Convert to Range, then try again.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>"Darwin Total" ×2</h3>
+                    <p>The data wasn't sorted, so the same council appears in separate runs — each run gets its own total.</p>
+                    <p class="fix">Fix: Remove All, sort by the grouping column, re-apply.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>Grand total is double</h3>
+                    <p>A SUM was pointed at a range that already contains subtotal rows — everything counted twice.</p>
+                    <p class="fix">Fix: use =SUBTOTAL(9, …) — it skips other SUBTOTALs automatically.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>Rows vanished</h3>
+                    <p>The outline was ungrouped or cleared while groups were folded — the detail rows stayed hidden.</p>
+                    <p class="fix">Fix: select across the gap ▸ Home ▸ Format ▸ Hide &amp; Unhide ▸ Unhide Rows.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>No + − symbols</h3>
+                    <p>The outline exists but the symbols are switched off for this worksheet.</p>
+                    <p class="fix">Fix: File ▸ Options ▸ Advanced ▸ tick "Show outline symbols if an outline is applied".</p>
+                </div>
+                <div class="card reveal" style="background:var(--green-soft); border-color:var(--excel-green);">
+                    <h3 style="color:var(--excel-green);">Golden rule</h3>
+                    <p style="color:var(--text);">Almost every mess traces back to the workflow order: <b>sort → Subtotal → fold → copy visible.</b> Re-run it in that order and the sheet heals.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 24 · Now teach it -->
+<section class="slide" id="s24" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Teach it</span>
+            <h2>Now teach it</h2>
+        </header>
+        <div class="sbody">
+            <div class="teach">
+                <div class="card">
+                    <h3 style="margin-bottom:16px;">Your six talking points</h3>
+                    <ol class="points">
+                        <li><b>An outline folds rows into levels</b> — hidden, never deleted. Level 1 grand · 2 groups · 3 detail.</li>
+                        <li><b>Two ways in:</b> Group draws the brackets yourself; the Subtotal dialog draws them <i>and</i> writes the totals.</li>
+                        <li><b>Sort first</b> — the dialog cuts at every change in the grouping column.</li>
+                        <li><b>Totals inside grouped data are SUBTOTAL(9,…)</b>, never SUM — they skip each other, so nothing double-counts.</li>
+                        <li><b>The − button lives at the summary row;</b> level buttons fold the whole sheet at once.</li>
+                        <li><b>Copy a folded view</b> with Go To Special ▸ Visible cells only.</li>
+                    </ol>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:16px;">Three challenges — click to reveal each answer</h3>
+                    <div class="challenge">
+                        <div class="q">① Top End · Rows 2–13 hold detail <i>and</i> three council totals. What goes in the grand-total row so nobody is counted twice?</div>
+                        <div class="ansf" data-step="1">=SUBTOTAL(9, C2:C13) <span class="res">→ 2,995 — SUM would say 5,990</span></div>
+                    </div>
+                    <div class="challenge">
+                        <div class="q">② Alice Springs · You want subtotals by <b>Age band</b> instead of Suburb. What has to happen before the dialog opens?</div>
+                        <div class="ansf" data-step="2">Sort by Age band <span class="res">→ then Subtotal ▸ At each change in: Age band</span></div>
+                    </div>
+                    <div class="challenge">
+                        <div class="q">③ The whole sheet is open at full detail. Show only the council totals and the grand total — in one click.</div>
+                        <div class="ansf" data-step="3">Press level button 2 <span class="res">→ every group folds at once</span></div>
+                    </div>
+                </div>
+            </div>
+            <p class="closing">If you can fold 2,995 rows into the four that matter, <em>you own it.</em></p>
+        </div>
+    </div>
+</section>
+
+</main>
+</div>
+
+<!-- ===========================================
+     SECTION RAIL (chrome, outside the stage)
+     =========================================== -->
+<nav class="rail" aria-label="Deck sections">
+    <div class="railtitle">Group &amp; Outline</div>
+    <div id="railSecs"></div>
+    <div class="railfoot">
+        <span id="railCount">1 / 24</span>
+        <span id="railStep"></span>
+        <span class="railhint">click / → build · ← back · E edit</span>
+    </div>
+</nav>
+
+<!-- Inline-edit chrome -->
+<div class="edit-hotzone" aria-hidden="true"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+<div class="edit-note">editing — click any text · Ctrl+S saves a copy · E to exit</div>
+<script>
+/* ===========================================
+   LOCKED DATASETS — NT Cyber Pulse 2026 (synthetic)
+   Single source of truth for every <SheetGrid> in the deck.
+   Row order matters: fx selectors address cells by data-row.
+   All subtotals cross-checked: details sum exactly to totals.
+   =========================================== */
+const TABLES = {
+    demo: {
+        headers: ['Habit', 'Count'],
+        rows: [['Shares passwords', '1,260'], ['No MFA', '1,689'], ['Low awareness', '1,010']]
+    },
+    topend: {   /* Top End survey — 3 councils × 3 suburbs, sorted by Council */
+        headers: ['Council', 'Suburb', 'Surveyed', 'Android', 'iPhone', 'No device', 'Shares pwd', 'No MFA'],
+        rows: [
+            ['Darwin',     'Casuarina',      '510', '234', '245', '31', '199', '265'],
+            ['Darwin',     'Karama',         '385', '197', '152', '36', '173', '227'],
+            ['Darwin',     'Nightcliff',     '420', '176', '214', '30', '168', '231'],
+            ['Litchfield', 'Berry Springs',  '190', '96',  '78',  '16', '84',  '118'],
+            ['Litchfield', 'Howard Springs', '285', '139', '130', '16', '117', '160'],
+            ['Litchfield', 'Humpty Doo',     '310', '158', '129', '23', '136', '186'],
+            ['Palmerston', 'Bakewell',       '340', '162', '156', '22', '143', '194'],
+            ['Palmerston', 'Moulden',        '260', '141', '96',  '23', '122', '156'],
+            ['Palmerston', 'Zuccoli',        '295', '128', '152', '15', '118', '152']
+        ]
+    },
+    topend_sub: {   /* as above with subtotal + grand rows (rows 4, 8, 12, 13) */
+        headers: ['Council', 'Suburb', 'Surveyed', 'Android', 'iPhone', 'No device', 'Shares pwd', 'No MFA'],
+        rows: [
+            ['Darwin',           'Casuarina',      '510',   '234',   '245',   '31',  '199',   '265'],
+            ['Darwin',           'Karama',         '385',   '197',   '152',   '36',  '173',   '227'],
+            ['Darwin',           'Nightcliff',     '420',   '176',   '214',   '30',  '168',   '231'],
+            ['Darwin Total',     '',               '1,315', '607',   '611',   '97',  '540',   '723'],
+            ['Litchfield',       'Berry Springs',  '190',   '96',    '78',    '16',  '84',    '118'],
+            ['Litchfield',       'Howard Springs', '285',   '139',   '130',   '16',  '117',   '160'],
+            ['Litchfield',       'Humpty Doo',     '310',   '158',   '129',   '23',  '136',   '186'],
+            ['Litchfield Total', '',               '785',   '393',   '337',   '55',  '337',   '464'],
+            ['Palmerston',       'Bakewell',       '340',   '162',   '156',   '22',  '143',   '194'],
+            ['Palmerston',       'Moulden',        '260',   '141',   '96',    '23',  '122',   '156'],
+            ['Palmerston',       'Zuccoli',        '295',   '128',   '152',   '15',  '118',   '152'],
+            ['Palmerston Total', '',               '895',   '431',   '404',   '60',  '383',   '502'],
+            ['Grand Total',      '',               '2,995', '1,431', '1,352', '212', '1,260', '1,689']
+        ]
+    },
+    topend_blank: {   /* summary rows present but empty — the deck fills them */
+        headers: ['Council', 'Suburb', 'Surveyed', 'Shares pwd', 'No MFA'],
+        rows: [
+            ['Darwin',     'Casuarina',      '510', '199', '265'],
+            ['Darwin',     'Karama',         '385', '173', '227'],
+            ['Darwin',     'Nightcliff',     '420', '168', '231'],
+            ['',           '',               '',    '',    ''],
+            ['Litchfield', 'Berry Springs',  '190', '84',  '118'],
+            ['Litchfield', 'Howard Springs', '285', '117', '160'],
+            ['Litchfield', 'Humpty Doo',     '310', '136', '186'],
+            ['',           '',               '',    '',    ''],
+            ['Palmerston', 'Bakewell',       '340', '143', '194'],
+            ['Palmerston', 'Moulden',        '260', '122', '156'],
+            ['Palmerston', 'Zuccoli',        '295', '118', '152'],
+            ['',           '',               '',    '',    ''],
+            ['',           '',               '',    '',    '']
+        ]
+    },
+    topend_frag: {   /* unsorted → fragmented subtotals */
+        headers: ['Council', 'Suburb', 'Surveyed'],
+        rows: [
+            ['Darwin',           'Casuarina', '510'],
+            ['Darwin Total',     '',          '510'],
+            ['Palmerston',       'Bakewell',  '340'],
+            ['Palmerston Total', '',          '340'],
+            ['Darwin',           'Karama',    '385'],
+            ['Darwin Total',     '',          '385']
+        ]
+    },
+    topend_ok: {   /* sorted → clean subtotals */
+        headers: ['Council', 'Suburb', 'Surveyed'],
+        rows: [
+            ['Darwin',           'Casuarina', '510'],
+            ['Darwin',           'Karama',    '385'],
+            ['Darwin Total',     '',          '895'],
+            ['Palmerston',       'Bakewell',  '340'],
+            ['Palmerston Total', '',          '340']
+        ]
+    },
+    alice: {   /* Alice Springs survey — 3 suburbs × 3 age bands */
+        headers: ['Suburb', 'Age band', 'Surveyed', 'Shares pwd', 'No MFA', 'Low awareness'],
+        rows: [
+            ['Braitling', 'Under 30', '95',  '31', '44', '22'],
+            ['Braitling', '30–59',    '120', '47', '62', '39'],
+            ['Braitling', '60+',      '85',  '51', '69', '47'],
+            ['Gillen',    'Under 30', '110', '36', '50', '26'],
+            ['Gillen',    '30–59',    '140', '55', '74', '48'],
+            ['Gillen',    '60+',      '95',  '58', '78', '55'],
+            ['Sadadeen',  'Under 30', '80',  '29', '41', '18'],
+            ['Sadadeen',  '30–59',    '105', '44', '58', '36'],
+            ['Sadadeen',  '60+',      '70',  '44', '59', '42']
+        ]
+    },
+    alice_sub: {   /* with suburb totals (rows 4, 8, 12) + grand (13) */
+        headers: ['Suburb', 'Age band', 'Surveyed', 'Shares pwd', 'No MFA', 'Low awareness'],
+        rows: [
+            ['Braitling',       'Under 30', '95',  '31',  '44',  '22'],
+            ['Braitling',       '30–59',    '120', '47',  '62',  '39'],
+            ['Braitling',       '60+',      '85',  '51',  '69',  '47'],
+            ['Braitling Total', '',         '300', '129', '175', '108'],
+            ['Gillen',          'Under 30', '110', '36',  '50',  '26'],
+            ['Gillen',          '30–59',    '140', '55',  '74',  '48'],
+            ['Gillen',          '60+',      '95',  '58',  '78',  '55'],
+            ['Gillen Total',    '',         '345', '149', '202', '129'],
+            ['Sadadeen',        'Under 30', '80',  '29',  '41',  '18'],
+            ['Sadadeen',        '30–59',    '105', '44',  '58',  '36'],
+            ['Sadadeen',        '60+',      '70',  '44',  '59',  '42'],
+            ['Sadadeen Total',  '',         '255', '117', '158', '96'],
+            ['Grand Total',     '',         '900', '395', '535', '333']
+        ]
+    },
+    hubs: {   /* phishing reports per regional hub, monthly + quarterly totals */
+        headers: ['Hub', 'Jan', 'Feb', 'Mar', 'Q1', 'Apr', 'May', 'Jun', 'Q2'],
+        rows: [
+            ['Darwin',        '34', '41', '39', '114', '46', '52', '58', '156'],
+            ['Katherine',     '9',  '12', '11', '32',  '14', '15', '19', '48'],
+            ['Tennant Creek', '6',  '8',  '7',  '21',  '9',  '11', '12', '32'],
+            ['Alice Springs', '21', '25', '24', '70',  '27', '31', '36', '94'],
+            ['Nhulunbuy',     '5',  '6',  '8',  '19',  '8',  '9',  '13', '30']
+        ]
+    },
+    summary: {   /* the clean paste result on the copy-visible slide */
+        headers: ['Council', 'Surveyed', 'No MFA'],
+        rows: [
+            ['Darwin Total',     '1,315', '723'],
+            ['Litchfield Total', '785',   '464'],
+            ['Palmerston Total', '895',   '502'],
+            ['Grand Total',      '2,995', '1,689']
+        ]
+    }
+};
+
+/* ===========================================
+   <SheetGrid> RENDERER
+   Turns every  <div class="sheet" data-table="...">  into a
+   spreadsheet: column letters, row numbers, header row, data cells.
+   Options: data-cols (subset), data-rows (limit), data-extra (blank
+   columns named X1…), data-outline (row-outline gutter + level
+   buttons, data-levels sets how many), data-coutline (column-outline
+   strip above the letters).
+   =========================================== */
+function buildSheets() {
+    document.querySelectorAll('.sheet[data-table]').forEach(sh => {
+        const t = TABLES[sh.dataset.table];
+        if (!t) return;
+        const cols  = sh.dataset.cols ? sh.dataset.cols.split(',') : t.headers.slice();
+        const idx   = cols.map(c => t.headers.indexOf(c));
+        const extra = +(sh.dataset.extra || 0);
+        const rows  = t.rows.slice(0, +(sh.dataset.rows || t.rows.length));
+        const nCols = cols.length + extra;
+        const og    = sh.dataset.outline ? 1 : 0;
+        const cog   = sh.dataset.coutline ? 1 : 0;
+        const lvls  = +(sh.dataset.levels || 3);
+        const clvls = +(sh.dataset.clevels || 2);
+        const colName = c => (c < cols.length ? cols[c] : 'X' + (c - cols.length + 1));
+        const lbtns   = (n, pre) => Array.from({ length: n }, (_, k) =>
+            `<span class="lb" data-lvl="${pre}${k + 1}">${k + 1}</span>`).join('');
+        sh.style.gridTemplateColumns = (og ? '46px ' : '') + `52px repeat(${nCols}, auto)`;
+
+        let html = '';
+        if (cog) {                                          /* column-outline strip */
+            html += `<div class="sc ogh corner" style="grid-column: span ${og + 1}">${lbtns(clvls, 'c')}</div>`;
+            for (let c = 0; c < nCols; c++)
+                html += `<div class="sc ogh" data-col="${colName(c)}"></div>`;
+        }
+        if (og)                                             /* corner: row level buttons */
+            html += `<div class="sc og corner" style="grid-column: span 2">${lbtns(lvls, '')}</div>`;
+        else
+            html += '<div class="sc cl"></div>';
+        for (let c = 0; c < nCols; c++)                     /* column letters */
+            html += `<div class="sc cl" data-col="${colName(c)}">${String.fromCharCode(65 + c)}</div>`;
+
+        if (og) html += '<div class="sc og" data-row="h"></div>';   /* header row */
+        html += '<div class="sc rn">1</div>';
+        cols.forEach(c => html += `<div class="sc h" data-col="${c}" dir="auto">${c}</div>`);
+        for (let e = 0; e < extra; e++) html += `<div class="sc h" data-col="X${e + 1}"></div>`;
+
+        rows.forEach((r, ri) => {                           /* data rows */
+            if (og) html += `<div class="sc og" data-row="${ri + 1}"></div>`;
+            html += `<div class="sc rn" data-row="${ri + 1}">${ri + 2}</div>`;
+            idx.forEach((ci, k) =>
+                html += `<div class="sc d" data-col="${cols[k]}" data-row="${ri + 1}" dir="auto">${r[ci]}</div>`);
+            for (let e = 0; e < extra; e++)
+                html += `<div class="sc d" data-col="X${e + 1}" data-row="${ri + 1}"></div>`;
+        });
+        sh.innerHTML = html;
+    });
+}
+
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER + STEP/FX ENGINE
+   Click / → advance build-steps within the slide first, then move
+   to the next slide. ← reverses one step, then one slide (arriving
+   at the previous slide fully built).
+   =========================================== */
+const SECTIONS = [
+    ['Intro',           0,  3],
+    ['The old way',     4,  5],
+    ['Group & fold',    6,  8],
+    ['SUBTOTAL()',      9,  11],
+    ['Subtotal dialog', 12, 16],
+    ['Beyond rows',     17, 20],
+    ['Teach it',        21, 23]
+];
+
+class SlidePresentation {
+    constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.stage  = document.getElementById('deckStage');
+        this.cur    = 0;
+        this.step   = this.slides.map(() => 0);          /* per-slide build progress */
+        this.fx     = this.slides.map(sl => this.resolveFx(sl));
+
+        this.buildRail();
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupPointerNav();
+        this.setupPrint();
+
+        const fromHash = parseInt((location.hash || '').slice(1), 10);
+        this.show(isNaN(fromHash) ? 0 : Math.min(Math.max(fromHash - 1, 0), this.slides.length - 1));
+    }
+
+    /* --- FX: parse each slide's <script type="text/fx"> into resolved entries --- */
+    resolveFx(slide) {
+        const tag = slide.querySelector('script[type="text/fx"]');
+        if (!tag) return [];
+        let entries;
+        try { entries = JSON.parse(tag.textContent); }
+        catch (err) { console.error('Bad fx JSON on', slide.id, err); return []; }
+        return entries.map(e => {
+            const els = Array.from(slide.querySelectorAll(e.sel));
+            els.forEach(el => {
+                if (e.text !== undefined && el.dataset.orig === undefined)
+                    el.dataset.orig = el.textContent;
+            });
+            return { ...e, els };
+        });
+    }
+
+    maxSteps(i) { return +(this.slides[i].dataset.steps || 0); }
+
+    /* --- apply a slide's visual state for step k (idempotent recompute) --- */
+    applyState(i, k) {
+        const slide = this.slides[i];
+        slide.querySelectorAll('[data-step]').forEach(el => {
+            const v = +el.dataset.step;
+            el.classList.toggle('on',  v <= k);
+            el.classList.toggle('now', v === k);
+        });
+        const fx = this.fx[i];
+        fx.forEach(e => e.els.forEach(el => {              /* clear everything first */
+            if (e.cls) el.classList.remove(...e.cls.split(' '));
+            if (e.text !== undefined) el.textContent = el.dataset.orig;
+            el.style.transitionDelay = '';
+        }));
+        fx.forEach(e => {                                  /* re-apply steps 0..k in order */
+            if (e.s > k) return;
+            e.els.forEach(el => {
+                if (e.d)   el.style.transitionDelay = e.d + 's';
+                if (e.cls) el.classList.add(...e.cls.split(' '));
+                if (e.rm)  el.classList.remove(...e.rm.split(' '));
+                if (e.text !== undefined) el.textContent = e.text;
+            });
+        });
+    }
+
+    show(i, step = 0) {
+        this.cur = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.step[this.cur] = Math.min(step, this.maxSteps(this.cur));
+        this.slides.forEach((sl, j) => {
+            sl.classList.toggle('active',  j === this.cur);
+            sl.classList.toggle('visible', j === this.cur);
+        });
+        this.applyState(this.cur, this.step[this.cur]);
+        try { history.replaceState(null, '', '#' + (this.cur + 1)); } catch (e) { /* file:// quirks in some browsers */ }
+        this.updateRail();
+    }
+
+    advance() {
+        if (this.step[this.cur] < this.maxSteps(this.cur)) {
+            this.step[this.cur]++;
+            this.applyState(this.cur, this.step[this.cur]);
+            this.updateRail();
+        } else if (this.cur < this.slides.length - 1) {
+            this.show(this.cur + 1, 0);
+        }
+    }
+
+    back() {
+        if (this.step[this.cur] > 0) {
+            this.step[this.cur]--;
+            this.applyState(this.cur, this.step[this.cur]);
+            this.updateRail();
+        } else if (this.cur > 0) {
+            this.show(this.cur - 1, this.maxSteps(this.cur - 1));   /* arrive fully built */
+        }
+    }
+
+    /* --- fixed 16:9 stage scaling: scale the whole stage, never reflow.
+           When the section rail is visible it reserves a strip on the
+           left, so deck chrome never overlaps slides. --- */
+    setupStageScale() {
+        const scale = () => {
+            const railW  = window.matchMedia('(max-width: 1080px)').matches ? 0 : 248;
+            const availW = window.innerWidth - railW;
+            const f = Math.min(availW / 1920, window.innerHeight / 1080);
+            const x = railW + (availW - 1920 * f) / 2;
+            const y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+    }
+
+    setupKeyboardNav() {
+        document.addEventListener('keydown', e => {
+            if (e.target.getAttribute && e.target.getAttribute('contenteditable')) return;
+            if (window.editor && window.editor.isActive) return;
+            switch (e.key) {
+                case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); this.advance(); break;
+                case 'ArrowLeft':  case 'PageUp':             e.preventDefault(); this.back();    break;
+                case 'Home': e.preventDefault(); this.show(0); break;
+                case 'End':  e.preventDefault(); this.show(this.slides.length - 1); break;
+            }
+        });
+    }
+
+    /* --- click = advance; touch: tap advances, horizontal swipe navigates.
+           A short debounce stops an accidental double-click from blowing
+           past a build step before it can be seen. --- */
+    setupPointerNav() {
+        const vp = document.querySelector('.deck-viewport');
+        let lastTouch = 0, lastAdvance = 0, tx = 0, ty = 0;
+        const debouncedAdvance = () => {
+            const now = Date.now();
+            if (now - lastAdvance < 350) return;
+            lastAdvance = now;
+            this.advance();
+        };
+        vp.addEventListener('click', e => {
+            if (window.editor && window.editor.isActive) return;
+            if (Date.now() - lastTouch < 500) return;      /* touch already handled */
+            if (e.target.closest('a, button')) return;
+            debouncedAdvance();
+        });
+        vp.addEventListener('touchstart', e => {
+            tx = e.changedTouches[0].clientX;
+            ty = e.changedTouches[0].clientY;
+        }, { passive: true });
+        vp.addEventListener('touchend', e => {
+            if (window.editor && window.editor.isActive) return;
+            lastTouch = Date.now();
+            const dx = e.changedTouches[0].clientX - tx;
+            const dy = e.changedTouches[0].clientY - ty;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+                dx < 0 ? this.advance() : this.back();
+            } else if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+                debouncedAdvance();                        /* plain tap */
+            }
+        }, { passive: true });
+    }
+
+    /* --- section rail --- */
+    buildRail() {
+        const box = document.getElementById('railSecs');
+        SECTIONS.forEach(([name, start], si) => {
+            const b = document.createElement('button');
+            b.className = 'sec';
+            b.innerHTML = `<span class="n">${si + 1}</span><span>${name}</span>`;
+            b.addEventListener('click', e => { e.stopPropagation(); this.show(start, 0); });
+            box.appendChild(b);
+        });
+    }
+
+    updateRail() {
+        const secs = document.querySelectorAll('.rail .sec');
+        SECTIONS.forEach(([, start, end], si) =>
+            secs[si].classList.toggle('cur', this.cur >= start && this.cur <= end));
+        document.getElementById('railCount').textContent = `${this.cur + 1} / ${this.slides.length}`;
+        const n = this.maxSteps(this.cur);
+        document.getElementById('railStep').textContent =
+            n ? `build ${this.step[this.cur]}/${n} ▸` : '';
+    }
+
+    /* --- print: render every slide fully built, restore after --- */
+    setupPrint() {
+        window.addEventListener('beforeprint', () =>
+            this.slides.forEach((sl, i) => this.applyState(i, this.maxSteps(i))));
+        window.addEventListener('afterprint', () =>
+            this.slides.forEach((sl, i) => this.applyState(i, this.step[i])));
+    }
+}
+
+/* ===========================================
+   INLINE EDITOR
+   Hover the top-left corner (or press E) → pencil → edit mode.
+   Edits persist to localStorage; Ctrl+S downloads an edited copy.
+   =========================================== */
+const EDIT_SEL = 'h1, h2, h3, p, li, .sc.d, .sc.h, .anscell, .cap, .kicker, .floatlabel, .fchip, .ansf, .closing, .chip, .fml .m, .keyrow span:last-child, .refrow .what, .refrow .use, .minitable td, .stat .big, .stat .lab, .xdchk, .xdselect span:first-child, .xdlabel, .rbtn, .menucard .mi, .callout';
+const STORE_KEY = 'grouping-deck-edits-v1';
+
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.els = Array.from(document.querySelectorAll(EDIT_SEL))
+            .filter(el => !el.closest('.rail'));
+        this.els.forEach((el, i) => el.dataset.eid = 'e' + i);
+        this.restore();
+        this.bindChrome();
+    }
+
+    restore() {
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { saved = {}; }
+        this.els.forEach(el => {
+            if (saved[el.dataset.eid] !== undefined) el.innerHTML = saved[el.dataset.eid];
+        });
+    }
+
+    persist() {
+        const out = {};
+        this.els.forEach(el => { if (el.dataset.dirty) out[el.dataset.eid] = el.innerHTML; });
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { saved = {}; }
+        localStorage.setItem(STORE_KEY, JSON.stringify({ ...saved, ...out }));
+    }
+
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        document.getElementById('editToggle').classList.toggle('active', this.isActive);
+        this.els.forEach(el => {
+            if (this.isActive) {
+                el.setAttribute('contenteditable', 'true');
+                el.addEventListener('input', this.markDirty);
+            } else {
+                el.removeAttribute('contenteditable');
+                el.removeEventListener('input', this.markDirty);
+            }
+        });
+        if (!this.isActive) this.persist();
+    }
+
+    markDirty(e) { e.currentTarget.dataset.dirty = '1'; }
+
+    downloadCopy() {
+        this.persist();
+        const clone = document.documentElement.cloneNode(true);
+        clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        const body = clone.querySelector('body');
+        if (body) body.classList.remove('editing');
+        const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'grouping-outlining-tutorial-edited.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    /* pencil hotzone: JS-based hover with a 400ms grace period */
+    bindChrome() {
+        const hotzone = document.querySelector('.edit-hotzone');
+        const toggle  = document.getElementById('editToggle');
+        let hideTimeout = null;
+        const scheduleHide = () => {
+            hideTimeout = setTimeout(() => {
+                if (!this.isActive) toggle.classList.remove('show');
+            }, 400);
+        };
+        hotzone.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); toggle.classList.add('show'); });
+        hotzone.addEventListener('mouseleave', scheduleHide);
+        toggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        toggle.addEventListener('mouseleave', scheduleHide);
+        hotzone.addEventListener('click', e => { e.stopPropagation(); this.toggleEditMode(); });
+        toggle.addEventListener('click',  e => { e.stopPropagation(); this.toggleEditMode(); });
+
+        document.addEventListener('keydown', e => {
+            if ((e.key === 'e' || e.key === 'E') && !e.ctrlKey && !e.metaKey
+                && !(e.target.getAttribute && e.target.getAttribute('contenteditable'))) {
+                this.toggleEditMode();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's' && this.isActive) {
+                e.preventDefault();
+                this.downloadCopy();
+            }
+        });
+    }
+}
+
+/* ===========================================
+   BOOT — order matters:
+   sheets first, then saved edits, then the controller (fx selectors
+   must resolve against the fully-rendered, edit-restored DOM).
+   =========================================== */
+buildSheets();
+window.editor = new InlineEditor();
+window.deck = new SlidePresentation();
+</script>
+</body>
+</html>

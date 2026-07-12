@@ -214,6 +214,47 @@
   .card-link:hover .open { color: var(--ochre-bright); text-shadow: 0 0 12px rgba(224,152,60,0.5); }
   .card.placeholder { cursor: default; }
 
+  /* ---------- Cards with a secondary action (file download) ----------
+     These cards use a <div class="card-link"> wrapper instead of an <a>,
+     because links can't nest. The .card-cover link is stretched over the
+     whole card via ::after, and the download button sits above it. */
+  .card-actions {
+    margin-top: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .card-actions .open { margin-top: 0; text-decoration: none; }
+  .card-cover::after { content: ""; position: absolute; inset: 0; }
+  .card-link:has(.card-cover:focus-visible) .card {
+    border-color: var(--ochre);
+    outline: 2px solid var(--ochre-bright);
+    outline-offset: 2px;
+  }
+  .download-btn {
+    position: relative;
+    z-index: 2;
+    font-family: "Consolas", "SF Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ochre);
+    text-decoration: none;
+    border: 1px solid var(--ochre-deep);
+    background: var(--ochre-faint);
+    padding: 0.35rem 0.75rem;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .download-btn:hover, .download-btn:focus-visible {
+    color: var(--ochre-bright);
+    border-color: var(--ochre);
+    background: rgba(224,152,60,0.12);
+    box-shadow: 0 0 14px -2px var(--glow);
+  }
+  .download-btn:focus-visible { outline: 2px solid var(--ochre-bright); outline-offset: 2px; }
+
   /* ---------- Footer ---------- */
   footer {
     border-top: 1px solid var(--ochre-faint);
@@ -365,15 +406,18 @@
       </div>
       <div class="cards">
 
-        <a class="card-link" href="MS_excel/xlookup_tutorial/">
+        <div class="card-link">
           <div class="card">
             <span class="tag">Available</span>
             <h4>VLOOKUP &rarr; XLOOKUP</h4>
             <p class="desc">A 30-slide click-to-build tutorial that takes a VLOOKUP user to XLOOKUP fluency: formulas assemble one argument at a time while the matching spreadsheet cells light up. Covers look-left, spilled arrays, match and search modes, and two-way lookups &mdash; then hands you three challenges to teach it yourself.</p>
-            <div class="meta">30 SLIDES &middot; CLICK-TO-BUILD &middot; SELF-PACED</div>
-            <span class="open">Open tutorial &rarr;</span>
+            <div class="meta">30 SLIDES &middot; CLICK-TO-BUILD &middot; SELF-PACED &middot; PRACTICE WORKBOOK</div>
+            <div class="card-actions">
+              <a class="open card-cover" href="MS_excel/xlookup_tutorial/">Open tutorial &rarr;</a>
+              <a class="download-btn" href="simulations_downloads/Excel_xlookup_files.xlsx" download>&#8681; Workbook</a>
+            </div>
           </div>
-        </a>
+        </div>
 
         <a class="card-link" href="MS_excel/pivot_tables_tutorial/">
           <div class="card">
@@ -381,6 +425,16 @@
             <h4>Data &rarr; Answers: PivotTables</h4>
             <p class="desc">A 27-slide click-to-build tutorial that turns a raw log into reports: drag fields into the four areas and watch the summary grid assemble itself. Covers grouping, slicing, aggregation choices, filters, date grouping, the refresh habit &mdash; and the classic traps, from Count-in-disguise to blank-versus-zero.</p>
             <div class="meta">27 SLIDES &middot; CLICK-TO-BUILD &middot; SELF-PACED</div>
+            <span class="open">Open tutorial &rarr;</span>
+          </div>
+        </a>
+
+        <a class="card-link" href="MS_excel/grouping_outlining_tutorial/">
+          <div class="card">
+            <span class="tag">Available</span>
+            <h4>Detail &rarr; Summary: Group &amp; Outline</h4>
+            <p class="desc">A 24-slide click-to-build tutorial that folds a big worksheet into its story: group rows, collapse them with the +/&minus; buttons and level controls, and let the Subtotal dialog build the whole outline in one hit. Built on NT Cyber Pulse survey data &mdash; suburb by suburb, the numbers on shared passwords and missing MFA tell their own story. Covers SUBTOTAL vs SUM, nested levels, column grouping, Auto Outline and copying only the visible cells.</p>
+            <div class="meta">24 SLIDES &middot; CLICK-TO-BUILD &middot; SELF-PACED</div>
             <span class="open">Open tutorial &rarr;</span>
           </div>
         </a>
