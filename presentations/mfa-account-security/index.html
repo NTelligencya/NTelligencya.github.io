@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MFA and Account Security — Roper Gulf Regional Council</title>
+
+<!-- "SIGN-IN" design — light, M365 dialogue-card language. Feature colour: CDU Blue #211645. Headings: Fraunces -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --navy: #211645;            /* CDU Blue — feature colour */
+    --navy-soft: #3B2D6B;       /* lighter navy for secondary emphasis */
+    --canvas: #F5F4F8;          /* pale lavender-grey canvas */
+    --card: #FFFFFF;
+    --wash: #ECE9F4;            /* pale navy wash */
+    --line: #D9D5E6;
+    --ink: #211645;
+    --muted: #6E6885;
+    --good: #1E7A4D;
+    --good-wash: #E3F1E9;
+    --bad: #A3341F;
+    --bad-wash: #F9E9E4;
+    --warn-edge: #B4540A;
+    --warn-wash: #FBEFE0;
+    --stage-bg: #140E2B;
+    --slide-bg: var(--canvas);
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Hanken Grotesk', 'Segoe UI', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== FIXED 16:9 STAGE (mandatory base) ===== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, svg { max-width: 100%; max-height: 100%; }
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .edit-toggle, .edit-hotzone { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===== SLIDE SCAFFOLD ===== */
+/* Top bar — navy strip with a lock chip and deck label, like an org sign-in header */
+.topbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 62px;
+    background: var(--navy); color: #EDEAF6;
+    display: flex; align-items: center; gap: 24px; padding: 0 44px;
+    font: 500 19px var(--font-mono); letter-spacing: .06em; z-index: 3;
+}
+.topbar .lock {
+    background: #EDEAF6; color: var(--navy); border-radius: 5px;
+    padding: 4px 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;
+}
+.topbar .crumb { opacity: .85; }
+.topbar .step-dots { margin-left: auto; display: flex; gap: 9px; }
+.topbar .step-dots i { width: 11px; height: 11px; border-radius: 50%; background: rgba(237,234,246,.28); }
+.topbar .step-dots i.on { background: #EDEAF6; }
+
+/* Footer — light band carrying the CDU brand strip */
+.foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 74px;
+    background: var(--card); border-top: 1.5px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 44px; z-index: 3;
+}
+.foot img { height: 36px; width: auto; }
+.foot .pg { font: 500 18px var(--font-mono); letter-spacing: .12em; color: var(--muted); }
+
+/* Content region */
+.body {
+    position: absolute; inset: 62px 120px 74px 120px;
+    display: flex; flex-direction: column; justify-content: center; z-index: 2;
+}
+.kicker { font: 500 20px var(--font-mono); letter-spacing: .3em; text-transform: uppercase; color: var(--navy-soft); margin-bottom: 24px; }
+h1 { font: 500 112px/1.04 var(--font-display); letter-spacing: -0.01em; color: var(--navy); }
+h2 { font: 500 78px/1.06 var(--font-display); letter-spacing: -0.008em; color: var(--navy); }
+h2 .hl { background: linear-gradient(transparent 62%, var(--wash) 62%); }
+.lede { font: 400 31px/1.55 var(--font-body); color: var(--ink); max-width: 1280px; }
+.lede b { font-weight: 700; }
+.muted { color: var(--muted); }
+
+/* Sign-in dialogue card */
+.dcard {
+    background: var(--card); border: 1.5px solid var(--line); border-radius: 12px;
+    border-top: 6px solid var(--navy);
+    box-shadow: 0 14px 34px rgba(33, 22, 69, .10);
+    padding: 40px 44px;
+}
+.dcard .ctag { font: 500 17px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--navy-soft); margin-bottom: 16px; }
+.dcard h3 { font: 600 34px/1.2 var(--font-display); color: var(--navy); margin-bottom: 14px; }
+.dcard p { font: 400 25px/1.5 var(--font-body); color: var(--ink); }
+.dcard p b { font-weight: 700; }
+
+/* Factor badge */
+.badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 92px; height: 92px; border-radius: 50%;
+    background: var(--navy); color: #EDEAF6; font-size: 44px; margin-bottom: 22px;
+}
+.badge.alt { background: var(--wash); color: var(--navy); border: 2.5px solid var(--navy); }
+
+/* Step rows (numbered) */
+.rows { display: flex; flex-direction: column; }
+.row {
+    display: flex; align-items: center; gap: 34px; padding: 25px 12px;
+    border-bottom: 1.5px solid var(--line); font: 400 29px/1.45 var(--font-body); color: var(--ink);
+}
+.row:last-child { border-bottom: none; }
+.row .n {
+    min-width: 60px; height: 60px; border-radius: 50%; flex: 0 0 60px;
+    background: var(--navy); color: #EDEAF6;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 24px var(--font-mono);
+}
+.row b { font-weight: 700; }
+.row .chip { margin-left: auto; font: 500 17px var(--font-mono); letter-spacing: .12em; color: var(--navy-soft); background: var(--wash); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Phone mock */
+.phone {
+    width: 380px; border-radius: 34px; background: var(--navy); padding: 16px;
+    box-shadow: 0 22px 44px rgba(33, 22, 69, .28);
+}
+.phone .screen { background: var(--card); border-radius: 22px; padding: 30px 26px; }
+.phone .app { font: 500 15px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+.phone .msg { font: 600 24px/1.35 var(--font-body); color: var(--navy); margin-bottom: 20px; }
+.phone .numpad { display: flex; gap: 12px; justify-content: center; margin-bottom: 22px; }
+.phone .numpad span {
+    width: 74px; height: 88px; border: 2.5px solid var(--navy); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 46px var(--font-mono); color: var(--navy); background: var(--wash);
+}
+.phone .btns { display: flex; gap: 12px; }
+.phone .btns span { flex: 1; text-align: center; padding: 15px 0; border-radius: 9px; font: 600 20px var(--font-body); }
+.phone .yes { background: var(--navy); color: #EDEAF6; }
+.phone .no { background: var(--card); color: var(--navy); border: 2px solid var(--navy); }
+.phone .no.hot { background: var(--bad); border-color: var(--bad); color: #fff; }
+
+/* Verdict strips */
+.strip { border-radius: 10px; padding: 26px 36px; font: 400 26px/1.5 var(--font-body); }
+.strip b { font-weight: 700; }
+.strip.good { background: var(--good-wash); border-left: 7px solid var(--good); color: #143D28; }
+.strip.bad { background: var(--bad-wash); border-left: 7px solid var(--bad); color: #58210F; }
+.strip.warn { background: var(--warn-wash); border-left: 7px solid var(--warn-edge); color: #5A3A12; }
+
+/* Grid helpers */
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; }
+
+/* Reveal animation */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.r1 { transition-delay: .08s; } .r2 { transition-delay: .2s; } .r3 { transition-delay: .32s; }
+.r4 { transition-delay: .44s; } .r5 { transition-delay: .56s; } .r6 { transition-delay: .68s; }
+.r7 { transition-delay: .8s; }
+
+/* Edit affordance */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 90px; height: 90px; z-index: 1200; }
+.edit-toggle {
+    position: fixed; top: 18px; left: 18px; z-index: 1201; width: 44px; height: 44px;
+    border-radius: 10px; border: none; background: rgba(33,22,69,.85); color: #fff;
+    font-size: 20px; cursor: pointer; opacity: 0; transition: opacity .3s;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; }
+body.editing [contenteditable="true"] { outline: 2px dashed rgba(33,22,69,.45); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+    <!-- ===== SLIDE 1 — TITLE ===== -->
+    <section class="slide" aria-label="Title">
+        <div class="topbar"><span class="lock">SECURE SIGN-IN</span><span class="crumb">roper-gulf.nt.gov.au</span>
+            <span class="step-dots"><i class="on"></i><i></i><i></i></span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="kicker reveal r1">Session 1 · Information Security Awareness</div>
+            <h1 class="reveal r2">MFA and<br>account security</h1>
+            <p class="lede reveal r3" style="margin-top:34px">Why your sign-in asks twice, and how that one extra step stops someone who has stolen your password.</p>
+            <p class="lede muted reveal r4" style="margin-top:22px;font-size:26px">Roper Gulf Regional Council · Digital and AI Literacy Training</p>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="Charles Darwin University — CDU TAFE, ICT, Cyber Security and Digital"><span class="pg">01 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 2 — PASSWORDS LEAK ===== -->
+    <section class="slide" aria-label="Passwords leak">
+        <div class="topbar"><span class="lock">SECURE SIGN-IN</span><span class="crumb">the problem</span>
+            <span class="step-dots"><i class="on"></i><i></i><i></i></span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The problem</div>
+            <h2 class="reveal r2">A password is <span class="hl">one key</span>, and keys get copied</h2>
+            <div class="grid3" style="margin-top:52px">
+                <div class="dcard reveal r3"><div class="ctag">Reused</div><h3>One password, many doors</h3><p>When the same password unlocks your email, banking and streaming accounts, one leak opens all of them.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Phished</div><h3>Tricked out of you</h3><p>A convincing fake email or text can lead you to a fake sign-in page, and you type the password in yourself.</p></div>
+                <div class="dcard reveal r5"><div class="ctag">Breached</div><h3>Stolen in bulk</h3><p>Passwords stolen from websites are traded online in huge lists, often years after the original breach.</p></div>
+            </div>
+            <p class="lede reveal r6" style="margin-top:46px">None of this needs a genius hacker. It just needs your password, <b>and your password can travel without you.</b></p>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">02 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 3 — THREE FACTORS ===== -->
+    <section class="slide" aria-label="The three factors">
+        <div class="topbar"><span class="lock">SECURE SIGN-IN</span><span class="crumb">know · have · are</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i><i></i></span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The fix</div>
+            <h2 class="reveal r2">Ask for two <span class="hl">different kinds</span> of proof</h2>
+            <div class="grid3" style="margin-top:50px">
+                <div class="dcard reveal r3" style="text-align:center"><div class="badge">🔑</div><div class="ctag">Factor 1</div><h3>Something you KNOW</h3><p>A password or PIN. It lives in your head, but it can be guessed, stolen or tricked out of you.</p></div>
+                <div class="dcard reveal r4" style="text-align:center"><div class="badge">📱</div><div class="ctag">Factor 2</div><h3>Something you HAVE</h3><p>Your phone with the Authenticator app. A thief on the other side of the world does not have it.</p></div>
+                <div class="dcard reveal r5" style="text-align:center"><div class="badge">👤</div><div class="ctag">Factor 3</div><h3>Something you ARE</h3><p>Your fingerprint or face. It unlocks your phone, which protects the app inside it.</p></div>
+            </div>
+            <p class="lede reveal r6" style="margin-top:44px"><b>Multi-factor authentication (MFA)</b> means two or more different types. Two passwords is still one type; a password <b>plus your phone</b> is two.</p>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">03 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 4 — KNOW ===== -->
+    <section class="slide" aria-label="Something you know">
+        <div class="topbar"><span class="lock">FACTOR 1 · KNOW</span><span class="crumb">passwords and passphrases</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i><i></i></span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Factor 1 · Something you know</div>
+            <h2 class="reveal r2">Strong on its own? <span class="hl">Never.</span> Still worth doing well</h2>
+            <div class="grid2" style="margin-top:50px">
+                <div class="dcard reveal r3"><div class="ctag">Weak</div><h3>Rooty2024!</h3><p>Short, based on a word, follows a pattern attackers try first. The exclamation mark is not fooling anyone.</p></div>
+                <div class="dcard reveal r4" style="border-top-color:#1E7A4D"><div class="ctag" style="color:var(--good)">Strong</div><h3>cyclone paddock lantern tide</h3><p>A passphrase: four unrelated words. Long, easy for you to remember, very slow for software to guess.</p></div>
+            </div>
+            <div class="strip warn reveal r5" style="margin-top:46px"><b>Keep work and personal passwords separate.</b> Your council password should not be used anywhere else, so a leak elsewhere never reaches the council.</div>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">04 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 5 — HAVE ===== -->
+    <section class="slide" aria-label="Something you have">
+        <div class="topbar"><span class="lock">FACTOR 2 · HAVE</span><span class="crumb">Microsoft Authenticator</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i><i></i></span></div>
+        <div class="body">
+            <div class="grid2">
+                <div>
+                    <div class="kicker reveal r1">Factor 2 · Something you have</div>
+                    <h2 class="reveal r2">Your phone becomes the <span class="hl">second lock</span></h2>
+                    <p class="lede reveal r3" style="margin-top:34px">The <b>Microsoft Authenticator</b> app on your phone receives a notification whenever someone signs in with your password.</p>
+                    <p class="lede reveal r4" style="margin-top:22px">No mobile signal needed at the moment of sign-in on Wi-Fi; the push arrives over any internet connection your phone has.</p>
+                    <p class="lede muted reveal r5" style="margin-top:22px">Lost phone? Tell IT straight away; they can move MFA to a new device.</p>
+                </div>
+                <div class="reveal r3" style="display:flex;justify-content:center">
+                    <div class="phone"><div class="screen">
+                        <div class="app">Microsoft Authenticator</div>
+                        <div class="msg">Approve sign-in?<br><span style="font-weight:400;font-size:19px;color:var(--muted)">Outlook · Darwin, NT</span></div>
+                        <div class="numpad"><span>4</span><span>7</span></div>
+                        <div class="btns"><span class="no">No, it's not me</span><span class="yes">Yes</span></div>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">05 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 6 — ARE ===== -->
+    <section class="slide" aria-label="Something you are">
+        <div class="topbar"><span class="lock">FACTOR 3 · ARE</span><span class="crumb">biometrics</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i><i></i></span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Factor 3 · Something you are</div>
+            <h2 class="reveal r2">Your face or fingerprint <span class="hl">guards the guard</span></h2>
+            <p class="lede reveal r3" style="margin-top:38px">You will mostly meet this factor when you <b>unlock your phone</b>. The fingerprint or face scan protects the Authenticator app sitting inside it.</p>
+            <div class="rows reveal r4" style="margin-top:40px;max-width:1500px">
+                <div class="row"><span class="n">✓</span><span>Stays on your device; the council never stores your fingerprint or face</span></div>
+                <div class="row"><span class="n">✓</span><span>Cannot be phished by email; there is nothing to type into a fake page</span></div>
+                <div class="row"><span class="n">✓</span><span>Means a stolen phone alone is still not enough to approve a sign-in</span></div>
+            </div>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">06 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 7 — COUNCIL SIGN-IN FLOW ===== -->
+    <section class="slide" aria-label="Council sign-in step by step">
+        <div class="topbar"><span class="lock">SECURE SIGN-IN</span><span class="crumb">your council sign-in</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Putting it together</div>
+            <h2 class="reveal r2">Your council sign-in, <span class="hl">step by step</span></h2>
+            <div class="rows" style="margin-top:44px;max-width:1620px">
+                <div class="row reveal r3"><span class="n">1</span><span>Enter your <b>work email address</b> on the Microsoft 365 sign-in page</span><span class="chip">START</span></div>
+                <div class="row reveal r4"><span class="n">2</span><span>Enter your <b>password</b></span><span class="chip">KNOW</span></div>
+                <div class="row reveal r5"><span class="n">3</span><span>The screen shows a <b>two-digit number</b>, and a notification lands on your phone</span><span class="chip">HAVE</span></div>
+                <div class="row reveal r6"><span class="n">4</span><span>Type that number into <b>Authenticator</b> and confirm (unlocking your phone used your fingerprint or face)</span><span class="chip">ARE</span></div>
+                <div class="row reveal r7"><span class="n">5</span><span><b>You're in.</b> Around ten extra seconds, once per day or less on a trusted device</span><span class="chip">DONE</span></div>
+            </div>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">07 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 8 — NUMBER MATCHING ===== -->
+    <section class="slide" aria-label="Why the number matters">
+        <div class="topbar"><span class="lock">NUMBER MATCHING</span><span class="crumb">why the two digits matter</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="body">
+            <div class="grid2">
+                <div>
+                    <div class="kicker reveal r1">Number matching</div>
+                    <h2 class="reveal r2">Why type a number instead of tapping <span class="hl">Approve</span>?</h2>
+                    <p class="lede reveal r3" style="margin-top:34px">The number appears <b>only on the screen where the sign-in is happening</b>. If that screen is not in front of you, you cannot approve, even by accident.</p>
+                    <p class="lede reveal r4" style="margin-top:22px">A plain Approve button can be tapped half-asleep. A number cannot be guessed into the app; <b>it makes approval deliberate.</b></p>
+                </div>
+                <div class="reveal r4" style="display:flex;justify-content:center">
+                    <div class="phone"><div class="screen">
+                        <div class="app">Microsoft Authenticator</div>
+                        <div class="msg">Enter the number shown to sign in</div>
+                        <div class="numpad"><span>2</span><span>9</span></div>
+                        <div class="btns"><span class="no">No, it's not me</span><span class="yes">Yes</span></div>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">08 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 9 — ATTACK, PART 1 ===== -->
+    <section class="slide" aria-label="Attack walkthrough part one">
+        <div class="topbar" style="background:#4A1F14"><span class="lock" style="color:#4A1F14">ATTACK · PART 1</span><span class="crumb">someone has your password</span>
+            <span class="step-dots"><i class="on"></i><i></i></span></div>
+        <div class="body">
+            <div class="kicker reveal r1" style="color:var(--bad)">Walkthrough · An attacker tries your account</div>
+            <h2 class="reveal r2">They have your password.<br><span class="hl">The password works.</span></h2>
+            <div class="rows" style="margin-top:44px;max-width:1620px">
+                <div class="row reveal r3"><span class="n" style="background:var(--bad)">1</span><span>A phishing email caught you months ago, or a website you used was breached. Your password is <b>on a list being sold online</b></span></div>
+                <div class="row reveal r4"><span class="n" style="background:var(--bad)">2</span><span>The attacker types your email and password into the council sign-in page, <b>from anywhere in the world</b></span></div>
+                <div class="row reveal r5"><span class="n" style="background:var(--bad)">3</span><span>The password is correct. With no MFA, they would now be reading your email, your files and everyone you deal with</span></div>
+            </div>
+            <div class="strip bad reveal r6" style="margin-top:44px"><b>Freeze the picture here.</b> The first lock has already failed. Everything now depends on the second factor.</div>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">09 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 10 — ATTACK, PART 2 ===== -->
+    <section class="slide" aria-label="Attack walkthrough part two">
+        <div class="topbar" style="background:#123D28"><span class="lock" style="color:#123D28">ATTACK · PART 2</span><span class="crumb">stopped at the second factor</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i></span></div>
+        <div class="body">
+            <div class="grid2">
+                <div>
+                    <div class="kicker reveal r1" style="color:var(--good)">Walkthrough · The second factor holds</div>
+                    <h2 class="reveal r2">The push goes to <span class="hl">your</span> phone, not theirs</h2>
+                    <div class="rows" style="margin-top:36px">
+                        <div class="row reveal r3"><span class="n" style="background:var(--good)">4</span><span>The two-digit number appears on <b>the attacker's screen</b>, far away</span></div>
+                        <div class="row reveal r4"><span class="n" style="background:var(--good)">5</span><span>The notification lands on <b>your phone</b>. You did not start this sign-in, and you cannot see their number anyway</span></div>
+                        <div class="row reveal r5"><span class="n" style="background:var(--good)">6</span><span>You tap <b>“No, it's not me.”</b> The sign-in dies. The stolen password is now almost worthless</span></div>
+                    </div>
+                    <div class="strip good reveal r6" style="margin-top:34px"><b>Blocked.</b> One tap from you beat a working stolen password.</div>
+                </div>
+                <div class="reveal r4" style="display:flex;justify-content:center">
+                    <div class="phone"><div class="screen">
+                        <div class="app">Microsoft Authenticator</div>
+                        <div class="msg">Approve sign-in?<br><span style="font-weight:400;font-size:19px;color:var(--bad)">Unknown location · 2:14 am</span></div>
+                        <div class="numpad"><span>?</span><span>?</span></div>
+                        <div class="btns"><span class="no hot">No, it's not me</span><span class="yes" style="opacity:.35">Yes</span></div>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">10 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 11 — UNEXPECTED PUSH ===== -->
+    <section class="slide" aria-label="A push you did not ask for">
+        <div class="topbar"><span class="lock">IF IT HAPPENS</span><span class="crumb">a push you didn't ask for</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="body">
+            <div class="kicker reveal r1">If it happens to you</div>
+            <h2 class="reveal r2">A push you didn't ask for means <span class="hl">someone has your password</span></h2>
+            <div class="rows" style="margin-top:44px;max-width:1620px">
+                <div class="row reveal r3"><span class="n">1</span><span><b>Never approve it</b>, even to make the notifications stop. Attackers sometimes send push after push hoping you will give in; denying costs you nothing</span></div>
+                <div class="row reveal r4"><span class="n">2</span><span>Tap <b>“No, it's not me”</b> every time</span></div>
+                <div class="row reveal r5"><span class="n">3</span><span><b>Change your password</b> as soon as you can</span></div>
+                <div class="row reveal r6"><span class="n">4</span><span><b>Tell IT</b>. An unexpected push is a security incident worth reporting, not an embarrassment</span></div>
+            </div>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">11 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 12 — GOOD HABITS ===== -->
+    <section class="slide" aria-label="Good account habits">
+        <div class="topbar"><span class="lock">GOOD HABITS</span><span class="crumb">day to day</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Day to day</div>
+            <h2 class="reveal r2">Four habits that do <span class="hl">most of the work</span></h2>
+            <div class="grid2" style="margin-top:48px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">Habit 1</div><h3>Only approve sign-ins you started</h3><p>If you are not looking at a sign-in screen right now, the answer is no.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Habit 2</div><h3>Nobody legitimate asks you to approve</h3><p>IT will never ring and ask you to approve a push or read out a code. Anyone who does is the attack.</p></div>
+                <div class="dcard reveal r5"><div class="ctag">Habit 3</div><h3>Use a passphrase, used nowhere else</h3><p>Four random words for the council account, different from every personal account.</p></div>
+                <div class="dcard reveal r6"><div class="ctag">Habit 4</div><h3>Keep Authenticator on your phone</h3><p>Do not delete it to save space; report a lost or new phone to IT promptly.</p></div>
+            </div>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">12 / 13</span></div>
+    </section>
+
+    <!-- ===== SLIDE 13 — TAKEAWAYS ===== -->
+    <section class="slide" aria-label="Takeaways">
+        <div class="topbar"><span class="lock">SIGNED IN ✓</span><span class="crumb">takeaways</span>
+            <span class="step-dots"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Wrapping up</div>
+            <h2 class="reveal r2">What to <span class="hl">take with you</span></h2>
+            <div class="rows" style="margin-top:44px;max-width:1620px">
+                <div class="row reveal r3"><span class="n">✓</span><span>A password alone is one copyable key; <b>MFA adds a second, different kind of lock</b></span></div>
+                <div class="row reveal r4"><span class="n">✓</span><span>The two-digit number means <b>only the person at the real sign-in screen can approve</b></span></div>
+                <div class="row reveal r5"><span class="n">✓</span><span>A push you didn't ask for = stolen password: <b>deny, change password, tell IT</b></span></div>
+                <div class="row reveal r6"><span class="n">✓</span><span>Ten seconds of your day versus an attacker in the council's systems is <b>a good trade</b></span></div>
+            </div>
+            <p class="lede muted reveal r7" style="margin-top:42px">Next in Session 1: spotting scam emails, and where AI fits into council work.</p>
+        </div>
+        <div class="foot"><img src="../../simulations/assets/CDU_SLIDE_BRAND.png" alt="CDU TAFE brand"><span class="pg">13 / 13</span></div>
+    </section>
+
+</main>
+</div>
+
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+
+<script>
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.wheelLock = false;
+        this.setupStageScale(); this.setupKeyboardNav(); this.setupWheelNav(); this.setupTouchNav();
+        this.showSlide(0);
+    }
+    setupStageScale() {
+        const scale = () => {
+            const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * f) / 2, y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale(); window.addEventListener('resize', scale);
+    }
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (document.body.classList.contains('editing') || e.target.isContentEditable) return;
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.showSlide(0); break;
+                case 'End': e.preventDefault(); this.showSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+    setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (this.wheelLock || Math.abs(e.deltaY) < 12) return;
+            this.wheelLock = true;
+            e.deltaY > 0 ? this.next() : this.prev();
+            setTimeout(() => { this.wheelLock = false; }, 650);
+        }, { passive: true });
+    }
+    setupTouchNav() {
+        let sx = 0, sy = 0;
+        window.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchend', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? this.next() : this.prev();
+        }, { passive: true });
+    }
+    next() { this.showSlide(this.currentSlide + 1); }
+    prev() { this.showSlide(this.currentSlide - 1); }
+    showSlide(i) {
+        this.currentSlide = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.slides.forEach((s, k) => {
+            s.classList.toggle('active', k === this.currentSlide);
+            s.classList.toggle('visible', k === this.currentSlide);
+        });
+    }
+}
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storeKey = 'mfa-deck-d1-edits-v1';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.hotzone = document.getElementById('editHotzone');
+        this.restore(); this.wire();
+    }
+    wire() {
+        let t = null;
+        const show = () => { clearTimeout(t); this.toggleBtn.classList.add('show'); };
+        const hide = () => { t = setTimeout(() => { if (!this.isActive) this.toggleBtn.classList.remove('show'); }, 400); };
+        this.hotzone.addEventListener('mouseenter', show); this.hotzone.addEventListener('mouseleave', hide);
+        this.toggleBtn.addEventListener('mouseenter', show); this.toggleBtn.addEventListener('mouseleave', hide);
+        this.hotzone.addEventListener('click', () => this.toggle()); this.toggleBtn.addEventListener('click', () => this.toggle());
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable && !e.metaKey && !e.ctrlKey) this.toggle();
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.download(); }
+        });
+        document.getElementById('deckStage').addEventListener('input', () => this.save());
+    }
+    toggle() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('show', true);
+        document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide .row span:not(.n), .slide .crumb, .slide .strip, .slide .msg, .slide .kicker')
+            .forEach(el => { this.isActive ? el.setAttribute('contenteditable', 'true') : el.removeAttribute('contenteditable'); });
+    }
+    save() {
+        const d = [...document.querySelectorAll('.slide')].map(s => s.innerHTML);
+        try { localStorage.setItem(this.storeKey, JSON.stringify(d)); } catch (e) {}
+    }
+    restore() {
+        try {
+            const d = JSON.parse(localStorage.getItem(this.storeKey) || 'null');
+            if (!d) return;
+            const s = document.querySelectorAll('.slide');
+            if (d.length === s.length) s.forEach((sl, i) => { sl.innerHTML = d[i]; });
+        } catch (e) {}
+    }
+    download() {
+        const c = document.documentElement.cloneNode(true);
+        c.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        c.querySelectorAll('body').forEach(b => b.classList.remove('editing'));
+        const blob = new Blob(['<!DOCTYPE html>\n' + c.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'mfa-account-security.html'; a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+new SlidePresentation(); new InlineEditor();
+</script>
+</body>
+</html>
