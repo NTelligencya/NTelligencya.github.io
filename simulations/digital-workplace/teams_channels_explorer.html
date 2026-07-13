@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teams &amp; Channels Explorer — Free-Play Sandbox</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --tp: #5B5FC7;          /* Teams purple */
+    --tp-deep: #4F52B2;
+    --tp-wash: #E8EBFA;     /* mention / selection wash */
+    --bg-page: #1a1a2e;     /* dark page frame, matches other sims */
+    --bg-app: #F5F5F5;
+    --panel: #FFFFFF;
+    --panel-alt: #FAFAFA;
+    --line: #E1E1E1;
+    --ink: #242424;
+    --dim: #616161;
+    --gold: #FFC845;
+    --good: #13795B;
+}
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-page); min-height: 100vh; padding: 20px; color: var(--ink); }
+
+/* ===== Activity header (site convention) ===== */
+.activity-header {
+    max-width: 1280px; margin: 0 auto 16px auto;
+    background: linear-gradient(135deg, #5b5fc7 0%, #7b2cbf 100%);
+    border-radius: 12px; padding: 18px 24px; color: #fff;
+    box-shadow: 0 4px 20px rgba(91, 95, 199, 0.4);
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.activity-header h1 { font-size: 21px; }
+.activity-header p { font-size: 14px; opacity: .95; line-height: 1.45; flex-basis: 100%; }
+.badge { background: rgba(255,255,255,.2); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+.header-btns { margin-left: auto; display: flex; gap: 10px; }
+.hbtn {
+    border: none; border-radius: 8px; padding: 9px 16px; cursor: pointer;
+    font: 600 14px 'Segoe UI', sans-serif; background: rgba(255,255,255,.92); color: var(--tp-deep);
+}
+.hbtn:hover { background: #fff; }
+
+/* ===== App window ===== */
+.window {
+    max-width: 1280px; margin: 0 auto; height: 720px;
+    background: var(--bg-app); border-radius: 12px; overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,.45);
+}
+
+/* Title bar */
+.titlebar {
+    height: 48px; background: #EBEBEB; display: flex; align-items: center;
+    gap: 14px; padding: 0 16px; border-bottom: 1px solid var(--line); flex: 0 0 48px;
+}
+.titlebar .search {
+    flex: 0 1 480px; margin: 0 auto; background: #fff; border: 1px solid var(--line);
+    border-radius: 6px; padding: 6px 12px; font-size: 13px; color: var(--dim); text-align: center;
+}
+.titlebar .me {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--tp); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
+}
+
+.appbody { flex: 1; display: flex; min-height: 0; }
+
+/* ===== App rail ===== */
+.rail {
+    width: 76px; background: #EBEBEB; border-right: 1px solid var(--line);
+    display: flex; flex-direction: column; align-items: center; padding-top: 10px; gap: 2px; flex: 0 0 76px;
+}
+.rail button {
+    width: 64px; border: none; background: none; cursor: pointer; border-radius: 8px;
+    padding: 8px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font: 400 11px 'Segoe UI', sans-serif; color: var(--dim); position: relative;
+}
+.rail button .ic { font-size: 20px; line-height: 1; }
+.rail button:hover { background: #E0E0E0; }
+.rail button.on { color: var(--tp-deep); font-weight: 600; }
+.rail button.on::before { content: ''; position: absolute; left: -6px; top: 12px; bottom: 12px; width: 3px; border-radius: 2px; background: var(--tp); }
+.rail .dot {
+    position: absolute; top: 4px; right: 10px; min-width: 18px; height: 18px; border-radius: 9px;
+    background: #C4314B; color: #fff; font: 700 11px/18px 'Segoe UI', sans-serif; padding: 0 4px; display: none;
+}
+.rail .dot.show { display: block; }
+
+/* ===== List pane (teams or chats) ===== */
+.listpane {
+    width: 280px; background: var(--panel-alt); border-right: 1px solid var(--line);
+    overflow-y: auto; flex: 0 0 280px;
+}
+.listpane h2 { font-size: 17px; padding: 16px 16px 10px; }
+.teamrow { padding: 6px 8px; }
+.teamhead {
+    display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 6px; cursor: pointer;
+    font-weight: 600; font-size: 14px;
+}
+.teamhead:hover { background: #EFEFEF; }
+.teamhead .icon {
+    width: 32px; height: 32px; border-radius: 8px; color: #fff; flex: 0 0 32px;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;
+}
+.teamhead .chev { margin-left: auto; color: var(--dim); font-size: 11px; transition: transform .2s; }
+.teamrow.open .chev { transform: rotate(90deg); }
+.channels { display: none; padding-left: 50px; }
+.teamrow.open .channels { display: block; }
+.channel {
+    padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 13.5px; color: var(--dim);
+}
+.channel:hover { background: #EFEFEF; }
+.channel.on { background: var(--panel); color: var(--tp-deep); font-weight: 600; box-shadow: inset 3px 0 0 var(--tp); }
+
+.chatrow {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-left: 3px solid transparent;
+}
+.chatrow:hover { background: #EFEFEF; }
+.chatrow.on { background: var(--panel); border-left-color: var(--tp); }
+.chatrow .av { width: 34px; height: 34px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex: 0 0 34px; }
+.chatrow .nm { font-size: 13.5px; font-weight: 600; }
+.chatrow .pv { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 175px; }
+
+/* ===== Main pane ===== */
+.main { flex: 1; display: flex; flex-direction: column; background: var(--panel); min-width: 0; }
+.mainhead { border-bottom: 1px solid var(--line); padding: 12px 20px 0; }
+.mainhead .crumb { font-size: 12.5px; color: var(--dim); margin-bottom: 2px; }
+.mainhead .name { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.tabs { display: flex; gap: 4px; margin-top: 8px; }
+.tab {
+    border: none; background: none; cursor: pointer; padding: 8px 14px; font: 600 13.5px 'Segoe UI', sans-serif;
+    color: var(--dim); border-bottom: 2.5px solid transparent;
+}
+.tab.on { color: var(--tp-deep); border-bottom-color: var(--tp); }
+
+.feed { flex: 1; overflow-y: auto; padding: 18px 26px; display: flex; flex-direction: column; gap: 14px; }
+
+/* Channel post (threaded) */
+.post { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.post .head { display: flex; gap: 10px; padding: 12px 14px 0; }
+.av { width: 34px; height: 34px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex: 0 0 34px; }
+.post .who { font-size: 13.5px; font-weight: 700; }
+.post .when { font-size: 12px; color: var(--dim); font-weight: 400; margin-left: 8px; }
+.post .msg { padding: 6px 14px 12px 58px; font-size: 14px; line-height: 1.5; }
+.post .attach {
+    margin: 0 14px 12px 58px; display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--line); border-radius: 6px; padding: 7px 12px; font-size: 13px; background: var(--panel-alt);
+}
+.replies { border-top: 1px solid var(--line); background: var(--panel-alt); border-radius: 0 0 8px 8px; padding: 8px 14px; }
+.reply { display: flex; gap: 8px; padding: 6px 0; font-size: 13.5px; line-height: 1.45; }
+.reply .av { width: 26px; height: 26px; font-size: 10px; flex: 0 0 26px; }
+.reply .who { font-weight: 700; margin-right: 6px; }
+.replybox { display: flex; gap: 8px; padding-top: 8px; }
+.replybox input {
+    flex: 1; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; font: 400 13.5px 'Segoe UI', sans-serif;
+}
+.replybox button, .send {
+    border: none; background: var(--tp); color: #fff; border-radius: 6px; padding: 8px 14px;
+    font: 600 13.5px 'Segoe UI', sans-serif; cursor: pointer;
+}
+.replybox button:hover, .send:hover { background: var(--tp-deep); }
+
+/* Chat bubbles */
+.bubble-row { display: flex; gap: 10px; align-items: flex-end; }
+.bubble-row.mine { flex-direction: row-reverse; }
+.bubble { max-width: 62%; border-radius: 10px; padding: 10px 14px; font-size: 14px; line-height: 1.45; background: var(--panel-alt); border: 1px solid var(--line); }
+.bubble-row.mine .bubble { background: var(--tp-wash); border-color: #D5DAF5; }
+.bubble .who { font-size: 12px; font-weight: 700; color: var(--dim); margin-bottom: 3px; }
+
+.mention { color: var(--tp-deep); background: var(--tp-wash); border-radius: 4px; padding: 1px 5px; font-weight: 600; }
+
+/* Composer */
+.composer { border-top: 1px solid var(--line); padding: 14px 26px 16px; position: relative; }
+.composer .box { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.composer .box:focus-within { border-color: var(--tp); box-shadow: 0 0 0 1px var(--tp); }
+.composer textarea {
+    width: 100%; border: none; outline: none; resize: none; padding: 12px 14px 4px;
+    font: 400 14px 'Segoe UI', sans-serif; height: 58px; background: transparent;
+}
+.composer .toolrow { display: flex; align-items: center; gap: 6px; padding: 4px 8px 8px; }
+.composer .toolrow .ti {
+    border: none; background: none; cursor: pointer; font-size: 16px; color: var(--dim);
+    padding: 5px 8px; border-radius: 5px;
+}
+.composer .toolrow .ti:hover { background: #EFEFEF; }
+.composer .toolrow .send { margin-left: auto; }
+.composer .hint { font-size: 12px; color: var(--dim); margin-top: 6px; }
+.composer .hint b { color: var(--tp-deep); }
+
+/* @mention picker */
+.picker {
+    position: absolute; bottom: 108px; left: 40px; width: 280px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18);
+    display: none; z-index: 40; overflow: hidden;
+}
+.picker.show { display: block; }
+.picker .pi { display: flex; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer; font-size: 13.5px; }
+.picker .pi:hover, .picker .pi.hot { background: var(--tp-wash); }
+
+/* Files tab */
+.filetable { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.filetable th { text-align: left; color: var(--dim); font-weight: 600; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.filetable td { padding: 11px 12px; border-bottom: 1px solid #EFEFEF; }
+.filetable tr:hover td { background: var(--panel-alt); }
+.filetable .fi { margin-right: 10px; }
+.filenote { margin: 16px 0 0; font-size: 13px; color: var(--dim); background: var(--tp-wash); border-radius: 8px; padding: 12px 16px; line-height: 1.5; }
+
+/* Placeholder views */
+.placeholder { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--dim); text-align: center; padding: 30px; }
+.placeholder .big { font-size: 44px; }
+.placeholder p { max-width: 440px; font-size: 14px; line-height: 1.5; }
+
+/* ===== Things to try checklist ===== */
+.trybox {
+    max-width: 1280px; margin: 16px auto 0; background: #252542; border-radius: 12px; padding: 16px 22px; color: #fff;
+}
+.trybox h3 { font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.trybox .score { margin-left: auto; font-size: 13px; background: rgba(255,255,255,.14); border-radius: 20px; padding: 3px 12px; }
+.tries { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.try { display: flex; gap: 9px; align-items: flex-start; font-size: 13.5px; line-height: 1.4; color: #C9C9DE; }
+.try .tick {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid #6E6E9C; flex: 0 0 20px; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent;
+}
+.try.done { color: #fff; }
+.try.done .tick { background: #13A06E; border-color: #13A06E; color: #fff; }
+
+/* ===== Tour ===== */
+.tour-card {
+    position: fixed; z-index: 90; width: 340px; background: #fff; border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.4); padding: 18px 20px; display: none;
+}
+.tour-card.show { display: block; }
+.tour-card .step { font-size: 12px; font-weight: 700; color: var(--tp-deep); letter-spacing: .06em; margin-bottom: 6px; }
+.tour-card h4 { font-size: 16px; margin-bottom: 8px; }
+.tour-card p { font-size: 13.5px; line-height: 1.5; color: #3a3a3a; }
+.tour-card .btns { display: flex; gap: 8px; margin-top: 14px; }
+.tour-card .btns button { border: none; border-radius: 6px; padding: 8px 14px; font: 600 13px 'Segoe UI', sans-serif; cursor: pointer; }
+.tour-card .nextb { background: var(--tp); color: #fff; }
+.tour-card .endb { background: #EFEFEF; color: var(--ink); }
+.spot { position: relative; z-index: 85 !important; box-shadow: 0 0 0 3px var(--gold), 0 0 0 6px rgba(255,200,69,.35) !important; border-radius: 8px; }
+
+/* Toast */
+.toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #242424; color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 14px;
+    transition: transform .3s; z-index: 95; max-width: 90vw; text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 900px) {
+    .listpane { width: 220px; flex-basis: 220px; }
+    .rail { width: 62px; flex-basis: 62px; }
+    .window { height: 640px; }
+}
+</style>
+</head>
+<body>
+
+<div class="activity-header">
+    <h1>💬 Teams &amp; Channels Explorer</h1>
+    <span class="badge">FREE PLAY</span>
+    <div class="header-btns">
+        <button class="hbtn" id="tourBtn">🗺️ Show me around</button>
+        <button class="hbtn" id="resetBtn">↺ Reset</button>
+    </div>
+    <p>A safe practice copy of Microsoft Teams. Nothing you do here is real or sent to anyone; click anything. Try the tour first if Teams is new to you.</p>
+</div>
+
+<div class="window" id="appWindow">
+    <div class="titlebar">
+        <span style="font-weight:700;color:var(--tp-deep)">Teams</span>
+        <div class="search">🔍 Search (practice copy — search is decorative)</div>
+        <div class="me" title="You">YOU</div>
+    </div>
+    <div class="appbody">
+
+        <nav class="rail" id="rail">
+            <button data-view="activity" id="railActivity"><span class="dot" id="actDot">1</span><span class="ic">🔔</span>Activity</button>
+            <button data-view="chat" id="railChat"><span class="ic">💬</span>Chat</button>
+            <button data-view="teams" class="on" id="railTeams"><span class="ic">👥</span>Teams</button>
+            <button data-view="calendar"><span class="ic">📅</span>Calendar</button>
+            <button data-view="files"><span class="ic">📁</span>Files</button>
+        </nav>
+
+        <aside class="listpane" id="listpane"></aside>
+
+        <section class="main" id="main"></section>
+    </div>
+</div>
+
+<div class="trybox" id="trybox">
+    <h3>🎯 Things to try <span class="score" id="tryScore">0 / 5</span></h3>
+    <div class="tries">
+        <div class="try" data-try="openChannel"><span class="tick">✓</span><span>Open a different <b>channel</b> inside a team</span></div>
+        <div class="try" data-try="postChannel"><span class="tick">✓</span><span><b>Post a message</b> in a channel</span></div>
+        <div class="try" data-try="mention"><span class="tick">✓</span><span>Use an <b>@mention</b> to get someone's attention</span></div>
+        <div class="try" data-try="reply"><span class="tick">✓</span><span><b>Reply</b> to an existing conversation thread</span></div>
+        <div class="try" data-try="files"><span class="tick">✓</span><span>Find the channel's shared files in the <b>Files tab</b></span></div>
+    </div>
+</div>
+
+<div class="tour-card" id="tourCard">
+    <div class="step" id="tourStep">STEP 1 OF 6</div>
+    <h4 id="tourTitle"></h4>
+    <p id="tourText"></p>
+    <div class="btns">
+        <button class="endb" id="tourEnd">End tour</button>
+        <button class="nextb" id="tourNext">Next →</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DATA ================= */
+const PEOPLE = {
+    you:   { name: 'You',          init: 'YOU', col: '#5B5FC7' },
+    grace: { name: 'Grace Nguyen', init: 'GN',  col: '#B4009E' },
+    ben:   { name: 'Ben Carter',   init: 'BC',  col: '#038387' },
+    aiyana:{ name: 'Aiyana Walker',init: 'AW',  col: '#CA5010' },
+    sam:   { name: 'Sam Riley',    init: 'SR',  col: '#498205' },
+    tom:   { name: 'Tom Ellis',    init: 'TE',  col: '#69417F' }
+};
+
+const TEAMS = [
+    {
+        id: 'depot', name: 'Works Depot', init: 'WD', col: '#CA5010',
+        channels: {
+            'General': {
+                posts: [
+                    { who: 'aiyana', when: 'Yesterday 4:10 pm', text: 'Reminder: toolbox talk tomorrow at 7:30 am in the shed. New starters especially welcome.', replies: [
+                        { who: 'ben', text: 'Will be there 👍' } ] },
+                    { who: 'grace', when: 'Yesterday 9:02 am', text: 'The updated <b>site induction checklist</b> is in the Files tab of this channel, please use that version from now on.', attach: 'Site_Induction_Checklist.docx', replies: [] }
+                ],
+                files: [
+                    { name: 'Site_Induction_Checklist.docx', icon: '📄', mod: 'Yesterday', by: 'Grace Nguyen' },
+                    { name: 'Depot_Contact_List.xlsx', icon: '📊', mod: 'Last week', by: 'Aiyana Walker' }
+                ]
+            },
+            'Road Maintenance': {
+                posts: [
+                    { who: 'ben', when: 'Monday 8:15 am', text: 'Pothole crew heading out to the north road this week. Flag anything urgent here rather than texting me; then the whole team can see it.', replies: [
+                        { who: 'sam', text: 'Culvert near the crossing needs a look too, added photos to Files.' } ] }
+                ],
+                files: [ { name: 'Culvert_Photos.jpg', icon: '🖼️', mod: 'Monday', by: 'Sam Riley' } ]
+            },
+            'Vehicle Bookings': {
+                posts: [
+                    { who: 'sam', when: 'Friday 1:40 pm', text: 'Ute 2 is booked for the waste run every Tuesday. Book vehicles by posting here with the day and job.', replies: [] }
+                ],
+                files: [ { name: 'Vehicle_Booking_Sheet.xlsx', icon: '📊', mod: 'Friday', by: 'Sam Riley' } ]
+            }
+        }
+    },
+    {
+        id: 'community', name: 'Community Services', init: 'CS', col: '#038387',
+        channels: {
+            'General': {
+                posts: [
+                    { who: 'grace', when: 'Today 8:20 am', text: 'Welcome to the Community Services team. Use <b>Events</b> for anything public-facing and keep this channel for general team business.', replies: [] }
+                ],
+                files: [ { name: 'Program_Calendar.pdf', icon: '📕', mod: 'Last week', by: 'Grace Nguyen' } ]
+            },
+            'Events': {
+                posts: [
+                    { who: 'tom', when: 'Today 9:05 am', text: 'Sports carnival planning kicks off next week. Who can help with setup on the Saturday? Reply in this thread so we keep it all together.', replies: [
+                        { who: 'grace', text: 'I can do the morning shift.' } ] }
+                ],
+                files: [ { name: 'Carnival_Run_Sheet.docx', icon: '📄', mod: 'Today', by: 'Tom Ellis' } ]
+            },
+            'Youth Programs': { posts: [ { who: 'aiyana', when: 'Tuesday 3:30 pm', text: 'Holiday program numbers are up again, great work everyone.', replies: [] } ], files: [] }
+        }
+    },
+    {
+        id: 'allstaff', name: 'All Staff', init: 'AS', col: '#69417F',
+        channels: {
+            'General': {
+                posts: [ { who: 'aiyana', when: 'Monday 10:00 am', text: 'Payslips are now in the new system. See the announcement channel for the how-to guide.', replies: [] } ],
+                files: [ { name: 'Payslip_HowTo.pdf', icon: '📕', mod: 'Monday', by: 'Aiyana Walker' } ]
+            },
+            'Announcements': {
+                posts: [ { who: 'grace', when: 'Last week', text: '📢 The office will close at 3 pm on the last Friday of the month for the staff barbecue.', replies: [] } ],
+                files: []
+            },
+            'Social Club': {
+                posts: [ { who: 'tom', when: 'Wednesday', text: 'Footy tipping is back! Post here if you want in this season.', replies: [ { who: 'ben', text: 'Count me in 🏉' } ] } ],
+                files: []
+            }
+        }
+    }
+];
+
+const CHATS = [
+    { id: 'grace', people: ['grace'], msgs: [
+        { who: 'grace', text: 'Hi! Just checking you found the induction checklist okay?' },
+        { who: 'you', text: 'Yes thanks, got it from the Files tab.' } ] },
+    { id: 'ben', people: ['ben'], msgs: [
+        { who: 'ben', text: 'Are you coming past the depot today?' } ] },
+    { id: 'group', people: ['tom', 'sam'], groupName: 'Carnival setup crew', msgs: [
+        { who: 'tom', text: 'This group chat is just us three for quick carnival logistics.' },
+        { who: 'sam', text: 'Easier than email 😄' } ] }
+];
+
+/* ================= STATE ================= */
+let view = 'teams';
+let curTeam = 'depot', curChannel = 'General', curTab = 'posts', curChat = 'grace';
+const tries = { openChannel: false, postChannel: false, mention: false, reply: false, files: false };
+
+/* ================= HELPERS ================= */
+const $ = (s) => document.querySelector(s);
+const esc = (t) => t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function toast(msg) {
+    const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 3200);
+}
+function avatar(p, cls) { const q = PEOPLE[p]; return `<span class="av ${cls||''}" style="background:${q.col}">${q.init}</span>`; }
+function markTry(key, msg) {
+    if (tries[key]) return;
+    tries[key] = true;
+    document.querySelector(`.try[data-try="${key}"]`).classList.add('done');
+    const done = Object.values(tries).filter(Boolean).length;
+    $('#tryScore').textContent = `${done} / 5`;
+    toast(msg + (done === 5 ? ' — that’s all five, nice work! 🎉' : ''));
+}
+function renderMentions(text) {
+    return text.replace(/@\[(.+?)\]/g, '<span class="mention">@$1</span>');
+}
+
+/* ================= LIST PANE ================= */
+function renderListPane() {
+    const lp = $('#listpane');
+    if (view === 'teams') {
+        lp.innerHTML = '<h2>Teams</h2>' + TEAMS.map(t => `
+            <div class="teamrow ${t.id === curTeam ? 'open' : ''}" data-team="${t.id}">
+                <div class="teamhead" data-team="${t.id}">
+                    <span class="icon" style="background:${t.col}">${t.init}</span>${t.name}
+                    <span class="chev">▶</span>
+                </div>
+                <div class="channels">
+                    ${Object.keys(t.channels).map(c => `<div class="channel ${t.id === curTeam && c === curChannel ? 'on' : ''}" data-team="${t.id}" data-channel="${c}">${c}</div>`).join('')}
+                </div>
+            </div>`).join('');
+        lp.querySelectorAll('.teamhead').forEach(h => h.addEventListener('click', () => {
+            h.parentElement.classList.toggle('open');
+        }));
+        lp.querySelectorAll('.channel').forEach(c => c.addEventListener('click', () => {
+            const first = (curTeam === c.dataset.team && curChannel === c.dataset.channel);
+            curTeam = c.dataset.team; curChannel = c.dataset.channel; curTab = 'posts';
+            if (!first && curChannel !== 'General') markTry('openChannel', 'You opened a channel. Each channel keeps one topic in one place.');
+            else if (!first) markTry('openChannel', 'You opened a channel.');
+            renderListPane(); renderMain();
+        }));
+    } else if (view === 'chat') {
+        lp.innerHTML = '<h2>Chat</h2>' + CHATS.map(c => {
+            const label = c.groupName || PEOPLE[c.people[0]].name;
+            const av = c.groupName
+                ? '<span class="av" style="background:#69417F">👥</span>'
+                : avatar(c.people[0]);
+            const last = c.msgs[c.msgs.length - 1];
+            return `<div class="chatrow ${c.id === curChat ? 'on' : ''}" data-chat="${c.id}">
+                ${av}<div><div class="nm">${label}</div><div class="pv">${last ? esc(last.text.slice(0, 40)) : ''}</div></div>
+            </div>`;
+        }).join('');
+        lp.querySelectorAll('.chatrow').forEach(r => r.addEventListener('click', () => {
+            curChat = r.dataset.chat; renderListPane(); renderMain();
+        }));
+    } else {
+        lp.innerHTML = '<h2>&nbsp;</h2>';
+    }
+}
+
+/* ================= MAIN PANE ================= */
+function team() { return TEAMS.find(t => t.id === curTeam); }
+function channel() { return team().channels[curChannel]; }
+function chat() { return CHATS.find(c => c.id === curChat); }
+
+function composerHTML(kind) {
+    return `
+    <div class="composer" id="composer">
+        <div class="picker" id="picker"></div>
+        <div class="box">
+            <textarea id="draft" placeholder="${kind === 'chat' ? 'Type a message' : 'Start a post in this channel'}&#8230; type @ to mention someone"></textarea>
+            <div class="toolrow">
+                <button class="ti" title="Mention someone" id="atBtn">＠</button>
+                <button class="ti" title="Attach a file (adds a practice file)" id="clipBtn">📎</button>
+                <button class="ti" title="Emoji">😊</button>
+                <button class="send" id="sendBtn">Send ➤</button>
+            </div>
+        </div>
+        <div class="hint">Tip: type <b>@</b> (or click ＠) to mention a person; they get a notification instead of hoping they scroll past your message.</div>
+    </div>`;
+}
+
+function renderMain() {
+    const m = $('#main');
+    if (view === 'teams') {
+        const t = team(), ch = channel();
+        let inner = `
+        <div class="mainhead">
+            <div class="crumb">${t.name}</div>
+            <div class="name"># ${curChannel}</div>
+            <div class="tabs">
+                <button class="tab ${curTab === 'posts' ? 'on' : ''}" data-tab="posts">Posts</button>
+                <button class="tab ${curTab === 'files' ? 'on' : ''}" data-tab="files">Files</button>
+                <button class="tab" data-tab="plus">＋</button>
+            </div>
+        </div>`;
+        if (curTab === 'posts') {
+            inner += `<div class="feed" id="feed">` + ch.posts.map((p, i) => `
+                <div class="post">
+                    <div class="head">${avatar(p.who)}<div><span class="who">${PEOPLE[p.who].name}</span><span class="when">${p.when}</span></div></div>
+                    <div class="msg">${renderMentions(p.text)}</div>
+                    ${p.attach ? `<div class="attach">📎 ${p.attach}</div>` : ''}
+                    <div class="replies">
+                        ${p.replies.map(r => `<div class="reply">${avatar(r.who)}<div><span class="who">${PEOPLE[r.who].name}</span>${renderMentions(esc(r.text))}</div></div>`).join('')}
+                        <div class="replybox"><input type="text" placeholder="Reply to this conversation&#8230;" data-post="${i}"><button data-post="${i}">Reply</button></div>
+                    </div>
+                </div>`).join('') + `</div>` + composerHTML('channel');
+        } else if (curTab === 'files') {
+            inner += `<div class="feed">
+                <table class="filetable">
+                    <tr><th>Name</th><th>Modified</th><th>Modified by</th></tr>
+                    ${ch.files.length ? ch.files.map(f => `<tr><td><span class="fi">${f.icon}</span>${f.name}</td><td>${f.mod}</td><td>${f.by}</td></tr>`).join('') : '<tr><td colspan="3" style="color:var(--dim)">No files in this channel yet. Attach one to a post and it will appear here.</td></tr>'}
+                </table>
+                <p class="filenote">📌 Every file shared in the <b># ${curChannel}</b> channel lands here automatically, stored in the cloud, one copy for everyone. No more emailing attachments back and forth.</p>
+            </div>`;
+        }
+        m.innerHTML = inner;
+        m.querySelectorAll('.tab').forEach(tb => tb.addEventListener('click', () => {
+            if (tb.dataset.tab === 'plus') { toast('In real Teams, ＋ adds extra tabs like a Planner board or a shared document.'); return; }
+            curTab = tb.dataset.tab;
+            if (curTab === 'files') markTry('files', 'You found the Files tab: every file shared in the channel lives here.');
+            renderMain();
+        }));
+        m.querySelectorAll('.replybox button').forEach(b => b.addEventListener('click', () => sendReply(b.dataset.post)));
+        m.querySelectorAll('.replybox input').forEach(inp => inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter') sendReply(inp.dataset.post);
+        }));
+        wireComposer('channel');
+    } else if (view === 'chat') {
+        const c = chat();
+        const label = c.groupName || PEOPLE[c.people[0]].name;
+        m.innerHTML = `
+        <div class="mainhead">
+            <div class="crumb">Chat ${c.groupName ? '· group of ' + (c.people.length + 1) : '· one-to-one'}</div>
+            <div class="name">${label}</div>
+            <div class="tabs"><button class="tab on">Chat</button><button class="tab" data-tab="files2">Files</button></div>
+        </div>
+        <div class="feed" id="feed">
+            ${c.msgs.map(msg => `
+                <div class="bubble-row ${msg.who === 'you' ? 'mine' : ''}">
+                    ${avatar(msg.who)}
+                    <div class="bubble">${c.groupName && msg.who !== 'you' ? `<div class="who">${PEOPLE[msg.who].name}</div>` : ''}${renderMentions(esc(msg.text))}</div>
+                </div>`).join('')}
+        </div>` + composerHTML('chat');
+        m.querySelector('[data-tab="files2"]')?.addEventListener('click', () => toast('Chats have a Files tab too — it collects files shared in this chat.'));
+        wireComposer('chat');
+    } else if (view === 'activity') {
+        $('#actDot').classList.remove('show');
+        m.innerHTML = `<div class="mainhead"><div class="crumb">Activity</div><div class="name">🔔 Your notifications</div><div class="tabs"><button class="tab on">Feed</button></div></div>
+        <div class="feed" id="activityFeed">${window._activity && window._activity.length ? window._activity.map(a => `
+            <div class="post"><div class="head">${avatar(a.who)}<div><span class="who">${a.title}</span><span class="when">just now</span></div></div><div class="msg">${a.text}</div></div>`).join('') :
+            '<div class="placeholder"><span class="big">🔔</span><p>Nothing yet. When someone <b>@mentions you</b>, replies to you, or reacts to your message, it shows up here so you never miss it.</p><p>Try posting a message with an @mention and watch this space.</p></div>'}
+        </div>`;
+    } else if (view === 'calendar') {
+        m.innerHTML = `<div class="placeholder"><span class="big">📅</span>
+            <p><b>Calendar lives here in real Teams</b>, showing your meetings for the week.</p>
+            <p>This practice tool keeps the focus on teams, channels and chat. Meetings have their own practice tool: the <b>Teams Meetings simulator</b> in the catalogue.</p></div>`;
+    } else if (view === 'files') {
+        m.innerHTML = `<div class="placeholder"><span class="big">📁</span>
+            <p><b>The Files area collects your recent files from every team and chat</b> in one list.</p>
+            <p>In this practice tool, look at the <b>Files tab inside a channel</b> instead; that is where day-to-day sharing happens.</p></div>`;
+    }
+}
+
+/* ================= POSTING ================= */
+function sendReply(idx) {
+    const inp = document.querySelector(`.replybox input[data-post="${idx}"]`);
+    const val = inp.value.trim();
+    if (!val) { toast('Type a short reply first.'); return; }
+    channel().posts[idx].replies.push({ who: 'you', text: val });
+    markTry('reply', 'You replied inside the thread, keeping the conversation in one tidy place.');
+    renderMain();
+}
+
+function wireComposer(kind) {
+    const draft = $('#draft'), picker = $('#picker');
+    if (!draft) return;
+    let attachPending = false;
+
+    const openPicker = () => {
+        picker.innerHTML = Object.entries(PEOPLE).filter(([k]) => k !== 'you').map(([k, p]) =>
+            `<div class="pi" data-p="${k}">${avatar(k)} ${p.name}</div>`).join('');
+        picker.classList.add('show');
+        picker.querySelectorAll('.pi').forEach(pi => pi.addEventListener('click', () => {
+            const p = PEOPLE[pi.dataset.p];
+            draft.value = draft.value.replace(/@\S*$/, '') + `@[${p.name}] `;
+            picker.classList.remove('show');
+            draft.focus();
+        }));
+    };
+
+    draft.addEventListener('input', () => {
+        if (/@\w*$/.test(draft.value) && draft.value.endsWith('@')) openPicker();
+        else if (!/@\w*$/.test(draft.value)) picker.classList.remove('show');
+    });
+    $('#atBtn').addEventListener('click', () => { draft.value += '@'; openPicker(); draft.focus(); });
+    $('#clipBtn').addEventListener('click', () => {
+        attachPending = true;
+        toast('📎 Practice file "Site_Photos.jpg" attached — it will land in the Files tab when you send.');
+    });
+    draft.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+    });
+    $('#sendBtn').addEventListener('click', doSend);
+
+    function doSend() {
+        const val = draft.value.trim();
+        if (!val && !attachPending) { toast('Type a message first, then Send.'); return; }
+        const hasMention = /@\[.+?\]/.test(val);
+        if (kind === 'channel') {
+            const post = { who: 'you', when: 'Just now', text: esc(val).replace(/@\[(.+?)\]/g, '@[$1]'), replies: [] };
+            if (attachPending) {
+                post.attach = 'Site_Photos.jpg';
+                channel().files.unshift({ name: 'Site_Photos.jpg', icon: '🖼️', mod: 'Just now', by: 'You' });
+            }
+            channel().posts.push(post);
+            markTry('postChannel', 'Posted! Everyone in this channel can see it, including people who join the team later.');
+        } else {
+            chat().msgs.push({ who: 'you', text: val });
+            toast('Sent. Chats are quick and informal; channels keep team topics organised.');
+        }
+        if (hasMention) {
+            markTry('mention', 'You @mentioned someone; they get a notification in their Activity feed.');
+            window._activity = window._activity || [];
+            const m = val.match(/@\[(.+?)\]/);
+            window._activity.unshift({ who: 'you', title: `You mentioned ${m[1]}`, text: renderMentions(esc(val)) });
+            $('#actDot').classList.add('show');
+            $('#actDot').textContent = window._activity.length;
+        }
+        renderMain();
+        const feed = $('#feed'); if (feed) feed.scrollTop = feed.scrollHeight;
+    }
+}
+
+/* ================= RAIL ================= */
+document.querySelectorAll('.rail button').forEach(b => b.addEventListener('click', () => {
+    view = b.dataset.view;
+    document.querySelectorAll('.rail button').forEach(x => x.classList.toggle('on', x === b));
+    renderListPane(); renderMain();
+}));
+
+/* ================= TOUR ================= */
+const TOUR = [
+    { sel: '#rail', title: 'The app rail', text: 'These buttons switch between the main areas of Teams. The two you will use most are Chat and Teams. The red badge on Activity means something needs your attention.' },
+    { sel: '#railChat', title: 'Chat vs Teams — the big idea', text: 'CHAT is for quick private messages to one person or a small group, like texting. TEAMS is for ongoing work topics the whole team should see. If others would benefit from reading it later, it belongs in a team channel.' },
+    { sel: '#listpane', title: 'Teams and their channels', text: 'Each team (like Works Depot) is a group of people. Inside it, channels split the conversation by topic, so vehicle bookings never bury the road maintenance discussion. Click a team name to expand its channels.' },
+    { sel: '#feed', title: 'Posts and threads', text: 'A channel conversation is made of posts. Replies stay attached underneath the post they answer, so the whole story stays in one place. Use Reply on an existing post rather than starting a new one on the same topic.' },
+    { sel: '#composer', title: '@mentions', text: 'Type @ and pick a name to mention someone. They get a notification in their Activity feed, which beats hoping they happen to scroll past. Mention people when you need them, not the whole team every time.' },
+    { sel: '.tabs', title: 'The Files tab', text: 'Every channel has a Files tab. Any file shared in the channel is stored there automatically, in the cloud, one copy for everyone. That is the modern answer to emailing attachments around.' }
+];
+let tourAt = -1;
+function tourShow(i) {
+    document.querySelectorAll('.spot').forEach(el => el.classList.remove('spot'));
+    if (i >= TOUR.length) { tourEnd(); toast('Tour finished — now try the checklist below. 🎯'); return; }
+    tourAt = i;
+    const step = TOUR[i];
+    if (i === 3 || i === 4 || i === 5) { view = 'teams'; document.querySelectorAll('.rail button').forEach(x => x.classList.toggle('on', x.dataset.view === 'teams')); curTab = 'posts'; renderListPane(); renderMain(); }
+    const el = document.querySelector(step.sel);
+    if (el) el.classList.add('spot');
+    $('#tourStep').textContent = `STEP ${i + 1} OF ${TOUR.length}`;
+    $('#tourTitle').textContent = step.title;
+    $('#tourText').textContent = step.text;
+    const card = $('#tourCard');
+    card.classList.add('show');
+    const r = el ? el.getBoundingClientRect() : { right: 100, top: 100, left: 0, bottom: 0 };
+    let x = Math.min(r.right + 14, window.innerWidth - 360);
+    let y = Math.max(14, Math.min(r.top, window.innerHeight - 260));
+    if (x < 0) x = 14;
+    card.style.left = x + 'px'; card.style.top = y + 'px';
+    $('#tourNext').textContent = (i === TOUR.length - 1) ? 'Finish ✓' : 'Next →';
+}
+function tourEnd() {
+    document.querySelectorAll('.spot').forEach(el => el.classList.remove('spot'));
+    $('#tourCard').classList.remove('show');
+    tourAt = -1;
+}
+$('#tourBtn').addEventListener('click', () => tourShow(0));
+$('#tourNext').addEventListener('click', () => tourShow(tourAt + 1));
+$('#tourEnd').addEventListener('click', tourEnd);
+
+/* ================= RESET ================= */
+$('#resetBtn').addEventListener('click', () => location.reload());
+
+/* ================= INIT ================= */
+renderListPane(); renderMain();
+</script>
+</body>
+</html>

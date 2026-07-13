@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Files &amp; Sharing Sandbox — Free-Play</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --tp: #5B5FC7;
+    --tp-deep: #4F52B2;
+    --tp-wash: #E8EBFA;
+    --bg-page: #1a1a2e;
+    --bg-app: #F5F5F5;
+    --panel: #FFFFFF;
+    --panel-alt: #FAFAFA;
+    --line: #E1E1E1;
+    --ink: #242424;
+    --dim: #616161;
+    --gold: #FFC845;
+    --good: #13795B;
+    --good-wash: #E3F1E9;
+    --bad: #A3341F;
+    --bad-wash: #F9E9E4;
+    --cloud: #EAF3FB;
+    --cloud-edge: #B8D4EA;
+}
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-page); min-height: 100vh; padding: 20px; color: var(--ink); }
+
+/* ===== Activity header (site convention) ===== */
+.activity-header {
+    max-width: 1280px; margin: 0 auto 16px auto;
+    background: linear-gradient(135deg, #5b5fc7 0%, #7b2cbf 100%);
+    border-radius: 12px; padding: 18px 24px; color: #fff;
+    box-shadow: 0 4px 20px rgba(91, 95, 199, 0.4);
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.activity-header h1 { font-size: 21px; }
+.activity-header p { font-size: 14px; opacity: .95; line-height: 1.45; flex-basis: 100%; }
+.badge { background: rgba(255,255,255,.2); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+.header-btns { margin-left: auto; display: flex; gap: 10px; }
+.hbtn { border: none; border-radius: 8px; padding: 9px 16px; cursor: pointer; font: 600 14px 'Segoe UI', sans-serif; background: rgba(255,255,255,.92); color: var(--tp-deep); }
+.hbtn:hover { background: #fff; }
+
+/* ===== App window ===== */
+.window {
+    max-width: 1280px; margin: 0 auto; height: 720px;
+    background: var(--bg-app); border-radius: 12px; overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,.45); position: relative;
+}
+.titlebar {
+    height: 48px; background: #EBEBEB; display: flex; align-items: center;
+    gap: 14px; padding: 0 16px; border-bottom: 1px solid var(--line); flex: 0 0 48px;
+}
+.titlebar .search { flex: 0 1 420px; margin: 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font-size: 13px; color: var(--dim); text-align: center; }
+.titlebar .me { width: 32px; height: 32px; border-radius: 50%; background: var(--tp); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+.appbody { flex: 1; display: flex; min-height: 0; }
+
+/* App rail */
+.rail { width: 76px; background: #EBEBEB; border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding-top: 10px; gap: 2px; flex: 0 0 76px; }
+.rail button {
+    width: 64px; border: none; background: none; cursor: pointer; border-radius: 8px;
+    padding: 8px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font: 400 11px 'Segoe UI', sans-serif; color: var(--dim); position: relative;
+}
+.rail button .ic { font-size: 20px; line-height: 1; }
+.rail button:hover { background: #E0E0E0; }
+.rail button.on { color: var(--tp-deep); font-weight: 600; }
+.rail button.on::before { content: ''; position: absolute; left: -6px; top: 12px; bottom: 12px; width: 3px; border-radius: 2px; background: var(--tp); }
+
+/* List pane */
+.listpane { width: 235px; background: var(--panel-alt); border-right: 1px solid var(--line); overflow-y: auto; flex: 0 0 235px; }
+.listpane h2 { font-size: 16px; padding: 14px 14px 8px; }
+.chatrow { display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer; border-left: 3px solid transparent; }
+.chatrow:hover { background: #EFEFEF; }
+.chatrow.on { background: var(--panel); border-left-color: var(--tp); }
+.av { width: 32px; height: 32px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex: 0 0 32px; }
+.chatrow .nm { font-size: 13px; font-weight: 600; }
+.chatrow .pv { font-size: 11.5px; color: var(--dim); }
+.teamhead { display: flex; align-items: center; gap: 10px; padding: 9px 12px; font-weight: 600; font-size: 13.5px; }
+.teamhead .icon { width: 30px; height: 30px; border-radius: 8px; color: #fff; flex: 0 0 30px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: #CA5010; }
+.channel { padding: 6px 10px 6px 52px; cursor: pointer; font-size: 13px; color: var(--dim); }
+.channel:hover { background: #EFEFEF; }
+.channel.on { background: var(--panel); color: var(--tp-deep); font-weight: 600; box-shadow: inset 3px 0 0 var(--tp); }
+
+/* Main pane */
+.main { flex: 1; display: flex; flex-direction: column; background: var(--panel); min-width: 0; }
+.mainhead { border-bottom: 1px solid var(--line); padding: 10px 18px 0; }
+.mainhead .crumb { font-size: 12px; color: var(--dim); }
+.mainhead .name { font-size: 16px; font-weight: 700; }
+.tabs { display: flex; gap: 4px; margin-top: 6px; }
+.tab { border: none; background: none; cursor: pointer; padding: 7px 12px; font: 600 13px 'Segoe UI', sans-serif; color: var(--dim); border-bottom: 2.5px solid transparent; }
+.tab.on { color: var(--tp-deep); border-bottom-color: var(--tp); }
+.feed { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+
+.bubble-row { display: flex; gap: 9px; align-items: flex-end; }
+.bubble-row.mine { flex-direction: row-reverse; }
+.bubble { max-width: 72%; border-radius: 10px; padding: 9px 13px; font-size: 13.5px; line-height: 1.45; background: var(--panel-alt); border: 1px solid var(--line); }
+.bubble-row.mine .bubble { background: var(--tp-wash); border-color: #D5DAF5; }
+
+.post { border: 1px solid var(--line); border-radius: 8px; }
+.post .head { display: flex; gap: 9px; padding: 10px 12px 0; align-items: center; }
+.post .who { font-size: 13px; font-weight: 700; }
+.post .when { font-size: 11.5px; color: var(--dim); margin-left: 7px; }
+.post .msg { padding: 5px 12px 11px 53px; font-size: 13.5px; line-height: 1.5; }
+
+/* File chip (clickable — opens co-edit) */
+.fchip {
+    display: inline-flex; align-items: center; gap: 9px; margin-top: 7px;
+    border: 1px solid var(--line); border-radius: 7px; padding: 8px 12px; font-size: 12.5px;
+    background: #fff; cursor: pointer; font-weight: 600;
+}
+.fchip:hover { border-color: var(--tp); background: var(--tp-wash); }
+.fchip .loc { display: block; font-weight: 400; font-size: 11px; color: var(--dim); }
+
+/* Composer */
+.composer { border-top: 1px solid var(--line); padding: 11px 18px 13px; }
+.composer .box { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); display: flex; align-items: center; padding: 4px 8px 4px 4px; }
+.composer .box:focus-within { border-color: var(--tp); box-shadow: 0 0 0 1px var(--tp); }
+.composer input { flex: 1; border: none; outline: none; padding: 9px 10px; font: 400 13.5px 'Segoe UI', sans-serif; background: transparent; }
+.composer .ti { border: none; background: none; cursor: pointer; font-size: 17px; color: var(--dim); padding: 6px 9px; border-radius: 5px; }
+.composer .ti:hover { background: #EFEFEF; }
+.composer .ti.pulse { animation: pulse 1.6s infinite; border-radius: 5px; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(91,95,199,0); } 50% { box-shadow: 0 0 0 5px rgba(91,95,199,.35); } }
+.send { border: none; background: var(--tp); color: #fff; border-radius: 6px; padding: 8px 13px; font: 600 13px 'Segoe UI', sans-serif; cursor: pointer; }
+.send:hover { background: var(--tp-deep); }
+.composer .hint { font-size: 11.5px; color: var(--dim); margin-top: 5px; }
+.composer .hint b { color: var(--tp-deep); }
+
+/* Files tab table */
+.filetable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.filetable th { text-align: left; color: var(--dim); font-weight: 600; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+.filetable td { padding: 10px; border-bottom: 1px solid #EFEFEF; }
+.filetable tr.clickable { cursor: pointer; }
+.filetable tr.clickable:hover td { background: var(--tp-wash); }
+.filenote { margin-top: 14px; font-size: 12.5px; color: var(--dim); background: var(--tp-wash); border-radius: 8px; padding: 11px 14px; line-height: 1.5; }
+
+/* ===== Cloud map panel ===== */
+.cloudmap {
+    width: 330px; flex: 0 0 330px; background: var(--cloud); border-left: 1px solid var(--cloud-edge);
+    overflow-y: auto; padding: 14px;
+}
+.cloudmap h3 { font-size: 14.5px; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.cloudmap .sub { font-size: 11.5px; color: var(--dim); margin-bottom: 12px; line-height: 1.45; }
+.drive { background: #fff; border: 1.5px solid var(--cloud-edge); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+.drive h4 { font-size: 13px; display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.drive .who { font-size: 11px; color: var(--dim); margin-bottom: 8px; line-height: 1.4; }
+.folder { font-size: 12px; font-weight: 600; color: var(--ink); padding: 4px 0 2px; }
+.cfile {
+    display: flex; align-items: center; gap: 7px; font-size: 12px; padding: 5px 8px; margin: 2px 0 2px 14px;
+    border-radius: 6px; background: var(--panel-alt); border: 1px solid transparent;
+}
+.cfile .cwho { margin-left: auto; font-size: 10px; color: var(--dim); white-space: nowrap; }
+.cfile.new { border-color: var(--good); background: var(--good-wash); animation: land .8s; }
+@keyframes land { 0% { transform: translateY(-14px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.emptyf { font-size: 11.5px; color: var(--dim); font-style: italic; margin-left: 14px; padding: 3px 0; }
+.keybox { background: #FFF9E8; border: 1px solid #EBD9A0; border-radius: 8px; padding: 10px 12px; font-size: 11.5px; line-height: 1.55; }
+
+/* ===== Modals ===== */
+.overlay { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 50; display: none; align-items: center; justify-content: center; padding: 24px; }
+.overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 14px; max-width: 640px; width: 100%; max-height: 92%; overflow-y: auto; padding: 24px 28px; }
+.modal h2 { font-size: 19px; margin-bottom: 6px; }
+.modal .sub2 { color: var(--dim); font-size: 13px; margin-bottom: 14px; line-height: 1.45; }
+.pickrow {
+    display: flex; align-items: center; gap: 12px; border: 1.5px solid var(--line); border-radius: 9px;
+    padding: 11px 14px; margin-bottom: 8px; cursor: pointer; font-size: 14px;
+}
+.pickrow:hover { border-color: var(--tp); background: var(--tp-wash); }
+.pickrow .fic { font-size: 20px; }
+.pickrow small { display: block; color: var(--dim); font-size: 12px; }
+.dest { background: var(--cloud); border: 1px solid var(--cloud-edge); border-radius: 9px; padding: 12px 15px; font-size: 13px; line-height: 1.55; margin: 12px 0; }
+.dest b { color: var(--tp-deep); }
+.mbtns { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.mbtn { border: none; border-radius: 8px; padding: 10px 17px; font: 600 13.5px 'Segoe UI', sans-serif; cursor: pointer; }
+.mbtn.primary { background: var(--tp); color: #fff; }
+.mbtn.primary:hover { background: var(--tp-deep); }
+.mbtn.ghost { background: #EFEFEF; }
+
+/* Co-edit modal */
+.doc { border: 1.5px solid var(--line); border-radius: 9px; overflow: hidden; margin: 10px 0; }
+.doc .dochead { background: #F3F2F1; padding: 8px 14px; display: flex; align-items: center; gap: 10px; font-size: 12.5px; border-bottom: 1px solid var(--line); }
+.doc .presence { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--dim); }
+.doc .pav { width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; }
+.doc textarea { width: 100%; border: none; outline: none; resize: none; padding: 14px 16px; font: 400 14px Georgia, serif; height: 120px; }
+.gline { font-size: 13px; padding: 0 16px 12px; color: #B4009E; font-family: Georgia, serif; }
+.gline .cursor { display: inline-block; width: 2px; height: 15px; background: #B4009E; vertical-align: text-bottom; animation: blink2 1s infinite; }
+@keyframes blink2 { 50% { opacity: 0; } }
+.autosave { font-size: 11.5px; color: var(--good); padding: 6px 16px 10px; }
+
+/* Email trap modal */
+.trapgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.trapcol { border: 1.5px solid var(--line); border-radius: 10px; padding: 13px 15px; }
+.trapcol h4 { font-size: 13.5px; margin-bottom: 8px; }
+.trapcol button { width: 100%; border: none; border-radius: 7px; padding: 9px; font: 600 13px 'Segoe UI', sans-serif; cursor: pointer; margin-bottom: 10px; }
+.trapcol .go-bad { background: var(--bad-wash); color: var(--bad); }
+.trapcol .go-good { background: var(--good-wash); color: var(--good); }
+.trapout { font-size: 12px; line-height: 1.5; min-height: 130px; }
+.vfile { display: flex; align-items: center; gap: 7px; padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; animation: land .5s; }
+.vfile.bad { background: var(--bad-wash); }
+.vfile.good { background: var(--good-wash); }
+.verdict { border-radius: 7px; padding: 8px 11px; font-size: 12px; font-weight: 600; margin-top: 7px; animation: land .5s; }
+.verdict.bad { background: var(--bad); color: #fff; }
+.verdict.good { background: var(--good); color: #fff; }
+
+/* ===== Things to try ===== */
+.trybox { max-width: 1280px; margin: 16px auto 0; background: #252542; border-radius: 12px; padding: 16px 22px; color: #fff; }
+.trybox h3 { font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.trybox .score { margin-left: auto; font-size: 13px; background: rgba(255,255,255,.14); border-radius: 20px; padding: 3px 12px; }
+.tries { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.try { display: flex; gap: 9px; align-items: flex-start; font-size: 13.5px; line-height: 1.4; color: #C9C9DE; }
+.try .tick { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #6E6E9C; flex: 0 0 20px; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; }
+.try.done { color: #fff; }
+.try.done .tick { background: #13A06E; border-color: #13A06E; color: #fff; }
+
+/* Toast */
+.toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #242424; color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 14px;
+    transition: transform .3s; z-index: 95; max-width: 90vw; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,.4);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 1100px) { .cloudmap { display: none; } }
+@media (max-width: 900px) { .listpane { width: 200px; flex-basis: 200px; } .window { height: 660px; } }
+</style>
+</head>
+<body>
+
+<div class="activity-header">
+    <h1>☁️ Files &amp; Sharing Sandbox</h1>
+    <span class="badge">FREE PLAY</span>
+    <div class="header-btns">
+        <button class="hbtn" id="trapBtn">📧 The email trap</button>
+        <button class="hbtn" id="resetBtn">↺ Reset</button>
+    </div>
+    <p>Share practice files in a chat and in a channel, and watch the <b>cloud map</b> on the right to see where each file really lives. Nothing here is real; share away.</p>
+</div>
+
+<div class="window" id="appWindow">
+    <div class="titlebar">
+        <span style="font-weight:700;color:var(--tp-deep)">Teams</span>
+        <div class="search">🔍 Search (practice copy)</div>
+        <div class="me" title="You">YOU</div>
+    </div>
+    <div class="appbody">
+        <nav class="rail">
+            <button data-view="chat" id="railChat"><span class="ic">💬</span>Chat</button>
+            <button data-view="teams" class="on" id="railTeams"><span class="ic">👥</span>Teams</button>
+        </nav>
+
+        <aside class="listpane" id="listpane"></aside>
+        <section class="main" id="main"></section>
+
+        <aside class="cloudmap" id="cloudmap"></aside>
+    </div>
+
+    <!-- File picker modal -->
+    <div class="overlay" id="pickOverlay">
+        <div class="modal">
+            <h2>📎 Share a file</h2>
+            <div class="sub2">Pick a practice file. In real Teams you would choose "Upload from this device" or attach one already in the cloud; either way it ends up in the cloud, not stuck in the message.</div>
+            <div id="pickList"></div>
+            <div class="dest" id="destPreview"></div>
+            <div class="mbtns">
+                <button class="mbtn ghost" id="pickCancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Co-edit modal -->
+    <div class="overlay" id="editOverlay">
+        <div class="modal">
+            <h2 id="editTitle">📄 Document</h2>
+            <div class="sub2">This is the one and only copy, open in the cloud. Grace opened the same link; you are both editing <b>the same file at the same time</b>.</div>
+            <div class="doc">
+                <div class="dochead">
+                    <span id="editName">file.docx</span>
+                    <span class="presence">
+                        <span class="pav" style="background:#B4009E">GN</span>
+                        <span class="pav" style="background:#5B5FC7">YOU</span>
+                        Grace Nguyen is editing…
+                    </span>
+                </div>
+                <textarea id="docText">Type here — your changes save automatically.</textarea>
+                <div class="gline" id="graceLine"></div>
+                <div class="autosave">✓ Saved to the cloud just now — no Save button, no attachments, no versions to email around.</div>
+            </div>
+            <div class="mbtns"><button class="mbtn primary" id="editClose">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Email trap modal -->
+    <div class="overlay" id="trapOverlay">
+        <div class="modal">
+            <h2>📧 The email trap: copies vs one shared link</h2>
+            <div class="sub2">You need three people to update the grader timesheet. Try both ways and compare what you end up with.</div>
+            <div class="trapgrid">
+                <div class="trapcol">
+                    <h4>📧 Email everyone a copy</h4>
+                    <button class="go-bad" id="goBad">Send 3 copies</button>
+                    <div class="trapout" id="badOut"></div>
+                </div>
+                <div class="trapcol">
+                    <h4>🔗 Share one cloud link</h4>
+                    <button class="go-good" id="goGood">Share the link</button>
+                    <div class="trapout" id="goodOut"></div>
+                </div>
+            </div>
+            <div class="mbtns"><button class="mbtn primary" id="trapClose">Close</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="trybox">
+    <h3>🎯 Things to try <span class="score" id="tryScore">0 / 5</span></h3>
+    <div class="tries">
+        <div class="try" data-try="chatShare"><span class="tick">✓</span><span>Share a file in a <b>chat</b> and watch where it lands</span></div>
+        <div class="try" data-try="channelShare"><span class="tick">✓</span><span>Share a file in a <b>channel</b> and compare</span></div>
+        <div class="try" data-try="filesTab"><span class="tick">✓</span><span>Find your shared file in the channel's <b>Files tab</b></span></div>
+        <div class="try" data-try="coedit"><span class="tick">✓</span><span><b>Open a shared file</b> and co-edit it with Grace</span></div>
+        <div class="try" data-try="trap"><span class="tick">✓</span><span>See both sides of the <b>email trap</b></span></div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DATA ================= */
+const PEOPLE = {
+    you:   { name: 'You',          init: 'YOU', col: '#5B5FC7' },
+    grace: { name: 'Grace Nguyen', init: 'GN',  col: '#B4009E' },
+    ben:   { name: 'Ben Carter',   init: 'BC',  col: '#038387' },
+    sam:   { name: 'Sam Riley',    init: 'SR',  col: '#498205' }
+};
+const SHAREABLE = [
+    { name: 'Grader_Timesheet.xlsx', icon: '📊', kind: 'spreadsheet' },
+    { name: 'Carnival_Poster.png',   icon: '🖼️', kind: 'image' },
+    { name: 'Induction_Checklist.docx', icon: '📄', kind: 'document' }
+];
+
+/* Cloud state */
+const cloud = {
+    onedrive: {
+        'Recordings': [ { name: 'Works Coordination — Weekly.mp4', icon: '🎥', who: 'Meeting invitees' } ],
+        'Microsoft Teams Chat Files': []
+    },
+    sharepoint: {
+        'General': [ { name: 'Depot_Contact_List.xlsx', icon: '📊', who: 'Whole team' } ],
+        'Road Maintenance': [ { name: 'Culvert_Photos.jpg', icon: '🖼️', who: 'Whole team' } ]
+    }
+};
+
+/* Conversations */
+const CHATS = [
+    { id: 'grace', label: 'Grace Nguyen', av: 'grace', msgs: [
+        { who: 'grace', text: 'Hi! Can you send me the timesheet when you get a sec?' } ], files: [] },
+    { id: 'ben', label: 'Ben Carter', av: 'ben', msgs: [
+        { who: 'ben', text: 'No rush, but the poster would be handy before Friday.' } ], files: [] }
+];
+const CHANNELS = {
+    'General': { posts: [
+        { who: 'grace', when: 'Yesterday', text: 'Contact list is up to date — grab it from the Files tab any time.' } ] },
+    'Road Maintenance': { posts: [
+        { who: 'sam', when: 'Monday', text: 'Culvert photos are in Files. Post this week\'s timesheets here so the whole crew can see them.' } ] }
+};
+
+/* ================= STATE ================= */
+let view = 'teams', curChat = 'grace', curChannel = 'Road Maintenance', curTab = 'posts';
+let pendingTarget = null;
+const tries = { chatShare: false, channelShare: false, filesTab: false, coedit: false, trap: false };
+let trapBadDone = false, trapGoodDone = false;
+
+/* ================= HELPERS ================= */
+const $ = (s) => document.querySelector(s);
+function toast(msg) {
+    const t = $('#toast'); t.innerHTML = msg; t.classList.add('show');
+    clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 4200);
+}
+function avatar(p) { const q = PEOPLE[p]; return `<span class="av" style="background:${q.col}">${q.init}</span>`; }
+function markTry(key, msg) {
+    if (tries[key]) return;
+    tries[key] = true;
+    document.querySelector(`.try[data-try="${key}"]`).classList.add('done');
+    const done = Object.values(tries).filter(Boolean).length;
+    $('#tryScore').textContent = `${done} / 5`;
+    toast(msg + (done === 5 ? ' — all five done! You share files like a pro. 🎉' : ''));
+}
+
+/* ================= CLOUD MAP ================= */
+let lastLanded = null;
+function renderCloud() {
+    const drives = [
+        { title: '👤 Your OneDrive', who: 'Private to you — until you share a file, then just those people can open it.', data: cloud.onedrive },
+        { title: '👥 Works Depot — SharePoint', who: 'The team\'s shared drive. Everyone in the team can open everything here.', data: cloud.sharepoint }
+    ];
+    $('#cloudmap').innerHTML = `
+        <h3>☁️ Cloud map</h3>
+        <div class="sub">Where files <b>actually</b> live. Nothing is "in" a chat or a channel — messages carry links to files stored here.</div>
+        ${drives.map(d => `
+        <div class="drive">
+            <h4>${d.title}</h4>
+            <div class="who">${d.who}</div>
+            ${Object.entries(d.data).map(([folder, files]) => `
+                <div class="folder">📁 ${folder}</div>
+                ${files.length ? files.map(f => `
+                    <div class="cfile ${lastLanded === f.name + folder ? 'new' : ''}">${f.icon} ${f.name}<span class="cwho">${f.who}</span></div>`).join('')
+                : '<div class="emptyf">empty</div>'}
+            `).join('')}
+        </div>`).join('')}
+        <div class="keybox">🔑 <b>The rule of thumb:</b> shared in a <b>chat</b> → your OneDrive, shared with those people only. Shared in a <b>channel</b> → the team's SharePoint, open to the whole team. Either way there is <b>one copy</b>, and everyone opens the same one.</div>`;
+    lastLanded = null;
+}
+
+/* ================= LIST PANE ================= */
+function renderListPane() {
+    const lp = $('#listpane');
+    if (view === 'chat') {
+        lp.innerHTML = '<h2>Chat</h2>' + CHATS.map(c => `
+            <div class="chatrow ${c.id === curChat ? 'on' : ''}" data-chat="${c.id}">
+                ${avatar(c.av)}<div><div class="nm">${c.label}</div><div class="pv">one-to-one chat</div></div>
+            </div>`).join('');
+        lp.querySelectorAll('.chatrow').forEach(r => r.addEventListener('click', () => {
+            curChat = r.dataset.chat; renderListPane(); renderMain();
+        }));
+    } else {
+        lp.innerHTML = `<h2>Teams</h2>
+            <div class="teamhead"><span class="icon">WD</span>Works Depot</div>
+            ${Object.keys(CHANNELS).map(c => `<div class="channel ${c === curChannel ? 'on' : ''}" data-channel="${c}">${c}</div>`).join('')}`;
+        lp.querySelectorAll('.channel').forEach(c => c.addEventListener('click', () => {
+            curChannel = c.dataset.channel; curTab = 'posts'; renderListPane(); renderMain();
+        }));
+    }
+}
+
+/* ================= MAIN PANE ================= */
+function fileChip(f, locNote) {
+    return `<span class="fchip" data-file="${f.name}">${f.icon} ${f.name}<span class="loc">☁️ ${locNote}</span></span>`;
+}
+function composerHTML(kind) {
+    return `<div class="composer">
+        <div class="box">
+            <button class="ti pulse" id="clipBtn" title="Attach a file">📎</button>
+            <input type="text" id="draft" placeholder="Type a message${kind === 'channel' ? ' to the channel' : ''}…">
+            <button class="send" id="sendBtn">Send ➤</button>
+        </div>
+        <div class="hint">Click the <b>📎 paperclip</b> to share a file — then watch the cloud map.</div>
+    </div>`;
+}
+function renderMain() {
+    const m = $('#main');
+    if (view === 'chat') {
+        const c = CHATS.find(x => x.id === curChat);
+        m.innerHTML = `
+        <div class="mainhead">
+            <div class="crumb">Chat · one-to-one</div>
+            <div class="name">${c.label}</div>
+            <div class="tabs"><button class="tab on">Chat</button><button class="tab" data-tab="chatfiles">Files</button></div>
+        </div>
+        <div class="feed" id="feed">
+            ${c.msgs.map(msg => `
+                <div class="bubble-row ${msg.who === 'you' ? 'mine' : ''}">
+                    ${avatar(msg.who)}
+                    <div class="bubble">${msg.text}${msg.file ? '<br>' + fileChip(msg.file, 'Your OneDrive · shared with ' + c.label) : ''}</div>
+                </div>`).join('')}
+        </div>` + composerHTML('chat');
+        m.querySelector('[data-tab="chatfiles"]')?.addEventListener('click', () => {
+            toast('This chat\'s Files tab lists everything shared here: ' + (c.files.length ? c.files.join(', ') : 'nothing yet — share something!'));
+        });
+    } else {
+        const ch = CHANNELS[curChannel];
+        let inner = `
+        <div class="mainhead">
+            <div class="crumb">Works Depot</div>
+            <div class="name"># ${curChannel}</div>
+            <div class="tabs">
+                <button class="tab ${curTab === 'posts' ? 'on' : ''}" data-tab="posts">Posts</button>
+                <button class="tab ${curTab === 'files' ? 'on' : ''}" data-tab="files">Files</button>
+            </div>
+        </div>`;
+        if (curTab === 'posts') {
+            inner += `<div class="feed" id="feed">` + ch.posts.map(p => `
+                <div class="post">
+                    <div class="head">${avatar(p.who)}<span class="who">${PEOPLE[p.who].name}</span><span class="when">${p.when}</span></div>
+                    <div class="msg">${p.text}${p.file ? '<br>' + fileChip(p.file, 'Works Depot SharePoint › ' + curChannel + ' · whole team') : ''}</div>
+                </div>`).join('') + `</div>` + composerHTML('channel');
+        } else {
+            const files = cloud.sharepoint[curChannel];
+            inner += `<div class="feed">
+                <table class="filetable">
+                    <tr><th>Name</th><th>Shared by</th><th>Who can open it</th></tr>
+                    ${files.length ? files.map(f => `<tr class="clickable" data-file="${f.name}"><td>${f.icon} ${f.name}</td><td>${f.sharedBy || '—'}</td><td>${f.who}</td></tr>`).join('') : '<tr><td colspan="3" style="color:var(--dim)">Nothing here yet.</td></tr>'}
+                </table>
+                <p class="filenote">📌 This tab is a window into <b>Works Depot's SharePoint › ${curChannel}</b> folder — the same place shown on the cloud map. Post a file in the channel and it appears here automatically. Click a file to open it.</p>
+            </div>`;
+        }
+        m.innerHTML = inner;
+        m.querySelectorAll('.tab').forEach(tb => tb.addEventListener('click', () => {
+            curTab = tb.dataset.tab;
+            if (curTab === 'files') {
+                const mine = cloud.sharepoint[curChannel].some(f => f.sharedBy === 'You');
+                if (mine) markTry('filesTab', 'There it is — your file, in the channel\'s Files tab, without you putting it there.');
+            }
+            renderMain();
+        }));
+        m.querySelectorAll('tr.clickable').forEach(r => r.addEventListener('click', () => openCoEdit(r.dataset.file)));
+    }
+    m.querySelector('#clipBtn')?.addEventListener('click', openPicker);
+    m.querySelector('#sendBtn')?.addEventListener('click', sendText);
+    m.querySelector('#draft')?.addEventListener('keydown', e => { if (e.key === 'Enter') sendText(); });
+    m.querySelectorAll('.fchip').forEach(chip => chip.addEventListener('click', () => openCoEdit(chip.dataset.file)));
+    const feed = m.querySelector('#feed'); if (feed) feed.scrollTop = feed.scrollHeight;
+}
+
+function sendText() {
+    const d = $('#draft'); const val = d.value.trim();
+    if (!val) { toast('Type a message, or click 📎 to share a file.'); return; }
+    if (view === 'chat') CHATS.find(x => x.id === curChat).msgs.push({ who: 'you', text: val });
+    else CHANNELS[curChannel].posts.push({ who: 'you', when: 'Just now', text: val });
+    renderMain();
+}
+
+/* ================= FILE PICKER ================= */
+function openPicker() {
+    pendingTarget = view === 'chat' ? { kind: 'chat', id: curChat } : { kind: 'channel', id: curChannel };
+    const dest = pendingTarget.kind === 'chat'
+        ? `Because this is a <b>chat</b>, the file will upload to <b>your OneDrive › Microsoft Teams Chat Files</b>, and <b>${CHATS.find(x => x.id === curChat).label}</b> automatically gets permission to open it. Nobody else can.`
+        : `Because this is a <b>channel</b>, the file will upload to <b>Works Depot's SharePoint › ${curChannel}</b>, where <b>everyone in the team</b> can open it — including people who join the team next year.`;
+    $('#destPreview').innerHTML = '☁️ ' + dest;
+    $('#pickList').innerHTML = SHAREABLE.map((f, i) => `
+        <div class="pickrow" data-i="${i}"><span class="fic">${f.icon}</span><span><b>${f.name}</b><small>Practice ${f.kind}</small></span></div>`).join('');
+    $('#pickList').querySelectorAll('.pickrow').forEach(r => r.addEventListener('click', () => shareFile(SHAREABLE[r.dataset.i])));
+    $('#pickOverlay').classList.add('show');
+}
+$('#pickCancel').addEventListener('click', () => $('#pickOverlay').classList.remove('show'));
+
+function shareFile(f) {
+    $('#pickOverlay').classList.remove('show');
+    if (pendingTarget.kind === 'chat') {
+        const c = CHATS.find(x => x.id === pendingTarget.id);
+        c.msgs.push({ who: 'you', text: 'Here you go 👍', file: f.name });
+        c.files.push(f.name);
+        cloud.onedrive['Microsoft Teams Chat Files'].push({ name: f.name, icon: f.icon, who: 'You + ' + c.label });
+        lastLanded = f.name + 'Microsoft Teams Chat Files';
+        markTry('chatShare', `Shared in chat → landed in <b>your OneDrive</b>, shared with ${c.label} only. See the cloud map.`);
+    } else {
+        CHANNELS[pendingTarget.id].posts.push({ who: 'you', when: 'Just now', text: 'Sharing this with the whole crew:', file: f.name });
+        cloud.sharepoint[pendingTarget.id].push({ name: f.name, icon: f.icon, who: 'Whole team', sharedBy: 'You' });
+        lastLanded = f.name + pendingTarget.id;
+        markTry('channelShare', `Shared in a channel → landed in <b>the team's SharePoint</b>. The whole team can open it. Now check the Files tab.`);
+    }
+    renderMain(); renderCloud();
+}
+
+/* ================= CO-EDIT ================= */
+const GRACE_LINES = [
+    'Adding the Tuesday grader hours now…',
+    'Fixed the fuel column — it was out by a day.',
+    'Done my bit! Your turn 😊'
+];
+let graceTimer = null;
+function openCoEdit(name) {
+    $('#editTitle').textContent = '📄 ' + name;
+    $('#editName').textContent = name;
+    $('#editOverlay').classList.add('show');
+    $('#graceLine').innerHTML = '';
+    let i = 0;
+    clearInterval(graceTimer);
+    graceTimer = setInterval(() => {
+        if (i < GRACE_LINES.length) {
+            $('#graceLine').innerHTML = 'Grace: ' + GRACE_LINES[i] + ' <span class="cursor"></span>';
+            i++;
+        } else clearInterval(graceTimer);
+    }, 2200);
+    markTry('coedit', 'You and Grace are in the same file at once — one copy, no emailing versions.');
+}
+$('#editClose').addEventListener('click', () => { $('#editOverlay').classList.remove('show'); clearInterval(graceTimer); });
+
+/* ================= EMAIL TRAP ================= */
+$('#trapBtn').addEventListener('click', () => $('#trapOverlay').classList.add('show'));
+$('#trapClose').addEventListener('click', () => $('#trapOverlay').classList.remove('show'));
+$('#goBad').addEventListener('click', () => {
+    const out = $('#badOut'); out.innerHTML = '';
+    const seq = [
+        '<div class="vfile bad">📊 Timesheet.xlsx <small>— Ben\'s copy, edited offline</small></div>',
+        '<div class="vfile bad">📊 Timesheet(1).xlsx <small>— Sam saved a duplicate</small></div>',
+        '<div class="vfile bad">📊 Timesheet_FINAL_v2.xlsx <small>— Grace\'s "final"… which isn\'t</small></div>',
+        '<div class="verdict bad">Three copies, three different truths. Someone now has to merge them by hand.</div>'
+    ];
+    seq.forEach((h, i) => setTimeout(() => { out.innerHTML += h; }, i * 700));
+    trapBadDone = true;
+    if (trapGoodDone) markTry('trap', 'You\'ve seen both sides of the email trap.');
+});
+$('#goGood').addEventListener('click', () => {
+    const out = $('#goodOut'); out.innerHTML = '';
+    const seq = [
+        '<div class="vfile good">📊 Grader_Timesheet.xlsx <small>— one copy, in the cloud</small></div>',
+        '<div class="vfile good">👥 Ben, Sam and Grace all open <b>the same link</b></div>',
+        '<div class="vfile good">✏️ Their edits appear in the one file as they type</div>',
+        '<div class="verdict good">One copy, one truth, always current. This is why we share links, not attachments.</div>'
+    ];
+    seq.forEach((h, i) => setTimeout(() => { out.innerHTML += h; }, i * 700));
+    trapGoodDone = true;
+    if (trapBadDone) markTry('trap', 'You\'ve seen both sides of the email trap.');
+});
+
+/* ================= RAIL ================= */
+document.querySelectorAll('.rail button').forEach(b => b.addEventListener('click', () => {
+    view = b.dataset.view;
+    document.querySelectorAll('.rail button').forEach(x => x.classList.toggle('on', x === b));
+    renderListPane(); renderMain();
+}));
+
+/* ================= RESET ================= */
+$('#resetBtn').addEventListener('click', () => location.reload());
+
+/* ================= INIT ================= */
+renderListPane(); renderMain(); renderCloud();
+setTimeout(() => toast('💡 Grace has asked you for the timesheet — try sharing it in your chat with her, then share one in a channel and compare.'), 4000);
+</script>
+</body>
+</html>
