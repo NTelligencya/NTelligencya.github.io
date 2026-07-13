@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sort &amp; Filter — an interactive self-study deck</title>
+
+<!-- === FONTS: Clash Display (display), General Sans (body) via Fontshare; JetBrains Mono (mono) via Google === -->
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=general-sans@400,500,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+
+<style>
+/* ===========================================
+   THEME TOKENS
+   =========================================== */
+:root {
+    --bg:          #F7F8FA;
+    --panel:       #FFFFFF;
+    --grid-line:   #E3E6EA;
+    --header-grey: #EEF1F4;
+    --text:        #1A1D21;
+    --text-dim:    #6B7280;
+    --excel-green: #107C41;
+    --green-soft:  rgba(16,124,65,0.10);
+    --hl-lookup:   #F4B740;   /* amber — where you click */
+    --hl-return:   #22A559;   /* green — the result you read */
+    --hl-result:   #2D7FF9;   /* blue  — what Excel does */
+    --danger:      #E5484D;
+
+    --stage-bg:    #D9DDE3;
+    --slide-bg:    var(--bg);
+
+    --font-display: 'Clash Display', 'General Sans', sans-serif;
+    --font-title:   Baskerville, 'Times New Roman', Georgia, serif;
+    --font-body:    'General Sans', sans-serif;
+    --font-mono:    'JetBrains Mono', monospace;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================
+   FIXED 16:9 STAGE — MANDATORY BASE STYLES
+   =========================================== */
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+.deck-viewport {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: var(--stage-bg, #000);
+}
+
+.deck-stage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    transform-origin: 0 0;
+    background: var(--slide-bg, #fff);
+}
+
+.slide {
+    position: absolute;
+    inset: 0;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    background: var(--slide-bg, #fff);
+}
+
+.slide.active,
+.slide.visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+img, video, canvas, svg { max-width: 100%; max-height: 100%; }
+
+.deck-controls {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide {
+        position: relative;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        width: 1920px;
+        height: 1080px;
+        break-after: page;
+        page-break-after: always;
+    }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .deck-controls, .rail, .edit-hotzone, .edit-toggle, .edit-note { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+    }
+}
+
+/* ===========================================
+   BASE TYPOGRAPHY & SLIDE SCAFFOLD
+   =========================================== */
+body { font-family: var(--font-body); color: var(--text); }
+
+.wrap {
+    position: absolute;
+    inset: 0;
+    padding: 60px 96px 52px;
+    display: flex;
+    flex-direction: column;
+}
+
+.shead { margin-bottom: 24px; flex: 0 0 auto; }
+.kicker {
+    font-family: var(--font-mono);
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--excel-green);
+}
+.shead h2 {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 58px;
+    line-height: 1.08;
+    margin-top: 8px;
+}
+.lede { font-size: 25px; color: var(--text-dim); margin-top: 10px; max-width: 1500px; line-height: 1.45; }
+.lede b { color: var(--text); }
+
+.sbody { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 24px; }
+
+/* ===========================================
+   ENTRANCE REVEALS
+   =========================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.reveal:nth-child(1) { transition-delay: 0.05s; }
+.reveal:nth-child(2) { transition-delay: 0.15s; }
+.reveal:nth-child(3) { transition-delay: 0.25s; }
+.reveal:nth-child(4) { transition-delay: 0.35s; }
+.reveal:nth-child(5) { transition-delay: 0.45s; }
+.reveal:nth-child(6) { transition-delay: 0.55s; }
+
+/* ===========================================
+   STEP ENGINE — click-to-build fragments
+   =========================================== */
+[data-step]:not(.step-alt):not(.cap) {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+[data-step]:not(.step-alt):not(.cap).on { opacity: 1; transform: none; }
+
+.capbox { position: relative; height: 40px; flex: 0 0 auto; }
+.cap {
+    position: absolute; left: 4px; top: 0;
+    font-size: 23px; color: var(--text-dim); font-style: italic;
+    opacity: 0; transition: opacity 0.35s 0.1s;
+}
+.cap.now { opacity: 1; }
+.cap b { color: var(--text); font-style: normal; }
+
+/* ===========================================
+   <SheetGrid> — spreadsheet component
+   =========================================== */
+.sheet {
+    display: grid;
+    width: max-content;
+    max-width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 25px;
+    box-shadow: 0 1px 3px rgba(26,29,33,0.06);
+    flex: 0 0 auto;
+}
+.sc {
+    padding: 9px 20px;
+    border-right: 1px solid var(--grid-line);
+    border-bottom: 1px solid var(--grid-line);
+    white-space: nowrap;
+    transition: background 0.35s, box-shadow 0.35s, opacity 0.35s, color 0.35s;
+    transition-delay: var(--d, 0s);
+}
+.sheet .cl, .sheet .rn {
+    background: var(--header-grey);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 6px 10px;
+}
+.sheet .rn { min-width: 52px; }
+.sheet .h {
+    background: var(--header-grey);
+    font-weight: 600;
+    font-size: 22px;
+}
+.sheet.small { font-size: 21px; }
+.sheet.small .sc { padding: 7px 16px; }
+.sheet.small .h { font-size: 19px; }
+.sheet.tiny { font-size: 18px; }
+.sheet.tiny .sc { padding: 5px 13px; }
+.sheet.tiny .h { font-size: 16.5px; }
+
+/* Cell highlight states */
+@keyframes cellpop {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.07); }
+    100% { transform: scale(1); }
+}
+.hl-lookup  { background: rgba(244,183,64,0.16); box-shadow: inset 0 0 0 2.5px var(--hl-lookup); animation: cellpop 0.45s var(--ease) var(--d, 0s); }
+.hl-return  { background: var(--green-soft);      box-shadow: inset 0 0 0 2.5px var(--hl-return); }
+.hl-result  { background: rgba(45,127,249,0.10);  box-shadow: inset 0 0 0 3px var(--hl-result); color: #1D57B0; font-weight: 600; animation: cellpop 0.45s var(--ease) var(--d, 0s); }
+.strong     { font-weight: 700; }
+.sc.strong.hl-lookup { background: rgba(244,183,64,0.32); }
+.dim        { opacity: 0.3; }
+.blocked {
+    background: rgba(229,72,77,0.14);
+    box-shadow: inset 0 0 0 2.5px var(--danger);
+    color: var(--danger); font-weight: 600;
+}
+.err { color: var(--danger); font-weight: 700; }
+.ok  { color: var(--excel-green); font-weight: 600; }
+.tbl-outline      { box-shadow: 0 0 0 3px var(--excel-green); }
+.tbl-outline-blue { box-shadow: 0 0 0 3.5px var(--hl-result); }
+
+/* Filter chrome on sheets: header arrows, funnel marker, hidden rows, blue row numbers */
+.sheet.fon .h::after { content: ' ▾'; color: #9AA2AC; font-size: 0.78em; }
+.sheet.fon .h.funnel::after { content: ' ▼'; color: var(--excel-green); font-size: 0.78em; }
+.sc.rowhide { display: none; }
+.sc.rn.filt { color: #1D57B0; font-weight: 700; background: rgba(45,127,249,0.10); }
+
+/* Before/after sheet swap: the after sheet sits on top and cross-fades in */
+.swap { position: relative; width: max-content; flex: 0 0 auto; }
+.swap .after { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity 0.55s var(--ease); }
+.swap .before { transition: opacity 0.55s var(--ease); }
+.swap.go .before { opacity: 0; }
+.swap.go .after { opacity: 1; }
+
+/* Status bar mock */
+.statusbar {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    color: var(--excel-green);
+    background: var(--header-grey);
+    border: 1px solid var(--grid-line);
+    border-radius: 8px;
+    padding: 8px 18px;
+    width: max-content;
+    flex: 0 0 auto;
+}
+.statusbar .sblabel { color: var(--text-dim); margin-right: 14px; }
+
+/* ===========================================
+   RIBBON MOCK — Data tab › Sort & Filter group
+   =========================================== */
+.ribbon {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 12px;
+    overflow: hidden;
+    width: max-content;
+    flex: 0 0 auto;
+    box-shadow: 0 1px 3px rgba(26,29,33,0.06);
+}
+.rtabs { display: flex; gap: 2px; background: var(--header-grey); padding: 8px 12px 0; font-size: 17px; }
+.rtab { padding: 7px 18px; border-radius: 8px 8px 0 0; color: var(--text-dim); }
+.rtab.on { background: var(--panel); color: var(--excel-green); font-weight: 600; }
+.rbody { display: flex; align-items: stretch; padding: 10px 18px 8px; gap: 4px; }
+.rgroup {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 0 18px;
+    border-right: 1px dashed var(--grid-line);
+}
+.rgroup:last-child { border-right: none; }
+.rbtns { display: flex; gap: 8px; }
+.rbtn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font-size: 16px; padding: 8px 14px; border-radius: 8px;
+    border: 1.5px solid transparent;
+    color: var(--text);
+    transition: background 0.35s, border-color 0.35s;
+}
+.rbtn .ic { font-family: var(--font-mono); font-size: 21px; line-height: 1.2; color: var(--excel-green); font-weight: 700; }
+.rbtn.hot { border-color: var(--hl-lookup); background: rgba(244,183,64,0.16); animation: cellpop 0.45s var(--ease); }
+.rbtn.dimmed { opacity: 0.35; }
+.rgname { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+/* Dropdown / menu cards */
+.menucard {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 10px 30px rgba(26,29,33,0.12);
+    font-size: 20px;
+    width: max-content;
+}
+.menucard .mi { padding: 6px 14px; border-radius: 8px; color: var(--text-dim); }
+.menucard .mi.sel { background: var(--green-soft); color: var(--excel-green); font-weight: 600; }
+.menucard .msep { border-top: 1px solid var(--grid-line); margin: 8px 4px; }
+
+/* ===========================================
+   DIALOG MOCKS (Sort dialog, Custom AutoFilter, Sort Warning)
+   =========================================== */
+.xldialog {
+    background: var(--panel);
+    border: 1px solid #B7BEC7;
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(26,29,33,0.18);
+    width: 620px;
+    font-size: 19px;
+    overflow: hidden;
+    flex: 0 0 auto;
+}
+.xldialog.smalld { width: 440px; font-size: 17.5px; }
+.xdtitle {
+    background: var(--header-grey);
+    padding: 10px 18px;
+    font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.xdtitle .x { color: var(--text-dim); font-size: 17px; }
+.xdbody { padding: 16px 22px; display: flex; flex-direction: column; gap: 11px; }
+.xdlabel { font-size: 16.5px; color: var(--text-dim); }
+.xdselect {
+    border: 1.5px solid #B7BEC7; border-radius: 7px;
+    padding: 7px 14px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 19px; background: #fff;
+    transition: border-color 0.35s, box-shadow 0.35s;
+    min-width: 150px;
+}
+.xdselect .car { color: var(--text-dim); font-size: 14px; margin-left: 14px; }
+.xdselect.hot { border-color: var(--hl-lookup); box-shadow: 0 0 0 3px rgba(244,183,64,0.25); animation: cellpop 0.45s var(--ease); }
+.srow { display: grid; grid-template-columns: 104px 1fr 1.2fr; gap: 12px; align-items: center; }
+.srow .slabel { font-size: 17.5px; color: var(--text-dim); }
+.xdchk { display: flex; gap: 10px; align-items: center; padding: 3px 6px; border-radius: 6px; transition: background 0.35s, box-shadow 0.35s; }
+.xdchk .bx {
+    width: 19px; height: 19px; flex: 0 0 auto;
+    border: 1.5px solid #9AA2AC; border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: var(--excel-green); background: #fff;
+}
+.xdchk.hot { background: rgba(244,183,64,0.20); box-shadow: 0 0 0 3px rgba(244,183,64,0.25); animation: cellpop 0.45s var(--ease); font-weight: 600; }
+.xdradio { display: flex; gap: 10px; align-items: center; font-size: 18px; }
+.xdradio .rb {
+    width: 18px; height: 18px; flex: 0 0 auto;
+    border: 1.5px solid #9AA2AC; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.xdradio.on .rb::after { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--excel-green); }
+.xdradio.on { font-weight: 600; }
+.xdbtns { display: flex; justify-content: flex-end; gap: 10px; padding: 6px 22px 18px; }
+.xdbtn {
+    border: 1.5px solid #B7BEC7; border-radius: 7px;
+    padding: 7px 22px; font-size: 18px;
+    background: var(--header-grey); color: var(--text);
+    transition: background 0.35s, border-color 0.35s, color 0.35s;
+}
+.xdbtn.left { margin-right: auto; }
+.xdbtn.hot {
+    border-color: var(--hl-lookup); background: rgba(244,183,64,0.16);
+    color: #7A5200; font-weight: 600;
+    animation: cellpop 0.45s var(--ease);
+}
+.xdbtn.hotgreen { border-color: var(--excel-green); background: var(--green-soft); color: var(--excel-green); font-weight: 600; animation: cellpop 0.45s var(--ease); }
+
+/* Keyboard keys */
+.kbd {
+    font-family: var(--font-mono); font-size: 0.85em;
+    background: var(--header-grey);
+    border: 1px solid #C3C8CF; border-bottom-width: 2.5px;
+    border-radius: 6px;
+    padding: 2px 9px;
+    white-space: nowrap;
+}
+
+/* ===========================================
+   CARDS, CALLOUTS, TAGS
+   =========================================== */
+.card {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-radius: 14px;
+    padding: 26px 30px;
+    box-shadow: 0 1px 2px rgba(26,29,33,0.04);
+}
+.card h3 { font-family: var(--font-display); font-weight: 600; font-size: 30px; margin-bottom: 10px; }
+.card p  { font-size: 22px; color: var(--text-dim); line-height: 1.45; }
+.card .mono { font-family: var(--font-mono); font-size: 21px; color: var(--text); }
+
+.callout {
+    background: var(--panel);
+    border: 1px solid var(--grid-line);
+    border-left: 6px solid var(--excel-green);
+    border-radius: 10px;
+    padding: 18px 26px;
+    font-size: 24px;
+    line-height: 1.45;
+    flex: 0 0 auto;
+}
+.callout.warn   { border-left-color: var(--hl-lookup); }
+.callout.danger { border-left-color: var(--danger); }
+.callout.big    { font-size: 30px; font-family: var(--font-display); font-weight: 600; }
+
+.tag {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--excel-green);
+    background: var(--green-soft);
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.keyrow { display: flex; align-items: center; gap: 16px; font-size: 23px; }
+.swatch { width: 40px; height: 40px; border-radius: 8px; flex: 0 0 auto; }
+.swatch.amber { background: rgba(244,183,64,0.25); box-shadow: inset 0 0 0 2.5px var(--hl-lookup); }
+.swatch.green { background: var(--green-soft); box-shadow: inset 0 0 0 2.5px var(--hl-return); }
+.swatch.blue  { background: rgba(45,127,249,0.12); box-shadow: inset 0 0 0 2.5px var(--hl-result); }
+
+.two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.row       { display: flex; gap: 32px; align-items: flex-start; }
+.grow      { flex: 1 1 auto; min-width: 0; }
+
+.floatlabel {
+    font-size: 20px; font-weight: 600; color: var(--text);
+    background: var(--panel); border: 1.5px solid var(--grid-line);
+    border-radius: 10px; padding: 10px 18px;
+    box-shadow: 0 4px 14px rgba(26,29,33,0.08);
+    display: inline-block;
+}
+.floatlabel .mono { font-family: var(--font-mono); }
+
+/* ===========================================
+   TITLE SLIDE
+   =========================================== */
+.gridpaper {
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 96px 64px;
+    opacity: 0.45;
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 30%, transparent 100%);
+            mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 30%, transparent 100%);
+}
+.t-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 30px;
+    padding: 0 120px;
+}
+.morph { position: relative; height: 110px; width: 100%; font-family: var(--font-mono); font-size: 76px; font-weight: 500; }
+.morph span { position: absolute; left: 50%; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.m-old { color: var(--text-dim); }
+.m-new { color: var(--excel-green); opacity: 0; font-weight: 700; }
+.slide.visible .m-old { animation: mOut 0.9s var(--ease) 1.3s forwards; }
+.slide.visible .m-new { animation: mIn  0.9s var(--ease) 1.7s forwards; }
+@keyframes mOut { to { opacity: 0; filter: blur(8px); transform: translateX(-50%) translateY(-18px); } }
+@keyframes mIn  { from { opacity: 0; filter: blur(8px); transform: translateX(-50%) translateY(18px); }
+                  to   { opacity: 1; filter: none;      transform: translateX(-50%) translateY(0); } }
+.title-slide h1 {
+    font-family: var(--font-title);
+    font-weight: 600; font-size: 108px; line-height: 1.05;
+}
+.title-slide h1 .arrow { color: var(--excel-green); }
+.title-slide .sub { font-size: 32px; color: var(--text-dim); }
+.fchips { display: flex; gap: 20px; }
+.fchip {
+    font-size: 23px; background: var(--panel);
+    border: 1px solid var(--grid-line); border-radius: 30px;
+    padding: 10px 26px; box-shadow: 0 1px 3px rgba(26,29,33,0.05);
+}
+
+/* ===========================================
+   PER-SLIDE LAYOUTS
+   =========================================== */
+/* s03 — two tools */
+.tools2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; flex: 0 0 auto; }
+.tools2 .card { padding: 36px 40px; }
+.tools2 .qline { font-family: var(--font-display); font-size: 34px; font-weight: 600; line-height: 1.2; }
+.tools2 .tool { font-family: var(--font-mono); font-size: 25px; font-weight: 700; color: var(--excel-green); margin: 14px 0 10px; display: block; }
+
+/* s10 / s17 — trap and clear cards */
+.traps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; flex: 1; align-content: start; }
+.traps3 .card h3 { font-size: 27px; }
+.traps3 .card p { font-size: 20.5px; }
+
+/* s19 — gotcha cards */
+.gotchas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; flex: 1; align-content: start; }
+.gotchas .card h3 { font-family: var(--font-display); font-size: 25px; color: var(--danger); }
+.gotchas .card p { font-size: 19px; }
+.gotchas .card .fix { color: var(--excel-green); font-weight: 600; margin-top: 10px; font-size: 19px; }
+
+/* s20 — cheat sheet */
+.cheat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; flex: 1; align-content: start; }
+.cheat .span3 { grid-column: 1 / -1; }
+.cheat h3 { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 12px; }
+.minitable { width: 100%; border-collapse: collapse; font-size: 19px; }
+.minitable td { border: 1px solid var(--grid-line); padding: 7px 14px; }
+.minitable td:last-child { font-family: var(--font-mono); font-weight: 700; color: var(--excel-green); white-space: nowrap; }
+.checklist { list-style: none; font-size: 19px; line-height: 1.5; }
+.checklist li { padding: 5px 0 5px 34px; position: relative; }
+.checklist li::before { content: "✓"; position: absolute; left: 4px; color: var(--excel-green); font-weight: 700; }
+
+/* s21 — do it for real */
+.teach { display: grid; grid-template-columns: 1fr 1.15fr; gap: 32px; flex: 1; min-height: 0; }
+.points { list-style: none; counter-reset: pt; display: flex; flex-direction: column; gap: 13px; }
+.points li { counter-increment: pt; display: flex; gap: 16px; font-size: 21.5px; line-height: 1.35; align-items: baseline; }
+.points li::before {
+    content: counter(pt);
+    font-family: var(--font-display); font-weight: 700; font-size: 22px;
+    color: var(--excel-green); background: var(--green-soft);
+    border-radius: 50%; min-width: 38px; height: 38px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: 0 0 auto; align-self: flex-start;
+}
+.points b { font-weight: 600; }
+.challenge { margin-bottom: 14px; }
+.challenge .q { font-size: 21px; font-weight: 500; margin-bottom: 8px; }
+.challenge .ansf { font-family: var(--font-mono); font-size: 18.5px; background: var(--header-grey); border-radius: 8px; padding: 10px 16px; }
+.challenge .ansf .res { color: var(--excel-green); font-weight: 700; }
+.closing { font-family: var(--font-display); font-size: 33px; font-weight: 600; text-align: center; margin-top: 6px; flex: 0 0 auto; }
+.closing em { color: var(--excel-green); font-style: normal; }
+.dlbtn {
+    display: inline-block;
+    font-family: var(--font-mono); font-size: 19px; font-weight: 700;
+    color: #fff; background: var(--excel-green);
+    border-radius: 10px; padding: 12px 24px;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(16,124,65,0.25);
+}
+
+/* ===========================================
+   SECTION RAIL (chrome, outside the stage)
+   =========================================== */
+.rail {
+    position: fixed; left: 16px; top: 50%;
+    transform: translateY(-50%);
+    z-index: 900;
+    width: 208px;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--grid-line);
+    border-radius: 14px;
+    padding: 16px 12px 12px;
+    box-shadow: 0 10px 34px rgba(26,29,33,0.10);
+    font-family: var(--font-body);
+}
+.railtitle {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.16em; color: var(--excel-green);
+    padding: 0 10px 10px; text-transform: uppercase;
+}
+.rail .sec {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 15px; color: var(--text-dim);
+    padding: 8px 10px; border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+.rail .sec:hover { background: var(--header-grey); }
+.rail .sec.cur { background: var(--green-soft); color: var(--excel-green); font-weight: 600; }
+.rail .sec .n { font-family: var(--font-mono); font-size: 11px; opacity: 0.75; min-width: 14px; }
+.railfoot {
+    margin-top: 10px; border-top: 1px solid var(--grid-line);
+    padding: 10px 10px 2px;
+    font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);
+    display: flex; flex-direction: column; gap: 5px;
+}
+#railStep { color: var(--excel-green); min-height: 16px; }
+.railhint { font-size: 11px; opacity: 0.75; }
+@media (max-width: 1080px) { .rail { display: none; } }
+
+/* ===========================================
+   INLINE EDIT CHROME
+   =========================================== */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+.edit-toggle {
+    position: fixed; top: 14px; left: 14px; z-index: 10001;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 1px solid var(--grid-line); background: var(--panel);
+    font-size: 20px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(26,29,33,0.12);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { background: var(--excel-green); color: #fff; }
+body.editing [contenteditable="true"] { outline: 2px dashed var(--hl-result); outline-offset: 2px; border-radius: 4px; cursor: text; }
+.edit-note {
+    position: fixed; top: 20px; left: 72px; z-index: 10001;
+    font-family: var(--font-mono); font-size: 13px;
+    background: var(--excel-green); color: #fff;
+    border-radius: 8px; padding: 8px 14px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+body.editing .edit-note { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+<!-- ================= § INTRO ================= -->
+
+<!-- 1 · Title -->
+<section class="slide title-slide" id="s01" data-steps="0">
+    <div class="gridpaper"></div>
+    <div class="t-center">
+        <div class="morph" aria-hidden="true">
+            <span class="m-old">58 rows of survey data</span>
+            <span class="m-new">the answer in two clicks</span>
+        </div>
+        <h1 class="reveal">Sort <span class="arrow">&amp;</span> Filter</h1>
+        <p class="reveal sub">Turn a wall of rows into answers; a self-study lesson you can turn around and teach.</p>
+        <div class="reveal fchips">
+            <span class="fchip">🌏 Top End Cyber Pulse</span>
+            <span class="fchip">Beginner friendly · no formulas</span>
+        </div>
+    </div>
+</section>
+
+<!-- 2 · How this deck works -->
+<section class="slide" id="s02" data-steps="1">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>How this deck works</h2>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow">
+                <div class="card reveal">
+                    <h3>Driving it</h3>
+                    <p style="font-size:23px; line-height:1.7;">
+                        <b style="color:var(--text)">Click</b> (or <span class="mono">→</span> / <span class="mono">Space</span>) — build the current slide one step at a time, then move on<br>
+                        <b style="color:var(--text)">←</b> — undo one step, then one slide<br>
+                        <b style="color:var(--text)">E</b> — edit any text in place (Ctrl+S saves a copy)<br>
+                        <b style="color:var(--text)">Rail</b> (left) — jump between the 7 sections
+                    </p>
+                </div>
+                <div class="card reveal">
+                    <h3>The colour key — memorise this</h3>
+                    <div style="display:flex; flex-direction:column; gap:16px; margin-top:12px;">
+                        <div class="keyrow"><span class="swatch amber"></span><span><b>Amber</b> — where you click: cells, buttons, dialog fields</span></div>
+                        <div class="keyrow"><span class="swatch blue"></span><span><b>Blue</b> — what Excel does in response</span></div>
+                        <div class="keyrow"><span class="swatch green"></span><span><b>Green</b> — the result you read off the sheet</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="align-items:center;">
+                <div class="sheet small d2" data-table="demo"></div>
+                <div class="grow">
+                    <div class="floatlabel reveal">Try it now — <b>click anywhere</b> to light up a cell ▸</div>
+                    <div class="capbox" style="margin-top:14px;">
+                        <span class="cap" data-step="1">One click = one build step. That's the whole trick.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".d2 .d[data-col='Count'][data-row='2']","cls":"hl-lookup strong"}
+    ]</script>
+</section>
+
+<!-- 3 · Two questions, two tools -->
+<section class="slide" id="s03" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>Two questions, two tools</h2>
+            <p class="lede">Nearly every question you ask of a big sheet is one of these two. Each has its own one-click tool, and this deck teaches both. No formulas needed anywhere in this lesson.</p>
+        </header>
+        <div class="sbody" style="justify-content:center;">
+            <div class="tools2">
+                <div class="card" data-step="1" style="border-top:6px solid var(--hl-lookup);">
+                    <div class="qline">"Which is biggest? Who comes first?"</div>
+                    <span class="tool">→ SORT</span>
+                    <p>Rearranges every row into an order you choose: largest to smallest, A to Z, oldest to newest. The answer floats to the top.</p>
+                </div>
+                <div class="card" data-step="2" style="border-top:6px solid var(--hl-result);">
+                    <div class="qline">"Show me only…"</div>
+                    <span class="tool">→ FILTER</span>
+                    <p>Hides every row you don't want to see right now: one council, one month, everything over a number. The rest waits quietly out of sight.</p>
+                </div>
+            </div>
+            <div class="callout big" data-step="3">Neither tool changes your numbers. Sort <em style="color:var(--excel-green); font-style:normal;">rearranges</em> rows; filter <em style="color:var(--excel-green); font-style:normal;">hides</em> rows. Both are reversible.</div>
+            <div class="capbox">
+                <span class="cap" data-step="1">sort answers ranking questions</span>
+                <span class="cap" data-step="2">filter answers "just show me this slice" questions</span>
+                <span class="cap" data-step="3">and used <b>together</b> they answer almost anything — that combo closes the deck</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4 · Meet the dataset -->
+<section class="slide" id="s04" data-steps="1">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>Meet the dataset</h2>
+            <p class="lede"><b>NT Cyber Pulse 2026</b> — a door-to-door survey of Top End households: what device people carry, and how they look after their accounts. All numbers are synthetic, built for practice. On screen we work with 9 suburbs you can see whole; the practice workbook has the full sheet, <b>58 suburbs</b>.</p>
+        </header>
+        <div class="sbody">
+            <div class="row" style="align-items:flex-start;">
+                <div>
+                    <div class="floatlabel reveal" style="margin-bottom:14px;">🌏 <b>Top End Survey</b> — as it arrived: no particular order</div>
+                    <div class="sheet small m4 reveal" data-table="survey"></div>
+                </div>
+                <div class="grow" style="padding-top:60px;">
+                    <div class="capbox">
+                        <span class="cap" data-step="1">Two columns to watch: <b>Shares pwd</b> counts people whose password is shared or written down; <b>No MFA</b> counts people with no second lock on their accounts. Someone has to decide which suburbs need help first.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".m4 .h[data-col='Shares pwd'], .m4 .d[data-col='Shares pwd'], .m4 .h[data-col='No MFA'], .m4 .d[data-col='No MFA']","cls":"hl-lookup"}
+    ]</script>
+</section>
+
+<!-- ================= § SORT BASICS ================= -->
+
+<!-- 5 · The golden rule -->
+<section class="slide" id="s05" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Sort basics</span>
+            <h2>Before anything: the one-cell rule</h2>
+            <p class="lede">The single most important habit in this whole deck. Don't select anything. Just click <b>one cell</b> in the column you care about.</p>
+        </header>
+        <div class="sbody">
+            <div class="row">
+                <div class="sheet small g5" data-table="survey"></div>
+                <div class="grow" style="display:flex; flex-direction:column; gap:20px; padding-top:8px;">
+                    <div class="callout" data-step="1" style="font-size:22px;"><b>1.</b> One click, one cell. That's your entire selection.</div>
+                    <div class="callout" data-step="2" style="border-left-color:var(--hl-result); font-size:22px;"><b>2.</b> Excel finds the edges of your data block by itself: every joined-up row and column, top to bottom.</div>
+                    <div class="callout" data-step="3" style="border-left-color:var(--hl-result); font-size:22px;"><b>3.</b> It also recognises row 1 as headers and keeps them parked at the top.</div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">click any cell in the column you want to sort by — here, Shares pwd</span>
+                <span class="cap" data-step="2">no dragging, no highlighting; Excel takes the whole table from that one click</span>
+                <span class="cap" data-step="3">headers stay put; only the data rows will move</span>
+            </div>
+            <div class="callout danger" data-step="3">Never highlight a whole column and then sort. That sorts one column <b>on its own</b> and scrambles your rows. The trap gets its own slide later.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".g5 .d[data-col='Shares pwd'][data-row='5']","cls":"hl-lookup strong"},
+        {"s":2,"sel":".g5","cls":"tbl-outline-blue"},
+        {"s":3,"sel":".g5 .h","cls":"hl-result"}
+    ]</script>
+</section>
+
+<!-- 6 · First sort: largest to smallest -->
+<section class="slide" id="s06" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Sort basics</span>
+            <h2>Your first sort: largest to smallest</h2>
+            <p class="lede">The question: <b>which suburb has the most shared passwords?</b> Watch how little it takes.</p>
+        </header>
+        <div class="sbody">
+            <div class="ribbon">
+                <div class="rtabs"><span class="rtab">Home</span><span class="rtab">Insert</span><span class="rtab on">Data</span><span class="rtab">View</span></div>
+                <div class="rbody">
+                    <div class="rgroup">
+                        <div class="rbtns">
+                            <div class="rbtn" id="r06az"><span class="ic">AZ↓</span><span>A to Z</span></div>
+                            <div class="rbtn" id="r06za"><span class="ic">ZA↓</span><span>Z to A</span></div>
+                            <div class="rbtn"><span class="ic">⇅</span><span>Sort</span></div>
+                            <div class="rbtn"><span class="ic">▽</span><span>Filter</span></div>
+                            <div class="rbtn"><span class="ic">✕</span><span>Clear</span></div>
+                        </div>
+                        <span class="rgname">Sort &amp; Filter</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="swap sw6">
+                    <div class="sheet small before b6" data-table="survey"></div>
+                    <div class="sheet small after a6" data-table="survey_zshares"></div>
+                </div>
+                <div class="grow" style="padding-top:8px;">
+                    <div class="capbox" style="height:auto; min-height:120px;">
+                        <span class="cap" data-step="1">one click in the <b>Shares pwd</b> column tells Excel which column matters</span>
+                        <span class="cap" data-step="2"><b>Data ▸ Sort &amp; Filter ▸ Z to A</b> — for numbers, that reads as largest to smallest</span>
+                        <span class="cap" data-step="3">every row moves as one piece; the whole table reorders in an instant</span>
+                        <span class="cap" data-step="4">read the answer off the top row: <b>Casuarina</b>, 199 shared passwords</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".b6 .d[data-col='Shares pwd'][data-row='5']","cls":"hl-lookup strong"},
+        {"s":2,"sel":"#r06za","cls":"hot"},
+        {"s":3,"sel":".sw6","cls":"go"},
+        {"s":4,"sel":".a6 .d[data-row='1']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- 7 · Text sorts A to Z -->
+<section class="slide" id="s07" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Sort basics</span>
+            <h2>Text sorts too: A to Z</h2>
+            <p class="lede">Same two buttons, different column. Click in a <b>text</b> column and the sort goes alphabetical.</p>
+        </header>
+        <div class="sbody">
+            <div class="ribbon">
+                <div class="rtabs"><span class="rtab">Home</span><span class="rtab">Insert</span><span class="rtab on">Data</span><span class="rtab">View</span></div>
+                <div class="rbody">
+                    <div class="rgroup">
+                        <div class="rbtns">
+                            <div class="rbtn" id="r07az"><span class="ic">AZ↓</span><span>A to Z</span></div>
+                            <div class="rbtn"><span class="ic">ZA↓</span><span>Z to A</span></div>
+                            <div class="rbtn"><span class="ic">⇅</span><span>Sort</span></div>
+                            <div class="rbtn"><span class="ic">▽</span><span>Filter</span></div>
+                            <div class="rbtn"><span class="ic">✕</span><span>Clear</span></div>
+                        </div>
+                        <span class="rgname">Sort &amp; Filter</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="swap sw7">
+                    <div class="sheet small before b7" data-table="survey"></div>
+                    <div class="sheet small after a7" data-table="survey_az"></div>
+                </div>
+                <div class="grow" style="display:flex; flex-direction:column; gap:18px; padding-top:8px;">
+                    <div class="capbox" style="height:auto; min-height:90px;">
+                        <span class="cap" data-step="1">one click in the <b>Suburb</b> column this time</span>
+                        <span class="cap" data-step="2">the same button; for text it reads as plain A to Z</span>
+                        <span class="cap" data-step="3">suburbs in alphabetical order — handy for finding one name in a long list</span>
+                    </div>
+                    <div class="callout" data-step="3" style="font-size:21px;">Same buttons every time: numbers sort by <b>size</b>, text sorts by <b>alphabet</b>, dates sort by <b>date</b>. Excel picks the right meaning from the column you clicked in.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".b7 .d[data-col='Suburb'][data-row='3']","cls":"hl-lookup strong"},
+        {"s":2,"sel":"#r07az","cls":"hot"},
+        {"s":3,"sel":".sw7","cls":"go"},
+        {"s":3,"sel":".a7 .d[data-col='Suburb']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- 8 · Rows travel together -->
+<section class="slide" id="s08" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Sort basics</span>
+            <h2>Rows travel together</h2>
+            <p class="lede">The worry everyone has the first time: "won't sorting mix up my numbers?" Watch one suburb through a sort.</p>
+        </header>
+        <div class="sbody">
+            <div class="row">
+                <div>
+                    <div class="floatlabel" style="margin-bottom:12px;">Before — survey order</div>
+                    <div class="sheet small b8" data-table="survey" data-cols="Council,Suburb,Surveyed,Shares pwd,No MFA"></div>
+                </div>
+                <div>
+                    <div class="floatlabel" style="margin-bottom:12px;">After — sorted by Shares pwd, largest first</div>
+                    <div class="sheet small a8" data-table="survey_zshares" data-cols="Council,Suburb,Surveyed,Shares pwd,No MFA"></div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">watch <b>Casuarina</b>: it starts on row 6, with 510 surveyed, 199 shared, 265 no MFA</span>
+                <span class="cap" data-step="2">after the sort it sits on row 2 — and <b>every one of its numbers came with it</b></span>
+            </div>
+            <div class="callout big" data-step="2">A sort moves <em style="color:var(--excel-green); font-style:normal;">whole rows</em>. Suburbs never swap numbers. That is exactly why you click one cell instead of selecting a column.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".b8 .d[data-row='5']","cls":"hl-lookup"},
+        {"s":2,"sel":".a8 .d[data-row='1']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- ================= § THE SORT DIALOG ================= -->
+
+<!-- 9 · Two-level sort -->
+<section class="slide" id="s09" data-steps="5">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The Sort dialog</span>
+            <h2>When one column isn't enough</h2>
+            <p class="lede">The question: <b>put the councils in order, and inside each council show the worst No MFA suburb first.</b> Two rules at once needs the big <span class="kbd">Sort</span> button, next to A to Z on the Data tab.</p>
+        </header>
+        <div class="sbody">
+            <div class="row">
+                <div class="xldialog" id="d9" data-step="1">
+                    <div class="xdtitle"><span>Sort</span><span class="x">✕</span></div>
+                    <div class="xdbody">
+                        <div style="display:flex; gap:10px;">
+                            <span class="xdbtn" id="d9add" style="font-size:16px; padding:5px 14px;">+ Add Level</span>
+                            <span class="xdbtn" style="font-size:16px; padding:5px 14px;">✕ Delete Level</span>
+                            <span class="xdchk" style="margin-left:auto; font-size:16px;"><span class="bx">✓</span>My data has headers</span>
+                        </div>
+                        <div class="srow" id="d9l1">
+                            <span class="slabel">Sort by</span>
+                            <span class="xdselect">Council <span class="car">▾</span></span>
+                            <span class="xdselect">A to Z <span class="car">▾</span></span>
+                        </div>
+                        <div class="srow" id="d9l2" data-step="3">
+                            <span class="slabel">Then by</span>
+                            <span class="xdselect">No MFA <span class="car">▾</span></span>
+                            <span class="xdselect">Largest to Smallest <span class="car">▾</span></span>
+                        </div>
+                    </div>
+                    <div class="xdbtns">
+                        <span class="xdbtn" id="d9ok">OK</span>
+                        <span class="xdbtn">Cancel</span>
+                    </div>
+                </div>
+                <div class="swap sw9">
+                    <div class="sheet small before b9" data-table="survey" data-cols="Council,Suburb,Shares pwd,No MFA"></div>
+                    <div class="sheet small after a9" data-table="survey_council" data-cols="Council,Suburb,Shares pwd,No MFA"></div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1"><b>Data ▸ Sort</b> opens the control room; one row in the dialog = one sorting rule</span>
+                <span class="cap" data-step="2">level 1: sort by <b>Council</b>, A to Z — that groups the three councils</span>
+                <span class="cap" data-step="3"><b>Add Level</b> ▸ then by <b>No MFA</b>, largest to smallest — the tie-breaker inside each council</span>
+                <span class="cap" data-step="4"><b>OK</b> — councils in order, and the worst suburb rises to the top of each block</span>
+                <span class="cap" data-step="5">one glance now ranks the worst suburb in <b>every</b> council: Casuarina, Humpty Doo, Bakewell</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":2,"sel":"#d9l1 .xdselect","cls":"hot"},
+        {"s":3,"sel":"#d9add","cls":"hotgreen"},
+        {"s":3,"sel":"#d9l2 .xdselect","cls":"hot"},
+        {"s":4,"sel":"#d9ok","cls":"hotgreen"},
+        {"s":4,"sel":".sw9","cls":"go"},
+        {"s":5,"sel":".a9 .d[data-row='1'], .a9 .d[data-row='4'], .a9 .d[data-row='7']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- 10 · Sort safety net -->
+<section class="slide" id="s10" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The Sort dialog</span>
+            <h2>The sort safety net</h2>
+            <p class="lede">Three things worth knowing before you sort anything that matters.</p>
+        </header>
+        <div class="sbody">
+            <div class="traps3">
+                <div class="card" data-step="1">
+                    <h3>The warning box is your friend</h3>
+                    <p>If you <b>did</b> select a column and hit sort, Excel throws a lifeline:</p>
+                    <div class="xldialog smalld" style="margin-top:14px; width:100%;">
+                        <div class="xdtitle"><span>Sort Warning</span><span class="x">✕</span></div>
+                        <div class="xdbody">
+                            <p style="font-size:16px;">Microsoft Excel found data next to your selection.</p>
+                            <span class="xdradio on"><span class="rb"></span>Expand the selection</span>
+                            <span class="xdradio"><span class="rb"></span>Continue with the current selection</span>
+                        </div>
+                        <div class="xdbtns"><span class="xdbtn hotgreen">Sort…</span><span class="xdbtn">Cancel</span></div>
+                    </div>
+                    <p class="tag">→ always take Expand the selection</p>
+                </div>
+                <div class="card" data-step="2">
+                    <h3>Blank rows and columns split the data</h3>
+                    <p>Excel finds the edges of your data by walking outward until it hits emptiness. A fully blank row or column inside your table is an <b>edge</b>: everything past it gets left out of the sort.</p>
+                    <p style="margin-top:10px;">Keep your table one solid block; delete decorative blank rows.</p>
+                </div>
+                <div class="card" data-step="3">
+                    <h3>Ctrl+Z is the escape hatch</h3>
+                    <p>A sort has no Clear button; the old order is simply gone. But <span class="kbd">Ctrl+Z</span> straight after undoes it perfectly.</p>
+                    <p style="margin-top:10px;">Sorted something weird and kept working? You can still press <span class="kbd">Ctrl+Z</span> several times, or close the file <b>without saving</b>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 11 · The header trap -->
+<section class="slide" id="s11" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ The Sort dialog</span>
+            <h2>The header trap: one clean header row</h2>
+            <p class="lede">Sorting behaves only when row 1 is headers and everything under it is data. Some sheets keep a second row of notes or question wording under the headers, and that's where sorts go wrong.</p>
+        </header>
+        <div class="sbody">
+            <div class="row">
+                <div class="swap sw11">
+                    <div class="sheet small before msy" data-table="messy"></div>
+                    <div class="sheet small after msys" data-table="messy_sorted"></div>
+                </div>
+                <div class="grow" style="display:flex; flex-direction:column; gap:18px; padding-top:8px;">
+                    <div class="capbox" style="height:auto; min-height:90px;">
+                        <span class="cap" data-step="1">row 2 here isn't data — it's the survey <b>question wording</b>, parked under the headers</span>
+                        <span class="cap" data-step="2">sort the sheet and Excel treats that row as data: it dives in and files itself among the answers</span>
+                        <span class="cap" data-step="3">on a 1,000-row sheet you might never notice — press <b>Ctrl+Z</b> the moment a sort looks wrong</span>
+                    </div>
+                    <div class="callout warn" data-step="3" style="font-size:21px;"><b>The rule:</b> one header row, then data, nothing else in the block. Notes and question wording belong on their own sheet. The practice workbook's <b>Survey Responses</b> sheet has exactly this trap waiting; you'll meet it in the final challenge.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".msy [data-row='1']","cls":"hl-lookup"},
+        {"s":2,"sel":".sw11","cls":"go"},
+        {"s":2,"sel":".msys [data-row='3']","cls":"blocked"},
+        {"s":3,"sel":".msys .d[data-col='Suburb'][data-row='3']","cls":"strong"}
+    ]</script>
+</section>
+
+<!-- ================= § FILTER ================= -->
+
+<!-- 12 · Turning filters on -->
+<section class="slide" id="s12" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Filter</span>
+            <h2>Turning filters on</h2>
+            <p class="lede">Filtering starts the same way as sorting: one click inside the data. Then one button.</p>
+        </header>
+        <div class="sbody">
+            <div class="ribbon">
+                <div class="rtabs"><span class="rtab">Home</span><span class="rtab">Insert</span><span class="rtab on">Data</span><span class="rtab">View</span></div>
+                <div class="rbody">
+                    <div class="rgroup">
+                        <div class="rbtns">
+                            <div class="rbtn"><span class="ic">AZ↓</span><span>A to Z</span></div>
+                            <div class="rbtn"><span class="ic">ZA↓</span><span>Z to A</span></div>
+                            <div class="rbtn"><span class="ic">⇅</span><span>Sort</span></div>
+                            <div class="rbtn" id="r12f"><span class="ic">▽</span><span>Filter</span></div>
+                            <div class="rbtn"><span class="ic">✕</span><span>Clear</span></div>
+                        </div>
+                        <span class="rgname">Sort &amp; Filter</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="sheet small f12" data-table="survey"></div>
+                <div class="grow" style="display:flex; flex-direction:column; gap:18px; padding-top:8px;">
+                    <div class="capbox" style="height:auto; min-height:90px;">
+                        <span class="cap" data-step="1">one click anywhere inside the data — the one-cell rule again</span>
+                        <span class="cap" data-step="2"><b>Data ▸ Sort &amp; Filter ▸ Filter</b> — the funnel button; no dialog, nothing to fill in</span>
+                        <span class="cap" data-step="3">every header grows a small <b>▾ arrow button</b>; nothing else has changed yet</span>
+                    </div>
+                    <div class="callout" data-step="3" style="font-size:21px;">The arrows <b>are</b> the filter controls; everything from here happens inside them. The same Filter button switches them off again.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".f12 .d[data-col='Suburb'][data-row='4']","cls":"hl-lookup strong"},
+        {"s":2,"sel":"#r12f","cls":"hot"},
+        {"s":3,"sel":".f12","cls":"fon"}
+    ]</script>
+</section>
+
+<!-- 13 · Your first filter: checkboxes -->
+<section class="slide" id="s13" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Filter</span>
+            <h2>Your first filter: tick what stays</h2>
+            <p class="lede">The question: <b>just show me Palmerston.</b> Click the arrow on the Council header and use the checkboxes.</p>
+        </header>
+        <div class="sbody">
+            <div class="row">
+                <div class="menucard" id="fm13" data-step="1" style="font-size:18px;">
+                    <div class="mi">Sort A to Z</div>
+                    <div class="mi">Sort Z to A</div>
+                    <div class="msep"></div>
+                    <div class="mi" style="opacity:0.5;">Clear Filter From "Council"</div>
+                    <div class="mi">Text Filters &nbsp;▸</div>
+                    <div class="msep"></div>
+                    <div class="xdselect" style="font-size:16px; margin:4px 0;">🔍 Search <span class="car"></span></div>
+                    <div style="display:flex; flex-direction:column; gap:4px; padding:6px 4px;">
+                        <span class="xdchk ck-all"><span class="bx">✓</span>(Select All)</span>
+                        <span class="xdchk ck-dar"><span class="bx">✓</span>Darwin</span>
+                        <span class="xdchk ck-lit"><span class="bx">✓</span>Litchfield</span>
+                        <span class="xdchk ck-pal"><span class="bx">✓</span>Palmerston</span>
+                    </div>
+                    <div class="xdbtns" style="padding:8px 4px 4px;">
+                        <span class="xdbtn ok" id="fm13ok" style="font-size:16px;">OK</span>
+                        <span class="xdbtn" style="font-size:16px;">Cancel</span>
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="sheet small f13" data-table="survey"></div>
+                    <div class="statusbar" id="sb13" data-step="4"><span class="sblabel">status bar ▸</span>3 of 9 records found</div>
+                </div>
+                <div class="grow" style="padding-top:8px;">
+                    <div class="capbox" style="height:auto; min-height:150px;">
+                        <span class="cap" data-step="1">click the <b>▾ arrow on Council</b>; the filter menu drops down</span>
+                        <span class="cap" data-step="2">untick <b>(Select All)</b>, then tick just <b>Palmerston</b></span>
+                        <span class="cap" data-step="3"><b>OK</b> — three rows stay, six hide</span>
+                        <span class="cap" data-step="4">the tell-tales: <b>blue row numbers that skip</b> (2, 5, 9), a <b>funnel</b> on the Council header, and the status bar count at the bottom of Excel</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".f13","cls":"fon"},
+        {"s":1,"sel":".f13 .h[data-col='Council']","cls":"hl-lookup"},
+        {"s":2,"sel":"#fm13 .ck-all .bx, #fm13 .ck-dar .bx, #fm13 .ck-lit .bx","text":""},
+        {"s":2,"sel":"#fm13 .ck-pal","cls":"hot"},
+        {"s":3,"sel":"#fm13ok","cls":"hotgreen"},
+        {"s":3,"sel":".f13 [data-row='2'], .f13 [data-row='3'], .f13 [data-row='5'], .f13 [data-row='6'], .f13 [data-row='7'], .f13 [data-row='9']","cls":"rowhide"},
+        {"s":3,"sel":".f13 .rn[data-row='1'], .f13 .rn[data-row='4'], .f13 .rn[data-row='8']","cls":"filt"},
+        {"s":3,"sel":".f13 .h[data-col='Council']","cls":"funnel"},
+        {"s":4,"sel":".f13 .d[data-col='Suburb'][data-row='1'], .f13 .d[data-col='Suburb'][data-row='4'], .f13 .d[data-col='Suburb'][data-row='8']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- 14 · Hidden, not deleted -->
+<section class="slide" id="s14" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Filter</span>
+            <h2>Hidden, not deleted</h2>
+            <p class="lede">The most important sentence about filtering: <b>the other rows still exist.</b> They are folded away, not thrown away.</p>
+        </header>
+        <div class="sbody">
+            <div class="row">
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="sheet small f14" data-table="survey"></div>
+                    <div class="statusbar"><span class="sblabel">status bar ▸</span><span id="sb14">3 of 9 records found</span></div>
+                </div>
+                <div class="grow" style="display:flex; flex-direction:column; gap:18px; padding-top:8px;">
+                    <div class="callout" data-step="1" style="font-size:22px;">The six hidden rows are still in the file: still saved, still counted by totals on other sheets, still there for whoever opens the workbook next. A filter only changes <b>what you can see</b>.</div>
+                    <div class="ribbon" data-step="2" style="align-self:flex-start;">
+                        <div class="rtabs"><span class="rtab">Home</span><span class="rtab on">Data</span><span class="rtab">View</span></div>
+                        <div class="rbody">
+                            <div class="rgroup">
+                                <div class="rbtns">
+                                    <div class="rbtn"><span class="ic">▽</span><span>Filter</span></div>
+                                    <div class="rbtn" id="r14clr"><span class="ic">✕</span><span>Clear</span></div>
+                                </div>
+                                <span class="rgname">Sort &amp; Filter</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="capbox">
+                        <span class="cap" data-step="1">row numbers 2, 5, 9 — the gaps are where the hidden rows live</span>
+                        <span class="cap" data-step="2"><b>Data ▸ Clear</b> — every row comes straight back; nothing was lost</span>
+                    </div>
+                    <div class="callout warn" data-step="2" style="font-size:21px;">If a workbook ever looks like it has lost rows, <b>check for blue row numbers first</b>. It is nearly always a filter someone left on.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".f14","cls":"fon"},
+        {"s":0,"sel":".f14 [data-row='2'], .f14 [data-row='3'], .f14 [data-row='5'], .f14 [data-row='6'], .f14 [data-row='7'], .f14 [data-row='9']","cls":"rowhide"},
+        {"s":0,"sel":".f14 .rn[data-row='1'], .f14 .rn[data-row='4'], .f14 .rn[data-row='8']","cls":"filt"},
+        {"s":0,"sel":".f14 .h[data-col='Council']","cls":"funnel"},
+        {"s":2,"sel":"#r14clr","cls":"hot"},
+        {"s":2,"sel":".f14 [data-row='2'], .f14 [data-row='3'], .f14 [data-row='5'], .f14 [data-row='6'], .f14 [data-row='7'], .f14 [data-row='9']","rm":"rowhide"},
+        {"s":2,"sel":".f14 .rn[data-row='1'], .f14 .rn[data-row='4'], .f14 .rn[data-row='8']","rm":"filt"},
+        {"s":2,"sel":".f14 .h[data-col='Council']","rm":"funnel"},
+        {"s":2,"sel":"#sb14","text":"Ready"}
+    ]</script>
+</section>
+
+<!-- 15 · Number filters -->
+<section class="slide" id="s15" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Filter</span>
+            <h2>Number filters: "everything over…"</h2>
+            <p class="lede">Checkboxes suit names. For numbers there's a better menu: <b>which suburbs have more than 200 people with no MFA?</b></p>
+        </header>
+        <div class="sbody">
+            <div class="row">
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <div class="menucard" id="fm15" data-step="1" style="font-size:18px;">
+                        <div class="mi">Sort Smallest to Largest</div>
+                        <div class="mi">Sort Largest to Smallest</div>
+                        <div class="msep"></div>
+                        <div class="mi sel">Number Filters &nbsp;▸</div>
+                    </div>
+                    <div class="menucard" id="sub15" data-step="2" style="font-size:18px; margin-left:40px;">
+                        <div class="mi">Equals…</div>
+                        <div class="mi sel">Greater Than…</div>
+                        <div class="mi">Less Than…</div>
+                        <div class="mi">Top 10…</div>
+                        <div class="mi">Above Average</div>
+                    </div>
+                </div>
+                <div class="xldialog smalld" id="dlg15" data-step="3">
+                    <div class="xdtitle"><span>Custom AutoFilter</span><span class="x">✕</span></div>
+                    <div class="xdbody">
+                        <span class="xdlabel">Show rows where: <b>No MFA</b></span>
+                        <div style="display:flex; gap:10px;">
+                            <span class="xdselect" style="flex:1;">is greater than <span class="car">▾</span></span>
+                            <span class="xdselect hot" style="min-width:110px;">200</span>
+                        </div>
+                    </div>
+                    <div class="xdbtns"><span class="xdbtn ok" id="dlg15ok">OK</span><span class="xdbtn">Cancel</span></div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="sheet small f15" data-table="survey" data-cols="Council,Suburb,Surveyed,No MFA"></div>
+                    <div class="statusbar" id="sb15" data-step="4"><span class="sblabel">status bar ▸</span>3 of 9 records found</div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">arrow on <b>No MFA</b> — a number column, so the menu offers <b>Number Filters</b></span>
+                <span class="cap" data-step="2">a whole family: greater than, less than, top 10, above average — pick <b>Greater Than…</b></span>
+                <span class="cap" data-step="3">type <b>200</b>; that's the whole setup</span>
+                <span class="cap" data-step="4">three suburbs over the line — Nightcliff, Casuarina, Karama; the worst offenders in one move</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".f15","cls":"fon"},
+        {"s":1,"sel":".f15 .h[data-col='No MFA']","cls":"hl-lookup"},
+        {"s":4,"sel":"#dlg15ok","cls":"hotgreen"},
+        {"s":4,"sel":".f15 [data-row='1'], .f15 [data-row='2'], .f15 [data-row='4'], .f15 [data-row='6'], .f15 [data-row='8'], .f15 [data-row='9']","cls":"rowhide"},
+        {"s":4,"sel":".f15 .rn[data-row='3'], .f15 .rn[data-row='5'], .f15 .rn[data-row='7']","cls":"filt"},
+        {"s":4,"sel":".f15 .h[data-col='No MFA']","cls":"funnel"},
+        {"s":4,"sel":".f15 .d[data-col='No MFA'][data-row='3'], .f15 .d[data-col='No MFA'][data-row='5'], .f15 .d[data-col='No MFA'][data-row='7']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- 16 · Filters stack -->
+<section class="slide" id="s16" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Filter</span>
+            <h2>Filters stack</h2>
+            <p class="lede">Filter more than one column at once and each funnel narrows the view further. The question: <b>big suburbs, in Darwin only.</b></p>
+        </header>
+        <div class="sbody">
+            <div class="row">
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="sheet small f16" data-table="survey" data-cols="Council,Suburb,Surveyed,Shares pwd,No MFA"></div>
+                    <div class="statusbar" id="sb16" data-step="1"><span class="sblabel">status bar ▸</span><span id="sb16t">5 of 9 records found</span></div>
+                </div>
+                <div class="grow" style="display:flex; flex-direction:column; gap:18px; padding-top:8px;">
+                    <div class="capbox" style="height:auto; min-height:120px;">
+                        <span class="cap" data-step="1">first funnel: <b>Surveyed greater than 300</b> leaves five suburbs</span>
+                        <span class="cap" data-step="2">second funnel: <b>Council = Darwin</b> narrows those five to three; both funnels work at once</span>
+                        <span class="cap" data-step="3">the answer: Nightcliff, Casuarina and Karama are Darwin's big suburbs</span>
+                    </div>
+                    <div class="callout" data-step="3" style="font-size:21px;">Every funnelled header is filtering at the same time. Clear them one at a time from each column's arrow menu, or all at once with <b>Data ▸ Clear</b>.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".f16","cls":"fon"},
+        {"s":1,"sel":".f16 [data-row='1'], .f16 [data-row='4'], .f16 [data-row='6'], .f16 [data-row='9']","cls":"rowhide"},
+        {"s":1,"sel":".f16 .rn[data-row='2'], .f16 .rn[data-row='3'], .f16 .rn[data-row='5'], .f16 .rn[data-row='7'], .f16 .rn[data-row='8']","cls":"filt"},
+        {"s":1,"sel":".f16 .h[data-col='Surveyed']","cls":"funnel"},
+        {"s":2,"sel":".f16 [data-row='2'], .f16 [data-row='8']","cls":"rowhide"},
+        {"s":2,"sel":".f16 .h[data-col='Council']","cls":"funnel"},
+        {"s":2,"sel":"#sb16t","text":"3 of 9 records found"},
+        {"s":3,"sel":".f16 .d[data-col='Suburb'][data-row='3'], .f16 .d[data-col='Suburb'][data-row='5'], .f16 .d[data-col='Suburb'][data-row='7']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- 17 · Three ways to clear -->
+<section class="slide" id="s17" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Filter</span>
+            <h2>Three ways back to everything</h2>
+            <p class="lede">Filters are polite: every one of them is reversible, at three different scales.</p>
+        </header>
+        <div class="sbody">
+            <div class="traps3">
+                <div class="card" data-step="1">
+                    <h3>Clear one column</h3>
+                    <p>The arrow menu of a filtered column offers:</p>
+                    <div class="menucard" style="margin-top:14px; font-size:17px; width:100%;">
+                        <div class="mi sel">Clear Filter From "Council"</div>
+                    </div>
+                    <p style="margin-top:12px;">The other funnels keep working; only this column lets go.</p>
+                </div>
+                <div class="card" data-step="2">
+                    <h3>Clear every filter</h3>
+                    <p><span class="kbd">Data</span> ▸ Sort &amp; Filter ▸ <span class="kbd">Clear</span> releases all columns at once. Every row returns; the ▾ arrows stay, ready for next time.</p>
+                </div>
+                <div class="card" data-step="3">
+                    <h3>Switch filtering off</h3>
+                    <p><span class="kbd">Data</span> ▸ <span class="kbd">Filter</span> again — the same funnel button that turned it on. Arrows disappear, all rows return, the sheet is back to plain.</p>
+                </div>
+            </div>
+            <div class="callout warn" data-step="3"><b>Worth knowing:</b> filters save with the file. Leave one on and the next person opens a workbook that looks half empty; clear filters before you save and share.</div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= § SORT + FILTER TOGETHER ================= -->
+
+<!-- 18 · The everyday combo -->
+<section class="slide" id="s18" data-steps="4">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Sort + filter together</span>
+            <h2>The everyday combo: filter, then sort</h2>
+            <p class="lede">The question a real job asks: <b>the awareness campaign visits Palmerston next month; which suburb first?</b> Narrow to what matters, then rank it.</p>
+        </header>
+        <div class="sbody">
+            <div class="ribbon">
+                <div class="rtabs"><span class="rtab">Home</span><span class="rtab">Insert</span><span class="rtab on">Data</span><span class="rtab">View</span></div>
+                <div class="rbody">
+                    <div class="rgroup">
+                        <div class="rbtns">
+                            <div class="rbtn"><span class="ic">AZ↓</span><span>A to Z</span></div>
+                            <div class="rbtn" id="r18za"><span class="ic">ZA↓</span><span>Z to A</span></div>
+                            <div class="rbtn"><span class="ic">⇅</span><span>Sort</span></div>
+                            <div class="rbtn"><span class="ic">▽</span><span>Filter</span></div>
+                            <div class="rbtn"><span class="ic">✕</span><span>Clear</span></div>
+                        </div>
+                        <span class="rgname">Sort &amp; Filter</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div style="display:flex; flex-direction:column; gap:14px;">
+                    <div class="swap sw18">
+                        <div class="sheet small before b18" data-table="survey" data-cols="Council,Suburb,Shares pwd,No MFA"></div>
+                        <div class="sheet small after a18" data-table="pal_sorted" data-cols="Council,Suburb,Shares pwd,No MFA" data-rns="5,7,8" data-filt="1"></div>
+                    </div>
+                    <div class="statusbar" id="sb18" data-step="1"><span class="sblabel">status bar ▸</span>3 of 9 records found</div>
+                </div>
+                <div class="grow" style="padding-top:8px;">
+                    <div class="capbox" style="height:auto; min-height:150px;">
+                        <span class="cap" data-step="1"><b>filter first:</b> Council ▸ tick only Palmerston — three rows stay</span>
+                        <span class="cap" data-step="2">now the one-cell rule: click in <b>Shares pwd</b></span>
+                        <span class="cap" data-step="3"><b>Z to A</b> — the visible rows rank themselves, worst first</span>
+                        <span class="cap" data-step="4">the campaign's running order: <b>Bakewell</b> (143), then Moulden (122), then Zuccoli (118)</span>
+                    </div>
+                    <div class="callout big" data-step="4" style="margin-top:10px;">Filter answers <em style="color:var(--excel-green); font-style:normal;">"just these"</em>; sort answers <em style="color:var(--excel-green); font-style:normal;">"in what order"</em>. Together they answer the actual question.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":0,"sel":".b18","cls":"fon"},
+        {"s":0,"sel":".a18","cls":"fon"},
+        {"s":0,"sel":".a18 .h[data-col='Council']","cls":"funnel"},
+        {"s":1,"sel":".b18 [data-row='2'], .b18 [data-row='3'], .b18 [data-row='5'], .b18 [data-row='6'], .b18 [data-row='7'], .b18 [data-row='9']","cls":"rowhide"},
+        {"s":1,"sel":".b18 .rn[data-row='1'], .b18 .rn[data-row='4'], .b18 .rn[data-row='8']","cls":"filt"},
+        {"s":1,"sel":".b18 .h[data-col='Council']","cls":"funnel"},
+        {"s":2,"sel":".b18 .d[data-col='Shares pwd'][data-row='8']","cls":"hl-lookup strong"},
+        {"s":3,"sel":"#r18za","cls":"hot"},
+        {"s":3,"sel":".sw18","cls":"go"},
+        {"s":4,"sel":".a18 .d[data-col='Shares pwd']","cls":"hl-return"}
+    ]</script>
+</section>
+
+<!-- ================= § TRIP-UPS ================= -->
+
+<!-- 19 · When it goes wrong -->
+<section class="slide" id="s19" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Trip-ups</span>
+            <h2>When it goes wrong — the five usual suspects</h2>
+        </header>
+        <div class="sbody">
+            <div class="gotchas">
+                <div class="card reveal">
+                    <h3>"My rows got scrambled"</h3>
+                    <p>You selected a column (or part of one) and sorted just that. One column reordered on its own; every row now mixes suburbs.</p>
+                    <p class="fix">Fix: Ctrl+Z immediately. Next time: click one cell, and if the Sort Warning appears, choose Expand the selection.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>"10 sorted before 9"</h3>
+                    <p>Numbers stored as text sort letter by letter, so "10" files before "9". Tell-tales: left-aligned numbers and small green corner marks.</p>
+                    <p class="fix">Fix: select the column, use the warning marker's Convert to Number, then sort again.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>"Half my data is missing"</h3>
+                    <p>A leftover filter, almost every time; possibly one that arrived saved inside the file.</p>
+                    <p class="fix">Fix: look for blue skipping row numbers and funnel icons; then Data ▸ Clear.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>"The sort ignored some rows"</h3>
+                    <p>A fully blank row or column inside the table split it into two blocks, and Excel only sorted the block you clicked in.</p>
+                    <p class="fix">Fix: delete blank rows and columns inside the data, then sort again.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>"There's a header in my data"</h3>
+                    <p>A second header row, notes, or question wording sat inside the block and got sorted like data.</p>
+                    <p class="fix">Fix: Ctrl+Z, move notes to their own sheet, keep one clean header row.</p>
+                </div>
+                <div class="card reveal" style="background:var(--green-soft); border-color:var(--excel-green);">
+                    <h3 style="color:var(--excel-green);">Golden rule</h3>
+                    <p style="color:var(--text);">One clean header row, one solid block of data, <b>one click in one cell</b>. Do that and sort and filter behave every single time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= § WRAP ================= -->
+
+<!-- 20 · Cheat sheet -->
+<section class="slide" id="s20" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Wrap</span>
+            <h2>The one-slide cheat sheet</h2>
+        </header>
+        <div class="sbody">
+            <div class="cheat">
+                <div class="card reveal">
+                    <h3>Where everything lives</h3>
+                    <ul class="checklist">
+                        <li><b>Data tab ▸ Sort &amp; Filter group</b> — all of it</li>
+                        <li>A to Z / Z to A — one-column sort</li>
+                        <li>Sort — the dialog, for two-level sorts</li>
+                        <li>Filter — the funnel; arrows on / off</li>
+                        <li>Clear — release every filter at once</li>
+                        <li>Right-click a cell ▸ Sort / Filter works too</li>
+                    </ul>
+                </div>
+                <div class="card reveal">
+                    <h3>Which tool for which question</h3>
+                    <table class="minitable">
+                        <tr><td>Who's highest, lowest, first?</td><td>Sort</td></tr>
+                        <tr><td>Show me only this council</td><td>Filter</td></tr>
+                        <tr><td>Everything over a number</td><td>Number Filters</td></tr>
+                        <tr><td>Order by two things at once</td><td>Sort dialog</td></tr>
+                        <tr><td>Rank inside one slice</td><td>Filter, then sort</td></tr>
+                    </table>
+                </div>
+                <div class="card reveal">
+                    <h3>Remember</h3>
+                    <ul class="checklist">
+                        <li>Click <b>one cell</b>; never select a column</li>
+                        <li>A sort moves <b>whole rows</b></li>
+                        <li>Filtering <b>hides</b>, it never deletes</li>
+                        <li>Blue skipping row numbers = filter is on</li>
+                        <li>Ctrl+Z undoes a sort straight away</li>
+                        <li>One clean header row, no notes in the block</li>
+                        <li>Clear filters before you save and share</li>
+                    </ul>
+                </div>
+                <div class="card reveal span3" style="display:flex; gap:44px; align-items:center; padding:16px 30px;">
+                    <div class="keyrow" style="font-size:19px;"><span class="swatch amber" style="width:30px;height:30px;"></span>where you click</div>
+                    <div class="keyrow" style="font-size:19px;"><span class="swatch blue" style="width:30px;height:30px;"></span>what Excel does</div>
+                    <div class="keyrow" style="font-size:19px;"><span class="swatch green" style="width:30px;height:30px;"></span>the result you read</div>
+                    <div style="font-family:var(--font-mono); font-size:17px; color:var(--text-dim); margin-left:auto;">works in every modern Excel, including Excel Online</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 21 · Do it for real -->
+<section class="slide" id="s21" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Wrap</span>
+            <h2>Now do it for real</h2>
+            <p class="lede">Download the practice workbook and open the <b>Top End Survey</b> sheet: the full version of what you've been using, 58 suburbs, real column names (<span class="kbd">Shares passwords</span>, <span class="kbd">No MFA</span>).</p>
+        </header>
+        <div class="sbody">
+            <div class="teach">
+                <div class="card">
+                    <h3 style="margin-bottom:16px;">Your six talking points</h3>
+                    <ol class="points">
+                        <li><b>One cell, one click</b> — never select a column before sorting.</li>
+                        <li><b>Sort rearranges whole rows</b> — largest to smallest, A to Z; the answer floats to the top.</li>
+                        <li><b>The Sort dialog</b> stacks rules: by council, then by the number that matters.</li>
+                        <li><b>Filter hides, never deletes</b> — checkboxes for names, Number Filters for "over 200".</li>
+                        <li><b>Read the tell-tales</b> — blue skipping row numbers, funnel icons, the status bar count.</li>
+                        <li><b>Filter, then sort</b> — narrow to the slice, then rank it. That combo answers real questions.</li>
+                    </ol>
+                    <div style="margin-top:22px;">
+                        <a class="dlbtn" href="../../simulations_downloads/Cyber_pulse_data.xlsx" download>⬇ Practice workbook (Excel)</a>
+                        <p style="font-size:17px; margin-top:10px;">Same workbook as the Group &amp; Outline tutorial; this lesson uses the Top End Survey and Survey Responses sheets.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom:16px;">Three challenges — click to reveal each answer</h3>
+                    <div class="challenge">
+                        <div class="q">① Sort Shares passwords largest to smallest. Which suburb tops the whole Territory list?</div>
+                        <div class="ansf" data-step="1">Anula (City of Darwin) <span class="res">→ 236 shared passwords of 538 surveyed</span></div>
+                    </div>
+                    <div class="challenge">
+                        <div class="q">② Filter Council to City of Darwin only. How many suburbs stay visible?</div>
+                        <div class="ansf" data-step="2">35 suburbs <span class="res">→ status bar: 35 of 58 records found</span></div>
+                    </div>
+                    <div class="challenge">
+                        <div class="q">③ Filter to City of Palmerston, then sort No MFA largest to smallest. Where does the campaign go first?</div>
+                        <div class="ansf" data-step="3">Farrar <span class="res">→ 281 people with no MFA</span></div>
+                    </div>
+                    <div class="callout warn" style="font-size:18.5px; margin-top:14px;"><b>Stretch — meet the header trap:</b> open the Survey Responses sheet. Row 2 is question wording, not data. Sort by Suburb, watch the wording row file itself in among the answers, then press Ctrl+Z. Now you've seen the trap from the inside.</div>
+                </div>
+            </div>
+            <p class="closing">Sort answers <em>"who's first"</em>. Filter answers <em>"show me only"</em>. Do both on 58 rows and <em>you own the sheet.</em></p>
+        </div>
+    </div>
+</section>
+
+</main>
+</div>
+
+<!-- ===========================================
+     SECTION RAIL (chrome, outside the stage)
+     =========================================== -->
+<nav class="rail" aria-label="Deck sections">
+    <div class="railtitle">Sort &amp; Filter</div>
+    <div id="railSecs"></div>
+    <div class="railfoot">
+        <span id="railCount">1 / 21</span>
+        <span id="railStep"></span>
+        <span class="railhint">click / → build · ← back · E edit</span>
+    </div>
+</nav>
+
+<!-- Inline-edit chrome -->
+<div class="edit-hotzone" aria-hidden="true"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+<div class="edit-note">editing — click any text · Ctrl+S saves a copy · E to exit</div>
+<script>
+/* ===========================================
+   LOCKED DATASETS
+   Single source of truth for every <SheetGrid> in the deck.
+   Row order matters: fx selectors address cells by data-row.
+   The 9 suburbs match the Group & Outline tutorial's subset of
+   the same practice workbook; the download has the full 58 rows.
+   =========================================== */
+const TABLES = {
+    demo: {
+        headers: ['Habit', 'Count'],
+        rows: [['Shares passwords', '1,260'], ['No MFA', '1,689'], ['Low awareness', '1,010']]
+    },
+    survey: {   /* as collected — deliberately unsorted */
+        headers: ['Council', 'Suburb', 'Surveyed', 'Shares pwd', 'No MFA'],
+        rows: [
+            ['Palmerston', 'Moulden',        '260', '122', '156'],
+            ['Litchfield', 'Humpty Doo',     '310', '136', '186'],
+            ['Darwin',     'Nightcliff',     '420', '168', '231'],
+            ['Palmerston', 'Zuccoli',        '295', '118', '152'],
+            ['Darwin',     'Casuarina',      '510', '199', '265'],
+            ['Litchfield', 'Berry Springs',  '190', '84',  '118'],
+            ['Darwin',     'Karama',         '385', '173', '227'],
+            ['Palmerston', 'Bakewell',       '340', '143', '194'],
+            ['Litchfield', 'Howard Springs', '285', '117', '160']
+        ]
+    },
+    survey_zshares: {   /* sorted by Shares pwd, largest to smallest */
+        headers: ['Council', 'Suburb', 'Surveyed', 'Shares pwd', 'No MFA'],
+        rows: [
+            ['Darwin',     'Casuarina',      '510', '199', '265'],
+            ['Darwin',     'Karama',         '385', '173', '227'],
+            ['Darwin',     'Nightcliff',     '420', '168', '231'],
+            ['Palmerston', 'Bakewell',       '340', '143', '194'],
+            ['Litchfield', 'Humpty Doo',     '310', '136', '186'],
+            ['Palmerston', 'Moulden',        '260', '122', '156'],
+            ['Palmerston', 'Zuccoli',        '295', '118', '152'],
+            ['Litchfield', 'Howard Springs', '285', '117', '160'],
+            ['Litchfield', 'Berry Springs',  '190', '84',  '118']
+        ]
+    },
+    survey_az: {   /* sorted by Suburb, A to Z */
+        headers: ['Council', 'Suburb', 'Surveyed', 'Shares pwd', 'No MFA'],
+        rows: [
+            ['Palmerston', 'Bakewell',       '340', '143', '194'],
+            ['Litchfield', 'Berry Springs',  '190', '84',  '118'],
+            ['Darwin',     'Casuarina',      '510', '199', '265'],
+            ['Litchfield', 'Howard Springs', '285', '117', '160'],
+            ['Litchfield', 'Humpty Doo',     '310', '136', '186'],
+            ['Darwin',     'Karama',         '385', '173', '227'],
+            ['Palmerston', 'Moulden',        '260', '122', '156'],
+            ['Darwin',     'Nightcliff',     '420', '168', '231'],
+            ['Palmerston', 'Zuccoli',        '295', '118', '152']
+        ]
+    },
+    survey_council: {   /* two-level: Council A to Z, then No MFA largest to smallest */
+        headers: ['Council', 'Suburb', 'Surveyed', 'Shares pwd', 'No MFA'],
+        rows: [
+            ['Darwin',     'Casuarina',      '510', '199', '265'],
+            ['Darwin',     'Nightcliff',     '420', '168', '231'],
+            ['Darwin',     'Karama',         '385', '173', '227'],
+            ['Litchfield', 'Humpty Doo',     '310', '136', '186'],
+            ['Litchfield', 'Howard Springs', '285', '117', '160'],
+            ['Litchfield', 'Berry Springs',  '190', '84',  '118'],
+            ['Palmerston', 'Bakewell',       '340', '143', '194'],
+            ['Palmerston', 'Moulden',        '260', '122', '156'],
+            ['Palmerston', 'Zuccoli',        '295', '118', '152']
+        ]
+    },
+    pal_sorted: {   /* Palmerston only, visible after sorting the filtered sheet by Shares pwd desc */
+        headers: ['Council', 'Suburb', 'Surveyed', 'Shares pwd', 'No MFA'],
+        rows: [
+            ['Palmerston', 'Bakewell', '340', '143', '194'],
+            ['Palmerston', 'Moulden',  '260', '122', '156'],
+            ['Palmerston', 'Zuccoli',  '295', '118', '152']
+        ]
+    },
+    messy: {   /* the header trap: question wording parked under the headers */
+        headers: ['Ref', 'Suburb', 'Shares password?', 'Uses MFA?'],
+        rows: [
+            ['', '', 'Q. Is a password shared?', 'Q. Is MFA turned on?'],
+            ['R-01', 'Karama',    '173', '227'],
+            ['R-02', 'Moulden',   '122', '156'],
+            ['R-03', 'Casuarina', '199', '265'],
+            ['R-04', 'Zuccoli',   '118', '152']
+        ]
+    },
+    messy_sorted: {   /* after sorting by Suburb A to Z: the wording row files itself among the data */
+        headers: ['Ref', 'Suburb', 'Shares password?', 'Uses MFA?'],
+        rows: [
+            ['R-03', 'Casuarina', '199', '265'],
+            ['R-01', 'Karama',    '173', '227'],
+            ['', '', 'Q. Is a password shared?', 'Q. Is MFA turned on?'],
+            ['R-02', 'Moulden',   '122', '156'],
+            ['R-04', 'Zuccoli',   '118', '152']
+        ]
+    }
+};
+
+/* ===========================================
+   <SheetGrid> RENDERER
+   Turns every  <div class="sheet" data-table="...">  into a
+   spreadsheet: column letters, row numbers, header row, data cells.
+   Options: data-cols (subset), data-rows (limit),
+   data-rns (custom row numbers, comma-separated, for filtered views),
+   data-filt (style all row numbers as filter-blue).
+   =========================================== */
+function buildSheets() {
+    document.querySelectorAll('.sheet[data-table]').forEach(sh => {
+        const t = TABLES[sh.dataset.table];
+        if (!t) return;
+        const cols = sh.dataset.cols ? sh.dataset.cols.split(',') : t.headers.slice();
+        const idx  = cols.map(c => t.headers.indexOf(c));
+        const rows = t.rows.slice(0, +(sh.dataset.rows || t.rows.length));
+        const rns  = sh.dataset.rns ? sh.dataset.rns.split(',') : null;
+        const filt = sh.dataset.filt ? ' filt' : '';
+        sh.style.gridTemplateColumns = `52px repeat(${cols.length}, auto)`;
+
+        let html = '<div class="sc cl"></div>';                       /* corner */
+        for (let c = 0; c < cols.length; c++)
+            html += `<div class="sc cl">${String.fromCharCode(65 + c)}</div>`;
+
+        html += '<div class="sc rn">1</div>';                         /* header row */
+        cols.forEach(c => html += `<div class="sc h" data-col="${c}">${c}</div>`);
+
+        rows.forEach((r, ri) => {                                     /* data rows */
+            html += `<div class="sc rn${filt}" data-row="${ri + 1}">${rns ? rns[ri] : ri + 2}</div>`;
+            idx.forEach((ci, k) =>
+                html += `<div class="sc d" data-col="${cols[k]}" data-row="${ri + 1}">${r[ci]}</div>`);
+        });
+        sh.innerHTML = html;
+    });
+}
+
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER + STEP/FX ENGINE
+   Click / → advance build-steps within the slide first, then move
+   to the next slide. ← reverses one step, then one slide (arriving
+   at the previous slide fully built).
+   =========================================== */
+const SECTIONS = [
+    ['Intro',           0, 3],
+    ['Sort basics',     4, 7],
+    ['The Sort dialog', 8, 10],
+    ['Filter',         11, 16],
+    ['Together',       17, 17],
+    ['Trip-ups',       18, 18],
+    ['Wrap',           19, 20]
+];
+
+class SlidePresentation {
+    constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.stage  = document.getElementById('deckStage');
+        this.cur    = 0;
+        this.step   = this.slides.map(() => 0);
+        this.fx     = this.slides.map(sl => this.resolveFx(sl));
+
+        this.buildRail();
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupPointerNav();
+        this.setupPrint();
+
+        const fromHash = parseInt((location.hash || '').slice(1), 10);
+        this.show(isNaN(fromHash) ? 0 : Math.min(Math.max(fromHash - 1, 0), this.slides.length - 1));
+    }
+
+    resolveFx(slide) {
+        const tag = slide.querySelector('script[type="text/fx"]');
+        if (!tag) return [];
+        let entries;
+        try { entries = JSON.parse(tag.textContent); }
+        catch (err) { console.error('Bad fx JSON on', slide.id, err); return []; }
+        return entries.map(e => {
+            const els = Array.from(slide.querySelectorAll(e.sel));
+            els.forEach(el => {
+                if (e.text !== undefined && el.dataset.orig === undefined)
+                    el.dataset.orig = el.textContent;
+            });
+            return { ...e, els };
+        });
+    }
+
+    maxSteps(i) { return +(this.slides[i].dataset.steps || 0); }
+
+    applyState(i, k) {
+        const slide = this.slides[i];
+        slide.querySelectorAll('[data-step]').forEach(el => {
+            const v = +el.dataset.step;
+            el.classList.toggle('on',  v <= k);
+            el.classList.toggle('now', v === k);
+        });
+        const fx = this.fx[i];
+        fx.forEach(e => e.els.forEach(el => {              /* clear everything first */
+            if (e.cls) el.classList.remove(...e.cls.split(' '));
+            if (e.text !== undefined) el.textContent = el.dataset.orig;
+            el.style.transitionDelay = '';
+        }));
+        fx.forEach(e => {                                  /* re-apply steps 0..k in order */
+            if (e.s > k) return;
+            e.els.forEach(el => {
+                if (e.d)   el.style.transitionDelay = e.d + 's';
+                if (e.cls) el.classList.add(...e.cls.split(' '));
+                if (e.rm)  el.classList.remove(...e.rm.split(' '));
+                if (e.text !== undefined) el.textContent = e.text;
+            });
+        });
+    }
+
+    show(i, step = 0) {
+        this.cur = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.step[this.cur] = Math.min(step, this.maxSteps(this.cur));
+        this.slides.forEach((sl, j) => {
+            sl.classList.toggle('active',  j === this.cur);
+            sl.classList.toggle('visible', j === this.cur);
+        });
+        this.applyState(this.cur, this.step[this.cur]);
+        try { history.replaceState(null, '', '#' + (this.cur + 1)); } catch (e) { /* file:// quirks */ }
+        this.updateRail();
+    }
+
+    advance() {
+        if (this.step[this.cur] < this.maxSteps(this.cur)) {
+            this.step[this.cur]++;
+            this.applyState(this.cur, this.step[this.cur]);
+            this.updateRail();
+        } else if (this.cur < this.slides.length - 1) {
+            this.show(this.cur + 1, 0);
+        }
+    }
+
+    back() {
+        if (this.step[this.cur] > 0) {
+            this.step[this.cur]--;
+            this.applyState(this.cur, this.step[this.cur]);
+            this.updateRail();
+        } else if (this.cur > 0) {
+            this.show(this.cur - 1, this.maxSteps(this.cur - 1));
+        }
+    }
+
+    setupStageScale() {
+        const scale = () => {
+            const railW  = window.matchMedia('(max-width: 1080px)').matches ? 0 : 248;
+            const availW = window.innerWidth - railW;
+            const f = Math.min(availW / 1920, window.innerHeight / 1080);
+            const x = railW + (availW - 1920 * f) / 2;
+            const y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+    }
+
+    setupKeyboardNav() {
+        document.addEventListener('keydown', e => {
+            if (e.target.getAttribute && e.target.getAttribute('contenteditable')) return;
+            if (window.editor && window.editor.isActive) return;
+            switch (e.key) {
+                case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); this.advance(); break;
+                case 'ArrowLeft':  case 'PageUp':             e.preventDefault(); this.back();    break;
+                case 'Home': e.preventDefault(); this.show(0); break;
+                case 'End':  e.preventDefault(); this.show(this.slides.length - 1); break;
+            }
+        });
+    }
+
+    setupPointerNav() {
+        const vp = document.querySelector('.deck-viewport');
+        let lastTouch = 0, lastAdvance = 0, tx = 0, ty = 0;
+        const debouncedAdvance = () => {
+            const now = Date.now();
+            if (now - lastAdvance < 350) return;
+            lastAdvance = now;
+            this.advance();
+        };
+        vp.addEventListener('click', e => {
+            if (window.editor && window.editor.isActive) return;
+            if (Date.now() - lastTouch < 500) return;
+            if (e.target.closest('a, button')) return;
+            debouncedAdvance();
+        });
+        vp.addEventListener('touchstart', e => {
+            tx = e.changedTouches[0].clientX;
+            ty = e.changedTouches[0].clientY;
+        }, { passive: true });
+        vp.addEventListener('touchend', e => {
+            if (window.editor && window.editor.isActive) return;
+            lastTouch = Date.now();
+            const dx = e.changedTouches[0].clientX - tx;
+            const dy = e.changedTouches[0].clientY - ty;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+                dx < 0 ? this.advance() : this.back();
+            } else if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+                debouncedAdvance();
+            }
+        }, { passive: true });
+    }
+
+    buildRail() {
+        const box = document.getElementById('railSecs');
+        SECTIONS.forEach(([name, start], si) => {
+            const b = document.createElement('button');
+            b.className = 'sec';
+            b.innerHTML = `<span class="n">${si + 1}</span><span>${name}</span>`;
+            b.addEventListener('click', e => { e.stopPropagation(); this.show(start, 0); });
+            box.appendChild(b);
+        });
+    }
+
+    updateRail() {
+        const secs = document.querySelectorAll('.rail .sec');
+        SECTIONS.forEach(([, start, end], si) =>
+            secs[si].classList.toggle('cur', this.cur >= start && this.cur <= end));
+        document.getElementById('railCount').textContent = `${this.cur + 1} / ${this.slides.length}`;
+        const n = this.maxSteps(this.cur);
+        document.getElementById('railStep').textContent =
+            n ? `build ${this.step[this.cur]}/${n} ▸` : '';
+    }
+
+    setupPrint() {
+        window.addEventListener('beforeprint', () =>
+            this.slides.forEach((sl, i) => this.applyState(i, this.maxSteps(i))));
+        window.addEventListener('afterprint', () =>
+            this.slides.forEach((sl, i) => this.applyState(i, this.step[i])));
+    }
+}
+
+/* ===========================================
+   INLINE EDITOR
+   Hover the top-left corner (or press E) → pencil → edit mode.
+   Edits persist to localStorage; Ctrl+S downloads an edited copy.
+   =========================================== */
+const EDIT_SEL = 'h1, h2, h3, p, li, .sc.d, .sc.h, .cap, .kicker, .floatlabel, .fchip, .ansf, .closing, .callout, .keyrow span:last-child, .qline, .minitable td, .mi, .xdchk, .xdselect, .xdlabel, .statusbar, .rbtn span:last-child';
+const STORE_KEY = 'sortfilter-deck-edits-v1';
+
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.els = Array.from(document.querySelectorAll(EDIT_SEL))
+            .filter(el => !el.closest('.rail'));
+        this.els.forEach((el, i) => el.dataset.eid = 'e' + i);
+        this.restore();
+        this.bindChrome();
+    }
+
+    restore() {
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { saved = {}; }
+        this.els.forEach(el => {
+            if (saved[el.dataset.eid] !== undefined) el.innerHTML = saved[el.dataset.eid];
+        });
+    }
+
+    persist() {
+        const out = {};
+        this.els.forEach(el => { if (el.dataset.dirty) out[el.dataset.eid] = el.innerHTML; });
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { saved = {}; }
+        localStorage.setItem(STORE_KEY, JSON.stringify({ ...saved, ...out }));
+    }
+
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        document.getElementById('editToggle').classList.toggle('active', this.isActive);
+        this.els.forEach(el => {
+            if (this.isActive) {
+                el.setAttribute('contenteditable', 'true');
+                el.addEventListener('input', this.markDirty);
+            } else {
+                el.removeAttribute('contenteditable');
+                el.removeEventListener('input', this.markDirty);
+            }
+        });
+        if (!this.isActive) this.persist();
+    }
+
+    markDirty(e) { e.currentTarget.dataset.dirty = '1'; }
+
+    downloadCopy() {
+        this.persist();
+        const clone = document.documentElement.cloneNode(true);
+        clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        const body = clone.querySelector('body');
+        if (body) body.classList.remove('editing');
+        const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'sort-filter-tutorial-edited.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    bindChrome() {
+        const hotzone = document.querySelector('.edit-hotzone');
+        const toggle  = document.getElementById('editToggle');
+        let hideTimeout = null;
+        const scheduleHide = () => {
+            hideTimeout = setTimeout(() => {
+                if (!this.isActive) toggle.classList.remove('show');
+            }, 400);
+        };
+        hotzone.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); toggle.classList.add('show'); });
+        hotzone.addEventListener('mouseleave', scheduleHide);
+        toggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        toggle.addEventListener('mouseleave', scheduleHide);
+        hotzone.addEventListener('click', e => { e.stopPropagation(); this.toggleEditMode(); });
+        toggle.addEventListener('click',  e => { e.stopPropagation(); this.toggleEditMode(); });
+
+        document.addEventListener('keydown', e => {
+            if ((e.key === 'e' || e.key === 'E') && !e.ctrlKey && !e.metaKey
+                && !(e.target.getAttribute && e.target.getAttribute('contenteditable'))) {
+                this.toggleEditMode();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's' && this.isActive) {
+                e.preventDefault();
+                this.downloadCopy();
+            }
+        });
+    }
+}
+
+/* ===========================================
+   BOOT — order matters:
+   sheets first, then saved edits, then the controller (fx selectors
+   must resolve against the fully-rendered, edit-restored DOM).
+   =========================================== */
+buildSheets();
+window.editor = new InlineEditor();
+window.deck = new SlidePresentation();
+</script>
+</body>
+</html>
