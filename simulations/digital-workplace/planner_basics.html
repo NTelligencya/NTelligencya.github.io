@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planner Basics Sandbox — Free-Play</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --tp: #5B5FC7;
+    --tp-deep: #4F52B2;
+    --tp-wash: #E8EBFA;
+    --bg-page: #1a1a2e;
+    --bg-app: #F5F5F5;
+    --panel: #FFFFFF;
+    --panel-alt: #FAFAFA;
+    --line: #E1E1E1;
+    --ink: #242424;
+    --dim: #616161;
+    --good: #13795B;
+    --good-wash: #E3F1E9;
+    --bad: #A3341F;
+    --bad-wash: #F9E9E4;
+}
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-page); min-height: 100vh; padding: 20px; color: var(--ink); }
+
+/* ===== Activity header (site convention) ===== */
+.activity-header {
+    max-width: 1280px; margin: 0 auto 16px auto;
+    background: linear-gradient(135deg, #5b5fc7 0%, #7b2cbf 100%);
+    border-radius: 12px; padding: 18px 24px; color: #fff;
+    box-shadow: 0 4px 20px rgba(91, 95, 199, 0.4);
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.activity-header h1 { font-size: 21px; }
+.activity-header p { font-size: 14px; opacity: .95; line-height: 1.45; flex-basis: 100%; }
+.badge { background: rgba(255,255,255,.2); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+.header-btns { margin-left: auto; display: flex; gap: 10px; }
+.hbtn { border: none; border-radius: 8px; padding: 9px 16px; cursor: pointer; font: 600 14px 'Segoe UI', sans-serif; background: rgba(255,255,255,.92); color: var(--tp-deep); }
+.hbtn:hover { background: #fff; }
+
+/* ===== App window ===== */
+.window {
+    max-width: 1280px; margin: 0 auto; height: 720px;
+    background: var(--bg-app); border-radius: 12px; overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,.45); position: relative;
+}
+.titlebar {
+    height: 48px; background: #EBEBEB; display: flex; align-items: center;
+    gap: 14px; padding: 0 16px; border-bottom: 1px solid var(--line); flex: 0 0 48px;
+}
+.titlebar .search { flex: 0 1 420px; margin: 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; font-size: 13px; color: var(--dim); text-align: center; }
+.titlebar .me { width: 32px; height: 32px; border-radius: 50%; background: var(--tp); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+.appbody { flex: 1; display: flex; min-height: 0; }
+
+/* App rail */
+.rail { width: 76px; background: #EBEBEB; border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding-top: 10px; gap: 2px; flex: 0 0 76px; }
+.rail button {
+    width: 64px; border: none; background: none; cursor: pointer; border-radius: 8px;
+    padding: 8px 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font: 400 11px 'Segoe UI', sans-serif; color: var(--dim); position: relative;
+}
+.rail button .ic { font-size: 20px; line-height: 1; }
+.rail button:hover { background: #E0E0E0; }
+.rail button.on { color: var(--tp-deep); font-weight: 600; }
+.rail button.on::before { content: ''; position: absolute; left: -6px; top: 12px; bottom: 12px; width: 3px; border-radius: 2px; background: var(--tp); }
+
+/* Plan header */
+.planhead { background: var(--panel); border-bottom: 1px solid var(--line); padding: 12px 20px 0; }
+.planhead .toprow { display: flex; align-items: center; gap: 12px; }
+.planhead .plicon { width: 34px; height: 34px; border-radius: 8px; background: var(--tp); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 17px; flex: 0 0 34px; }
+.planhead .name { font-size: 17px; font-weight: 700; }
+.planhead .crumb { font-size: 12px; color: var(--dim); }
+.members { margin-left: auto; display: flex; align-items: center; }
+.members .mav { width: 28px; height: 28px; border-radius: 50%; color: #fff; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; margin-left: -7px; }
+.members .mav:first-child { margin-left: 0; }
+.viewtabs { display: flex; gap: 4px; margin-top: 8px; }
+.vtab { border: none; background: none; cursor: pointer; padding: 8px 14px; font: 600 13.5px 'Segoe UI', sans-serif; color: var(--dim); border-bottom: 2.5px solid transparent; }
+.vtab.on { color: var(--tp-deep); border-bottom-color: var(--tp); }
+
+/* ===== Board ===== */
+.stage { flex: 1; overflow: auto; min-height: 0; }
+.board { display: flex; gap: 16px; padding: 16px 20px; align-items: flex-start; min-width: 760px; }
+.bucket { width: 300px; flex: 0 0 300px; background: #ECECEC; border-radius: 10px; padding: 10px; }
+.bucket.dragover { outline: 2.5px dashed var(--tp); outline-offset: -3px; background: var(--tp-wash); }
+.bucket h3 { font-size: 14px; padding: 4px 6px 10px; display: flex; align-items: center; gap: 8px; }
+.bucket h3 .cnt { font-weight: 400; color: var(--dim); font-size: 12.5px; }
+.addbtn {
+    width: 100%; border: 1.5px dashed #BDBDBD; background: none; border-radius: 8px;
+    padding: 9px; font: 600 13px 'Segoe UI', sans-serif; color: var(--tp-deep); cursor: pointer; margin-bottom: 8px;
+}
+.addbtn:hover { background: var(--tp-wash); border-color: var(--tp); }
+.addform { background: #fff; border: 1.5px solid var(--tp); border-radius: 8px; padding: 9px; margin-bottom: 8px; }
+.addform input { width: 100%; border: none; outline: none; font: 400 13.5px 'Segoe UI', sans-serif; padding: 2px 1px 8px; }
+.addform .row { display: flex; gap: 7px; }
+.addform .go { flex: 1; border: none; border-radius: 6px; background: var(--tp); color: #fff; font: 600 12.5px 'Segoe UI', sans-serif; padding: 7px; cursor: pointer; }
+.addform .go:hover { background: var(--tp-deep); }
+.addform .no { border: none; border-radius: 6px; background: #EFEFEF; font: 600 12.5px 'Segoe UI', sans-serif; padding: 7px 12px; cursor: pointer; }
+
+.cardlist { display: flex; flex-direction: column; gap: 8px; min-height: 8px; }
+.task {
+    background: #fff; border-radius: 8px; padding: 10px 12px; cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12); border: 1.5px solid transparent; position: relative;
+}
+.task:hover { border-color: var(--tp); }
+.task.dragging { opacity: .45; }
+.task .trow { display: flex; align-items: flex-start; gap: 9px; }
+.task .ring {
+    width: 19px; height: 19px; border-radius: 50%; border: 2px solid #9E9E9E; flex: 0 0 19px; margin-top: 1px;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; background: #fff;
+}
+.task .ring:hover { border-color: var(--good); color: var(--good); }
+.task .tname { font-size: 13.5px; line-height: 1.35; font-weight: 600; }
+.task .tfoot { display: flex; align-items: center; gap: 8px; margin-top: 8px; min-height: 22px; }
+.duechip { font-size: 11.5px; border-radius: 5px; padding: 2.5px 8px; background: #EFEFEF; color: var(--dim); font-weight: 600; }
+.duechip.late { background: var(--bad-wash); color: var(--bad); }
+.tav { width: 22px; height: 22px; border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 1.5px solid #fff; margin-left: -6px; }
+.tavs { display: flex; margin-left: auto; }
+.tavs .tav:first-child { margin-left: 0; }
+.task.iscomplete { background: var(--panel-alt); }
+.task.iscomplete .tname { text-decoration: line-through; color: var(--dim); font-weight: 400; }
+.task.iscomplete .ring { background: var(--good); border-color: var(--good); color: #fff; }
+.donehead { font-size: 12px; font-weight: 600; color: var(--dim); padding: 8px 6px 6px; }
+
+/* ===== List view ===== */
+.listwrap { padding: 16px 20px; }
+.listtable { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.listtable th { text-align: left; color: var(--dim); font-weight: 600; padding: 11px 12px; border-bottom: 1px solid var(--line); background: var(--panel-alt); }
+.listtable td { padding: 10px 12px; border-bottom: 1px solid #EFEFEF; }
+.listtable tr.rowtask { cursor: pointer; }
+.listtable tr.rowtask:hover td { background: var(--tp-wash); }
+.listtable .ring { width: 19px; height: 19px; border-radius: 50%; border: 2px solid #9E9E9E; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; background: #fff; cursor: pointer; vertical-align: middle; }
+.listtable .ring:hover { border-color: var(--good); color: var(--good); }
+.listtable tr.rowdone td { color: var(--dim); }
+.listtable tr.rowdone .tn { text-decoration: line-through; }
+.listtable tr.rowdone .ring { background: var(--good); border-color: var(--good); color: #fff; }
+.listnote { margin-top: 14px; font-size: 12.5px; color: var(--dim); background: var(--tp-wash); border-radius: 8px; padding: 11px 14px; line-height: 1.5; }
+
+/* ===== Modals ===== */
+.overlay { position: absolute; inset: 0; background: rgba(0,0,0,.55); z-index: 50; display: none; align-items: center; justify-content: center; padding: 24px; }
+.overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 14px; max-width: 560px; width: 100%; max-height: 92%; overflow-y: auto; padding: 24px 28px; }
+.modal h2 { font-size: 19px; margin-bottom: 4px; }
+.modal .sub2 { color: var(--dim); font-size: 13px; margin-bottom: 16px; line-height: 1.45; }
+.field { margin-bottom: 16px; }
+.field .lbl { font-size: 12.5px; font-weight: 700; color: var(--dim); margin-bottom: 7px; text-transform: uppercase; letter-spacing: .4px; }
+.pills { display: flex; gap: 7px; flex-wrap: wrap; }
+.pill {
+    border: 1.5px solid var(--line); background: #fff; border-radius: 20px; padding: 6px 13px;
+    font: 600 12.5px 'Segoe UI', sans-serif; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; color: var(--ink);
+}
+.pill:hover { border-color: var(--tp); background: var(--tp-wash); }
+.pill.on { border-color: var(--tp); background: var(--tp); color: #fff; }
+.pill .pav { width: 20px; height: 20px; border-radius: 50%; color: #fff; font-size: 8.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; margin-left: -5px; }
+.hintline { font-size: 12px; color: var(--dim); margin-top: 7px; line-height: 1.45; }
+.mbtns { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+.mbtn { border: none; border-radius: 8px; padding: 10px 17px; font: 600 13.5px 'Segoe UI', sans-serif; cursor: pointer; }
+.mbtn.primary { background: var(--tp); color: #fff; }
+.mbtn.primary:hover { background: var(--tp-deep); }
+.mbtn.done { background: var(--good); color: #fff; }
+.mbtn.ghost { background: #EFEFEF; }
+
+/* ===== Tour ===== */
+.tourbox {
+    position: fixed; z-index: 200; background: #fff; border-radius: 12px; padding: 16px 18px;
+    max-width: 320px; box-shadow: 0 8px 30px rgba(0,0,0,.5); font-size: 13.5px; line-height: 1.5; display: none;
+}
+.tourbox.show { display: block; }
+.tourbox h4 { font-size: 14px; margin-bottom: 5px; color: var(--tp-deep); }
+.tourbox .tbtns { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+.tourbox .step { font-size: 11.5px; color: var(--dim); margin-right: auto; }
+.tourbox button { border: none; border-radius: 6px; padding: 7px 13px; font: 600 12.5px 'Segoe UI', sans-serif; cursor: pointer; background: var(--tp); color: #fff; }
+.tourbox button.skip { background: #EFEFEF; color: var(--ink); }
+.tourglow { position: fixed; z-index: 190; border-radius: 10px; pointer-events: none; display: none;
+    box-shadow: 0 0 0 4px var(--tp), 0 0 0 9999px rgba(0,0,0,.55); }
+.tourglow.show { display: block; }
+
+/* ===== Things to try ===== */
+.trybox { max-width: 1280px; margin: 16px auto 0; background: #252542; border-radius: 12px; padding: 16px 22px; color: #fff; }
+.trybox h3 { font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+.trybox .score { margin-left: auto; font-size: 13px; background: rgba(255,255,255,.14); border-radius: 20px; padding: 3px 12px; }
+.tries { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.try { display: flex; gap: 9px; align-items: flex-start; font-size: 13.5px; line-height: 1.4; color: #C9C9DE; }
+.try .tick { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #6E6E9C; flex: 0 0 20px; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: transparent; }
+.try.done { color: #fff; }
+.try.done .tick { background: #13A06E; border-color: #13A06E; color: #fff; }
+
+/* Toast */
+.toast {
+    position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #242424; color: #fff; border-radius: 8px; padding: 12px 20px; font-size: 14px;
+    transition: transform .3s; z-index: 95; max-width: 90vw; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,.4);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 900px) { .window { height: 660px; } }
+</style>
+</head>
+<body>
+
+<div class="activity-header">
+    <h1>📋 Planner Basics Sandbox</h1>
+    <span class="badge">FREE PLAY</span>
+    <div class="header-btns">
+        <button class="hbtn" id="tourBtn">👋 Show me around</button>
+        <button class="hbtn" id="resetBtn">↺ Reset</button>
+    </div>
+    <p>A free-play copy of <b>Microsoft Planner</b>, the task board built into Teams. Create tasks, hand them to people, set due dates, drag jobs between buckets and tick them off when they are done. Nothing here is real; plan away.</p>
+</div>
+
+<div class="window" id="appWindow">
+    <div class="titlebar">
+        <span style="font-weight:700;color:var(--tp-deep)">Teams</span>
+        <div class="search">🔍 Search (practice copy)</div>
+        <div class="me" title="You">YOU</div>
+    </div>
+    <div class="appbody">
+        <nav class="rail">
+            <button data-view="chat"><span class="ic">💬</span>Chat</button>
+            <button data-view="teams"><span class="ic">👥</span>Teams</button>
+            <button data-view="planner" class="on"><span class="ic">📋</span>Planner</button>
+        </nav>
+
+        <section style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div class="planhead" id="planhead">
+                <div class="toprow">
+                    <div class="plicon">📋</div>
+                    <div>
+                        <div class="crumb">Works Depot · plan</div>
+                        <div class="name">Depot Jobs</div>
+                    </div>
+                    <div class="members" id="memberRow" title="Everyone in this plan"></div>
+                </div>
+                <div class="viewtabs">
+                    <button class="vtab on" data-vt="board" id="vtBoard">Board</button>
+                    <button class="vtab" data-vt="list" id="vtList">List</button>
+                </div>
+            </div>
+            <div class="stage" id="stage"></div>
+        </section>
+    </div>
+
+    <!-- Task detail modal -->
+    <div class="overlay" id="taskOverlay">
+        <div class="modal">
+            <h2 id="tdName">Task</h2>
+            <div class="sub2">Everything about a task lives on its card, so the whole crew sees the same picture; no chasing updates by email.</div>
+
+            <div class="field">
+                <div class="lbl">Assigned to</div>
+                <div class="pills" id="tdPeople"></div>
+                <div class="hintline">Click a name to assign or unassign. In the real thing they get a Teams notification, and the task appears in their own <b>My Tasks</b> list.</div>
+            </div>
+
+            <div class="field">
+                <div class="lbl">Due date</div>
+                <div class="pills" id="tdDates"></div>
+                <div class="hintline">Quick picks stand in for the calendar picker. Overdue tasks show their date in red on the board.</div>
+            </div>
+
+            <div class="field">
+                <div class="lbl">Bucket</div>
+                <div class="pills" id="tdBuckets"></div>
+                <div class="hintline">Buckets are just columns the team names for itself; moving a task tells everyone where the job is up to.</div>
+            </div>
+
+            <div class="mbtns">
+                <button class="mbtn done" id="tdComplete">✓ Mark complete</button>
+                <button class="mbtn ghost" id="tdClose">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="trybox">
+    <h3>🎯 Things to try <span class="score" id="tryScore">0 / 6</span></h3>
+    <div class="tries">
+        <div class="try" data-try="create"><span class="tick">✓</span><span><b>Create a task</b> with + Add task</span></div>
+        <div class="try" data-try="assign"><span class="tick">✓</span><span><b>Assign a task</b> to someone on the crew</span></div>
+        <div class="try" data-try="due"><span class="tick">✓</span><span><b>Set a due date</b> on a task</span></div>
+        <div class="try" data-try="move"><span class="tick">✓</span><span><b>Move a task</b> to another bucket (drag it, or use its card)</span></div>
+        <div class="try" data-try="complete"><span class="tick">✓</span><span><b>Mark a task complete</b> with the circle</span></div>
+        <div class="try" data-try="listview"><span class="tick">✓</span><span>Switch to <b>List view</b> and back</span></div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="tourglow" id="tourGlow"></div>
+<div class="tourbox" id="tourBox"></div>
+
+<script>
+/* ================= DATA ================= */
+const PEOPLE = {
+    you:    { name: 'You',           init: 'YOU', col: '#5B5FC7' },
+    grace:  { name: 'Grace Nguyen',  init: 'GN',  col: '#B4009E' },
+    ben:    { name: 'Ben Carter',    init: 'BC',  col: '#038387' },
+    aiyana: { name: 'Aiyana Walker', init: 'AW',  col: '#CA5010' },
+    sam:    { name: 'Sam Riley',     init: 'SR',  col: '#498205' },
+    tom:    { name: 'Tom Ellis',     init: 'TE',  col: '#69417F' }
+};
+const BUCKETS = [
+    { id: 'todo',    label: 'To do' },
+    { id: 'doing',   label: 'In progress' },
+    { id: 'waiting', label: 'Waiting on parts' }
+];
+
+function dayShift(n) { const d = new Date(); d.setDate(d.getDate() + n); d.setHours(0,0,0,0); return d; }
+function nextFriday() { const d = new Date(); const ahead = (5 - d.getDay() + 7) % 7 || 7; return dayShift(ahead); }
+function nextMonday() { const d = new Date(); const ahead = (1 - d.getDay() + 7) % 7 || 7; return dayShift(ahead); }
+function fmtDate(d) { return d.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' }); }
+function isLate(d) { return d && d < dayShift(0); }
+
+let nextId = 1;
+function mkTask(name, bucket, assigned, due, done) {
+    return { id: nextId++, name, bucket, assigned: assigned || [], due: due || null, done: !!done };
+}
+let tasks = [];
+function seed() {
+    nextId = 1;
+    tasks = [
+        mkTask('Grade the north access road', 'todo', ['sam'], nextFriday()),
+        mkTask('Order culvert pipes', 'todo', [], null),
+        mkTask('Submit grader timesheets', 'todo', ['grace'], null, true),
+        mkTask('Fix the depot gate latch', 'doing', ['tom'], dayShift(1)),
+        mkTask('Community hall clean-up', 'doing', ['aiyana'], nextFriday()),
+        mkTask('Service the loader', 'waiting', ['ben'], dayShift(-1))
+    ];
+}
+
+/* ================= STATE ================= */
+let viewMode = 'board';
+let openTaskId = null;
+let addingIn = null;
+const tries = { create: false, assign: false, due: false, move: false, complete: false, listview: false };
+
+/* ================= HELPERS ================= */
+const $ = (s) => document.querySelector(s);
+function toast(msg) {
+    const t = $('#toast'); t.innerHTML = msg; t.classList.add('show');
+    clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 4200);
+}
+function markTry(key, msg) {
+    if (tries[key]) { if (msg) toast(msg); return; }
+    tries[key] = true;
+    document.querySelector('.try[data-try="' + key + '"]').classList.add('done');
+    const done = Object.values(tries).filter(Boolean).length;
+    $('#tryScore').textContent = done + ' / 6';
+    toast(msg + (done === 6 ? ' — all six done! You can run a task board. 🎉' : ''));
+}
+function getTask(id) { return tasks.find(t => t.id === Number(id)); }
+function avatarsHTML(ids, cls) {
+    return ids.map(p => '<span class="' + cls + '" style="background:' + PEOPLE[p].col + '" title="' + PEOPLE[p].name + '">' + PEOPLE[p].init + '</span>').join('');
+}
+function dueChip(t) {
+    if (!t.due) return '';
+    const late = isLate(t.due) && !t.done;
+    return '<span class="duechip' + (late ? ' late' : '') + '">🗓 ' + fmtDate(t.due) + (late ? ' · overdue' : '') + '</span>';
+}
+
+/* ================= RENDER: BOARD ================= */
+function bucketHTML(b) {
+    const open = tasks.filter(t => t.bucket === b.id && !t.done);
+    const done = tasks.filter(t => t.bucket === b.id && t.done);
+    const form = addingIn === b.id
+        ? '<div class="addform"><input type="text" id="newName" placeholder="Give the task a name…" maxlength="80">' +
+          '<div class="row"><button class="go" data-add="' + b.id + '">Add task</button><button class="no" data-addcancel="1">✕</button></div></div>'
+        : '<button class="addbtn" data-addstart="' + b.id + '">+ Add task</button>';
+    return '<div class="bucket" data-bucket="' + b.id + '">' +
+        '<h3>' + b.label + ' <span class="cnt">' + open.length + '</span></h3>' + form +
+        '<div class="cardlist" data-drop="' + b.id + '">' +
+        open.map(taskCard).join('') +
+        (done.length ? '<div class="donehead">Completed · ' + done.length + '</div>' + done.map(taskCard).join('') : '') +
+        '</div></div>';
+}
+function taskCard(t) {
+    return '<div class="task' + (t.done ? ' iscomplete' : '') + '" draggable="true" data-task="' + t.id + '">' +
+        '<div class="trow"><span class="ring" data-ring="' + t.id + '" title="' + (t.done ? 'Reopen' : 'Mark complete') + '">✓</span>' +
+        '<span class="tname">' + t.name + '</span></div>' +
+        '<div class="tfoot">' + dueChip(t) + '<span class="tavs">' + avatarsHTML(t.assigned, 'tav') + '</span></div></div>';
+}
+function renderBoard() {
+    $('#stage').innerHTML = '<div class="board" id="board">' + BUCKETS.map(bucketHTML).join('') + '</div>';
+    wireBoard();
+}
+function wireBoard() {
+    const st = $('#stage');
+    st.querySelectorAll('[data-addstart]').forEach(btn => btn.addEventListener('click', () => {
+        addingIn = btn.dataset.addstart; renderBoard();
+        const inp = $('#newName'); if (inp) { inp.focus(); inp.addEventListener('keydown', e => { if (e.key === 'Enter') addTask(addingIn); }); }
+    }));
+    st.querySelectorAll('[data-add]').forEach(btn => btn.addEventListener('click', () => addTask(btn.dataset.add)));
+    st.querySelectorAll('[data-addcancel]').forEach(btn => btn.addEventListener('click', () => { addingIn = null; renderBoard(); }));
+    st.querySelectorAll('[data-ring]').forEach(r => r.addEventListener('click', e => { e.stopPropagation(); toggleComplete(r.dataset.ring); }));
+    st.querySelectorAll('.task').forEach(card => {
+        card.addEventListener('click', () => openTask(card.dataset.task));
+        card.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('text/plain', card.dataset.task);
+            card.classList.add('dragging');
+        });
+        card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    });
+    st.querySelectorAll('.bucket').forEach(bk => {
+        bk.addEventListener('dragover', e => { e.preventDefault(); bk.classList.add('dragover'); });
+        bk.addEventListener('dragleave', () => bk.classList.remove('dragover'));
+        bk.addEventListener('drop', e => {
+            e.preventDefault(); bk.classList.remove('dragover');
+            const id = e.dataTransfer.getData('text/plain');
+            moveTask(id, bk.dataset.bucket, true);
+        });
+    });
+}
+function addTask(bucketId) {
+    const inp = $('#newName');
+    const name = inp ? inp.value.trim() : '';
+    if (!name) { toast('Give the task a short name first, like "Check the pump shed".'); return; }
+    tasks.unshift(mkTask(name, bucketId, [], null));
+    addingIn = null;
+    render();
+    markTry('create', 'Task created. Now click its card to assign it and give it a due date.');
+}
+
+/* ================= RENDER: LIST ================= */
+function renderList() {
+    const rows = tasks.map(t => {
+        const b = BUCKETS.find(x => x.id === t.bucket);
+        return '<tr class="rowtask' + (t.done ? ' rowdone' : '') + '" data-task="' + t.id + '">' +
+            '<td style="width:34px"><span class="ring" data-ring="' + t.id + '" title="' + (t.done ? 'Reopen' : 'Mark complete') + '">✓</span></td>' +
+            '<td class="tn">' + t.name + '</td>' +
+            '<td>' + (t.assigned.length ? t.assigned.map(p => PEOPLE[p].name).join(', ') : '<span style="color:var(--dim)">Unassigned</span>') + '</td>' +
+            '<td>' + b.label + '</td>' +
+            '<td>' + (t.due ? dueChip(t) : '<span style="color:var(--dim)">—</span>') + '</td></tr>';
+    }).join('');
+    $('#stage').innerHTML = '<div class="listwrap"><table class="listtable">' +
+        '<tr><th></th><th>Task</th><th>Assigned to</th><th>Bucket</th><th>Due</th></tr>' + rows + '</table>' +
+        '<p class="listnote">📌 Same tasks, different lens. <b>Board</b> is best for seeing where work is up to at a glance; <b>List</b> is best for scanning dates and names. Click any row to open the task.</p></div>';
+    $('#stage').querySelectorAll('[data-ring]').forEach(r => r.addEventListener('click', e => { e.stopPropagation(); toggleComplete(r.dataset.ring); }));
+    $('#stage').querySelectorAll('.rowtask').forEach(row => row.addEventListener('click', () => openTask(row.dataset.task)));
+}
+
+/* ================= RENDER: SHARED ================= */
+function renderMembers() {
+    $('#memberRow').innerHTML = Object.keys(PEOPLE).map(p =>
+        '<span class="mav" style="background:' + PEOPLE[p].col + '" title="' + PEOPLE[p].name + '">' + PEOPLE[p].init + '</span>').join('');
+}
+function render() {
+    if (viewMode === 'board') renderBoard(); else renderList();
+}
+
+/* ================= TASK ACTIONS ================= */
+function moveTask(id, bucketId, viaDrag) {
+    const t = getTask(id);
+    if (!t || t.bucket === bucketId) return;
+    const label = BUCKETS.find(b => b.id === bucketId).label;
+    t.bucket = bucketId;
+    render();
+    if (openTaskId === t.id) fillModal();
+    markTry('move', '"' + t.name + '" is now in <b>' + label + '</b>. Everyone on the plan sees the move straight away.');
+}
+function toggleComplete(id) {
+    const t = getTask(id);
+    if (!t) return;
+    t.done = !t.done;
+    render();
+    if (openTaskId === t.id) fillModal();
+    if (t.done) markTry('complete', 'Ticked. The whole crew can see "' + t.name + '" is done; nobody needs to send a "did this happen?" email.');
+    else toast('Reopened. The task is back on the board as unfinished.');
+}
+
+/* ================= TASK MODAL ================= */
+function openTask(id) {
+    openTaskId = Number(id);
+    fillModal();
+    $('#taskOverlay').classList.add('show');
+}
+function fillModal() {
+    const t = getTask(openTaskId);
+    if (!t) return;
+    $('#tdName').textContent = '📋 ' + t.name;
+    $('#tdPeople').innerHTML = Object.keys(PEOPLE).map(p =>
+        '<button class="pill' + (t.assigned.includes(p) ? ' on' : '') + '" data-person="' + p + '">' +
+        '<span class="pav" style="background:' + PEOPLE[p].col + '">' + PEOPLE[p].init + '</span>' + PEOPLE[p].name + '</button>').join('');
+    $('#tdPeople').querySelectorAll('[data-person]').forEach(btn => btn.addEventListener('click', () => {
+        const p = btn.dataset.person;
+        if (t.assigned.includes(p)) {
+            t.assigned = t.assigned.filter(x => x !== p);
+            toast(PEOPLE[p].name + ' is off the task.');
+        } else {
+            t.assigned.push(p);
+            markTry('assign', 'Assigned to ' + PEOPLE[p].name + '. In the real thing ' + (p === 'you' ? 'it lands in your own My Tasks list.' : 'they get a Teams notification and it appears in their My Tasks list.'));
+        }
+        render(); fillModal();
+    }));
+    const dates = [
+        { label: 'Today', d: dayShift(0) },
+        { label: 'Tomorrow', d: dayShift(1) },
+        { label: 'This Friday', d: nextFriday() },
+        { label: 'Next Monday', d: nextMonday() }
+    ];
+    $('#tdDates').innerHTML = dates.map((x, i) =>
+        '<button class="pill' + (t.due && t.due.getTime() === x.d.getTime() ? ' on' : '') + '" data-date="' + i + '">' + x.label + ' · ' + fmtDate(x.d) + '</button>').join('') +
+        '<button class="pill" data-datenone="1">No date</button>';
+    $('#tdDates').querySelectorAll('[data-date]').forEach(btn => btn.addEventListener('click', () => {
+        t.due = dates[Number(btn.dataset.date)].d;
+        render(); fillModal();
+        markTry('due', 'Due ' + fmtDate(t.due) + '. If it slips past that date, it shows in red so nothing quietly disappears.');
+    }));
+    $('#tdDates').querySelector('[data-datenone]').addEventListener('click', () => {
+        t.due = null; render(); fillModal(); toast('Date cleared.');
+    });
+    $('#tdBuckets').innerHTML = BUCKETS.map(b =>
+        '<button class="pill' + (t.bucket === b.id ? ' on' : '') + '" data-bkt="' + b.id + '">' + b.label + '</button>').join('');
+    $('#tdBuckets').querySelectorAll('[data-bkt]').forEach(btn => btn.addEventListener('click', () => moveTask(t.id, btn.dataset.bkt, false)));
+    $('#tdComplete').textContent = t.done ? '↩ Reopen task' : '✓ Mark complete';
+    $('#tdComplete').className = 'mbtn ' + (t.done ? 'ghost' : 'done');
+}
+$('#tdComplete').addEventListener('click', () => toggleComplete(openTaskId));
+$('#tdClose').addEventListener('click', () => { $('#taskOverlay').classList.remove('show'); openTaskId = null; });
+
+/* ================= VIEW TABS ================= */
+document.querySelectorAll('.vtab').forEach(tb => tb.addEventListener('click', () => {
+    viewMode = tb.dataset.vt;
+    document.querySelectorAll('.vtab').forEach(x => x.classList.toggle('on', x === tb));
+    render();
+    if (viewMode === 'list') markTry('listview', 'Same plan, laid out as a list; handy for scanning names and due dates.');
+}));
+
+/* ================= RAIL ================= */
+document.querySelectorAll('.rail button').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.view !== 'planner') {
+        toast('This sandbox stays in Planner. Chat and channels have their own sandbox: the Teams &amp; Channels Explorer.');
+    }
+}));
+
+/* ================= TOUR ================= */
+const TOUR = [
+    { sel: '#board .bucket:first-child', title: 'Buckets', text: 'Each column is a bucket, a label the team picks for itself. This plan uses To do, In progress and Waiting on parts.' },
+    { sel: '#board .task', title: 'A task card', text: 'One job per card: its name, who owns it and when it is due. The circle on the left ticks it off when the job is done.' },
+    { sel: '#board .addbtn', title: 'Add a task', text: 'Click + Add task, type a short name and it joins the bucket. You can assign it and give it a date afterwards.' },
+    { sel: '#board .task', title: 'Open the details', text: 'Click any card to assign people, set a due date or move it to another bucket. You can also just drag a card across.' },
+    { sel: '.viewtabs', title: 'Board or List', text: 'The same tasks can be shown as a board or a list. Try both and see which one suits how you think.' },
+    { sel: '.trybox', title: 'Things to try', text: 'Work through this checklist; it ticks itself as you go. That is the whole tour, over to you.' }
+];
+let tourStep = -1;
+function showTourStep() {
+    const s = TOUR[tourStep];
+    const el = document.querySelector(s.sel);
+    if (!el) { endTour(); return; }
+    el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    const r = el.getBoundingClientRect();
+    const glow = $('#tourGlow');
+    glow.style.left = (r.left - 6) + 'px'; glow.style.top = (r.top - 6) + 'px';
+    glow.style.width = (r.width + 12) + 'px'; glow.style.height = (r.height + 12) + 'px';
+    glow.classList.add('show');
+    const box = $('#tourBox');
+    box.innerHTML = '<h4>' + s.title + '</h4>' + s.text +
+        '<div class="tbtns"><span class="step">' + (tourStep + 1) + ' of ' + TOUR.length + '</span>' +
+        '<button class="skip" id="tourSkip">Skip</button>' +
+        '<button id="tourNext">' + (tourStep === TOUR.length - 1 ? 'Done' : 'Next') + '</button></div>';
+    box.classList.add('show');
+    const below = r.bottom + 14;
+    const boxTop = (below + 190 < window.innerHeight) ? below : Math.max(14, r.top - 190);
+    box.style.top = boxTop + 'px';
+    box.style.left = Math.max(14, Math.min(window.innerWidth - 340, r.left)) + 'px';
+    $('#tourNext').addEventListener('click', () => { tourStep++; if (tourStep >= TOUR.length) endTour(); else showTourStep(); });
+    $('#tourSkip').addEventListener('click', endTour);
+}
+function endTour() {
+    tourStep = -1;
+    $('#tourGlow').classList.remove('show');
+    $('#tourBox').classList.remove('show');
+}
+$('#tourBtn').addEventListener('click', () => {
+    viewMode = 'board';
+    document.querySelectorAll('.vtab').forEach(x => x.classList.toggle('on', x.dataset.vt === 'board'));
+    render();
+    tourStep = 0; showTourStep();
+});
+
+/* ================= RESET ================= */
+$('#resetBtn').addEventListener('click', () => location.reload());
+
+/* ================= INIT ================= */
+seed(); renderMembers(); render();
+setTimeout(() => toast('💡 "Order culvert pipes" has no owner and no date. Click its card, assign it to someone and give it a due date.'), 4000);
+</script>
+</body>
+</html>

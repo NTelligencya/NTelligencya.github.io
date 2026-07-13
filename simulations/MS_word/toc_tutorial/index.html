@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Table of Contents that builds itself — an interactive Word lesson</title>
+
+<!-- === FONTS: Clash Display (display), General Sans (body) via Fontshare; JetBrains Mono (labels) via Google === -->
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=general-sans@400,500,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+
+<style>
+/* ===========================================
+   THEME TOKENS — Word blue edition
+   =========================================== */
+:root {
+    --bg:          #F7F8FA;
+    --panel:       #FFFFFF;
+    --grid-line:   #E3E6EA;
+    --header-grey: #EEF1F4;
+    --text:        #1A1D21;
+    --text-dim:    #6B7280;
+    --word-blue:   #2B579A;   /* primary accent */
+    --blue-soft:   rgba(43,87,154,0.10);
+    --hl-click:    #F4B740;   /* amber — where you click / what you select */
+    --hl-field:    #2D7FF9;   /* blue  — what Word does for you */
+    --hl-new:      #22A559;   /* green — the result after an update */
+    --green-soft:  rgba(34,165,89,0.12);
+    --danger:      #E5484D;
+    --doc-heading: #2F5496;   /* Word's built-in heading colour */
+
+    --stage-bg:    #D9DDE3;
+    --slide-bg:    var(--bg);
+
+    --font-display: 'Clash Display', 'General Sans', sans-serif;
+    --font-title:   Baskerville, 'Times New Roman', Georgia, serif;
+    --font-body:    'General Sans', sans-serif;
+    --font-mono:    'JetBrains Mono', monospace;
+    --font-doc:     'Calibri', 'Carlito', 'Segoe UI', sans-serif;
+    --font-doc-h:   'Calibri Light', 'Carlito', 'Segoe UI Light', 'Segoe UI', sans-serif;
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================
+   FIXED 16:9 STAGE: MANDATORY BASE STYLES
+   Slides are authored at 1920×1080 and scaled as a whole.
+   =========================================== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg, #000); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg, #000); }
+.deck-stage {
+    position: absolute; left: 0; top: 0;
+    width: 1920px; height: 1080px; overflow: hidden;
+    transform-origin: 0 0; background: var(--slide-bg, #fff);
+}
+.slide {
+    position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden;
+    display: block; visibility: hidden; opacity: 0; pointer-events: none;
+    background: var(--slide-bg, #fff);
+}
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, video, canvas, svg { max-width: 100%; max-height: 100%; }
+.deck-controls { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000; }
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide {
+        position: relative; display: block !important; visibility: visible !important;
+        opacity: 1 !important; pointer-events: auto !important;
+        width: 1920px; height: 1080px; break-after: page; page-break-after: always;
+    }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .deck-controls, .rail, .edit-hotzone, .edit-toggle, .edit-note { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===========================================
+   BASE TYPOGRAPHY & SLIDE SCAFFOLD
+   =========================================== */
+body { font-family: var(--font-body); color: var(--text); }
+.wrap { position: absolute; inset: 0; padding: 60px 96px 52px; display: flex; flex-direction: column; }
+.shead { margin-bottom: 24px; flex: 0 0 auto; }
+.kicker {
+    font-family: var(--font-mono); font-size: 19px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--word-blue);
+}
+.shead h2 { font-family: var(--font-title); font-weight: 600; font-size: 58px; line-height: 1.08; margin-top: 8px; }
+.lede { font-size: 25px; color: var(--text-dim); margin-top: 10px; max-width: 1350px; line-height: 1.45; }
+.sbody { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 24px; }
+
+/* Entrance reveals */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.reveal:nth-child(1) { transition-delay: 0.05s; }
+.reveal:nth-child(2) { transition-delay: 0.15s; }
+.reveal:nth-child(3) { transition-delay: 0.25s; }
+.reveal:nth-child(4) { transition-delay: 0.35s; }
+.reveal:nth-child(5) { transition-delay: 0.45s; }
+.reveal:nth-child(6) { transition-delay: 0.55s; }
+
+/* Step engine fragments */
+[data-step]:not(.step-alt):not(.cap) {
+    opacity: 0; transform: translateY(14px);
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+}
+[data-step]:not(.step-alt):not(.cap).on { opacity: 1; transform: none; }
+
+/* Strike targets */
+.zap { transition: color 0.4s, opacity 0.4s; }
+.zap.on { color: var(--danger); text-decoration: line-through; text-decoration-thickness: 3px; opacity: 0.45; }
+
+/* Captions */
+.capbox { position: relative; height: 40px; flex: 0 0 auto; }
+.cap {
+    position: absolute; left: 4px; top: 0;
+    font-size: 23px; color: var(--text-dim); font-style: italic;
+    opacity: 0; transition: opacity 0.35s 0.1s;
+}
+.cap.now { opacity: 1; }
+.cap b { color: var(--text); font-style: normal; }
+
+/* ===========================================
+   <DocPage> — the Word document mock
+   JS renders lines from the DOC array; each line carries
+   data-line for the FX engine.
+   =========================================== */
+.docpage {
+    position: relative;
+    width: 780px; max-width: 100%;
+    background: #fff; border: 1px solid var(--grid-line); border-radius: 6px;
+    box-shadow: 0 4px 18px rgba(26,29,33,0.10);
+    padding: 44px 58px 40px;
+    font-family: var(--font-doc); font-size: 21.5px; line-height: 1.5;
+    flex: 0 0 auto;
+}
+.docpage.small { width: 660px; font-size: 18px; padding: 34px 44px 30px; }
+.pline { padding: 5px 8px; border-radius: 4px; transition: background 0.35s, color 0.35s, font-size 0.35s; }
+.pline + .pline { margin-top: 2px; }
+.pl-title { font-family: var(--font-doc-h); font-size: 1.85em; color: #323130; padding-bottom: 10px; }
+.faux { font-weight: 700; }                       /* hand-bolded "heading" */
+.docpage .st-h1 {
+    font-family: var(--font-doc-h); font-weight: 400; font-size: 1.32em;
+    color: var(--doc-heading); margin-top: 12px;
+}
+.docpage .st-h2 {
+    font-family: var(--font-doc-h); font-weight: 400; font-size: 1.14em;
+    color: var(--doc-heading); margin-top: 8px;
+}
+.sel { background: rgba(45,127,249,0.26); }        /* Word text selection */
+@keyframes linepop { 0% { transform: scale(1); } 45% { transform: scale(1.03); } 100% { transform: scale(1); } }
+.flash { animation: linepop 0.5s var(--ease); }
+.pagebadge {
+    position: absolute; top: 12px; right: 16px;
+    font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);
+    background: var(--header-grey); border-radius: 10px; padding: 2px 10px;
+}
+.dimline { opacity: 0.32; }
+
+/* ===========================================
+   RIBBON mock
+   =========================================== */
+.ribbon { background: #FBFCFE; border: 1px solid var(--grid-line); border-radius: 10px; overflow: hidden; flex: 0 0 auto; width: max-content; max-width: 100%; }
+.rtabs { display: flex; background: #fff; border-bottom: 1px solid var(--grid-line); }
+.rtab { padding: 10px 22px; font-size: 19px; color: var(--text-dim); border-bottom: 3px solid transparent; border-radius: 4px 4px 0 0; transition: box-shadow 0.3s; }
+.rtab.file { background: var(--word-blue); color: #fff; }
+.rtab.on { color: var(--word-blue); font-weight: 600; border-bottom-color: var(--word-blue); }
+.rbar { display: flex; align-items: stretch; padding: 14px 10px 10px; gap: 0; }
+.rgroup { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 22px; border-right: 1px solid var(--grid-line); }
+.rgroup:last-child { border-right: none; }
+.rgitems { display: flex; gap: 10px; align-items: center; flex: 1; }
+.rglabel { font-size: 13.5px; color: var(--text-dim); }
+.ph { background: #E9EDF3; border-radius: 6px; }   /* dimmed placeholder control */
+.ph.s { width: 34px; height: 34px; }
+.ph.m { width: 60px; height: 34px; }
+.ph.l { width: 110px; height: 34px; }
+.stylechip {
+    border: 1px solid var(--grid-line); border-radius: 8px; background: #fff;
+    padding: 8px 16px 7px; min-width: 128px; text-align: center; transition: box-shadow 0.3s;
+}
+.stylechip .aa { display: block; font-family: var(--font-doc); font-size: 21px; line-height: 1.15; }
+.stylechip .nm { display: block; font-size: 12.5px; color: var(--text-dim); margin-top: 3px; }
+.stylechip.c-h1 .aa, .stylechip.c-h2 .aa { font-family: var(--font-doc-h); color: var(--doc-heading); }
+.stylechip.c-h2 .aa { font-size: 18px; }
+.bigbtn {
+    border: 1px solid var(--grid-line); border-radius: 8px; background: #fff;
+    padding: 8px 18px 7px; text-align: center; transition: box-shadow 0.3s;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.bigbtn .bic { font-size: 26px; line-height: 1.1; }
+.bigbtn .bnm { font-size: 14px; line-height: 1.25; }
+.smallbtn { border: 1px solid var(--grid-line); border-radius: 8px; background: #fff; padding: 7px 13px; font-size: 14.5px; transition: box-shadow 0.3s; }
+
+/* the amber "click here" ring */
+@keyframes clickpulse { 0%,100% { box-shadow: 0 0 0 3px var(--hl-click); } 50% { box-shadow: 0 0 0 7px rgba(244,183,64,0.45); } }
+.click-here { box-shadow: 0 0 0 3px var(--hl-click); animation: clickpulse 1.4s infinite; border-radius: 8px; }
+
+/* ===========================================
+   ToC mock, typed contents, gallery, dialog, nav pane
+   =========================================== */
+.tocbox {
+    width: 780px; max-width: 100%; background: #fff;
+    border: 1px solid var(--grid-line); border-radius: 6px;
+    box-shadow: 0 4px 18px rgba(26,29,33,0.10);
+    padding: 30px 58px 28px; font-family: var(--font-doc); font-size: 21px;
+    flex: 0 0 auto; position: relative; transition: background 0.4s;
+}
+.tochead { font-family: var(--font-doc-h); font-size: 26px; color: var(--doc-heading); margin-bottom: 14px; }
+.tentry { display: flex; align-items: baseline; gap: 6px; padding: 4px 6px; border-radius: 4px; }
+.tentry.t2 { padding-left: 40px; font-size: 0.92em; }
+.tentry .tt { white-space: nowrap; }
+.tlead { flex: 1; border-bottom: 2.5px dotted #9AA2AD; transform: translateY(-5px); min-width: 40px; }
+.tpg { font-variant-numeric: tabular-nums; transition: color 0.35s, background 0.35s; padding: 0 4px; border-radius: 4px; }
+.tocbox.field { background: #E8EDF5; }             /* Word field shading */
+.tentry.newrow { background: var(--green-soft); animation: linepop 0.5s var(--ease); }
+.tpg.fixed { background: var(--green-soft); color: #0C5A32; font-weight: 700; }
+.tentry.ghostrow {
+    border: 2px dashed var(--danger); border-radius: 6px; color: var(--danger);
+    font-style: italic; justify-content: center; padding: 6px;
+    display: none;
+}
+.tentry.ghostrow.on { display: flex; animation: linepop 0.5s var(--ease); }
+.dots { color: #9AA2AD; letter-spacing: 2px; overflow: hidden; flex: 1; white-space: nowrap; }
+
+/* floating Update Table pill (appears when you click in a ToC) */
+.updpill {
+    position: absolute; top: -22px; left: 24px;
+    background: #fff; border: 1px solid var(--grid-line); border-radius: 8px;
+    padding: 7px 14px; font: 500 15px var(--font-body);
+    box-shadow: 0 4px 14px rgba(26,29,33,0.14); transition: box-shadow 0.3s;
+}
+
+/* ToC dropdown gallery */
+.tocmenu {
+    background: #fff; border: 1px solid var(--grid-line); border-radius: 12px;
+    box-shadow: 0 14px 40px rgba(26,29,33,0.18); padding: 18px; width: max-content;
+    display: flex; gap: 16px;
+}
+.tocopt { border: 1.5px solid var(--grid-line); border-radius: 10px; padding: 14px 18px; width: 300px; transition: box-shadow 0.3s; }
+.tocopt h4 { font-size: 17px; margin-bottom: 10px; }
+.tocopt .prevline { display: flex; gap: 4px; align-items: baseline; font-family: var(--font-doc); font-size: 14px; color: var(--text-dim); padding: 2px 0; }
+.tocopt .prevline .tlead { border-bottom-width: 1.5px; transform: translateY(-3px); }
+.tocopt .note { font-size: 13.5px; color: var(--text-dim); margin-top: 10px; line-height: 1.4; }
+
+/* Update dialog */
+.dlg {
+    background: #fff; border: 1px solid var(--grid-line); border-radius: 12px;
+    box-shadow: 0 14px 40px rgba(26,29,33,0.2); padding: 22px 26px; width: 460px;
+}
+.dlg h4 { font-size: 20px; margin-bottom: 6px; }
+.dlg .dsub { font-size: 16.5px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.4; }
+.radio { display: flex; align-items: center; gap: 12px; font-size: 18px; padding: 9px 12px; border-radius: 8px; transition: box-shadow 0.3s; }
+.radio .dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #9AA2AD; flex: 0 0 20px; position: relative; }
+.radio.picked .dot { border-color: var(--word-blue); }
+.radio.picked .dot::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--word-blue); }
+.dlgbtns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+.dlgbtns span { border: 1px solid var(--grid-line); border-radius: 7px; padding: 7px 22px; font-size: 15.5px; }
+.dlgbtns .okb { background: var(--word-blue); color: #fff; border-color: var(--word-blue); }
+
+/* Navigation pane */
+.navpane {
+    width: 330px; flex: 0 0 330px; background: #F5F7FA;
+    border: 1px solid var(--grid-line); border-radius: 10px; padding: 18px 20px;
+}
+.navpane h4 { font-size: 17px; margin-bottom: 10px; }
+.navpane .nsearch { background: #fff; border: 1px solid var(--grid-line); border-radius: 6px; padding: 7px 12px; font-size: 14.5px; color: var(--text-dim); margin-bottom: 14px; }
+.naventry { font-size: 16.5px; padding: 6px 10px; border-radius: 6px; color: var(--word-blue); }
+.naventry.n2 { padding-left: 34px; font-size: 15px; }
+.navempty { font-size: 15.5px; color: var(--text-dim); font-style: italic; padding: 10px 4px; line-height: 1.5; }
+
+/* Mini pages (pagination view) */
+.minipages { display: flex; gap: 26px; align-items: flex-start; flex: 0 0 auto; }
+.mini {
+    width: 250px; min-height: 320px; background: #fff; position: relative;
+    border: 1px solid var(--grid-line); border-radius: 6px;
+    box-shadow: 0 3px 12px rgba(26,29,33,0.10); padding: 20px 22px 34px;
+    font-family: var(--font-doc);
+}
+.mini .mh1 { font-family: var(--font-doc-h); color: var(--doc-heading); font-size: 17.5px; padding: 4px 6px; margin-top: 6px; border-radius: 4px; }
+.mini .mh2 { font-family: var(--font-doc-h); color: var(--doc-heading); font-size: 15px; padding: 3px 6px 3px 18px; border-radius: 4px; }
+.mini .mtitle { font-family: var(--font-doc-h); font-size: 21px; padding: 2px 6px 8px; }
+.mini .mline { height: 8px; background: #E9EDF3; border-radius: 4px; margin: 8px 6px; }
+.mini .mline.w60 { width: 60%; }
+.mini .mpg {
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-dim);
+}
+.mini .newh { display: none; }
+.mini .newh.landed { display: block; background: var(--green-soft); animation: linepop 0.5s var(--ease); }
+.mini .pushed { opacity: 0.25; text-decoration: line-through; text-decoration-color: var(--danger); }
+.mini.ghostpage { display: none; }
+.mini.ghostpage.landed { display: block; animation: linepop 0.5s var(--ease); }
+
+/* ===========================================
+   CARDS, CALLOUTS, TAGS
+   =========================================== */
+.card {
+    background: var(--panel); border: 1px solid var(--grid-line); border-radius: 14px;
+    padding: 26px 30px; box-shadow: 0 1px 2px rgba(26,29,33,0.04);
+}
+.card h3 { font-family: var(--font-display); font-weight: 600; font-size: 30px; margin-bottom: 10px; }
+.card p { font-size: 22px; color: var(--text-dim); line-height: 1.45; }
+.card .mono { font-family: var(--font-mono); font-size: 21px; color: var(--text); }
+.callout {
+    background: var(--panel); border: 1px solid var(--grid-line);
+    border-left: 6px solid var(--word-blue); border-radius: 10px;
+    padding: 18px 26px; font-size: 24px; line-height: 1.45; flex: 0 0 auto;
+}
+.callout.warn { border-left-color: var(--hl-click); }
+.callout.danger { border-left-color: var(--danger); }
+.callout.good { border-left-color: var(--hl-new); }
+.callout.big { font-size: 30px; font-family: var(--font-display); font-weight: 600; }
+.tag {
+    display: inline-block; margin-top: 14px;
+    font-family: var(--font-mono); font-size: 16px; font-weight: 600;
+    color: var(--word-blue); background: var(--blue-soft);
+    padding: 4px 12px; border-radius: 20px;
+}
+.keyrow { display: flex; align-items: center; gap: 16px; font-size: 23px; }
+.swatch { width: 40px; height: 40px; border-radius: 8px; flex: 0 0 auto; }
+.swatch.amber { background: rgba(244,183,64,0.25); box-shadow: inset 0 0 0 2.5px var(--hl-click); }
+.swatch.blue  { background: rgba(45,127,249,0.12); box-shadow: inset 0 0 0 2.5px var(--hl-field); }
+.swatch.green { background: var(--green-soft); box-shadow: inset 0 0 0 2.5px var(--hl-new); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.row { display: flex; gap: 32px; align-items: flex-start; }
+.grow { flex: 1 1 auto; min-width: 0; }
+.center-v { display: flex; flex-direction: column; justify-content: center; }
+
+.floatlabel {
+    font-size: 20px; font-weight: 600; color: var(--text);
+    background: var(--panel); border: 1.5px solid var(--grid-line);
+    border-radius: 10px; padding: 10px 18px;
+    box-shadow: 0 4px 14px rgba(26,29,33,0.08); display: inline-block;
+}
+.floatlabel .mono { font-family: var(--font-mono); }
+
+/* ===========================================
+   TITLE SLIDE
+   =========================================== */
+.ruledpaper {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(var(--grid-line) 1px, transparent 1px);
+    background-size: 100% 64px; opacity: 0.5;
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 30%, transparent 100%);
+            mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 30%, transparent 100%);
+}
+.t-center {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; gap: 30px; padding: 0 120px;
+}
+.morph { position: relative; height: 100px; width: 100%; font-family: var(--font-mono); font-size: 64px; font-weight: 500; }
+.morph span { position: absolute; left: 50%; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.m-old { color: var(--text-dim); }
+.m-new { color: var(--word-blue); opacity: 0; font-weight: 700; }
+.slide.visible .m-old { animation: mOut 0.9s var(--ease) 1.3s forwards; }
+.slide.visible .m-new { animation: mIn  0.9s var(--ease) 1.7s forwards; }
+@keyframes mOut { to { opacity: 0; filter: blur(8px); transform: translateX(-50%) translateY(-18px); } }
+@keyframes mIn  { from { opacity: 0; filter: blur(8px); transform: translateX(-50%) translateY(18px); }
+                  to   { opacity: 1; filter: none;      transform: translateX(-50%) translateY(0); } }
+.title-slide h1 { font-family: var(--font-title); font-weight: 600; font-size: 100px; line-height: 1.05; }
+.title-slide h1 .arrow { color: var(--word-blue); }
+.title-slide .sub { font-size: 32px; color: var(--text-dim); }
+.fchips { display: flex; gap: 20px; }
+.fchip {
+    font-size: 23px; background: var(--panel);
+    border: 1px solid var(--grid-line); border-radius: 30px;
+    padding: 10px 26px; box-shadow: 0 1px 3px rgba(26,29,33,0.05);
+}
+
+/* ===========================================
+   PER-SLIDE LAYOUTS
+   =========================================== */
+/* habit slide */
+.points { list-style: none; counter-reset: pt; display: flex; flex-direction: column; gap: 22px; }
+.points li { counter-increment: pt; display: flex; gap: 18px; font-size: 27px; line-height: 1.4; align-items: baseline; }
+.points li::before {
+    content: counter(pt);
+    font-family: var(--font-display); font-weight: 700; font-size: 24px;
+    color: var(--word-blue); background: var(--blue-soft);
+    border-radius: 50%; min-width: 44px; height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: 0 0 auto; align-self: flex-start;
+}
+.points b { font-weight: 600; }
+
+/* gotcha cards */
+.gotchas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; flex: 1; align-content: start; }
+.gotchas .card h3 { font-size: 27px; color: var(--danger); }
+.gotchas .card .fix { color: var(--hl-new); font-weight: 600; margin-top: 12px; font-size: 20px; }
+
+/* final challenge */
+.challenge .q { font-size: 24px; font-weight: 500; margin-bottom: 8px; }
+.dlbtn {
+    display: inline-block; background: var(--word-blue); color: #fff;
+    border-radius: 10px; padding: 13px 26px; font-size: 21px; font-weight: 600;
+    text-decoration: none; margin-top: 14px;
+}
+.closing { font-family: var(--font-display); font-size: 33px; font-weight: 600; text-align: center; margin-top: 6px; flex: 0 0 auto; }
+.closing em { color: var(--word-blue); font-style: normal; }
+.checklist { list-style: none; font-size: 21px; line-height: 1.55; }
+.checklist li { padding: 6px 0 6px 36px; position: relative; }
+.checklist li::before { content: "✓"; position: absolute; left: 4px; color: var(--hl-new); font-weight: 700; }
+
+/* ===========================================
+   SECTION RAIL (chrome, lives OUTSIDE the stage)
+   =========================================== */
+.rail {
+    position: fixed; left: 16px; top: 50%; transform: translateY(-50%);
+    z-index: 900; width: 208px;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(10px);
+    border: 1px solid var(--grid-line); border-radius: 14px;
+    padding: 16px 12px 12px; box-shadow: 0 10px 34px rgba(26,29,33,0.10);
+    font-family: var(--font-body);
+}
+.railtitle {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.16em; color: var(--word-blue);
+    padding: 0 10px 10px; text-transform: uppercase;
+}
+.rail .sec {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 15px; color: var(--text-dim);
+    padding: 8px 10px; border-radius: 8px; transition: background 0.2s, color 0.2s;
+}
+.rail .sec:hover { background: var(--header-grey); }
+.rail .sec.cur { background: var(--blue-soft); color: var(--word-blue); font-weight: 600; }
+.rail .sec .n { font-family: var(--font-mono); font-size: 11px; opacity: 0.75; min-width: 14px; }
+.railfoot {
+    margin-top: 10px; border-top: 1px solid var(--grid-line);
+    padding: 10px 10px 2px;
+    font-family: var(--font-mono); font-size: 13px; color: var(--text-dim);
+    display: flex; flex-direction: column; gap: 5px;
+}
+#railStep { color: var(--word-blue); min-height: 16px; }
+.railhint { font-size: 11px; opacity: 0.75; }
+@media (max-width: 1080px) { .rail { display: none; } }
+
+/* ===========================================
+   INLINE EDIT CHROME
+   =========================================== */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+.edit-toggle {
+    position: fixed; top: 14px; left: 14px; z-index: 10001;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 1px solid var(--grid-line); background: var(--panel);
+    font-size: 20px; cursor: pointer; box-shadow: 0 4px 14px rgba(26,29,33,0.12);
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { background: var(--word-blue); color: #fff; }
+body.editing [contenteditable="true"] { outline: 2px dashed var(--hl-field); outline-offset: 2px; border-radius: 4px; cursor: text; }
+.edit-note {
+    position: fixed; top: 20px; left: 72px; z-index: 10001;
+    font-family: var(--font-mono); font-size: 13px;
+    background: var(--word-blue); color: #fff;
+    border-radius: 8px; padding: 8px 14px;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+body.editing .edit-note { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+<!-- ================= § INTRO ================= -->
+
+<!-- 1 · Title -->
+<section class="slide title-slide" id="s01" data-steps="0">
+    <div class="ruledpaper"></div>
+    <div class="t-center">
+        <div class="morph" aria-hidden="true">
+            <span class="m-old">Contents · typed by hand</span>
+            <span class="m-new">Contents · built by Word</span>
+        </div>
+        <h1 class="reveal">A Table of Contents<br>that <span class="arrow">builds itself</span></h1>
+        <p class="reveal sub">A click-along Microsoft Word lesson; no experience needed.</p>
+        <div class="reveal fchips">
+            <span class="fchip">📄 The Depot Induction Guide</span>
+            <span class="fchip">🖱 Click as you go</span>
+            <span class="fchip">⏱ About 15 minutes</span>
+        </div>
+    </div>
+</section>
+
+<!-- 2 · How this deck works -->
+<section class="slide" id="s02" data-steps="1">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>How this lesson works</h2>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow">
+                <div class="card reveal">
+                    <h3>Driving it</h3>
+                    <p style="font-size:23px; line-height:1.7;">
+                        <b style="color:var(--text)">Click</b> (or <span class="mono">→</span> / <span class="mono">Space</span>) builds the current slide one step at a time, then moves on<br>
+                        <b style="color:var(--text)">←</b> undoes one step, then one slide<br>
+                        <b style="color:var(--text)">E</b> edits any text in place (Ctrl+S saves a copy)<br>
+                        <b style="color:var(--text)">Rail</b> (left) jumps between the 5 sections
+                    </p>
+                </div>
+                <div class="card reveal">
+                    <h3>The colour key</h3>
+                    <div style="display:flex; flex-direction:column; gap:16px; margin-top:12px;">
+                        <div class="keyrow"><span class="swatch amber"></span><span><b>Amber</b>: where to click, or what to select</span></div>
+                        <div class="keyrow"><span class="swatch blue"></span><span><b>Blue</b>: what Word does for you</span></div>
+                        <div class="keyrow"><span class="swatch green"></span><span><b>Green</b>: the result after an update</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="align-items:center;">
+                <div class="docpage small" data-doc="guide" data-from="2" data-to="3"></div>
+                <div class="grow">
+                    <div class="floatlabel reveal">Try it now: <b>click anywhere</b> to select a line ▸</div>
+                    <div class="capbox" style="margin-top:14px;">
+                        <span class="cap" data-step="1">One click = one step. That is the whole trick.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".docpage .pline[data-line='2']","cls":"sel"}
+    ]</script>
+</section>
+
+<!-- 3 · The old way -->
+<section class="slide" id="s03" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Intro</span>
+            <h2>The contents page most people make</h2>
+            <p class="lede">Typed by hand: the headings copied out one by one, a river of full stops, and page numbers checked by flicking through the document.</p>
+        </header>
+        <div class="sbody">
+            <div class="tocbox reveal">
+                <div class="tochead">Contents</div>
+                <div class="tentry"><span class="tt">Before your first day</span><span class="dots">......................................................</span><span class="tpg">1</span></div>
+                <div class="tentry"><span class="tt"><span class="zap" id="oldname">Your first week</span></span><span class="dots">......................................................</span><span class="tpg">2</span></div>
+                <div class="tentry"><span class="tt">Staying safe</span><span class="dots">......................................................</span><span class="tpg zap" id="oldpg1">2</span></div>
+                <div class="tentry"><span class="tt">Who to ask for help</span><span class="dots">......................................................</span><span class="tpg zap" id="oldpg2">3</span></div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">you add half a page of text, and every number below it is now wrong</span>
+                <span class="cap" data-step="2">you rename a section, and the contents page still shows the old name</span>
+                <span class="cap" data-step="3">nobody notices until the document is printed, or sent</span>
+            </div>
+            <div class="callout danger big" data-step="3">A typed contents page starts going stale the moment you keep writing. Word can do this whole job for you.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#oldpg1","cls":"on"},
+        {"s":1,"sel":"#oldpg2","cls":"on"},
+        {"s":2,"sel":"#oldname","cls":"on"}
+    ]</script>
+</section>
+
+<!-- ================= § HEADING STYLES ================= -->
+
+<!-- 4 · Meet the document -->
+<section class="slide" id="s04" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Heading styles</span>
+            <h2>Meet the document</h2>
+            <p class="lede">The Depot Induction Guide. The headings are bolded by hand, and to a person it reads fine.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="docpage small reveal" data-doc="guide" data-from="0" data-to="5" data-page="Page 1"></div>
+                <div class="navpane reveal">
+                    <h4>Navigation</h4>
+                    <div class="nsearch">🔍 Search document</div>
+                    <div class="navempty" id="navEmpty">Create an interactive outline of your document…<br><br>It's a great way to keep track of where you are.</div>
+                </div>
+                <div class="grow center-v">
+                    <div class="capbox" style="height:auto; min-height:80px;">
+                        <span class="cap" data-step="1">the bold lines look like headings <b>to you</b>…</span>
+                        <span class="cap" data-step="2">…but Word's Navigation pane is empty. To Word, every line here is just text.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".docpage .pline[data-line='2'], .docpage .pline[data-line='4']","cls":"sel"},
+        {"s":2,"sel":"#navEmpty","cls":"flash"}
+    ]</script>
+</section>
+
+<!-- 5 · What a style is -->
+<section class="slide" id="s05" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Heading styles</span>
+            <h2>Styles: the fix for that</h2>
+            <p class="lede">On the Home tab, the Styles gallery holds named looks: Normal, Heading 1, Heading 2. A style changes how a line looks <b>and</b> tells Word what the line is.</p>
+        </header>
+        <div class="sbody">
+            <div class="ribbon reveal">
+                <div class="rtabs">
+                    <span class="rtab file">File</span><span class="rtab on">Home</span><span class="rtab">Insert</span><span class="rtab">Layout</span><span class="rtab">References</span><span class="rtab">Review</span><span class="rtab">View</span>
+                </div>
+                <div class="rbar">
+                    <div class="rgroup"><div class="rgitems"><span class="ph s"></span><span class="ph s"></span></div><div class="rglabel">Clipboard</div></div>
+                    <div class="rgroup"><div class="rgitems"><span class="ph l"></span><span class="ph m"></span><span class="ph s"></span><span class="ph s"></span></div><div class="rglabel">Font</div></div>
+                    <div class="rgroup">
+                        <div class="rgitems">
+                            <span class="stylechip"><span class="aa">AaBbCc</span><span class="nm">Normal</span></span>
+                            <span class="stylechip c-h1" id="chipH1"><span class="aa">AaBb</span><span class="nm">Heading 1</span></span>
+                            <span class="stylechip c-h2" id="chipH2"><span class="aa">AaBbC</span><span class="nm">Heading 2</span></span>
+                        </div>
+                        <div class="rglabel">Styles</div>
+                    </div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">these two are the only styles this lesson needs</span>
+                <span class="cap" data-step="2"><b>Heading 1</b> marks the big sections; <b>Heading 2</b> marks the parts inside them</span>
+            </div>
+            <div class="two-col">
+                <div class="card" data-step="1"><h3>Bold text says nothing</h3><p>Making a line big and bold changes pixels, not meaning. Word still files it under "just text".</p></div>
+                <div class="card" data-step="2"><h3>A heading style says "I am a heading"</h3><p>Once a line is styled Heading 1 or Heading 2, Word can list it, link to it, and number its page; that is exactly what a Table of Contents needs.</p></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#chipH1, #chipH2","cls":"click-here"},
+        {"s":2,"sel":"#chipH1, #chipH2","rm":"click-here","cls":""}
+    ]</script>
+</section>
+
+<!-- 6 · Apply Heading 1 -->
+<section class="slide" id="s06" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Heading styles</span>
+            <h2>Apply your first heading style</h2>
+        </header>
+        <div class="sbody">
+            <div class="ribbon reveal">
+                <div class="rtabs">
+                    <span class="rtab file">File</span><span class="rtab on">Home</span><span class="rtab">Insert</span><span class="rtab">Layout</span><span class="rtab">References</span><span class="rtab">Review</span><span class="rtab">View</span>
+                </div>
+                <div class="rbar">
+                    <div class="rgroup"><div class="rgitems"><span class="ph s"></span><span class="ph s"></span></div><div class="rglabel">Clipboard</div></div>
+                    <div class="rgroup"><div class="rgitems"><span class="ph l"></span><span class="ph m"></span><span class="ph s"></span><span class="ph s"></span></div><div class="rglabel">Font</div></div>
+                    <div class="rgroup">
+                        <div class="rgitems">
+                            <span class="stylechip"><span class="aa">AaBbCc</span><span class="nm">Normal</span></span>
+                            <span class="stylechip c-h1" id="chip6H1"><span class="aa">AaBb</span><span class="nm">Heading 1</span></span>
+                            <span class="stylechip c-h2"><span class="aa">AaBbC</span><span class="nm">Heading 2</span></span>
+                        </div>
+                        <div class="rglabel">Styles</div>
+                    </div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1"><b>step 1</b>: click anywhere in the line; no need to select the whole thing</span>
+                <span class="cap" data-step="2"><b>step 2</b>: click Heading 1 in the Styles gallery</span>
+                <span class="cap" data-step="3"><b>done</b>: the look changes, and Word now knows this line <b>is</b> a heading</span>
+            </div>
+            <div class="docpage small reveal" data-doc="guide" data-from="1" data-to="5" data-page="Page 1"></div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".docpage .pline[data-line='2']","cls":"sel"},
+        {"s":2,"sel":"#chip6H1","cls":"click-here"},
+        {"s":3,"sel":".docpage .pline[data-line='2']","rm":"sel","cls":"st-h1 flash"},
+        {"s":3,"sel":"#chip6H1","rm":"click-here","cls":""}
+    ]</script>
+</section>
+
+<!-- 7 · Heading 2 and the rest -->
+<section class="slide" id="s07" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Heading styles</span>
+            <h2>Heading 2, then do the rest</h2>
+            <p class="lede">Same move each time: click in the line, click the style. Sections inside a section get Heading 2.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="docpage small reveal" data-doc="guide" data-from="0" data-to="14"></div>
+                <div class="grow center-v" style="gap:20px;">
+                    <div class="capbox" style="height:auto; min-height:110px;">
+                        <span class="cap" data-step="1">"What to bring" sits <b>inside</b> "Before your first day", so it gets <b>Heading 2</b></span>
+                        <span class="cap" data-step="2">style the rest the same way; big sections Heading 1, parts inside them Heading 2</span>
+                        <span class="cap" data-step="3">squint at it: the document now has a <b>shape</b>, and Word can read that shape</span>
+                    </div>
+                    <div class="callout" data-step="3">Chapters, then sections inside chapters. That layered shape is called an outline, and it is what the Table of Contents will be built from.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":".docpage .pline[data-line='4']","cls":"st-h2 flash"},
+        {"s":2,"sel":".docpage .pline[data-line='6'], .docpage .pline[data-line='11'], .docpage .pline[data-line='13']","cls":"st-h1 flash"},
+        {"s":2,"sel":".docpage .pline[data-line='2']","cls":"st-h1"},
+        {"s":2,"sel":".docpage .pline[data-line='7'], .docpage .pline[data-line='9']","cls":"st-h2 flash"},
+        {"s":3,"sel":".docpage .pline[data-line='1'], .docpage .pline[data-line='3'], .docpage .pline[data-line='5'], .docpage .pline[data-line='8'], .docpage .pline[data-line='10'], .docpage .pline[data-line='12'], .docpage .pline[data-line='14']","cls":"dimline"}
+    ]</script>
+</section>
+
+<!-- 8 · Navigation pane proof -->
+<section class="slide" id="s08" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Heading styles</span>
+            <h2>Proof Word can see them now</h2>
+            <p class="lede">On the <b>View</b> tab, tick <b>Navigation Pane</b>. It lists every styled heading in the document.</p>
+        </header>
+        <div class="sbody">
+            <div class="row grow">
+                <div class="docpage small reveal" data-doc="guide" data-from="0" data-to="10" data-styled="all" data-page="Page 1"></div>
+                <div class="navpane reveal">
+                    <h4>Navigation</h4>
+                    <div class="nsearch">🔍 Search document</div>
+                    <div class="naventry" data-step="1">Before your first day</div>
+                    <div class="naventry n2" data-step="1">What to bring</div>
+                    <div class="naventry" data-step="1">Your first week</div>
+                    <div class="naventry n2" data-step="1">Getting your logins</div>
+                    <div class="naventry n2" data-step="1">Meet the team</div>
+                    <div class="naventry" data-step="1">Staying safe</div>
+                    <div class="naventry" data-step="1">Who to ask for help</div>
+                </div>
+                <div class="grow center-v" style="gap:20px;">
+                    <div class="capbox" style="height:auto; min-height:80px;">
+                        <span class="cap" data-step="1">the same pane that was empty on the unstyled document is now a map</span>
+                        <span class="cap" data-step="2">clicking an entry jumps straight to that section; handy in long documents</span>
+                    </div>
+                    <div class="callout good" data-step="2">If a heading shows up here, it will show up in your Table of Contents. This pane is your preview.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[]</script>
+</section>
+
+<!-- ================= § INSERT THE TOC ================= -->
+
+<!-- 9 · References tab -->
+<section class="slide" id="s09" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Insert the ToC</span>
+            <h2>The References tab</h2>
+            <p class="lede">Everything Word builds <b>from</b> your document lives here: the contents page, footnotes, citations. You need the button on the far left.</p>
+        </header>
+        <div class="sbody">
+            <div class="ribbon reveal">
+                <div class="rtabs">
+                    <span class="rtab file">File</span><span class="rtab">Home</span><span class="rtab">Insert</span><span class="rtab">Layout</span><span class="rtab on" id="refsTab">References</span><span class="rtab">Review</span><span class="rtab">View</span>
+                </div>
+                <div class="rbar">
+                    <div class="rgroup">
+                        <div class="rgitems">
+                            <span class="bigbtn" id="tocBtn"><span class="bic">📑</span><span class="bnm">Table of<br>Contents ▾</span></span>
+                            <span class="smallbtn">Update Table</span>
+                        </div>
+                        <div class="rglabel">Table of Contents</div>
+                    </div>
+                    <div class="rgroup"><div class="rgitems"><span class="ph m"></span><span class="ph s"></span><span class="ph s"></span></div><div class="rglabel">Footnotes</div></div>
+                    <div class="rgroup"><div class="rgitems"><span class="ph l"></span><span class="ph m"></span><span class="ph s"></span></div><div class="rglabel">Citations &amp; Bibliography</div></div>
+                    <div class="rgroup"><div class="rgitems"><span class="ph m"></span><span class="ph s"></span></div><div class="rglabel">Captions</div></div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">first, click where the contents page should go; the usual spot is the top of the document</span>
+                <span class="cap" data-step="2">then <b>References ▸ Table of Contents</b>, the first button on the tab</span>
+            </div>
+            <div class="callout" data-step="1">Word inserts the table wherever your cursor is sitting, so park the cursor before you click. In front of the first heading is the usual home for it.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":2,"sel":"#tocBtn","cls":"click-here"}
+    ]</script>
+</section>
+
+<!-- 10 · Pick an automatic table -->
+<section class="slide" id="s10" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Insert the ToC</span>
+            <h2>Pick an automatic table</h2>
+        </header>
+        <div class="sbody">
+            <div class="tocmenu reveal" style="margin:0 auto;">
+                <div class="tocopt" id="opt1">
+                    <h4>Automatic Table 1</h4>
+                    <div class="prevline"><span>Contents</span></div>
+                    <div class="prevline"><span>Heading 1</span><span class="tlead"></span><span>1</span></div>
+                    <div class="prevline" style="padding-left:16px;"><span>Heading 2</span><span class="tlead"></span><span>1</span></div>
+                    <div class="prevline"><span>Heading 1</span><span class="tlead"></span><span>2</span></div>
+                    <div class="note">Built from your heading styles. Updates on command.</div>
+                </div>
+                <div class="tocopt">
+                    <h4>Automatic Table 2</h4>
+                    <div class="prevline"><span>Table of Contents</span></div>
+                    <div class="prevline"><span>Heading 1</span><span class="tlead"></span><span>1</span></div>
+                    <div class="prevline" style="padding-left:16px;"><span>Heading 2</span><span class="tlead"></span><span>1</span></div>
+                    <div class="prevline"><span>Heading 1</span><span class="tlead"></span><span>2</span></div>
+                    <div class="note">Identical, just a different title line.</div>
+                </div>
+                <div class="tocopt" id="optManual">
+                    <h4><span class="zap step-alt" id="manualZap">Manual Table</span></h4>
+                    <div class="prevline"><span>Type chapter title…</span><span class="tlead"></span><span>1</span></div>
+                    <div class="prevline"><span>Type chapter title…</span><span class="tlead"></span><span>2</span></div>
+                    <div class="prevline"><span>Type chapter title…</span><span class="tlead"></span><span>3</span></div>
+                    <div class="note">You fill in every line yourself, and keep it current yourself.</div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">either automatic table will do; this lesson uses <b>Automatic Table 1</b></span>
+                <span class="cap" data-step="2">the Manual Table is the typed-by-hand trap from earlier, wearing a costume; walk past it</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#opt1","cls":"click-here"},
+        {"s":2,"sel":"#manualZap","cls":"on"}
+    ]</script>
+</section>
+
+<!-- 11 · The ToC lands -->
+<section class="slide" id="s11" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Insert the ToC</span>
+            <h2>One click later</h2>
+        </header>
+        <div class="sbody">
+            <div class="tocbox" data-step="1" style="border:2.5px solid var(--hl-field);">
+                <div class="tochead">Contents</div>
+                <div class="tentry"><span class="tt">Before your first day</span><span class="tlead"></span><span class="tpg">1</span></div>
+                <div class="tentry t2" id="ind1"><span class="tt">What to bring</span><span class="tlead"></span><span class="tpg">1</span></div>
+                <div class="tentry"><span class="tt">Your first week</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry t2" id="ind2"><span class="tt">Getting your logins</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry t2" id="ind3"><span class="tt">Meet the team</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry"><span class="tt">Staying safe</span><span class="tlead"></span><span class="tpg">3</span></div>
+                <div class="tentry"><span class="tt">Who to ask for help</span><span class="tlead"></span><span class="tpg">3</span></div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">every styled heading, its dotted leader and its page number, typed by Word in one hit</span>
+                <span class="cap" data-step="2">Heading 2 lines come in <b>indented</b> under their Heading 1, so the shape of the document shows</span>
+                <span class="cap" data-step="3">nothing on this page was typed by hand; that is the whole point</span>
+            </div>
+            <div class="callout good" data-step="3">Word read your headings and built the lot. If a heading is missing here, it was never given a heading style; that is the first thing to check.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":2,"sel":"#ind1, #ind2, #ind3","cls":"sel"},
+        {"s":3,"sel":"#ind1, #ind2, #ind3","rm":"sel","cls":""}
+    ]</script>
+</section>
+
+<!-- 12 · It is a field, not text -->
+<section class="slide" id="s12" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Insert the ToC</span>
+            <h2>It looks like text; it is smarter than text</h2>
+        </header>
+        <div class="sbody">
+            <div class="tocbox reveal" id="fieldToc">
+                <div class="tochead">Contents</div>
+                <div class="tentry"><span class="tt">Before your first day</span><span class="tlead"></span><span class="tpg">1</span></div>
+                <div class="tentry t2"><span class="tt">What to bring</span><span class="tlead"></span><span class="tpg">1</span></div>
+                <div class="tentry" id="ctrlRow"><span class="tt">Your first week</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry t2"><span class="tt">Getting your logins</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry"><span class="tt">Staying safe</span><span class="tlead"></span><span class="tpg">3</span></div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">click anywhere inside it: the grey tint says <b>this is a field</b>, a block Word maintains for you</span>
+                <span class="cap" data-step="2">hold <b>Ctrl</b> and click an entry, and Word jumps you straight to that section</span>
+            </div>
+            <div class="two-col">
+                <div class="card" data-step="1"><h3>Grey means "Word owns this"</h3><p>Do not edit the table's text directly; your edits would be thrown away at the next update. Change the headings in the document instead.</p></div>
+                <div class="card" data-step="2"><h3>Every entry is a link</h3><p>Ctrl+Click any line to jump to it. In a PDF export those links keep working, so readers can navigate too.</p></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#fieldToc","cls":"field"},
+        {"s":2,"sel":"#ctrlRow","cls":"sel"}
+    ]</script>
+</section>
+
+<!-- ================= § EDIT & UPDATE ================= -->
+
+<!-- 13 · The document moves on -->
+<section class="slide" id="s13" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Edit &amp; update</span>
+            <h2>Then the document moves on</h2>
+            <p class="lede">Payday questions came up all week, so you write a new section: <b>Your first pay</b>, styled Heading 1 like the others.</p>
+        </header>
+        <div class="sbody">
+            <div class="minipages reveal" style="justify-content:center;">
+                <div class="mini">
+                    <div class="mtitle">Depot Induction Guide</div>
+                    <div class="mline"></div><div class="mline w60"></div>
+                    <div class="mh1">Before your first day</div>
+                    <div class="mline"></div>
+                    <div class="mh2">What to bring</div>
+                    <div class="mline w60"></div>
+                    <span class="mpg">1</span>
+                </div>
+                <div class="mini">
+                    <div class="mh1">Your first week</div>
+                    <div class="mh2">Getting your logins</div>
+                    <div class="mline"></div>
+                    <div class="mh2">Meet the team</div>
+                    <div class="mline"></div><div class="mline w60"></div>
+                    <span class="mpg">2</span>
+                </div>
+                <div class="mini">
+                    <div class="mh1 newh step-alt" id="newPay">Your first pay</div>
+                    <div class="mline step-alt newh" id="newPayLine"></div>
+                    <div class="mh1">Staying safe</div>
+                    <div class="mline"></div>
+                    <div class="mh1 step-alt" id="whoOld">Who to ask for help</div>
+                    <div class="mline w60 step-alt" id="whoOldLine"></div>
+                    <span class="mpg">3</span>
+                </div>
+                <div class="mini ghostpage step-alt" id="page4">
+                    <div class="mh1">Who to ask for help</div>
+                    <div class="mline"></div><div class="mline w60"></div>
+                    <span class="mpg">4</span>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">the new section lands on page 3, above Staying safe</span>
+                <span class="cap" data-step="2">and everything below it shifts: <b>Who to ask for help</b> is pushed onto a new page 4</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#newPay, #newPayLine","cls":"landed"},
+        {"s":2,"sel":"#whoOld, #whoOldLine","cls":"pushed"},
+        {"s":2,"sel":"#page4","cls":"landed"}
+    ]</script>
+</section>
+
+<!-- 14 · The trap -->
+<section class="slide" id="s14" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Edit &amp; update</span>
+            <h2>Scroll back to the contents page…</h2>
+        </header>
+        <div class="sbody">
+            <div class="tocbox reveal">
+                <div class="tochead">Contents</div>
+                <div class="tentry"><span class="tt">Before your first day</span><span class="tlead"></span><span class="tpg">1</span></div>
+                <div class="tentry t2"><span class="tt">What to bring</span><span class="tlead"></span><span class="tpg">1</span></div>
+                <div class="tentry"><span class="tt">Your first week</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry t2"><span class="tt">Getting your logins</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry t2"><span class="tt">Meet the team</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry ghostrow step-alt" data-step="1" id="ghost"><span>Your first pay is nowhere in this list</span></div>
+                <div class="tentry"><span class="tt">Staying safe</span><span class="tlead"></span><span class="tpg">3</span></div>
+                <div class="tentry"><span class="tt">Who to ask for help</span><span class="tlead"></span><span class="tpg zap" id="wrongPg">3</span></div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">the new section is missing, and "Who to ask for help" now points at the wrong page</span>
+                <span class="cap" data-step="2">the table did not break; it is a <b>snapshot</b>, waiting to be told the document changed</span>
+            </div>
+            <div class="callout danger" data-step="2">An automatic Table of Contents does not watch your edits. It updates when you tell it to; that is the one habit this lesson asks you to build.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#wrongPg","cls":"on"}
+    ]</script>
+</section>
+
+<!-- 15 · Update the table -->
+<section class="slide" id="s15" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Edit &amp; update</span>
+            <h2>Update it: two clicks</h2>
+        </header>
+        <div class="sbody">
+            <div class="row grow" style="align-items:center;">
+                <div class="tocbox field" style="width:640px; font-size:18px;">
+                    <span class="updpill" id="updBtn">🔄 Update Table…</span>
+                    <div class="tochead">Contents</div>
+                    <div class="tentry"><span class="tt">Before your first day</span><span class="tlead"></span><span class="tpg">1</span></div>
+                    <div class="tentry"><span class="tt">Your first week</span><span class="tlead"></span><span class="tpg">2</span></div>
+                    <div class="tentry"><span class="tt">Staying safe</span><span class="tlead"></span><span class="tpg">3</span></div>
+                    <div class="tentry"><span class="tt">Who to ask for help</span><span class="tlead"></span><span class="tpg">3</span></div>
+                </div>
+                <div class="grow center-v" style="align-items:center;">
+                    <div class="dlg" data-step="2">
+                        <h4>Update Table of Contents</h4>
+                        <div class="dsub">Word is about to rebuild the table. Choose one:</div>
+                        <label class="radio" id="rPages"><span class="dot"></span> Update page numbers only</label>
+                        <label class="radio" id="rAll"><span class="dot"></span> Update entire table</label>
+                        <div class="dlgbtns"><span class="okb">OK</span><span>Cancel</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1"><b>click 1</b>: click inside the table, then the <b>Update Table…</b> button (it is on the References tab too, and F9 does the same job)</span>
+                <span class="cap" data-step="2">Word asks how much to refresh</span>
+                <span class="cap" data-step="3"><b>click 2</b>: pick <b>Update entire table</b>; it catches new, renamed and moved headings, all of it</span>
+            </div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#updBtn","cls":"click-here"},
+        {"s":2,"sel":"#updBtn","rm":"click-here","cls":""},
+        {"s":3,"sel":"#rAll","cls":"picked click-here"}
+    ]</script>
+</section>
+
+<!-- 16 · The refreshed ToC -->
+<section class="slide" id="s16" data-steps="2">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Edit &amp; update</span>
+            <h2>Current again, in two clicks</h2>
+        </header>
+        <div class="sbody">
+            <div class="tocbox reveal">
+                <div class="tochead">Contents</div>
+                <div class="tentry"><span class="tt">Before your first day</span><span class="tlead"></span><span class="tpg">1</span></div>
+                <div class="tentry t2"><span class="tt">What to bring</span><span class="tlead"></span><span class="tpg">1</span></div>
+                <div class="tentry"><span class="tt">Your first week</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry t2"><span class="tt">Getting your logins</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry t2"><span class="tt">Meet the team</span><span class="tlead"></span><span class="tpg">2</span></div>
+                <div class="tentry step-alt" id="newEntry"><span class="tt">Your first pay</span><span class="tlead"></span><span class="tpg">3</span></div>
+                <div class="tentry"><span class="tt">Staying safe</span><span class="tlead"></span><span class="tpg">3</span></div>
+                <div class="tentry"><span class="tt">Who to ask for help</span><span class="tlead"></span><span class="tpg step-alt" id="fixedPg">4</span></div>
+            </div>
+            <div class="capbox">
+                <span class="cap" data-step="1">the new section is in, and every page number is true again</span>
+                <span class="cap" data-step="2">updating took two clicks; typing it by hand took ten minutes, and was wrong by Friday</span>
+            </div>
+            <div class="callout good big" data-step="2">Edit freely. The table catches up whenever you ask it to.</div>
+        </div>
+    </div>
+    <script type="text/fx">[
+        {"s":1,"sel":"#newEntry","cls":"newrow"},
+        {"s":1,"sel":"#fixedPg","cls":"fixed"}
+    ]</script>
+</section>
+
+<!-- ================= § MAKE IT STICK ================= -->
+
+<!-- 17 · The habit -->
+<section class="slide" id="s17" data-steps="3">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Make it stick</span>
+            <h2>The whole skill, in three moves</h2>
+        </header>
+        <div class="sbody" style="justify-content:center; gap:34px;">
+            <ul class="points" style="max-width:1500px;">
+                <li data-step="1"><span><b>Styles first.</b> Give every heading a heading style: Heading 1 for the big sections, Heading 2 for the parts inside them. The Navigation pane is your preview of what Word can see.</span></li>
+                <li data-step="2"><span><b>Let Word type it.</b> Put the cursor where the contents page belongs, then References ▸ Table of Contents ▸ an automatic table. Never the manual one.</span></li>
+                <li data-step="3"><span><b>Update before it leaves you.</b> Before you print, send or save as PDF: click in the table, Update Table, <b>Update entire table</b>. Two clicks, and the snapshot is current.</span></li>
+            </ul>
+            <div class="callout big" data-step="3" style="max-width:1500px;">Styles first. Let Word type it. Update before it leaves you.</div>
+        </div>
+    </div>
+    <script type="text/fx">[]</script>
+</section>
+
+<!-- 18 · Trip-ups -->
+<section class="slide" id="s18" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Make it stick</span>
+            <h2>The three usual trip-ups</h2>
+        </header>
+        <div class="sbody">
+            <div class="gotchas">
+                <div class="card reveal">
+                    <h3>"I bolded it, why isn't it listed?"</h3>
+                    <p>Bold text is decoration; Word cannot see it as a heading. Only lines styled Heading 1, 2 or 3 make it into the table.</p>
+                    <p class="fix">Fix: click the line, apply a heading style, update the table.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>"I updated, but it's still wrong"</h3>
+                    <p>"Update page numbers only" refreshes the numbers and nothing else; new and renamed headings stay missing.</p>
+                    <p class="fix">Fix: when in doubt, always pick Update entire table.</p>
+                </div>
+                <div class="card reveal">
+                    <h3>"The PDF I sent shows the old contents"</h3>
+                    <p>Saving as PDF freezes whatever the table said at that moment. A stale snapshot travels with the file.</p>
+                    <p class="fix">Fix: update the table, then export. In that order, every time.</p>
+                </div>
+            </div>
+            <p class="closing reveal">All three have the same shape: <em>the table only knows what you told it, when you last told it.</em></p>
+        </div>
+    </div>
+    <script type="text/fx">[]</script>
+</section>
+
+<!-- 19 · Do it for real -->
+<section class="slide" id="s19" data-steps="0">
+    <div class="wrap">
+        <header class="shead">
+            <span class="kicker">§ Make it stick</span>
+            <h2>Now do it in real Word</h2>
+            <p class="lede">The practice file is the Depot Induction Guide from this lesson, with hand-bolded headings; exactly the document from slide 4.</p>
+        </header>
+        <div class="sbody">
+            <div class="two-col grow" style="align-content:center;">
+                <div class="card reveal" style="padding:36px 40px;">
+                    <h3>Your three tasks</h3>
+                    <ul class="checklist" style="margin-top:12px;">
+                        <li>Style the headings: Heading 1 for the five main sections, Heading 2 for the three inside them. Check your work in the Navigation pane.</li>
+                        <li>Put the cursor above the welcome line and insert an automatic Table of Contents.</li>
+                        <li>Add a new Heading 1 section called <b>Your first pay</b>, then update the entire table and watch it appear.</li>
+                    </ul>
+                </div>
+                <div class="card reveal center-v" style="padding:36px 40px; align-items:flex-start;">
+                    <h3>The practice document</h3>
+                    <p>A one-page Word file, ready to fix. It opens in Word on the desktop, in a browser, or on a tablet.</p>
+                    <a class="dlbtn" href="../../simulations_downloads/Word_ToC_practice.docx" download>⭳ Download the practice document</a>
+                </div>
+            </div>
+            <p class="closing reveal">If you can do those three moves, <em>you own this skill.</em></p>
+        </div>
+    </div>
+    <script type="text/fx">[]</script>
+</section>
+
+</main>
+</div>
+
+<!-- ===========================================
+     SECTION RAIL (chrome, outside the stage)
+     =========================================== -->
+<nav class="rail" aria-label="Deck sections">
+    <div class="railtitle">Word · Contents</div>
+    <div id="railSecs"></div>
+    <div class="railfoot">
+        <span id="railCount">1 / 19</span>
+        <span id="railStep"></span>
+        <span class="railhint">click / → build · ← back · E edit</span>
+    </div>
+</nav>
+
+<!-- Inline-edit chrome -->
+<div class="edit-hotzone" aria-hidden="true"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+<div class="edit-note">editing · click any text · Ctrl+S saves a copy · E to exit</div>
+<script>
+/* ===========================================
+   LOCKED DOCUMENT
+   Single source of truth for every <DocPage> in the deck.
+   Line order matters: fx selectors address lines by data-line.
+   =========================================== */
+const DOC = [
+    { k: 'title', t: 'Depot Induction Guide' },                                                                         /* 0 */
+    { k: 'p',  t: 'Welcome to the depot. This guide covers your first week: the gear you need, the logins to set up and who to ask when you are stuck.' },
+    { k: 'h1', t: 'Before your first day' },                                                                            /* 2 */
+    { k: 'p',  t: 'Read your letter of offer and bring photo ID with you on the first morning.' },
+    { k: 'h2', t: 'What to bring' },                                                                                    /* 4 */
+    { k: 'p',  t: 'Steel-capped boots, a hat and a water bottle. The depot supplies hi-vis and gloves.' },
+    { k: 'h1', t: 'Your first week' },                                                                                  /* 6 */
+    { k: 'h2', t: 'Getting your logins' },                                                                              /* 7 */
+    { k: 'p',  t: 'IT will set up your account and help you install the Authenticator app on your phone.' },
+    { k: 'h2', t: 'Meet the team' },                                                                                    /* 9 */
+    { k: 'p',  t: 'Your supervisor will walk you around the yard and introduce the crew.' },
+    { k: 'h1', t: 'Staying safe' },                                                                                     /* 11 */
+    { k: 'p',  t: 'Sign in at the gate on every visit. If you are unsure about a job, stop and ask.' },
+    { k: 'h1', t: 'Who to ask for help' },                                                                              /* 13 */
+    { k: 'p',  t: 'Your buddy is your first stop. The depot office can answer pay and roster questions.' }              /* 14 */
+];
+
+/* ===========================================
+   <DocPage> RENDERER
+   Turns every <div class="docpage" data-doc="guide"> into a Word
+   page mock. Options: data-from / data-to (line range),
+   data-styled="all" (headings pre-styled), data-page (corner badge).
+   Default: headings render as hand-bolded body text (.faux).
+   =========================================== */
+function buildDocs() {
+    document.querySelectorAll('.docpage[data-doc]').forEach(dp => {
+        const from = +(dp.dataset.from || 0);
+        const to = +(dp.dataset.to || DOC.length - 1);
+        const styled = dp.dataset.styled === 'all';
+        let html = '';
+        for (let i = from; i <= to && i < DOC.length; i++) {
+            const L = DOC[i];
+            let cls = 'pline';
+            if (L.k === 'title') cls += ' pl-title';
+            else if (L.k === 'h1') cls += styled ? ' st-h1' : ' faux';
+            else if (L.k === 'h2') cls += styled ? ' st-h2' : ' faux';
+            html += `<div class="${cls}" data-line="${i}">${L.t}</div>`;
+        }
+        if (dp.dataset.page) html += `<span class="pagebadge">${dp.dataset.page}</span>`;
+        dp.innerHTML = html;
+    });
+}
+
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER + STEP/FX ENGINE
+   Click / → advance build-steps within the slide first, then move
+   to the next slide. ← reverses one step, then one slide (arriving
+   at the previous slide fully built).
+   =========================================== */
+const SECTIONS = [
+    ['Intro',           0, 2],
+    ['Heading styles',  3, 7],
+    ['Insert the ToC',  8, 11],
+    ['Edit & update',  12, 15],
+    ['Make it stick',  16, 18]
+];
+
+class SlidePresentation {
+    constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.stage  = document.getElementById('deckStage');
+        this.cur    = 0;
+        this.step   = this.slides.map(() => 0);
+        this.fx     = this.slides.map(sl => this.resolveFx(sl));
+
+        this.buildRail();
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupPointerNav();
+        this.setupPrint();
+
+        const fromHash = parseInt((location.hash || '').slice(1), 10);
+        this.show(isNaN(fromHash) ? 0 : Math.min(Math.max(fromHash - 1, 0), this.slides.length - 1));
+    }
+
+    resolveFx(slide) {
+        const tag = slide.querySelector('script[type="text/fx"]');
+        if (!tag) return [];
+        let entries;
+        try { entries = JSON.parse(tag.textContent); }
+        catch (err) { console.error('Bad fx JSON on', slide.id, err); return []; }
+        return entries.map(e => {
+            const els = Array.from(slide.querySelectorAll(e.sel));
+            els.forEach(el => {
+                if (e.text !== undefined && el.dataset.orig === undefined)
+                    el.dataset.orig = el.textContent;
+            });
+            return { ...e, els };
+        });
+    }
+
+    maxSteps(i) { return +(this.slides[i].dataset.steps || 0); }
+
+    applyState(i, k) {
+        const slide = this.slides[i];
+        slide.querySelectorAll('[data-step]').forEach(el => {
+            const v = +el.dataset.step;
+            el.classList.toggle('on',  v <= k);
+            el.classList.toggle('now', v === k);
+        });
+        const fx = this.fx[i];
+        fx.forEach(e => e.els.forEach(el => {
+            if (e.cls) el.classList.remove(...e.cls.split(' ').filter(Boolean));
+            if (e.text !== undefined) el.textContent = el.dataset.orig;
+            el.style.transitionDelay = '';
+        }));
+        fx.forEach(e => {
+            if (e.s > k) return;
+            e.els.forEach(el => {
+                if (e.d)   el.style.transitionDelay = e.d + 's';
+                if (e.cls) el.classList.add(...e.cls.split(' ').filter(Boolean));
+                if (e.rm)  el.classList.remove(...e.rm.split(' ').filter(Boolean));
+                if (e.text !== undefined) el.textContent = e.text;
+            });
+        });
+    }
+
+    show(i, step = 0) {
+        this.cur = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.step[this.cur] = Math.min(step, this.maxSteps(this.cur));
+        this.slides.forEach((sl, j) => {
+            sl.classList.toggle('active',  j === this.cur);
+            sl.classList.toggle('visible', j === this.cur);
+        });
+        this.applyState(this.cur, this.step[this.cur]);
+        try { history.replaceState(null, '', '#' + (this.cur + 1)); } catch (e) { /* file:// quirks */ }
+        this.updateRail();
+    }
+
+    advance() {
+        if (this.step[this.cur] < this.maxSteps(this.cur)) {
+            this.step[this.cur]++;
+            this.applyState(this.cur, this.step[this.cur]);
+            this.updateRail();
+        } else if (this.cur < this.slides.length - 1) {
+            this.show(this.cur + 1, 0);
+        }
+    }
+
+    back() {
+        if (this.step[this.cur] > 0) {
+            this.step[this.cur]--;
+            this.applyState(this.cur, this.step[this.cur]);
+            this.updateRail();
+        } else if (this.cur > 0) {
+            this.show(this.cur - 1, this.maxSteps(this.cur - 1));
+        }
+    }
+
+    setupStageScale() {
+        const scale = () => {
+            const railW  = window.matchMedia('(max-width: 1080px)').matches ? 0 : 248;
+            const availW = window.innerWidth - railW;
+            const f = Math.min(availW / 1920, window.innerHeight / 1080);
+            const x = railW + (availW - 1920 * f) / 2;
+            const y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+    }
+
+    setupKeyboardNav() {
+        document.addEventListener('keydown', e => {
+            if (e.target.getAttribute && e.target.getAttribute('contenteditable')) return;
+            if (window.editor && window.editor.isActive) return;
+            switch (e.key) {
+                case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); this.advance(); break;
+                case 'ArrowLeft':  case 'PageUp':             e.preventDefault(); this.back();    break;
+                case 'Home': e.preventDefault(); this.show(0); break;
+                case 'End':  e.preventDefault(); this.show(this.slides.length - 1); break;
+            }
+        });
+    }
+
+    setupPointerNav() {
+        const vp = document.querySelector('.deck-viewport');
+        let lastTouch = 0, lastAdvance = 0, tx = 0, ty = 0;
+        const debouncedAdvance = () => {
+            const now = Date.now();
+            if (now - lastAdvance < 350) return;
+            lastAdvance = now;
+            this.advance();
+        };
+        vp.addEventListener('click', e => {
+            if (window.editor && window.editor.isActive) return;
+            if (Date.now() - lastTouch < 500) return;
+            if (e.target.closest('a, button')) return;
+            debouncedAdvance();
+        });
+        vp.addEventListener('touchstart', e => {
+            tx = e.changedTouches[0].clientX;
+            ty = e.changedTouches[0].clientY;
+        }, { passive: true });
+        vp.addEventListener('touchend', e => {
+            if (window.editor && window.editor.isActive) return;
+            lastTouch = Date.now();
+            const dx = e.changedTouches[0].clientX - tx;
+            const dy = e.changedTouches[0].clientY - ty;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+                dx < 0 ? this.advance() : this.back();
+            } else if (Math.abs(dx) < 12 && Math.abs(dy) < 12) {
+                debouncedAdvance();
+            }
+        }, { passive: true });
+    }
+
+    buildRail() {
+        const box = document.getElementById('railSecs');
+        SECTIONS.forEach(([name, start], si) => {
+            const b = document.createElement('button');
+            b.className = 'sec';
+            b.innerHTML = `<span class="n">${si + 1}</span><span>${name}</span>`;
+            b.addEventListener('click', e => { e.stopPropagation(); this.show(start, 0); });
+            box.appendChild(b);
+        });
+    }
+
+    updateRail() {
+        const secs = document.querySelectorAll('.rail .sec');
+        SECTIONS.forEach(([, start, end], si) =>
+            secs[si].classList.toggle('cur', this.cur >= start && this.cur <= end));
+        document.getElementById('railCount').textContent = `${this.cur + 1} / ${this.slides.length}`;
+        const n = this.maxSteps(this.cur);
+        document.getElementById('railStep').textContent =
+            n ? `build ${this.step[this.cur]}/${n} ▸` : '';
+    }
+
+    setupPrint() {
+        window.addEventListener('beforeprint', () =>
+            this.slides.forEach((sl, i) => this.applyState(i, this.maxSteps(i))));
+        window.addEventListener('afterprint', () =>
+            this.slides.forEach((sl, i) => this.applyState(i, this.step[i])));
+    }
+}
+
+/* ===========================================
+   INLINE EDITOR
+   Hover the top-left corner (or press E) → pencil → edit mode.
+   Edits persist to localStorage; Ctrl+S downloads an edited copy.
+   =========================================== */
+const EDIT_SEL = 'h1, h2, h3, h4, p, li, .pline, .cap, .kicker, .floatlabel, .fchip, .closing, .keyrow span:last-child, .tentry .tt, .tochead, .naventry, .stylechip .nm, .rglabel, .radio, .dsub, .tocopt .note, .points li span, .mini .mh1, .mini .mh2, .mini .mtitle';
+const STORE_KEY = 'word-toc-deck-edits-v1';
+
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.els = Array.from(document.querySelectorAll(EDIT_SEL))
+            .filter(el => !el.closest('.rail'));
+        this.els.forEach((el, i) => el.dataset.eid = 'e' + i);
+        this.restore();
+        this.bindChrome();
+    }
+
+    restore() {
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { saved = {}; }
+        this.els.forEach(el => {
+            if (saved[el.dataset.eid] !== undefined) el.innerHTML = saved[el.dataset.eid];
+        });
+    }
+
+    persist() {
+        const out = {};
+        this.els.forEach(el => { if (el.dataset.dirty) out[el.dataset.eid] = el.innerHTML; });
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { saved = {}; }
+        localStorage.setItem(STORE_KEY, JSON.stringify({ ...saved, ...out }));
+    }
+
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        document.getElementById('editToggle').classList.toggle('active', this.isActive);
+        this.els.forEach(el => {
+            if (this.isActive) {
+                el.setAttribute('contenteditable', 'true');
+                el.addEventListener('input', this.markDirty);
+            } else {
+                el.removeAttribute('contenteditable');
+                el.removeEventListener('input', this.markDirty);
+            }
+        });
+        if (!this.isActive) this.persist();
+    }
+
+    markDirty(e) { e.currentTarget.dataset.dirty = '1'; }
+
+    downloadCopy() {
+        this.persist();
+        const clone = document.documentElement.cloneNode(true);
+        clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        const body = clone.querySelector('body');
+        if (body) body.classList.remove('editing');
+        const blob = new Blob(['<!DOCTYPE html>\n' + clone.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'word-toc-tutorial-edited.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    bindChrome() {
+        const hotzone = document.querySelector('.edit-hotzone');
+        const toggle  = document.getElementById('editToggle');
+        let hideTimeout = null;
+        const scheduleHide = () => {
+            hideTimeout = setTimeout(() => {
+                if (!this.isActive) toggle.classList.remove('show');
+            }, 400);
+        };
+        hotzone.addEventListener('mouseenter', () => { clearTimeout(hideTimeout); toggle.classList.add('show'); });
+        hotzone.addEventListener('mouseleave', scheduleHide);
+        toggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+        toggle.addEventListener('mouseleave', scheduleHide);
+        hotzone.addEventListener('click', e => { e.stopPropagation(); this.toggleEditMode(); });
+        toggle.addEventListener('click',  e => { e.stopPropagation(); this.toggleEditMode(); });
+
+        document.addEventListener('keydown', e => {
+            if ((e.key === 'e' || e.key === 'E') && !e.ctrlKey && !e.metaKey
+                && !(e.target.getAttribute && e.target.getAttribute('contenteditable'))) {
+                this.toggleEditMode();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's' && this.isActive) {
+                e.preventDefault();
+                this.downloadCopy();
+            }
+        });
+    }
+}
+
+/* ===========================================
+   BOOT — docs first, then saved edits, then the controller
+   (fx selectors must resolve against the rendered DOM).
+   =========================================== */
+buildDocs();
+window.editor = new InlineEditor();
+window.deck = new SlidePresentation();
+</script>
+</body>
+</html>
