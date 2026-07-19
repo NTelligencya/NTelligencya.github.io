@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can AI Read My Handwriting and Understand My Voice? &middot; Simulation Tools &middot; NTell World Ink</title>
+<meta name="description" content="An interactive walkthrough of what really happens when you upload a handwritten page or a voice recording to an AI: OCR, speech-to-text, why messiness causes errors, and where your file actually travels for processing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0B0B0E;
+  --bg-2: #131318;
+  --bg-3: #17171D;
+  --line: #26262F;
+  --text: #ECEAE4;
+  --text-2: #B9B6AD;
+  --text-3: #7C796F;
+  --accent: #1AC9C9;
+  --accent-soft: #6FE3E3;
+  --accent-wash: rgba(26,201,201,0.08);
+  --warm: #E08A3C;
+  --warm-wash: rgba(224,138,60,0.10);
+  --bad: #E05B4A;
+  --good: #4CC98A;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Manrope', 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --hand: 'Caveat', cursive;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text-2); font-family: var(--sans); line-height: 1.65; }
+a { color: var(--accent-soft); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+header.top {
+  border-bottom: 1px solid var(--line); padding: 18px 0; background: #08080A;
+  position: sticky; top: 0; z-index: 50;
+}
+header.top .wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; }
+.brand:hover { text-decoration: none; }
+.brand-mark { width: 32px; height: 32px; position: relative; display: inline-block; flex: 0 0 32px; }
+.brand-mark::before, .brand-mark::after { content: ''; position: absolute; inset: 4px; border: 1.5px solid var(--accent); border-radius: 4px; }
+.brand-mark::after { transform: rotate(45deg); border-color: var(--accent-soft); opacity: 0.5; }
+.brand-name { font-family: var(--serif); font-weight: 500; font-size: 20px; letter-spacing: 0.04em; color: var(--text); }
+.brand-name .dot { color: var(--accent); }
+.crumb { font: 500 12px var(--mono); color: var(--text-3); letter-spacing: 0.08em; }
+header.top nav { margin-left: auto; display: flex; gap: 18px; }
+header.top nav a { font: 500 12px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); }
+
+.masthead { padding: 64px 0 30px; }
+.eyebrow { font: 500 13px var(--mono); letter-spacing: 0.26em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+h1 { font: 500 52px/1.1 var(--serif); color: var(--text); letter-spacing: -0.01em; max-width: 860px; }
+.sub { font-size: 19px; margin-top: 20px; max-width: 780px; }
+.sub b { color: var(--text); }
+
+section.block { padding: 44px 0; border-top: 1px solid var(--line); }
+.block-eyebrow { font: 500 12px var(--mono); letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-3); margin-bottom: 10px; }
+h2 { font: 500 34px/1.2 var(--serif); color: var(--text); margin-bottom: 16px; }
+h3 { font: 500 23px/1.3 var(--serif); color: var(--text); margin: 26px 0 10px; }
+p { margin-bottom: 14px; }
+p b, li b { color: var(--text); }
+
+.panel {
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px;
+  padding: 28px; margin: 22px 0;
+}
+.panel .ptag {
+  display: inline-block; font: 500 11px var(--mono); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-wash); border-radius: 999px; padding: 5px 14px; margin-bottom: 16px;
+}
+.panel.warm-edge { border-left: 3px solid var(--warm); }
+.panel.teal-edge { border-left: 3px solid var(--accent); }
+
+/* Controls */
+.choices { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 18px; }
+.choice {
+  font: 600 14px var(--sans); color: var(--text-2); background: var(--bg-3);
+  border: 1px solid var(--line); border-radius: 999px; padding: 9px 20px; cursor: pointer;
+  transition: all 0.15s;
+}
+.choice:hover { border-color: var(--accent); color: var(--text); }
+.choice.on { background: var(--accent); border-color: var(--accent); color: #04211F; }
+.gobtn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 700 15px var(--sans); color: #04211F; background: var(--accent);
+  border: none; border-radius: 10px; padding: 13px 26px; cursor: pointer; transition: filter 0.15s;
+}
+.gobtn:hover { filter: brightness(1.1); }
+.gobtn:disabled { opacity: 0.45; cursor: default; }
+.gobtn.warm { background: var(--warm); color: #2A1503; }
+
+/* Handwritten page scans */
+.noteimg {
+  display: block; width: 100%; max-width: 560px; border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.4);
+}
+.result.scrolly { max-height: 380px; overflow-y: auto; }
+
+/* Journey pipeline */
+.journey { display: flex; align-items: stretch; gap: 0; margin: 24px 0 8px; flex-wrap: wrap; }
+.jstage {
+  flex: 1 1 150px; min-width: 150px; text-align: center; padding: 18px 12px;
+  border: 1px solid var(--line); background: var(--bg-3); position: relative;
+  opacity: 0.35; transition: all 0.4s;
+}
+.jstage:first-child { border-radius: 12px 0 0 12px; }
+.jstage:last-child { border-radius: 0 12px 12px 0; }
+.jstage.lit { opacity: 1; border-color: var(--accent); background: var(--accent-wash); }
+.jstage.lit .jicon { color: var(--accent); }
+.jstage .jicon { font: 500 12px var(--mono); letter-spacing: 0.14em; color: var(--text-3); display: block; margin-bottom: 8px; text-transform: uppercase; }
+.jstage .jname { font: 700 15px var(--sans); color: var(--text); display: block; margin-bottom: 4px; }
+.jstage .jdesc { font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
+.jarrow { display: flex; align-items: center; font: 500 18px var(--mono); color: var(--text-3); padding: 0 4px; }
+
+/* Processing log */
+.proclog {
+  background: #050506; border: 1px dashed var(--line); border-radius: 10px;
+  font: 400 13.5px/1.9 var(--mono); color: var(--text-2); padding: 18px 22px; margin: 18px 0;
+  min-height: 60px;
+}
+.proclog .ln { display: block; opacity: 0; transform: translateY(6px); transition: all 0.35s; }
+.proclog .ln.show { opacity: 1; transform: none; }
+.proclog .ok { color: var(--good); }
+.proclog .hmm { color: var(--warm); }
+.proclog .term { color: var(--accent-soft); font-weight: 500; }
+
+/* OCR result */
+.result {
+  background: var(--bg-3); border: 1px solid var(--line); border-radius: 10px;
+  padding: 22px 26px; margin: 16px 0; font-size: 17px; line-height: 2; color: var(--text);
+  display: none;
+}
+.result.show { display: block; }
+.result .conf { font: 500 12px var(--mono); letter-spacing: 0.1em; color: var(--text-3); display: block; margin-bottom: 12px; text-transform: uppercase; }
+.miss {
+  background: var(--warm-wash); border-bottom: 2px dotted var(--warm); border-radius: 3px;
+  padding: 1px 5px; cursor: help; position: relative; color: var(--warm);
+}
+.miss:hover::after {
+  content: 'actually written: "' attr(data-real) '"';
+  position: absolute; left: 0; bottom: calc(100% + 6px); white-space: nowrap;
+  background: #050506; color: var(--text); border: 1px solid var(--line); border-radius: 8px;
+  font: 500 12.5px var(--sans); padding: 7px 12px; z-index: 20;
+}
+.gone { background: rgba(224,91,74,0.12); border-bottom: 2px dotted var(--bad); border-radius: 3px; padding: 1px 5px; color: var(--bad); font-family: var(--mono); font-size: 14px; }
+
+/* Voice */
+.voicecard {
+  background: var(--bg-3); border: 1px solid var(--line); border-radius: 14px;
+  padding: 20px 24px; display: flex; align-items: center; gap: 18px; max-width: 560px;
+}
+.voicecard .vmeta { font: 500 12px var(--mono); color: var(--text-3); letter-spacing: 0.08em; }
+.voicecard .vname { font: 700 15px var(--sans); color: var(--text); display: block; margin-bottom: 3px; }
+.wave { display: flex; align-items: center; gap: 3px; height: 44px; flex: 1; min-width: 120px; }
+.wave i {
+  display: block; width: 4px; border-radius: 2px; background: var(--accent); opacity: 0.55;
+  height: 22%;
+}
+.wave.playing i { animation: wavebob 0.9s ease-in-out infinite; }
+@keyframes wavebob { 0%,100% { transform: scaleY(0.6); } 50% { transform: scaleY(1.5); } }
+
+/* Verdict cards */
+.cards3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0; }
+.vcard { background: var(--bg-2); border: 1px solid var(--line); border-top: 3px solid var(--accent); border-radius: 10px; padding: 20px 22px; }
+.vcard.warm { border-top-color: var(--warm); }
+.vcard.good { border-top-color: var(--good); }
+.vcard h4 { font: 600 19px var(--serif); color: var(--text); margin-bottom: 8px; }
+.vcard p { font-size: 14.5px; line-height: 1.6; margin: 0; }
+
+.pullquote {
+  font-family: var(--serif); font-size: 22px; line-height: 1.5; color: var(--text);
+  padding: 20px 26px; border-left: 3px solid var(--accent); background: var(--accent-wash);
+  margin: 24px 0; font-style: italic;
+}
+
+.footer { border-top: 1px solid var(--line); padding: 36px 0 48px; margin-top: 40px; font-size: 14px; color: var(--text-3); }
+.footer a { color: var(--text-2); }
+
+@media (max-width: 700px) {
+  h1 { font-size: 36px; }
+  .journey { flex-direction: column; }
+  .jstage:first-child { border-radius: 12px 12px 0 0; }
+  .jstage:last-child { border-radius: 0 0 12px 12px; }
+  .jarrow { justify-content: center; transform: rotate(90deg); padding: 2px 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span></a>
+    <span class="crumb">/ simulations / handwriting &amp; voice</span>
+    <nav>
+      <a href="/simulations/">All tools</a>
+      <a href="/">Home</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap masthead">
+  <div class="eyebrow">AI Workshop &middot; Interactive Walkthrough</div>
+  <h1>Can AI Read My Handwriting, and Understand My Voice?</h1>
+  <p class="sub">Short answer: <b>yes, remarkably well; and imperfectly, in ways worth understanding.</b> This tool walks through what actually happens when you upload a handwritten page or a voice memo to an AI: where the file goes, how it gets read, why messiness turns into errors, and one thing every researcher should know before uploading anything.</p>
+</div>
+
+<!-- ================= PART 1 : HANDWRITING ================= -->
+<section class="block wrap" id="handwriting">
+  <div class="block-eyebrow">// part one</div>
+  <h2>Reading your handwriting</h2>
+  <p>Here is a poem, handwritten into a notebook three times: neatly, in a hurry, and messily, complete with crossed-out corrections and a coffee stain. These are real scanned pages, not fonts. Choose a version, then upload it and watch what the machine does with it.</p>
+
+  <div class="panel">
+    <span class="ptag">Step 1 &middot; The page</span>
+    <div class="choices" id="neatChoices">
+      <button class="choice on" data-neat="neat">Written neatly</button>
+      <button class="choice" data-neat="rushed">Written in a hurry</button>
+      <button class="choice" data-neat="scrawl">Messy: corrections and a coffee stain</button>
+    </div>
+    <img class="noteimg" id="noteimg" src="assets/Neatest_poem3.png" alt="A poem titled A Map of Where She Keeps Herself, handwritten neatly on lined notebook paper.">
+    <p style="margin-top:18px"><button class="gobtn" id="ocrGo">Upload the page &rarr;</button></p>
+  </div>
+
+  <div class="panel teal-edge" id="ocrJourneyPanel" style="display:none">
+    <span class="ptag">Step 2 &middot; Where the page goes</span>
+    <p>Your photo does not get read by your phone. It travels:</p>
+    <div class="journey" id="ocrJourney">
+      <div class="jstage"><span class="jicon">01</span><span class="jname">Your device</span><span class="jdesc">The page becomes a photo: just a grid of coloured dots (pixels).</span></div>
+      <div class="jarrow">&rarr;</div>
+      <div class="jstage"><span class="jicon">02</span><span class="jname">The internet</span><span class="jdesc">The photo is sent, usually encrypted, to the AI company's servers.</span></div>
+      <div class="jarrow">&rarr;</div>
+      <div class="jstage"><span class="jicon">03</span><span class="jname">A data centre</span><span class="jdesc">Often overseas: commonly the United States, sometimes China, depending on whose tool it is.</span></div>
+      <div class="jarrow">&rarr;</div>
+      <div class="jstage"><span class="jicon">04</span><span class="jname">Back to you</span><span class="jdesc">Only the finished text comes home. The processing happened over there.</span></div>
+    </div>
+    <p style="margin-top:14px;font-size:14px" class="crumb-note">Hold that thought; it becomes important in Part Three.</p>
+  </div>
+
+  <div class="panel" id="ocrProcPanel" style="display:none">
+    <span class="ptag">Step 3 &middot; Inside the machine: OCR</span>
+    <p>The technical name for this is <b style="color:var(--accent-soft)">OCR: Optical Character Recognition</b>. "Optical" because it works from the image, "character recognition" because its job is turning shapes into letters. Watch it work:</p>
+    <div class="proclog" id="ocrLog"></div>
+  </div>
+
+  <div class="panel warm-edge" id="ocrResultPanel" style="display:none">
+    <span class="ptag">Step 4 &middot; What came back</span>
+    <div class="result show scrolly" id="ocrResult"></div>
+    <p id="ocrVerdict" style="margin-top:10px"></p>
+    <p style="font-size:14.5px;color:var(--text-3)">Dotted words are the machine's confident guesses; hover or tap them to see what was really written. Notice the errors are real words, not gibberish; the final step guesses from context, so <b>OCR mistakes look plausible</b>, which is exactly why they slip through unchecked. Crossed-out corrections, underlines and stains are classic OCR traps; each produces its own style of error.</p>
+    <p><button class="gobtn warm" id="ocrAgain">Try a different neatness &uarr;</button></p>
+  </div>
+</section>
+
+<!-- ================= PART 2 : VOICE ================= -->
+<section class="block wrap" id="voice">
+  <div class="block-eyebrow">// part two</div>
+  <h2>Understanding your voice</h2>
+  <p>Now the same journey for sound. Here is a voice memo recorded after a morning site inspection. Choose the recording conditions, then send it off for transcription.</p>
+
+  <div class="panel">
+    <span class="ptag">Step 1 &middot; The recording</span>
+    <div class="choices" id="voiceChoices">
+      <button class="choice on" data-cond="clear">Quiet room, clear speech</button>
+      <button class="choice" data-cond="noisy">Recorded in a noisy workshop</button>
+      <button class="choice" data-cond="two">Two people talking over each other</button>
+    </div>
+    <div class="voicecard">
+      <div>
+        <span class="vname">site-notes-tuesday.m4a</span>
+        <span class="vmeta">0:19 &middot; VOICE MEMO</span>
+      </div>
+      <div class="wave" id="wave"></div>
+    </div>
+    <p style="margin-top:18px"><button class="gobtn" id="asrGo">Upload the recording &rarr;</button></p>
+  </div>
+
+  <div class="panel" id="asrProcPanel" style="display:none">
+    <span class="ptag">Step 2 &middot; Inside the machine: speech-to-text</span>
+    <p>This one is called <b style="color:var(--accent-soft)">speech-to-text</b> (engineers say ASR, automatic speech recognition). The recording makes the same overseas journey as the photo did, then:</p>
+    <div class="proclog" id="asrLog"></div>
+  </div>
+
+  <div class="panel warm-edge" id="asrResultPanel" style="display:none">
+    <span class="ptag">Step 3 &middot; The transcript</span>
+    <div class="result show" id="asrResult"></div>
+    <p id="asrVerdict" style="margin-top:10px"></p>
+    <p style="font-size:14.5px;color:var(--text-3)">Notice what struggled even in the clean recording: <b>the surname</b>. Speech models learn from enormous amounts of recorded English, most of it American and British, so unfamiliar names, place names and strong accents are exactly where transcription is least reliable; worth knowing before you trust an auto-transcript of anything.</p>
+    <p><button class="gobtn warm" id="asrAgain">Try different conditions &uarr;</button></p>
+  </div>
+</section>
+
+<!-- ================= PART 3 : WHERE DID IT GO ================= -->
+<section class="block wrap" id="where">
+  <div class="block-eyebrow">// part three</div>
+  <h2>One more thing: where did your file actually go?</h2>
+  <p>Both uploads made the same trip: your device, the internet, and then <b>a data centre that is usually not in Australia</b>. Most of the popular AI tools process uploads in the United States; some are run by Chinese companies and process them in China. The finished text comes back to your screen; the file itself made an international journey to get read.</p>
+  <div class="cards3">
+    <div class="vcard warm">
+      <h4>It left the country</h4>
+      <p>Assume anything you upload to a free public AI tool is processed overseas, under that country's laws, on that company's servers.</p>
+    </div>
+    <div class="vcard warm">
+      <h4>Free tools may keep it</h4>
+      <p>Many free tiers can store what you upload and use it to improve their models. Paid and workplace versions often promise not to; the settings and terms differ tool by tool.</p>
+    </div>
+    <div class="vcard good">
+      <h4>So choose what you upload</h4>
+      <p>Shopping lists and your own drafts: fine. Interview recordings, patient information, cultural knowledge, other people's voices: stop and use the approved tool for that work, or don't upload at all.</p>
+    </div>
+  </div>
+  <p class="pullquote">The question is never just "can the AI read this?" It is also "who else is holding it while the AI reads it?"</p>
+</section>
+
+<!-- ================= VERDICT ================= -->
+<section class="block wrap" id="verdict">
+  <div class="block-eyebrow">// the verdict</div>
+  <h2>So: can it?</h2>
+  <div class="cards3">
+    <div class="vcard good">
+      <h4>Yes, it can read</h4>
+      <p>Trained on enormous amounts of text and imagery, OCR reads reasonably neat handwriting well, and speech-to-text handles clear recordings well. These tools are useful, and getting better.</p>
+    </div>
+    <div class="vcard warm">
+      <h4>Messiness becomes errors</h4>
+      <p>Scrawl, background noise, crosstalk, accents and unfamiliar words all push the machine into confident guessing. Teaching a model every handwriting style and every voice on earth is extremely hard; the long tail never ends.</p>
+    </div>
+    <div class="vcard warm">
+      <h4>So always check the output</h4>
+      <p>Errors come back as plausible words, not obvious garbage. Anything that matters (names, numbers, quotes, medication doses) gets read by a human before it gets used.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GLOSSARY ================= -->
+<section class="block wrap" id="glossary">
+  <div class="block-eyebrow">// glossary</div>
+  <h2>Glossary</h2>
+  <p><b>OCR (Optical Character Recognition)</b>: software that turns an image of writing (typed or handwritten) into editable text.</p>
+  <p><b>Speech-to-text / ASR (Automatic Speech Recognition)</b>: software that turns recorded speech into written text.</p>
+  <p><b>Pixels</b>: the grid of coloured dots that make up a digital photo; all the machine ever "sees".</p>
+  <p><b>Segmentation</b>: the step where the machine finds the lines, words and letter shapes on the page before trying to read them.</p>
+  <p><b>Confidence score</b>: the machine's own estimate of how sure it is about each word; low confidence is where to look first for errors.</p>
+  <p><b>Data centre</b>: the warehouse of computers, often overseas, where uploads are actually processed.</p>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <p><a href="/simulations/">&larr; Back to the Simulation Tools catalogue</a></p>
+    <p>NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+    Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/cookie-notice" target="_blank" rel="noopener">Cookies</a> | <a href="mailto:webservices@cdu.edu.au">Feedback</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- shared helpers ---------- */
+  function playLog(el, lines, done) {
+    el.innerHTML = '';
+    lines.forEach(function (l, i) {
+      var s = document.createElement('span');
+      s.className = 'ln';
+      s.innerHTML = l;
+      el.appendChild(s);
+      setTimeout(function () { s.classList.add('show'); }, 450 * (i + 1));
+    });
+    if (done) setTimeout(done, 450 * (lines.length + 1));
+  }
+  function lightJourney(el, done) {
+    var stages = el.querySelectorAll('.jstage');
+    stages.forEach(function (s) { s.classList.remove('lit'); });
+    stages.forEach(function (s, i) {
+      setTimeout(function () { s.classList.add('lit'); }, 550 * (i + 1));
+    });
+    if (done) setTimeout(done, 550 * (stages.length + 1));
+  }
+
+  /* ---------- Part 1: OCR ---------- */
+  var neat = 'neat';
+  var noteimg = document.getElementById('noteimg');
+  var noteSrcs = { neat: 'assets/Neatest_poem3.png', rushed: 'assets/Neater_Poem2.png', scrawl: 'assets/messy_poem1.png' };
+  var noteAlts = {
+    neat: 'A poem titled A Map of Where She Keeps Herself, handwritten neatly on lined notebook paper.',
+    rushed: 'The same poem handwritten in a hurry, with less even letters and spacing.',
+    scrawl: 'The same poem handwritten messily in cursive, with crossed-out corrections, underlined words and a coffee stain over part of the page.'
+  };
+  document.getElementById('neatChoices').addEventListener('click', function (e) {
+    var b = e.target.closest('.choice'); if (!b) return;
+    this.querySelectorAll('.choice').forEach(function (c) { c.classList.remove('on'); });
+    b.classList.add('on');
+    neat = b.dataset.neat;
+    noteimg.src = noteSrcs[neat];
+    noteimg.alt = noteAlts[neat];
+  });
+
+  var ocrOutputs = {
+    neat: {
+      conf: "OCR complete · overall confidence 99%",
+      html: "<b>A Map of Where She Keeps Herself</b><br><br>There is a country made of her,<br>mapped out in light, not land;<br>its harbours hold her photographs,<br>its rivers, all she's planned.<br><br>Like every map, it keeps a key,<br>a legend no one reads;<br>four <span class=\"miss\" data-real=\"wandering\">wondering</span> words that walk its roads<br>are all the key she needs.<br><br>Old sailors wrote \"here dragons be\"<br>where charted waters end;<br>so sing the sirens off her coast,<br>each one a \"trusted friend\".<br><br>She cuts a different key for each,<br>no gate repeats its twin;<br>for one key lost to wreck or thief<br>would let the whole world in.<br><br>Two lighthouses guard her harbour mouth,<br>and both must know her name;<br>one light is fixed, one shifts with tide,<br>no pirate charts its flame.<br><br>She is cartographer and land,<br>the compass and the coast;<br>and what she guards with quiet keys<br>is what she loves the most.<br><br>And if you passed her window now<br>you'd see no coast, no keep;<br>just a woman at a small lit screen,<br>the house behind her asleep.<br><br>But watch her hands; she's whispering<br>four words the dark can't take,<br>and borders open, one by one,<br>and all her harbours wake.<br><br>So call it just a password, then,<br>the key to her machine;<br>but it opens the whole geography<br>of everywhere she's been.",
+      verdict: "<b>Near-perfect, and still worth a proofread.</b> One classic slip survived: \"wandering\" became \"wondering\"; a real word, confidently wrong, easy to miss."
+    },
+    rushed: {
+      conf: "OCR complete · overall confidence 91%",
+      html: "<b>A Map of Where She Keeps Herself</b><br><br>There is a country made of her,<br>mapped out in light, not land;<br>its harbours hold her photographs,<br>its rivers, all she's planned.<br><br>Like every map, it keeps a key,<br>a legend no one reads;<br>four <span class=\"miss\" data-real=\"wandering\">wondering</span> words that walk its roads<br>are all the key she needs.<br><br>Old sailors wrote \"here dragons be\"<br>where <span class=\"miss\" data-real=\"charted\">chartered</span> waters end;<br>so sing the sirens off her coast,<br>each one a \"trusted friend\".<br><br>She cuts a different key for each,<br><span class=\"miss\" data-real=\"no gate\">no date</span> repeats its twin;<br>for one key lost to <span class=\"miss\" data-real=\"wreck or thief\">wreck or their</span><br>would let the whole world in.<br><br>Two lighthouses guard her harbour mouth,<br>and both must know her name;<br>one light is fixed, one shifts <span class=\"miss\" data-real=\"with tide\">with time</span>,<br>no pirate charts its flame.<br><br>She is cartographer and land,<br>the compass and the coast;<br>and what she guards with quiet keys<br>is what she loves the most.<br><br>And if you passed her window now<br>you'd see no coast, no keep;<br>just a woman at a small lit screen,<br>the house behind her asleep.<br><br>But watch her hands; she's whispering<br>four words the dark can't take,<br>and borders open, one by one,<br>and all her harbours wake.<br><br>So call it just a password, then,<br>the key to her machine;<br>but it opens the whole <span class=\"miss\" data-real=\"geography\">geographer</span><br>of everywhere she's been.",
+      verdict: "<b>Still fluent, increasingly wrong.</b> \"No date repeats its twin\" and \"wreck or their\" read smoothly until you compare them with the page; hurried letter shapes get matched to the nearest common word."
+    },
+    scrawl: {
+      conf: "OCR complete · overall confidence 73%",
+      html: "<b>A Map of Where She Keeps Herself</b><br><br>There is a country made of her,<br>mapped out in light, not <span class=\"miss\" data-real=\"land (crossed out on the page)\">lond land</span>;<br>its harbours hold her photographs,<br>its rivers, all she's planned.<br><br>Like every map, it keeps a key,<br>a legend no one reads;<br>four <span class=\"miss\" data-real=\"wandering\">wondering</span> words that <span class=\"miss\" data-real=\"walk (underlined on the page)\">wall</span> its roads<br>are all the key she needs.<br><br>Old sailors wrote \"here dragons be\"<br>where charted waters <span class=\"miss\" data-real=\"end (a scribbled-out word sits before it)\">emdie end</span>;<br>so sing the <span class=\"miss\" data-real=\"sirens off her coast\">silence of her cast</span>,<br>each one a \"trusted friend\".<br><br><span class=\"miss\" data-real=\"She cuts\">She cats</span> a different key for each,<br>no gate repeats its twin;<br>for one key lost to wreck or <span class=\"gone\">[unclear]</span><br>would let the <span class=\"miss\" data-real=\"whole world\">whale world</span> in.<br><br>Two <span class=\"miss\" data-real=\"lighthouses\">light horses</span> guard her harbour mouth,<br>and both must know her name;<br>one light is fixed, <span class=\"miss\" data-real=\"one shifts with tide (a crossed-out word sits mid-line)\">on one shifts with tide</span>,<br>no pirate charts its flame.<br><br>She is <span class=\"miss\" data-real=\"cartographer\">photographer</span> and land,<br>the compass and <span class=\"gone\">[unclear]</span> coast;<br>and what she guards with quiet keys<br>is what she loves the <span class=\"miss\" data-real=\"most (underlined on the page)\">mast</span>.<br><br>And if you passed her window now<br>you'd see no coast, no keep;<br>just a woman at a small lit screen,<br>the house behind her asleep.<br><br>But watch her hands; she's <span class=\"miss\" data-real=\"whispering\">whimpering</span><br>four words the dark can't take,<br>and borders open, one by one,<br>and all her harbours <span class=\"miss\" data-real=\"wake (crossed out and re-written)\">woke</span>.<br><br>So call it just a password, <span class=\"gone\">[unclear]</span>,<br>the key to her machine;<br>but it opens the whole <span class=\"miss\" data-real=\"geography\">geometry</span><br>of <span class=\"miss\" data-real=\"everywhere (underlined on the page)\">every where</span> she's been.",
+      verdict: "<b>Now look at what tripped it.</b> The crossed-out corrections got half-read back in, the underlined words confused the letter shapes, the coffee stain simply erased words, and the cursive loops turned \"lighthouses\" into \"light horses\". Each kind of mess produces its own kind of error."
+    }
+  };
+  var ocrLogLines = [
+    '&gt; receiving image ... <span class="ok">done</span> (1 page, 3.1 MP)',
+    '&gt; step 1 · pixels: the page is now a grid of coloured dots',
+    '&gt; step 2 · <span class="term">segmentation</span>: finding lines ... <span class="ok">38 lines</span>, finding words ... <span class="ok">241 word shapes</span>',
+    '&gt; step 3 · <span class="term">recognition</span>: matching each shape to letters it saw in training',
+    '&gt; step 4 · language cleanup: a language model picks the most <span class="hmm">plausible</span> word for each shape',
+    '&gt; assembling text ... <span class="ok">done</span>'
+  ];
+  var ocrBusy = false;
+  document.getElementById('ocrGo').addEventListener('click', function () {
+    if (ocrBusy) return; ocrBusy = true;
+    var jp = document.getElementById('ocrJourneyPanel'),
+        pp = document.getElementById('ocrProcPanel'),
+        rp = document.getElementById('ocrResultPanel');
+    pp.style.display = 'none'; rp.style.display = 'none';
+    jp.style.display = 'block';
+    jp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    lightJourney(document.getElementById('ocrJourney'), function () {
+      pp.style.display = 'block';
+      pp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      playLog(document.getElementById('ocrLog'), ocrLogLines, function () {
+        var o = ocrOutputs[neat];
+        document.getElementById('ocrResult').innerHTML = '<span class="conf">' + o.conf + '</span>' + o.html;
+        document.getElementById('ocrVerdict').innerHTML = o.verdict;
+        rp.style.display = 'block';
+        rp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ocrBusy = false;
+      });
+    });
+  });
+  document.getElementById('ocrAgain').addEventListener('click', function () {
+    document.getElementById('handwriting').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  /* ---------- Part 2: voice ---------- */
+  var wave = document.getElementById('wave');
+  var heights = [30,55,80,45,95,60,35,75,50,90,40,65,85,45,70,30,60,95,50,75,40,85,55,65];
+  heights.forEach(function (h, i) {
+    var bar = document.createElement('i');
+    bar.style.height = h + '%';
+    bar.style.animationDelay = (i * 0.07) + 's';
+    wave.appendChild(bar);
+  });
+
+  var cond = 'clear';
+  document.getElementById('voiceChoices').addEventListener('click', function (e) {
+    var b = e.target.closest('.choice'); if (!b) return;
+    this.querySelectorAll('.choice').forEach(function (c) { c.classList.remove('on'); });
+    b.classList.add('on');
+    cond = b.dataset.cond;
+  });
+
+  var asrOutputs = {
+    clear: {
+      conf: 'Transcription complete · overall confidence 96%',
+      html: 'Hi team, quick note after this morning\'s site visit. We found eleven issues on the checklist, mostly minor ones. Can someone courier the paperwork to <span class="miss" data-real="Mr Przybylski">Mr Shabelski</span> by Thursday? Also the generator at the depot needs looking at. Thanks.',
+      verdict: '<b>Excellent, except the word that mattered.</b> Clear English sailed through; the surname got sounded out into something else entirely, because the model has rarely heard it.'
+    },
+    noisy: {
+      conf: 'Transcription complete · overall confidence 84%',
+      html: 'Hi team, quick note after this <span class="miss" data-real="morning\'s site visit">morning\'s night shift</span>. We found <span class="miss" data-real="eleven">seven</span> issues on the checklist, mostly minor ones. Can someone <span class="miss" data-real="courier the paperwork">carry the paper back</span> to <span class="gone">[inaudible]</span> by Thursday? Also the generator at the <span class="miss" data-real="depot">day port</span> needs looking at. Thanks.',
+      verdict: '<b>The background noise is winning.</b> "Carry the paper back", and notice a number changed silently from eleven to seven; the dangerous kind of error, because nothing about it looks wrong.'
+    },
+    two: {
+      conf: 'Transcription complete · overall confidence 77%',
+      html: 'Hi team, quick note after this morning\'s site visit. We found eleven <span class="miss" data-real="issues; [second speaker interrupts]">issues did you send the</span> on the checklist, mostly <span class="miss" data-real="minor ones">mine ones</span>. Can someone courier the <span class="gone">[crosstalk]</span> by Thursday? Also the <span class="miss" data-real="generator">generation</span> at the depot needs looking at. Thanks.',
+      verdict: '<b>Two voices, one transcript, no idea who said what.</b> Overlapping speech gets merged into a single stream; recordings with more than one speaker always need careful checking.'
+    }
+  };
+  var asrLogLines = [
+    '&gt; receiving audio ... <span class="ok">done</span> (0:19, m4a)',
+    '&gt; step 1 · the sound wave is sliced into tiny fragments, a few hundredths of a second each',
+    '&gt; step 2 · each slice is matched to <span class="term">sound units</span> (the building-block sounds of speech)',
+    '&gt; step 3 · sound units are assembled into the most <span class="hmm">likely</span> words, given the words around them',
+    '&gt; step 4 · punctuation and capitals are guessed and added at the end',
+    '&gt; assembling transcript ... <span class="ok">done</span>'
+  ];
+  var asrBusy = false;
+  document.getElementById('asrGo').addEventListener('click', function () {
+    if (asrBusy) return; asrBusy = true;
+    wave.classList.add('playing');
+    var pp = document.getElementById('asrProcPanel'),
+        rp = document.getElementById('asrResultPanel');
+    rp.style.display = 'none';
+    pp.style.display = 'block';
+    pp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    playLog(document.getElementById('asrLog'), asrLogLines, function () {
+      wave.classList.remove('playing');
+      var o = asrOutputs[cond];
+      document.getElementById('asrResult').innerHTML = '<span class="conf">' + o.conf + '</span>' + o.html;
+      document.getElementById('asrVerdict').innerHTML = o.verdict;
+      rp.style.display = 'block';
+      rp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      asrBusy = false;
+    });
+  });
+  document.getElementById('asrAgain').addEventListener('click', function () {
+    document.getElementById('voice').scrollIntoView({ behavior: 'smooth' });
+  });
+})();
+</script>
+
+</body>
+</html>

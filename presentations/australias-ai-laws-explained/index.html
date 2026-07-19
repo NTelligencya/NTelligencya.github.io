@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Australia's AI Laws: What's Coming &middot; Presentations &middot; NTell World Ink</title>
+<meta name="description" content="An explainer for non-lawyers and students: what the Prime Minister announced about AI legislation on 15 July 2026, why Australia has no dedicated AI Act yet, what the coming laws seem likely to cover, and how a press release becomes a law.">
+
+<!-- "AFTER DARK" design: ntworldink dark theme, teal + ochre accents. Headings: Cormorant Garamond. Scaffold shared with the How Scammers Fake It with AI deck. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --stage-bg: #050506;
+    --slide-bg: #0B0B0E;
+    --card: #131318;
+    --card-2: #17171D;
+    --line: #26262F;
+    --text: #ECEAE4;
+    --text-2: #B9B6AD;
+    --text-3: #7C796F;
+    --accent: #1AC9C9;          /* teal */
+    --accent-soft: #6FE3E3;
+    --accent-wash: rgba(26,201,201,0.08);
+    --warm: #E08A3C;            /* ochre */
+    --warm-wash: rgba(224,138,60,0.10);
+    --bad: #E05B4A;
+    --bad-wash: rgba(224,91,74,0.10);
+    --good: #4CC98A;
+    --good-wash: rgba(76,201,138,0.10);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Manrope', 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== FIXED 16:9 STAGE ===== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, svg { max-width: 100%; max-height: 100%; }
+a { color: var(--accent-soft); text-decoration: none; }
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .edit-toggle, .edit-hotzone { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===== SLIDE SCAFFOLD ===== */
+.topbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 62px;
+    background: #08080A; color: var(--text-2); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 24px; padding: 0 44px;
+    font: 500 18px var(--font-mono); letter-spacing: .06em; z-index: 3;
+}
+.topbar .chip {
+    background: var(--accent); color: #04211F; border-radius: 5px;
+    padding: 4px 14px; font-weight: 500; letter-spacing: .1em;
+}
+.topbar .chip.warm { background: var(--warm); color: #2A1503; }
+.topbar .chip.bad { background: var(--bad); color: #2B0C07; }
+.topbar .crumb { opacity: .8; }
+.topbar .sect { margin-left: auto; font-size: 15px; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); }
+
+.foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+    background: #08080A; border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 44px; z-index: 3;
+}
+.foot .brand { font: 700 22px var(--font-body); color: var(--text); letter-spacing: -0.01em; }
+.foot .brand .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 18px; letter-spacing: .08em; }
+.foot .pg { font: 500 17px var(--font-mono); letter-spacing: .12em; color: var(--text-3); }
+
+.body {
+    position: absolute; inset: 62px 120px 70px 120px;
+    display: flex; flex-direction: column; justify-content: center; z-index: 2;
+}
+.kicker { font: 500 19px var(--font-mono); letter-spacing: .28em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+.kicker.warm { color: var(--warm); }
+.kicker.bad { color: var(--bad); }
+h1 { font: 500 118px/1.02 var(--font-display); letter-spacing: -0.01em; color: var(--text); }
+h2 { font: 500 76px/1.06 var(--font-display); letter-spacing: -0.008em; color: var(--text); }
+h2 .hl { background: linear-gradient(transparent 64%, var(--accent-wash) 64%); color: var(--accent-soft); }
+h2 .hlw { background: linear-gradient(transparent 64%, var(--warm-wash) 64%); color: var(--warm); }
+.lede { font: 400 30px/1.55 var(--font-body); color: var(--text-2); max-width: 1360px; }
+.lede b { font-weight: 700; color: var(--text); }
+.muted { color: var(--text-3); }
+
+/* Cards */
+.dcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    border-top: 5px solid var(--accent);
+    padding: 38px 42px;
+}
+.dcard.warm { border-top-color: var(--warm); }
+.dcard.bad { border-top-color: var(--bad); }
+.dcard.good { border-top-color: var(--good); }
+.dcard .ctag { font: 500 16px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.dcard.warm .ctag { color: var(--warm); }
+.dcard.bad .ctag { color: var(--bad); }
+.dcard.good .ctag { color: var(--good); }
+.dcard h3 { font: 600 33px/1.2 var(--font-display); color: var(--text); margin-bottom: 14px; }
+.dcard p { font: 400 24px/1.5 var(--font-body); color: var(--text-2); }
+.dcard p b { font-weight: 700; color: var(--text); }
+
+/* Step rows */
+.rows { display: flex; flex-direction: column; }
+.row {
+    display: flex; align-items: center; gap: 34px; padding: 24px 12px;
+    border-bottom: 1px solid var(--line); font: 400 28px/1.45 var(--font-body); color: var(--text-2);
+}
+.row:last-child { border-bottom: none; }
+.row .n {
+    min-width: 58px; height: 58px; border-radius: 50%; flex: 0 0 58px;
+    background: var(--accent); color: #04211F;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 23px var(--font-mono);
+}
+.row .n.warm { background: var(--warm); color: #2A1503; }
+.row .n.bad { background: var(--bad); color: #2B0C07; }
+.row .n.good { background: var(--good); color: #06291A; }
+.row b { font-weight: 700; color: var(--text); }
+.row .tag { margin-left: auto; font: 500 16px var(--font-mono); letter-spacing: .12em; color: var(--accent-soft); background: var(--accent-wash); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Verdict strips */
+.strip { border-radius: 10px; padding: 26px 36px; font: 400 26px/1.5 var(--font-body); }
+.strip b { font-weight: 700; }
+.strip.good { background: var(--good-wash); border-left: 6px solid var(--good); color: #CDEBDB; }
+.strip.bad { background: var(--bad-wash); border-left: 6px solid var(--bad); color: #F2D4CE; }
+.strip.warn { background: var(--warm-wash); border-left: 6px solid var(--warm); color: #F0DCC6; }
+.strip.teal { background: var(--accent-wash); border-left: 6px solid var(--accent); color: #CFEDEA; }
+
+/* Story (vignette) slides */
+.story-tag {
+    display: inline-block; font: 500 17px var(--font-mono); letter-spacing: .24em; text-transform: uppercase;
+    color: var(--warm); border: 1px solid var(--warm); border-radius: 999px; padding: 10px 26px; margin-bottom: 40px;
+}
+.story {
+    font: 400 46px/1.45 var(--font-display); font-style: italic; color: var(--text);
+    max-width: 1500px;
+}
+.story b { font-weight: 600; color: var(--warm); font-style: normal; }
+.story-close { font: 400 30px/1.5 var(--font-body); color: var(--text-2); margin-top: 44px; max-width: 1400px; }
+.story-close b { color: var(--text); font-weight: 700; }
+
+/* Stat tiles */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 40px 42px; border-top: 5px solid var(--warm);
+}
+.stat .big { font: 600 84px/1 var(--font-display); color: var(--warm); margin-bottom: 16px; }
+.stat .lbl { font: 400 23px/1.45 var(--font-body); color: var(--text-2); }
+.stat .lbl b { color: var(--text); font-weight: 700; }
+
+/* Message mock */
+.msgbox {
+    background: var(--card); border: 1px dashed var(--line); border-radius: 12px;
+    font: 400 24px/1.6 var(--font-mono); color: var(--text-2); padding: 30px 34px;
+}
+.msgbox .from { color: var(--warm); font-size: 18px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+
+.cite { font: 400 17px/1.6 var(--font-mono); color: var(--text-3); letter-spacing: .02em; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; }
+
+/* Reveal animation */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.r1 { transition-delay: .08s; } .r2 { transition-delay: .2s; } .r3 { transition-delay: .32s; }
+.r4 { transition-delay: .44s; } .r5 { transition-delay: .56s; } .r6 { transition-delay: .68s; }
+.r7 { transition-delay: .8s; }
+
+/* Edit affordance */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 90px; height: 90px; z-index: 1200; }
+.edit-toggle {
+    position: fixed; top: 74px; left: 18px; z-index: 1201; width: 44px; height: 44px;
+    border-radius: 10px; border: 1px solid var(--line); background: rgba(19,19,24,.9); color: var(--text);
+    font: 600 15px var(--font-mono); cursor: pointer; opacity: 0; transition: opacity .3s;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; }
+body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+    <!-- ===== SLIDE 1 : TITLE ===== -->
+    <section class="slide" aria-label="Title">
+        <div class="topbar"><span class="chip">EXPLAINER</span><span class="crumb">ntworldink.com</span><span class="sect">July 2026</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="kicker reveal r1">Civics &amp; AI Literacy &middot; An Explainer for Non-Lawyers</div>
+            <h1 class="reveal r2">Australia's AI Laws:<br>What's Coming</h1>
+            <p class="lede reveal r3" style="margin-top:36px;font-size:34px;font-style:italic;font-family:var(--font-display)">What the Prime Minister announced on 15 July 2026, what it might become, and how a press release turns into a law.</p>
+            <p class="lede muted reveal r4" style="margin-top:24px;font-size:23px">General information for students and community, not legal advice.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">01 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 2 : THE BASELINE ===== -->
+    <section class="slide" aria-label="The baseline">
+        <div class="topbar"><span class="chip">EXPLAINER</span><span class="crumb">where we start from</span><span class="sect">The baseline</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">First, the surprising baseline</div>
+            <h2 class="reveal r2">As of July 2026, Australia has <span class="hlw">no dedicated AI law</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">Elsewhere</div><h3>The EU has an AI Act</h3><p>The European Union passed a dedicated, risk-based AI Act in 2024, with its rules phasing in over several years. It is the reference point most countries compare themselves against.</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">Here</div><h3>Australia: existing laws only</h3><p>AI in Australia is governed by the general laws that already exist: privacy, consumer protection, copyright, defamation. <b>There is no single Act written for AI itself.</b> That is what is now set to change.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>Why that matters:</b> when a new technology arrives faster than the law, the gaps get worked out in courtrooms and headlines. Legislation is how a country closes the gaps on its own terms.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">02 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 3 : WHAT WAS ANNOUNCED ===== -->
+    <section class="slide" aria-label="What was announced">
+        <div class="topbar"><span class="chip">15 JULY 2026</span><span class="crumb">the announcement</span><span class="sect">The announcement</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">What was announced, 15 July 2026</div>
+            <h2 class="reveal r2">"Australian Standards for AI":<br>one <span class="hl">national framework</span></h2>
+            <div class="rows" style="margin-top:40px;max-width:1640px">
+                <div class="row reveal r3"><span class="n">1</span><span>A single, national regulatory framework for AI, described as <b>"clear, consistent and mandatory"</b></span></div>
+                <div class="row reveal r4"><span class="n">2</span><span>An <b>Office of AI</b>, established immediately inside the Department of the Prime Minister and Cabinet, to coordinate design across every minister and department</span></div>
+                <div class="row reveal r5"><span class="n">3</span><span><b>National Cabinet</b> (the premiers and chief ministers) asked to agree the approach in August 2026</span></div>
+                <div class="row reveal r6"><span class="n">4</span><span>Legislation aimed at Parliament <b>early 2027</b></span></div>
+            </div>
+            <p class="cite reveal r7" style="margin-top:34px">Source: Prime Minister's address at the University of Sydney, 15 July 2026 (pm.gov.au). Full link on the final slide.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">03 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 4 : WHY LEGISLATE TECHNOLOGY ===== -->
+    <section class="slide" aria-label="Why legislate technology at all">
+        <div class="topbar"><span class="chip">EXPLAINER</span><span class="crumb">why laws chase technology</span><span class="sect">Why legislate?</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Step back: why does technology need laws at all?</div>
+            <h2 class="reveal r2">New technology outgrows old rules; <span class="hl">it always has</span></h2>
+            <div class="rows" style="margin-top:40px;max-width:1640px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>The industrial revolution</b> reshaped work; the eight-hour day and minimum wage were the legal answer</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Civil aviation</b> in the 1920s and <b>genetics</b> in the 1990s each needed coordinated national rules; the PM cited both as precedents</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Social media</b>: Australia's under-16 ban, announced in 2024, was called radical; more than 20 nations have since implemented or begun implementing age restrictions</span></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:40px"><b>The pattern:</b> a technology arrives, its benefits and harms outgrow the existing law, and eventually parliament writes rules for it specifically. The argument in the speech is that with AI, Australia should write the rules early rather than late.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">04 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 5 : PILLAR 1, CREATIVE WORKS ===== -->
+    <section class="slide" aria-label="Pillar one: creative works">
+        <div class="topbar"><span class="chip warm">PILLAR 1</span><span class="crumb">artists and media</span><span class="sect">Creative works</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">What it seems the laws will cover &middot; 1</div>
+            <h2 class="reveal r2">Australian creative works:<br><span class="hlw">"Anything less, is theft"</span></h2>
+            <p class="lede reveal r3" style="margin-top:34px">The strongest, clearest commitment in the speech. In the PM's words:</p>
+            <div class="dcard warm reveal r4" style="margin-top:28px;max-width:1560px"><p style="font-size:29px;line-height:1.55;font-style:italic;font-family:var(--font-display)">"Australian writers, musicians, artists and journalists must retain ownership and control of their work. Our laws will spell that out, plain as day... No company should use Australian books, music, art or news to build or train AI without the artist's control. That includes the artist's control of the price and value of their work. Anything less, is theft."</p></div>
+            <p class="lede reveal r5" style="margin-top:34px">What that seems to mean: <b>consent and control over AI training use, including price.</b> The speech also concedes "no country has got this right yet"; the detail is still to be designed.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">05 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 6 : PILLAR 2, SOVEREIGNTY ===== -->
+    <section class="slide" aria-label="Pillar two: sovereignty">
+        <div class="topbar"><span class="chip warm">PILLAR 2</span><span class="crumb">sovereignty and data</span><span class="sect">Sovereignty</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">What it seems the laws will cover &middot; 2</div>
+            <h2 class="reveal r2">Sovereignty: not just <span class="hlw">"a data warehouse"</span> for others</h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">The worry named</div><h3>Dependence is vulnerability</h3><p>The speech warns against "subcontracting our sovereignty and security to the control of foreign monopolies" and being "the last link of the digital supply chain"; it cites keeping the NBN in public hands as the precedent.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">The ambition</div><h3>Build capability here</h3><p>Attracting AI development, skills and investment onshore, so Australia has "more of a stake in where AI is made, and how it is made"; sovereignty over data, infrastructure and capability as a running theme.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:40px"><b>A precise note:</b> the speech never uses the phrase "data sovereignty" as a term. The theme is sovereignty over data, infrastructure and capability. For Indigenous Data Sovereignty specifically, see the ICIP resource library; it is a related but distinct body of work.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">06 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 7 : PILLAR 3, DATA CENTRES ===== -->
+    <section class="slide" aria-label="Pillar three: data centres">
+        <div class="topbar"><span class="chip warm">PILLAR 3</span><span class="crumb">data centres</span><span class="sect">Data centres</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">What it seems the laws will cover &middot; 3</div>
+            <h2 class="reveal r2">Data centres: rules on <span class="hlw">location, power and water</span></h2>
+            <div class="grid3" style="margin-top:44px">
+                <div class="dcard reveal r3"><div class="ctag">Location</div><h3>Room to build</h3><p>Sited so they do not compete with new housing; "we have a continent to ourselves" is the advantage claimed.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Energy</div><h3>Net-generators</h3><p>A legal obligation to underwrite new renewable power, pay full grid-connection costs, and put at least as much energy into the grid as they take out.</p></div>
+                <div class="dcard reveal r5"><div class="ctag">Water</div><h3>The driest continent</h3><p>Minimise water use, maximise efficiency, and pay for any additional water infrastructure required.</p></div>
+            </div>
+            <p class="lede reveal r6" style="margin-top:40px">The speech claims Australia would be <b>"the first country in the world to bring these issues into a single, national framework."</b> AI needs a physical footprint; that footprint is the leverage.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">07 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 8 : WHAT WAS NOT ANNOUNCED ===== -->
+    <section class="slide" aria-label="What was not announced">
+        <div class="topbar"><span class="chip bad">READ CAREFULLY</span><span class="crumb">what was not announced</span><span class="sect">The gaps</span></div>
+        <div class="body">
+            <div class="kicker bad reveal r1">Just as important: what was not announced</div>
+            <h2 class="reveal r2">A speech is a map, <span class="hl">not the road</span></h2>
+            <div class="rows" style="margin-top:40px;max-width:1640px">
+                <div class="row reveal r3"><span class="n bad">&middot;</span><span><b>No bill text exists yet.</b> Nothing announced is law today, and none of it binds anyone yet</span></div>
+                <div class="row reveal r4"><span class="n bad">&middot;</span><span><b>No detail</b> on enforcement, penalties, which regulator polices what, or exactly how artist consent would work in practice</span></div>
+                <div class="row reveal r5"><span class="n bad">&middot;</span><span>The speech itself says the goal is <b>not</b> "to legislate for every possible eventuality or risk"; this will be a flexible framework, not an EU-style rulebook</span></div>
+                <div class="row reveal r6"><span class="n bad">&middot;</span><span>Legal commentators note the hardest copyright and data centre decisions are <b>still to be made</b> through consultation</span></div>
+            </div>
+            <div class="strip bad reveal r7" style="margin-top:38px"><b>The literacy habit:</b> when you read "the government will...", ask "has Parliament voted yet?" Between announcement and law sits every step on the next slide.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">08 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 9 : HOW A LAW GETS MADE ===== -->
+    <section class="slide" aria-label="How a law gets made">
+        <div class="topbar"><span class="chip">CIVICS</span><span class="crumb">press release to law</span><span class="sect">How laws pass</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The civics bit, in one slide</div>
+            <h2 class="reveal r2" style="font-size:64px">How a press release becomes a law</h2>
+            <div class="rows" style="margin-top:34px;max-width:1660px;font-size:25px">
+                <div class="row reveal r3" style="padding:17px 12px"><span class="n">1</span><span><b>Announcement and consultation.</b> Government signals intent, negotiates with states (National Cabinet), industry and community</span></div>
+                <div class="row reveal r4" style="padding:17px 12px"><span class="n">2</span><span><b>Drafting.</b> Lawyers turn policy into a bill; often an "exposure draft" is released for public comment first</span></div>
+                <div class="row reveal r5" style="padding:17px 12px"><span class="n">3</span><span><b>Parliament.</b> The bill is introduced, debated, usually examined by a committee, amended, and must pass <b>both</b> the House and the Senate</span></div>
+                <div class="row reveal r6" style="padding:17px 12px"><span class="n">4</span><span><b>Royal assent.</b> The Governor-General signs; the bill becomes an Act</span></div>
+                <div class="row reveal r7" style="padding:17px 12px"><span class="n">5</span><span><b>Commencement.</b> The Act takes effect, sometimes in stages over months or years; regulations fill in the fine detail</span></div>
+            </div>
+            <p class="lede muted reveal r7" style="margin-top:28px;font-size:24px">At every step the content can change; and a government without a Senate majority must negotiate to pass anything.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">09 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 10 : WHAT TO EXPECT WHEN ===== -->
+    <section class="slide" aria-label="What to expect and when">
+        <div class="topbar"><span class="chip">CIVICS</span><span class="crumb">the likely timeline</span><span class="sect">Timeline</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Expectations, not promises</div>
+            <h2 class="reveal r2">What to <span class="hl">watch for, and when</span></h2>
+            <div class="rows" style="margin-top:40px;max-width:1640px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>August 2026</b>: National Cabinet asked to agree the approach</span><span class="tag">ANNOUNCED</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Late 2026</b>: consultation with industry, trading partners and community; drafting</span><span class="tag">EXPECTED</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Early 2027</b>: legislation introduced to Parliament</span><span class="tag">ANNOUNCED AIM</span></div>
+                <div class="row reveal r6"><span class="n">&middot;</span><span><b>After passage</b>: commencement, possibly phased, plus regulations with the fine detail</span><span class="tag">TYPICAL</span></div>
+            </div>
+            <div class="strip warn reveal r7" style="margin-top:40px"><b>A calibration note:</b> announced legislative timelines slip routinely, for good reasons and bad. Treat every date after August 2026 as an intention.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">10 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 11 : WHO IS DOING WHAT ===== -->
+    <section class="slide" aria-label="Who is doing what">
+        <div class="topbar"><span class="chip">CIVICS</span><span class="crumb">the machinery</span><span class="sect">Who does what</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The machinery behind it</div>
+            <h2 class="reveal r2">One office, <span class="hl">many ministers</span></h2>
+            <p class="lede reveal r3" style="margin-top:32px">AI touches every portfolio, which is why coordination was the announcement's centrepiece. From the speech:</p>
+            <div class="rows" style="margin-top:30px;max-width:1660px;font-size:25px">
+                <div class="row reveal r4" style="padding:16px 12px"><span class="n">&middot;</span><span><b>Office of AI</b> (PM's department) coordinates, working with the Industry and Innovation Minister and the Assistant Minister for the Digital Economy</span></div>
+                <div class="row reveal r5" style="padding:16px 12px"><span class="n">&middot;</span><span><b>Attorney-General</b>: copyright and artist protections &middot; <b>Energy Minister</b>: data centre rules with the states</span></div>
+                <div class="row reveal r6" style="padding:16px 12px"><span class="n">&middot;</span><span><b>Treasurer</b>: productivity &middot; <b>Employment Minister</b>: AI in the workplace &middot; <b>Education Minister</b>: AI in schools &middot; <b>Home Affairs and Defence</b>: security, disinformation and the Five Eyes partnership</span></div>
+            </div>
+            <p class="lede muted reveal r7" style="margin-top:32px">Useful to know when you want a say: submissions go to whichever consultation matches your concern; artists to the Attorney-General's copyright process, for instance.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">11 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 12 : WHAT IT MEANS FOR YOU ===== -->
+    <section class="slide" aria-label="What it could mean for you">
+        <div class="topbar"><span class="chip">SO WHAT?</span><span class="crumb">researchers, artists, community</span><span class="sect">For you</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">What it could mean, depending on who you are</div>
+            <h2 class="reveal r2">Why this is worth <span class="hl">watching from the NT</span></h2>
+            <div class="grid3" style="margin-top:44px">
+                <div class="dcard reveal r3"><div class="ctag">Artists &amp; creators</div><h3>Consent and price</h3><p>If the commitment survives into law, using Australian creative work to train AI would require the creator's control, including over price. Watch the copyright consultation closely.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Researchers</div><h3>The ICIP intersection</h3><p>The announcement is silent on Indigenous Cultural and Intellectual Property specifically. Whether ICIP and Indigenous Data Sovereignty principles are built in is a question for the consultation phase; and a reason to be in it.</p></div>
+                <div class="dcard reveal r5"><div class="ctag">Community</div><h3>Trust and recourse</h3><p>A single framework could mean clearer complaint pathways when AI is misused; today's patchwork makes "who do I complain to?" genuinely hard to answer.</p></div>
+            </div>
+            <p class="lede reveal r6" style="margin-top:40px">"You do not need to be an expert in AI to have a say or a stake in it. <b>We are all involved.</b>" That line from the speech is the invitation; consultations are public.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">12 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 13 : KEEP WATCHING ===== -->
+    <section class="slide" aria-label="Keep watching">
+        <div class="topbar"><span class="chip">KEEP WATCHING</span><span class="crumb">where to follow it</span><span class="sect">Follow it</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Follow it as it happens</div>
+            <h2 class="reveal r2">Where to <span class="hl">keep up</span> as this becomes law</h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">Primary sources</div><h3>Go straight to the source</h3><p><a href="https://www.pm.gov.au/media/ai-australias-interests-0">The full 15 July 2026 address</a> (pm.gov.au)<br><a href="https://www.aph.gov.au/">Australian Parliament House</a>: bills, committees and hearings once legislation is introduced</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Context</div><h3>Related reading on this site</h3><p><a href="/alice-springs-arn/icip-resource-library.html">The ICIP and Data Sovereignty resource library</a>: the Indigenous data governance frameworks this legislation will sit alongside<br><a href="/presentations/">More presentations</a></p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:42px"><b>One more time, because it matters:</b> nothing announced on 15 July 2026 is law yet. This deck describes an intention, dated July 2026; check the primary sources for what has happened since.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">13 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 14 : SOURCES ===== -->
+    <section class="slide" aria-label="Sources">
+        <div class="topbar"><span class="chip">SOURCES</span><span class="crumb">where this comes from</span><span class="sect">References</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Sources used</div>
+            <h2 class="reveal r2" style="font-size:62px">Where this deck's claims come from</h2>
+            <div class="rows reveal r3" style="margin-top:38px;max-width:1680px">
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>Prime Minister Anthony Albanese, <b>address at the University of Sydney</b>, 15 July 2026; all quotes are from the published text: <a href="https://www.pm.gov.au/media/ai-australias-interests-0">pm.gov.au/media/ai-australias-interests-0</a></span></div>
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>Gadens, <b>"Prime Minister announces national AI regulation: key takeaways"</b>, 16 July 2026: <a href="https://www.gadens.com/legal-insights/prime-minister-announces-national-ai-regulation-key-takeaways-for-investors-developers-and-operators/">gadens.com</a> (source for the "no dedicated AI Act" comparison and the unsettled-detail caveat)</span></div>
+                <div class="row" style="font-size:23px;padding:18px 12px"><span><b>EU Artificial Intelligence Act</b>, Regulation (EU) 2024/1689, in force since 2024 with phased application: <a href="https://artificialintelligenceact.eu/">artificialintelligenceact.eu</a></span></div>
+            </div>
+            <p class="lede muted reveal r4" style="margin-top:36px;font-size:24px">This presentation is general information for education, prepared July 2026. It is not legal advice; for legal questions about AI and your work, speak to a qualified lawyer.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>Explainers</small></span><span class="pg">14 / 14</span></div>
+    </section>
+
+</main>
+</div>
+
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">ED</button>
+
+<script>
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.wheelLock = false;
+        this.setupStageScale(); this.setupKeyboardNav(); this.setupWheelNav(); this.setupTouchNav();
+        this.showSlide(0);
+    }
+    setupStageScale() {
+        const scale = () => {
+            const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * f) / 2, y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale(); window.addEventListener('resize', scale);
+    }
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (document.body.classList.contains('editing') || e.target.isContentEditable) return;
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.showSlide(0); break;
+                case 'End': e.preventDefault(); this.showSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+    setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (this.wheelLock || Math.abs(e.deltaY) < 12) return;
+            this.wheelLock = true;
+            e.deltaY > 0 ? this.next() : this.prev();
+            setTimeout(() => { this.wheelLock = false; }, 650);
+        }, { passive: true });
+    }
+    setupTouchNav() {
+        let sx = 0, sy = 0;
+        window.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchend', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? this.next() : this.prev();
+        }, { passive: true });
+    }
+    next() { this.showSlide(this.currentSlide + 1); }
+    prev() { this.showSlide(this.currentSlide - 1); }
+    showSlide(i) {
+        this.currentSlide = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.slides.forEach((s, k) => {
+            s.classList.toggle('active', k === this.currentSlide);
+            s.classList.toggle('visible', k === this.currentSlide);
+        });
+    }
+}
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storeKey = 'ai-laws-explained-deck-edits-v1';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.hotzone = document.getElementById('editHotzone');
+        this.restore(); this.wire();
+    }
+    wire() {
+        let t = null;
+        const show = () => { clearTimeout(t); this.toggleBtn.classList.add('show'); };
+        const hide = () => { t = setTimeout(() => { if (!this.isActive) this.toggleBtn.classList.remove('show'); }, 400); };
+        this.hotzone.addEventListener('mouseenter', show); this.hotzone.addEventListener('mouseleave', hide);
+        this.toggleBtn.addEventListener('mouseenter', show); this.toggleBtn.addEventListener('mouseleave', hide);
+        this.hotzone.addEventListener('click', () => this.toggle()); this.toggleBtn.addEventListener('click', () => this.toggle());
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable && !e.metaKey && !e.ctrlKey) this.toggle();
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.download(); }
+        });
+        document.getElementById('deckStage').addEventListener('input', () => this.save());
+    }
+    toggle() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('show', true);
+        document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide .row span:not(.n), .slide .crumb, .slide .strip, .slide .kicker, .slide .story, .slide .story-close, .slide .stat .big, .slide .stat .lbl, .slide .msgbox')
+            .forEach(el => { this.isActive ? el.setAttribute('contenteditable', 'true') : el.removeAttribute('contenteditable'); });
+    }
+    save() {
+        const d = [...document.querySelectorAll('.slide')].map(s => s.innerHTML);
+        try { localStorage.setItem(this.storeKey, JSON.stringify(d)); } catch (e) {}
+    }
+    restore() {
+        try {
+            const d = JSON.parse(localStorage.getItem(this.storeKey) || 'null');
+            if (!d) return;
+            const s = document.querySelectorAll('.slide');
+            if (d.length === s.length) s.forEach((sl, i) => { sl.innerHTML = d[i]; });
+        } catch (e) {}
+    }
+    download() {
+        const c = document.documentElement.cloneNode(true);
+        c.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        c.querySelectorAll('body').forEach(b => b.classList.remove('editing'));
+        const blob = new Blob(['<!DOCTYPE html>\n' + c.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'australias-ai-laws-explained.html'; a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+new SlidePresentation(); new InlineEditor();
+</script>
+</body>
+</html>
