@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Scammers Fake It with AI &middot; Alice Springs ARN &middot; NTell World Ink</title>
+<meta name="description" content="A browser-based presentation for the Alice Springs Aboriginal Researcher Network: how scammers use AI to clone voices, fake videos and spoof websites, the fake online casino scams targeting NT communities, and what to do about all of it.">
+
+<!-- "AFTER DARK" design: ntworldink dark theme, teal + ochre accents. Headings: Cormorant Garamond -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --stage-bg: #050506;
+    --slide-bg: #0B0B0E;
+    --card: #131318;
+    --card-2: #17171D;
+    --line: #26262F;
+    --text: #ECEAE4;
+    --text-2: #B9B6AD;
+    --text-3: #7C796F;
+    --accent: #1AC9C9;          /* teal */
+    --accent-soft: #6FE3E3;
+    --accent-wash: rgba(26,201,201,0.08);
+    --warm: #E08A3C;            /* ochre */
+    --warm-wash: rgba(224,138,60,0.10);
+    --bad: #E05B4A;
+    --bad-wash: rgba(224,91,74,0.10);
+    --good: #4CC98A;
+    --good-wash: rgba(76,201,138,0.10);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Manrope', 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== FIXED 16:9 STAGE ===== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, svg { max-width: 100%; max-height: 100%; }
+a { color: var(--accent-soft); text-decoration: none; }
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .edit-toggle, .edit-hotzone { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===== SLIDE SCAFFOLD ===== */
+.topbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 62px;
+    background: #08080A; color: var(--text-2); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 24px; padding: 0 44px;
+    font: 500 18px var(--font-mono); letter-spacing: .06em; z-index: 3;
+}
+.topbar .chip {
+    background: var(--accent); color: #04211F; border-radius: 5px;
+    padding: 4px 14px; font-weight: 500; letter-spacing: .1em;
+}
+.topbar .chip.warm { background: var(--warm); color: #2A1503; }
+.topbar .chip.bad { background: var(--bad); color: #2B0C07; }
+.topbar .crumb { opacity: .8; }
+.topbar .sect { margin-left: auto; font-size: 15px; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); }
+
+.foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+    background: #08080A; border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 44px; z-index: 3;
+}
+.foot .brand { font: 700 22px var(--font-body); color: var(--text); letter-spacing: -0.01em; }
+.foot .brand .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 18px; letter-spacing: .08em; }
+.foot .pg { font: 500 17px var(--font-mono); letter-spacing: .12em; color: var(--text-3); }
+
+.body {
+    position: absolute; inset: 62px 120px 70px 120px;
+    display: flex; flex-direction: column; justify-content: center; z-index: 2;
+}
+.kicker { font: 500 19px var(--font-mono); letter-spacing: .28em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+.kicker.warm { color: var(--warm); }
+.kicker.bad { color: var(--bad); }
+h1 { font: 500 118px/1.02 var(--font-display); letter-spacing: -0.01em; color: var(--text); }
+h2 { font: 500 76px/1.06 var(--font-display); letter-spacing: -0.008em; color: var(--text); }
+h2 .hl { background: linear-gradient(transparent 64%, var(--accent-wash) 64%); color: var(--accent-soft); }
+h2 .hlw { background: linear-gradient(transparent 64%, var(--warm-wash) 64%); color: var(--warm); }
+.lede { font: 400 30px/1.55 var(--font-body); color: var(--text-2); max-width: 1360px; }
+.lede b { font-weight: 700; color: var(--text); }
+.muted { color: var(--text-3); }
+
+/* Cards */
+.dcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    border-top: 5px solid var(--accent);
+    padding: 38px 42px;
+}
+.dcard.warm { border-top-color: var(--warm); }
+.dcard.bad { border-top-color: var(--bad); }
+.dcard.good { border-top-color: var(--good); }
+.dcard .ctag { font: 500 16px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.dcard.warm .ctag { color: var(--warm); }
+.dcard.bad .ctag { color: var(--bad); }
+.dcard.good .ctag { color: var(--good); }
+.dcard h3 { font: 600 33px/1.2 var(--font-display); color: var(--text); margin-bottom: 14px; }
+.dcard p { font: 400 24px/1.5 var(--font-body); color: var(--text-2); }
+.dcard p b { font-weight: 700; color: var(--text); }
+
+/* Step rows */
+.rows { display: flex; flex-direction: column; }
+.row {
+    display: flex; align-items: center; gap: 34px; padding: 24px 12px;
+    border-bottom: 1px solid var(--line); font: 400 28px/1.45 var(--font-body); color: var(--text-2);
+}
+.row:last-child { border-bottom: none; }
+.row .n {
+    min-width: 58px; height: 58px; border-radius: 50%; flex: 0 0 58px;
+    background: var(--accent); color: #04211F;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 23px var(--font-mono);
+}
+.row .n.warm { background: var(--warm); color: #2A1503; }
+.row .n.bad { background: var(--bad); color: #2B0C07; }
+.row .n.good { background: var(--good); color: #06291A; }
+.row b { font-weight: 700; color: var(--text); }
+.row .tag { margin-left: auto; font: 500 16px var(--font-mono); letter-spacing: .12em; color: var(--accent-soft); background: var(--accent-wash); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Verdict strips */
+.strip { border-radius: 10px; padding: 26px 36px; font: 400 26px/1.5 var(--font-body); }
+.strip b { font-weight: 700; }
+.strip.good { background: var(--good-wash); border-left: 6px solid var(--good); color: #CDEBDB; }
+.strip.bad { background: var(--bad-wash); border-left: 6px solid var(--bad); color: #F2D4CE; }
+.strip.warn { background: var(--warm-wash); border-left: 6px solid var(--warm); color: #F0DCC6; }
+.strip.teal { background: var(--accent-wash); border-left: 6px solid var(--accent); color: #CFEDEA; }
+
+/* Story (vignette) slides */
+.story-tag {
+    display: inline-block; font: 500 17px var(--font-mono); letter-spacing: .24em; text-transform: uppercase;
+    color: var(--warm); border: 1px solid var(--warm); border-radius: 999px; padding: 10px 26px; margin-bottom: 40px;
+}
+.story {
+    font: 400 46px/1.45 var(--font-display); font-style: italic; color: var(--text);
+    max-width: 1500px;
+}
+.story b { font-weight: 600; color: var(--warm); font-style: normal; }
+.story-close { font: 400 30px/1.5 var(--font-body); color: var(--text-2); margin-top: 44px; max-width: 1400px; }
+.story-close b { color: var(--text); font-weight: 700; }
+
+/* Stat tiles */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 40px 42px; border-top: 5px solid var(--warm);
+}
+.stat .big { font: 600 84px/1 var(--font-display); color: var(--warm); margin-bottom: 16px; }
+.stat .lbl { font: 400 23px/1.45 var(--font-body); color: var(--text-2); }
+.stat .lbl b { color: var(--text); font-weight: 700; }
+
+/* Message mock */
+.msgbox {
+    background: var(--card); border: 1px dashed var(--line); border-radius: 12px;
+    font: 400 24px/1.6 var(--font-mono); color: var(--text-2); padding: 30px 34px;
+}
+.msgbox .from { color: var(--warm); font-size: 18px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+
+.cite { font: 400 17px/1.6 var(--font-mono); color: var(--text-3); letter-spacing: .02em; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; }
+
+/* Reveal animation */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.r1 { transition-delay: .08s; } .r2 { transition-delay: .2s; } .r3 { transition-delay: .32s; }
+.r4 { transition-delay: .44s; } .r5 { transition-delay: .56s; } .r6 { transition-delay: .68s; }
+.r7 { transition-delay: .8s; }
+
+/* Edit affordance */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 90px; height: 90px; z-index: 1200; }
+.edit-toggle {
+    position: fixed; top: 74px; left: 18px; z-index: 1201; width: 44px; height: 44px;
+    border-radius: 10px; border: 1px solid var(--line); background: rgba(19,19,24,.9); color: var(--text);
+    font: 600 15px var(--font-mono); cursor: pointer; opacity: 0; transition: opacity .3s;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; }
+body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+    <!-- ===== SLIDE 1 : TITLE ===== -->
+    <section class="slide" aria-label="Title">
+        <div class="topbar"><span class="chip">REAL OR FAKE?</span><span class="crumb">ntworldink.com</span><span class="sect">Alice Springs ARN</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="kicker reveal r1">Alice Springs Aboriginal Researcher Network &middot; AI &amp; Cyber Safety</div>
+            <h1 class="reveal r2">How Scammers<br>Fake It with AI</h1>
+            <p class="lede reveal r3" style="margin-top:36px;font-size:34px;font-style:italic;font-family:var(--font-display)">Now you're the experts; what do you think they do?</p>
+            <p class="lede muted reveal r4" style="margin-top:24px;font-size:25px">Cloned voices, fake videos, spoofed websites, and the scam aimed at NT communities right now.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">01 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 2 : YOU ARE THE EXPERTS ===== -->
+    <section class="slide" aria-label="Now you are the experts">
+        <div class="topbar"><span class="chip">REAL OR FAKE?</span><span class="crumb">think like a scammer</span><span class="sect">Warm-up</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">You just did all of this yourself</div>
+            <h2 class="reveal r2">You made AI write. You made AI paint.<br><span class="hl">So what would a scammer make?</span></h2>
+            <div class="grid3" style="margin-top:52px">
+                <div class="dcard reveal r3"><div class="ctag">You saw</div><h3>Text prediction</h3><p>AI writes anything, in any style, in any voice, instantly; you watched it guess the next word.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">You saw</div><h3>Image generation</h3><p>Everyone typed the same prompt and got a different crocodile. Pictures of things that never happened.</p></div>
+                <div class="dcard warm reveal r5"><div class="ctag">Now discuss</div><h3>Your turn</h3><p>If you had these tools and no conscience, <b>what would you build to take someone's money?</b></p></div>
+            </div>
+            <p class="lede reveal r6" style="margin-top:44px">Whatever the room just suggested; <b>they already sell it as a service.</b></p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">02 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 3 : WHAT THEY BUILD IS TRUST ===== -->
+    <section class="slide" aria-label="What scammers build is trust">
+        <div class="topbar"><span class="chip">REAL OR FAKE?</span><span class="crumb">the toolkit</span><span class="sect">Overview</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The answer</div>
+            <h2 class="reveal r2">Scammers don't build tricks.<br>They build <span class="hlw">trust</span>.</h2>
+            <p class="lede reveal r3" style="margin-top:36px">Scams succeed because they look and sound like the real thing. AI makes the real thing cheap to copy. Tonight, four fakes:</p>
+            <div class="rows reveal r4" style="margin-top:36px;max-width:1560px">
+                <div class="row"><span class="n">1</span><span><b>A voice you know</b>, on the phone, saying words it never said</span></div>
+                <div class="row"><span class="n">2</span><span><b>A face you trust</b>, on video, endorsing something fake</span></div>
+                <div class="row"><span class="n">3</span><span><b>A website that looks real</b>, showing you numbers that are drawn on the screen</span></div>
+                <div class="row"><span class="n warm">4</span><span><b>A game that looks like fun</b>; the fake casino scam moving through NT communities right now</span></div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">03 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 4 : VOICE CLONING ===== -->
+    <section class="slide" aria-label="Voice cloning">
+        <div class="topbar"><span class="chip">FAKE 1</span><span class="crumb">voices</span><span class="sect">Voice cloning</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Fake 1 &middot; A voice you know</div>
+            <h2 class="reveal r2">A few seconds of audio is enough to <span class="hl">clone a voice</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">Where they get the voice</div><h3>You already published it</h3><p>A birthday video on Facebook. A voicemail greeting. A TikTok. A few seconds of clear speech is all the software needs, and most of us have posted years of it.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">What they do with it</div><h3>It says anything, live</h3><p>The cloned voice can speak any words the scammer types, in real time, on a phone call. It laughs, hesitates and sounds stressed on demand.</p></div>
+            </div>
+            <div class="strip warn reveal r5" style="margin-top:44px"><b>The voice is no longer proof of who is talking.</b> That is a hard sentence to accept about someone you love, and it is now simply true.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">04 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 5 : VIGNETTE, THE GRANDSON CALL ===== -->
+    <section class="slide" aria-label="Story: the grandson call">
+        <div class="topbar"><span class="chip warm">A YARN</span><span class="crumb">based on real Australian cases</span><span class="sect">Voice cloning</span></div>
+        <div class="body" style="align-items:flex-start">
+            <span class="story-tag reveal r1">Based on real cases; names and places changed</span>
+            <p class="story reveal r2">Nan's phone rings after tea. It's her grandson's voice; she'd know it anywhere. <b>"Nan, I'm in trouble in Darwin. I need $800 for bail money tonight. Please don't tell Mum."</b> He sounds frightened. He tells her exactly which store to go to and how to send it.</p>
+            <p class="story-close reveal r3">The grandson was home in Mparntwe the whole time, asleep. His voice came from a football video posted online. <b>The fear in her chest was real; the voice was not.</b></p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">05 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 6 : BEATING THE VOICE CLONE ===== -->
+    <section class="slide" aria-label="Beating the voice clone">
+        <div class="topbar"><span class="chip">FAKE 1</span><span class="crumb">what beats it</span><span class="sect">Voice cloning</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">What beats it</div>
+            <h2 class="reveal r2">Hang up. <span class="hl">Ring them back</span> on the number you already have.</h2>
+            <div class="rows" style="margin-top:44px;max-width:1620px">
+                <div class="row reveal r3"><span class="n good">1</span><span><b>Hang up and call back</b> on the number saved in your phone; the clone cannot answer the real person's phone</span></div>
+                <div class="row reveal r4"><span class="n good">2</span><span>Set a <b>family safe word</b>; a word only your mob knows, that any caller asking for money must say</span></div>
+                <div class="row reveal r5"><span class="n good">3</span><span><b>Being rushed is the tell.</b> "Tonight", "right now", "don't tell anyone" is pressure, and pressure is the scam</span></div>
+                <div class="row reveal r6"><span class="n good">4</span><span>Ask something <b>only the real person would know</b> that has never been posted online</span></div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">06 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 7 : DEEPFAKE VIDEO ===== -->
+    <section class="slide" aria-label="Deepfake video and fake endorsements">
+        <div class="topbar"><span class="chip">FAKE 2</span><span class="crumb">faces and video</span><span class="sect">Deepfakes</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Fake 2 &middot; A face you trust</div>
+            <h2 class="reveal r2">AI can put <span class="hl">any words in any mouth</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">The classic</div><h3>The famous face ad</h3><p>A video of a well-known presenter, politician or finance expert warmly endorsing an investment platform. The face is real, the footage is real; <b>the words were never said.</b></p></div>
+                <div class="dcard bad reveal r4"><div class="ctag">Why it works</div><h3>Borrowed authority</h3><p>We trust the endorsement because we trust the person. Scammers rent that trust for the cost of a video clip, and place the ad on the same social feeds as real news.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>Rule of thumb:</b> a celebrity who genuinely endorses an investment will be on the company's official website and in mainstream news, not only in a social media ad.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">07 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 8 : VIGNETTE, THE ECONOMIST AD ===== -->
+    <section class="slide" aria-label="Story: the economist ad">
+        <div class="topbar"><span class="chip warm">A YARN</span><span class="crumb">based on real Australian cases</span><span class="sect">Deepfakes</span></div>
+        <div class="body" style="align-items:flex-start">
+            <span class="story-tag reveal r1">Based on real cases; names and places changed</span>
+            <p class="story reveal r2">A pensioner sees a video of a famous economist recommending an investment platform. She does the right things: she watches it twice, she visits the website, it looks professional. She starts small. A friendly "account manager" moves the chat to WhatsApp. <b>Her dashboard shows her money growing week after week.</b></p>
+            <p class="story-close reveal r3">The video was a deepfake. The dashboard was a picture of profits, drawn on the screen by the scammers. When she tried to withdraw, there was suddenly a "tax" to pay first, then a "release fee", then silence. <b>$76,000; her savings.</b></p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">08 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 9 : THE PLATFORM SWITCH ===== -->
+    <section class="slide" aria-label="The platform switch">
+        <div class="topbar"><span class="chip bad">RED FLAG</span><span class="crumb">the platform switch</span><span class="sect">Deepfakes</span></div>
+        <div class="body">
+            <div class="kicker bad reveal r1">The red flag hiding in that story</div>
+            <h2 class="reveal r2">If the chat wants to move,<br><span class="hlw">that's the scam moving</span></h2>
+            <p class="lede reveal r3" style="margin-top:36px">"Let's continue on WhatsApp" sounds friendly. What it actually does:</p>
+            <div class="rows" style="margin-top:32px;max-width:1560px">
+                <div class="row reveal r4"><span class="n bad">1</span><span>Moves you <b>away from the platform's scam detection</b> and report buttons</span></div>
+                <div class="row reveal r5"><span class="n bad">2</span><span>Moves you into an <b>encrypted, private channel</b> where nobody else can see the grooming</span></div>
+                <div class="row reveal r6"><span class="n bad">3</span><span>Makes the relationship feel <b>personal and special</b>; that feeling is the product</span></div>
+            </div>
+            <div class="strip bad reveal r7" style="margin-top:38px"><b>A business you have never met that wants to leave the app you met on is a scam until proven otherwise.</b> Banks, brokers and government agencies do not run your account through WhatsApp.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">09 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 10 : FAKE WEBSITES ===== -->
+    <section class="slide" aria-label="Fake websites">
+        <div class="topbar"><span class="chip">FAKE 3</span><span class="crumb">websites</span><span class="sect">Spoofed sites</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Fake 3 &middot; A website that looks real</div>
+            <h2 class="reveal r2">Copying a real website takes <span class="hl">minutes, not months</span></h2>
+            <div class="grid3" style="margin-top:48px">
+                <div class="dcard reveal r3"><div class="ctag">The clone</div><h3>Same look, wrong address</h3><p>Scammers copy a bank or shop site pixel for pixel. The only honest thing left on the page is the address bar; <b>read it slowly</b>.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">The padlock myth</div><h3>The padlock is not approval</h3><p>The browser padlock means the connection is private. It says nothing about who is on the other end; <b>scam sites have padlocks too</b>.</p></div>
+                <div class="dcard bad reveal r5"><div class="ctag">The drawn-on screen</div><h3>Screens can lie</h3><p>Balances, profits, "reviews", even urgent virus warnings can simply be drawn on the page. <b>A number on a screen is not money.</b></p></div>
+            </div>
+            <div class="strip teal reveal r6" style="margin-top:42px"><b>Habit that beats all three:</b> never follow the link you were sent. Type the address yourself, or search the organisation's name together with the word "scam" first.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">10 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 11 : SCAMBLING, WHAT IT LOOKS LIKE ===== -->
+    <section class="slide" aria-label="Scambling: what it looks like">
+        <div class="topbar"><span class="chip warm">HERE, NOW</span><span class="crumb">fake online casinos</span><span class="sect">Scambling</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">Fake 4 &middot; The one aimed at NT communities right now</div>
+            <h2 class="reveal r2">"Scambling": the casino game<br>that is <span class="hlw">not a casino</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard warm reveal r3"><div class="ctag">What it looks like</div><h3>Bright, friendly, familiar</h3><p>A colourful pokies-style game, shared on Facebook or WhatsApp; often the link comes from <b>someone you know</b> who is playing it too. That is the trap: it arrives through trust, not from a stranger.</p></div>
+                <div class="reveal r4" style="display:flex;align-items:center">
+                    <div class="msgbox" style="width:100%">
+                        <div class="from">Facebook message &middot; from a cousin</div>
+                        Sis try this one, I won $250 last night!! Free credits when u sign up, this one actually pays. [link]
+                    </div>
+                </div>
+            </div>
+            <div class="strip warn reveal r5" style="margin-top:42px"><b>The site is not a licensed casino.</b> It is a scam operation, often overseas, using geo-targeting to reach remote communities; and it never intends to pay out.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">11 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 12 : SCAMBLING, THE HOOK ===== -->
+    <section class="slide" aria-label="Scambling: how the hook works">
+        <div class="topbar"><span class="chip warm">HERE, NOW</span><span class="crumb">how the hook works</span><span class="sect">Scambling</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">How the hook works</div>
+            <h2 class="reveal r2">Free credits, small wins,<br>then <span class="hlw">the door closes</span></h2>
+            <div class="rows" style="margin-top:44px;max-width:1620px">
+                <div class="row reveal r3"><span class="n warm">1</span><span><b>Free credits</b> to start; the game is genuinely fun, and the first small "wins" come easily</span></div>
+                <div class="row reveal r4"><span class="n warm">2</span><span>Your "balance" grows; but when you try to withdraw, you must <b>deposit real money first</b> to "unlock" it</span></div>
+                <div class="row reveal r5"><span class="n warm">3</span><span>The winnings never arrive. Instead: more deposits, more conditions, or <b>"recruit your friends and family"</b> to unlock</span></div>
+                <div class="row reveal r6"><span class="n warm">4</span><span>That recruiting step is why it <b>moves through families and communities</b>; every player is pushed to become the next messenger</span></div>
+            </div>
+            <p class="lede reveal r7" style="margin-top:38px">People are losing money for food and power, and going into debt; <b>and feeling ashamed to tell anyone.</b> Shame is part of the scam's design.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">12 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 13 : SCAMBLING, THE NUMBERS ===== -->
+    <section class="slide" aria-label="Scambling: the numbers">
+        <div class="topbar"><span class="chip warm">HERE, NOW</span><span class="crumb">the numbers</span><span class="sect">Scambling</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">The numbers; and they are undercounts</div>
+            <h2 class="reveal r2">This is not rare, and it is <span class="hlw">not far away</span></h2>
+            <div class="stats" style="margin-top:48px">
+                <div class="stat reveal r3"><div class="big">$1.6m</div><div class="lbl">reported lost to fake online casinos in 2025, <b>up from $449,000</b> in 2024</div></div>
+                <div class="stat reveal r4"><div class="big">~half</div><div class="lbl">of reported scambling victims are <b>First Nations people</b></div></div>
+                <div class="stat reveal r5"><div class="big">257.5%</div><div class="lbl">rise in First Nations betting-scam losses in one year, to <b>$790,685</b></div></div>
+            </div>
+            <p class="lede reveal r6" style="margin-top:42px">Communities named in national reporting include <b>Wadeye and the Tiwi Islands</b>. And official figures are known undercounts: reporting from remote communities stays low, so <b>the real losses are higher</b>.</p>
+            <p class="cite reveal r7" style="margin-top:30px">Sources: National Anti-Scam Centre, Targeting Scams 2025 report (March 2026); SBS NITV, 9 July 2026, reporting Financial Counselling Australia findings. Full links on the final slide.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">13 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 14 : SCAMBLING, THE RULE AND THE YARN ===== -->
+    <section class="slide" aria-label="Scambling: the one rule and what to say">
+        <div class="topbar"><span class="chip warm">HERE, NOW</span><span class="crumb">the rule, and the yarn to have</span><span class="sect">Scambling</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">One rule, one yarn</div>
+            <h2 class="reveal r2">A casino that won't pay out <span class="hlw">is not a casino</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard warm reveal r3"><div class="ctag">The rule</div><h3>Withdrawal is the test</h3><p>Real licensed gambling pays out winnings; that is the whole deal. A site that keeps inventing reasons you can't withdraw is <b>not a casino, it's a scam</b>; stop putting money in.</p></div>
+                <div class="dcard good reveal r4"><div class="ctag">The yarn to have</div><h3>No shame, just stop the money</h3><p>"You haven't done anything wrong; that game was built to do this to people. Let's stop the deposits, screenshot everything, and report it together. <b>Plenty of mob got caught by this one.</b>"</p></div>
+            </div>
+            <div class="strip good reveal r5" style="margin-top:42px"><b>If money is owed or bills are behind because of it:</b> Mob Strong Debt Help, 1800 808 488; free legal advice and financial counselling for Aboriginal and Torres Strait Islander people, anywhere in Australia.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">14 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 15 : THE LONG GAME ===== -->
+    <section class="slide" aria-label="The long game: romance baiting">
+        <div class="topbar"><span class="chip">FAKE + PATIENCE</span><span class="crumb">the long game</span><span class="sect">Romance baiting</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The long game &middot; "romance baiting"</div>
+            <h2 class="reveal r2">The cruellest scams are <span class="hl">slow</span></h2>
+            <p class="lede reveal r3" style="margin-top:34px">Weeks or months of friendship or romance first; the money talk comes late, and by then it doesn't feel like a stranger asking.</p>
+            <div class="rows" style="margin-top:34px;max-width:1620px">
+                <div class="row reveal r4"><span class="n">1</span><span>A friendly message out of nowhere; often a "wrong number" or a new online friend, then <b>the chat moves to WhatsApp</b></span></div>
+                <div class="row reveal r5"><span class="n">2</span><span>Daily attention, real warmth, no requests at all; <b>this stage is the investment</b></span></div>
+                <div class="row reveal r6"><span class="n">3</span><span>Then a casual mention of crypto "investing", small amounts first, a dashboard showing profits; <b>the same drawn-on screen as before</b></span></div>
+            </div>
+            <p class="lede reveal r7" style="margin-top:36px">First Nations investment scam losses reached <b>$4.1 million in 2025</b>, up 162.7% in a year. <span class="cite">(NASC Targeting Scams 2025, March 2026)</span></p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">15 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 16 : STOP CHECK PROTECT ===== -->
+    <section class="slide" aria-label="Stop, Check, Protect">
+        <div class="topbar"><span class="chip">DEFENCE</span><span class="crumb">three words to remember</span><span class="sect">Stop &middot; Check &middot; Protect</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The national advice, three words</div>
+            <h2 class="reveal r2"><span class="hl">Stop. Check. Protect.</span></h2>
+            <div class="grid3" style="margin-top:50px">
+                <div class="dcard reveal r3"><div class="ctag">Stop</div><h3>Pressure is the tell</h3><p>Scammers rush you so you can't think. Real organisations can wait while you take your time; <b>anyone who can't wait is the scam</b>.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Check</div><h3>Could this be fake?</h3><p>Never click the link you were sent. Find the organisation yourself, from its official website or app, and <b>ring back on the number you already have</b>.</p></div>
+                <div class="dcard reveal r5"><div class="ctag">Protect</div><h3>Act fast if it feels wrong</h3><p>Contact your bank first if money or details have gone, then report it. <b>Acting quickly is what recovers money</b>; embarrassment can wait.</p></div>
+            </div>
+            <p class="lede muted reveal r6" style="margin-top:42px">Same three words as the Little Book of Scams; everything in that book is still true. Tonight was what's happened since it was printed.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">16 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 17 : REPORT AND GET HELP ===== -->
+    <section class="slide" aria-label="Report it and get help">
+        <div class="topbar"><span class="chip">DEFENCE</span><span class="crumb">report it, get help</span><span class="sect">Help</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Report it, and get real help</div>
+            <h2 class="reveal r2">Bank first. Then <span class="hl">report and recover</span>.</h2>
+            <div class="rows" style="margin-top:40px;max-width:1660px">
+                <div class="row reveal r3"><span class="n good">1</span><span><b>Your bank, immediately</b>, if money has moved or card details are out; ring the number on the back of your card</span><span class="tag">FIRST</span></div>
+                <div class="row reveal r4"><span class="n">2</span><span><b>Scamwatch</b>, scamwatch.gov.au; reports can be made <b>anonymously, or on behalf of someone else</b></span><span class="tag">REPORT</span></div>
+                <div class="row reveal r5"><span class="n">3</span><span><b>IDCARE</b>, 1800 595 160; free help when identity details have been stolen</span><span class="tag">IDENTITY</span></div>
+                <div class="row reveal r6"><span class="n">4</span><span><b>Mob Strong Debt Help</b>, 1800 808 488; free legal and financial counselling for Aboriginal and Torres Strait Islander people</span><span class="tag">MONEY</span></div>
+                <div class="row reveal r7"><span class="n">5</span><span><b>National Debt Helpline</b>, 1800 007 007; free financial counselling for anyone</span><span class="tag">MONEY</span></div>
+            </div>
+            <div class="strip teal reveal r7" style="margin-top:36px"><b>"On behalf of someone else" matters here.</b> If an Elder or family member won't ring anyone, you can report for them.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">17 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 18 : PASS IT ON ===== -->
+    <section class="slide" aria-label="Pass it on">
+        <div class="topbar"><span class="chip">PASS IT ON</span><span class="crumb">you are the messengers</span><span class="sect">Close</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The real close</div>
+            <h2 class="reveal r2">The warnings don't reach your communities.<br><span class="hlw">You do.</span></h2>
+            <p class="lede reveal r3" style="margin-top:36px">Official reporting from remote communities is low; the algorithms don't carry these warnings to the people who need them. A yarn from someone trusted does what no government campaign can. <b>Take the handouts; give them away.</b></p>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard reveal r4"><div class="ctag">To give away</div><h3>Plain-language guides</h3><p><a href="https://consumeraffairs.nt.gov.au/_resources/documents/for-consumers/scams/little-book-of-scams-2025-first-nations.pdf">The Little Book of Scams, First Nations edition</a><br><a href="https://consumeraffairs.nt.gov.au/_resources/documents/for-consumers/scams/the-little-black-book-scams-easy-read.pdf">The Little Black Book of Scams, Easy Read</a></p></div>
+                <div class="dcard reveal r5"><div class="ctag">To look things up</div><h3>Every scam type, explained</h3><p><a href="https://consumeraffairs.nt.gov.au/for-consumers/scams">NT Consumer Affairs, scams A to Z</a><br><a href="https://www.scamwatch.gov.au/">Scamwatch</a> &middot; <a href="https://www.cyber.gov.au/">cyber.gov.au</a> &middot; <a href="https://www.esafety.gov.au/">esafety.gov.au</a></p></div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">18 / 19</span></div>
+    </section>
+
+    <!-- ===== SLIDE 19 : SOURCES ===== -->
+    <section class="slide" aria-label="Sources">
+        <div class="topbar"><span class="chip">SOURCES</span><span class="crumb">where the numbers come from</span><span class="sect">References</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Sources used</div>
+            <h2 class="reveal r2" style="font-size:62px">Where tonight's numbers come from</h2>
+            <div class="rows reveal r3" style="margin-top:38px;max-width:1680px;font-size:22px">
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>National Anti-Scam Centre, <b>Targeting Scams 2025</b> (published March 2026): <a href="https://www.nasc.gov.au/system/files/targeting-scams-report-2025.pdf">nasc.gov.au, targeting-scams-report-2025.pdf</a></span></div>
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>ACCC media release, <b>annual scam losses exceed $2 billion</b>, 30 March 2026: <a href="https://www.accc.gov.au/media-release/continued-action-critical-to-combat-fraud-as-annual-scam-losses-exceed-2-billion">accc.gov.au</a></span></div>
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>SBS NITV, <b>fake online casinos in Indigenous communities</b>, 9 July 2026, reporting Financial Counselling Australia: <a href="https://www.sbs.com.au/nitv/article/80-of-people-in-some-indigenous-communities-being-scammed-by-fake-online-casinos/k4olorslz">sbs.com.au/nitv</a></span></div>
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>ACCC / National Anti-Scam Centre, <b>The Little Book of Scams, First Nations edition</b> (2024), via NT Consumer Affairs</span></div>
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>Mob Strong Debt Help, Financial Rights Legal Centre (page updated 16 January 2026): <a href="https://financialrights.org.au/getting-help/mob-strong-debt-help/">financialrights.org.au</a></span></div>
+            </div>
+            <p class="lede muted reveal r4" style="margin-top:34px;font-size:24px">The two story slides are composites based on real, publicly reported Australian cases; names, places and details have been changed.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">19 / 19</span></div>
+    </section>
+
+</main>
+</div>
+
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">ED</button>
+
+<script>
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.wheelLock = false;
+        this.setupStageScale(); this.setupKeyboardNav(); this.setupWheelNav(); this.setupTouchNav();
+        this.showSlide(0);
+    }
+    setupStageScale() {
+        const scale = () => {
+            const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * f) / 2, y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale(); window.addEventListener('resize', scale);
+    }
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (document.body.classList.contains('editing') || e.target.isContentEditable) return;
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.showSlide(0); break;
+                case 'End': e.preventDefault(); this.showSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+    setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (this.wheelLock || Math.abs(e.deltaY) < 12) return;
+            this.wheelLock = true;
+            e.deltaY > 0 ? this.next() : this.prev();
+            setTimeout(() => { this.wheelLock = false; }, 650);
+        }, { passive: true });
+    }
+    setupTouchNav() {
+        let sx = 0, sy = 0;
+        window.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchend', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? this.next() : this.prev();
+        }, { passive: true });
+    }
+    next() { this.showSlide(this.currentSlide + 1); }
+    prev() { this.showSlide(this.currentSlide - 1); }
+    showSlide(i) {
+        this.currentSlide = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.slides.forEach((s, k) => {
+            s.classList.toggle('active', k === this.currentSlide);
+            s.classList.toggle('visible', k === this.currentSlide);
+        });
+    }
+}
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storeKey = 'scammers-fake-ai-deck-edits-v1';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.hotzone = document.getElementById('editHotzone');
+        this.restore(); this.wire();
+    }
+    wire() {
+        let t = null;
+        const show = () => { clearTimeout(t); this.toggleBtn.classList.add('show'); };
+        const hide = () => { t = setTimeout(() => { if (!this.isActive) this.toggleBtn.classList.remove('show'); }, 400); };
+        this.hotzone.addEventListener('mouseenter', show); this.hotzone.addEventListener('mouseleave', hide);
+        this.toggleBtn.addEventListener('mouseenter', show); this.toggleBtn.addEventListener('mouseleave', hide);
+        this.hotzone.addEventListener('click', () => this.toggle()); this.toggleBtn.addEventListener('click', () => this.toggle());
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable && !e.metaKey && !e.ctrlKey) this.toggle();
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.download(); }
+        });
+        document.getElementById('deckStage').addEventListener('input', () => this.save());
+    }
+    toggle() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('show', true);
+        document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide .row span:not(.n), .slide .crumb, .slide .strip, .slide .kicker, .slide .story, .slide .story-close, .slide .stat .big, .slide .stat .lbl, .slide .msgbox')
+            .forEach(el => { this.isActive ? el.setAttribute('contenteditable', 'true') : el.removeAttribute('contenteditable'); });
+    }
+    save() {
+        const d = [...document.querySelectorAll('.slide')].map(s => s.innerHTML);
+        try { localStorage.setItem(this.storeKey, JSON.stringify(d)); } catch (e) {}
+    }
+    restore() {
+        try {
+            const d = JSON.parse(localStorage.getItem(this.storeKey) || 'null');
+            if (!d) return;
+            const s = document.querySelectorAll('.slide');
+            if (d.length === s.length) s.forEach((sl, i) => { sl.innerHTML = d[i]; });
+        } catch (e) {}
+    }
+    download() {
+        const c = document.documentElement.cloneNode(true);
+        c.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        c.querySelectorAll('body').forEach(b => b.classList.remove('editing'));
+        const blob = new Blob(['<!DOCTYPE html>\n' + c.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'how-scammers-fake-it-with-ai.html'; a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+new SlidePresentation(); new InlineEditor();
+</script>
+</body>
+</html>
