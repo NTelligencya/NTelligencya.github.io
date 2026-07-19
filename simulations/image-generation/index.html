@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Image Generation Works</title>
+<style>
+  :root {
+    --ink: #000000; --panel: #0a0a0a;
+    --white: #f4f4f2; --body: #d5d8d9; --grey: #b9bcbd;
+    --grey-dim: #7d8183; --line: #35383a;
+    --glow: rgba(230, 235, 238, 0.35);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--ink); color: var(--white);
+    font-family: Baskerville, "Baskerville Old Face", "Libre Baskerville", "Times New Roman", serif;
+    font-weight: 400; overflow: hidden;
+  }
+  #stage { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
+
+  /* Chrome */
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 28px; flex-wrap: wrap;
+    padding: 20px 36px; font-size: 14px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--grey-dim); flex-shrink: 0;
+  }
+  header .mod-tag { color: var(--white); }
+  footer {
+    flex-shrink: 0; display: flex; justify-content: center; align-items: center;
+    gap: 10px; padding: 22px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background .3s, box-shadow .3s; }
+  .dot.on { background: var(--white); box-shadow: 0 0 10px var(--glow); }
+  main { flex: 1; display: flex; padding: 14px 60px; overflow: auto; }
+  .beat { display: none; max-width: 1100px; width: 100%; margin: auto; animation: rise .45s ease; }
+  .beat.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* Shared elements */
+  .eyebrow { color: var(--grey-dim); font-size: 15px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 14px; }
+  h1 { font-weight: 400; font-size: 54px; line-height: 1.1; letter-spacing: 0.04em; }
+  h2 { font-weight: 400; font-size: 38px; line-height: 1.15; margin-bottom: 22px; letter-spacing: 0.04em; }
+  .lede { font-size: 22px; color: var(--grey); margin-top: 16px; max-width: 820px; line-height: 1.5; }
+  .lede strong, .callout strong { font-weight: 400; color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  .myth {
+    display: inline-block; margin-top: 26px; padding: 9px 20px;
+    border: 1px solid var(--white); border-radius: 24px;
+    color: var(--white); font-size: 18px;
+    box-shadow: 0 0 16px -4px var(--glow);
+  }
+  .callout {
+    border-left: 3px solid var(--white); background: var(--panel);
+    padding: 22px 30px; border-radius: 0 10px 10px 0;
+    font-size: 23px; line-height: 1.5; max-width: 880px; color: var(--body);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.8), 0 0 0 1px rgba(230,235,238,0.04);
+    margin-top: 26px;
+  }
+  .caption { color: var(--grey-dim); font-size: 15px; margin-top: 18px; line-height: 1.6; }
+  .caption a, .cite a { color: var(--grey); }
+  .btn {
+    display: inline-block; margin-top: 26px; padding: 13px 32px;
+    background: var(--white); color: var(--ink); border: none; border-radius: 7px;
+    font-size: 18px; font-weight: 400; font-family: inherit; cursor: pointer;
+    transition: box-shadow .2s; min-height: 48px;
+  }
+  .btn:hover { box-shadow: 0 0 20px -2px var(--glow); }
+  .btn.ghost { background: transparent; color: var(--grey); border: 1px solid var(--line); }
+  .btn.ghost:hover { color: var(--white); border-color: var(--grey-dim); }
+  .btn:focus-visible, .cellbtn:focus-visible, input[type=range]:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
+  .navhint { position: fixed; right: 30px; bottom: 20px; color: var(--grey-dim); font-size: 13px; letter-spacing: 1px; }
+
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; }
+  .card h3 { font-weight: 400; font-size: 24px; margin-bottom: 10px; }
+  .card p { font-size: 19px; line-height: 1.5; color: var(--body); }
+  .mono { font-family: Consolas, monospace; }
+
+  /* Step 1 · ping */
+  .pingwrap { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  .cellbtn { cursor: pointer; }
+  .cellbtn circle.body { fill: var(--panel); stroke: var(--line); stroke-width: 2; transition: fill .3s, stroke .3s, filter .3s; }
+  .cellbtn.onping circle.body { fill: #2a2d2f; stroke: var(--white); filter: drop-shadow(0 0 8px rgba(230,235,238,0.55)); }
+  .cellbtn text { fill: var(--grey); font-size: 15px; }
+  .cellbtn.onping text { fill: var(--white); }
+  .wire { stroke: var(--line); fill: none; transition: stroke .3s, filter .3s; }
+  .wire.live { stroke: var(--white); filter: drop-shadow(0 0 5px rgba(230,235,238,0.6)); }
+  #bigcell circle.body { fill: var(--panel); stroke: var(--line); stroke-width: 2.5; transition: all .35s; }
+  #bigcell.fired circle.body { fill: #34383a; stroke: var(--white); filter: drop-shadow(0 0 16px rgba(230,235,238,0.8)); }
+  #bigcell text { fill: var(--grey-dim); font-size: 17px; transition: fill .3s; }
+  #bigcell.fired text { fill: var(--white); }
+  #sumline { font-size: 21px; color: var(--grey); margin-top: 16px; }
+  #sumline b { font-weight: 400; color: var(--white); }
+
+  /* Step 2 · ladder of layers */
+  .layerstack { display: flex; flex-direction: column-reverse; gap: 12px; margin-top: 14px; max-width: 880px; }
+  .layer {
+    display: grid; grid-template-columns: 240px 1fr; gap: 22px; align-items: center;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 24px; opacity: .35; transition: opacity .5s, border-color .5s, box-shadow .5s;
+  }
+  .layer.lit { opacity: 1; border-color: var(--grey-dim); box-shadow: 0 0 22px -8px var(--glow); }
+  .layer .lname { font-size: 21px; }
+  .layer .lsub { color: var(--grey-dim); font-size: 14.5px; margin-top: 4px; line-height: 1.45; }
+  .layer svg { justify-self: end; }
+  .layer svg .g0 { opacity: .25; transition: opacity .5s; }
+  .layer.lit svg .g0 { opacity: 1; }
+
+  /* Step 3 · training */
+  .train-grid { display: grid; grid-template-columns: 300px 1fr; gap: 26px; margin-top: 12px; align-items: start; }
+  .photocard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; text-align: center; }
+  .photocard .plabel { font-family: Consolas, monospace; letter-spacing: 3px; font-size: 15px; color: var(--white); margin-top: 12px; }
+  .guessline { font-size: 24px; line-height: 1.5; color: var(--body); }
+  .guessline b { font-weight: 400; color: var(--white); text-shadow: 0 0 12px rgba(255,255,255,0.4); }
+  .err-track { height: 26px; background: var(--line); border-radius: 5px; overflow: hidden; margin-top: 14px; max-width: 520px; }
+  .err-fill { height: 100%; width: 50%; background: var(--grey-dim); border-radius: 5px; transition: width .8s cubic-bezier(.4,0,.2,1), background .4s; }
+  .err-fill.good { background: linear-gradient(90deg, var(--grey), var(--white)); box-shadow: 0 0 14px var(--glow); }
+  .step-count { font-family: Consolas, monospace; color: var(--grey-dim); font-size: 15px; margin-top: 14px; }
+
+  /* Step 4 · dataset grid */
+  .cifar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 14px; max-width: 880px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 10px 10px; text-align: center; }
+  .tile .tlabel { font-family: Consolas, monospace; font-size: 12.5px; letter-spacing: 2px; color: var(--grey); margin-top: 8px; text-transform: uppercase; }
+  .tile svg { width: 100%; max-width: 86px; height: auto; }
+
+  /* Step 5 · croc vs alligator */
+  .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 12px; max-width: 900px; }
+  .cmp .card { text-align: center; }
+  .cmp .cname { font-size: 22px; margin-top: 10px; }
+  .cmp svg { width: 100%; max-width: 300px; height: auto; }
+  .featbtns { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 20px; }
+  .featbtns .btn { margin-top: 0; }
+  #featNote { margin-top: 18px; font-size: 21px; color: var(--body); max-width: 860px; line-height: 1.5; min-height: 64px; }
+  #featNote b { font-weight: 400; color: var(--white); }
+  .hl-snout .snout, .hl-teeth .teeth, .hl-colour .hide { stroke: var(--white) !important; stroke-width: 3 !important; filter: drop-shadow(0 0 6px rgba(230,235,238,0.8)); }
+
+  /* Step 6 · denoise */
+  .denoise-wrap { display: grid; grid-template-columns: minmax(0, 640px) 1fr; gap: 30px; margin-top: 12px; align-items: start; }
+  .scenebox { position: relative; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #000; }
+  .scenebox img { display: block; width: 100%; height: auto; transition: filter .5s, opacity .5s; }
+  .scenebox canvas { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity .5s; pointer-events: none; }
+  .sliderrow { margin-top: 18px; }
+  .sliderrow label { display: block; font-size: 16px; color: var(--grey); margin-bottom: 10px; letter-spacing: 1px; }
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; width: 100%; max-width: 640px; height: 34px; background: transparent; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: var(--line); }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--white); margin-top: -11px; box-shadow: 0 0 12px var(--glow);
+  }
+  input[type=range]::-moz-range-track { height: 8px; border-radius: 4px; background: var(--line); }
+  input[type=range]::-moz-range-thumb { width: 30px; height: 30px; border: none; border-radius: 50%; background: var(--white); }
+  #denoiseCap { font-size: 20px; color: var(--body); line-height: 1.55; min-height: 96px; }
+  #denoiseCap b { font-weight: 400; color: var(--white); }
+
+  /* Step 7 · generate again */
+  .runsrow { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
+  .runcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; width: 300px; animation: rise .5s ease; }
+  .runcard img { display: block; width: 100%; height: auto; border-radius: 6px; }
+  .runcard .runlbl { font-family: Consolas, monospace; font-size: 12.5px; letter-spacing: 2px; color: var(--grey-dim); margin: 10px 2px 2px; }
+
+  /* Step 8 · payoff */
+  .prompt-chip {
+    display: inline-block; margin-top: 20px; padding: 14px 26px;
+    background: var(--panel); border: 1px solid var(--grey-dim); border-radius: 10px;
+    font-size: 24px; color: var(--white); box-shadow: 0 0 22px -6px var(--glow);
+  }
+  .cite { color: var(--grey-dim); font-size: 14px; margin-top: 16px; line-height: 1.7; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.15s !important; }
+  }
+  @media (max-width: 760px) {
+    main { padding: 10px 22px; }
+    h1 { font-size: 34px; }
+    h2 { font-size: 27px; }
+    .lede { font-size: 18px; }
+    .callout { font-size: 19px; padding: 18px 22px; }
+    .pair, .train-grid, .cmp, .denoise-wrap { grid-template-columns: 1fr; }
+    .cifar { grid-template-columns: repeat(3, 1fr); }
+    .layer { grid-template-columns: 1fr; }
+    .layer svg { justify-self: start; }
+    .navhint { display: none; }
+    header { padding: 14px 20px; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+<header>
+  <span id="hdrLeft">How image generation works</span>
+  <span class="mod-tag" id="hdrRight"></span>
+</header>
+<main id="main">
+
+  <!-- 0 · Title -->
+  <section class="beat active" data-title="">
+    <p class="eyebrow">A companion to How AI Predicts the Next Word</p>
+    <h1>How Image Generation Works</h1>
+    <p class="lede">You ask for a picture of a crocodile driving a Hilux, and thirty seconds later there it is. Where did it come from? Not from a folder. Not from the internet. This is the story of how a machine paints something <strong>nobody has ever seen</strong>.</p>
+    <div class="myth">Myth to retire: "it finds a picture and hands it over"</div>
+    <p class="caption">Eight short steps. Click anywhere, tap, or use the arrow keys to move through.</p>
+    <button class="btn" onclick="next()">Begin</button>
+  </section>
+
+  <!-- 1 · Ping -->
+  <section class="beat" data-title="Step 1 · A cell that goes ping" data-onenter="resetPing">
+    <h2>Start small: a cell that goes ping</h2>
+    <p class="lede">A brain cell, or the artificial kind in this machine, mostly just sits there. Sometimes it <strong>goes ping</strong>. It decides to ping based on how many pings are arriving from the cells connected to it, and how strong each connection is. That is the whole component. Everything else is just lots of them.</p>
+    <div class="pingwrap">
+      <svg width="560" height="240" viewBox="0 0 560 240" role="img" aria-label="Three input cells connected to one output cell">
+        <path id="w0" class="wire" stroke-width="6" d="M 128 50 C 240 50, 300 105, 396 116"/>
+        <path id="w1" class="wire" stroke-width="3" d="M 128 120 C 230 120, 300 120, 396 120"/>
+        <path id="w2" class="wire" stroke-width="3" d="M 128 190 C 240 190, 300 135, 396 124"/>
+        <g id="c0" class="cellbtn" tabindex="0" role="button" aria-label="Cell A, strong connection">
+          <circle class="body" cx="90" cy="50" r="36"/><text x="90" y="56" text-anchor="middle">A</text>
+        </g>
+        <g id="c1" class="cellbtn" tabindex="0" role="button" aria-label="Cell B, weak connection">
+          <circle class="body" cx="90" cy="120" r="36"/><text x="90" y="126" text-anchor="middle">B</text>
+        </g>
+        <g id="c2" class="cellbtn" tabindex="0" role="button" aria-label="Cell C, weak connection">
+          <circle class="body" cx="90" cy="190" r="36"/><text x="90" y="196" text-anchor="middle">C</text>
+        </g>
+        <g id="bigcell">
+          <circle class="body" cx="452" cy="120" r="52"/>
+          <text id="bigtext" x="452" y="127" text-anchor="middle">quiet</text>
+        </g>
+      </svg>
+      <div>
+        <p style="font-size:20px; color:var(--body); max-width:400px; line-height:1.55;">Click the small cells to make them ping. The <b style="font-weight:400; color:var(--white)">thick wire counts double</b>, because that connection is strong.</p>
+        <p id="sumline">arriving: <b>0</b> · needs 3 to fire</p>
+      </div>
+    </div>
+    <div class="callout">A cell never sees the whole picture. It only ever asks one tiny question: <strong>are my neighbours pinging hard enough?</strong></div>
+  </section>
+
+  <!-- 2 · Edges, beak, bird -->
+  <section class="beat" data-title="Step 2 · Edges, beak, bird" data-onenter="resetLayers">
+    <h2>Stack them up: edges, then beak, then bird</h2>
+    <p class="lede">How do you recognise a bird? You do not write rules for "bird". You build upward, layer by layer, each layer pinging when the layer below gives it something to ping about.</p>
+    <div class="layerstack">
+      <div class="layer" id="lay0">
+        <div><div class="lname">Bottom layer: pixels</div><div class="lsub">A pixel is one tiny dot of the picture. Some bright, some dark. That is all this layer knows.</div></div>
+        <svg width="180" height="44" viewBox="0 0 180 44"><g class="g0">
+          <rect x="2" y="8" width="24" height="24" fill="#e8e8e6"/><rect x="30" y="8" width="24" height="24" fill="#3a3d3f"/><rect x="58" y="8" width="24" height="24" fill="#c8c9c7"/><rect x="86" y="8" width="24" height="24" fill="#232527"/><rect x="114" y="8" width="24" height="24" fill="#9a9c9b"/><rect x="142" y="8" width="24" height="24" fill="#55585a"/>
+        </g></svg>
+      </div>
+      <div class="layer" id="lay1">
+        <div><div class="lname">Next: edge detectors</div><div class="lsub">A cell here pings when bright pixels sit beside dark ones. Bright against dark is an edge.</div></div>
+        <svg width="180" height="44" viewBox="0 0 180 44"><g class="g0" stroke="#e8e8e6" stroke-width="3" stroke-linecap="round">
+          <line x1="10" y1="34" x2="40" y2="10"/><line x1="60" y1="10" x2="90" y2="34"/><line x1="108" y1="22" x2="140" y2="22"/><line x1="156" y1="8" x2="156" y2="36"/>
+        </g></svg>
+      </div>
+      <div class="layer" id="lay2">
+        <div><div class="lname">Next: little parts</div><div class="lsub">Cells that ping when a few edges line up: a pointy thing that might be a beak, a small circle that might be an eye.</div></div>
+        <svg width="180" height="44" viewBox="0 0 180 44"><g class="g0">
+          <path d="M 20 12 L 62 22 L 20 32 Z" fill="none" stroke="#e8e8e6" stroke-width="2.5"/>
+          <circle cx="110" cy="22" r="12" fill="none" stroke="#e8e8e6" stroke-width="2.5"/><circle cx="110" cy="22" r="4" fill="#e8e8e6"/>
+        </g></svg>
+      </div>
+      <div class="layer" id="lay3">
+        <div><div class="lname">Next: a possible head</div><div class="lsub">One cell pings only when a possible beak and a possible eye sit in the right place together.</div></div>
+        <svg width="180" height="44" viewBox="0 0 180 44"><g class="g0">
+          <circle cx="120" cy="22" r="17" fill="none" stroke="#e8e8e6" stroke-width="2.5"/>
+          <circle cx="126" cy="17" r="3.5" fill="#e8e8e6"/>
+          <path d="M 103 20 L 76 24 L 103 28 Z" fill="#e8e8e6"/>
+        </g></svg>
+      </div>
+      <div class="layer" id="lay4">
+        <div><div class="lname">Top: bird</div><div class="lsub">Head plus wing plus feet, all pinging at once. A cell up here says: probably a bird.</div></div>
+        <svg width="180" height="44" viewBox="0 0 180 44"><g class="g0">
+          <ellipse cx="96" cy="26" rx="26" ry="13" fill="none" stroke="#e8e8e6" stroke-width="2.5"/>
+          <circle cx="126" cy="15" r="9" fill="none" stroke="#e8e8e6" stroke-width="2.5"/>
+          <path d="M 135 13 L 150 15 L 135 18 Z" fill="#e8e8e6"/>
+          <path d="M 86 24 Q 96 12 110 20" fill="none" stroke="#e8e8e6" stroke-width="2.5"/>
+          <line x1="88" y1="39" x2="88" y2="44" stroke="#e8e8e6" stroke-width="2.5"/><line x1="102" y1="39" x2="102" y2="44" stroke="#e8e8e6" stroke-width="2.5"/>
+        </g></svg>
+      </div>
+    </div>
+    <button class="btn" id="layerBtn" onclick="layerStep()">Light the bottom layer</button>
+  </section>
+
+  <!-- 3 · Training -->
+  <section class="beat" data-title="Step 3 · Nudged, not programmed" data-onenter="resetTrain">
+    <h2>Nobody sets those connections by hand</h2>
+    <p class="lede">The connection strengths start out <strong>random</strong>. You show the machine a labelled picture and ask: bird or not? Then you nudge every connection a tiny bit in whichever direction makes the guess <strong>less wrong</strong>, and you do that across millions of labelled pictures, millions of times. That nudging is the learning. That is all "training" is.</p>
+    <div class="train-grid">
+      <div class="photocard">
+        <svg width="220" height="150" viewBox="0 0 220 150" role="img" aria-label="A simple picture of a bird, labelled bird">
+          <rect x="0" y="0" width="220" height="150" fill="#101213"/>
+          <line x1="30" y1="118" x2="200" y2="112" stroke="#4a4e50" stroke-width="3"/>
+          <ellipse cx="110" cy="88" rx="38" ry="20" fill="#8b8e8c"/>
+          <circle cx="150" cy="68" r="14" fill="#8b8e8c"/>
+          <path d="M 163 64 L 186 68 L 163 73 Z" fill="#c9cbc9"/>
+          <circle cx="154" cy="64" r="3" fill="#0a0a0a"/>
+          <path d="M 92 84 Q 108 62 130 78" fill="none" stroke="#c9cbc9" stroke-width="4"/>
+          <line x1="98" y1="106" x2="96" y2="118" stroke="#c9cbc9" stroke-width="3"/>
+          <line x1="120" y1="106" x2="122" y2="117" stroke="#c9cbc9" stroke-width="3"/>
+        </svg>
+        <div class="plabel">LABEL: BIRD</div>
+      </div>
+      <div>
+        <p class="guessline">The machine's guess: <b id="guessPct">50% bird</b><span id="guessNote">, which is a coin flip. It has no idea.</span></p>
+        <div class="err-track"><div class="err-fill" id="confFill"></div></div>
+        <p class="step-count" id="trainNote">labelled pictures seen: 0 · connections: random</p>
+        <button class="btn" id="trainBtn" onclick="trainStep()">Show it a thousand labelled pictures</button>
+      </div>
+    </div>
+    <div class="callout">No rules were typed in. The idea of "beak" was never programmed. It <strong>grew</strong>, because having a beak detector made the guesses less wrong.</div>
+  </section>
+
+  <!-- 4 · Labelled data -->
+  <section class="beat" data-title="Step 4 · Millions of labelled pictures">
+    <h2>What "labelled pictures" actually look like</h2>
+    <p class="lede">This is not a mystery ingredient. A labelled dataset is just pictures with a word attached to each one. A famous one, CIFAR-10, holds 60,000 tiny photos in ten classes: cat, dog, bird, automobile, truck and so on. Sixty thousand tiny flash cards.</p>
+    <div class="cifar">
+      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><circle cx="43" cy="36" r="17" fill="#9a9c9b"/><path d="M 30 26 L 26 8 L 40 20 Z" fill="#9a9c9b"/><path d="M 56 26 L 60 8 L 46 20 Z" fill="#9a9c9b"/><circle cx="37" cy="33" r="2.5" fill="#0a0a0a"/><circle cx="49" cy="33" r="2.5" fill="#0a0a0a"/><path d="M 39 42 Q 43 46 47 42" fill="none" stroke="#0a0a0a" stroke-width="1.6"/></svg><div class="tlabel">cat</div></div>
+      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><circle cx="43" cy="34" r="16" fill="#8b8e8c"/><path d="M 28 24 Q 20 32 26 44 L 32 34 Z" fill="#8b8e8c"/><path d="M 58 24 Q 66 32 60 44 L 54 34 Z" fill="#8b8e8c"/><circle cx="37" cy="31" r="2.5" fill="#0a0a0a"/><circle cx="49" cy="31" r="2.5" fill="#0a0a0a"/><ellipse cx="43" cy="40" rx="4" ry="3" fill="#0a0a0a"/></svg><div class="tlabel">dog</div></div>
+      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><ellipse cx="40" cy="38" rx="18" ry="10" fill="#9a9c9b"/><circle cx="58" cy="28" r="7" fill="#9a9c9b"/><path d="M 64 26 L 76 28 L 64 31 Z" fill="#c9cbc9"/><circle cx="60" cy="26" r="1.8" fill="#0a0a0a"/><path d="M 32 36 Q 40 26 50 33" fill="none" stroke="#c9cbc9" stroke-width="2.5"/></svg><div class="tlabel">bird</div></div>
+      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><rect x="14" y="30" width="58" height="14" rx="4" fill="#9a9c9b"/><path d="M 26 30 Q 30 18 42 18 L 54 18 Q 62 20 64 30 Z" fill="#9a9c9b"/><rect x="34" y="21" width="16" height="9" rx="2" fill="#232527"/><circle cx="28" cy="46" r="7" fill="#232527"/><circle cx="60" cy="46" r="7" fill="#232527"/></svg><div class="tlabel">automobile</div></div>
+      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><rect x="10" y="22" width="38" height="22" fill="#9a9c9b"/><rect x="48" y="28" width="26" height="16" rx="2" fill="#8b8e8c"/><rect x="52" y="31" width="10" height="8" fill="#232527"/><circle cx="24" cy="48" r="6.5" fill="#232527"/><circle cx="62" cy="48" r="6.5" fill="#232527"/></svg><div class="tlabel">truck</div></div>
+    </div>
+    <p class="caption">The real thing, browsable online: the CIFAR-10 dataset at <a href="https://huggingface.co/datasets/uoft-cs/cifar10">huggingface.co/datasets/uoft-cs/cifar10</a>. The truck and automobile classes are our stand-in for the Hilux.</p>
+    <div class="callout">Teach a machine cat versus dog from labelled examples and you can teach it <strong>any</strong> difference the same way. You just need the flash cards.</div>
+  </section>
+
+  <!-- 5 · Croc vs alligator -->
+  <section class="beat" data-title="Step 5 · Crocodile or alligator" data-onenter="resetFeat">
+    <h2>Fine differences, learnt the same way</h2>
+    <p class="lede">Here in the Territory we know the difference at a glance. A machine could learn it too, from enough labelled photos, even though nobody would ever type the rules in. Click each feature to see what the layers would quietly discover.</p>
+    <div class="cmp">
+      <div class="card">
+        <svg id="crocSvg" width="300" height="120" viewBox="0 0 300 120" role="img" aria-label="Stylised crocodile head, long narrow snout, teeth showing">
+          <path class="hide" d="M 30 78 Q 20 60 38 50 Q 70 34 130 40 L 285 58 Q 292 64 285 70 L 130 84 Q 70 90 38 84 Q 24 82 30 78 Z" fill="#4a5246" stroke="#5c665a" stroke-width="1.5"/>
+          <path class="snout" d="M 130 40 L 285 58 Q 292 64 285 70 L 130 84" fill="none" stroke="#5c665a" stroke-width="1.5"/>
+          <g class="teeth" fill="#e8e8e6" stroke="none">
+            <path d="M 160 76 l 5 9 l 5 -8 Z"/><path d="M 185 78 l 5 9 l 5 -8 Z"/><path d="M 210 80 l 5 8 l 5 -7 Z"/><path d="M 235 81 l 4 8 l 5 -7 Z"/><path d="M 258 82 l 4 7 l 4 -6 Z"/>
+          </g>
+          <circle cx="66" cy="52" r="7" fill="#d5d8d9"/><circle cx="68" cy="52" r="3.5" fill="#0a0a0a"/>
+          <circle cx="52" cy="42" r="4" fill="#4a5246" stroke="#5c665a"/>
+        </svg>
+        <div class="cname">Crocodile</div>
+      </div>
+      <div class="card">
+        <svg id="gatorSvg" width="300" height="120" viewBox="0 0 300 120" role="img" aria-label="Stylised alligator head, broad rounded snout, no teeth showing">
+          <path class="hide" d="M 30 76 Q 20 58 38 48 Q 70 32 140 38 L 235 44 Q 282 50 282 64 Q 282 78 235 82 L 140 86 Q 70 90 38 82 Q 24 80 30 76 Z" fill="#3a4044" stroke="#4c5458" stroke-width="1.5"/>
+          <path class="snout" d="M 140 38 L 235 44 Q 282 50 282 64 Q 282 78 235 82 L 140 86" fill="none" stroke="#4c5458" stroke-width="1.5"/>
+          <g class="teeth"></g>
+          <circle cx="66" cy="50" r="7" fill="#d5d8d9"/><circle cx="68" cy="50" r="3.5" fill="#0a0a0a"/>
+          <circle cx="52" cy="40" r="4" fill="#3a4044" stroke="#4c5458"/>
+        </svg>
+        <div class="cname">Alligator</div>
+      </div>
+    </div>
+    <div class="featbtns">
+      <button class="btn ghost" onclick="showFeat('snout')">The snout</button>
+      <button class="btn ghost" onclick="showFeat('teeth')">The teeth</button>
+      <button class="btn ghost" onclick="showFeat('colour')">The colour</button>
+    </div>
+    <p id="featNote">Three tells, all learnable from examples.</p>
+    <div class="callout">There is no famous crocodile-versus-alligator dataset. But you can picture building one: a few thousand labelled photos of each, and the machine would find the snout, the teeth and the colour <strong>on its own</strong>. That is worth sitting with.</div>
+  </section>
+
+  <!-- 6 · Denoise -->
+  <section class="beat" data-title="Step 6 · Painting from static" data-onenter="resetDenoise">
+    <h2>Now run the whole thing in reverse</h2>
+    <p class="lede">After all that training, the machine holds a rich sense of what things look like: the ridged back of a crocodile, the metal shine of a car door. Generation uses that sense backwards. Start with a square of <strong>pure random static</strong>, like an old TV between channels. Then ask: if this static were slowly becoming "a crocodile driving a Hilux", which speckles should change, and which way? Nudge them. Look again. Nudge again.</p>
+    <div class="denoise-wrap">
+      <div>
+        <div class="scenebox" id="sceneBox"></div>
+        <div class="sliderrow">
+          <label for="denoiseSlider">Drag from static to picture, one nudge at a time</label>
+          <input type="range" id="denoiseSlider" min="0" max="4" step="1" value="0" oninput="setDenoise(+this.value)">
+        </div>
+        <button class="btn ghost" onclick="freshStatic()">Start over with fresh static</button>
+      </div>
+      <div>
+        <p id="denoiseCap"></p>
+        <div class="callout" style="margin-top:22px; font-size:20px;">Honest version of the fancy word: the machine is <strong>removing noise a little at a time</strong> until a picture that matches your words is left standing.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · Same words, new picture -->
+  <section class="beat" data-title="Step 7 · Same words, new picture" data-onenter="resetGen">
+    <h2>Why everyone's crocodile is different</h2>
+    <p class="lede">The static it starts from is fresh and random <strong>every single time</strong>. Different static means the nudges land differently, so the same words end somewhere new. Same prompt, three runs:</p>
+    <button class="btn" id="genBtn" onclick="genStep()">Generate: a crocodile driving a Hilux</button>
+    <div class="runsrow" id="genRuns"></div>
+    <div class="callout" id="genMoral" style="opacity:0; transition:opacity .6s;">Generative AI is not looking anything up. It is <strong>imagining, from noise, guided by your words</strong>. That is why no two are alike.</div>
+  </section>
+
+  <!-- 8 · Over to you -->
+  <section class="beat" data-title="Step 8 · Over to you">
+    <h2>Now prove it with the room</h2>
+    <p class="lede">Everyone, at the same time, give your AI tool the exact same prompt:</p>
+    <div class="prompt-chip">Show me a picture of a crocodile driving a Hilux.</div>
+    <p class="lede" style="margin-top:26px;">Then compare screens. Thirty people, thirty different crocodiles. You now know exactly why: thirty squares of fresh static, each nudged until it matched the same nine words.</p>
+    <div class="pair" style="margin-top:30px;">
+      <div class="card">
+        <h3>The one idea to keep</h3>
+        <p>The machine learnt what things look like from millions of labelled pictures, feature by feature. To make a new picture, it runs that understanding in reverse, starting from random static. Fresh static every time is why the same words never paint the same picture twice.</p>
+      </div>
+      <div class="card">
+        <h3>Where this connects</h3>
+        <p>This deck's sibling, <a href="../next-word-prediction/" style="color:var(--white)">How AI Predicts the Next Word</a>, tells the same story for text: weighted dice instead of nudged static, and the same lesson at the end. The machine predicts; it does not look up.</p>
+      </div>
+    </div>
+    <p class="cite">Dataset shown in Step 4: CIFAR-10 (Krizhevsky), via huggingface.co/datasets/uoft-cs/cifar10.</p>
+  </section>
+
+</main>
+<footer id="dots"></footer>
+<div class="navhint">click / tap / arrow keys · M for start</div>
+</div>
+
+<script>
+  // ---------- navigation ----------
+  const beats = Array.from(document.querySelectorAll('.beat'));
+  let idx = 0;
+  const onEnterHooks = {};
+
+  function show(i) {
+    idx = Math.max(0, Math.min(i, beats.length - 1));
+    beats.forEach((b, n) => b.classList.toggle('active', n === idx));
+    document.getElementById('hdrRight').textContent = beats[idx].dataset.title || '';
+    const dots = document.getElementById('dots');
+    dots.innerHTML = '';
+    beats.forEach((_, n) => {
+      const d = document.createElement('div');
+      d.className = 'dot' + (n === idx ? ' on' : '');
+      dots.appendChild(d);
+    });
+    const hook = beats[idx].dataset.onenter;
+    if (hook && onEnterHooks[hook]) onEnterHooks[hook]();
+    document.getElementById('main').scrollTop = 0;
+  }
+  function next() { if (idx < beats.length - 1) show(idx + 1); }
+  function prev() { if (idx > 0) show(idx - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') prev();
+    else if (e.key === 'm' || e.key === 'M') show(0);
+  });
+  document.getElementById('main').addEventListener('click', e => {
+    if (e.target.closest('button, svg, a, input, [role=button]')) return;
+    next();
+  });
+
+  // ---------- step 1: ping ----------
+  const pingOn = [false, false, false];
+  const pingWeight = [2, 1, 1];
+  function wirePing() {
+    [0,1,2].forEach(n => {
+      const cell = document.getElementById('c' + n);
+      const toggle = () => {
+        pingOn[n] = !pingOn[n];
+        cell.classList.toggle('onping', pingOn[n]);
+        document.getElementById('w' + n).classList.toggle('live', pingOn[n]);
+        const sum = pingOn.reduce((a, on, i) => a + (on ? pingWeight[i] : 0), 0);
+        document.getElementById('sumline').innerHTML =
+          'arriving: <b>' + sum + '</b> · needs 3 to fire';
+        const big = document.getElementById('bigcell');
+        const fired = sum >= 3;
+        big.classList.toggle('fired', fired);
+        document.getElementById('bigtext').textContent = fired ? 'PING' : 'quiet';
+      };
+      cell.addEventListener('click', toggle);
+      cell.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    });
+  }
+  onEnterHooks.resetPing = () => {
+    [0,1,2].forEach(n => {
+      pingOn[n] = false;
+      document.getElementById('c' + n).classList.remove('onping');
+      document.getElementById('w' + n).classList.remove('live');
+    });
+    document.getElementById('bigcell').classList.remove('fired');
+    document.getElementById('bigtext').textContent = 'quiet';
+    document.getElementById('sumline').innerHTML = 'arriving: <b>0</b> · needs 3 to fire';
+  };
+  wirePing();
+
+  // ---------- step 2: layers ----------
+  const layerLabels = [
+    'Light the bottom layer',
+    'Now find the edges',
+    'Now the little parts',
+    'Now a possible head',
+    'Now the whole bird',
+    'Done: no rules for "bird" anywhere, just layers of ping'
+  ];
+  let layerIdx = 0;
+  function layerStep() {
+    if (layerIdx > 4) return;
+    document.getElementById('lay' + layerIdx).classList.add('lit');
+    layerIdx++;
+    document.getElementById('layerBtn').textContent = layerLabels[layerIdx];
+  }
+  onEnterHooks.resetLayers = () => {
+    layerIdx = 0;
+    for (let n = 0; n <= 4; n++) document.getElementById('lay' + n).classList.remove('lit');
+    document.getElementById('layerBtn').textContent = layerLabels[0];
+  };
+
+  // ---------- step 3: training ----------
+  const trainStates = [
+    { pct: '50% bird', note: ', which is a coin flip. It has no idea.', w: 50, good: false, count: 'labelled pictures seen: 0 · connections: random' },
+    { pct: '61% bird', note: '. A little less wrong; every connection got its tiny nudge.', w: 61, good: false, count: 'labelled pictures seen: 1,000' },
+    { pct: '83% bird', note: '. Edge detectors are forming; a beak cell is starting to earn its keep.', w: 83, good: false, count: 'labelled pictures seen: 100,000' },
+    { pct: '97% bird', note: '. The connections have settled. It knows what a bird looks like.', w: 97, good: true, count: 'labelled pictures seen: millions' }
+  ];
+  let trainIdx = 0;
+  function renderTrain() {
+    const s = trainStates[trainIdx];
+    document.getElementById('guessPct').textContent = s.pct;
+    document.getElementById('guessNote').textContent = s.note;
+    const f = document.getElementById('confFill');
+    f.style.width = s.w + '%';
+    f.classList.toggle('good', s.good);
+    document.getElementById('trainNote').textContent = s.count;
+    document.getElementById('trainBtn').textContent =
+      trainIdx === 0 ? 'Show it a thousand labelled pictures'
+      : trainIdx < trainStates.length - 1 ? 'Keep nudging'
+      : 'Done: that is all training is';
+  }
+  function trainStep() { if (trainIdx < trainStates.length - 1) { trainIdx++; renderTrain(); } }
+  onEnterHooks.resetTrain = () => { trainIdx = 0; renderTrain(); };
+
+  // ---------- crocodile-in-Hilux pictures (AI-generated, local assets) ----------
+  const crocPics = [
+    'image_gen_assets/Croc_hilux1.png',
+    'image_gen_assets/croc_hilux2.png',
+    'image_gen_assets/croc_hilux3.png'
+  ];
+  function crocImg(n) {
+    return '<img src="' + crocPics[n] + '" alt="An AI-generated picture of a crocodile driving a Hilux ute">';
+  }
+
+  // ---------- step 6: denoise ----------
+  const denoiseStages = [
+    { noise: 1,    blur: 16, op: 0,   cap: '<b>Pure random static.</b> No picture is hiding in here. This square is different every time you start.' },
+    { noise: 0.75, blur: 13, op: 0.6, cap: 'First pass. The machine asks: which speckles should get a little more <b>crocodile</b>, which a little more <b>ute</b>, which a little more <b>windscreen</b>? And it nudges them.' },
+    { noise: 0.45, blur: 7,  op: 0.85,cap: 'Look again, nudge again. Shapes the machine learnt from all those labelled pictures are starting to win the argument.' },
+    { noise: 0.18, blur: 2.5,op: 1,   cap: 'Almost there. Each pass removes a little more noise and agrees a little more with the words you typed.' },
+    { noise: 0,    blur: 0,  op: 1,   cap: '<b>A picture nobody has ever seen before.</b> Not found. Not fetched. Painted out of static, guided by nine words.' }
+  ];
+  let sceneSvgEl, noiseCanvas;
+  function buildScene() {
+    const box = document.getElementById('sceneBox');
+    box.innerHTML = crocImg(0) + '<canvas width="320" height="180"></canvas>';
+    sceneSvgEl = box.querySelector('img');
+    noiseCanvas = box.querySelector('canvas');
+    paintNoise();
+  }
+  function paintNoise() {
+    const ctx = noiseCanvas.getContext('2d');
+    const img = ctx.createImageData(320, 180);
+    for (let p = 0; p < img.data.length; p += 4) {
+      const g = Math.floor(Math.random() * 256);
+      img.data[p] = g; img.data[p+1] = g; img.data[p+2] = g; img.data[p+3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+  function setDenoise(n) {
+    const s = denoiseStages[n];
+    noiseCanvas.style.opacity = s.noise;
+    sceneSvgEl.style.filter = s.blur ? 'blur(' + s.blur + 'px)' : 'none';
+    sceneSvgEl.style.opacity = s.op;
+    document.getElementById('denoiseCap').innerHTML = s.cap;
+  }
+  function freshStatic() {
+    paintNoise();
+    document.getElementById('denoiseSlider').value = 0;
+    setDenoise(0);
+  }
+  onEnterHooks.resetDenoise = () => {
+    if (!sceneSvgEl) buildScene();
+    freshStatic();
+  };
+
+  // ---------- step 7: generate ----------
+  const genLabels = [
+    'Generate: a crocodile driving a Hilux',
+    'Same words. Generate again',
+    'Once more',
+    'Three runs, three crocodiles, zero repeats'
+  ];
+  let genIdx = 0;
+  function genStep() {
+    if (genIdx >= 3) return;
+    const div = document.createElement('div');
+    div.className = 'runcard';
+    div.innerHTML = crocImg(genIdx) +
+      '<div class="runlbl">RUN ' + (genIdx + 1) + ' · same prompt, fresh static</div>';
+    document.getElementById('genRuns').appendChild(div);
+    genIdx++;
+    document.getElementById('genBtn').textContent = genLabels[genIdx];
+    if (genIdx === 3) document.getElementById('genMoral').style.opacity = 1;
+  }
+  onEnterHooks.resetGen = () => {
+    genIdx = 0;
+    document.getElementById('genRuns').innerHTML = '';
+    document.getElementById('genBtn').textContent = genLabels[0];
+    document.getElementById('genMoral').style.opacity = 0;
+  };
+
+  // ---------- step 5: features ----------
+  const featData = {
+    snout: 'The <b>snout</b>: a crocodile’s tapers to a narrow point; an alligator’s is broad and rounded, like a shovel. To the machine this is just edge detectors voting, the same cells that found the beak.',
+    teeth: 'The <b>teeth</b>: with its mouth shut, a crocodile still shows teeth along the jaw; an alligator hides them. A "visible tooth" detector would grow in training without anyone asking for it.',
+    colour: 'The <b>colour</b>: crocodiles run lighter and greener; alligators darker, nearly black. Colour is the easiest feature of all, it lives right down in the pixel layer.'
+  };
+  function showFeat(k) {
+    ['crocSvg', 'gatorSvg'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('hl-snout', 'hl-teeth', 'hl-colour');
+      el.classList.add('hl-' + k);
+    });
+    document.getElementById('featNote').innerHTML = featData[k];
+  }
+  onEnterHooks.resetFeat = () => {
+    ['crocSvg', 'gatorSvg'].forEach(id =>
+      document.getElementById(id).classList.remove('hl-snout', 'hl-teeth', 'hl-colour'));
+    document.getElementById('featNote').textContent = 'Three tells, all learnable from examples.';
+  };
+
+  show(0);
+</script>
+</body>
+</html>

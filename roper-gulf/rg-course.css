@@ -1,0 +1,204 @@
+/* Roper Gulf course styles, shared across the landing page and the five session pages.
+   Reuses the design tokens defined in ../styles.css.
+   Landing-only rules are namespaced under .rg-landing; session-only rules under .rg-session. */
+
+/* ---- shared layout ---- */
+.container-content { max-width: 860px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+.rg-landing .container-content { max-width: 920px; }
+
+.content-section { padding-top: 26px; padding-bottom: 8px; }
+.content-section h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-size: 26px;
+  margin: 0 0 6px; color: var(--text); font-weight: 500; border: none; padding: 0;
+}
+.content-section p { color: var(--text-2); line-height: 1.75; margin: 0 0 14px; }
+.content-section strong { color: var(--text); font-weight: 600; }
+.rg-landing .content-section { padding-top: 30px; padding-bottom: 6px; }
+.rg-landing .content-section h2 { font-size: 30px; margin: 0 0 16px; }
+
+/* ---- Acknowledgement of Country (landing) ---- */
+.acknowledgement {
+  max-width: 920px; margin: 8px auto 0; padding: 22px 26px;
+  background: rgba(26,201,201,0.05); border: 1px solid var(--rule-2);
+  border-left: 3px solid var(--accent); border-radius: 12px;
+}
+.acknowledgement .label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+}
+.acknowledgement p {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; line-height: 1.55;
+  color: var(--text); margin: 0; font-weight: 300;
+}
+
+/* ---- session cards (landing) ---- */
+.session-list { display: grid; gap: 14px; margin: 14px 0 10px; }
+.session-card {
+  display: block; text-decoration: none;
+  background: var(--bg-2); border: 1px solid var(--rule-2);
+  border-radius: 12px; padding: 20px 24px;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+.session-card:hover { border-color: var(--accent); background: rgba(26,201,201,0.03); transform: translateY(-1px); }
+.session-card .num {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--accent); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px;
+}
+.session-card h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px;
+  color: var(--text); margin: 0 0 4px; font-weight: 500;
+}
+.session-card .focus { color: var(--text-2); font-size: 14.5px; line-height: 1.6; margin: 0 0 10px; }
+.session-card ul { margin: 0; padding-left: 18px; color: var(--text-2); }
+.session-card ul li { font-size: 14px; line-height: 1.55; margin-bottom: 2px; }
+.session-card .go {
+  display: inline-block; margin-top: 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--accent-2); letter-spacing: 0.06em;
+}
+
+.interlude {
+  margin: 14px 0; padding: 14px 22px;
+  border-left: 3px dashed var(--rule-2); background: rgba(255,255,255,0.015);
+  border-radius: 0 10px 10px 0;
+}
+.interlude .tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 4px;
+}
+.interlude p { color: var(--text-2); font-size: 14.5px; line-height: 1.6; margin: 0; }
+
+.back-strip { margin: 22px 0 0; }
+.back-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--text-3); text-decoration: none;
+  text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.15s;
+}
+.back-link:hover { color: var(--accent-2); }
+.back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+/* ---- session-page navigation ---- */
+.session-nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin: 6px 0 0;
+}
+.session-nav a, .session-nav span.disabled {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 0.06em;
+  text-decoration: none; color: var(--text-3); text-transform: uppercase;
+}
+.session-nav a:hover { color: var(--accent-2); }
+.session-nav .home { color: var(--accent-2); }
+
+/* ---- outcome and facilitator note (session) ---- */
+.outcome-box {
+  background: var(--bg-2); border: 1px solid var(--rule-2);
+  border-left: 3px solid var(--accent); border-radius: 12px;
+  padding: 18px 24px; margin: 6px 0 8px;
+}
+.outcome-box .label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+}
+.outcome-box p { color: var(--text); font-size: 16px; line-height: 1.6; margin: 0; }
+
+.prep {
+  background: rgba(255,255,255,0.015); border: 1px dashed var(--rule-2);
+  border-radius: 10px; padding: 14px 20px; margin: 18px 0 2px;
+}
+.prep .label {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-3); margin-bottom: 6px;
+}
+.prep p { color: var(--text-2); font-size: 14px; line-height: 1.6; margin: 0; }
+
+/* ---- running order (session) ---- */
+.ros { margin: 8px 0 0; }
+.ros-item {
+  display: grid; grid-template-columns: 62px 1fr; gap: 20px;
+  border-top: 1px solid var(--rule-2); padding: 20px 0;
+}
+.ros-item:last-child { border-bottom: 1px solid var(--rule-2); }
+.ros-time {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent);
+  padding-top: 3px; letter-spacing: 0.02em;
+}
+.ros-body h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-size: 21px; font-weight: 500;
+  color: var(--text); margin: 0 0 6px;
+}
+.ros-body p { color: var(--text-2); line-height: 1.7; margin: 0 0 6px; font-size: 15px; }
+.ros-body .break-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-3);
+}
+
+/* ---- tool open button (session) ---- */
+.tool-btn {
+  display: flex; align-items: center; gap: 14px; margin: 12px 0 4px;
+  background: rgba(26,201,201,0.05); border: 1px solid var(--accent);
+  border-radius: 10px; padding: 13px 16px; text-decoration: none;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.tool-btn:hover { background: rgba(26,201,201,0.12); transform: translateY(-1px); }
+.tool-btn .ic {
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 8px;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+}
+.tool-btn .ic svg { width: 18px; height: 18px; stroke: #06202a; fill: none; stroke-width: 2; }
+.tool-btn .lbl { display: flex; flex-direction: column; line-height: 1.3; }
+.tool-btn .lbl strong { color: var(--text); font-size: 15px; font-weight: 600; }
+.tool-btn .lbl small {
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.06em;
+  color: var(--text-3); text-transform: uppercase; margin-top: 2px;
+}
+.tool-btn.stretch { background: transparent; border-style: dashed; border-color: var(--rule-2); }
+.tool-btn.stretch:hover { background: rgba(255,255,255,0.02); }
+.tool-btn.stretch .ic { background: var(--bg-3); }
+.tool-btn.stretch .ic svg { stroke: var(--accent-2); }
+
+/* download variant (session) */
+.tool-btn.download .ic { background: var(--accent-2); }
+
+/* pending tool, not yet a link (session) */
+.tool-pending {
+  display: flex; align-items: center; gap: 14px; margin: 12px 0 4px;
+  background: rgba(255,255,255,0.015); border: 1px dashed var(--rule-2);
+  border-radius: 10px; padding: 13px 16px;
+}
+.tool-pending .ic {
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 8px;
+  background: var(--bg-3); display: flex; align-items: center; justify-content: center;
+}
+.tool-pending .ic svg { width: 18px; height: 18px; stroke: var(--text-3); fill: none; stroke-width: 2; }
+.tool-pending .lbl { display: flex; flex-direction: column; line-height: 1.3; }
+.tool-pending .lbl strong { color: var(--text-2); font-size: 15px; font-weight: 600; }
+.tool-pending .lbl small {
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.06em;
+  color: var(--text-3); text-transform: uppercase; margin-top: 2px;
+}
+
+/* ---- teach / activity box (session) ---- */
+.teachbox {
+  background: var(--bg-2); border: 1px solid var(--rule-2); border-radius: 10px;
+  padding: 16px 20px; margin: 12px 0 4px;
+}
+.teachbox ul { margin: 4px 0 0; padding-left: 18px; color: var(--text-2); }
+.teachbox ul li { font-size: 14.5px; line-height: 1.65; margin-bottom: 7px; }
+.teachbox a { color: var(--accent-2); }
+.teachbox .takeaway { color: var(--text); font-size: 14.5px; line-height: 1.65; margin: 12px 0 0; }
+.teachbox .takeaway strong { color: var(--accent-2); }
+.teachbox .prompt {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic;
+  font-size: 20px; line-height: 1.5; color: var(--text);
+  border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; margin: 6px 0 0;
+}
+
+/* ---- responsive ---- */
+@media (max-width: 720px) {
+  .container-content { padding: 0 20px; }
+  .content-section h2 { font-size: 24px; }
+  .rg-landing .content-section h2 { font-size: 24px; }
+  .acknowledgement { margin: 8px 20px 0; }
+  .ros-item { grid-template-columns: 52px 1fr; gap: 14px; }
+}
