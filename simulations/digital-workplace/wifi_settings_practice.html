@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -12,10 +12,18 @@
   html,body{height:100%}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
   .app{max-width:1080px;margin:0 auto;padding:16px 20px}
-  .heading{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .heading{display:flex;align-items:center;gap:12px;margin-bottom:6px}
   .heading h1{font-size:20px;margin:0}
   .goal{background:#f5f5f5;border:1px solid var(--outline);padding:10px 12px;border-radius:8px;margin-bottom:12px}
   .goal strong{font-weight:700}
+
+  /* Tabs */
+  .tabbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tabbar button{appearance:none;border:1px solid var(--outline);background:#fafafa;color:#000;padding:9px 14px;border-radius:999px;cursor:pointer;font-size:14px}
+  .tabbar button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .view{display:none}
+  .view.on{display:block}
+
   .panel{display:grid;grid-template-columns:360px 1fr;gap:16px;align-items:start}
   @media (max-width: 860px){ .panel{grid-template-columns:1fr} }
   .card{border:1px solid var(--outline);border-radius:10px;background:#fff}
@@ -31,7 +39,7 @@
   .net{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--outline);cursor:pointer}
   .net:hover{background:#f8f8f8}
   .net.active{outline:2px solid var(--accent);outline-offset:-2px;background:#f0f7ff}
-  .net .meta{font-size:12px;color:#111}
+  .net .meta{font-size:12px;color:#111;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .badge{font-size:11px;border:1px solid var(--outline);border-radius:999px;padding:2px 8px;background:#fafafa}
   .right .content{padding:14px 16px}
   .row{display:grid;grid-template-columns:120px 1fr;gap:10px;margin:8px 0;align-items:center}
@@ -46,8 +54,7 @@
   .status.warn{border-color:#ffe2b3;background:#fff8e6}
   .status.bad{border-color:#f1b3b3;background:#fff0f0}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .subtle{color:#000}
-  .signal{display:inline-flex;gap:2px}
+  .signal{display:inline-flex;gap:2px;align-items:flex-end}
   .bar{width:4px;background:#bbb;display:inline-block}
   .bar:nth-child(1){height:6px}
   .bar:nth-child(2){height:10px}
@@ -57,6 +64,68 @@
   .net.connected .badge{border-color:#9ad39a;background:#e9f6e9}
   .help{font-size:13px;color:#111;margin-top:8px}
   .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+
+  /* Safety note inside network details */
+  .safety{margin-top:12px;padding:10px 12px;border-radius:8px;font-size:13px;line-height:1.55}
+  .safety.green{background:#eef8ee;border:1px solid #b7dfb7}
+  .safety.amber{background:#fff8e6;border:1px solid #ffe2b3}
+  .safety strong{display:block;margin-bottom:3px}
+
+  /* Trust guide */
+  .trustgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+  .trustcard{border-radius:10px;padding:16px;border:1px solid var(--outline)}
+  .trustcard.green{background:#eef8ee;border-color:#9ad39a}
+  .trustcard.amber{background:#fff8e6;border-color:#f4cf87}
+  .trustcard.red{background:#fff0f0;border-color:#eeb0b0}
+  .trustcard h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block;flex:none}
+  .dot.g{background:var(--ok)} .dot.a{background:var(--warn)} .dot.r{background:var(--bad)}
+  .trustcard ul{margin:0;padding-left:18px;font-size:13px;line-height:1.65}
+  .explain{border:1px solid var(--outline);border-radius:10px;padding:16px;margin-top:14px;background:#fafafa;font-size:14px;line-height:1.65}
+  .explain h3{margin:0 0 8px;font-size:15px}
+  .explain p{margin:0 0 10px}
+  .explain p:last-child{margin-bottom:0}
+
+  /* Sorter activity */
+  .sorter{border:1px solid var(--outline);border-radius:10px;padding:16px;margin-top:14px}
+  .sorter h3{margin:0 0 4px;font-size:15px}
+  .sorter .sub{font-size:13px;color:#333;margin-bottom:12px}
+  .chipwrap{display:flex;flex-wrap:wrap;gap:8px;min-height:44px;padding:8px;border:1px dashed var(--outline);border-radius:8px;margin-bottom:10px}
+  .chip{border:1px solid var(--outline);background:#fff;border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer}
+  .chip:hover{border-color:var(--accent)}
+  .buckets{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:700px){.buckets{grid-template-columns:1fr}}
+  .bucket{border-radius:10px;padding:10px;min-height:90px}
+  .bucket h4{margin:0 0 8px;font-size:13px}
+  .bucket.safe{background:#eef8ee;border:1px solid #9ad39a}
+  .bucket.wait{background:#fff8e6;border:1px solid #f4cf87}
+  .chip.placed{cursor:default;opacity:.95}
+  .chip.rightpick{border-color:var(--ok);background:#e9f6e9}
+  .chip.wrongpick{border-color:var(--bad);background:#fdecec}
+  .sorter .verdict{font-size:13px;margin-top:10px;min-height:20px}
+
+  /* VPN demo */
+  .vpnwrap{border:1px solid var(--outline);border-radius:10px;padding:16px;margin-top:14px}
+  .vpnwrap h3{margin:0 0 8px;font-size:15px}
+  .vpn-toggle-row{display:flex;align-items:center;gap:12px;margin:12px 0}
+  .vpn-diagram{width:100%;max-width:760px;display:block;margin:0 auto}
+  .vpn-readout{max-width:760px;margin:12px auto 0;padding:12px 14px;border-radius:8px;font-size:13.5px;line-height:1.6}
+  .vpn-readout.off{background:#fff8e6;border:1px solid #f4cf87}
+  .vpn-readout.on{background:#eef8ee;border:1px solid #9ad39a}
+  .vpn-readout ul{margin:6px 0 0;padding-left:18px}
+
+  /* Quiz */
+  .quiz{border:1px solid var(--outline);border-radius:10px;padding:16px;margin-top:14px}
+  .quiz h3{margin:0 0 10px;font-size:15px}
+  .q{margin-bottom:16px}
+  .q p{margin:0 0 8px;font-size:14px;font-weight:600}
+  .q .opts{display:grid;gap:6px}
+  .q .opts button{text-align:left;font-size:13.5px;padding:9px 12px;border-radius:8px}
+  .q .opts button.correct{background:#e9f6e9;border-color:var(--ok)}
+  .q .opts button.wrong{background:#fdecec;border-color:var(--bad)}
+  .q .why{display:none;font-size:13px;background:#f5f5f5;border-left:3px solid var(--accent);padding:8px 10px;margin-top:6px;line-height:1.55}
+  .q .why.show{display:block}
+  .padlock{display:inline-block;vertical-align:-2px}
 </style>
 </head>
 <body>
@@ -65,9 +134,18 @@
     <h1>Wi-Fi Settings Practice</h1>
   </div>
   <div class="goal" aria-live="polite">
-    <strong>Learning goal:</strong> Connect to Wi-Fi internet
+    <strong>Learning goals:</strong> connect to Wi-Fi, decide which networks to trust with which tasks, and understand why workplaces give staff a VPN.
   </div>
 
+  <div class="tabbar" role="tablist">
+    <button class="on" data-view="connect" role="tab">1. Connect to Wi-Fi</button>
+    <button data-view="trust" role="tab">2. Which Wi-Fi can you trust?</button>
+    <button data-view="vpn" role="tab">3. Why work gives you a VPN</button>
+    <button data-view="quiz" role="tab">4. Check yourself</button>
+  </div>
+
+  <!-- ============ VIEW 1: CONNECT ============ -->
+  <div class="view on" id="view-connect">
   <div class="panel">
     <div class="left">
       <div class="card">
@@ -88,19 +166,150 @@
           <span class="badge" id="connState">Not connected</span>
         </div>
         <div class="content" id="details">
-          <p class="help">Select a network on the left. If it’s secured, type the password shown and press <strong>Connect</strong>.</p>
+          <p class="help">Select a network on the left. If it&rsquo;s secured, type the password shown and press <strong>Connect</strong>.</p>
         </div>
       </div>
       <div class="card" style="margin-top:12px">
         <div class="titlebar"><h2>Tips</h2></div>
         <div class="content">
-          <ul>
-            <li><strong>Open</strong> networks don’t need a password (be careful with sensitive info).</li>
-            <li><strong>Secured</strong> networks show their password here for practice.</li>
-            <li>After connecting, you’ll see <em>Connected</em> and the network moves to the top of the list.</li>
+          <ul style="line-height:1.7">
+            <li><strong>Secured</strong> networks need a password; for practice, the password is shown in the list.</li>
+            <li><strong>Open</strong> networks need no password. Anyone nearby can join them, including people you would not lend your phone to.</li>
+            <li>Free Wi-Fi at a hotel, airport or caf&eacute; is fine for everyday browsing. Save banking, MyGov and other logins for a network you trust; the next tab explains why.</li>
           </ul>
         </div>
       </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ============ VIEW 2: TRUST ============ -->
+  <div class="view" id="view-trust">
+    <div class="trustgrid">
+      <div class="trustcard green">
+        <h3><span class="dot g"></span>Usually fine for everything</h3>
+        <ul>
+          <li><strong>Your home Wi-Fi</strong>, with its own password</li>
+          <li><strong>Your phone&rsquo;s hotspot</strong>, using your mobile data</li>
+          <li><strong>Your workplace network</strong>, run by your IT team</li>
+        </ul>
+        <p style="font-size:13px;margin:10px 0 0">You know who runs these networks, and they are protected with a password.</p>
+      </div>
+      <div class="trustcard amber">
+        <h3><span class="dot a"></span>Fine for browsing, careful with logins</h3>
+        <ul>
+          <li><strong>Hotel guest Wi-Fi</strong></li>
+          <li><strong>Airport free Wi-Fi</strong></li>
+          <li><strong>Caf&eacute;, pub and shopping centre hotspots</strong></li>
+        </ul>
+        <p style="font-size:13px;margin:10px 0 0">Reading news, checking maps and looking things up is fine. Avoid internet banking, MyGov, and typing passwords or card numbers; do those at home, or switch to your phone&rsquo;s mobile data.</p>
+      </div>
+      <div class="trustcard red">
+        <h3><span class="dot r"></span>Walk away</h3>
+        <ul>
+          <li>Networks that ask for <strong>card details</strong> or odd personal information just to connect</li>
+          <li><strong>Look-alike names</strong> such as &ldquo;Airport_Free_WiFi_2&rdquo; sitting next to the real one; scammers set up fake hotspots with trustworthy-sounding names</li>
+          <li>Any network a stranger urges you to join</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="explain">
+      <h3>Why the caution on free Wi-Fi?</h3>
+      <p>A public network is a <strong>shared space</strong>. You do not know who set it up, who else is on it, or how well it is run. Information sent over an unprotected connection can travel as <strong>plain text</strong>, like a postcard: anyone handling it along the way can read it.</p>
+      <p>Most websites today use a secure connection (the address starts with <strong>https</strong> and the browser shows a padlock <svg class="padlock" width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><rect x="1" y="6" width="10" height="7" rx="1.5" fill="#444"/><path d="M3.5 6V4.5a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="#444" stroke-width="1.5"/></svg>), which seals the postcard inside an envelope. That helps a lot, but it is not the whole story: a fake hotspot can still steer you to counterfeit login pages, the network owner can still see <em>which</em> sites you visit, and one slip on a non-secure page can expose what you typed.</p>
+      <p>So the rule of thumb many people in the NT have never been told: <strong>free Wi-Fi itself is not the danger; it is what you log in to while you are on it.</strong> Browse freely, but keep banking, government accounts and anything with a password for your home network, your phone&rsquo;s data, or a work VPN (next tab).</p>
+    </div>
+
+    <div class="sorter">
+      <h3>Try it: you&rsquo;re on the hotel guest Wi-Fi</h3>
+      <div class="sub">Click each activity, then choose the bucket it belongs in.</div>
+      <div class="chipwrap" id="chipTray"></div>
+      <div class="buckets">
+        <div class="bucket safe"><h4>Go ahead on hotel Wi-Fi</h4><div class="chipwrap" id="bucketSafe" style="border:none;padding:0"></div></div>
+        <div class="bucket wait"><h4>Wait, or switch to mobile data</h4><div class="chipwrap" id="bucketWait" style="border:none;padding:0"></div></div>
+      </div>
+      <div class="verdict" id="sortVerdict" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- ============ VIEW 3: VPN ============ -->
+  <div class="view" id="view-vpn">
+    <div class="explain">
+      <h3>&ldquo;Isn&rsquo;t a VPN that thing for watching overseas Netflix?&rdquo;</h3>
+      <p>That is the pop-culture version. Streaming ads sell VPNs as a way to appear to be in another country, and yes, they can do that. But it is a side effect, not the point.</p>
+      <p>A <strong>VPN (virtual private network)</strong> builds an <strong>encrypted tunnel</strong> from your device to another network you trust, usually your employer&rsquo;s. Everything you send travels through that tunnel scrambled. Whoever runs the Wi-Fi you happen to be on, a hotel, an airport, a caf&eacute;, sees only scrambled traffic going to one address; not the sites you visit, not the files you open, not what you type.</p>
+      <p><strong>This is why workplaces give staff a VPN.</strong> Staff work from home, hotels and airports, on networks the employer cannot vouch for. The VPN makes any of those networks behave like a direct, private cable back to the office, so company logins, client records and internal systems stay protected wherever staff happen to sit. It is also how you reach systems that only exist inside the office network.</p>
+      <p>One honest caveat: a VPN protects data <em>in transit</em>. It does not stop you clicking a scam link or reusing a weak password; judgement still required.</p>
+    </div>
+
+    <div class="vpnwrap">
+      <h3>See the difference</h3>
+      <div class="vpn-toggle-row">
+        <label class="toggle"><span><strong>Work VPN</strong></span>
+          <input id="vpnToggle" type="checkbox" aria-label="VPN on/off">
+        </label>
+        <span class="badge" id="vpnState">VPN off</span>
+      </div>
+
+      <svg class="vpn-diagram" viewBox="0 0 760 210" role="img" aria-label="Diagram showing traffic between your laptop, the cafe Wi-Fi and the internet, with and without a VPN">
+        <!-- Laptop -->
+        <g>
+          <rect x="20" y="80" width="90" height="55" rx="6" fill="#eef2f7" stroke="#8aa"/>
+          <rect x="30" y="90" width="70" height="35" rx="3" fill="#fff" stroke="#8aa"/>
+          <text x="65" y="160" text-anchor="middle" font-size="13" fill="#222">Your laptop</text>
+        </g>
+        <!-- Cafe wifi -->
+        <g>
+          <circle cx="380" cy="105" r="34" fill="#fdf3e3" stroke="#d8a44a"/>
+          <path d="M366 108 a20 20 0 0 1 28 0 M372 114 a12 12 0 0 1 16 0" fill="none" stroke="#b07a1e" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="380" cy="120" r="2.6" fill="#b07a1e"/>
+          <text x="380" y="160" text-anchor="middle" font-size="13" fill="#222">Caf&eacute; Wi-Fi (owner unknown)</text>
+        </g>
+        <!-- Internet cloud -->
+        <g>
+          <ellipse cx="680" cy="105" rx="58" ry="32" fill="#e8f0fb" stroke="#7f9fc6"/>
+          <text x="680" y="110" text-anchor="middle" font-size="13" fill="#222">Internet</text>
+        </g>
+        <!-- Traffic without VPN: postcards -->
+        <g id="plainTraffic">
+          <g font-size="11" fill="#7a4a00">
+            <rect x="130" y="88" width="66" height="26" rx="3" fill="#fff8e6" stroke="#d8a44a"/>
+            <text x="163" y="105" text-anchor="middle">bank login</text>
+            <rect x="210" y="98" width="66" height="26" rx="3" fill="#fff8e6" stroke="#d8a44a"/>
+            <text x="243" y="115" text-anchor="middle">password</text>
+            <rect x="440" y="88" width="66" height="26" rx="3" fill="#fff8e6" stroke="#d8a44a"/>
+            <text x="473" y="105" text-anchor="middle">email text</text>
+            <rect x="520" y="98" width="70" height="26" rx="3" fill="#fff8e6" stroke="#d8a44a"/>
+            <text x="555" y="115" text-anchor="middle">sites visited</text>
+          </g>
+          <text x="380" y="30" text-anchor="middle" font-size="13" fill="#7a4a00">Postcards: readable along the way</text>
+        </g>
+        <!-- Traffic with VPN: tunnel -->
+        <g id="vpnTraffic" style="display:none">
+          <rect x="118" y="86" width="500" height="38" rx="19" fill="#e9f6e9" stroke="#2f8f2f" stroke-width="2" stroke-dasharray="7 5"/>
+          <text x="368" y="110" text-anchor="middle" font-size="12" fill="#1e6b1e" font-family="monospace">x9$k#q2..vB7@wM4..zR8!nT6..pL3&amp;hJ9..fD5</text>
+          <text x="380" y="30" text-anchor="middle" font-size="13" fill="#1e6b1e">Encrypted tunnel: scrambled until it reaches your work&rsquo;s network</text>
+        </g>
+      </svg>
+
+      <div class="vpn-readout off" id="vpnReadout">
+        <strong>VPN off.</strong> The caf&eacute; Wi-Fi (and anyone who has tampered with it) can see:
+        <ul>
+          <li>which websites you visit;</li>
+          <li>anything sent over a non-secure connection, in plain text;</li>
+          <li>enough, on a hostile hotspot, to steer you toward fake login pages.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ VIEW 4: QUIZ ============ -->
+  <div class="view" id="view-quiz">
+    <div class="quiz">
+      <h3>Quick check: six questions</h3>
+      <div id="quizArea"></div>
+      <div class="status" id="quizScore" style="display:none"></div>
     </div>
   </div>
 </div>
@@ -110,15 +319,32 @@
   const $ = (q,root=document)=>root.querySelector(q);
   const $$ = (q,root=document)=>Array.from(root.querySelectorAll(q));
 
+  /* ===== TABS ===== */
+  $$('.tabbar button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      $$('.tabbar button').forEach(b=>b.classList.remove('on'));
+      btn.classList.add('on');
+      $$('.view').forEach(v=>v.classList.remove('on'));
+      $('#view-'+btn.dataset.view).classList.add('on');
+    });
+  });
+
+  /* ===== NETWORKS ===== */
+  const SAFETY = {
+    trusted: {cls:'green', title:'Trusted network', text:'You know who runs this network and it is password-protected. Fine for everyday use, including logins.'},
+    open:    {cls:'amber', title:'Open public network', text:'Fine for browsing, maps and looking things up. Avoid internet banking, MyGov and typing passwords or card numbers here; wait for a trusted network, use your phone’s mobile data, or connect through a work VPN.'}
+  };
+
   const networks = [
-    {ssid:"CDU-Staff", security:"WPA2", password:"TopEnd2025!", strength:4, connected:false},
-    {ssid:"Free Public Wi-Fi", security:"Open", password:"None", strength:3, connected:false},
-    {ssid:"Community Hub", security:"WPA2", password:"Welcome123", strength:2, connected:false},
-    {ssid:"Guest-Training", security:"WPA3", password:"TrainMe-NT", strength:4, connected:false},
-    {ssid:"Personal Hotspot", security:"WPA2", password:"555-Password", strength:1, connected:false}
+    {ssid:"Home-WiFi", security:"WPA2", password:"MyPlace2026", strength:4, connected:false, kind:'trusted'},
+    {ssid:"CDU-Staff", security:"WPA2", password:"TopEnd2026!", strength:4, connected:false, kind:'trusted'},
+    {ssid:"Hotel Guest WiFi", security:"Open", password:"None", strength:3, connected:false, kind:'open'},
+    {ssid:"Airport Free WiFi", security:"Open", password:"None", strength:3, connected:false, kind:'open'},
+    {ssid:"Cafe_FreeWiFi", security:"Open", password:"None", strength:2, connected:false, kind:'open'},
+    {ssid:"Personal Hotspot", security:"WPA2", password:"555-Password", strength:1, connected:false, kind:'trusted'}
   ];
 
-  const state = { on:true, selected:null, connecting:false, connectedSsid:null };
+  const state = { on:true, selected:null, connectedSsid:null };
 
   const els = {
     list: $('#list'),
@@ -138,6 +364,10 @@
     const bars = [1,2,3,4].map(i => `<span class="bar" style="background:${i<=n?'#111':'#bbb'}"></span>`).join('');
     return `<span class="signal" aria-hidden="true">${bars}</span>`;
   }
+  function lockIcon(sec){
+    if(sec==='Open') return '';
+    return `<svg class="padlock" width="11" height="13" viewBox="0 0 12 14" aria-label="secured"><rect x="1" y="6" width="10" height="7" rx="1.5" fill="#444"/><path d="M3.5 6V4.5a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="#444" stroke-width="1.5"/></svg>`;
+  }
 
   function renderList(){
     els.list.innerHTML = "";
@@ -148,7 +378,6 @@
       els.list.appendChild(div);
       return;
     }
-    // sort: connected first, then by strength
     const sorted = networks.slice().sort((a,b)=> (b.connected - a.connected) || (b.strength - a.strength));
     sorted.forEach(net=>{
       const item = document.createElement('div');
@@ -157,9 +386,9 @@
       item.tabIndex = 0;
       item.innerHTML = `
         <div>
-          <div><strong>${escapeHtml(net.ssid)}</strong></div>
+          <div><strong>${escapeHtml(net.ssid)}</strong> ${lockIcon(net.security)}</div>
           <div class="meta">
-            ${renderBars(net.strength)} &nbsp; 
+            ${renderBars(net.strength)}
             <span>${net.security==='Open'?'Open network':'Secured ('+net.security+')'}</span>
           </div>
         </div>
@@ -194,6 +423,7 @@
       return;
     }
     const n = state.selected;
+    const safety = SAFETY[n.kind];
     els.title.textContent = n.ssid;
     els.connState.textContent = n.connected? "Connected":"Not connected";
     const wrap = document.createElement('div');
@@ -207,7 +437,8 @@
         <button class="primary" id="connectBtn">${n.connected? "Disconnect":"Connect"}</button>
       </div>
       <div id="status" class="status" aria-live="polite">Ready.</div>
-      <div class="help">Practice task: Connect to <strong>Free Public Wi-Fi</strong> (no password) or a secured network using the password shown.</div>
+      <div class="safety ${safety.cls}"><strong>${safety.title}</strong>${safety.text}</div>
+      <div class="help">Practice task: connect to <strong>Hotel Guest WiFi</strong> (no password), then to a secured network using the password shown.</div>
     `;
     els.details.appendChild(wrap);
 
@@ -227,7 +458,6 @@
 
     connectBtn.addEventListener('click', ()=>{
       if(n.connected){
-        // disconnect
         n.connected = false;
         state.connectedSsid = null;
         status.className = "status";
@@ -247,19 +477,151 @@
       status.textContent = "Connecting…";
       connectBtn.disabled = true;
       setTimeout(()=>{
-        // mark all others disconnected
         networks.forEach(x=>x.connected=false);
         n.connected = true;
         state.connectedSsid = n.ssid;
-        status.className = "status good";
-        status.textContent = `Connected to ${n.ssid}.`;
         renderList();
         renderDetails();
+        const newStatus = $('#status');
+        if(newStatus){
+          newStatus.className = "status good";
+          newStatus.textContent = n.kind==='open'
+            ? `Connected to ${n.ssid}. Remember: browse freely, but save logins and banking for a trusted network.`
+            : `Connected to ${n.ssid}.`;
+        }
       }, 800);
     });
   }
 
-  function escapeHtml(s){return (s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;"," >":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+  function escapeHtml(s){return (s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+
+  /* ===== SORTER (hotel Wi-Fi activity) ===== */
+  const ACTIVITIES = [
+    {label:'Read the news', safe:true,  why:'Reading public pages exposes nothing sensitive.'},
+    {label:'Look up tomorrow’s weather', safe:true, why:'No login, nothing sensitive.'},
+    {label:'Check a map for directions', safe:true, why:'Fine; no personal details involved.'},
+    {label:'Internet banking', safe:false, why:'Never on public Wi-Fi. Use mobile data or wait until home.'},
+    {label:'Log in to MyGov', safe:false, why:'Government accounts hold your identity; treat like banking.'},
+    {label:'Type your card number into a shop site', safe:false, why:'Card details on public Wi-Fi is asking for trouble.'},
+    {label:'Watch free videos', safe:true, why:'Fine, if the hotel bandwidth can take it.'},
+    {label:'Change your email password', safe:false, why:'Password changes are exactly what an eavesdropper wants to catch.'}
+  ];
+  let currentChip = null, sortedCount = 0, sortRight = 0;
+
+  function buildSorter(){
+    const tray = $('#chipTray');
+    ACTIVITIES.forEach((a,i)=>{
+      const c = document.createElement('button');
+      c.className='chip';
+      c.textContent=a.label;
+      c.dataset.idx=i;
+      c.addEventListener('click', ()=>{
+        if(c.classList.contains('placed')) return;
+        $$('.chip').forEach(x=>x.style.outline='');
+        c.style.outline='2px solid var(--accent)';
+        currentChip = c;
+        $('#sortVerdict').textContent = 'Now click the bucket where "'+a.label+'" belongs.';
+      });
+      tray.appendChild(c);
+    });
+    [['#bucketSafe',true],['#bucketWait',false]].forEach(([sel,isSafe])=>{
+      $(sel).parentElement.addEventListener('click', ()=>{
+        if(!currentChip) return;
+        const a = ACTIVITIES[currentChip.dataset.idx];
+        const right = (a.safe===isSafe);
+        currentChip.classList.add('placed', right?'rightpick':'wrongpick');
+        currentChip.style.outline='';
+        $(isSafe?'#bucketSafe':'#bucketWait').appendChild(currentChip);
+        sortedCount++; if(right) sortRight++;
+        $('#sortVerdict').innerHTML = (right?'<strong>Right.</strong> ':'<strong>Not quite.</strong> ') + a.why +
+          (sortedCount===ACTIVITIES.length ? `<br><strong>Done: ${sortRight} of ${ACTIVITIES.length} placed correctly.</strong>` : '');
+        currentChip = null;
+      });
+    });
+  }
+  buildSorter();
+
+  /* ===== VPN DEMO ===== */
+  const vpnToggle = $('#vpnToggle');
+  vpnToggle.addEventListener('change', ()=>{
+    const on = vpnToggle.checked;
+    $('#plainTraffic').style.display = on?'none':'';
+    $('#vpnTraffic').style.display = on?'':'none';
+    $('#vpnState').textContent = on?'VPN on':'VPN off';
+    const r = $('#vpnReadout');
+    r.className = 'vpn-readout ' + (on?'on':'off');
+    r.innerHTML = on
+      ? `<strong>VPN on.</strong> The caf&eacute; Wi-Fi now sees only:
+         <ul>
+           <li>scrambled data flowing to one address (your work&rsquo;s VPN server);</li>
+           <li>no site names, no page contents, no passwords.</li>
+         </ul>
+         Your traffic exits onto the internet from your work&rsquo;s network, as if you were sitting in the office.`
+      : `<strong>VPN off.</strong> The caf&eacute; Wi-Fi (and anyone who has tampered with it) can see:
+         <ul>
+           <li>which websites you visit;</li>
+           <li>anything sent over a non-secure connection, in plain text;</li>
+           <li>enough, on a hostile hotspot, to steer you toward fake login pages.</li>
+         </ul>`;
+  });
+
+  /* ===== QUIZ ===== */
+  const QUIZ = [
+    {q:'You are at the airport with an hour to spare. Which is the safest way to check your bank balance?',
+     opts:['Airport free Wi-Fi','Your phone’s mobile data','A hotspot called "Airport_Banking_WiFi"'], correct:1,
+     why:'Mobile data goes straight through your phone provider; no shared public network involved. A hotspot named for banking is exactly what a fake hotspot would call itself.'},
+    {q:'Hotel Wi-Fi asks only for your room number and surname to connect. Using it to read the news is:',
+     opts:['Dangerous; never use hotel Wi-Fi','Fine; reading public pages risks little','Only safe with banking apps open'], correct:1,
+     why:'Public browsing on public Wi-Fi is fine. The caution is for logins, banking and personal details.'},
+    {q:'What does the padlock (https) in the browser address bar mean?',
+     opts:['The website is trustworthy and cannot be a scam','Your connection to that site is encrypted','The Wi-Fi network is secure'], correct:1,
+     why:'It seals the connection, like an envelope instead of a postcard. But scam sites can use https too, so the padlock alone does not make a site honest.'},
+    {q:'Two networks appear: "CityLibrary-WiFi" and "CityLibrary-WiFi-FREE". What should you do?',
+     opts:['Join the FREE one; free is better','Ask staff which network is theirs','Join whichever has the stronger signal'], correct:1,
+     why:'Look-alike names are a classic fake hotspot trick. The people who run the venue know the real name.'},
+    {q:'The main reason your workplace gives you a VPN is:',
+     opts:['So you can watch overseas Netflix','To create an encrypted tunnel back to the office, making untrusted Wi-Fi safe for work','To make the internet faster'], correct:1,
+     why:'The VPN scrambles everything between your device and the office, so hotel or café Wi-Fi cannot read company logins and files.'},
+    {q:'You are on café Wi-Fi with your work VPN switched on. What can the café’s network see?',
+     opts:['Every site you visit','Your emails, but not passwords','Only scrambled data going to one address'], correct:2,
+     why:'Everything is encrypted inside the tunnel; the Wi-Fi sees only that scrambled traffic flows to your work’s VPN server.'}
+  ];
+  let quizRight = 0, quizDone = 0;
+  function buildQuiz(){
+    const area = $('#quizArea');
+    QUIZ.forEach((item,qi)=>{
+      const d = document.createElement('div');
+      d.className='q';
+      d.innerHTML = `<p>${qi+1}. ${item.q}</p><div class="opts">`+
+        item.opts.map((o,i)=>`<button data-q="${qi}" data-i="${i}">${o}</button>`).join('')+
+        `</div><div class="why">${item.why}</div>`;
+      area.appendChild(d);
+      $$('button', d).forEach(b=>{
+        b.addEventListener('click', ()=>{
+          if(d.dataset.done) return;
+          d.dataset.done = '1';
+          const i = +b.dataset.i;
+          $$('button', d).forEach((x,xi)=>{
+            if(xi===item.correct) x.classList.add('correct');
+            else if(xi===i) x.classList.add('wrong');
+            x.disabled = true;
+          });
+          $('.why', d).classList.add('show');
+          quizDone++; if(i===item.correct) quizRight++;
+          if(quizDone===QUIZ.length){
+            const s = $('#quizScore');
+            s.style.display='block';
+            s.className='status ' + (quizRight>=5?'good':(quizRight>=3?'warn':'bad'));
+            s.textContent = `You scored ${quizRight} of ${QUIZ.length}. ` +
+              (quizRight>=5 ? 'You are ready to make smart Wi-Fi choices.' :
+               quizRight>=3 ? 'Good progress; re-read the Trust tab and try again.' :
+               'Worth another pass through tabs 2 and 3 before retrying.');
+          }
+        });
+      });
+    });
+  }
+  buildQuiz();
 
   // init
   renderList();

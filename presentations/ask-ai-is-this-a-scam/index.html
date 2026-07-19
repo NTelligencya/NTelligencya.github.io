@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Is This a Scam? Ask an AI &middot; NTell World Ink</title>
+<meta name="description" content="An interactive browser presentation: how to use an AI assistant like Claude or ChatGPT as a second pair of eyes on suspicious emails, texts and voicemails. Two hands-on scenarios: the fake Australia Post email and the 'Hey Gran, I lost my phone' message.">
+
+<!-- "AFTER DARK" design: ntworldink dark theme, teal + ochre accents. Headings: Cormorant Garamond -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --stage-bg: #050506;
+    --slide-bg: #0B0B0E;
+    --card: #131318;
+    --card-2: #17171D;
+    --line: #26262F;
+    --text: #ECEAE4;
+    --text-2: #B9B6AD;
+    --text-3: #7C796F;
+    --accent: #1AC9C9;          /* teal */
+    --accent-soft: #6FE3E3;
+    --accent-wash: rgba(26,201,201,0.08);
+    --warm: #E08A3C;            /* ochre */
+    --warm-wash: rgba(224,138,60,0.10);
+    --bad: #E05B4A;
+    --bad-wash: rgba(224,91,74,0.10);
+    --good: #4CC98A;
+    --good-wash: rgba(76,201,138,0.10);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Manrope', 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== FIXED 16:9 STAGE ===== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, svg { max-width: 100%; max-height: 100%; }
+a { color: var(--accent-soft); text-decoration: none; }
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .edit-toggle, .edit-hotzone { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===== SLIDE SCAFFOLD ===== */
+.topbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 62px;
+    background: #08080A; color: var(--text-2); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 24px; padding: 0 44px;
+    font: 500 18px var(--font-mono); letter-spacing: .06em; z-index: 3;
+}
+.topbar .chip {
+    background: var(--accent); color: #04211F; border-radius: 5px;
+    padding: 4px 14px; font-weight: 500; letter-spacing: .1em;
+}
+.topbar .chip.warm { background: var(--warm); color: #2A1503; }
+.topbar .chip.bad { background: var(--bad); color: #2B0C07; }
+.topbar .crumb { opacity: .8; }
+.topbar .sect { margin-left: auto; font-size: 15px; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); }
+
+.foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+    background: #08080A; border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 44px; z-index: 3;
+}
+.foot .brand { font: 700 22px var(--font-body); color: var(--text); letter-spacing: -0.01em; }
+.foot .brand .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 18px; letter-spacing: .08em; }
+.foot .pg { font: 500 17px var(--font-mono); letter-spacing: .12em; color: var(--text-3); }
+
+.body {
+    position: absolute; inset: 62px 120px 70px 120px;
+    display: flex; flex-direction: column; justify-content: center; z-index: 2;
+}
+.kicker { font: 500 19px var(--font-mono); letter-spacing: .28em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+.kicker.warm { color: var(--warm); }
+.kicker.bad { color: var(--bad); }
+h1 { font: 500 118px/1.02 var(--font-display); letter-spacing: -0.01em; color: var(--text); }
+h2 { font: 500 76px/1.06 var(--font-display); letter-spacing: -0.008em; color: var(--text); }
+h2 .hl { background: linear-gradient(transparent 64%, var(--accent-wash) 64%); color: var(--accent-soft); }
+h2 .hlw { background: linear-gradient(transparent 64%, var(--warm-wash) 64%); color: var(--warm); }
+.lede { font: 400 30px/1.55 var(--font-body); color: var(--text-2); max-width: 1360px; }
+.lede b { font-weight: 700; color: var(--text); }
+.muted { color: var(--text-3); }
+
+/* Cards */
+.dcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    border-top: 5px solid var(--accent);
+    padding: 38px 42px;
+}
+.dcard.warm { border-top-color: var(--warm); }
+.dcard.bad { border-top-color: var(--bad); }
+.dcard.good { border-top-color: var(--good); }
+.dcard .ctag { font: 500 16px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.dcard.warm .ctag { color: var(--warm); }
+.dcard.bad .ctag { color: var(--bad); }
+.dcard.good .ctag { color: var(--good); }
+.dcard h3 { font: 600 33px/1.2 var(--font-display); color: var(--text); margin-bottom: 14px; }
+.dcard p { font: 400 24px/1.5 var(--font-body); color: var(--text-2); }
+.dcard p b { font-weight: 700; color: var(--text); }
+
+/* Step rows */
+.rows { display: flex; flex-direction: column; }
+.row {
+    display: flex; align-items: center; gap: 34px; padding: 24px 12px;
+    border-bottom: 1px solid var(--line); font: 400 28px/1.45 var(--font-body); color: var(--text-2);
+}
+.row:last-child { border-bottom: none; }
+.row .n {
+    min-width: 58px; height: 58px; border-radius: 50%; flex: 0 0 58px;
+    background: var(--accent); color: #04211F;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 23px var(--font-mono);
+}
+.row .n.warm { background: var(--warm); color: #2A1503; }
+.row .n.bad { background: var(--bad); color: #2B0C07; }
+.row .n.good { background: var(--good); color: #06291A; }
+.row b { font-weight: 700; color: var(--text); }
+
+/* Verdict strips */
+.strip { border-radius: 10px; padding: 26px 36px; font: 400 26px/1.5 var(--font-body); }
+.strip b { font-weight: 700; }
+.strip.good { background: var(--good-wash); border-left: 6px solid var(--good); color: #CDEBDB; }
+.strip.bad { background: var(--bad-wash); border-left: 6px solid var(--bad); color: #F2D4CE; }
+.strip.warn { background: var(--warm-wash); border-left: 6px solid var(--warm); color: #F0DCC6; }
+.strip.teal { background: var(--accent-wash); border-left: 6px solid var(--accent); color: #CFEDEA; }
+
+/* Stat tiles */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 40px 42px; border-top: 5px solid var(--warm);
+}
+.stat .big { font: 600 84px/1 var(--font-display); color: var(--warm); margin-bottom: 16px; }
+.stat .lbl { font: 400 23px/1.45 var(--font-body); color: var(--text-2); }
+.stat .lbl b { color: var(--text); font-weight: 700; }
+
+.cite { font: 400 17px/1.6 var(--font-mono); color: var(--text-3); letter-spacing: .02em; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; }
+
+/* ===== EMAIL MOCK (light client, like a real inbox) ===== */
+.emailmock {
+    background: #F7F7F5; color: #202124; border-radius: 12px; overflow: hidden;
+    border: 1px solid #3a3a44; font-family: var(--font-body);
+    box-shadow: 0 18px 60px rgba(0,0,0,.5);
+}
+.emailmock .em-head { background: #ECEBE8; padding: 20px 30px; border-bottom: 1px solid #DDDCD8; }
+.emailmock .em-subject { font-weight: 700; font-size: 27px; color: #1a1a1a; }
+.emailmock .em-meta { font-size: 19px; color: #5f6368; margin-top: 8px; line-height: 1.5; }
+.emailmock .em-meta b { color: #b3261e; font-weight: 700; }
+.emailmock .em-body { padding: 26px 30px; font-size: 21px; line-height: 1.65; color: #202124; }
+.emailmock .em-body p { margin-bottom: 14px; }
+.emailmock .em-btn {
+    display: inline-block; background: #DC1928; color: #fff; font-weight: 700;
+    border-radius: 6px; padding: 12px 26px; font-size: 20px; margin: 6px 0 10px;
+}
+.emailmock .em-link { font-size: 16px; color: #1a56c4; word-break: break-all; }
+.emailmock .em-fine { font-size: 15px; color: #80868b; margin-top: 12px; }
+
+/* ===== PHONE MOCK ===== */
+.phone {
+    width: 440px; background: #101014; border: 3px solid #2c2c34; border-radius: 46px;
+    padding: 18px 16px 24px; box-shadow: 0 18px 60px rgba(0,0,0,.55); position: relative;
+}
+.phone .notch { width: 130px; height: 24px; background: #2c2c34; border-radius: 12px; margin: 0 auto 14px; }
+.phone .p-screen { background: #17171D; border-radius: 28px; overflow: hidden; }
+.phone .p-status { display: flex; justify-content: space-between; padding: 12px 22px 6px; font: 500 15px var(--font-mono); color: var(--text-3); }
+.phone .p-app { padding: 6px 22px 22px; }
+.phone .p-title { font: 700 21px var(--font-body); color: var(--text); padding: 8px 0 2px; }
+.phone .p-sub { font: 500 14px var(--font-mono); color: var(--text-3); margin-bottom: 14px; letter-spacing: .06em; }
+.phone .vm-card { background: #1F1F27; border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+.phone .vm-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.phone .vm-num { font: 700 19px var(--font-body); color: var(--text); }
+.phone .vm-time { font: 500 14px var(--font-mono); color: var(--text-3); }
+.phone .vm-wave { display: flex; gap: 3px; align-items: flex-end; height: 26px; margin: 10px 0 12px; }
+.phone .vm-wave span { width: 4px; background: var(--accent); opacity: .65; border-radius: 2px; }
+.phone .vm-label { font: 500 13px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); margin-bottom: 8px; }
+.phone .vm-text { font: 400 19px/1.55 var(--font-body); color: var(--text-2); }
+.phone .vm-text b { color: var(--text); }
+
+/* ===== AI CHAT MOCK ===== */
+.chatui {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    display: flex; flex-direction: column; overflow: hidden; height: 100%;
+}
+.chatui .ch-head {
+    padding: 16px 26px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 14px;
+    font: 500 17px var(--font-mono); letter-spacing: .1em; color: var(--text-2);
+}
+.chatui .ch-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+.chatui .ch-body { flex: 1; padding: 24px 28px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; }
+.bubble { border-radius: 14px; padding: 18px 24px; font: 400 21px/1.55 var(--font-body); max-width: 92%; }
+.bubble.user { align-self: flex-end; background: rgba(26,201,201,.14); border: 1px solid rgba(26,201,201,.3); color: var(--text); }
+.bubble.user .quoted { display: block; margin-top: 10px; font: 400 17px/1.5 var(--font-mono); color: var(--text-2); border-left: 3px solid var(--accent); padding-left: 14px; }
+.bubble.ai { align-self: flex-start; background: var(--card-2); border: 1px solid var(--line); color: var(--text-2); }
+.bubble.ai b { color: var(--text); font-weight: 700; }
+.bubble.ai .verdict { display: inline-block; font: 500 15px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; background: var(--bad-wash); color: #F2A79B; border: 1px solid rgba(224,91,74,.4); border-radius: 999px; padding: 6px 16px; margin-bottom: 12px; }
+.bubble.ai ul { margin: 10px 0 10px 24px; }
+.bubble.ai li { margin-bottom: 7px; }
+.typing { display: inline-flex; gap: 6px; padding: 6px 2px; }
+.typing span { width: 9px; height: 9px; border-radius: 50%; background: var(--text-3); animation: blink 1.2s infinite; }
+.typing span:nth-child(2) { animation-delay: .2s; }
+.typing span:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+.ch-actions { padding: 18px 26px; border-top: 1px solid var(--line); display: flex; gap: 16px; align-items: center; }
+.btn-ask {
+    appearance: none; border: none; cursor: pointer; border-radius: 9px;
+    background: var(--accent); color: #04211F; font: 700 20px var(--font-body);
+    padding: 15px 34px; transition: transform .15s var(--ease), opacity .2s;
+}
+.btn-ask:hover { transform: translateY(-2px); }
+.btn-ask:disabled { opacity: .35; cursor: default; transform: none; }
+.btn-reset {
+    appearance: none; background: none; border: none; cursor: pointer;
+    font: 500 16px var(--font-mono); color: var(--text-3); letter-spacing: .08em;
+}
+.btn-reset:hover { color: var(--text-2); }
+.ch-hint { font: 500 16px var(--font-mono); color: var(--text-3); letter-spacing: .04em; }
+
+/* Reveal animation */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.r1 { transition-delay: .08s; } .r2 { transition-delay: .2s; } .r3 { transition-delay: .32s; }
+.r4 { transition-delay: .44s; } .r5 { transition-delay: .56s; } .r6 { transition-delay: .68s; }
+.r7 { transition-delay: .8s; }
+
+/* Edit affordance */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 90px; height: 90px; z-index: 1200; }
+.edit-toggle {
+    position: fixed; top: 74px; left: 18px; z-index: 1201; width: 44px; height: 44px;
+    border-radius: 10px; border: 1px solid var(--line); background: rgba(19,19,24,.9); color: var(--text);
+    font: 600 15px var(--font-mono); cursor: pointer; opacity: 0; transition: opacity .3s;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; }
+body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+    <!-- ===== SLIDE 1 : TITLE ===== -->
+    <section class="slide" aria-label="Title">
+        <div class="topbar"><span class="chip">ASK FIRST</span><span class="crumb">ntworldink.com</span><span class="sect">Community session</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="kicker reveal r1">AI literacy &middot; Cyber safety &middot; Interactive session</div>
+            <h1 class="reveal r2">Is This a Scam?<br>Ask an AI.</h1>
+            <p class="lede reveal r3" style="margin-top:36px;font-size:34px;font-style:italic;font-family:var(--font-display)">A second pair of eyes lives in your pocket now. Let's practise using it.</p>
+            <p class="lede muted reveal r4" style="margin-top:24px;font-size:25px">Two real-world scenarios: the parcel email that isn't from Australia Post, and the voicemail that isn't from your grandson.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">01 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 2 : THE MOMENT OF DOUBT ===== -->
+    <section class="slide" aria-label="The moment of doubt">
+        <div class="topbar"><span class="chip">ASK FIRST</span><span class="crumb">why this matters</span><span class="sect">The problem</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The problem</div>
+            <h2 class="reveal r2">Scams arrive when you're busy,<br>and they're built to <span class="hlw">rush you</span></h2>
+            <div class="stats" style="margin-top:52px">
+                <div class="stat reveal r3"><div class="big">$2.18b</div><div class="lbl">reported lost by Australians to scams in <b>2025</b> (National Anti-Scam Centre, March 2026)</div></div>
+                <div class="stat reveal r4"><div class="big">481,523</div><div class="lbl">scam reports across all agencies in 2025; <b>phishing alone cost $97.6 million</b></div></div>
+                <div class="stat reveal r5"><div class="big">1 pause</div><div class="lbl">is what most scams cannot survive. The whole trick is stopping you from <b>taking a moment to check</b></div></div>
+            </div>
+            <p class="lede reveal r6" style="margin-top:44px">You often <b>feel</b> something is off. What's been missing is a quick, judgement-free way to check that feeling.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">02 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 3 : THE NEW MOVE ===== -->
+    <section class="slide" aria-label="The new move">
+        <div class="topbar"><span class="chip">ASK FIRST</span><span class="crumb">the technique</span><span class="sect">The move</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The new move</div>
+            <h2 class="reveal r2">Copy it. Paste it. Ask:<br><span class="hl">"Does this look like a scam?"</span></h2>
+            <div class="rows reveal r3" style="margin-top:44px;max-width:1620px">
+                <div class="row"><span class="n">1</span><span><b>Copy the message</b>; press and hold on a phone, or select and copy on a computer. Don't click anything in it.</span></div>
+                <div class="row"><span class="n">2</span><span><b>Open an AI assistant</b>; Claude, ChatGPT, Copilot or Gemini. The free versions are fine for this.</span></div>
+                <div class="row"><span class="n">3</span><span><b>Paste and ask</b>: "I received this message. Does it look like a scam? What should I do?"</span></div>
+                <div class="row"><span class="n">4</span><span><b>Read the reasons, not just the verdict.</b> The red flags it lists are the same ones you'll spot yourself next time.</span></div>
+            </div>
+            <div class="strip teal reveal r4" style="margin-top:40px;max-width:1620px"><b>Why does this work?</b> Scams follow patterns, and those patterns are documented in huge amounts of public writing; scam warnings, news reports, consumer alerts. Pattern-spotting in text is precisely what these AI systems are good at.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">03 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 4 : SCENARIO 1 SETUP ===== -->
+    <section class="slide" aria-label="Scenario one: the parcel email">
+        <div class="topbar"><span class="chip warm">SCENARIO 1</span><span class="crumb">the parcel email</span><span class="sect">Email</span></div>
+        <div class="body">
+            <div class="grid2" style="align-items:center">
+                <div>
+                    <div class="kicker warm reveal r1">Scenario one</div>
+                    <h2 class="reveal r2" style="font-size:64px">An email says your<br>parcel is <span class="hlw">on hold</span></h2>
+                    <p class="lede reveal r3" style="margin-top:30px;font-size:26px">You're expecting a delivery, as most of us are, most of the time. This lands in your inbox. It has the logo, the colours, the tracking number.</p>
+                    <p class="lede reveal r4" style="margin-top:18px;font-size:26px"><b>You're just not sure.</b> Something feels a little off, but you can't say what.</p>
+                </div>
+                <div class="reveal r3">
+                    <div class="emailmock">
+                        <div class="em-head">
+                            <div class="em-subject">Action required: your parcel is being held</div>
+                            <div class="em-meta">From: AusPost Delivery Team &lt;<b>notice@auspost-parcels-au.info</b>&gt;<br>To: you</div>
+                        </div>
+                        <div class="em-body">
+                            <p>Dear Customer,</p>
+                            <p>Your parcel <b>AP-7729-041-NT</b> could not be delivered and is being held at our depot. To avoid it being returned to sender, you must confirm your address and pay a redelivery fee of <b>$2.99</b> within 24 hours.</p>
+                            <p><span class="em-btn">Confirm details &amp; pay fee</span><br>
+                            <span class="em-link">https://auspost.redirect-parcel.info/track?id=7729041</span></p>
+                            <p class="em-fine">Australia Post Customer Services. If you do not action this notice your item will be returned.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">04 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 5 : SCENARIO 1 INTERACTIVE ===== -->
+    <section class="slide" aria-label="Scenario one: ask the AI">
+        <div class="topbar"><span class="chip warm">SCENARIO 1</span><span class="crumb">paste it into an AI</span><span class="sect">Interactive</span></div>
+        <div class="body" style="justify-content:flex-start;padding-top:36px">
+            <div class="kicker warm reveal r1" style="margin-bottom:14px">Try the move: press the button, watch the AI think</div>
+            <div class="reveal r2" style="height:790px">
+                <div class="chatui">
+                    <div class="ch-head"><span class="ch-dot"></span>AI ASSISTANT &middot; Claude / ChatGPT / Copilot / Gemini</div>
+                    <div class="ch-body" id="chat1">
+                        <div class="bubble ai">Paste the suspicious email below and I'll take a look.</div>
+                    </div>
+                    <div class="ch-actions">
+                        <button class="btn-ask" id="ask1" onclick="runScenario(1)">Paste the email &amp; ask</button>
+                        <button class="btn-reset" onclick="resetScenario(1)">reset</button>
+                        <span class="ch-hint" id="hint1">The reply below is a realistic example of what today's AI assistants say to this exact kind of message.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">05 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 6 : SCENARIO 1 DEBRIEF ===== -->
+    <section class="slide" aria-label="Scenario one: what the AI spotted">
+        <div class="topbar"><span class="chip warm">SCENARIO 1</span><span class="crumb">the debrief</span><span class="sect">Red flags</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">What the AI spotted, and you now can too</div>
+            <h2 class="reveal r2" style="font-size:66px">Four flags, <span class="hl">one habit</span></h2>
+            <div class="rows" style="margin-top:40px;max-width:1620px">
+                <div class="row reveal r3"><span class="n bad">1</span><span><b>The sender's address.</b> Real Australia Post mail comes from auspost.com.au; not "auspost-parcels-au.info"</span></div>
+                <div class="row reveal r4"><span class="n bad">2</span><span><b>The fee and the link.</b> Australia Post says it will never email or text you asking to click a link to pay a fee or confirm personal details</span></div>
+                <div class="row reveal r5"><span class="n bad">3</span><span><b>The deadline.</b> "Within 24 hours" is pressure; pressure is the scam</span></div>
+                <div class="row reveal r6"><span class="n bad">4</span><span><b>The generic greeting.</b> "Dear Customer"; they don't know your name, because they don't have your parcel</span></div>
+            </div>
+            <div class="strip good reveal r7" style="margin-top:36px;max-width:1620px"><b>What to do:</b> don't click; check parcels only in the official AusPost app or auspost.com.au; forward the email to <b>scams@auspost.com.au</b>, then delete it. Entered card details already? Ring your bank now.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">06 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 7 : SCENARIO 2 SETUP ===== -->
+    <section class="slide" aria-label="Scenario two: the voicemail">
+        <div class="topbar"><span class="chip bad">SCENARIO 2</span><span class="crumb">the voicemail</span><span class="sect">Family scam</span></div>
+        <div class="body">
+            <div class="grid2" style="align-items:center">
+                <div>
+                    <div class="kicker bad reveal r1">Scenario two</div>
+                    <h2 class="reveal r2" style="font-size:64px">"Hey Gran,<br>I <span class="hlw">lost my phone</span>"</h2>
+                    <p class="lede reveal r3" style="margin-top:30px;font-size:26px">A voicemail from a number you don't know. Your phone has written out the words for you. It sounds exactly like something your grandson would say.</p>
+                    <p class="lede reveal r4" style="margin-top:18px;font-size:26px">Your chest tightens. He needs help. <b>And that feeling is exactly what the message is designed to produce.</b></p>
+                </div>
+                <div class="reveal r3" style="display:flex;justify-content:center">
+                    <div class="phone">
+                        <div class="notch"></div>
+                        <div class="p-screen">
+                            <div class="p-status"><span>4:47 pm</span><span>4G &middot; 62%</span></div>
+                            <div class="p-app">
+                                <div class="p-title">Voicemail</div>
+                                <div class="p-sub">UNKNOWN NUMBER &middot; TODAY</div>
+                                <div class="vm-card">
+                                    <div class="vm-row"><span class="vm-num">+61 4XX XXX XXX</span><span class="vm-time">0:24</span></div>
+                                    <div class="vm-wave"><span style="height:8px"></span><span style="height:16px"></span><span style="height:22px"></span><span style="height:12px"></span><span style="height:19px"></span><span style="height:9px"></span><span style="height:24px"></span><span style="height:14px"></span><span style="height:20px"></span><span style="height:10px"></span><span style="height:17px"></span><span style="height:23px"></span><span style="height:11px"></span><span style="height:15px"></span><span style="height:7px"></span></div>
+                                    <div class="vm-label">Transcription (beta)</div>
+                                    <div class="vm-text">"Hey Gran, it's me. Don't stress, but I <b>lost my phone</b>, I'm calling from a mate's. I need you to send me <b>$400 tonight</b> so I can sort a new one, I'll pay you back Thursday. <b>Don't ring my old number</b>, it's dead. I'll text you the account. Love you."</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">07 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 8 : SCENARIO 2 INTERACTIVE ===== -->
+    <section class="slide" aria-label="Scenario two: ask the AI">
+        <div class="topbar"><span class="chip bad">SCENARIO 2</span><span class="crumb">paste it into an AI</span><span class="sect">Interactive</span></div>
+        <div class="body" style="justify-content:flex-start;padding-top:36px">
+            <div class="kicker bad reveal r1" style="margin-bottom:14px">Try the move: the transcript makes it easy to copy and paste</div>
+            <div class="reveal r2" style="height:790px">
+                <div class="chatui">
+                    <div class="ch-head"><span class="ch-dot"></span>AI ASSISTANT &middot; Claude / ChatGPT / Copilot / Gemini</div>
+                    <div class="ch-body" id="chat2">
+                        <div class="bubble ai">Paste the voicemail transcript below and I'll take a look.</div>
+                    </div>
+                    <div class="ch-actions">
+                        <button class="btn-ask" id="ask2" onclick="runScenario(2)">Paste the transcript &amp; ask</button>
+                        <button class="btn-reset" onclick="resetScenario(2)">reset</button>
+                        <span class="ch-hint" id="hint2">Notice the AI recognises the scam instantly; this pattern appears thousands of times in public scam warnings.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">08 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 9 : SCENARIO 2 DEBRIEF ===== -->
+    <section class="slide" aria-label="Scenario two: what the AI knew">
+        <div class="topbar"><span class="chip bad">SCENARIO 2</span><span class="crumb">the debrief</span><span class="sect">Family scam</span></div>
+        <div class="body">
+            <div class="kicker bad reveal r1">Why the AI was so sure</div>
+            <h2 class="reveal r2" style="font-size:66px">It has read every warning<br>about <span class="hlw">this exact scam</span></h2>
+            <p class="lede reveal r3" style="margin-top:32px">The "Hi Mum" or family impersonation scam is one of the most heavily documented scams in Australia. The ACCC issued a national warning after more than <b>1,150 Australians</b> lost <b>$2.6 million</b> to it in the first seven months of 2022 alone, and it has kept circulating ever since; women over 55 made up two thirds of victims.</p>
+            <div class="rows" style="margin-top:36px;max-width:1620px">
+                <div class="row reveal r4"><span class="n good">1</span><span><b>Ring the real number now.</b> The ACCC's own advice: call your grandchild on the number already saved in your phone. "Lost" phones ring; scammers can't answer them</span></div>
+                <div class="row reveal r5"><span class="n good">2</span><span><b>Never send money on a message alone</b>; not to "new numbers", not to bank details sent by text</span></div>
+                <div class="row reveal r6"><span class="n good">3</span><span><b>Sent money already?</b> Ring your bank first, then report to Scamwatch (scamwatch.gov.au)</span></div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">09 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 10 : WHY YOU CAN TRUST IT HERE ===== -->
+    <section class="slide" aria-label="Why AI is trustworthy for this task">
+        <div class="topbar"><span class="chip">ASK FIRST</span><span class="crumb">trust, calibrated</span><span class="sect">Strengths</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Trust, calibrated</div>
+            <h2 class="reveal r2">Why scam-checking is a job<br>AI is <span class="hl">actually good at</span></h2>
+            <div class="grid3" style="margin-top:48px">
+                <div class="dcard good reveal r3"><div class="ctag">Strength</div><h3>Pattern recognition</h3><p>Scam formats repeat worldwide and are described in thousands of public warnings. Matching your message against those patterns is a low-risk, high-skill task for an AI.</p></div>
+                <div class="dcard good reveal r4"><div class="ctag">Strength</div><h3>It explains itself</h3><p>You don't just get "scam" or "safe". You get the reasons; the odd sender address, the pressure tactics, the link that doesn't match. <b>The reasons teach you.</b></p></div>
+                <div class="dcard good reveal r5"><div class="ctag">Strength</div><h3>Hallucination risk is low</h3><p>AI systems can invent facts when asked to recall specifics. Here they aren't recalling; they're reading text you gave them. That's the kind of task where they are most reliable.</p></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:40px;max-width:1720px"><b>The honest caveat:</b> treat "this looks like a scam" as a strong signal, and "this looks fine" as an opinion, not a guarantee. When money or logins are involved, verify with the organisation directly, using a number or website you found yourself.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">10 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 11 : HOW TO ASK WELL ===== -->
+    <section class="slide" aria-label="How to ask well">
+        <div class="topbar"><span class="chip">ASK FIRST</span><span class="crumb">the wording</span><span class="sect">Technique</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">How to ask well</div>
+            <h2 class="reveal r2" style="font-size:66px">A good question gets<br>a <span class="hl">useful answer</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">Say this</div><h3>A prompt that works</h3><p style="font-family:var(--font-mono);font-size:21px;line-height:1.6">"I received this message and I'm not sure about it. Does it look like a scam? What are the red flags, and what should I do next?"<br><br>[paste the message]</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">Before you paste</div><h3>Leave your details out</h3><p>The scammer's message is not private; your details are. Remove or blank out your own name, address, account numbers or codes before pasting. The AI doesn't need them to judge the message.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:40px;max-width:1720px"><b>Follow-up questions are allowed, and encouraged.</b> "Why is that a red flag?", "What would the real Australia Post email look like?", "How should I warn my mum about this?" The conversation is the tool.</div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">11 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 12 : PRACTICE ===== -->
+    <section class="slide" aria-label="Practice makes confident">
+        <div class="topbar"><span class="chip">ASK FIRST</span><span class="crumb">building the habit</span><span class="sect">Practice</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Building the habit</div>
+            <h2 class="reveal r2">You get good at AI the same way<br>you get good at anything: <span class="hl">practice</span></h2>
+            <p class="lede reveal r3" style="margin-top:34px">The people who benefit most from AI assistants are the ones who have practised talking to them; who know what they're strong at, where they wobble, and how to ask a better question. Scam-checking is the perfect practice ground: real stakes, clear answers, and every session teaches you the red flags yourself.</p>
+            <div class="rows reveal r4" style="margin-top:36px;max-width:1620px">
+                <div class="row"><span class="n">1</span><span><b>Practise on messages you already know are scams</b>; watch how the AI reasons about them</span></div>
+                <div class="row"><span class="n">2</span><span><b>Practise on real messages too</b>; see how the AI describes a genuine email from your bank or Australia Post</span></div>
+                <div class="row"><span class="n">3</span><span><b>Show someone else the move.</b> The person most likely to be targeted in your family is the person least likely to hear about this trick</span></div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">12 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 13 : GOLDEN RULES ===== -->
+    <section class="slide" aria-label="The golden rules">
+        <div class="topbar"><span class="chip">ASK FIRST</span><span class="crumb">take these home</span><span class="sect">Summary</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Take these home</div>
+            <h2 class="reveal r2"><span class="hl">Stop. Paste. Verify. Report.</span></h2>
+            <div class="rows" style="margin-top:44px;max-width:1620px">
+                <div class="row reveal r3"><span class="n">1</span><span><b>Stop.</b> No genuine organisation, and no genuine grandchild, needs money or details from you within the hour</span></div>
+                <div class="row reveal r4"><span class="n">2</span><span><b>Paste and ask.</b> Copy the message into Claude, ChatGPT, Copilot or Gemini: "does this look like a scam?"</span></div>
+                <div class="row reveal r5"><span class="n">3</span><span><b>Verify independently.</b> Ring the person on their saved number; check parcels in the official app; type the bank's address yourself</span></div>
+                <div class="row reveal r6"><span class="n">4</span><span><b>Report it.</b> Bank first if money moved; then scamwatch.gov.au, and scams@auspost.com.au for the parcel ones</span></div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">13 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 14 : SOURCES ===== -->
+    <section class="slide" aria-label="Sources">
+        <div class="topbar"><span class="chip">SOURCES</span><span class="crumb">where the numbers come from</span><span class="sect">References</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Sources used</div>
+            <h2 class="reveal r2" style="font-size:62px">Where today's numbers come from</h2>
+            <div class="rows reveal r3" style="margin-top:38px;max-width:1680px">
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>National Anti-Scam Centre, <b>Targeting Scams 2025</b> report (published March 2026); 2025 combined losses $2.18 billion across 481,523 reports; phishing losses $97.6 million: <a href="https://www.nasc.gov.au/system/files/targeting-scams-report-2025.pdf">nasc.gov.au</a></span></div>
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>ACCC media release, <b>"ACCC warning of suspicious messages as 'Hi Mum' scams spike"</b>, December 2022; 1,150+ victims and $2.6 million lost January to July 2022: <a href="https://www.accc.gov.au/media-release/accc-warning-of-suspicious-messages-as-hi-mum-scams-spike">accc.gov.au</a></span></div>
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>Australia Post, <b>scam alerts and online security</b>; Australia Post says it never asks for payment or personal details via email or text links; report to scams@auspost.com.au: <a href="https://auspost.com.au/about-us/about-our-site/online-security-scams-fraud/scam-alerts">auspost.com.au</a></span></div>
+                <div class="row" style="font-size:23px;padding:18px 12px"><span>Scamwatch (National Anti-Scam Centre), <b>reporting and advice</b>: <a href="https://www.scamwatch.gov.au">scamwatch.gov.au</a></span></div>
+            </div>
+            <p class="lede muted reveal r4" style="margin-top:34px;font-size:24px">The two scenario messages are fictional composites built from the patterns documented in the sources above. The simulated AI replies are realistic examples written for this session, not live output.</p>
+        </div>
+        <div class="foot"><span class="brand">ntworld<span class="dot">.</span>ink<small>AI &amp; Cyber Safety</small></span><span class="pg">14 / 14</span></div>
+    </section>
+
+</main>
+</div>
+
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">ED</button>
+
+<script>
+/* ===== INTERACTIVE SCENARIOS ===== */
+const SCENARIOS = {
+    1: {
+        user: `I received this email and I'm not sure about it. Does it look like a scam? What should I do?
+            <span class="quoted">From: AusPost Delivery Team &lt;notice@auspost-parcels-au.info&gt;<br>
+            Subject: Action required: your parcel is being held<br><br>
+            Dear Customer, your parcel AP-7729-041-NT could not be delivered... you must confirm your address and pay a redelivery fee of $2.99 within 24 hours...<br>
+            https://auspost.redirect-parcel.info/track?id=7729041</span>`,
+        answer: [
+            `<span class="verdict">Almost certainly a scam</span>`,
+            `<p>This has the classic shape of a <b>fake parcel-delivery phishing email</b>, one of the most commonly reported scams in Australia. Here's what gives it away:</p>`,
+            `<ul>
+                <li><b>The sender's address is wrong.</b> Genuine Australia Post email comes from auspost.com.au. "auspost-parcels-au.info" is a look-alike domain anyone can register.</li>
+                <li><b>The link doesn't go to Australia Post.</b> "auspost.redirect-parcel.info" is not auspost.com.au; the real name is buried inside a fake one.</li>
+                <li><b>It asks for a fee through a link.</b> Australia Post states publicly that it never emails or texts customers asking them to click a link to pay a fee or confirm personal or financial details.</li>
+                <li><b>Urgency and a generic greeting.</b> "Within 24 hours" plus "Dear Customer" is pressure applied to someone whose name they don't actually know.</li>
+            </ul>`,
+            `<p><b>What I'd suggest:</b> don't click the link or enter any details. If you are expecting a parcel, check it in the official AusPost app or by typing auspost.com.au yourself. You can forward this email to <b>scams@auspost.com.au</b>, then delete it. If you already entered card details, ring your bank straight away and also report it at scamwatch.gov.au.</p>`
+        ]
+    },
+    2: {
+        user: `My phone transcribed this voicemail from a number I don't know. It sounds like my grandson. Is it a scam?
+            <span class="quoted">"Hey Gran, it's me. Don't stress, but I lost my phone, I'm calling from a mate's. I need you to send me $400 tonight so I can sort a new one, I'll pay you back Thursday. Don't ring my old number, it's dead. I'll text you the account. Love you."</span>`,
+        answer: [
+            `<span class="verdict">Almost certainly a scam</span>`,
+            `<p>This matches, almost word for word, the <b>"Hi Mum" / family impersonation scam</b> that Australian authorities have been warning about for years. The ACCC reported more than 1,150 victims and $2.6 million lost to it in the first seven months of 2022, and it is still circulating widely.</p>`,
+            `<ul>
+                <li><b>"I lost my phone / new number"</b> is the setup line; it explains away the unknown number.</li>
+                <li><b>"Send money tonight"</b> creates urgency so you act before you think.</li>
+                <li><b>"Don't ring my old number"</b> is the tell. This instruction exists for one reason: because if you rang it, your real grandson would answer.</li>
+                <li><b>Bank details by text</b> from an unknown number is how the money disappears.</li>
+            </ul>`,
+            `<p><b>What I'd suggest, right now:</b> ring your grandson on the number already saved in your phone. That is also the ACCC's official advice. Do not send anything to the new number. If he answers, you have your answer. If you have already transferred money, call your bank immediately, then report it at scamwatch.gov.au. You could also ask him a question only the real person could answer, one that has never been posted online.</p>`
+        ]
+    }
+};
+
+function el(html) {
+    const d = document.createElement('div');
+    d.innerHTML = html.trim();
+    return d.firstChild;
+}
+
+function runScenario(n) {
+    const btn = document.getElementById('ask' + n);
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const body = document.getElementById('chat' + n);
+    const sc = SCENARIOS[n];
+
+    const user = el(`<div class="bubble user">${sc.user}</div>`);
+    body.appendChild(user);
+    body.scrollTop = body.scrollHeight;
+
+    const typing = el(`<div class="bubble ai"><span class="typing"><span></span><span></span><span></span></span></div>`);
+    setTimeout(() => { body.appendChild(typing); body.scrollTop = body.scrollHeight; }, 500);
+
+    setTimeout(() => {
+        typing.remove();
+        const ai = el(`<div class="bubble ai"></div>`);
+        body.appendChild(ai);
+        let i = 0;
+        const step = () => {
+            if (i < sc.answer.length) {
+                ai.insertAdjacentHTML('beforeend', sc.answer[i]);
+                body.scrollTop = body.scrollHeight;
+                i++;
+                setTimeout(step, 900);
+            }
+        };
+        step();
+    }, 2100);
+}
+
+function resetScenario(n) {
+    const body = document.getElementById('chat' + n);
+    body.innerHTML = `<div class="bubble ai">Paste the suspicious ${n === 1 ? 'email' : 'voicemail transcript'} below and I'll take a look.</div>`;
+    document.getElementById('ask' + n).disabled = false;
+}
+
+/* ===== DECK NAVIGATION ===== */
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.wheelLock = false;
+        this.setupStageScale(); this.setupKeyboardNav(); this.setupWheelNav(); this.setupTouchNav();
+        this.showSlide(0);
+    }
+    setupStageScale() {
+        const scale = () => {
+            const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * f) / 2, y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale(); window.addEventListener('resize', scale);
+    }
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (document.body.classList.contains('editing') || e.target.isContentEditable) return;
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.showSlide(0); break;
+                case 'End': e.preventDefault(); this.showSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+    setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (e.target.closest && e.target.closest('.ch-body')) return; /* allow scrolling the chat */
+            if (this.wheelLock || Math.abs(e.deltaY) < 12) return;
+            this.wheelLock = true;
+            e.deltaY > 0 ? this.next() : this.prev();
+            setTimeout(() => { this.wheelLock = false; }, 650);
+        }, { passive: true });
+    }
+    setupTouchNav() {
+        let sx = 0, sy = 0;
+        window.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchend', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (e.target.closest && e.target.closest('.chatui')) return;
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? this.next() : this.prev();
+        }, { passive: true });
+    }
+    next() { this.showSlide(this.currentSlide + 1); }
+    prev() { this.showSlide(this.currentSlide - 1); }
+    showSlide(i) {
+        this.currentSlide = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.slides.forEach((s, k) => {
+            s.classList.toggle('active', k === this.currentSlide);
+            s.classList.toggle('visible', k === this.currentSlide);
+        });
+    }
+}
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storeKey = 'ask-ai-scam-deck-edits-v1';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.hotzone = document.getElementById('editHotzone');
+        this.restore(); this.wire();
+    }
+    wire() {
+        let t = null;
+        const show = () => { clearTimeout(t); this.toggleBtn.classList.add('show'); };
+        const hide = () => { t = setTimeout(() => { if (!this.isActive) this.toggleBtn.classList.remove('show'); }, 400); };
+        this.hotzone.addEventListener('mouseenter', show); this.hotzone.addEventListener('mouseleave', hide);
+        this.toggleBtn.addEventListener('mouseenter', show); this.toggleBtn.addEventListener('mouseleave', hide);
+        this.hotzone.addEventListener('click', () => this.toggle()); this.toggleBtn.addEventListener('click', () => this.toggle());
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable && !e.metaKey && !e.ctrlKey) this.toggle();
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.download(); }
+        });
+        document.getElementById('deckStage').addEventListener('input', () => this.save());
+    }
+    toggle() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('show', true);
+        document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide .row span:not(.n), .slide .crumb, .slide .strip, .slide .kicker, .slide .stat .big, .slide .stat .lbl, .slide .em-body, .slide .em-subject, .slide .vm-text')
+            .forEach(el => { this.isActive ? el.setAttribute('contenteditable', 'true') : el.removeAttribute('contenteditable'); });
+    }
+    save() {
+        const d = [...document.querySelectorAll('.slide')].map(s => s.innerHTML);
+        try { localStorage.setItem(this.storeKey, JSON.stringify(d)); } catch (e) {}
+    }
+    restore() {
+        try {
+            const d = JSON.parse(localStorage.getItem(this.storeKey) || 'null');
+            if (!d) return;
+            const s = document.querySelectorAll('.slide');
+            if (d.length === s.length) s.forEach((sl, i) => { sl.innerHTML = d[i]; });
+        } catch (e) {}
+    }
+    download() {
+        const c = document.documentElement.cloneNode(true);
+        c.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        c.querySelectorAll('body').forEach(b => b.classList.remove('editing'));
+        const blob = new Blob(['<!DOCTYPE html>\n' + c.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'is-this-a-scam-ask-an-ai.html'; a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+new SlidePresentation(); new InlineEditor();
+</script>
+</body>
+</html>
