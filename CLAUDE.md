@@ -98,12 +98,35 @@ Structure: /resources/index.html hub with a card per category, plus one page per
 
 - [x] /resources/index.html (hub) (built 25 July 2026; includes a non-linked "In planning" card for AI Benchmarks)
 - [x] Videos and Podcasts; source: 1-ai-resources-videos.html (built 25 July 2026; embeds converted to YouTube watch links in the standard card format)
-- [x] Articles and Papers; source: 1-ai-resources-articles.html (built 25 July 2026)
-- [x] Websites and Tools; source: 1-ai-resources-websites.html (built 25 July 2026; internal-only CDU ChatGPT Guidance card left out as unsuitable for the public site)
+- [ ] Articles and Papers; source: 1-ai-resources-articles.html (built 25 July 2026). REMOVED 27 July 2026 as outdated, to be rebuilt another day. The page is now a redirect stub to /resources/ and its hub card is gone; the original is preserved in git commit 48a33e6. WildChat Visualiser and the Content Authenticity Initiative were carried into the References library before removal.
+- [x] Websites and Tools; source: 1-ai-resources-websites.html (built 25 July 2026). SUPERSEDED 27 July 2026 by the filterable References library at /references/ (see its own section below). Its ~50 curated resources were merged into the tool; /resources/websites-and-tools.html now redirects to /references/, reached from the unchanged "Websites & Tools" card on the hub.
 - [x] Legislation and Guidelines; source: 1-ai-resources-legislation.html. MUST link to the Australian AI legislation presentation at /presentations/australias-ai-laws-explained/. (built 25 July 2026; links via a "Start here" callout)
 - [ ] AI Benchmarks; new build from research-ai-benchmarks-landscape.md (shortlist approved 25 July 2026). Each entry: benchmark link, release paper link, abstract-style description, status flag (watch / nearing saturation / retired-historical).
 - [x] CLAUDE.md inside /resources/ documenting the card format and house rules for adding a resource (SD adds roughly one per week and is picky; no unvetted links). (written 25 July 2026)
 - [x] "add-resource" skill for SD: takes a URL, drafts the annotation, inserts the card in the right category for approval. Delivered as a .skill file for SD to save. (delivered 25 July 2026)
+
+## References library (/references/)
+
+Added 27 July 2026. A filterable, searchable reference index that replaces the old Websites and Tools resource page. It is reached from the "Websites & Tools" card on the /resources/ hub; there is no separate top-nav item. It is indexable.
+
+This is a DELIBERATE EXCEPTION to the /resources/ house rules above (approved by SD, 27 July 2026): it is JavaScript-rendered and carries its own page CSS, because it needs live search, category filtering, A-to-Z sorting and copy-to-clipboard for grab-and-email use in workshops, which the static card format cannot provide. Do not "fix" it to match the card rules.
+
+Files:
+- `/references/index.html`; site chrome (shared `styles.css`, header, breadcrumb, masthead, CDU footer) plus the tool markup.
+- `/references/references.css`; page-specific styles, built on the `styles.css` design tokens.
+- `/references/references.js`; the data and the render/filter/sort/copy logic.
+
+Single source of truth: the `DATA` array at the top of `/references/references.js`. Each entry is one object:
+
+```js
+{t: "Resource title", d: "One-line note.", u: "https://clean-url", c: "Category"}
+```
+
+Category `c` must be exactly one of the seven strings in the `CATS` array: "AI info", "AI tools", "AI Security", "Basic Digital Literacy", "Cyber Security", "Datasets & repos", "Other". The entry total, the per-category counts and the filter chips are all derived from `DATA` at page load; nothing else needs editing.
+
+To add a resource: add one object to the `DATA` array. Order does not matter (the page sorts by title), so paste it anywhere. Australian English, no em-dashes, no emoji, as everywhere on the site. NOTE: the "add-resource" skill is for the /resources/ card pages, not this tool; References entries are added by hand in `references.js`.
+
+History: the merged content from the old Websites and Tools page, and the retired Articles and Papers page, are preserved in git commit 48a33e6. The old URLs `/resources/websites-and-tools.html` and `/resources/articles-and-papers.html` now serve redirect stubs.
 
 ## Build order (suggested; SD may reshuffle)
 

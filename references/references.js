@@ -178,7 +178,89 @@ const DATA = [
   {t:"Jobs and Skills Australia", d:"Labour-market and careers data.", u:"https://www.jobsandskills.gov.au", c:"Other"},
   {t:"Jobs and Skills Australia: ICT industry overview", d:"Computer system design and related services.", u:"https://www.jobsandskills.gov.au/jobs-and-skills-atlas/industry/70-computer-system-design-and-related-services/overview", c:"Other"},
   {t:"Repeal the Online Safety Act (UK petition)", d:"UK Parliament petition.", u:"https://petition.parliament.uk/petitions/722903", c:"Other"},
-  {t:"ALRC: genetic discrimination in Australia", d:"Evidence report on genetic discrimination in employment.", u:"https://www.alrc.gov.au/publication/essentially-yours-the-protection-of-human-genetic-information-in-australia-alrc-report-96/30-genetic-discrimination-in-employment/evidence-of-genetic-discrimination-in-australia/", c:"Other"}
+  {t:"ALRC: genetic discrimination in Australia", d:"Evidence report on genetic discrimination in employment.", u:"https://www.alrc.gov.au/publication/essentially-yours-the-protection-of-human-genetic-information-in-australia-alrc-report-96/30-genetic-discrimination-in-employment/evidence-of-genetic-discrimination-in-australia/", c:"Other"},
+
+  // ============================================================
+  // Merged from the former /resources/websites-and-tools.html
+  // (curated, verified Feb 2026; folded in 27 July 2026). Plus
+  // WildChat Visualiser carried over from the retired Articles
+  // & Papers page. Duplicates of entries above were left out.
+  // ============================================================
+
+  // Benchmarks and leaderboards
+  {t:"SWE-bench", d:"Benchmark measuring how well AI models solve real-world software engineering tasks drawn from GitHub issues; a practical measure of coding ability.", u:"https://www.swebench.com/", c:"AI info"},
+  {t:"Humanity's Last Exam (HLE)", d:"A 2,500-question benchmark across 100+ subjects from the Center for AI Safety and Scale AI, published in Nature (January 2026), testing genuine expertise rather than pattern matching.", u:"https://agi.safe.ai/", c:"AI info"},
+  {t:"Aider Code Editing Leaderboard", d:"Ranks LLMs on how well they edit code via the Aider assistant; useful for real-world coding comparisons.", u:"https://aider.chat/docs/leaderboards/", c:"AI info"},
+  {t:"Arena (formerly LMSYS Chatbot Arena)", d:"Crowdsourced blind comparison of LLM outputs producing Elo-style rankings; rebranded from LMArena to Arena in January 2026.", u:"https://lmarena.ai/", c:"AI info"},
+
+  // Interactive learning and visualisation
+  {t:"TensorFlow Playground", d:"Browser-based neural network visualisation from Google; adjust layers, neurons and data to watch a network learn in real time.", u:"https://playground.tensorflow.org/", c:"AI info"},
+  {t:"Transformer Explainer", d:"Interactive visualisation of how a transformer model processes text; good for explaining attention (Georgia Tech Polo Club).", u:"https://poloclub.github.io/transformer-explainer/", c:"AI info"},
+  {t:"OpenAI Tokenizer", d:"Official OpenAI tool showing how text is broken into tokens; explains why prompts have length limits.", u:"https://platform.openai.com/tokenizer", c:"AI info"},
+  {t:"Hugging Face Tokenizer Playground", d:"Compare tokenisation across models (GPT, LLaMA, Mistral); shows how models see the same text differently.", u:"https://huggingface.co/spaces/Xenova/the-tokenizer-playground", c:"AI info"},
+  {t:"WildChat Visualiser", d:"Interactive tool for exploring how people actually use AI chatbots in the wild; useful for real-world usage patterns.", u:"https://wildvisualizer.com/?contains=essay&dataset=wildchat", c:"AI info"},
+
+  // AI browsers, agents and emerging tools
+  {t:"OpenAI ChatGPT Atlas", d:"OpenAI's Chromium-based browser with ChatGPT in every tab, browser memory and an agent mode; note the privacy implications of the memory feature.", u:"https://chatgpt.com/atlas/", c:"AI tools"},
+  {t:"Perplexity Comet", d:"AI-native browser from Perplexity with ad blocking and background agents that can act across tabs.", u:"https://www.perplexity.ai/comet", c:"AI tools"},
+  {t:"Google Antigravity", d:"Google's agent-first AI IDE, released alongside Gemini 3 in late 2025; agents plan, code, test and validate across editor, terminal and browser.", u:"https://antigravity.google/", c:"AI tools"},
+  {t:"OpenAI Prism", d:"Free LaTeX-native workspace for scientific paper writing with GPT built in.", u:"https://prism.openai.com/", c:"AI tools"},
+  {t:"OpenAI Codex Cookbook", d:"Official examples and recipes for using OpenAI's Codex coding agent.", u:"https://cookbook.openai.com/topic/codex", c:"AI info"},
+  {t:"Awesome Claude: Vibe Coding Guide", d:"Community guide to vibe coding with Claude; a plain-language explainer of directing an AI to build software.", u:"https://awesomeclaude.ai/vibe-coding-guide", c:"AI info"},
+  {t:"Awesome Claude: Code Cheatsheet", d:"Quick reference for Claude's code capabilities.", u:"https://awesomeclaude.ai/code-cheatsheet", c:"AI info"},
+  {t:"Moltbook", d:"Self-described front page of the agent internet; an early directory and forum for AI agents.", u:"https://www.moltbook.com/m/general", c:"AI info"},
+  {t:"Crabby-Rathbun AI-agent incident", d:"Case study: the GitHub profile of an AI agent that retaliated against an open-source maintainer who rejected its contribution by publishing a defamatory post; an early example of an agent independently targeting a human. See the NYT Hard Fork podcast at youtu.be/3n_jKx6v6qU.", u:"https://github.com/crabby-rathbun", c:"AI Security"},
+
+  // AI safety, security and incident tracking
+  {t:"AI Forensics", d:"European non-profit investigating the societal impacts of AI platforms, including algorithmic audits and content-moderation analysis.", u:"https://www.aiforensics.org/work", c:"AI Security"},
+  {t:"AI Forensics: Grok Unleashed", d:"Investigation into X's Grok assistant and its behaviour around misinformation and content moderation.", u:"https://www.aiforensics.org/work/grok-unleashed", c:"AI Security"},
+  {t:"ICMEC: Child Safety in the Age of AI", d:"ICMEC Australia resource on AI and child-safety risks, including deepfakes and CSAM generation.", u:"https://icmec.org.au/prioritising-child-safety-in-the-age-of-ai-2/", c:"AI Security"},
+  {t:"Center for AI Safety (CAIS)", d:"The organisation behind Humanity's Last Exam and the Statement on AI Risk; a hub for AI safety research and advocacy.", u:"https://www.safe.ai/", c:"AI Security"},
+
+  // AI privacy, data and user control
+  {t:"ChatGPT Memory FAQ", d:"OpenAI's explainer on how ChatGPT memory works: what it saves, and how to view and delete memories.", u:"https://help.openai.com/en/articles/8590148-memory-faq", c:"AI info"},
+  {t:"OpenAI Privacy Portal", d:"Where users submit data opt-out requests to OpenAI.", u:"https://privacy.openai.com", c:"AI info"},
+  {t:"OAIC: Privacy Guidance for AI Products", d:"Australian Information Commissioner's guidance on privacy obligations when using commercial AI products, including PIAs and data minimisation.", u:"https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies/guidance-on-privacy-and-the-use-of-commercially-available-ai-products", c:"Cyber Security"},
+  {t:"LM Studio", d:"Desktop app for running open-source LLMs locally, with no data sent to external servers.", u:"https://lmstudio.ai/", c:"AI tools"},
+
+  // Content provenance and copyright
+  {t:"Content Authenticity Initiative", d:"Adobe-led initiative implementing the C2PA content-provenance standard in practice, with tools and guidance for creators and publishers.", u:"https://contentauthenticity.org/", c:"AI info"},
+
+  // Australian AI policy, governance and regulation
+  {t:"Voluntary AI Safety Standard (VAISS)", d:"Australia's 10 voluntary guardrails for safe and responsible AI; now integrated into the Guidance for AI Adoption (October 2025).", u:"https://www.industry.gov.au/publications/voluntary-ai-safety-standard", c:"AI info"},
+  {t:"Australia's AI Ecosystem: Growth and Opportunities", d:"Government overview of Australia's AI ecosystem: investment, capability and workforce.", u:"https://www.industry.gov.au/publications/australias-artificial-intelligence-ecosystem-growth-and-opportunities", c:"AI info"},
+  {t:"National Artificial Intelligence Centre (NAIC)", d:"Leads national AI policy development, including the VAISS and Guidance for AI Adoption.", u:"https://www.industry.gov.au/science-technology-and-innovation/technology/national-artificial-intelligence-centre", c:"AI info"},
+  {t:"AI Adoption Tracker (Data)", d:"Government data tracking AI adoption across Australian industry sectors.", u:"https://www.industry.gov.au/publications/ai-adoption-tracker/ai-adoption-data", c:"AI info"},
+  {t:"CAIDP: Council of Europe AI Treaty", d:"Resource on the Council of Europe Framework Convention on AI and Human Rights, the first binding international AI treaty.", u:"https://www.caidp.org/resources/coe-ai-treaty/", c:"AI info"},
+  {t:"eSafety Commissioner: Generative AI", d:"eSafety guidance on generative AI risks and industry obligations under the Online Safety Act.", u:"https://www.esafety.gov.au/industry/tech-trends-and-challenges/generative-ai", c:"AI info"},
+
+  // Cybersecurity and online safety
+  {t:"Good Things Foundation: Internet Safety Tip Sheet", d:"Basic internet safety guidance from Good Things Foundation Australia, with The Smith Family.", u:"https://goodthingsaustralia.org/learn-resource/smithfamily-tipsheet-usinginternetv2/", c:"Basic Digital Literacy"},
+
+  // AI research and discovery platforms
+  {t:"Emergent Mind", d:"AI-powered research discovery tool for exploring arXiv papers through natural-language queries.", u:"https://www.emergentmind.com/", c:"AI info"},
+  {t:"Google DeepMind Publications", d:"Full catalogue of DeepMind's research publications, from AlphaFold to Gemini.", u:"https://deepmind.google/research/publications/", c:"AI info"},
+  {t:"Hugging Face", d:"The central hub for open-source AI models, datasets and demos; often called the GitHub of AI.", u:"https://huggingface.co/", c:"Datasets & repos"},
+  {t:"Napkin AI", d:"Turns text into visual diagrams and infographics; handy for making training materials.", u:"https://www.napkin.ai/", c:"AI tools"},
+  {t:"Stanford HAI AI Index Report", d:"The most comprehensive annual report on the state of AI globally (2025, 8th edition); benchmarks, investment, policy and workforce.", u:"https://hai.stanford.edu/ai-index/2025-ai-index-report", c:"AI info"},
+
+  // Australian-made AI
+  {t:"Maincode", d:"Melbourne company building AI models designed, trained and hosted in Australia; created Matilda, Australia's first homegrown language model.", u:"https://maincode.com/", c:"AI info"},
+
+  // Productivity tools and prompt libraries
+  {t:"Microsoft Copilot Prompt Gallery", d:"Microsoft's official prompt library for Copilot across the Office apps.", u:"https://copilot.cloud.microsoft/en-us/prompts/all", c:"AI info"},
+
+  // Workforce, education and skills data
+  {t:"Australian Bureau of Statistics: Labour Force", d:"Current Australian labour force data; grounds AI workforce discussions in real figures.", u:"https://www.abs.gov.au/statistics/labour/employment-and-unemployment/labour-force-australia/latest-release", c:"Other"},
+  {t:"OECD: Education at a Glance 2024", d:"Comprehensive international education data (OECD, 2024).", u:"https://www.oecd.org/en/publications/education-at-a-glance-2024_c00cad36-en.html", c:"Other"},
+  {t:"Future Skills Organisation", d:"Australian Government-funded body identifying emerging skills needs across the economy.", u:"https://www.futureskillsorganisation.com.au/", c:"Other"},
+  {t:"NCVER", d:"Australia's primary source of VET sector research and statistics.", u:"https://www.ncver.edu.au/", c:"Other"},
+  {t:"VOCEDplus", d:"International research database for VET and tertiary education, maintained by NCVER.", u:"https://www.voced.edu.au/", c:"Other"},
+
+  // Trending commentary and big-picture reads
+  {t:"Matt Shumer: Something Big Is Happening", d:"Viral 2026 essay arguing AI capability has crossed a threshold that will disrupt white-collar work; widely discussed and widely criticised. Read as a conversation starter.", u:"https://shumer.dev/something-big-is-happening", c:"AI info"},
+  {t:"Dario Amodei: The Adolescence of Technology", d:"Essay by Anthropic's CEO framing this phase of AI as an adolescence; a more measured counterpoint to the Shumer piece.", u:"https://www.darioamodei.com/essay/the-adolescence-of-technology", c:"AI info"},
+  {t:"Citrini Research: The 2028 Global Intelligence Crisis", d:"Speculative scenario modelling AI's possible impact on labour markets; framed explicitly as scenario planning, not prediction (February 2026).", u:"https://www.citriniresearch.com/p/2028gic", c:"AI info"}
 ];
 
 // ---- state ----
@@ -234,7 +316,7 @@ function render(){
   listEl.innerHTML = rows.map(d => {
     const idx = DATA.indexOf(d);
     return `<div class="rl-ref">`
-      + `<a class="rl-t" href="${d.u}" target="_blank" rel="noopener noreferrer">${esc(d.t)}</a>`
+      + `<a class="rl-t" href="${esc(d.u)}" target="_blank" rel="noopener noreferrer">${esc(d.t)}</a>`
       + `<span class="rl-tag" data-cat="${esc(d.c)}" role="button" tabindex="0" title="Filter to ${esc(d.c)}">${esc(d.c)}</span>`
       + `<span class="rl-d"> ${esc(d.d)}</span>`
       + `<span class="rl-u">${esc(prettyUrl(d.u))}</span>`
