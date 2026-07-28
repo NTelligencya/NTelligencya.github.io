@@ -9,7 +9,7 @@ House rules and card format for the NT World Ink Resources section. Read this be
 - `articles-and-papers.html`: RETIRED 27 July 2026 (outdated, to be rebuilt another day); now a redirect stub to `/resources/`, and its hub card has been removed. Original preserved in git 48a33e6.
 - `websites-and-tools.html`: RETIRED 27 July 2026; now a redirect stub to the filterable References library at `/references/` (documented in the main `/CLAUDE.md`). Its curated resources were merged into that tool, and the hub's "Websites & Tools" card now points to `/references/`.
 - `legislation-and-guidelines.html`: policy, frameworks and law; must keep its link to the presentation at `/presentations/australias-ai-laws-explained/`.
-- AI Benchmarks category page: planned, not yet built. Its hub card is a non-linked "In planning" card until the page exists.
+- `ai-benchmarks.html`: the benchmark catalogue (built 28 July 2026), grouped by capability area. Its cards carry a status flag in the category line (Watch / Watch, nearing saturation / Retired, historical) and a release paper link at the end of each annotation; the page's own template comment shows the variant. Scores and statuses date quickly; recheck against the linked leaderboards when editing.
 
 ## The resource card
 

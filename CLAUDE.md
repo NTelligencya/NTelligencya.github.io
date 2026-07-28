@@ -101,7 +101,7 @@ Structure: /resources/index.html hub with a card per category, plus one page per
 - [ ] Articles and Papers; source: 1-ai-resources-articles.html (built 25 July 2026). REMOVED 27 July 2026 as outdated, to be rebuilt another day. The page is now a redirect stub to /resources/ and its hub card is gone; the original is preserved in git commit 48a33e6. WildChat Visualiser and the Content Authenticity Initiative were carried into the References library before removal.
 - [x] Websites and Tools; source: 1-ai-resources-websites.html (built 25 July 2026). SUPERSEDED 27 July 2026 by the filterable References library at /references/ (see its own section below). Its ~50 curated resources were merged into the tool; /resources/websites-and-tools.html now redirects to /references/, reached from the unchanged "Websites & Tools" card on the hub.
 - [x] Legislation and Guidelines; source: 1-ai-resources-legislation.html. MUST link to the Australian AI legislation presentation at /presentations/australias-ai-laws-explained/. (built 25 July 2026; links via a "Start here" callout)
-- [ ] AI Benchmarks; new build from research-ai-benchmarks-landscape.md (shortlist approved 25 July 2026). Each entry: benchmark link, release paper link, abstract-style description, status flag (watch / nearing saturation / retired-historical).
+- [x] AI Benchmarks; new build from research-ai-benchmarks-landscape.md (shortlist approved 25 July 2026). Each entry: benchmark link, release paper link, abstract-style description, status flag (watch / nearing saturation / retired-historical). (built 28 July 2026 at /resources/ai-benchmarks.html; hub card now links to it; combined cards used for ARC-AGI 2+3, MMLU+MMLU-Pro, AIME+MATH; NIAH card unlinked, no vetted link)
 - [x] CLAUDE.md inside /resources/ documenting the card format and house rules for adding a resource (SD adds roughly one per week and is picky; no unvetted links). (written 25 July 2026)
 - [x] "add-resource" skill for SD: takes a URL, drafts the annotation, inserts the card in the right category for approval. Delivered as a .skill file for SD to save. (delivered 25 July 2026)
 
@@ -131,8 +131,8 @@ History: the merged content from the old Websites and Tools page, and the retire
 ## Build order (suggested; SD may reshuffle)
 
 - DONE 25 July 2026: Session A, resources scaffolding (hub, four migrated category pages, resources CLAUDE.md, nav "Resources" links, add-resource skill delivered).
-- NEXT SESSION: Session B, AI Benchmarks resource page plus benchmarks workshop page (shortlist already approved).
-- Session B: AI Benchmarks resource page plus benchmarks workshop page (once shortlist approved).
+- DONE 28 July 2026: Session B part one, AI Benchmarks resource page (/resources/ai-benchmarks.html) built and linked from the hub.
+- NEXT: Session B part two, the benchmarks workshop page ("Which AI Is Best? Reading the Scoreboard Like a Pro") in /workshops/.
 - Session C onwards: workshop pages roughly two or three per session, starting with the ones needing no new research (AI Bubble, Digital Equity, Cognitive Cost, Caring for Your Data), then the research-heavy rebuilds (World Tour, NT, Watermarking, Agentic AI), then front page changes once enough pages exist to populate the catalogue.
 - Front page section and Power Query demotion go live only when at least a handful of workshop pages are ready to link.
 

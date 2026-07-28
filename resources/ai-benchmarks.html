@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Benchmarks · Resources · NT World Ink</title>
+<meta name="description" content="A guided catalogue of the benchmarks used to answer &quot;which AI is best?&quot;: what each one measures, its release paper, and whether it still tells you anything. Reasoning, mathematics, coding, agents, cybersecurity, long context and the big leaderboards.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- =============== HEADER =============== -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#library">Library</a>
+      <a href="/simulations/">Tools</a>
+      <a href="/presentations/">Presentations</a>
+      <a href="/resources/">Resources</a>
+      <a href="/#about">About</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- =============== BREADCRUMB =============== -->
+<div class="container">
+  <nav class="breadcrumb">
+    <a href="/">ntworld.ink</a>
+    <span class="sep">/</span>
+    <a href="/resources/">resources</a>
+    <span class="sep">/</span>
+    <span>ai benchmarks</span>
+  </nav>
+</div>
+
+<!-- =============== PAGE MASTHEAD =============== -->
+<div class="container">
+  <div class="page-masthead">
+    <div class="series-label">Resources · Scoreboards</div>
+    <h1>AI Benchmarks</h1>
+    <p class="subtitle">The tests used to answer "which AI is best?", grouped by what they measure. Each entry links the benchmark itself and its release paper, says what it tests, and carries a status flag: <strong>Watch</strong> means the benchmark still separates today's frontier models; <strong>nearing saturation</strong> means top scores are bunching near the ceiling and the number is losing meaning; <strong>Retired, historical</strong> means the test is solved and is listed here to show how the field got here. Scores quoted were current at the linked leaderboards in July 2026; they age quickly.</p>
+    <p>Jump to: <a href="#reasoning">Reasoning &amp; Knowledge</a> · <a href="#mathematics">Mathematics</a> · <a href="#coding">Coding</a> · <a href="#agentic">Agents &amp; Computer Use</a> · <a href="#cyber">Cybersecurity</a> · <a href="#multimodal">Multimodal &amp; Long Context</a> · <a href="#meta">Leaderboards &amp; Indices</a></p>
+  </div>
+</div>
+
+<!-- ============================================================
+     HOW TO ADD A BENCHMARK: copy-paste template
+
+     Copy the block below, paste it inside the app-grid of the
+     right section, and fill in the parts:
+       1. Creator or maintainer, date, and status flag
+          (Watch / Watch, nearing saturation / Retired, historical)
+       2. Benchmark title, wrapped in the leaderboard or site link
+       3. A one-to-two sentence annotation: what it measures,
+          and what its scores currently mean
+       4. The release paper link at the end of the annotation
+     Vetted links only. Full house rules: see /resources/CLAUDE.md
+
+<div class="app-card app-card-wide">
+  <div class="app-card-category">Creator &middot; Date &middot; Status</div>
+  <h3><a href="PASTE-VETTED-LINK-HERE" target="_blank" rel="noopener">Benchmark name</a></h3>
+  <p>What it measures and what the scores mean. <a href="PASTE-PAPER-LINK-HERE" target="_blank" rel="noopener">Release paper</a>.</p>
+</div>
+
+     ============================================================ -->
+
+<div class="content-body">
+  <div class="container">
+
+    <!-- =============== HOW TO READ THIS PAGE =============== -->
+    <section class="content-section">
+      <div class="callout callout-key">
+        <div class="callout-title">How to read this page</div>
+        <p>There is no single "best AI". Capability is jagged; the same model can win a gold-medal score on Olympiad mathematics and still misread an analogue clock, so choose by task and treat every score as directional rather than final. Benchmarks also saturate in months, not years, and vendor-reported scores routinely run higher than independent ones; prefer independent leaderboards, note the date on every number, and distrust any single headline figure. One useful side effect: apps that quietly repackage a cheaper model behind a polished interface never publish independent benchmark results, so asking "where does this sit on Arena or the Epoch hub?" quickly separates frontier models from wrappers.</p>
+      </div>
+    </section>
+
+    <!-- =============== SECTION: REASONING & KNOWLEDGE =============== -->
+    <section class="content-section" id="reasoning">
+      <h2>Reasoning &amp; Knowledge</h2>
+      <div class="app-grid">
+
+        <!-- BENCHMARK: Humanity's Last Exam -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Scale AI &amp; Center for AI Safety &middot; January 2025 &middot; Watch</div>
+          <h3><a href="https://labs.scale.com/leaderboard/humanitys_last_exam" target="_blank" rel="noopener">Humanity's Last Exam (HLE)</a></h3>
+          <p>2,500 questions written by subject experts across roughly 100 fields, built to be the last closed-ended academic exam models can't pass; top models sat between about 44% and 53% in July 2026 and are climbing fast. A February 2026 audit (HLE-Verified) found a material error rate in the questions themselves, so read small score gaps sceptically. <a href="https://arxiv.org/abs/2501.14249" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: GPQA Diamond -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Rein et al., NYU &middot; November 2023 &middot; Watch, nearing saturation</div>
+          <h3><a href="https://epoch.ai/benchmarks/gpqa-diamond" target="_blank" rel="noopener">GPQA Diamond</a></h3>
+          <p>198 graduate-level science questions designed to be "Google-proof"; even PhD holders outside the sub-field score poorly. Frontier models now sit at 93% to 95%, and much of what remains is label noise, yet it is still quoted in nearly every model launch. <a href="https://arxiv.org/abs/2311.12022" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: ARC-AGI 2 and 3 -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">ARC Prize Foundation &middot; v2 March 2025; v3 March 2026 &middot; Watch</div>
+          <h3><a href="https://arcprize.org/leaderboard" target="_blank" rel="noopener">ARC-AGI (versions 2 and 3)</a></h3>
+          <p>Fluid-intelligence puzzles that are easy for people and hard for models, testing novel-problem solving rather than memorised knowledge; version 3 moves to interactive game environments where frontier models scored under 1% at launch against near-perfect human play. The best official verified ARC-AGI-2 score was 54% in July 2026, so both versions still separate the field. <a href="https://arxiv.org/abs/2505.11831" target="_blank" rel="noopener">ARC-AGI-2 paper</a>; <a href="https://arcprize.org/arc-agi/3" target="_blank" rel="noopener">ARC-AGI-3 documentation</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: MMLU and MMLU-Pro (historical) -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Hendrycks et al.; TIGER-Lab &middot; 2020 and 2024 &middot; Retired, historical</div>
+          <h3><a href="https://artificialanalysis.ai/evaluations/mmlu-pro" target="_blank" rel="noopener">MMLU and MMLU-Pro</a></h3>
+          <p>The multiple-choice knowledge exam that defined "smart" for the ChatGPT era, and its harder 2024 successor; both now sit around 90% or above, and MMLU itself carries an estimated 9% label-error rate. Kept here because thousands of older claims cite them; treat any MMLU number as a history lesson. <a href="https://arxiv.org/abs/2009.03300" target="_blank" rel="noopener">MMLU paper</a>; <a href="https://arxiv.org/abs/2406.01574" target="_blank" rel="noopener">MMLU-Pro paper</a>.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =============== SECTION: MATHEMATICS =============== -->
+    <section class="content-section" id="mathematics">
+      <h2>Mathematics</h2>
+      <div class="app-grid">
+
+        <!-- BENCHMARK: FrontierMath -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Epoch AI &middot; November 2024 &middot; Watch</div>
+          <h3><a href="https://epoch.ai/frontiermath/tiers-1-4/about" target="_blank" rel="noopener">FrontierMath</a></h3>
+          <p>Around 340 unpublished research-level mathematics problems in four difficulty tiers, written by professional mathematicians; the version 2 release of June 2026 corrected errors an audit found in roughly a third of the problems. Also a benchmark-integrity teaching story: OpenAI funded its creation with dataset access under an undisclosed agreement, and Epoch now keeps a 50-problem holdout no lab ever sees. <a href="https://arxiv.org/abs/2411.04872" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: MathArena -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">MathArena &middot; Ongoing, since 2025 &middot; Watch</div>
+          <h3><a href="https://matharena.ai/competitions" target="_blank" rel="noopener">MathArena live competitions</a></h3>
+          <p>Runs models on real mathematics competitions (IMO, USAMO, HMMT, Putnam) within hours of the problems being released, which makes it the cleanest contamination-free signal in mathematics; in July 2025 it certified a gold-medal IMO performance by Gemini Deep Think. <a href="https://arxiv.org/abs/2505.23281" target="_blank" rel="noopener">Methodology paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: AIME and MATH (historical) -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">MAA competition, tracked by MathArena; Hendrycks et al. &middot; Yearly; 2021 &middot; Retired, historical</div>
+          <h3><a href="https://matharena.ai/?comp=aime--aime_2026" target="_blank" rel="noopener">AIME and MATH</a></h3>
+          <p>The two staples of maths benchmarking for years: the American Invitational Mathematics Examination and the MATH competition-problem dataset. Both are now saturated at the frontier; five models scored 100% on AIME 2025, and MATH sits at 97% to 99%, so neither can tell strong models apart any more. <a href="https://arxiv.org/abs/2103.03874" target="_blank" rel="noopener">MATH paper</a>.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =============== SECTION: CODING =============== -->
+    <section class="content-section" id="coding">
+      <h2>Coding</h2>
+      <div class="app-grid">
+
+        <!-- BENCHMARK: SWE-bench Verified -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Princeton; Verified split by OpenAI &middot; 2023; August 2024 &middot; Watch, nearing saturation</div>
+          <h3><a href="https://www.swebench.com/" target="_blank" rel="noopener">SWE-bench Verified</a></h3>
+          <p>500 human-validated real GitHub issues the model must fix in actual Python repositories; the most-quoted coding number in the industry. Top agents now resolve roughly 85% to 95%, so its power to separate frontier models is fading. <a href="https://arxiv.org/abs/2310.06770" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: SWE-bench Pro -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Scale AI &middot; September 2025 &middot; Watch</div>
+          <h3><a href="https://labs.scale.com/leaderboard/swe_bench_pro_public" target="_blank" rel="noopener">SWE-bench Pro</a></h3>
+          <p>1,865 enterprise-grade software tasks across 41 repositories and four languages, with contamination-controlled splits. Standardised public scores sit around 59% while vendor-run claims land 10 to 30 points higher; a tidy demonstration of why the test harness matters as much as the model. <a href="https://arxiv.org/abs/2509.16941" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: Terminal-Bench -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Stanford &amp; Laude Institute &middot; May 2025; v2.0 November 2025 &middot; Watch</div>
+          <h3><a href="https://www.tbench.ai/leaderboard/terminal-bench/2.0" target="_blank" rel="noopener">Terminal-Bench 2.0</a></h3>
+          <p>Real tasks completed inside a live terminal and container environment, from build failures to system administration; closer to actual developer work than issue-fixing alone. Top agents reached 83% to 85% by May 2026, so watch for saturation at the top. <a href="https://arxiv.org/abs/2601.11868" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: HumanEval (historical) -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">OpenAI &middot; July 2021 &middot; Retired, historical</div>
+          <h3><a href="https://github.com/openai/human-eval" target="_blank" rel="noopener">HumanEval</a></h3>
+          <p>164 short Python function-writing problems; the benchmark that launched code generation as a research field. Solved years ago (96% to 98% and above) and kept here purely to show how far the goalposts have moved: from writing one function to fixing real enterprise codebases. <a href="https://arxiv.org/abs/2107.03374" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =============== SECTION: AGENTS & COMPUTER USE =============== -->
+    <section class="content-section" id="agentic">
+      <h2>Agents &amp; Computer Use</h2>
+      <div class="app-grid">
+
+        <!-- BENCHMARK: OSWorld-Verified -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">OSWorld team &middot; 2024; Verified July 2025 &middot; Watch, nearing saturation</div>
+          <h3><a href="https://os-world.github.io/" target="_blank" rel="noopener">OSWorld-Verified</a></h3>
+          <p>369 real tasks in a live operating system: spreadsheets, browsers, file managers, multi-app workflows. Top agents now score 82% to 85%, above the roughly 72% human baseline, which says as much about the benchmark's ceiling as about the agents. <a href="https://arxiv.org/abs/2404.07972" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: tau2-bench -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Sierra &middot; June 2025 &middot; Watch, nearing saturation</div>
+          <h3><a href="https://github.com/sierra-research/tau2-bench" target="_blank" rel="noopener">tau2-bench</a></h3>
+          <p>Customer-service agents that must follow business policy while using tools mid-conversation, scored on whether they succeed reliably across repeated runs rather than once. Headline splits are close to solved (97% to 99% on telecom), and aggregate indices have already moved to a harder successor. <a href="https://arxiv.org/abs/2506.07982" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: BrowseComp -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">OpenAI &middot; April 2025 &middot; Watch, nearing saturation</div>
+          <h3><a href="https://openai.com/index/browsecomp/" target="_blank" rel="noopener">BrowseComp</a></h3>
+          <p>1,266 questions built to require persistent, creative web research; agents scored 0.6% at launch and roughly 90% by July 2026, one of the fastest saturation arcs on record. A stricter successor (BrowseComp-Plus) restores the difficulty. <a href="https://arxiv.org/abs/2504.12516" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: Vending-Bench 2 -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Andon Labs &middot; February 2025; v2 November 2025 &middot; Watch</div>
+          <h3><a href="https://andonlabs.com/evals/vending-bench-2" target="_blank" rel="noopener">Vending-Bench 2</a></h3>
+          <p>A long-horizon business simulation: the model runs a vending machine company for a simulated year from $500 of capital, scored on closing net worth; it punishes the drift and forgetfulness that short benchmarks never see. In July 2026 the leading model finished with $10,937. <a href="https://arxiv.org/abs/2502.15840" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: METR time horizons -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">METR &middot; March 2025, updated January 2026 &middot; Watch</div>
+          <h3><a href="https://metr.org/time-horizons/" target="_blank" rel="noopener">METR time horizons</a></h3>
+          <p>Rather than a pass rate, METR measures how long a task a model can complete at 50% reliability, expressed in human working time; the January 2026 update put the frontier at roughly a 320-minute horizon, doubling about every 89 days since 2024. The single best chart for showing a general audience how fast agentic capability is moving. <a href="https://arxiv.org/abs/2503.14499" target="_blank" rel="noopener">Methodology paper</a>.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =============== SECTION: CYBERSECURITY =============== -->
+    <section class="content-section" id="cyber">
+      <h2>Cybersecurity</h2>
+      <div class="app-grid">
+
+        <!-- BENCHMARK: Cybench -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Stanford &middot; August 2024 &middot; Watch, nearing saturation</div>
+          <h3><a href="https://cybench.github.io/" target="_blank" rel="noopener">Cybench</a></h3>
+          <p>40 professional capture-the-flag security challenges with graded subtasks, drawn from real CTF competitions. Frontier models are closing in on the ceiling, but it remains a fixture of the safety sections in model system cards. <a href="https://arxiv.org/abs/2408.08926" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: CyberGym -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">UC Berkeley &middot; June 2025 &middot; Watch</div>
+          <h3><a href="https://rdi.berkeley.edu/blog/cybergym/" target="_blank" rel="noopener">CyberGym</a></h3>
+          <p>Over 1,500 tasks built from real vulnerabilities in open-source projects: agents must reproduce known flaws and sometimes discover new ones. Cited directly in lab safety evaluations, including the Claude Opus 4.5 system card (50.63% pass rate, November 2025). <a href="https://arxiv.org/abs/2506.02548" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: ExploitBench -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Carnegie Mellon &middot; May 2026 &middot; Watch, very new</div>
+          <h3><a href="https://exploitbench.ai/" target="_blank" rel="noopener">ExploitBench</a></h3>
+          <p>A capability ladder against 41 real Chrome browser vulnerabilities, scoring how far an agent climbs from reaching the flawed code to a full working exploit; at release the best public model achieved the top rung on just one bug. Only months old, so treat it as promising rather than established. <a href="https://arxiv.org/abs/2605.14153" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =============== SECTION: MULTIMODAL & LONG CONTEXT =============== -->
+    <section class="content-section" id="multimodal">
+      <h2>Multimodal &amp; Long Context</h2>
+      <div class="app-grid">
+
+        <!-- BENCHMARK: MMMU-Pro -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">MMMU team &middot; September 2024 &middot; Watch</div>
+          <h3><a href="https://mmmu-benchmark.github.io/" target="_blank" rel="noopener">MMMU-Pro</a></h3>
+          <p>College-level problems that require reading images, charts and diagrams together with text; the Pro version strips shortcuts that let models answer without truly looking at the picture. The standard citation for multimodal reasoning. <a href="https://arxiv.org/abs/2409.02813" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: RULER -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">NVIDIA &middot; April 2024 &middot; Watch</div>
+          <h3><a href="https://github.com/NVIDIA/RULER" target="_blank" rel="noopener">RULER</a></h3>
+          <p>Measures a model's effective context length: how much of the advertised window it can actually use before quality collapses, which is routinely far less than the marketing number. Discrimination between frontier models now happens at 256k tokens and beyond. <a href="https://arxiv.org/abs/2404.06654" target="_blank" rel="noopener">Release paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: MRCR -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">OpenAI &middot; 2025 &middot; Watch</div>
+          <h3><a href="https://huggingface.co/datasets/openai/mrcr" target="_blank" rel="noopener">MRCR</a></h3>
+          <p>Multi-round co-reference: the model must track many similar items scattered through a very long conversation and retrieve exactly the right one. Cited by the major labs, and its hardest splits remain unsolved, which makes it a better long-context test than simple retrieval.</p>
+        </div>
+
+        <!-- BENCHMARK: Needle in a Haystack (historical) -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Community test &middot; 2023 &middot; Retired, historical</div>
+          <h3>Needle in a Haystack</h3>
+          <p>The original long-context test: hide one sentence in a mass of text and ask the model to find it. Every serious model now passes, so a perfect score means little; it survives as a sanity check and a reminder that retrieval is not comprehension. No vetted public link yet; the title is searchable.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =============== SECTION: LEADERBOARDS & INDICES =============== -->
+    <section class="content-section" id="meta">
+      <h2>Leaderboards &amp; Aggregate Indices</h2>
+      <div class="app-grid">
+
+        <!-- BENCHMARK: Arena -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Arena &middot; Ongoing &middot; Watch</div>
+          <h3><a href="https://lmarena.ai" target="_blank" rel="noopener">Arena (formerly LMArena)</a></h3>
+          <p>Millions of blind side-by-side votes from real users, ranked by Elo rating; the largest human-preference leaderboard, with the top labs now separated by only a handful of points. Read it alongside "The Leaderboard Illusion" (April 2025), which documented how private variant testing can flatter the rankings. <a href="https://arxiv.org/abs/2504.20879" target="_blank" rel="noopener">The Leaderboard Illusion paper</a>.</p>
+        </div>
+
+        <!-- BENCHMARK: Artificial Analysis Intelligence Index -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Artificial Analysis &middot; Ongoing; Index v4.1 June 2026 &middot; Watch</div>
+          <h3><a href="https://artificialanalysis.ai" target="_blank" rel="noopener">Artificial Analysis Intelligence Index</a></h3>
+          <p>An independent composite score built from agentic, coding, scientific-reasoning and general benchmarks, re-run in-house on every major model with cost and speed alongside; it drops components as they saturate. A single convenient number, with all the caveats a single number deserves.</p>
+        </div>
+
+        <!-- BENCHMARK: Epoch AI Benchmarking Hub -->
+        <div class="app-card app-card-wide">
+          <div class="app-card-category">Epoch AI &middot; Ongoing, since February 2025 &middot; Watch</div>
+          <h3><a href="https://epoch.ai/benchmarks" target="_blank" rel="noopener">Epoch AI Benchmarking Hub</a></h3>
+          <p>Independent trend charts across the major benchmarks, with costs and a note on who actually ran each evaluation; the most transparent place to see saturation curves and vendor-versus-independent gaps at a glance.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="last-updated">Last updated: 28 July 2026</div>
+  </div>
+</div>
+
+<!-- =============== FOOTER =============== -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. No paywall; no email harvesting; no nonsense.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/#library">All courses</a></li>
+          <li><a href="/simulations/">Simulation Tools Catalogue</a></li>
+          <li><a href="/presentations/">Presentations</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About this site</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/cookie-notice" target="_blank" rel="noopener">Cookies</a> | <a href="mailto:webservices@cdu.edu.au">Feedback</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
