@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growing Up Digital: An AI World Tour &middot; Workshops &middot; NTell World Ink</title>
+<meta name="description" content="A one-hour workshop touring how AI is growing up differently around the world: UNESCO readiness assessments for the Territory's biggest migrant-community homelands, the global sentiment and trust story, and what Anthropic's data reveals about how Australians actually use AI.">
+
+<!-- "AFTER DARK" design: ntworldink dark theme, teal + ochre accents. Headings: Cormorant Garamond. Scaffold shared with the Which AI Is Best deck. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --stage-bg: #050506;
+    --slide-bg: #0B0B0E;
+    --card: #131318;
+    --card-2: #17171D;
+    --line: #26262F;
+    --text: #ECEAE4;
+    --text-2: #B9B6AD;
+    --text-3: #7C796F;
+    --accent: #1AC9C9;          /* teal */
+    --accent-soft: #6FE3E3;
+    --accent-wash: rgba(26,201,201,0.08);
+    --warm: #E08A3C;            /* ochre */
+    --warm-wash: rgba(224,138,60,0.10);
+    --bad: #E05B4A;
+    --bad-wash: rgba(224,91,74,0.10);
+    --good: #4CC98A;
+    --good-wash: rgba(76,201,138,0.10);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Manrope', 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== FIXED 16:9 STAGE ===== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, svg { max-width: 100%; max-height: 100%; }
+a { color: var(--accent-soft); text-decoration: none; }
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .edit-toggle, .edit-hotzone { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===== SLIDE SCAFFOLD ===== */
+.topbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 62px;
+    background: #08080A; color: var(--text-2); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 24px; padding: 0 44px;
+    font: 500 18px var(--font-mono); letter-spacing: .06em; z-index: 3;
+}
+.topbar .chip {
+    background: var(--accent); color: #04211F; border-radius: 5px;
+    padding: 4px 14px; font-weight: 500; letter-spacing: .1em;
+}
+.topbar .chip.warm { background: var(--warm); color: #2A1503; }
+.topbar .chip.bad { background: var(--bad); color: #2B0C07; }
+.topbar .crumb { opacity: .8; }
+.topbar .sect { margin-left: auto; font-size: 15px; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); }
+
+.foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+    background: #08080A; border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 44px; z-index: 3;
+}
+.foot .brand { font: 700 22px var(--font-body); color: var(--text); letter-spacing: -0.01em; }
+.foot .brand .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 18px; letter-spacing: .08em; }
+.foot .pg { font: 500 17px var(--font-mono); letter-spacing: .12em; color: var(--text-3); }
+
+.body {
+    position: absolute; inset: 62px 120px 70px 120px;
+    display: flex; flex-direction: column; justify-content: center; z-index: 2;
+}
+.kicker { font: 500 19px var(--font-mono); letter-spacing: .28em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+.kicker.warm { color: var(--warm); }
+.kicker.bad { color: var(--bad); }
+h1 { font: 500 118px/1.02 var(--font-display); letter-spacing: -0.01em; color: var(--text); }
+h2 { font: 500 76px/1.06 var(--font-display); letter-spacing: -0.008em; color: var(--text); }
+h2 .hl { background: linear-gradient(transparent 64%, var(--accent-wash) 64%); color: var(--accent-soft); }
+h2 .hlw { background: linear-gradient(transparent 64%, var(--warm-wash) 64%); color: var(--warm); }
+.lede { font: 400 30px/1.55 var(--font-body); color: var(--text-2); max-width: 1360px; }
+.lede b { font-weight: 700; color: var(--text); }
+.muted { color: var(--text-3); }
+
+/* Cards */
+.dcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    border-top: 5px solid var(--accent);
+    padding: 38px 42px;
+}
+.dcard.warm { border-top-color: var(--warm); }
+.dcard.bad { border-top-color: var(--bad); }
+.dcard.good { border-top-color: var(--good); }
+.dcard .ctag { font: 500 16px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.dcard.warm .ctag { color: var(--warm); }
+.dcard.bad .ctag { color: var(--bad); }
+.dcard.good .ctag { color: var(--good); }
+.dcard h3 { font: 600 33px/1.2 var(--font-display); color: var(--text); margin-bottom: 14px; }
+.dcard p { font: 400 24px/1.5 var(--font-body); color: var(--text-2); }
+.dcard p b { font-weight: 700; color: var(--text); }
+
+/* Step rows */
+.rows { display: flex; flex-direction: column; }
+.row {
+    display: flex; align-items: center; gap: 34px; padding: 24px 12px;
+    border-bottom: 1px solid var(--line); font: 400 28px/1.45 var(--font-body); color: var(--text-2);
+}
+.row:last-child { border-bottom: none; }
+.row .n {
+    min-width: 58px; height: 58px; border-radius: 50%; flex: 0 0 58px;
+    background: var(--accent); color: #04211F;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 23px var(--font-mono);
+}
+.row .n.warm { background: var(--warm); color: #2A1503; }
+.row .n.bad { background: var(--bad); color: #2B0C07; }
+.row .n.good { background: var(--good); color: #06291A; }
+.row b { font-weight: 700; color: var(--text); }
+.row .tag { margin-left: auto; font: 500 16px var(--font-mono); letter-spacing: .12em; color: var(--accent-soft); background: var(--accent-wash); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Verdict strips */
+.strip { border-radius: 10px; padding: 26px 36px; font: 400 26px/1.5 var(--font-body); }
+.strip b { font-weight: 700; }
+.strip.good { background: var(--good-wash); border-left: 6px solid var(--good); color: #CDEBDB; }
+.strip.bad { background: var(--bad-wash); border-left: 6px solid var(--bad); color: #F2D4CE; }
+.strip.warn { background: var(--warm-wash); border-left: 6px solid var(--warm); color: #F0DCC6; }
+.strip.teal { background: var(--accent-wash); border-left: 6px solid var(--accent); color: #CFEDEA; }
+
+/* Story (vignette) slides */
+.story-tag {
+    display: inline-block; font: 500 17px var(--font-mono); letter-spacing: .24em; text-transform: uppercase;
+    color: var(--warm); border: 1px solid var(--warm); border-radius: 999px; padding: 10px 26px; margin-bottom: 40px;
+}
+.story {
+    font: 400 46px/1.45 var(--font-display); font-style: italic; color: var(--text);
+    max-width: 1500px;
+}
+.story b { font-weight: 600; color: var(--warm); font-style: normal; }
+.story-close { font: 400 30px/1.5 var(--font-body); color: var(--text-2); margin-top: 44px; max-width: 1400px; }
+.story-close b { color: var(--text); font-weight: 700; }
+
+/* Stat tiles */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 40px 42px; border-top: 5px solid var(--warm);
+}
+.stat .big { font: 600 84px/1 var(--font-display); color: var(--warm); margin-bottom: 16px; }
+.stat .lbl { font: 400 23px/1.45 var(--font-body); color: var(--text-2); }
+.stat .lbl b { color: var(--text); font-weight: 700; }
+
+/* Message mock */
+.msgbox {
+    background: var(--card); border: 1px dashed var(--line); border-radius: 12px;
+    font: 400 24px/1.6 var(--font-mono); color: var(--text-2); padding: 30px 34px;
+}
+.msgbox .from { color: var(--warm); font-size: 18px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+
+.cite { font: 400 17px/1.6 var(--font-mono); color: var(--text-3); letter-spacing: .02em; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; }
+
+/* Reveal animation */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.r1 { transition-delay: .08s; } .r2 { transition-delay: .2s; } .r3 { transition-delay: .32s; }
+.r4 { transition-delay: .44s; } .r5 { transition-delay: .56s; } .r6 { transition-delay: .68s; }
+.r7 { transition-delay: .8s; }
+
+
+/* Site logo (matches styles.css .brand on the main site) */
+.foot .brand { display: flex; align-items: center; gap: 14px; }
+.foot .brand-mark { width: 34px; height: 34px; position: relative; flex: 0 0 34px; }
+.foot .brand-mark::before, .foot .brand-mark::after { content: ''; position: absolute; inset: 5px; border: 1.5px solid var(--accent); border-radius: 4px; }
+.foot .brand-mark::after { transform: rotate(45deg); border-color: #4DDCDC; opacity: 0.5; }
+.foot .brand-name { font-family: var(--font-display); font-weight: 500; font-size: 27px; letter-spacing: .04em; color: var(--text); }
+.foot .brand-name .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 16px; letter-spacing: .08em; }
+
+/* Illustrative bench chart (slide 2) */
+.bc-row { display: flex; align-items: center; gap: 20px; margin-bottom: 13px; }
+.bc-label { width: 250px; font: 600 23px var(--font-body); color: var(--text); text-align: right; line-height: 1.15; }
+.bc-label small { display: block; font: 500 14px var(--font-mono); color: var(--text-3); letter-spacing: .04em; }
+.bc-track { flex: 1; height: 30px; background: var(--card-2); border-radius: 5px; overflow: hidden; }
+.bc-bar { height: 100%; background: var(--accent); opacity: .82; border-radius: 0 4px 4px 0; }
+.bc-bar.warm { background: var(--warm); }
+.chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.chip-m { font: 500 17px var(--font-mono); letter-spacing: .08em; color: var(--accent-soft); background: var(--accent-wash); border: 1px solid var(--line); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Video finale */
+.video-wrap { width: 1420px; height: 798px; margin: 30px auto 0; background: #000; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; position: relative; }
+.video-wrap iframe { width: 100%; height: 100%; border: 0; }
+.yt-facade { width: 100%; height: 100%; border: 0; padding: 0; cursor: pointer; background: #000; position: relative; display: block; }
+.yt-facade img { width: 100%; height: 100%; object-fit: cover; opacity: .75; }
+.yt-facade .playbtn { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 120px; height: 84px; background: rgba(8,8,10,.82); border: 1.5px solid var(--accent); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+.yt-facade .playbtn::after { content: ''; border-style: solid; border-width: 20px 0 20px 34px; border-color: transparent transparent transparent var(--accent); }
+
+/* Edit affordance */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 90px; height: 90px; z-index: 1200; }
+.edit-toggle {
+    position: fixed; top: 74px; left: 18px; z-index: 1201; width: 44px; height: 44px;
+    border-radius: 10px; border: 1px solid var(--line); background: rgba(19,19,24,.9); color: var(--text);
+    font: 600 15px var(--font-mono); cursor: pointer; opacity: 0; transition: opacity .3s;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; }
+body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5); outline-offset: 3px; }
+</style>
+<style>
+/* World Tour additions: diverging bar chart (what Australians ask) */
+.dv-row { display: flex; align-items: center; gap: 16px; margin-bottom: 11px; }
+.dv-label { width: 470px; font: 500 20px/1.25 var(--font-body); color: var(--text-2); text-align: right; }
+.dv-label b { color: var(--text); font-weight: 700; }
+.dv-plot { flex: 1; height: 32px; position: relative; background: var(--card-2); border-radius: 5px; }
+.dv-plot::before { content: ''; position: absolute; left: 50%; top: -4px; bottom: -4px; width: 2px; background: var(--line); }
+.dv-bar { position: absolute; top: 0; height: 100%; opacity: .85; }
+.dv-bar.pos { left: 50%; background: var(--accent); border-radius: 0 4px 4px 0; }
+.dv-bar.neg { right: 50%; background: var(--warm); border-radius: 4px 0 0 4px; }
+.dv-val { position: absolute; top: 50%; transform: translateY(-50%); font: 500 16px var(--font-mono); color: var(--text); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+    <!-- ===== SLIDE 1 : TITLE ===== -->
+    <section class="slide" aria-label="Title">
+        <div class="topbar"><span class="chip">WORKSHOP</span><span class="crumb">ntworldink.com</span><span class="sect">July 2026</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="kicker reveal r1">AI Special Topic Workshops &middot; A One-Hour Session</div>
+            <h1 class="reveal r2">Growing Up Digital:<br>An AI World Tour</h1>
+            <p class="lede reveal r3" style="margin-top:36px;font-size:34px;font-style:italic;font-family:var(--font-display)">AI isn't arriving everywhere the same way. This hour tours how it's growing up in the countries our neighbours come from, then comes home to a surprising portrait of Australia.</p>
+            <p class="lede muted reveal r4" style="margin-top:24px;font-size:23px">Figures quoted were current at their linked sources in July 2026; sentiment moves fast, so check the dates.</p>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">01 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 2 : WHY A WORLD TOUR ===== -->
+    <section class="slide" aria-label="Why a world tour">
+        <div class="topbar"><span class="chip">WHY</span><span class="crumb">the Territory angle</span><span class="sect">Why a tour?</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Why take this tour from the Northern Territory?</div>
+            <h2 class="reveal r2">Nobody arrives as <span class="hl">a blank slate</span></h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">The idea</div><h3>Digital worlds travel with people</h3><p>When someone moves here, they bring years of experience of their home country's digital life: its platforms, its rules, its assumptions about privacy and AI. Attitudes to technology aren't just personal preferences; they're <b>products of the systems people grew up inside</b>.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">The payoff</div><h3>Meeting people where they are</h3><p>The Territory's classrooms, clinics and workplaces are full of colleagues, students and clients from across Asia and beyond. Knowing what digital world someone grew up in turns generic advice into guidance that actually lands; understanding, not assumption.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>The itinerary:</b> how the world measures a country's AI readiness; a six-stop tour of homelands of some of the Territory's biggest migrant communities; what the world actually feels about AI; and then home, to what Australians really do with it.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">02 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 3 : TWO DIFFERENT QUESTIONS ===== -->
+    <section class="slide" aria-label="Readiness versus sentiment">
+        <div class="topbar"><span class="chip warm">KEY IDEA</span><span class="crumb">two different questions</span><span class="sect">Readiness vs sentiment</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">The distinction this whole hour hangs on</div>
+            <h2 class="reveal r2">Is a country <span class="hlw">ready</span> for AI, and does it <span class="hl">want</span> it? Different questions.</h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">Readiness</div><h3>What governments and systems can do</h3><p>Measured by structured assessments: laws, institutions, skills, infrastructure, data. This is what <b>UNESCO's Readiness Assessment Methodology</b> evaluates, country by country. It says nothing about how people feel.</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">Sentiment</div><h3>What people trust and fear</h3><p>Measured by surveys of ordinary people: excitement, nervousness, trust in government to regulate. This is what <b>Pew and the Stanford AI Index</b> track. It says nothing about whether the wiring is in place.</p></div>
+            </div>
+            <div class="strip warn reveal r5" style="margin-top:44px"><b>Why it matters:</b> the two often point in opposite directions. Some of the world's most AI-enthusiastic publics live in countries still building basic digital infrastructure, while some of the best-wired nations have the most anxious citizens. Never let one number stand in for both.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">03 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 4 : HOW READINESS IS MEASURED ===== -->
+    <section class="slide" aria-label="How readiness is measured">
+        <div class="topbar"><span class="chip">READINESS</span><span class="crumb">the UNESCO method</span><span class="sect">Measuring readiness</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The measuring stick for our tour</div>
+            <h2 class="reveal r2">UNESCO's RAM: a <span class="hl">country-scale check-up</span></h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">What it is</div><h3>Readiness Assessment Methodology</h3><p>A structured review a government completes with UNESCO under the global Recommendation on the Ethics of AI: legislation, institutions, skills, infrastructure and data ecosystems, ending in concrete recommendations. Dozens of countries have now published one; every report is free to read on <a href="https://www.unesco.org/ethics-ai/en/ram" target="_blank" rel="noopener">UNESCO's Global AI Ethics and Governance Observatory</a>.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">How to read one</div><h3>A mirror, not a medal</h3><p>A RAM report is a self-examination, not a ranking; there's no leaderboard and no score to win. Read it for what a country says about its own gaps. (Separately, Oxford Insights publishes an annual Government AI Readiness Index that does rank countries; and the OECD has so far reviewed only a handful, so beware mislabelled citations.)</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>Boarding call:</b> all six countries on our tour have completed UNESCO readiness assessments in the last two years; a quiet milestone in itself. Reports for each are on the Observatory site.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">04 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 5 : THE TOUR, PART ONE ===== -->
+    <section class="slide" aria-label="Tour stops: India, Bangladesh, Indonesia">
+        <div class="topbar"><span class="chip">THE TOUR</span><span class="crumb">first three stops</span><span class="sect">India · Bangladesh · Indonesia</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The tour, first three stops</div>
+            <h2 class="reveal r2" style="font-size:64px">India &middot; Bangladesh &middot; Indonesia</h2>
+            <div class="grid3" style="margin-top:38px">
+                <div class="dcard reveal r3"><div class="ctag">India</div><h3>Scale like nowhere else</h3><p>Home of the world's largest digital identity system (Aadhaar) and a UNESCO readiness assessment published February 2026. Sentiment is intense both ways: 89% trust their own government to regulate AI, the highest of 25 countries Pew surveyed, yet nervousness rose 14 points in a single year, the sharpest rise recorded.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Bangladesh</div><h3>The data gap, personified</h3><p>Completed its UNESCO readiness assessment in November 2025 (published in draft form), yet barely features in the big global sentiment surveys. A reminder that "global" data has holes, and they're usually the same countries every time.</p></div>
+                <div class="dcard reveal r5"><div class="ctag">Indonesia</div><h3>The early mover</h3><p>An early adopter of UNESCO's assessment (2024), a national AI strategy since 2020, and its first comprehensive data protection law only in 2022. Daily digital life runs on WhatsApp and Grab; and its public is among the world's most upbeat, with 76% trusting their government to regulate AI.</p></div>
+            </div>
+            <p class="cite reveal r6" style="margin-top:30px">Readiness reports: UNESCO RAM via unesco.org/ethics-ai/en/ram. Sentiment: Pew Research Center, October 2025; Stanford AI Index 2026, chapter 9 (Ipsos AI Monitor data).</p>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">05 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 6 : THE TOUR, PART TWO ===== -->
+    <section class="slide" aria-label="Tour stops: Vietnam, Philippines, Thailand">
+        <div class="topbar"><span class="chip">THE TOUR</span><span class="crumb">next three stops</span><span class="sect">Vietnam · Philippines · Thailand</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The tour, next three stops</div>
+            <h2 class="reveal r2" style="font-size:64px">Vietnam &middot; Philippines &middot; Thailand</h2>
+            <div class="grid3" style="margin-top:38px">
+                <div class="dcard reveal r3"><div class="ctag">Vietnam</div><h3>Assessed, but under-surveyed</h3><p>Published its UNESCO readiness assessment in October 2025, one of the newest in the region; like Bangladesh, it's largely missing from the major global sentiment surveys, so its people's views go under-reported in "worldwide" headlines.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Philippines</div><h3>Ethics up front</h3><p>Its UNESCO assessment (November 2025) was launched under the banner of <a href="https://www.unesco.org/en/articles/unesco-ai-readiness-assessment-report-anchoring-ethics-ai-governance-philippines" target="_blank" rel="noopener">"anchoring ethics in AI governance"</a>; a deliberate framing choice, putting values ahead of infrastructure. Filipino communities are among the Territory's largest, which makes this stop personal for many Darwin workplaces.</p></div>
+                <div class="dcard reveal r5"><div class="ctag">Thailand</div><h3>Enthusiasm out front</h3><p>UNESCO assessment published June 2025, and one of the world's most optimistic publics: in Thailand, Malaysia, Indonesia and Singapore, more than 80% of people expect AI to profoundly change their lives within three to five years.</p></div>
+            </div>
+            <p class="cite reveal r6" style="margin-top:30px">Readiness reports: UNESCO RAM via unesco.org/ethics-ai/en/ram. Sentiment: Stanford AI Index 2026, chapter 9 (Ipsos AI Monitor data).</p>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">06 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 7 : DIFFERENT DIGITAL WORLDS ===== -->
+    <section class="slide" aria-label="Different digital worlds">
+        <div class="topbar"><span class="chip">CULTURE</span><span class="crumb">platforms shape people</span><span class="sect">Different worlds</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">What "everyone knows" isn't the same everywhere</div>
+            <h2 class="reveal r2">"Just Google it" <span class="hlw">doesn't translate</span></h2>
+            <div class="rows" style="margin-top:38px;max-width:1660px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span>A student from China may never have used Google, YouTube, WhatsApp or ChatGPT; but they'll be expert users of <b>WeChat, Baidu, Douyin and DeepSeek</b>.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span>An Indonesian arrival might run daily life through <b>WhatsApp and Grab</b>; someone from India may be entirely comfortable with <b>Aadhaar-linked services</b> and carry different assumptions about digital identity.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span>People from countries where big AI tools were <b>blocked or restricted</b> often adopt them at speed on arrival; with all the enthusiasm, and none of the slowly-learned verification habits.</span></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:40px"><b>The teaching point:</b> when we say "just Google it" or assume everyone's AI starting point matches ours, we may be speaking past our audience entirely. Ask what tools someone already knows; build from there.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">07 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 8 : PRIVACY IS CULTURAL ===== -->
+    <section class="slide" aria-label="Privacy is cultural">
+        <div class="topbar"><span class="chip">CULTURE</span><span class="crumb">three framings of privacy</span><span class="sect">Privacy, three ways</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The deepest difference on the tour</div>
+            <h2 class="reveal r2">Privacy itself is <span class="hl">a cultural concept</span></h2>
+            <div class="grid3" style="margin-top:44px">
+                <div class="dcard reveal r3"><div class="ctag">Consent-based</div><h3>"My data, my choice"</h3><p>The Australian and broadly Western framing: privacy as an individual right, built on consent. You own your data and decide who gets access; the assumption behind our Privacy Act.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Collective-benefit</div><h3>"Data serves the community"</h3><p>Research on privacy attitudes in China, for example, often finds privacy framed through collective benefit and social harmony rather than individual control. Not wrong; differently reasoned.</p></div>
+                <div class="dcard reveal r5"><div class="ctag">State-managed</div><h3>"The system handles it"</h3><p>In government-managed digital ecosystems, people may carry quite different assumptions about who can access their data and why; and find Australian caution genuinely puzzling.</p></div>
+            </div>
+            <div class="strip teal reveal r6" style="margin-top:44px"><b>No judging on this tour:</b> the goal isn't to rank these framings; it's to recognise that someone operating from one can find the others baffling, and that good digital-safety guidance starts from the framing a person actually holds.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">08 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 9 : SENTIMENT, THE SPLIT WORLD ===== -->
+    <section class="slide" aria-label="Global sentiment: the split">
+        <div class="topbar"><span class="chip">SENTIMENT</span><span class="crumb">what the world feels</span><span class="sect">The mood</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Now the other question: what do people feel?</div>
+            <h2 class="reveal r2">The world is <span class="hl">torn, not divided</span></h2>
+            <div class="stats" style="margin-top:44px">
+                <div class="stat reveal r3"><div class="big">42%</div><div class="lbl">The global median who feel <b>equally concerned and excited</b> about AI in daily life; the single most common answer across 25 countries (Pew, 28,333 adults, surveyed January to April 2025).</div></div>
+                <div class="stat reveal r4"><div class="big">16%</div><div class="lbl">Median who are <b>mostly excited</b>. No country surveyed cracked 30%. Concern leads excitement almost everywhere; around half of adults in the US, Italy, Brazil, Greece <b>and Australia</b> are mostly concerned.</div></div>
+                <div class="stat reveal r5"><div class="big">59%</div><div class="lbl">Globally, the share who say AI's <b>benefits outweigh drawbacks</b>, up from 55% in 2024; yet the share who say AI makes them <b>nervous</b> also rose, to 52% (Ipsos AI Monitor, 30 countries, via Stanford AI Index 2026).</div></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:44px"><b>Read those together:</b> optimism and anxiety are rising at the same time, in the same people. That's not confusion; it's a reasonable response to a technology this large arriving this fast.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">09 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 10 : SENTIMENT, THE SURPRISE PATTERN ===== -->
+    <section class="slide" aria-label="The surprise pattern">
+        <div class="topbar"><span class="chip">SENTIMENT</span><span class="crumb">who's most enthusiastic?</span><span class="sect">The surprise</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The pattern most Australians haven't heard</div>
+            <h2 class="reveal r2">The most AI-enthusiastic people <span class="hlw">aren't in the richest countries</span></h2>
+            <div class="rows" style="margin-top:38px;max-width:1660px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>Southeast Asia leads the world in optimism:</b> more than 80% in Malaysia, Thailand, Indonesia and Singapore expect AI to profoundly change their lives in three to five years.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Workplace adoption is higher in several emerging economies</b> than in many advanced ones: 58% of employees globally use AI at work regularly or semi-regularly, but in India, China, Nigeria, the UAE and Saudi Arabia the share tops 80%.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Trust in government to regulate AI</b> runs highest in Singapore (81%) and Indonesia (76%) against a 54% global average; the United States recorded the lowest of any surveyed country, at 31%.</span></div>
+                <div class="row reveal r6"><span class="n">&middot;</span><span><b>Awareness runs the other way:</b> about half of adults in Japan, Germany, France and the US have heard a lot about AI, versus 14% in India and 12% in Kenya. Enthusiasm and exposure are different things too.</span></div>
+            </div>
+            <p class="cite reveal r7" style="margin-top:30px">Stanford AI Index 2026 chapter 9 (Ipsos AI Monitor); Pew Research Center, October 2025.</p>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">10 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 11 : WHO DO PEOPLE TRUST TO REGULATE ===== -->
+    <section class="slide" aria-label="Trust in regulators">
+        <div class="topbar"><span class="chip">SENTIMENT</span><span class="crumb">who should hold the leash?</span><span class="sect">Trust</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">One more sentiment finding worth carrying home</div>
+            <h2 class="reveal r2">Asked who they trust to regulate AI, the world says: <span class="hl">the EU, then the US, then China</span></h2>
+            <div class="stats" style="margin-top:44px">
+                <div class="stat reveal r3"><div class="big">53%</div><div class="lbl">Median trust in the <b>European Union</b> to regulate AI effectively, across 25 countries (Pew, 2025). The EU's early, strict AI Act appears to have bought it credibility abroad.</div></div>
+                <div class="stat reveal r4"><div class="big">37%</div><div class="lbl">Median trust in the <b>United States</b>; at home, Americans split almost evenly, 44% trusting their own country against 47% who don't.</div></div>
+                <div class="stat reveal r5"><div class="big">27%</div><div class="lbl">Median trust in <b>China</b>. Yet within many countries, people trust their <b>own government</b> most of all: India at 89%, Greece at just 22%.</div></div>
+            </div>
+            <div class="strip teal reveal r6" style="margin-top:44px"><b>For the Australian audience:</b> when our government designs AI rules (see the "Australia's AI Laws" explainer on this site), it's competing for trust in a world that currently gives the benefit of the doubt to Brussels.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">11 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 12 : COMING HOME ===== -->
+    <section class="slide" aria-label="Coming home to Australia">
+        <div class="topbar"><span class="chip warm">HOMEWARD</span><span class="crumb">the Australian paradox</span><span class="sect">Coming home</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">Last leg: bring it home</div>
+            <h2 class="reveal r2">Australia: <span class="hlw">anxious in the surveys</span>, sophisticated in practice</h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard warm reveal r3"><div class="ctag">What surveys say</div><h3>One of the wary countries</h3><p>Around half of Australians say they're more concerned than excited about AI, placing us with the US, Italy, Brazil and Greece near the top of Pew's concern table. Optimism has climbed 10 points since 2022 on Ipsos's measure, but from a low base.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">What behaviour says</div><h3>One of the heaviest users</h3><p>Anthropic's data tells a different story: Australians use Claude at <b>more than four times</b> the rate our population size would predict; seventh in the world per person. Wariness in surveys, enthusiasm at the keyboard.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>The next few slides</b> dig into that behavioural data: where it comes from, what Australians actually ask, and why the pattern looks encouragingly mature. Source: <a href="https://www.anthropic.com/research/how-australia-uses-claude" target="_blank" rel="noopener">Anthropic, "How Australia uses Claude"</a>, 31 March 2026.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">12 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 13 : THE ECONOMIC INDEX, AND ITS METADATA ===== -->
+    <section class="slide" aria-label="The Anthropic Economic Index and its metadata">
+        <div class="topbar"><span class="chip">METHOD</span><span class="crumb">where this data comes from</span><span class="sect">The Economic Index</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">First, know your source; and what it reveals about metadata</div>
+            <h2 class="reveal r2">How would Anthropic <span class="hl">know?</span></h2>
+            <div class="grid2" style="margin-top:38px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">The method</div><h3>Automated analysis at scale</h3><p>The Anthropic Economic Index studies aggregated, anonymised Claude.ai conversation data (this report: a February 2026 sample) to map what AI is actually used for. Its headline metric, the <b>AI Usage Index (AUI)</b>, is simple: a place's share of usage divided by its share of population. 1.0 means "exactly proportional".</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">The bonus lesson</div><h3>Your chats are data</h3><p>Notice what this report could measure: topics, task types, complexity, even the reading level of prompts, by state. That's a window into the kind of metadata AI providers can derive from usage at scale. A good prompt for any tool you use: <b>what does my provider's privacy policy say about how conversations are analysed?</b></p></div>
+            </div>
+            <div class="strip warn reveal r5" style="margin-top:40px"><b>Handle with care:</b> this is one company's view of one assistant's users; a rich lens, not a census. It also can't see ChatGPT, Gemini or Copilot use. Treat it as directional, like every scoreboard in these workshops.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">13 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 14 : AUSTRALIA ON THE MAP ===== -->
+    <section class="slide" aria-label="Australia on the map">
+        <div class="topbar"><span class="chip">HOME DATA</span><span class="crumb">who's using it, where</span><span class="sect">Australia mapped</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Australia on the Claude map, February 2026</div>
+            <h2 class="reveal r2" style="font-size:60px">Heavy use, <span class="hl">unevenly spread</span></h2>
+            <div class="grid2" style="margin-top:30px;align-items:start;grid-template-columns:1.2fr 1fr">
+                <div class="reveal r3">
+                    <div class="bc-row"><div class="bc-label">NSW<small>AUI 1.20</small></div><div class="bc-track"><div class="bc-bar" style="width:93%"></div></div><div class="dv-val" style="position:static;transform:none">37.2%</div></div>
+                    <div class="bc-row"><div class="bc-label">VIC<small>AUI 1.19</small></div><div class="bc-track"><div class="bc-bar" style="width:77%"></div></div><div class="dv-val" style="position:static;transform:none">30.8%</div></div>
+                    <div class="bc-row"><div class="bc-label">QLD<small>AUI 0.86</small></div><div class="bc-track"><div class="bc-bar" style="width:44%"></div></div><div class="dv-val" style="position:static;transform:none">17.7%</div></div>
+                    <div class="bc-row"><div class="bc-label">WA<small>AUI 0.68</small></div><div class="bc-track"><div class="bc-bar" style="width:19%"></div></div><div class="dv-val" style="position:static;transform:none">7.6%</div></div>
+                    <div class="bc-row"><div class="bc-label">SA<small>AUI 0.68</small></div><div class="bc-track"><div class="bc-bar" style="width:11.5%"></div></div><div class="dv-val" style="position:static;transform:none">4.6%</div></div>
+                    <div class="bc-row"><div class="bc-label">ACT<small>AUI 0.76</small></div><div class="bc-track"><div class="bc-bar" style="width:3.5%"></div></div><div class="dv-val" style="position:static;transform:none">1.4%</div></div>
+                    <div class="bc-row"><div class="bc-label">TAS<small>AUI 0.32</small></div><div class="bc-track"><div class="bc-bar" style="width:1.5%"></div></div><div class="dv-val" style="position:static;transform:none">0.6%</div></div>
+                    <div class="bc-row"><div class="bc-label">NT<small>AUI 0.12</small></div><div class="bc-track"><div class="bc-bar" style="width:0.5%"></div></div><div class="dv-val" style="position:static;transform:none">0.1%</div></div>
+                    <p class="cite" style="margin-top:14px">Share of Australia's Claude.ai conversations by state and territory; AUI 1.0 = proportional to population. Anthropic, February 2026 data.</p>
+                </div>
+                <div class="reveal r4">
+                    <div class="dcard"><div class="ctag">The national picture</div><h3>7th per person worldwide</h3><p>Australia contributes <b>1.6% of global Claude.ai traffic</b> (11th overall) with an AUI of <b>4.1</b>. Usage splits almost evenly: 46% work, 47% personal, 7% coursework.</p></div>
+                    <div class="dcard" style="margin-top:26px"><div class="ctag">Reading the spread</div><h3>It follows knowledge work</h3><p>Only NSW and Victoria punch above their population weight. Anthropic notes the spread tracks the size of professional-service sectors, not income; adoption follows the kind of work a place does.</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">14 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 15 : WHAT AUSTRALIANS ASK ===== -->
+    <section class="slide" aria-label="What Australians ask Claude">
+        <div class="topbar"><span class="chip">HOME DATA</span><span class="crumb">versus the global average</span><span class="sect">What we ask</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">What Australians ask, relative to the world</div>
+            <h2 class="reveal r2" style="font-size:60px">Less code, <span class="hl">more life admin</span></h2>
+            <div style="margin-top:34px;max-width:1640px" class="reveal r3">
+                <div class="dv-row"><div class="dv-label"><b>Daily life, personal info &amp; household</b></div><div class="dv-plot"><div class="dv-bar pos" style="width:26.6%"></div><span class="dv-val" style="left:calc(50% + 26.6% + 10px)">+1.9 pp (7.6% vs 5.7%)</span></div></div>
+                <div class="dv-row"><div class="dv-label"><b>Health, fitness &amp; wellbeing</b></div><div class="dv-plot"><div class="dv-bar pos" style="width:25.2%"></div><span class="dv-val" style="left:calc(50% + 25.2% + 10px)">+1.8 pp (6.1% vs 4.2%)</span></div></div>
+                <div class="dv-row"><div class="dv-label"><b>Workplace emails &amp; correspondence</b></div><div class="dv-plot"><div class="dv-bar pos" style="width:23.8%"></div><span class="dv-val" style="left:calc(50% + 23.8% + 10px)">+1.7 pp (4.4% vs 2.7%)</span></div></div>
+                <div class="dv-row"><div class="dv-label"><b>Presentations &amp; workplace documents</b></div><div class="dv-plot"><div class="dv-bar pos" style="width:22.4%"></div><span class="dv-val" style="left:calc(50% + 22.4% + 10px)">+1.6 pp (5.0% vs 3.4%)</span></div></div>
+                <div class="dv-row"><div class="dv-label"><b>Financial information &amp; tax guidance</b></div><div class="dv-plot"><div class="dv-bar pos" style="width:18.2%"></div><span class="dv-val" style="left:calc(50% + 18.2% + 10px)">+1.3 pp (5.7% vs 4.3%)</span></div></div>
+                <div class="dv-row"><div class="dv-label"><b>Translation, writing &amp; editing</b></div><div class="dv-plot"><div class="dv-bar neg" style="width:28%"></div><span class="dv-val" style="right:calc(50% + 28% + 10px)">-2.0 pp (5.6% vs 7.6%)</span></div></div>
+                <div class="dv-row"><div class="dv-label"><b>Software development &amp; debugging</b></div><div class="dv-plot"><div class="dv-bar neg" style="width:46.2%"></div><span class="dv-val" style="left:calc(50% - 46.2% + 12px);color:#2A1503;font-weight:600">-3.3 pp (13.5% vs 16.8%)</span></div></div>
+            </div>
+            <p class="cite reveal r4" style="margin-top:20px">Each bar: the request type's share of Australian conversations minus its global share, in percentage points (Australian vs global shares in parentheses). Rebuilt from Anthropic Economic Index, "How Australia uses Claude", February 2026 data.</p>
+            <div class="strip teal reveal r5" style="margin-top:22px"><b>Translation:</b> Australians lean on AI for the everyday fabric of life and work; household admin, health questions, emails, slide decks, tax; and lean on it <b>less</b> than the world does for coding. Ordinary people, not just programmers.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">15 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 16 : THE SOPHISTICATION SIGNALS ===== -->
+    <section class="slide" aria-label="The sophistication signals">
+        <div class="topbar"><span class="chip">HOME DATA</span><span class="crumb">the encouraging part</span><span class="sect">Sophistication</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The finding worth celebrating</div>
+            <h2 class="reveal r2">Australians are using AI <span class="hl">like editors, not vending machines</span></h2>
+            <div class="stats" style="margin-top:44px">
+                <div class="stat reveal r3"><div class="big">11.9 yrs</div><div class="lbl">The schooling needed to fully parse the average Australian prompt; <b>above the global median</b>. Australians write longer, more specified, more context-rich requests.</div></div>
+                <div class="stat reveal r4"><div class="big">3.38 / 5</div><div class="lbl">Australia's autonomy score: <b>more collaborative, less delegated</b> than the global norm. Australians iterate with the AI rather than handing work over wholesale; matching other Anglosphere countries.</div></div>
+                <div class="stat reveal r5"><div class="big">2.7 hrs</div><div class="lbl">Typical human-time value of tasks Australians bring to Claude, versus 3.3 hours globally: <b>shorter but more intellectually demanding</b> work, not bulk automation.</div></div>
+            </div>
+            <div class="strip good reveal r6" style="margin-top:44px"><b>Why this matters for AI literacy:</b> collaborative, well-specified, iterative use is exactly what "human in the loop" looks like in the wild. The awareness this site teaches is measurably sinking in; Australians are steering, not surrendering.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">16 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 17 : WHO'S CHECKING AUSTRALIA'S READINESS ===== -->
+    <section class="slide" aria-label="Australia's readiness: the AI Agency Tool">
+        <div class="topbar"><span class="chip">READINESS</span><span class="crumb">Australia's check-up</span><span class="sect">AI Agency Tool</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">And who's doing the readiness check-up here?</div>
+            <h2 class="reveal r2">Australia's report card: <span class="hl">the AI Agency Tool</span></h2>
+            <div class="grid2" style="margin-top:38px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">The tool</div><h3>103 capabilities, three lenses</h3><p>The <a href="https://techpolicy.au/aiagency/" target="_blank" rel="noopener">AI Agency Tool</a> (Tech Policy Design Institute, final version June 2026) is a structured, repeatable method to assess a nation's AI position across <b>103 capabilities</b> in six layers, scoring each for <b>maturity</b>, <b>sovereignty</b> (control, access, choice, leverage) and <b>agency</b>; ending in prioritised recommended actions, not just a grade.</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">The verdict so far</div><h3>Real strengths, named gaps</h3><p>Strengths: critical minerals, domain-specific datasets (medical, geospatial, environmental) and computer-vision expertise. Gaps flagged: public-sector compute, data lifecycle management, inclusive AI models and regulatory oversight capability; with a note that national planning doesn't yet fully play to Australia's strongest cards.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:40px"><b>Close the loop:</b> this is the same kind of self-examination UNESCO's RAM asks of the countries we toured; Australia doing its own homework, at the frontier of how AI readiness gets assessed here.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">17 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 18 : TAKEAWAYS ===== -->
+    <section class="slide" aria-label="Takeaways">
+        <div class="topbar"><span class="chip">TAKEAWAY</span><span class="crumb">five souvenirs</span><span class="sect">The takeaways</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Five souvenirs from the tour</div>
+            <h2 class="reveal r2">What to <span class="hl">bring home</span></h2>
+            <div class="rows" style="margin-top:38px;max-width:1660px;font-size:26px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>Readiness and sentiment are different questions;</b> always ask which one a headline is answering.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Digital worlds differ;</b> platforms, privacy framings and AI access shape people before they ever reach your classroom or counter.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Enthusiasm lives where you least expect it;</b> Southeast Asia leads the world in optimism, while the wealthy West worries.</span></div>
+                <div class="row reveal r6"><span class="n">&middot;</span><span><b>Australia is anxious in surveys and sophisticated in practice;</b> heavy, collaborative, well-specified use. The human is staying in the loop.</span></div>
+                <div class="row reveal r7"><span class="n">&middot;</span><span><b>Usage data is metadata;</b> the same reports that fascinate us should remind us to read our AI tools' privacy settings.</span></div>
+            </div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">18 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 19 : KEEP EXPLORING ===== -->
+    <section class="slide" aria-label="Keep exploring">
+        <div class="topbar"><span class="chip">KEEP GOING</span><span class="crumb">the good data, bookmarked</span><span class="sect">Keep exploring</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Every stop on this tour, bookmarkable</div>
+            <h2 class="reveal r2">Keep exploring: <span class="hl">the primary sources</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">Readiness</div><h3>The assessments</h3><p><a href="https://www.unesco.org/ethics-ai/en/ram" target="_blank" rel="noopener">UNESCO Readiness Assessment Methodology</a>: every country report, free &middot; <a href="https://techpolicy.au/aiagency/" target="_blank" rel="noopener">AI Agency Tool</a> (Tech Policy Design Institute): Australia's 103-capability check-up</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Sentiment &amp; usage</div><h3>The surveys and the behaviour</h3><p><a href="https://www.pewresearch.org/global/2025/10/15/how-people-around-the-world-view-ai/" target="_blank" rel="noopener">Pew: How people around the world view AI</a> (Oct 2025) &middot; <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report/public-opinion" target="_blank" rel="noopener">Stanford AI Index 2026, Public Opinion chapter</a> &middot; <a href="https://www.anthropic.com/research/how-australia-uses-claude" target="_blank" rel="noopener">Anthropic: How Australia uses Claude</a> (Mar 2026)</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:42px"><b>The one-line summary of this hour:</b> AI is growing up differently everywhere; ask whether you're looking at readiness or feeling, remember whose data you're reading, and meet people where they actually are.</div>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">19 / 20</span></div>
+    </section>
+
+    <!-- ===== SLIDE 20 : SOURCES ===== -->
+    <section class="slide" aria-label="Sources">
+        <div class="topbar"><span class="chip">SOURCES</span><span class="crumb">where this comes from</span><span class="sect">References</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Sources used</div>
+            <h2 class="reveal r2" style="font-size:62px">Where this deck's claims come from</h2>
+            <div class="rows reveal r3" style="margin-top:34px;max-width:1680px">
+                <div class="row" style="font-size:21px;padding:13px 12px"><span><b>UNESCO Global AI Ethics and Governance Observatory</b>, Readiness Assessment Methodology and country reports: <a href="https://www.unesco.org/ethics-ai/en/ram">unesco.org/ethics-ai/en/ram</a>; Philippines launch article (November 2025): <a href="https://www.unesco.org/en/articles/unesco-ai-readiness-assessment-report-anchoring-ethics-ai-governance-philippines">unesco.org</a></span></div>
+                <div class="row" style="font-size:21px;padding:13px 12px"><span><b>Stanford AI Index Report 2026, chapter 9: Public Opinion</b> (Ipsos AI Monitor 2025, 30 countries, 23,216 adults): <a href="https://hai.stanford.edu/ai-index/2026-ai-index-report/public-opinion">hai.stanford.edu</a> (<a href="https://hai.stanford.edu/assets/files/ai_index_report_2026_chapter_9_public_opinion.pdf">chapter PDF</a>)</span></div>
+                <div class="row" style="font-size:21px;padding:13px 12px"><span><b>Pew Research Center</b>, "How people around the world view AI" (25 countries, 28,333 adults, surveyed January to April 2025; published 15 October 2025): <a href="https://www.pewresearch.org/global/2025/10/15/how-people-around-the-world-view-ai/">pewresearch.org</a></span></div>
+                <div class="row" style="font-size:21px;padding:13px 12px"><span><b>Anthropic Economic Index</b>, "How Australia uses Claude" (31 March 2026; February 2026 conversation sample): <a href="https://www.anthropic.com/research/how-australia-uses-claude">anthropic.com/research/how-australia-uses-claude</a>; source of the AUI, state, request-mix and sophistication figures</span></div>
+                <div class="row" style="font-size:21px;padding:13px 12px"><span><b>Tech Policy Design Institute</b>, AI Agency Tool (final version June 2026): <a href="https://techpolicy.au/aiagency/">techpolicy.au/aiagency</a></span></div>
+                <div class="row" style="font-size:21px;padding:13px 12px"><span>Cultural and platform observations adapted from NT World Ink's "Understanding Digital Contexts" workshop materials (CDU TAFE, 2026)</span></div>
+            </div>
+            <p class="lede muted reveal r4" style="margin-top:28px;font-size:22px">Prepared July 2026 for the NT World Ink AI Special Topic Workshops. Survey findings describe populations, never individuals; treat every figure as a snapshot with a date.</p>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">20 / 20</span></div>
+    </section>
+
+</main>
+</div>
+
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">ED</button>
+
+<script>
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.wheelLock = false;
+        this.setupStageScale(); this.setupKeyboardNav(); this.setupWheelNav(); this.setupTouchNav();
+        this.showSlide(0);
+    }
+    setupStageScale() {
+        const scale = () => {
+            const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * f) / 2, y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale(); window.addEventListener('resize', scale);
+    }
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (document.body.classList.contains('editing') || e.target.isContentEditable) return;
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.showSlide(0); break;
+                case 'End': e.preventDefault(); this.showSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+    setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (this.wheelLock || Math.abs(e.deltaY) < 12) return;
+            this.wheelLock = true;
+            e.deltaY > 0 ? this.next() : this.prev();
+            setTimeout(() => { this.wheelLock = false; }, 650);
+        }, { passive: true });
+    }
+    setupTouchNav() {
+        let sx = 0, sy = 0;
+        window.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchend', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? this.next() : this.prev();
+        }, { passive: true });
+    }
+    next() { this.showSlide(this.currentSlide + 1); }
+    prev() { this.showSlide(this.currentSlide - 1); }
+    showSlide(i) {
+        this.currentSlide = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.slides.forEach((s, k) => {
+            s.classList.toggle('active', k === this.currentSlide);
+            s.classList.toggle('visible', k === this.currentSlide);
+        });
+    }
+}
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storeKey = 'global-ai-world-tour-deck-edits-v1';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.hotzone = document.getElementById('editHotzone');
+        this.restore(); this.wire();
+    }
+    wire() {
+        let t = null;
+        const show = () => { clearTimeout(t); this.toggleBtn.classList.add('show'); };
+        const hide = () => { t = setTimeout(() => { if (!this.isActive) this.toggleBtn.classList.remove('show'); }, 400); };
+        this.hotzone.addEventListener('mouseenter', show); this.hotzone.addEventListener('mouseleave', hide);
+        this.toggleBtn.addEventListener('mouseenter', show); this.toggleBtn.addEventListener('mouseleave', hide);
+        this.hotzone.addEventListener('click', () => this.toggle()); this.toggleBtn.addEventListener('click', () => this.toggle());
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable && !e.metaKey && !e.ctrlKey) this.toggle();
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.download(); }
+        });
+        document.getElementById('deckStage').addEventListener('input', () => this.save());
+    }
+    toggle() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('show', true);
+        document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide .row span:not(.n), .slide .crumb, .slide .strip, .slide .kicker, .slide .story, .slide .story-close, .slide .stat .big, .slide .stat .lbl, .slide .msgbox')
+            .forEach(el => { this.isActive ? el.setAttribute('contenteditable', 'true') : el.removeAttribute('contenteditable'); });
+    }
+    save() {
+        const d = [...document.querySelectorAll('.slide')].map(s => s.innerHTML);
+        try { localStorage.setItem(this.storeKey, JSON.stringify(d)); } catch (e) {}
+    }
+    restore() {
+        try {
+            const d = JSON.parse(localStorage.getItem(this.storeKey) || 'null');
+            if (!d) return;
+            const s = document.querySelectorAll('.slide');
+            if (d.length === s.length) s.forEach((sl, i) => { sl.innerHTML = d[i]; });
+        } catch (e) {}
+    }
+    download() {
+        const c = document.documentElement.cloneNode(true);
+        c.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        c.querySelectorAll('body').forEach(b => b.classList.remove('editing'));
+        const blob = new Blob(['<!DOCTYPE html>\n' + c.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'global-ai-world-tour.html'; a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+new SlidePresentation(); new InlineEditor();
+</script>
+</body>
+</html>
