@@ -65,30 +65,10 @@ body {
   overflow-x: hidden;
 }
 
-/* Ambient teal gradient */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 75% 20%, var(--accent-glow), transparent 45%),
-    radial-gradient(circle at 15% 80%, rgba(26, 201, 201, 0.04), transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Subtle grid lines */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
-  background-size: 64px 64px;
-  pointer-events: none;
-  z-index: 0;
-}
+/* Flat near-black background. The ambient teal glow and the tiled grid overlay
+   were removed deliberately: a glow-plus-grid field on dark is a generated-UI
+   tell, and the teal identity carries on flat black. The banner keeps its own
+   fade (see .banner-fade) and the grain stays in .noise-overlay. */
 
 img { max-width: 100%; display: block; }
 a { color: var(--accent-2); }
@@ -303,19 +283,19 @@ nav.site-nav a:hover { color: var(--text); }
   white-space: nowrap;
 }
 
-/* Filled teal */
+/* Filled teal — solid, no gradient, no glow halo. Near-black label on bright
+   teal reads as the brand's own colours and clears contrast comfortably. */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-deep), var(--accent));
-  color: white;
-  box-shadow: 0 0 0 1px rgba(26, 201, 201, 0.3),
-              0 8px 24px -8px var(--accent-glow);
+  background: var(--accent);
+  color: var(--bg);
+  box-shadow: 0 6px 20px -12px rgba(0, 0, 0, 0.8);
 }
 
 .btn-primary:hover {
+  background: var(--accent-2);
+  color: var(--bg);
   transform: translateY(-1px);
-  box-shadow: 0 0 0 1px rgba(77, 220, 220, 0.5),
-              0 12px 28px -8px var(--accent-glow);
-  color: white;
+  box-shadow: 0 10px 26px -12px rgba(0, 0, 0, 0.85);
 }
 
 /* Outlined */
@@ -511,7 +491,7 @@ details.course {
 details.course:last-of-type { border-bottom: 1px solid var(--rule); }
 
 details.course[open] {
-  background: linear-gradient(180deg, rgba(26,201,201,0.025), transparent);
+  background: rgba(26, 201, 201, 0.02);
 }
 
 details.course summary {
@@ -522,11 +502,11 @@ details.course summary {
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: 24px;
-  transition: padding 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 details.course summary::-webkit-details-marker { display: none; }
-details.course summary:hover { padding-left: 12px; }
+details.course summary:hover { transform: translateX(12px); }
 
 .course-num {
   font-family: 'JetBrains Mono', monospace;
@@ -885,19 +865,18 @@ footer.site {
   border-radius: 12px;
   padding: 24px 28px;
   margin: 28px 0;
-  border-left: 3px solid var(--accent);
+  border: 1px solid var(--rule-2);
+  border-left: 1px solid var(--accent);
   background: var(--bg-2);
   position: relative;
 }
 
 .callout-key {
   border-left-color: var(--accent);
-  background: linear-gradient(135deg, rgba(26,201,201,0.06), var(--bg-2));
 }
 
 .callout-warning {
   border-left-color: var(--warm);
-  background: linear-gradient(135deg, rgba(26,201,201,0.06), var(--bg-2));
 }
 
 .callout-warning .callout-title { color: var(--warm); }
