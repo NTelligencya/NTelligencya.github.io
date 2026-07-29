@@ -28,9 +28,9 @@ Master plan for two builds on ntworldink.com (repo NTelligencya.github.io), agre
 
 ## Front page changes (index.html)
 
-- New section "AI Special Topic Workshops" at the top of the page content, above the existing course library; SD wants her quality AI material most prominent. Card or accordion per topic linking to /workshops/<slug>.html.
-- Demote Power Query: it currently sits first in the library (course 01, open by default). Move it down the library order and move the `open` attribute to whichever course ends up first.
-- Nav: add "Workshops" and "Resources" links. Footer library column: add the same. ("Resources" added to nav and footer on index.html and presentations/index.html, 25 July 2026; "Workshops" still pending.)
+- DONE 29 July 2026: "AI Special Topic Workshops" section built at the top of index.html (id="workshops", directly after the hero banner, above About and the library). Unnumbered app-card grid: one linked card per built workshop deck plus an unlinked "More topics on the way" wide card listing coming hook titles. When a new deck ships, add its card here and trim its topic from the coming-soon card.
+- DONE 29 July 2026: Power Query demoted to second-last in the library (before "More to come"); course-num spans renumbered 01-08 in the new order (Excel Fundamentals now 01 and open-by-default).
+- DONE 29 July 2026: "Workshops" nav link added (index.html "#workshops"; "/#workshops" on presentations/index.html, references/index.html and all live /resources/ pages) and to the index.html footer library column. The two workshop decks themselves have no site nav (deck chrome only), as designed.
 - The existing /cdu-ai-staff/ section (eight migrated pages) stays as is; where a workshop topic overlaps (Agentic AI), the workshop page is the new build and /cdu-ai-staff/ is untouched.
 
 ## The eleven workshop topics
