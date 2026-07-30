@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inside the QR Code</title>
+<style>
+  :root {
+    --ink: #000000; --panel: #0a0a0a;
+    --white: #f4f4f2; --body: #d5d8d9; --grey: #b9bcbd;
+    --grey-dim: #7d8183; --line: #35383a;
+    --glow: rgba(230, 235, 238, 0.35);
+    --accent: #e0983c; --accent-bright: #f2ab52; --accent-deep: #6b3d10;
+    --accent-glow: rgba(224, 152, 60, 0.40);
+    --finder: #cf5148; --timing: #4f86ad; --align: #d9a441;
+    --format: #949577; --darkmod: #a77e67;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--ink); color: var(--white);
+    font-family: Baskerville, "Baskerville Old Face", "Libre Baskerville", "Times New Roman", serif;
+    font-weight: 400; overflow: hidden;
+  }
+  #stage { height: 100vh; display: flex; flex-direction: column; }
+
+  /* Chrome */
+  header {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 28px; flex-wrap: wrap;
+    padding: 20px 36px; font-size: 14px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--grey-dim); flex-shrink: 0;
+  }
+  header .mod-tag { color: var(--white); }
+  footer {
+    flex-shrink: 0; display: flex; justify-content: center; align-items: center;
+    gap: 10px; padding: 22px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background .3s, box-shadow .3s; }
+  .dot.on { background: var(--white); box-shadow: 0 0 10px var(--glow); }
+  main { flex: 1; display: flex; padding: 14px 60px; overflow: auto; }
+  .beat { display: none; max-width: 1100px; width: 100%; margin: auto; animation: rise .45s ease; }
+  .beat.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* Shared elements */
+  .eyebrow { color: var(--grey-dim); font-size: 15px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 14px; }
+  h1 { font-weight: 400; font-size: 56px; line-height: 1.1; letter-spacing: 0.04em; }
+  h2 { font-weight: 400; font-size: 40px; line-height: 1.15; margin-bottom: 28px; letter-spacing: 0.04em; }
+  .lede { font-size: 22px; color: var(--grey); margin-top: 18px; max-width: 780px; }
+  .myth {
+    display: inline-block; margin-top: 26px; padding: 9px 20px;
+    border: 1px solid var(--white); border-radius: 24px;
+    color: var(--white); font-size: 18px;
+    box-shadow: 0 0 16px -4px var(--glow);
+  }
+  .callout {
+    border-left: 1px solid var(--white); background: var(--panel);
+    padding: 26px 32px; border-radius: 0 10px 10px 0;
+    font-size: 26px; line-height: 1.45; max-width: 880px; color: var(--body);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.8), 0 0 0 1px rgba(230,235,238,0.04);
+  }
+  .callout strong { font-weight: 400; color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  .caption { color: var(--grey-dim); font-size: 14px; margin-top: 22px; max-width: 900px; line-height: 1.55; }
+  .cite { color: var(--grey-dim); font-size: 13px; margin-top: 14px; line-height: 1.6; }
+  .btn {
+    display: inline-block; margin-top: 30px; padding: 13px 32px;
+    background: var(--white); color: var(--ink); border: none; border-radius: 7px;
+    font-size: 18px; font-weight: 400; font-family: inherit; cursor: pointer;
+    transition: box-shadow .2s;
+  }
+  .btn:hover { box-shadow: 0 0 20px -2px var(--glow); }
+  .btn.ghost { background: transparent; color: var(--grey); border: 1px solid var(--line); }
+  .btn.ghost:hover { color: var(--white); border-color: var(--grey-dim); }
+  .btn:disabled { opacity: .45; cursor: default; box-shadow: none; }
+  .btn:focus-visible, .menu-item:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
+  .navhint { position: fixed; right: 30px; bottom: 20px; color: var(--grey-dim); font-size: 13px; letter-spacing: 1px; }
+  .mono { font-family: Consolas, "SF Mono", ui-monospace, monospace; }
+
+  /* Menu */
+  .menu-item {
+    display: flex; align-items: baseline; gap: 24px; width: 100%;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 24px 30px; margin-bottom: 14px; cursor: pointer; text-align: left;
+    color: var(--white); font-family: inherit; font-weight: 400;
+    transition: border-color .2s, box-shadow .25s;
+  }
+  .menu-item:hover { border-color: var(--grey-dim); box-shadow: 0 0 26px -6px var(--glow); }
+  .menu-item .num { color: var(--grey-dim); font-size: 15px; letter-spacing: 3px; }
+  .menu-item .name { font-size: 26px; flex: 1; }
+  .menu-item .state { color: var(--grey-dim); font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* Generic panels & pairs */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 10px; }
+  .pair .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 30px 34px; font-size: 25px; line-height: 1.5; color: var(--body); }
+  .pair .card em { font-style: normal; color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
+  .qline { margin-top: 34px; font-size: 24px; color: var(--grey); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; }
+  .panel .lbl, .lbl { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--grey-dim); margin-bottom: 14px; }
+  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 6px; }
+  .trio .hcard, .helps .hcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 26px 30px; }
+  .trio .hcard h3, .helps .hcard h3 { font-weight: 400; font-size: 23px; color: var(--white); margin-bottom: 10px; }
+  .trio .hcard p, .helps .hcard p { font-size: 17px; line-height: 1.55; color: var(--grey); }
+  .helps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 6px; }
+  .reveal-ans { display: none; margin-top: 18px; font-size: 30px; color: var(--white); text-shadow: 0 0 16px rgba(255,255,255,0.4); }
+  .reveal-ans.shown { display: block; animation: rise .4s ease; }
+  .reveal-ans .note { display: block; font-size: 16px; color: var(--grey-dim); margin-top: 8px; text-shadow: none; }
+
+  /* Timeline */
+  .tline { margin-top: 6px; max-width: 900px; }
+  .tl-item {
+    display: grid; grid-template-columns: 150px 1fr; gap: 24px; align-items: start;
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+    opacity: 0; transform: translateY(8px); transition: opacity .5s, transform .5s;
+  }
+  .tl-item.shown { opacity: 1; transform: none; }
+  .tl-item:last-of-type { border-bottom: none; }
+  .tl-item .year { font-family: Consolas, ui-monospace, monospace; font-size: 24px; color: var(--white); }
+  .tl-item.accent .year { color: var(--accent-bright); text-shadow: 0 0 14px var(--accent-glow); }
+  .tl-item .ttext { font-size: 19px; line-height: 1.5; color: var(--body); }
+  .tl-item .ttext .tsub { display: block; font-size: 15px; color: var(--grey-dim); margin-top: 5px; }
+
+  /* Calc lines */
+  .calcline {
+    font-family: Consolas, "SF Mono", ui-monospace, monospace; font-size: 27px; color: var(--body);
+    padding: 15px 0; border-bottom: 1px solid var(--line);
+    opacity: 0; transition: opacity .5s;
+  }
+  .calcline.shown { opacity: 1; }
+  .calcline .op { color: var(--grey-dim); font-size: 19px; }
+  .calcline:last-of-type { border-bottom: none; }
+  .calcline.result { color: var(--white); font-size: 34px; text-shadow: 0 0 22px rgba(255,255,255,0.35); }
+
+  /* Key size / EC bars */
+  .keybars { margin-top: 10px; max-width: 860px; }
+  .keybar { display: grid; grid-template-columns: 260px 1fr 110px; gap: 20px; align-items: center; padding: 14px 0; }
+  .keybar .kname { font-size: 21px; color: var(--body); }
+  .keybar .kname .sub { display: block; font-size: 14px; color: var(--grey-dim); }
+  .keybar .track { height: 30px; background: var(--line); border-radius: 6px; overflow: hidden; }
+  .keybar .fill { height: 100%; width: 0; border-radius: 6px; transition: width 1s cubic-bezier(.4,0,.2,1); background: linear-gradient(90deg, var(--grey-dim), var(--grey)); }
+  .keybar.accent .fill { background: linear-gradient(90deg, var(--accent-deep), var(--accent)); box-shadow: 0 0 14px var(--accent-glow); }
+  .keybar .kval { font-family: Consolas, ui-monospace, monospace; font-size: 19px; color: var(--grey); text-align: right; }
+
+  /* QR SVG panels */
+  .qrrow { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+  .qrbox { background: #ffffff; border: 1px solid var(--line); border-radius: 10px; padding: 18px; line-height: 0; }
+  .qrbox svg { display: block; }
+  .qr-side { flex: 1; min-width: 300px; }
+  .qr-side .btn { margin-top: 14px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .legend button {
+    font-family: inherit; font-size: 16px; padding: 9px 16px; cursor: pointer;
+    background: var(--panel); color: var(--grey); border: 1px solid var(--line); border-radius: 20px;
+    display: flex; align-items: center; gap: 9px; transition: border-color .2s, color .2s;
+  }
+  .legend button:hover { color: var(--white); border-color: var(--grey-dim); }
+  .legend button.on { color: var(--white); border-color: var(--grey); box-shadow: 0 0 16px -4px var(--glow); }
+  .legend .chip { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+  .anat-note { margin-top: 20px; font-size: 19px; color: var(--body); line-height: 1.55; min-height: 90px; max-width: 420px; }
+  .anat-note .t { color: var(--white); }
+
+  /* Barcode */
+  .bcwrap { background: #ffffff; border-radius: 10px; padding: 24px 28px 14px; display: inline-block; }
+  .bcdigits { font-family: Consolas, ui-monospace, monospace; font-size: 20px; color: #111; letter-spacing: 6px; text-align: center; margin-top: 6px; }
+  .bcrow { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+  .bc-side { flex: 1; min-width: 300px; }
+  .bcinput {
+    font-family: Consolas, ui-monospace, monospace; font-size: 22px; letter-spacing: 4px;
+    background: var(--panel); color: var(--white); border: 1px solid var(--line);
+    border-radius: 7px; padding: 12px 16px; width: 100%; max-width: 340px;
+  }
+  .bcinput:focus { outline: none; border-color: var(--grey-dim); }
+  .checkline { font-family: Consolas, ui-monospace, monospace; font-size: 20px; color: var(--grey); margin-top: 16px; min-height: 56px; line-height: 1.6; }
+  .checkline .hot { color: var(--accent-bright); }
+
+  /* Damage painter */
+  .dmg-stats { font-size: 21px; color: var(--body); margin-top: 18px; line-height: 1.6; }
+  .dmg-stats .pct { font-family: Consolas, ui-monospace, monospace; font-size: 30px; color: var(--white); }
+  .dmg-verdict { margin-top: 10px; font-size: 20px; min-height: 56px; color: var(--grey); line-height: 1.5; }
+  .dmg-verdict.ok { color: var(--white); }
+  .dmg-verdict.risk { color: var(--accent-bright); }
+  .dmg-track { height: 26px; background: var(--line); border-radius: 6px; overflow: hidden; position: relative; margin-top: 14px; max-width: 420px; }
+  .dmg-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--grey-dim), var(--accent)); transition: width .2s; }
+  .dmg-mark { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--white); left: 15%; }
+  .dmg-mark span { position: absolute; top: -22px; left: -14px; font-size: 12px; color: var(--grey-dim); letter-spacing: 1px; }
+
+  /* Mask picker */
+  .maskgrid { display: grid; grid-template-columns: repeat(4, max-content); gap: 16px; margin-top: 8px; }
+  .maskwrap { flex: 0 0 auto; }
+  .maskcell {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px; cursor: pointer; text-align: center; transition: border-color .2s, box-shadow .2s;
+  }
+  .maskcell:hover { border-color: var(--grey-dim); }
+  .maskcell.on { border-color: var(--accent); box-shadow: 0 0 18px -4px var(--accent-glow); }
+  .maskcell .mini { background: #fff; border-radius: 6px; padding: 6px; line-height: 0; }
+  .maskcell .mlbl { font-family: Consolas, ui-monospace, monospace; font-size: 14px; color: var(--grey); margin-top: 8px; }
+  .maskcell.on .mlbl { color: var(--accent-bright); }
+  .maskcell.best .mlbl::after { content: " · lowest"; color: var(--grey-dim); font-size: 11px; }
+
+  /* Hamming cube */
+  .cuberow { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; }
+  .cubebox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  svg text { font-family: Baskerville, "Baskerville Old Face", "Libre Baskerville", "Times New Roman", serif; font-weight: 400; }
+  svg .svgmono { font-family: Consolas, ui-monospace, monospace; }
+  .cube-side { flex: 1; min-width: 280px; }
+  .cube-side .btn { margin-top: 14px; }
+  .hopnote { font-size: 19px; color: var(--grey); margin-top: 16px; min-height: 56px; line-height: 1.5; }
+  .hopnote .cur { color: var(--accent-bright); }
+
+  /* URL check quiz */
+  .urlcard {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 24px 28px; margin-bottom: 14px;
+  }
+  .urlcard .scenario { font-size: 18px; color: var(--grey); margin-bottom: 12px; line-height: 1.5; }
+  .urlcard .url { font-family: Consolas, ui-monospace, monospace; font-size: 21px; color: var(--white); word-break: break-all; margin-bottom: 14px; }
+  .urlcard .verdict { display: none; margin-top: 14px; font-size: 18px; line-height: 1.55; color: var(--body); }
+  .urlcard .verdict.shown { display: block; animation: rise .4s ease; }
+  .urlcard .verdict .v-ok { color: var(--white); }
+  .urlcard .verdict .v-bad { color: var(--accent-bright); }
+  .urlcard .btns { display: flex; gap: 12px; }
+  .urlcard .btns .btn { margin-top: 0; padding: 9px 22px; font-size: 16px; }
+  .urlcard.answered .btns { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beat, .reveal-ans.shown, .urlcard .verdict.shown { animation: none; }
+    .tl-item, .keybar .fill, .calcline, .dmg-fill { transition: none; }
+  }
+  @media (max-width: 900px) {
+    h1 { font-size: 38px; } h2 { font-size: 30px; }
+    .pair, .trio, .helps { grid-template-columns: 1fr; }
+    .qrrow, .bcrow, .cuberow { flex-direction: column; }
+    .maskgrid { grid-template-columns: repeat(2, max-content); }
+    .keybar { grid-template-columns: 1fr; gap: 8px; }
+    .keybar .kval { text-align: left; }
+    .tl-item { grid-template-columns: 1fr; gap: 6px; }
+    main { padding: 0 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <header>
+    <span class="mod-tag" id="hdrLeft">Inside the QR code</span>
+    <span id="hdrRight">Press M for menu</span>
+  </header>
+  <main id="main">
+
+    <!-- ============ MENU ============ -->
+    <section class="beat" data-scene="menu">
+      <div class="eyebrow">An interactive walkthrough</div>
+      <h1>Inside the QR code</h1>
+      <p class="lede">The checkerboard squares you scan every day have a 200-year backstory, a clever mathematical heart, and a security problem hiding in plain sight. Five short modules; no maths beyond arithmetic.</p>
+      <div style="margin-top:44px">
+        <button class="menu-item" onclick="goModule(1)">
+          <span class="num">01</span><span class="name">From Morse to the barcode</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(2)">
+          <span class="num">02</span><span class="name">The two-dimensional leap</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(3)">
+          <span class="num">03</span><span class="name">Anatomy of a QR code</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(4)">
+          <span class="num">04</span><span class="name">Unkillable codes</span><span class="state">Start</span>
+        </button>
+        <button class="menu-item" onclick="goModule(5)">
+          <span class="num">05</span><span class="name">The dark side of the squares</span><span class="state">Start</span>
+        </button>
+      </div>
+      <a class="btn ghost" href="../" style="margin-top:24px; text-decoration:none">&larr; Back to catalogue</a>
+    </section>
+
+    <!-- ============ MODULE 1 ============ -->
+
+    <section class="beat" data-scene="m1">
+      <div class="eyebrow">Module 01</div>
+      <h1>From Morse to the barcode</h1>
+      <div class="myth">Myth we'll unpick: "QR codes are a modern invention"</div>
+      <p class="lede">Every QR code is the descendant of a telegraph wire. The story starts with a letter that arrived too late.</p>
+    </section>
+
+    <section class="beat" data-scene="m1">
+      <h2>A letter that arrived too late</h2>
+      <div class="callout">In 1825, the painter Samuel Morse was in Washington on the job of his life when a courier brought word that his wife was gravely ill. He rushed home to New Haven by horse and wagon, day and night. She had already died; he had even missed the funeral. From that day he hunted for a <strong>faster way to send a message</strong>.</div>
+      <p class="caption">By 1836, working with Joseph Henry and Alfred Vail, Morse had a telegraph that needed only a single circuit; the price of that simplicity was a cleverer code. Short and long pulses; dots and dashes.</p>
+    </section>
+
+    <section class="beat" data-scene="m1" data-onenter="resetMorse">
+      <h2>The first data compression</h2>
+      <div class="pair">
+        <div class="card">
+          <em>Common letters, short codes.</em><br>
+          <span class="mono" style="font-size:30px">E = &middot; &nbsp;&nbsp; T = &ndash;</span>
+          <div style="font-size:18px; color:var(--grey-dim); margin-top:12px">One key press each. Rare letters got longer codes. Sound familiar? It is the same instinct behind every compression scheme since.</div>
+        </div>
+        <div class="card">
+          <em>So what does SOS stand for?</em>
+          <div class="reveal-ans" id="sosAns">Nothing at all.<span class="note">&middot;&middot;&middot; &ndash;&ndash;&ndash; &middot;&middot;&middot; is simply easy to send and impossible to mistake. The meaning came later, invented by people who assumed it must be an acronym.</span></div>
+          <button class="btn ghost" id="sosBtn" onclick="sosReveal()">Reveal</button>
+        </div>
+      </div>
+      <p class="qline">Morse code turned language into a stream of two symbols. Hold that thought; it never goes away.</p>
+    </section>
+
+    <section class="beat" data-scene="m1">
+      <h2>Morse code, drawn in the sand</h2>
+      <div class="callout">In the late 1940s a Philadelphia supermarket boss begged a university to speed up his checkouts. Engineering student Bernard Silver overheard, and told his friend Norman Joseph Woodland. On a Florida beach, Woodland idly dragged his fingers through the sand, stretching the dots and dashes of Morse code <strong>downwards into thin and thick lines</strong>. The barcode was born.</div>
+      <p class="caption">The UPC barcode that grew from that moment stores just 12 digits, read by scanning a laser across the stripes; thin and thick, dot and dash, zero and one.</p>
+    </section>
+
+    <section class="beat" data-scene="m1" data-onenter="resetUpc">
+      <h2>Build a real barcode</h2>
+      <div class="bcrow">
+        <div>
+          <div class="bcwrap">
+            <svg id="upcSvg" width="380" height="150" viewBox="0 0 380 150"></svg>
+            <div class="bcdigits" id="upcDigits"></div>
+          </div>
+        </div>
+        <div class="bc-side">
+          <div class="lbl">Type any 11 digits</div>
+          <input class="bcinput" id="upcIn" maxlength="11" inputmode="numeric" spellcheck="false" value="93573200016">
+          <div class="checkline" id="upcCheck"></div>
+          <p class="caption" style="margin-top:14px">The 12th digit is not yours to choose. It is computed from the other eleven: triple the digits in the odd positions, add the rest, and the check digit tops the total up to a multiple of ten. Damage any single digit and the sum snitches.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m1">
+      <h2>Twelve digits was never going to be enough</h2>
+      <div class="trio">
+        <div class="hcard"><h3>What a barcode says</h3><p>"I am product number 93573200016 4." That is the entire message. A pointer into somebody's database, nothing more.</p></div>
+        <div class="hcard"><h3>What people wanted to say</h3><p>Where was this made? When? Which batch? Which paddock did this beef come from? Twelve digits cannot carry a story.</p></div>
+        <div class="hcard"><h3>The pressure builds</h3><p>Through the 1980s and 90s, industry after industry hit the same wall: the code was full. Something had to grow.</p></div>
+      </div>
+      <p class="qline">And in the 1980s, a crisis in British paddocks made the question urgent.</p>
+    </section>
+
+    <!-- ============ MODULE 2 ============ -->
+
+    <section class="beat" data-scene="m2">
+      <div class="eyebrow">Module 02</div>
+      <h1>The two-dimensional leap</h1>
+      <div class="myth">Myth we'll unpick: "Someone set out to invent the QR code"</div>
+      <p class="lede">It took a disease outbreak, a frustrated factory engineer and a board game to push the barcode into two dimensions.</p>
+    </section>
+
+    <section class="beat" data-scene="m2">
+      <h2>Mad cows and missing data</h2>
+      <div class="callout">From 1986, British cattle began dying of BSE, mad cow disease, and people who ate infected beef could contract a fatal illness. Suddenly everyone wanted to know exactly <strong>where their meat had been</strong>; and a 12-digit barcode had no room for the answer.</div>
+      <p class="caption">Inventors tried stacking barcodes on top of each other, like Code 49 and its descendant PDF417, still found on airline boarding passes. Better, but still a bookshelf of one-dimensional codes. The real answer was a true two-dimensional grid.</p>
+    </section>
+
+    <section class="beat" data-scene="m2" data-onenter="resetHara">
+      <h2>A factory problem and a game of Go</h2>
+      <div class="tline">
+        <div class="tl-item" id="hara1"><span class="year">1994</span><span class="ttext">Masahiro Hara, an engineer at Japanese auto parts maker DENSO, is sick of scanning up to ten barcodes on every box of components.<span class="tsub">He decides to build a better code himself.</span></span></div>
+        <div class="tl-item" id="hara2"><span class="year">Go board</span><span class="ttext">His inspiration is the game of Go: black and white stones on a grid. White for zero, black for one; a whole grid of bits in one glance.<span class="tsub">A camera can read thousands of squares at once. A laser reads stripes one at a time.</span></span></div>
+        <div class="tl-item accent" id="hara3"><span class="year">Open patent</span><span class="ttext">DENSO Wave holds the patent but chooses not to enforce it, making the code free for anyone to use, and sells scanners instead.<span class="tsub">Hara has said opening the patent is what made the QR code spread. Rival codes stayed proprietary; the QR code ate the world.</span></span></div>
+      </div>
+      <p class="cite">As told by Masahiro Hara in interview (Veritasium, October 2024).</p>
+    </section>
+
+    <section class="beat" data-scene="m2" data-onenter="resetSizes">
+      <h2>How much can the grid hold?</h2>
+      <div class="keybars">
+        <div class="keybar" data-w="12">
+          <span class="kname">Version 1 <span class="sub">21 &times; 21 modules</span></span>
+          <div class="track"><div class="fill"></div></div>
+          <span class="kval">~25 chars</span>
+        </div>
+        <div class="keybar" data-w="16">
+          <span class="kname">Version 2 <span class="sub">25 &times; 25; the one we build next</span></span>
+          <div class="track"><div class="fill"></div></div>
+          <span class="kval">~47 chars</span>
+        </div>
+        <div class="keybar" data-w="42">
+          <span class="kname">Version 10 <span class="sub">57 &times; 57</span></span>
+          <div class="track"><div class="fill"></div></div>
+          <span class="kval">~395 chars</span>
+        </div>
+        <div class="keybar accent" data-w="100">
+          <span class="kname">Version 40 <span class="sub">177 &times; 177; the largest</span></span>
+          <div class="track"><div class="fill"></div></div>
+          <span class="kval">~3 KB</span>
+        </div>
+      </div>
+      <p class="caption">Forty sizes, each adding four modules per side. Version 40 holds close to three kilobytes; one programmer famously squeezed a playable game of Snake into a single code. Your phone works out the version by counting the modules.</p>
+      <p class="cite">Capacities: DENSO Wave, qrcode.com (byte mode, level M approximate).</p>
+    </section>
+
+    <section class="beat" data-scene="m2" data-onenter="resetAdopt">
+      <h2>Slow burn, then everywhere</h2>
+      <div class="tline">
+        <div class="tl-item" id="ad1"><span class="year">2002</span><span class="ttext">Mad cow disease resurfaces in the UK. QR codes get one of their first consumer outings: beef traceability labels.</span></div>
+        <div class="tl-item" id="ad2"><span class="year">2017</span><span class="ttext">Apple and Android build QR reading into their native camera apps. No more third-party scanner apps; the reader is in every pocket.</span></div>
+        <div class="tl-item" id="ad3"><span class="year">2020</span><span class="ttext">The pandemic makes contactless everything. Menus, check-ins, payments; the little squares become infrastructure.</span></div>
+        <div class="tl-item accent" id="ad4"><span class="year">Today</span><span class="ttext">India alone processes billions of QR-based payments every month.<span class="tsub">The code built for car parts became the front door of the internet.</span></span></div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 3 ============ -->
+
+    <section class="beat" data-scene="m3">
+      <div class="eyebrow">Module 03</div>
+      <h1>Anatomy of a QR code</h1>
+      <div class="myth">Myth we'll unpick: "It's just random squares"</div>
+      <p class="lede">Every module in the grid has a job. The code on the next screen is real; it encodes this website's address, and your phone will read it straight off the screen.</p>
+    </section>
+
+    <section class="beat" data-scene="m3" data-onenter="resetAnatomy">
+      <h2>Tap each part to light it up</h2>
+      <div class="qrrow">
+        <div class="qrbox"><svg id="anatSvg"></svg></div>
+        <div class="qr-side">
+          <div class="legend" id="anatLegend"></div>
+          <div class="anat-note" id="anatNote">This is a live version 2 QR code (25 &times; 25) encoding <span class="t mono">ntworldink.com</span>. Choose a layer to see which squares are scaffolding and which carry your data.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m3" data-onenter="resetAscii">
+      <h2>Turning letters into squares</h2>
+      <div class="panel" style="max-width:860px">
+        <div class="lbl">Byte encoding, one character at a time</div>
+        <div class="calcline" id="asc1">'w' <span class="op">is character number</span> 119</div>
+        <div class="calcline" id="asc2">119 <span class="op">in binary is</span> 01110111</div>
+        <div class="calcline" id="asc3">01110111 <span class="op">becomes</span> &#9633;&#9632;&#9632;&#9632;&#9633;&#9632;&#9632;&#9632; <span class="op">, eight little squares</span></div>
+        <div class="calcline result" id="asc4">Every character of the message: eight squares each</div>
+      </div>
+      <button class="btn" id="ascBtn" onclick="ascStep()">Step through</button>
+      <p class="caption">The first few squares of every QR code declare the data type (numbers only, letters and numbers, bytes, or kanji) and the message length; then the message itself follows, byte after byte.</p>
+    </section>
+
+    <section class="beat" data-scene="m3" data-onenter="resetFill">
+      <h2>Watch the data pour in</h2>
+      <div class="qrrow">
+        <div class="qrbox"><svg id="fillSvg"></svg></div>
+        <div class="qr-side">
+          <p style="font-size:20px; color:var(--body); line-height:1.6">Data enters at the <span style="color:var(--white)">bottom right corner</span> and zigzags upward in two-column ribbons, snaking around the fixed patterns, all the way to the top left.</p>
+          <button class="btn" id="fillBtn" onclick="fillRun()">Pour the data in</button>
+          <button class="btn ghost" onclick="fillInstant()" style="margin-left:10px">Skip to full</button>
+          <p class="caption" id="fillNote">359 data modules will fill in true placement order.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m3" data-onenter="resetScan">
+      <h2>Now scan it</h2>
+      <div class="qrrow">
+        <div class="qrbox"><svg id="scanSvg"></svg></div>
+        <div class="qr-side">
+          <div class="callout" style="font-size:23px">Point your phone camera at the screen. This code was built module by module through this walkthrough, and it <strong>really works</strong>: it goes to ntworldink.com.</div>
+          <p class="caption">Half of what you just watched fill in is not the message at all. The rest of the grid is something stranger; that is module 04.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 4 ============ -->
+
+    <section class="beat" data-scene="m4">
+      <div class="eyebrow">Module 04</div>
+      <h1>Unkillable codes</h1>
+      <div class="myth">Myth we'll unpick: "A damaged code is a dead code"</div>
+      <p class="lede">Tear a corner off a QR code and it still scans. That is not luck; it is some of the most elegant mathematics in daily use.</p>
+    </section>
+
+    <section class="beat" data-scene="m4" data-onenter="resetCube">
+      <h2>The trick: keep valid messages far apart</h2>
+      <div class="cuberow">
+        <div class="cubebox"><svg id="cubeSvg" width="360" height="320" viewBox="0 0 360 320"></svg></div>
+        <div class="cube-side">
+          <p style="font-size:20px; color:var(--body); line-height:1.6">Suppose the only two valid messages are <span class="mono" style="color:var(--white)">000</span> and <span class="mono" style="color:var(--white)">111</span>, opposite corners of a cube. Flip any single bit in transit and you land on a corner that is <span style="color:var(--white)">not a valid message</span>; the error announces itself, and the nearest valid corner is almost certainly what was meant.</p>
+          <button class="btn" id="cubeBtn" onclick="cubeFlip()">Flip a bit</button>
+          <div class="hopnote" id="cubeNote">The distance between valid code words is called the Hamming distance. Spacing words further apart lets you correct more flipped bits.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m4">
+      <h2>Reed-Solomon: redundancy with a brain</h2>
+      <div class="pair">
+        <div class="card" style="font-size:21px; line-height:1.6">
+          <em>The idea in one sentence:</em><br>
+          before sending, add a few extra numbers computed so the whole message satisfies equations the receiver knows; if the equations fail on arrival, the pattern of failure reveals <span style="color:var(--white)">where</span> the damage is and <span style="color:var(--white)">what the missing values were</span>.
+        </div>
+        <div class="card" style="font-size:21px; line-height:1.6">
+          <em>You have trusted it for decades:</em><br>
+          Reed-Solomon codes (1960) recover scratched CDs and DVDs, and still pull Voyager's fading whisper out of deep space, half a century after launch. QR codes carry the same mathematics in every corner shop.
+        </div>
+      </div>
+      <p class="qline">In a QR code, roughly half the grid can be these recovery numbers. How much exactly is your choice.</p>
+    </section>
+
+    <section class="beat" data-scene="m4" data-onenter="resetEc">
+      <h2>Four levels of stubbornness</h2>
+      <div class="keybars">
+        <div class="keybar" data-w="23">
+          <span class="kname">Level L <span class="sub">light protection, most room for data</span></span>
+          <div class="track"><div class="fill"></div></div>
+          <span class="kval">7% damage</span>
+        </div>
+        <div class="keybar accent" data-w="50">
+          <span class="kname">Level M <span class="sub">the everyday default; our code uses it</span></span>
+          <div class="track"><div class="fill"></div></div>
+          <span class="kval">15% damage</span>
+        </div>
+        <div class="keybar" data-w="83">
+          <span class="kname">Level Q <span class="sub">for grubby factory floors</span></span>
+          <div class="track"><div class="fill"></div></div>
+          <span class="kval">25% damage</span>
+        </div>
+        <div class="keybar" data-w="100">
+          <span class="kname">Level H <span class="sub">maximum; survives a logo punched through it</span></span>
+          <div class="track"><div class="fill"></div></div>
+          <span class="kval">30% damage</span>
+        </div>
+      </div>
+      <p class="caption">This is why designers can stamp a logo over the middle of a code and it still scans: the logo is just damage the mathematics routes around.</p>
+      <p class="cite">Restoration rates: DENSO Wave, qrcode.com, "Error correction feature".</p>
+    </section>
+
+    <section class="beat" data-scene="m4" data-onenter="resetDmg">
+      <h2>Try to kill it</h2>
+      <div class="qrrow">
+        <div class="qrbox"><svg id="dmgSvg"></svg></div>
+        <div class="qr-side">
+          <p style="font-size:19px; color:var(--body); line-height:1.55">Click or drag on the code to paint damage, then <span style="color:var(--white)">test it with your own phone camera</span>. This code uses level M; in theory it should survive until roughly 15% of it is gone.</p>
+          <div class="dmg-stats">Damage: <span class="pct" id="dmgPct">0.0%</span></div>
+          <div class="dmg-track"><div class="dmg-fill" id="dmgFill"></div><div class="dmg-mark"><span>15%</span></div></div>
+          <div class="dmg-verdict" id="dmgVerdict">Untouched. It scans.</div>
+          <button class="btn ghost" onclick="dmgLogo()">Stamp a logo on it</button>
+          <button class="btn ghost" onclick="dmgReset()" style="margin-left:10px">Repair it</button>
+          <p class="caption">Damage to the three big position squares hurts far more than damage to the data region; the recovery maths cannot protect the parts that tell the camera where the code is.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m4" data-onenter="resetMask">
+      <h2>Eight disguises, one message</h2>
+      <div class="qrrow">
+        <div class="maskwrap">
+          <div class="maskgrid" id="maskGrid"></div>
+        </div>
+        <div class="qr-side">
+          <p style="font-size:19px; color:var(--body); line-height:1.55">Raw data can bunch into blank patches that confuse scanners, so the standard defines <span style="color:var(--white)">eight masking patterns</span> that flip pixels in fixed ways. A generator scores all eight for awkward patches and publishes the least awkward one; the winner's number rides along in the format strip.</p>
+          <div class="hopnote" id="maskNote">All eight below are real and scannable, and all decode to exactly the same address. Tap them; penalty scores are shown, lower is better.</div>
+          <p class="caption">This is why two generators can hand you different-looking codes for the same link.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 5 ============ -->
+
+    <section class="beat" data-scene="m5">
+      <div class="eyebrow">Module 05</div>
+      <h1>The dark side of the squares</h1>
+      <div class="myth">Myth we'll unpick: "If it scans, it's safe"</div>
+      <p class="lede">Everything that makes QR codes brilliant for machines makes them opaque to people. Scammers noticed.</p>
+    </section>
+
+    <section class="beat" data-scene="m5">
+      <h2>The core problem: you cannot read it</h2>
+      <div class="callout">A QR code pointing at your bank and a QR code pointing at a scam page are <strong>visually identical</strong>. Humans cannot proofread a checkerboard. Every safety habit you have for links ("hover over it", "read it before you click") fails at the exact moment you scan.</div>
+      <p class="caption">Security folk call QR phishing "quishing". The attack is usually not technical at all; it is a sticker.</p>
+    </section>
+
+    <section class="beat" data-scene="m5">
+      <h2>Three ways the trick is played</h2>
+      <div class="trio">
+        <div class="hcard"><h3>The sticker</h3><p>A scam code printed on adhesive paper, stuck squarely over the real one; on a parking meter, a menu, a charging station. The equipment looks official because it is; only the sticker is new.</p></div>
+        <div class="hcard"><h3>The letterbox drop</h3><p>Fake fines, missed-delivery cards and "update your details" letters carrying a QR code. Paper feels trustworthy, and the code hides the destination.</p></div>
+        <div class="hcard"><h3>The borrowed brand</h3><p>A scam page dressed as a bank, toll operator or government agency, reached through a code in an email or poster. The page can look pixel-perfect; the address gives it away.</p></div>
+      </div>
+      <p class="qline">Your one defence sits in the address preview your phone shows before it opens anything. Let's train on it.</p>
+    </section>
+
+    <section class="beat" data-scene="m5" data-onenter="resetQuiz">
+      <h2>Check before you tap</h2>
+      <p class="caption" style="margin-top:0; margin-bottom:18px">Your camera shows a preview of where each code leads. Trust it or not? All addresses below are invented for this exercise.</p>
+      <div class="urlcard" data-good="0">
+        <div class="scenario">A sticker on a Darwin parking meter offers "pay by phone". The preview reads:</div>
+        <div class="url">https://nt-parkingfines-pay.com/meter</div>
+        <div class="btns">
+          <button class="btn" onclick="quizAnswer(this, false)">Looks fine</button>
+          <button class="btn ghost" onclick="quizAnswer(this, true)">Suspicious</button>
+        </div>
+        <div class="verdict"><span class="v-bad">Suspicious is right.</span> Government payments in the Territory live under nt.gov.au. A hyphenated look-alike domain that merely mentions NT is the classic sticker scam; pay through the meter, the official app you already have, or an address you type yourself.</div>
+      </div>
+      <div class="urlcard" data-good="1">
+        <div class="scenario">A restaurant table card for the menu. The preview reads:</div>
+        <div class="url">https://ordermate.online/menu/darwin-laksa-house</div>
+        <div class="btns">
+          <button class="btn" onclick="quizAnswer(this, true)">Looks fine</button>
+          <button class="btn ghost" onclick="quizAnswer(this, false)">Suspicious</button>
+        </div>
+        <div class="verdict"><span class="v-ok">Reasonable.</span> Menus commonly live on third-party ordering platforms, and a menu does not ask for money up front or your personal details. Risk is low; stay alert the moment any "menu" wants card numbers or a login.</div>
+      </div>
+      <div class="urlcard" data-good="0">
+        <div class="scenario">A letter about an unpaid toll, urging immediate payment. The preview reads:</div>
+        <div class="url">https://linkt.com-pay-secure.net/invoice</div>
+        <div class="btns">
+          <button class="btn" onclick="quizAnswer(this, false)">Looks fine</button>
+          <button class="btn ghost" onclick="quizAnswer(this, true)">Suspicious</button>
+        </div>
+        <div class="verdict"><span class="v-bad">Suspicious is right.</span> Read domains from the end: this page lives on <span class="mono">com-pay-secure.net</span>, not on the real operator's domain; "linkt" is only a subdomain costume. The words before the first slash can be dressed up to say anything.</div>
+      </div>
+      <div class="hopnote" id="quizScore"></div>
+    </section>
+
+    <section class="beat" data-scene="m5">
+      <h2>Habits that beat the sticker</h2>
+      <div class="helps">
+        <div class="hcard">
+          <h3>Preview, then read backwards</h3>
+          <p>Always look at the address your camera shows before opening, and read the domain from the end. The true owner is just before the first single slash.</p>
+        </div>
+        <div class="hcard">
+          <h3>Feel the surface</h3>
+          <p>On parking meters, menus and public posters, a code on a sticker over another code is a red flag you can literally feel. Unexpected codes in letters and emails deserve the same suspicion as unexpected links.</p>
+        </div>
+        <div class="hcard">
+          <h3>Never pay through a scanned code</h3>
+          <p>For fines, tolls, banking and anything with your card details, close the browser and go in the front door: the official app, or an address you type yourself.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m5">
+      <h2>Why this matters</h2>
+      <div class="callout">The QR code is Morse code's great-grandchild: language flattened into two symbols, spread onto a grid, wrapped in mathematics that <strong>heals its own wounds</strong>. It is free, open and effectively inexhaustible; the number of possible codes dwarfs the number of atoms' worth of stickers we could ever print. The only part with no error correction is <strong>the human holding the phone</strong>. Now you scan with your eyes open.</div>
+      <p class="cite">Built on: Veritasium, "I built a QR code with my bare hands to see how it works" (October 2024), including Masahiro Hara interview material; DENSO Wave, qrcode.com ("Error correction feature"; "Information capacity and versions of QR Code"); ISO/IEC 18004 (QR code standard). The QR codes on these pages were generated for this walkthrough and encode ntworldink.com.</p>
+      <button class="btn ghost" style="margin-top:36px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+  </main>
+  <footer id="dots"></footer>
+</div>
+<div class="navhint">&larr; &rarr; or space &nbsp;|&nbsp; M menu</div>
+
+<script>
+  /* ================= Deck scaffold ================= */
+  const beats = Array.from(document.querySelectorAll('.beat'));
+  let idx = 0;
+
+  const sceneTitles = {
+    m1: 'Module 01 · From Morse to the barcode',
+    m2: 'Module 02 · The two-dimensional leap',
+    m3: 'Module 03 · Anatomy of a QR code',
+    m4: 'Module 04 · Unkillable codes',
+    m5: 'Module 05 · The dark side of the squares'
+  };
+  const onEnterHooks = {
+    resetMorse: resetMorseState, resetUpc: resetUpcState,
+    resetHara: resetHaraState, resetSizes: resetSizesState, resetAdopt: resetAdoptState,
+    resetAnatomy: resetAnatomyState, resetAscii: resetAsciiState, resetFill: resetFillState, resetScan: resetScanState,
+    resetCube: resetCubeState, resetEc: resetEcState, resetDmg: resetDmgState, resetMask: resetMaskState,
+    resetQuiz: resetQuizState
+  };
+
+  function show(i) {
+    idx = Math.max(0, Math.min(i, beats.length - 1));
+    beats.forEach((b, n) => b.classList.toggle('active', n === idx));
+    const scene = beats[idx].dataset.scene;
+    document.getElementById('hdrLeft').textContent =
+      scene === 'menu' ? 'Inside the QR code' : sceneTitles[scene];
+    const dots = document.getElementById('dots');
+    dots.innerHTML = '';
+    if (scene !== 'menu') {
+      const moduleBeats = beats.filter(b => b.dataset.scene === scene);
+      const pos = moduleBeats.indexOf(beats[idx]);
+      moduleBeats.forEach((_, n) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (n === pos ? ' on' : '');
+        dots.appendChild(d);
+      });
+    }
+    const hook = beats[idx].dataset.onenter;
+    if (hook && onEnterHooks[hook]) onEnterHooks[hook]();
+  }
+  function goMenu() { show(0); }
+  function goModule(n) {
+    const i = beats.findIndex(b => b.dataset.scene === 'm' + n);
+    if (i > -1) show(i);
+  }
+  function next() { if (idx < beats.length - 1) show(idx + 1); }
+  function prev() { if (idx > 0) show(idx - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') prev();
+    else if (e.key === 'm' || e.key === 'M') goMenu();
+    else if (e.key >= '1' && e.key <= '5') goModule(Number(e.key));
+  });
+  document.getElementById('main').addEventListener('click', e => {
+    if (e.target.closest('button, svg, a, input, .urlcard, .maskcell, .qrbox')) return;
+    next();
+  });
+
+  /* ================= Embedded QR data =================
+     Real version 2 (25x25) QR codes encoding https://ntworldink.com
+     at error correction level M, pre-generated and verified scannable.
+     roles: F finder, S separator, T timing, A alignment, M format, K dark module, D data/EC */
+  const QR = {
+    size: 25,
+    bestMask: 5,
+    scores: [577, 632, 530, 678, 537, 523, 553, 670],
+    masks: [
+["1111111001101111001111111","1000001011100001001000001","1011101000110001001011101","1011101000100000001011101","1011101010011111001011101","1000001000010011101000001","1111111010101010101111111","0000000001111101000000000","1010101000100101100010010","1001010011011100101000001","0100001001111110111000111","0001000101100111110010010","0011001101000100111001011","0001000001110000101001001","1011001011000100111100111","0100110000010111101010010","1011101111001101111111000","0000000010011001100011011","1111111000011001101011011","1000001000001110100011011","1011101011110010111111011","1011101000010001100111100","1011101011000100100010001","1000001001010000101011010","1111111011001001110100011"],
+["1111111010111010001111111","1000001000110100001000001","1011101011100100001011101","1011101001110101001011101","1011101001001010001011101","1000001011000110101000001","1111111010101010101111111","0000000000101000000000000","1010001101110000100100101","1100000110001001111101011","0001011100101011101101101","0100010000110010100111000","0110011000010001101100001","0100010100100101111100011","1110011110010001101001101","0001100101000010111111000","1110111010011000111110010","0000000011001100100010001","1111111011001100101010001","1000001001011011100010001","1011101000100111111110001","1011101001000100110010110","1011101010010001110111011","1000001000000101111110000","1111111010011100100001001"],
+["1111111000001100101111111","1000001001111101001000001","1011101011010010101011101","1011101010111100001011101","1011101011111100101011101","1000001010001111101000001","1111111010101010101111111","0000000011100001000000000","1011111001000110001111100","0101000111000000110100010","0111101010011101011011011","1101010001111011101110001","0000101110100111011010111","1101010101101100110101010","1000101000100111011111011","1000100100001011110110001","1000001100101110111110100","0000000010000101100011000","1111111001111010101010111","1000001010010010100011000","1011101010010001111110111","1011101010001101111011111","1011101010100111000001101","1000001001001100110111001","1111111010101010010111111"],
+["1111111010001100101111111","1000001010100110001000001","1011101000111111001011101","1011101010111100001011101","1011101000100111101011101","1000001001100010001000001","1111111010101010101111111","0000000010111010000000000","1011011100101011101001011","0101000111000000110100010","1100111001000110000000000","0000110100010110000011100","0000101110100111011010111","0110000110110111101110001","0101001101001010110010110","1000100100001011110110001","0011011111110101111111111","0000000011101000100010101","1111111011111010101010111","1000001011001001100010011","1011101001111100111111010","1011101010001101111011111","1011101011111100011010110","1000001000100001011010100","1111111010101010010111111"],
+["1111111011001011101111111","1000001000111010001000001","1011101001101010001011101","1011101010000100101011101","1011101010111011101011101","1000001011001000101000001","1111111010101010101111111","0000000011011001100000000","1000101110000001011111001","0010000000000111110011010","1111011010100101100011100","0101100001000011010110110","0111101001100000011101111","1010010010101011110010010","0000011000011111100111100","0000010100110011001110110","1111001011101001111111100","0000000011000010100010000","1111111011000010101010000","1000001000101010100011111","1011101011010110111111111","1011101001001010111100111","1011101000011111111001010","1000001001110100001111110","1111111011101101010000111"],
+["1111111000111010001111111","1000001010111100001000001","1011101011010010101011101","1011101011011111101011101","1011101001111100101011101","1000001001001110101000001","1111111010101010101111111","0000000010100000000000000","1000001011000110011001110","0110100100100011010111110","0111101010011101011011011","1100010000111010101111001","0110011000010001101100001","1100010100101101110100010","1000101000100111011111011","1011000111101000010101101","1000001100101110111110100","0000000011000100100010000","1111111001001100101010001","1000001001010011100010000","1011101000010001111110111","1011101001101110011000011","1011101000100111000001101","1000001000001101110110001","1111111010011100100001001"],
+["1111111010111010001111111","1000001010111010001000001","1011101011110110001011101","1011101001011111101011101","1011101011101110101011101","1000001001111110001000001","1111111010101010101111111","0000000000100110000000000","1001111111100010110010111","0110100100100011010111110","0101111000001111001001001","1100100000001010011111111","0110011000010001101100001","1010010010101011110010010","1100001100000011111011111","1011000111101000010101101","1010011110111100111110110","0000000011110100100010110","1111111011001100101010001","1000001011010101100010000","1011101010110101111110011","1011101011101110011000011","1011101000110101010011111","1000001000111101000110111","1111111010011100100001001"],
+["1111111001101111001111111","1000001001000101101000001","1011101000100011001011101","1011101000100000001011101","1011101000111011101011101","1000001010000001101000001","1111111010101010101111111","0000000001011001100000000","1001011010110111110100000","1001010011011100101000001","0000101101011010011100011","0011010111110101100000000","0011001101000100111001011","0101100101010100001101101","1001011001010110101110101","0100110000010111101010010","1111001011101001111111100","0000000010001011100011001","1111111000011001101011011","1000001010101010100011111","1011101001100000111111001","1011101010010001100111100","1011101001100000000110101","1000001001000010111001000","1111111011001001110100011"]
+    ],
+    roles: ["FFFFFFFSMDDDDDDDDSFFFFFFF","FFFFFFFSMDDDDDDDDSFFFFFFF","FFFFFFFSMDDDDDDDDSFFFFFFF","FFFFFFFSMDDDDDDDDSFFFFFFF","FFFFFFFSMDDDDDDDDSFFFFFFF","FFFFFFFSMDDDDDDDDSFFFFFFF","FFFFFFFSTTTTTTTTTSFFFFFFF","SSSSSSSSMDDDDDDDDSSSSSSSS","MMMMMMTMMDDDDDDDDMMMMMMMM","DDDDDDTDDDDDDDDDDDDDDDDDD","DDDDDDTDDDDDDDDDDDDDDDDDD","DDDDDDTDDDDDDDDDDDDDDDDDD","DDDDDDTDDDDDDDDDDDDDDDDDD","DDDDDDTDDDDDDDDDDDDDDDDDD","DDDDDDTDDDDDDDDDDDDDDDDDD","DDDDDDTDDDDDDDDDDDDDDDDDD","DDDDDDTDDDDDDDDDAAAAADDDD","SSSSSSSSKDDDDDDDAAAAADDDD","FFFFFFFSMDDDDDDDAAAAADDDD","FFFFFFFSMDDDDDDDAAAAADDDD","FFFFFFFSMDDDDDDDAAAAADDDD","FFFFFFFSMDDDDDDDDDDDDDDDD","FFFFFFFSMDDDDDDDDDDDDDDDD","FFFFFFFSMDDDDDDDDDDDDDDDD","FFFFFFFSMDDDDDDDDDDDDDDDD"]
+  };
+  QR.main = QR.masks[QR.bestMask];
+
+  /* Zigzag placement order, computed per the standard: two-column ribbons from
+     bottom right, skipping the timing column and all function modules. */
+  QR.order = (function () {
+    const n = QR.size, order = [];
+    let col = n - 1, upward = true;
+    while (col > 0) {
+      if (col === 6) col -= 1;
+      const rows = [];
+      if (upward) { for (let r = n - 1; r >= 0; r--) rows.push(r); }
+      else { for (let r = 0; r < n; r++) rows.push(r); }
+      for (const r of rows) {
+        for (const c of [col, col - 1]) {
+          if (QR.roles[r][c] === 'D') order.push([r, c]);
+        }
+      }
+      col -= 2; upward = !upward;
+    }
+    return order;
+  })();
+
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  /* Render a QR matrix into an svg element. Returns 2D array of rects. */
+  function renderQR(svgId, matrix, cell, quiet) {
+    const svg = document.getElementById(svgId);
+    const n = matrix.length, q = quiet === undefined ? 2 : quiet;
+    const dim = (n + 2 * q) * cell;
+    svg.setAttribute('width', dim); svg.setAttribute('height', dim);
+    svg.setAttribute('viewBox', '0 0 ' + dim + ' ' + dim);
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    const bg = document.createElementNS(SVGNS, 'rect');
+    bg.setAttribute('width', dim); bg.setAttribute('height', dim); bg.setAttribute('fill', '#ffffff');
+    svg.appendChild(bg);
+    const rects = [];
+    for (let r = 0; r < n; r++) {
+      rects.push([]);
+      for (let c = 0; c < n; c++) {
+        const rect = document.createElementNS(SVGNS, 'rect');
+        rect.setAttribute('x', (c + q) * cell); rect.setAttribute('y', (r + q) * cell);
+        rect.setAttribute('width', cell); rect.setAttribute('height', cell);
+        rect.setAttribute('fill', matrix[r][c] === '1' ? '#111111' : '#ffffff');
+        svg.appendChild(rect);
+        rects[r].push(rect);
+      }
+    }
+    return rects;
+  }
+
+  /* ---------- Module 1 ---------- */
+  function sosReveal() {
+    document.getElementById('sosAns').classList.add('shown');
+    document.getElementById('sosBtn').style.display = 'none';
+  }
+  function resetMorseState() {
+    document.getElementById('sosAns').classList.remove('shown');
+    document.getElementById('sosBtn').style.display = '';
+  }
+
+  /* UPC-A: real rendering with computed check digit */
+  const UPC_L = ['0001101','0011001','0010011','0111101','0100011','0110001','0101111','0111011','0110111','0001011'];
+  function upcCheck11(digs) {
+    let odd = 0, even = 0;
+    digs.forEach((d, i) => { if (i % 2 === 0) odd += d; else even += d; });
+    const rem = (odd * 3 + even) % 10;
+    return { odd, even, rem, check: rem === 0 ? 0 : 10 - rem };
+  }
+  function upcRender() {
+    const inp = document.getElementById('upcIn');
+    const raw = inp.value.replace(/\D/g, '').slice(0, 11);
+    if (inp.value !== raw) inp.value = raw;
+    const svg = document.getElementById('upcSvg');
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    const digitsEl = document.getElementById('upcDigits');
+    const checkEl = document.getElementById('upcCheck');
+    if (raw.length < 11) {
+      digitsEl.textContent = raw.padEnd(12, '_');
+      checkEl.innerHTML = 'Waiting for ' + (11 - raw.length) + ' more digit' + (11 - raw.length === 1 ? '' : 's') + '&hellip;';
+      return;
+    }
+    const digs = raw.split('').map(Number);
+    const { odd, even, rem, check } = upcCheck11(digs);
+    const all = digs.concat([check]);
+    /* pattern: guard 101, 6 left digits, guard 01010, 6 right digits (inverted), guard 101 */
+    let bits = '101';
+    for (let i = 0; i < 6; i++) bits += UPC_L[all[i]];
+    bits += '01010';
+    for (let i = 6; i < 12; i++) bits += UPC_L[all[i]].split('').map(b => b === '1' ? '0' : '1').join('');
+    bits += '101';
+    const w = 380 / bits.length;
+    for (let i = 0; i < bits.length; i++) {
+      if (bits[i] === '1') {
+        const rect = document.createElementNS(SVGNS, 'rect');
+        rect.setAttribute('x', i * w); rect.setAttribute('y', 0);
+        rect.setAttribute('width', w + 0.15); rect.setAttribute('height', 150);
+        rect.setAttribute('fill', '#111');
+        svg.appendChild(rect);
+      }
+    }
+    digitsEl.textContent = raw + ' ' + check;
+    checkEl.innerHTML = '(' + odd + ' &times; 3) + ' + even + ' = ' + (odd * 3 + even) +
+      ' &nbsp;&rarr;&nbsp; remainder ' + rem + ' &nbsp;&rarr;&nbsp; check digit <span class="hot">' + check + '</span>';
+  }
+  function resetUpcState() { upcRender(); }
+  document.getElementById('upcIn').addEventListener('input', upcRender);
+
+  /* ---------- Module 2 ---------- */
+  function staggerShow(ids, delay) {
+    ids.forEach((id, i) => {
+      const el = document.getElementById(id);
+      el.classList.remove('shown');
+      setTimeout(() => el.classList.add('shown'), 150 + i * delay);
+    });
+  }
+  function resetHaraState() { staggerShow(['hara1', 'hara2', 'hara3'], 700); }
+  function resetAdoptState() { staggerShow(['ad1', 'ad2', 'ad3', 'ad4'], 600); }
+  function resetSizesState() {
+    document.querySelectorAll('[data-scene="m2"] .keybar').forEach(kb => {
+      const fill = kb.querySelector('.fill');
+      fill.style.width = '0';
+      setTimeout(() => { fill.style.width = kb.dataset.w + '%'; }, 250);
+    });
+  }
+
+  /* ---------- Module 3 ---------- */
+  const ROLE_INFO = {
+    F: { name: 'Position squares', colour: 'var(--finder)', hex: '#cf5148',
+         note: 'The three big squares tell the camera "a QR code is here" and which way up it sits. Identical in every QR code ever printed. The white strips beside them are separators that keep them visible.' },
+    T: { name: 'Timing strips', colour: 'var(--timing)', hex: '#4f86ad',
+         note: 'The alternating row and column linking the position squares. Counting these modules tells the reader the code’s version, and therefore how much data to expect.' },
+    A: { name: 'Alignment square', colour: 'var(--align)', hex: '#d9a441',
+         note: 'The small fourth square. It lets software un-warp the grid when the code is read at an angle or from a distance. Bigger versions carry many of these.' },
+    M: { name: 'Format strips', colour: 'var(--format)', hex: '#949577',
+         note: 'Fifteen modules recording the error correction level and mask number, stored twice in full, because the reader needs them before it can trust anything else.' },
+    K: { name: 'The dark module', colour: 'var(--darkmod)', hex: '#a77e67',
+         note: 'One module beside the bottom-left position square that is always dark. Veritasium asked the inventor whether it means anything special. It does not.' },
+    D: { name: 'Data + recovery', colour: 'var(--accent)', hex: '#e0983c',
+         note: 'Everything else: your message in bytes, plus the Reed-Solomon recovery numbers that bring damaged codes back from the dead. In this code, that is 359 modules.' }
+  };
+  let anatRects = null, anatActive = null;
+  function anatHighlight(role) {
+    anatActive = role === anatActive ? null : role;
+    const n = QR.size;
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      const dark = QR.main[r][c] === '1';
+      const match = anatActive && (QR.roles[r][c] === anatActive || (anatActive === 'F' && QR.roles[r][c] === 'S'));
+      let fill;
+      if (!anatActive) fill = dark ? '#111111' : '#ffffff';
+      else if (match) fill = dark ? ROLE_INFO[anatActive].hex : '#f7e9dd';
+      else fill = dark ? '#c9c9c9' : '#ffffff';
+      anatRects[r][c].setAttribute('fill', fill);
+    }
+    document.querySelectorAll('#anatLegend button').forEach(b => b.classList.toggle('on', b.dataset.role === anatActive));
+    document.getElementById('anatNote').innerHTML = anatActive
+      ? '<span class="t">' + ROLE_INFO[anatActive].name + '.</span> ' + ROLE_INFO[anatActive].note
+      : 'This is a live version 2 QR code (25 &times; 25) encoding <span class="t mono">ntworldink.com</span>. Choose a layer to see which squares are scaffolding and which carry your data.';
+  }
+  function resetAnatomyState() {
+    anatRects = renderQR('anatSvg', QR.main, 15);
+    anatActive = null;
+    const leg = document.getElementById('anatLegend');
+    leg.innerHTML = '';
+    ['F', 'T', 'A', 'M', 'K', 'D'].forEach(role => {
+      const b = document.createElement('button');
+      b.dataset.role = role;
+      b.innerHTML = '<span class="chip" style="background:' + ROLE_INFO[role].colour + '"></span>' + ROLE_INFO[role].name;
+      b.onclick = () => anatHighlight(role);
+      leg.appendChild(b);
+    });
+    document.getElementById('anatNote').innerHTML = 'This is a live version 2 QR code (25 &times; 25) encoding <span class="t mono">ntworldink.com</span>. Choose a layer to see which squares are scaffolding and which carry your data.';
+  }
+
+  let ascStepN = 0;
+  function ascStep() {
+    ascStepN++;
+    for (let i = 1; i <= ascStepN && i <= 4; i++) document.getElementById('asc' + i).classList.add('shown');
+    if (ascStepN >= 4) document.getElementById('ascBtn').style.display = 'none';
+  }
+  function resetAsciiState() {
+    ascStepN = 0;
+    for (let i = 1; i <= 4; i++) document.getElementById('asc' + i).classList.remove('shown');
+    document.getElementById('ascBtn').style.display = '';
+  }
+
+  let fillRects = null, fillTimer = null, fillPos = 0;
+  function fillBase() {
+    /* function patterns visible, data modules blank */
+    const n = QR.size;
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      const isData = QR.roles[r][c] === 'D';
+      fillRects[r][c].setAttribute('fill', isData ? '#ffffff' : (QR.main[r][c] === '1' ? '#111111' : '#ffffff'));
+    }
+  }
+  function fillRun() {
+    fillInstantStop();
+    fillBase(); fillPos = 0;
+    document.getElementById('fillBtn').disabled = true;
+    fillTimer = setInterval(() => {
+      for (let k = 0; k < 4 && fillPos < QR.order.length; k++, fillPos++) {
+        const [r, c] = QR.order[fillPos];
+        fillRects[r][c].setAttribute('fill', QR.main[r][c] === '1' ? '#111111' : '#efe4d5');
+      }
+      document.getElementById('fillNote').textContent = fillPos + ' of ' + QR.order.length + ' data modules placed.';
+      if (fillPos >= QR.order.length) {
+        fillInstantStop();
+        document.getElementById('fillNote').textContent = 'All ' + QR.order.length + ' data modules placed. The tinted squares are the freshly poured data and recovery bits.';
+      }
+    }, 30);
+  }
+  function fillInstantStop() {
+    if (fillTimer) { clearInterval(fillTimer); fillTimer = null; }
+    document.getElementById('fillBtn').disabled = false;
+  }
+  function fillInstant() {
+    fillInstantStop();
+    QR.order.forEach(([r, c]) => fillRects[r][c].setAttribute('fill', QR.main[r][c] === '1' ? '#111111' : '#efe4d5'));
+    document.getElementById('fillNote').textContent = 'All ' + QR.order.length + ' data modules placed. The tinted squares are the freshly poured data and recovery bits.';
+  }
+  function resetFillState() {
+    fillInstantStop();
+    fillRects = renderQR('fillSvg', QR.main, 15);
+    fillBase();
+    document.getElementById('fillNote').textContent = QR.order.length + ' data modules will fill in true placement order.';
+  }
+
+  function resetScanState() { renderQR('scanSvg', QR.main, 15); }
+
+  /* ---------- Module 4 ---------- */
+  const CUBE = {
+    /* corner positions for a drawn cube, keyed by bit string */
+    pos: { '000': [70, 250], '100': [230, 250], '010': [120, 180], '110': [280, 180],
+           '001': [70, 110], '101': [230, 110], '011': [120, 40], '111': [280, 40] },
+    edges: [['000','100'],['000','010'],['000','001'],['100','110'],['100','101'],['010','110'],
+            ['010','011'],['001','101'],['001','011'],['110','111'],['101','111'],['011','111']]
+  };
+  let cubeState = 0;
+  function buildCube() {
+    const svg = document.getElementById('cubeSvg');
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    CUBE.edges.forEach(([a, b]) => {
+      const l = document.createElementNS(SVGNS, 'line');
+      const [x1, y1] = CUBE.pos[a], [x2, y2] = CUBE.pos[b];
+      l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+      l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+      l.setAttribute('stroke', '#35383a'); l.setAttribute('stroke-width', '1.5');
+      svg.appendChild(l);
+    });
+    Object.entries(CUBE.pos).forEach(([bits, [x, y]]) => {
+      const valid = bits === '000' || bits === '111';
+      const circ = document.createElementNS(SVGNS, 'circle');
+      circ.setAttribute('cx', x); circ.setAttribute('cy', y);
+      circ.setAttribute('r', valid ? 11 : 6);
+      circ.setAttribute('fill', valid ? '#f4f4f2' : '#0a0a0a');
+      circ.setAttribute('stroke', valid ? '#f4f4f2' : '#7d8183');
+      circ.setAttribute('stroke-width', '1.5');
+      circ.setAttribute('id', 'cube-' + bits);
+      svg.appendChild(circ);
+      const t = document.createElementNS(SVGNS, 'text');
+      t.setAttribute('x', x + (x > 200 ? 18 : -18)); t.setAttribute('y', y + 5);
+      t.setAttribute('text-anchor', x > 200 ? 'start' : 'end');
+      t.setAttribute('fill', valid ? '#f4f4f2' : '#7d8183');
+      t.setAttribute('font-size', valid ? '17' : '14');
+      t.setAttribute('class', 'svgmono');
+      t.textContent = bits;
+      svg.appendChild(t);
+    });
+  }
+  const CUBE_FLIPS = ['100', '010', '110', '011', '101'];
+  function cubeFlip() {
+    buildCube();
+    const bits = CUBE_FLIPS[cubeState % CUBE_FLIPS.length]; cubeState++;
+    const el = document.getElementById('cube-' + bits);
+    el.setAttribute('fill', '#e0983c'); el.setAttribute('stroke', '#f2ab52'); el.setAttribute('r', 9);
+    const ones = bits.split('').filter(b => b === '1').length;
+    const nearest = ones >= 2 ? '111' : '000';
+    const near = document.getElementById('cube-' + nearest);
+    near.setAttribute('stroke', '#f2ab52'); near.setAttribute('stroke-width', '3');
+    document.getElementById('cubeNote').innerHTML =
+      'Received <span class="cur svgmono">' + bits + '</span>: not a valid word, so an error definitely occurred. Nearest valid corner is <span class="cur svgmono">' + nearest + '</span> (' + (ones >= 2 ? ones === 2 ? 'one' : 'zero' : ones === 1 ? 'one' : 'zero') + ' flip away), so decode it as that.';
+  }
+  function resetCubeState() { cubeState = 0; buildCube();
+    document.getElementById('cubeNote').textContent = 'The distance between valid code words is called the Hamming distance. Spacing words further apart lets you correct more flipped bits.';
+  }
+
+  function resetEcState() {
+    document.querySelectorAll('[data-scene="m4"] .keybar').forEach(kb => {
+      const fill = kb.querySelector('.fill');
+      fill.style.width = '0';
+      setTimeout(() => { fill.style.width = kb.dataset.w + '%'; }, 250);
+    });
+  }
+
+  /* Damage painter */
+  let dmgRects = null, dmgSet = null, dmgPainting = false, dmgMode = true;
+  function dmgApply(r, c, on) {
+    const key = r + ',' + c;
+    if (on) dmgSet.add(key); else dmgSet.delete(key);
+    dmgRects[r][c].setAttribute('fill', on ? '#e0983c' : (QR.main[r][c] === '1' ? '#111111' : '#ffffff'));
+    dmgUpdate();
+  }
+  function dmgUpdate() {
+    const total = QR.size * QR.size;
+    const pct = dmgSet.size / total * 100;
+    document.getElementById('dmgPct').textContent = pct.toFixed(1) + '%';
+    document.getElementById('dmgFill').style.width = Math.min(100, pct / 30 * 100) + '%';
+    const v = document.getElementById('dmgVerdict');
+    let touchedFinder = false;
+    dmgSet.forEach(k => { const [r, c] = k.split(',').map(Number); if (QR.roles[r][c] === 'F') touchedFinder = true; });
+    if (dmgSet.size === 0) { v.className = 'dmg-verdict ok'; v.textContent = 'Untouched. It scans.'; }
+    else if (touchedFinder && pct > 4) { v.className = 'dmg-verdict risk'; v.textContent = 'You are hitting a position square. Even light damage there can blind the camera entirely; try it with your phone.'; }
+    else if (pct <= 15) { v.className = 'dmg-verdict ok'; v.textContent = 'Inside the level M budget. Reed-Solomon should still reconstruct the message; check with your phone.'; }
+    else if (pct <= 22) { v.className = 'dmg-verdict risk'; v.textContent = 'Past the 15% guarantee. Some phones may still manage it; you are living on borrowed mathematics.'; }
+    else { v.className = 'dmg-verdict risk'; v.textContent = 'Well past the budget. The recovery equations no longer have enough intact numbers to solve.'; }
+  }
+  function dmgEventCell(e) {
+    const svg = document.getElementById('dmgSvg');
+    const pt = svg.createSVGPoint();
+    const ev = e.touches ? e.touches[0] : e;
+    pt.x = ev.clientX; pt.y = ev.clientY;
+    const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    const cell = 15, q = 2;
+    const c = Math.floor(p.x / cell) - q, r = Math.floor(p.y / cell) - q;
+    if (r < 0 || c < 0 || r >= QR.size || c >= QR.size) return null;
+    return [r, c];
+  }
+  function dmgDown(e) {
+    const cell = dmgEventCell(e); if (!cell) return;
+    e.preventDefault();
+    dmgPainting = true;
+    dmgMode = !dmgSet.has(cell[0] + ',' + cell[1]);
+    dmgApply(cell[0], cell[1], dmgMode);
+  }
+  function dmgMove(e) {
+    if (!dmgPainting) return;
+    const cell = dmgEventCell(e); if (!cell) return;
+    e.preventDefault();
+    dmgApply(cell[0], cell[1], dmgMode);
+  }
+  function dmgUp() { dmgPainting = false; }
+  function dmgLogo() {
+    for (let r = 9; r <= 15; r++) for (let c = 9; c <= 15; c++) dmgApply(r, c, true);
+  }
+  function dmgReset() {
+    dmgSet.clear();
+    const n = QR.size;
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++)
+      dmgRects[r][c].setAttribute('fill', QR.main[r][c] === '1' ? '#111111' : '#ffffff');
+    dmgUpdate();
+  }
+  function resetDmgState() {
+    dmgRects = renderQR('dmgSvg', QR.main, 15);
+    dmgSet = new Set();
+    dmgUpdate();
+    const svg = document.getElementById('dmgSvg');
+    svg.style.cursor = 'crosshair'; svg.style.touchAction = 'none';
+    svg.onmousedown = dmgDown; svg.onmousemove = dmgMove;
+    svg.ontouchstart = dmgDown; svg.ontouchmove = dmgMove;
+    window.addEventListener('mouseup', dmgUp); window.addEventListener('touchend', dmgUp);
+  }
+
+  /* Mask picker */
+  function resetMaskState() {
+    const grid = document.getElementById('maskGrid');
+    grid.innerHTML = '';
+    for (let m = 0; m < 8; m++) {
+      const cellDiv = document.createElement('div');
+      cellDiv.className = 'maskcell' + (m === QR.bestMask ? ' on best' : '');
+      cellDiv.innerHTML = '<div class="mini"><svg id="maskSvg' + m + '"></svg></div>' +
+        '<div class="mlbl">mask ' + m + ' &middot; ' + QR.scores[m] + '</div>';
+      cellDiv.onclick = () => {
+        document.querySelectorAll('.maskcell').forEach((el, i) => el.classList.toggle('on', i === m));
+        document.getElementById('maskNote').innerHTML =
+          'Mask ' + m + ', penalty score <span class="cur">' + QR.scores[m] + '</span>' +
+          (m === QR.bestMask ? '; the lowest of the eight, so this is the disguise the generator publishes.' : '; scannable, but a generator would prefer mask ' + QR.bestMask + ' (score ' + QR.scores[QR.bestMask] + ').');
+      };
+      grid.appendChild(cellDiv);
+    }
+    for (let m = 0; m < 8; m++) renderQR('maskSvg' + m, QR.masks[m], 5, 1);
+    document.getElementById('maskNote').innerHTML = 'All eight below are real and scannable, and all decode to exactly the same address. Tap them; penalty scores are shown, lower is better.';
+  }
+
+  /* ---------- Module 5 ---------- */
+  let quizDone = 0, quizRight = 0;
+  function quizAnswer(btn, correct) {
+    const card = btn.closest('.urlcard');
+    if (card.classList.contains('answered')) return;
+    card.classList.add('answered');
+    card.querySelector('.verdict').classList.add('shown');
+    quizDone++; if (correct) quizRight++;
+    if (quizDone === 3) {
+      document.getElementById('quizScore').innerHTML =
+        'You called <span class="cur">' + quizRight + ' of 3</span> correctly. The skill is always the same: ignore the design, read the domain from the end.';
+    }
+  }
+  function resetQuizState() {
+    quizDone = 0; quizRight = 0;
+    document.querySelectorAll('.urlcard').forEach(c => {
+      c.classList.remove('answered');
+      c.querySelector('.verdict').classList.remove('shown');
+    });
+    document.getElementById('quizScore').textContent = '';
+  }
+
+  /* boot */
+  show(0);
+</script>
+</body>
+</html>
