@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setting Your Status in Teams</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --tp: #5B5FC7;
+    --tp-deep: #4F52B2;
+    --bg-page: #1a1a2e;
+    --mtg-panel: #201F2B;
+    --mtg-tile: #2C2B3A;
+    --mtg-line-solid: #343342;
+    --txt: #F2F2F2;
+    --dim: #9C9CB0;
+    --gold: #FFC845;
+    --good: #13A06E;
+    --busy: #C4314B;
+    --dnd: #8E1F2F;
+    --brb: #F2C812;
+    --away: #EAA300;
+    --off: #6E6E7A;
+}
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-page); min-height: 100vh; padding: 20px; color: #242424; }
+
+.activity-header {
+    max-width: 980px; margin: 0 auto 16px auto;
+    background: linear-gradient(135deg, #5b5fc7 0%, #7b2cbf 100%);
+    border-radius: 12px; padding: 18px 24px; color: #fff;
+    box-shadow: 0 4px 20px rgba(91, 95, 199, 0.4);
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.activity-header h1 { font-size: 21px; display: flex; align-items: center; gap: 10px; }
+.activity-header p { font-size: 14px; opacity: .95; line-height: 1.45; flex-basis: 100%; }
+.badge { background: rgba(255,255,255,.2); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+.header-btns { margin-left: auto; display: flex; gap: 10px; }
+.hbtn { border: none; border-radius: 8px; padding: 9px 16px; cursor: pointer; font: 600 14px 'Segoe UI', sans-serif; background: rgba(255,255,255,.92); color: var(--tp-deep); }
+.hbtn:hover { background: #fff; }
+
+.stage { max-width: 980px; margin: 0 auto; position: relative; }
+.topbar {
+    background: #252542; border-radius: 12px 12px 0 0; padding: 12px 20px;
+    display: flex; align-items: center; gap: 14px; color: var(--txt);
+}
+.topbar .search { flex: 1; background: #33334A; border-radius: 6px; padding: 7px 14px; font-size: 12.5px; color: var(--dim); }
+.topbar .avwrap { position: relative; cursor: default; }
+.topbar .av { width: 34px; height: 34px; border-radius: 50%; background: var(--tp); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
+.topbar .dot { position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid #252542; background: var(--good); }
+
+.card {
+    background: var(--mtg-panel); border-radius: 0 0 12px 12px; padding: 0 0 6px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.5); color: var(--txt); position: relative;
+}
+.profile-row { display: flex; align-items: center; gap: 14px; padding: 20px 24px 16px; border-bottom: 1px solid var(--mtg-line-solid); position: relative; }
+.profile-row .bigav { width: 56px; height: 56px; border-radius: 50%; background: var(--tp); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; position: relative; }
+.profile-row .bigav .dot { position: absolute; bottom: 0; right: 0; width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--mtg-panel); background: var(--good); }
+.profile-row .pname { font-size: 15.5px; font-weight: 700; }
+.profile-row .pstatus { font-size: 12.5px; color: var(--dim); margin-top: 2px; }
+.statusmsg { margin: 14px 24px; background: var(--mtg-tile); border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: var(--dim); }
+
+.statuslist { padding: 6px 8px; }
+.srow { display: flex; align-items: center; gap: 12px; padding: 9px 16px; border-radius: 8px; position: relative; }
+.srow:hover { background: var(--mtg-tile); }
+.srow .sdot { width: 13px; height: 13px; border-radius: 50%; flex: 0 0 13px; }
+.srow .slabel { font-size: 13.5px; }
+.srow .selected { color: var(--dim); font-size: 12px; margin-left: 6px; }
+
+.info-btn {
+    margin-left: auto; width: 22px; height: 22px; border-radius: 50%; border: none;
+    background: var(--gold); color: #1a1a2e; font-weight: 800; font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex: 0 0 22px;
+}
+.info-btn:hover { background: #ffd873; }
+.info-btn.open { background: #fff; }
+
+.divider { height: 1px; background: var(--mtg-line-solid); margin: 6px 16px; }
+.metarow { display: flex; align-items: center; gap: 12px; padding: 9px 16px; font-size: 13px; color: var(--dim); position: relative; }
+.metarow .micon { width: 13px; text-align: center; }
+
+.popup {
+    display: none; position: absolute; right: 44px; top: -6px; background: #fff; color: #242424;
+    border-radius: 10px; padding: 13px 16px; font-size: 12.5px; line-height: 1.55; width: 300px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5); z-index: 30;
+}
+.popup.open { display: block; }
+.popup b { display: block; font-size: 13px; margin-bottom: 4px; color: var(--tp-deep); }
+.popup::after { content: ''; position: absolute; right: -6px; top: 16px; width: 12px; height: 12px; background: #fff; transform: rotate(45deg); }
+
+@media (max-width: 900px) {
+    .popup { position: static; width: auto; margin-top: 8px; right: auto; top: auto; }
+    .popup::after { display: none; }
+}
+
+.footnote { max-width: 980px; margin: 14px auto 0; color: var(--dim); font-size: 12px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="activity-header">
+    <h1>🟢 Setting Your Status in Teams</h1>
+    <span class="badge">CLICK EACH ⓘ</span>
+    <div class="header-btns">
+        <button class="hbtn" id="closeAllBtn">✕ Close all</button>
+    </div>
+    <p>Click the ⓘ next to any status to see what it actually means, what triggers it, and what still gets through to you.</p>
+</div>
+
+<div class="stage">
+    <div class="topbar">
+        <div class="search">Search</div>
+        <div class="avwrap">
+            <div class="av">YOU</div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="profile-row">
+            <div class="bigav">YOU<div class="dot"></div></div>
+            <div>
+                <div class="pname">You</div>
+                <div class="pstatus">Available</div>
+            </div>
+            <button class="info-btn" data-target="pop-visibility" style="margin-left:auto;">ⓘ</button>
+            <div class="popup" id="pop-visibility">
+                <b>Who can see this</b>
+                By default, your status is visible to everyone across your organisation, in nearly real time. It can also be visible to people outside your organisation, depending on external access settings, unless your organisation has turned on privacy mode.
+            </div>
+        </div>
+        <div class="statusmsg">Set a status message, for example: in a workshop until 3pm</div>
+
+        <div class="statuslist">
+            <div class="srow">
+                <span class="sdot" style="background:var(--good)"></span>
+                <span class="slabel">Available</span>
+                <span class="selected">✓ current</span>
+                <button class="info-btn" data-target="pop-available">ⓘ</button>
+                <div class="popup" id="pop-available">
+                    <b>Available</b>
+                    Shown automatically when you're active on a device. You can also choose it yourself, but only if nothing more accurate is already in play, for example you can't manually set Available while your calendar shows you're in a meeting.
+                </div>
+            </div>
+
+            <div class="srow">
+                <span class="sdot" style="background:var(--busy)"></span>
+                <span class="slabel">Busy</span>
+                <button class="info-btn" data-target="pop-busy">ⓘ</button>
+                <div class="popup" id="pop-busy">
+                    <b>Busy</b>
+                    You're online but focused. Notifications still show as normal; colleagues just see that you're occupied. Teams also sets this automatically while you're in a call, in a meeting, or presenting.
+                </div>
+            </div>
+
+            <div class="srow">
+                <span class="sdot" style="background:var(--dnd)"></span>
+                <span class="slabel">Do not disturb</span>
+                <button class="info-btn" data-target="pop-dnd">ⓘ</button>
+                <div class="popup" id="pop-dnd">
+                    <b>Do not disturb</b>
+                    The only status that changes what reaches you. Banner notifications are switched off and incoming calls go straight to voicemail. Chat messages still arrive, you just aren't interrupted by them. Anyone on your priority access list can still call you and will still show as normal.
+                </div>
+            </div>
+
+            <div class="srow">
+                <span class="sdot" style="background:var(--brb)"></span>
+                <span class="slabel">Be right back</span>
+                <button class="info-btn" data-target="pop-brb">ⓘ</button>
+                <div class="popup" id="pop-brb">
+                    <b>Be right back</b>
+                    A manual-only status. It never gets set automatically; you choose it yourself for a short break, so colleagues know you'll be back shortly rather than genuinely away.
+                </div>
+            </div>
+
+            <div class="srow">
+                <span class="sdot" style="background:var(--away)"></span>
+                <span class="slabel">Appear away</span>
+                <button class="info-btn" data-target="pop-away">ⓘ</button>
+                <div class="popup" id="pop-away">
+                    <b>Appear away</b>
+                    Set automatically if you've been inactive on your computer for a few minutes, if your computer locks, or if the Teams mobile app has been sitting in the background for a while. You can also choose it manually if you want to look away without going fully offline.
+                </div>
+            </div>
+
+            <div class="srow">
+                <span class="sdot" style="background:var(--off)"></span>
+                <span class="slabel">Appear offline</span>
+                <button class="info-btn" data-target="pop-offline">ⓘ</button>
+                <div class="popup" id="pop-offline">
+                    <b>Appear offline</b>
+                    Hides your presence from colleagues completely; they'll see you as offline even though you're still using Teams normally in the background. It's also the only status that stays in place indefinitely once you set it manually, rather than expiring after a day or a week.
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="metarow">
+            <span class="micon">↺</span> Reset status
+            <button class="info-btn" data-target="pop-reset">ⓘ</button>
+            <div class="popup" id="pop-reset">
+                <b>Reset status</b>
+                Clears anything you've set manually and hands presence back to Teams, which then calculates it automatically again from your activity, calls, and calendar.
+            </div>
+        </div>
+        <div class="metarow">
+            <span class="micon">⏱</span> Duration, set how long a status lasts
+            <button class="info-btn" data-target="pop-duration">ⓘ</button>
+            <div class="popup" id="pop-duration">
+                <b>Duration</b>
+                You can choose how long a manually set status should last. If you don't set a duration yourself, Busy and Do not disturb default to one day, most other statuses default to seven days, and Appear offline stays until you change it.
+            </div>
+        </div>
+    </div>
+</div>
+
+<p class="footnote">Source: Microsoft Learn, "User presence in Teams," last updated 16 July 2026.</p>
+
+<script>
+document.querySelectorAll('.info-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var target = document.getElementById(this.dataset.target);
+        var wasOpen = target.classList.contains('open');
+        document.querySelectorAll('.popup').forEach(function(p) { p.classList.remove('open'); });
+        document.querySelectorAll('.info-btn').forEach(function(b) { b.classList.remove('open'); });
+        if (!wasOpen) {
+            target.classList.add('open');
+            this.classList.add('open');
+        }
+    });
+});
+document.getElementById('closeAllBtn').addEventListener('click', function() {
+    document.querySelectorAll('.popup').forEach(function(p) { p.classList.remove('open'); });
+    document.querySelectorAll('.info-btn').forEach(function(b) { b.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
