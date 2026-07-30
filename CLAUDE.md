@@ -32,6 +32,7 @@ Master plan for two builds on ntworldink.com (repo NTelligencya.github.io), agre
 - DONE 29 July 2026: Power Query demoted to second-last in the library (before "More to come"); course-num spans renumbered 01-08 in the new order (Excel Fundamentals now 01 and open-by-default).
 - DONE 29 July 2026: "Workshops" nav link added (index.html "#workshops"; "/#workshops" on presentations/index.html, references/index.html and all live /resources/ pages) and to the index.html footer library column. The two workshop decks themselves have no site nav (deck chrome only), as designed.
 - The existing /cdu-ai-staff/ section (eight migrated pages) stays as is; where a workshop topic overlaps (Agentic AI), the workshop page is the new build and /cdu-ai-staff/ is untouched.
+- DONE 30 July 2026: Course 08 "Power BI for Cyber Security: Build Your First SIEM Dashboard" added to the library accordion, built at /powerbi-siem/index.html as a single-page learner-facing course (SOC-flavoured, Parts A to K, stumbling-block callouts, DAX code blocks, facilitator notes section at the end) with the two synthetic datasets (soc_dataset1.xlsx, synthetic-windows-event-data.xlsx) as downloads in the same folder. "More to come" moved from 08 to 09; footer library column links the course. Source document: course-08-powerbi-siem-dashboard.md in SD's PowerBI Obsidian folder. Power BI Desktop download deliberately mentioned as text, not linked, pending an SD-vetted link.
 
 ## The eleven workshop topics
 

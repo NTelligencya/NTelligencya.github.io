@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power BI for Cyber Security: Build Your First SIEM Dashboard · NTell World Ink</title>
+<meta name="description" content="Learn Power BI properly with cyber security as the running example. Load synthetic Windows security logs, build a star schema, write your first DAX measures, and hunt a simulated intruder through 4,000 events on a dashboard you built yourself.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* ============================================================
+     PAGE-SCOPED ADDITIONS, Power BI SIEM course
+     Reuses tokens from styles.css (--accent, --bg-2, --rule etc).
+     ============================================================ */
+
+  .container-course {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Contents block */
+  .course-toc {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 32px auto 56px;
+  }
+
+  .course-toc h2 {
+    font-size: 24px;
+    margin: 0 0 14px;
+    padding: 0;
+    border: none;
+  }
+
+  .course-toc ul {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .course-toc ul li {
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .course-toc ul li:last-child { border-bottom: none; }
+
+  .course-toc ul li .toc-part {
+    color: var(--accent);
+    font-weight: 500;
+    min-width: 52px;
+  }
+
+  .course-toc ul li a {
+    color: var(--text);
+    flex: 1;
+    text-decoration: none;
+  }
+
+  .course-toc ul li a:hover { color: var(--accent-2); }
+
+  .course-toc ul li::after {
+    content: attr(data-skill);
+    color: var(--text-3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Downloads block */
+  .data-assets {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 0 auto 56px;
+  }
+
+  .data-assets h2 {
+    font-size: 28px;
+    padding: 0;
+    margin: 0 0 8px;
+    border: none;
+  }
+
+  .data-assets .blurb {
+    color: var(--text-2);
+    font-style: italic;
+    margin-bottom: 24px;
+    font-size: 15px;
+  }
+
+  .download-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+  }
+
+  .dl-card {
+    display: block;
+    background: var(--bg-3);
+    border: 1px solid var(--rule-2);
+    border-left: 3px solid transparent;
+    border-radius: 8px;
+    padding: 14px 16px;
+    color: var(--text);
+    text-decoration: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    transition: all 0.15s ease;
+  }
+
+  .dl-card:hover {
+    border-left-color: var(--accent);
+    background: rgba(26,201,201,0.04);
+    color: var(--accent-2);
+  }
+
+  .dl-card .dl-name {
+    display: block;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+    word-break: break-all;
+  }
+
+  .dl-card .dl-meta {
+    display: block;
+    color: var(--text-3);
+    font-size: 11px;
+  }
+
+  /* Course parts */
+  .part {
+    padding-top: 48px;
+    margin-bottom: 8px;
+  }
+
+  .part-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border-top: 1px solid var(--rule);
+    padding-top: 18px;
+    margin-bottom: 6px;
+  }
+
+  .part-header .part-num { color: var(--accent); font-weight: 500; }
+
+  .part h2 {
+    margin-top: 6px;
+  }
+
+  /* Stumbling block callout */
+  .stumble {
+    background: rgba(224, 158, 62, 0.05);
+    border: 1px solid rgba(224, 158, 62, 0.25);
+    border-left: 3px solid #e09e3e;
+    border-radius: 10px;
+    padding: 22px 26px 16px;
+    margin: 28px 0;
+  }
+
+  .stumble .stumble-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #e09e3e;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .stumble h3 {
+    font-size: 19px;
+    margin: 0 0 10px;
+  }
+
+  .stumble p { font-size: 15px; }
+  .stumble p:last-child { margin-bottom: 6px; }
+
+  /* Analyst aside callout */
+  .analyst-aside {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 22px 26px 16px;
+    margin: 28px 0;
+  }
+
+  .analyst-aside .aside-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .analyst-aside p { font-size: 15px; }
+  .analyst-aside p:last-child { margin-bottom: 6px; }
+
+  /* DAX / code blocks */
+  .part pre, .facilitator pre {
+    background: var(--bg-3);
+    border: 1px solid var(--rule-2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--accent-2);
+    overflow-x: auto;
+    margin: 18px 0;
+  }
+
+  /* Column guide and reference tables */
+  table.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 20px 0 26px;
+  }
+
+  table.ref-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    text-align: left;
+    font-weight: 500;
+    padding: 8px 14px 8px 0;
+    border-bottom: 1px solid var(--rule-2);
+  }
+
+  table.ref-table td {
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--rule);
+    color: var(--text-2);
+    vertical-align: top;
+  }
+
+  table.ref-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* Column guide definition list */
+  dl.col-guide { margin: 20px 0 10px; }
+
+  dl.col-guide dt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent-2);
+    margin-top: 16px;
+  }
+
+  dl.col-guide dd {
+    margin: 4px 0 0;
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* Build steps */
+  ol.steps {
+    list-style: none;
+    counter-reset: step;
+    padding: 0;
+    margin: 20px 0;
+  }
+
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 12px 0 12px 52px;
+    border-bottom: 1px dotted var(--rule);
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  ol.steps li:last-child { border-bottom: none; }
+
+  ol.steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* Half-day split divider */
+  .split-banner {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border-top: 1px solid var(--rule-2);
+    border-bottom: 1px solid var(--rule-2);
+    padding: 16px 10px;
+    margin: 56px 0;
+  }
+
+  .split-banner strong { color: var(--accent); font-weight: 500; }
+
+  /* Facilitator notes */
+  .facilitator {
+    background: var(--bg-2);
+    border: 1px dashed var(--rule-2);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 56px auto 40px;
+  }
+
+  .facilitator h2 {
+    font-size: 26px;
+    padding: 0;
+    margin: 0 0 14px;
+    border: none;
+  }
+
+  .facilitator p, .facilitator li { font-size: 15px; }
+
+  /* Outcome list */
+  ul.outcomes {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 28px;
+  }
+
+  ul.outcomes li {
+    position: relative;
+    padding: 8px 0 8px 22px;
+    color: var(--text-2);
+    font-size: 14.5px;
+    line-height: 1.6;
+    border-bottom: 1px dotted var(--rule);
+  }
+
+  ul.outcomes li::before {
+    content: "//";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    top: 11px;
+  }
+
+  .last-updated {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin: 48px 0 40px;
+  }
+
+  @media (max-width: 720px) {
+    .container-course { padding: 0 20px; }
+    .data-assets, .course-toc, .facilitator { padding: 24px 20px; }
+    ul.outcomes { grid-template-columns: 1fr; }
+    ol.steps li { padding-left: 44px; }
+    table.ref-table td:first-child { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../#library">Library</a>
+      <a href="../#about">About</a>
+      <a href="../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container-course">
+  <nav class="breadcrumb">
+    <a href="../">Home</a>
+    <span class="sep">/</span>
+    <a href="../#library">Library</a>
+    <span class="sep">/</span>
+    <span>Power BI for Cyber Security</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container-course">
+  <div class="series-label">Course Library &middot; Data &amp; Cyber Stream</div>
+  <h1>Power BI for Cyber Security: Build Your First SIEM Dashboard</h1>
+  <p class="subtitle">Turn 4,000 raw Windows security events into an investigation surface, then hunt the intruder hiding inside them.</p>
+
+  <div class="page-meta">
+    <span class="page-meta-item">DURATION · <strong>1 day, or 2 half-days</strong></span>
+    <span class="page-meta-item">LEVEL · <strong>Beginner to intermediate</strong></span>
+    <span class="page-meta-item">FORMAT · <strong>Single-page course + 2 Excel datasets</strong></span>
+  </div>
+</section>
+
+<main class="content-body">
+
+  <!-- WHY THIS COURSE EXISTS -->
+  <section class="container-course" id="why">
+    <div class="section-eyebrow">// why this course exists</div>
+    <h2>You cannot practise on a real SIEM. So we built you a fake one.</h2>
+    <p>Security Operations Centre (SOC) analysts spend their days reading event logs through a SIEM (Security Information and Event Management) tool such as Splunk or Microsoft Sentinel. The problem for learners is that you cannot practise on your employer's SIEM; the back end of your organisation's Windows environment is, quite rightly, locked away from you.</p>
+    <p>This course solves that with synthetic data. You will work with realistic, made-up security logs that behave exactly like the real thing, and use Power BI, a free tool, to do what a SIEM dashboard does: turn thousands of raw events into an investigation surface. Along the way you learn Power BI properly; data modelling, relationships, measures, interactivity and conditional formatting; with cyber security as the running example rather than sales figures.</p>
+    <p>By the end you will have hunted a simulated intruder through 4,000 Windows security events using a dashboard you built yourself.</p>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// before you start</span>
+      <p>You need <strong>Power BI Desktop</strong> on Windows; it is a free download from Microsoft (search "Power BI Desktop" on the Microsoft Store, or find it on Microsoft's Power BI site). No organisational data, licences or admin access are required, and everything on this page works offline once the two datasets below are downloaded. No Power BI experience is assumed; basic Excel familiarity helps. This course follows on well from Cyber Security Awareness and Power Query: Surveillance Data Analysis, both in the library, but stands alone.</p>
+    </div>
+
+    <div class="section-eyebrow" style="margin-top:40px;">// what you will learn</div>
+    <ul class="outcomes">
+      <li>Explain what a SIEM does and how SOC alert data differs from raw event log data</li>
+      <li>Load Excel data into Power BI correctly, choosing Table objects over worksheets in the Navigator</li>
+      <li>Build a star schema by relating a fact table to a lookup table, and explain why real security tools are structured the same way</li>
+      <li>Read the core columns of a Windows Security event log, including event codes, logon types, and Subject versus Target accounts</li>
+      <li>Create a DAX measure and understand why counting rows beats counting columns</li>
+      <li>Build an interactive multi-visual report page where every click cross-filters every other visual</li>
+      <li>Apply a conditional formatting colour scale to build an executive-ready host heatmap</li>
+      <li>Lay out and format a dashboard page deliberately: canvas behaviour, themes, slicer styles, alignment, and a KPI card row</li>
+      <li>Use the Smart Narrative, decomposition tree and anomaly detection features to add analyst-grade storytelling to a report</li>
+      <li>Conduct a basic threat hunt: find a brute-force attack, trace the compromise, and identify malware staging activity</li>
+    </ul>
+  </section>
+
+  <!-- DOWNLOADS -->
+  <section class="data-assets container-course" id="downloads">
+    <div class="section-eyebrow">// course downloads</div>
+    <h2>The two datasets</h2>
+    <p class="blurb">Both workbooks are entirely synthetic; every account, machine, IP address and event was generated. External addresses use the 198.51.100.0/24 range reserved for documentation under RFC 5737, so nothing in these files touches the real internet. Download both before starting Part B.</p>
+
+    <div class="download-grid">
+      <a class="dl-card" href="./soc_dataset1.xlsx" download><span class="dl-name">soc_dataset1.xlsx</span><span class="dl-meta">1,000 SOC alerts &middot; 7 event types &middot; reference sheet</span></a>
+      <a class="dl-card" href="./synthetic-windows-event-data.xlsx" download><span class="dl-name">synthetic-windows-event-data.xlsx</span><span class="dl-meta">3,998 Windows events &middot; 26 hosts &middot; 37 event codes</span></a>
+    </div>
+
+    <p style="margin-top:22px; font-size:14px; color:var(--text-3);"><strong style="color:var(--text-2);">Dataset one: SOC alert data.</strong> One row per security alert, as an analyst would see them in a case queue: EventID, Timestamp, SourceIP, DestinationIP, EventType, Severity, Department, Status, ResolvedDate and AnalystAssigned, plus an EventTypeReference sheet defining each of the seven event types.</p>
+    <p style="font-size:14px; color:var(--text-3);"><strong style="color:var(--text-2);">Dataset two: raw Windows event logs.</strong> Windows Security log events across 26 machines, formatted as they would appear after ingestion into Splunk; 26 columns including _time, host, EventCode, SubjectUserName, TargetUserName, LogonType, IpAddress, ProcessName and the full Message text, plus a reference sheet defining all 37 event codes present. A planted attack story is hiding in here; you hunt it in the capstone.</p>
+  </section>
+
+  <!-- CONTENTS -->
+  <section class="course-toc container-course" id="contents">
+    <div class="section-eyebrow">// contents</div>
+    <h2>Course map</h2>
+    <ul>
+      <li data-skill="CONCEPTS"><span class="toc-part">PART A</span><a href="#part-a">Two kinds of security data</a></li>
+      <li data-skill="GET DATA &middot; POWER QUERY"><span class="toc-part">PART B</span><a href="#part-b">Loading data the right way</a></li>
+      <li data-skill="DATA MODELLING"><span class="toc-part">PART C</span><a href="#part-c">The star schema</a></li>
+      <li data-skill="FIRST VISUAL"><span class="toc-part">PART D</span><a href="#part-d">The first chart, and the traps inside it</a></li>
+      <li data-skill="EVENT LOG LITERACY"><span class="toc-part">PART E</span><a href="#part-e">Raw Windows event logs</a></li>
+      <li data-skill="DAX"><span class="toc-part">PART F</span><a href="#part-f">Your first measure</a></li>
+      <li data-skill="CROSS-FILTERING"><span class="toc-part">PART G</span><a href="#part-g">The interactive page</a></li>
+      <li data-skill="LAYOUT &middot; FORMATTING"><span class="toc-part">PART H</span><a href="#part-h">From clumsy to CISO-ready</a></li>
+      <li data-skill="CONDITIONAL FORMATTING"><span class="toc-part">PART I</span><a href="#part-i">The CISO heatmap</a></li>
+      <li data-skill="ADVANCED VISUALS"><span class="toc-part">PART J</span><a href="#part-j">Visuals that make it remarkable</a></li>
+      <li data-skill="CAPSTONE"><span class="toc-part">PART K</span><a href="#part-k">Hunt the intruder</a></li>
+    </ul>
+  </section>
+
+  <!-- PART A -->
+  <article class="part container-course" id="part-a">
+    <div class="part-header">
+      <span><span class="part-num">PART A</span> &nbsp;//&nbsp; CONCEPTS</span>
+      <span>NO SOFTWARE NEEDED YET</span>
+    </div>
+    <h2>Two kinds of security data</h2>
+    <p>Before touching Power BI, you need one distinction that underpins the whole course.</p>
+    <p>The SOC dataset is <strong>alert data</strong>: each row is a thing an analyst is handling. It is the refined output of a security pipeline; triaged, assigned, tracked to resolution.</p>
+    <p>The Windows dataset is <strong>raw event data</strong>: each row is a single thing a machine recorded. Logons, logoffs, processes starting and stopping, files touched. Windows does not log "attacks"; it logs everything, and detection means finding malicious needles in that haystack. Thousands of these events occur before any human looks at one.</p>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// mental model</span>
+      <p>Raw events are the ore; alerts are what comes out of the refinery. A SIEM is the refinery. This course works with both ends of that pipeline.</p>
+    </div>
+
+    <h3>Column guide: the SOC alert data</h3>
+    <p>Read these before loading anything; every column earns its place on a real SOC queue.</p>
+    <dl class="col-guide">
+      <dt>EventID</dt>
+      <dd>Unique ticket number per alert. The primary key.</dd>
+      <dt>Timestamp</dt>
+      <dd>When the event was detected. Time is central to security analysis; clusters of events in short windows, and activity outside business hours, are both classic signals.</dd>
+      <dt>SourceIP and DestinationIP</dt>
+      <dd>Where activity came from and what it targeted. Addresses starting 10. and 192.168. are private internal ranges; a port scan's SourceIP is the scanner, its DestinationIP the machine being probed.</dd>
+      <dt>EventType</dt>
+      <dd>The category of suspicious activity. The reference sheet defines each; they map to real attack stages, from reconnaissance (Port Scan) through to data exfiltration (Unusual Data Transfer), plus modern cloud-era types such as Unauthorised OAuth Grant and Unsanctioned AI Domain Access.</dd>
+      <dt>Severity</dt>
+      <dd>Low, Medium, High, Critical. Drives triage order.</dd>
+      <dt>Department</dt>
+      <dd>Business context; the same alert matters more in Finance than in most teams.</dd>
+      <dt>Status</dt>
+      <dd>The alert lifecycle; Open, Investigating, Resolved, False Positive. False positive rates are a standard SOC metric.</dd>
+      <dt>ResolvedDate</dt>
+      <dd>Blank until an alert closes. The blanks are meaningful, not missing data. ResolvedDate minus Timestamp gives time-to-resolution, a headline SOC measure.</dd>
+      <dt>AnalystAssigned</dt>
+      <dd>Who owns the ticket; enables workload views.</dd>
+    </dl>
+  </article>
+
+  <!-- PART B -->
+  <article class="part container-course" id="part-b">
+    <div class="part-header">
+      <span><span class="part-num">PART B</span> &nbsp;//&nbsp; GET DATA &middot; POWER QUERY</span>
+      <span>DATASET ONE</span>
+    </div>
+    <h2>Loading data the right way</h2>
+    <p>Open Power BI Desktop, then <strong>Get Data &gt; Excel workbook</strong>, and select <code>soc_dataset1.xlsx</code>.</p>
+
+    <div class="stumble">
+      <span class="stumble-label">// stumbling block</span>
+      <h3>Four options for two tables</h3>
+      <p>The Navigator will show four tickable items for this workbook, something like NetworkEvents, NetworkEvents1, EventTypeReference and EventTypeReference2. This confuses almost everyone. The cause: the workbook contains each dataset twice over; once as a worksheet, and once as a formatted Excel Table object sitting on that sheet. Power BI lists both, and when names collide it appends a number.</p>
+      <p>Pick the <strong>Table</strong> versions. Tell them apart by the icon (Tables show a small grid with a coloured header band; worksheets show a plain sheet icon) or by clicking each and reading the preview. Tables come in with headers already recognised and never pick up stray cells around the data. Tick the two Table items and leave the sheet versions unticked.</p>
+    </div>
+
+    <h3>Always transform before loading</h3>
+    <p>Click <strong>Transform Data</strong> rather than Load, even on clean data; the habit pays off on messy files. In Power Query, check three things: Timestamp and ResolvedDate show the date/time data type (fix via the icon in the column header if they read as text); ResolvedDate contains nulls and should keep them; each query has a sensible name. Then Close and Apply.</p>
+
+    <div class="stumble">
+      <span class="stumble-label">// stumbling block</span>
+      <h3>Table names with numbers on them</h3>
+      <p>If your tables loaded as NetworkEvents1 or EventTypeReference2, rename them: right-click the table name in the Data pane, then Rename. Everything already built on the table updates automatically, and the rename is local to your model; it does not touch the Excel file or break refresh.</p>
+    </div>
+  </article>
+
+  <!-- PART C -->
+  <article class="part container-course" id="part-c">
+    <div class="part-header">
+      <span><span class="part-num">PART C</span> &nbsp;//&nbsp; DATA MODELLING</span>
+      <span>THE CONCEPTUAL HEART OF THE COURSE</span>
+    </div>
+    <h2>The star schema, as a senior analyst would explain it</h2>
+    <p>Every row in NetworkEvents is a thing that happened; an event, at a time, from an IP, to an IP. It happened once and will never happen again, and tomorrow there will be a thousand more rows like it. That table only ever grows. That is what makes it the <strong>fact table</strong>: it records occurrences.</p>
+    <p>EventTypeReference has seven rows. It records nothing that happened; it records what things mean. Port Scan is reconnaissance, typically Medium. Unusual Data Transfer is exfiltration, typically High. That is institutional knowledge, not activity, and it changes only when the security team decides to change it. That is the <strong>lookup table</strong> (also called a dimension table): it describes rather than records.</p>
+    <p>Why keep them separate? Suppose the full description lived on every event row. You would store the same sentence a thousand times over; wasteful but survivable. The real problem: the day Port Scan gets reclassified into a new category, you would have to update every historical row, and any you missed would make your reports silently disagree with themselves. With a lookup table you change one row and every event, past and future, picks up the new meaning instantly. One source of truth for definitions; an untouched, ever-growing record of facts.</p>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// why this matters in security</span>
+      <p>This pattern is everywhere in security. The SIEM does exactly this: raw events are facts, and the event code reference (4624 means successful logon) is a lookup. Threat intelligence feeds, asset inventories and user directories are all lookup tables joined onto the stream of facts to give it meaning. When an analyst enriches an alert with "this IP belongs to Finance", they are doing a fact-to-dimension join in their head. Diagram one fact table surrounded by its lookups and the shape is a star; hence the name.</p>
+    </div>
+
+    <p>In Power BI: open <strong>Model view</strong> (the linked-tables icon on the left rail) and confirm a one-to-many relationship on EventType, with the 1 on EventTypeReference and the asterisk on NetworkEvents. Power BI usually auto-detects it; if not, drag one EventType field onto the other.</p>
+    <p><strong>Verification exercise:</strong> build a table visual using Category from the lookup and a count of EventID from the fact table. If counts split by category rather than repeating one number, the relationship works.</p>
+  </article>
+
+  <!-- PART D -->
+  <article class="part container-course" id="part-d">
+    <div class="part-header">
+      <span><span class="part-num">PART D</span> &nbsp;//&nbsp; FIRST VISUAL</span>
+      <span>THREE TRAPS, ONE CHART</span>
+    </div>
+    <h2>The first chart, and the traps inside it</h2>
+    <p>Build a stacked column chart: alerts per day, coloured by severity. Three stumbling blocks arrive at once; treat each as part of the lesson, because every Power BI beginner meets all three.</p>
+
+    <div class="stumble">
+      <span class="stumble-label">// stumbling block</span>
+      <h3>The field names are nowhere on screen</h3>
+      <p>You select the chart, see the empty X axis, Y axis and Legend wells, and cannot find anything to drag. The fields live in a third panel, the <strong>Data pane</strong> (labelled Fields in older versions), at the far right edge, and it is frequently collapsed into a thin vertical strip. Expand it via the chevron, or restore it from the View ribbon. The working rhythm is: select the visual on the canvas, drag from the Data pane, drop into the wells in the Visualisations pane. Those two panes work as a pair.</p>
+    </div>
+
+    <div class="stumble">
+      <span class="stumble-label">// stumbling block</span>
+      <h3>One giant bar instead of a timeline</h3>
+      <p>Drop Timestamp on the X axis and the chart shows a single column labelled with a quarter or year. Power BI automatically wraps date fields in a hierarchy (Year, Quarter, Month, Day) and starts at the top; a month of data rolls up into one bar. Two fixes: use the drill arrows that appear under the visual (single down arrow toggles per-bar drill mode; double down arrow moves the whole chart down a level; up arrow backs out), or simply delete Year, Quarter and Month from the X-axis well leaving only Day.</p>
+      <p>Note: drilling adds an italic temporary filter in the Filters pane (for example "Timestamp - Year is 2026"); that is normal and reversible.</p>
+    </div>
+
+    <div class="stumble">
+      <span class="stumble-label">// stumbling block</span>
+      <h3>Severity colours are wrong</h3>
+      <p>The legend assigns colours alphabetically, so Critical will not be red. Fix it under Format visual &gt; Colours: Critical red, High orange, Medium amber, Low grey. This convention is universal on SOC dashboards and worth enforcing from the first chart.</p>
+    </div>
+  </article>
+
+  <!-- HALF-DAY SPLIT -->
+  <div class="split-banner container-course">
+    RUNNING THIS AS TWO HALF-DAYS? <strong>BREAK HERE.</strong> PARTS A TO D USED THE ALERT DATA; PARTS E TO K USE THE RAW WINDOWS LOGS.
+  </div>
+
+  <!-- PART E -->
+  <article class="part container-course" id="part-e">
+    <div class="part-header">
+      <span><span class="part-num">PART E</span> &nbsp;//&nbsp; EVENT LOG LITERACY</span>
+      <span>DATASET TWO</span>
+    </div>
+    <h2>Raw Windows event logs</h2>
+    <p>Now the main event. Load <code>synthetic-windows-event-data.xlsx</code> the same way. The Navigator shows about twenty items this time: ten worksheets plus ten Table objects. Tick only the Table versions of <strong>NetworkEvents</strong> and <strong>EventTypeReference</strong>; the eight Cat_ tables are per-category documentation subsets, useful to read in Excel but redundant in the model. The Table-versus-sheet distinction matters more here, because the category sheets have title text above their data; a sheet version would arrive with junk rows and Column1-style headers.</p>
+    <p>In Power Query: _time should be Date/Time; EventCode arrives as a whole number, which is fine, but remember it is a label, never a quantity to sum; and expect large numbers of nulls in IpAddress, ProcessName, ObjectName and similar. Each event type populates only its own fields, so the blanks are correct behaviour, not dirty data.</p>
+    <p>Relate EventCode to EventCode in Model view; same star, bigger and rawer fact table.</p>
+
+    <h3>Column guide: reading a Windows Security log</h3>
+    <p>Work through a few real rows with this guide beside you. The key columns:</p>
+    <dl class="col-guide">
+      <dt>_time, index, sourcetype, host</dt>
+      <dd>Splunk's plumbing; the timestamp, storage bucket, data type and reporting machine. The underscore prefix marks Splunk internal fields.</dd>
+      <dt>LogName</dt>
+      <dd>Which Windows log; Security for audit events, System for operating system events.</dd>
+      <dt>EventCode</dt>
+      <dd>The single most important column. Every Windows event kind has a fixed numeric ID, and analysts memorise the common ones; see the table below.</dd>
+      <dt>ComputerName</dt>
+      <dd>Where the event occurred. Naming conventions encode machine type: WKS workstation, LAP laptop, SRV server, DC domain controller; the domain controller handles all domain logins and is the crown jewels.</dd>
+      <dt>Subject versus Target accounts</dt>
+      <dd>The beginner trap. Subject is who performed the action; Target is who it was done to. For a self-logon they match. For "an account was created", Subject is the admin, Target the new account. Unexpected mismatches deserve attention. SIDs are the accounts' permanent internal identifiers; usernames can change, SIDs cannot. Accounts prefixed adm. are separate administrator accounts, mirroring real practice.</dd>
+      <dt>LogonType</dt>
+      <dd>How a logon happened, as a code; see the table below.</dd>
+      <dt>ProcessName</dt>
+      <dd>Full path of a program for process events. Paths matter: C:\Windows\System32 is normal territory; executables running from a Public user folder with names like stage_2.exe are textbook malware staging.</dd>
+      <dt>ObjectName and ObjectType</dt>
+      <dd>Files and registry keys touched. The registry is Windows' settings database; attackers modify it to survive reboots.</dd>
+      <dt>PrivilegeList</dt>
+      <dd>Specific admin rights invoked, such as SeDebugPrivilege, abused by credential-theft tools.</dd>
+      <dt>ServiceName</dt>
+      <dd>For Kerberos events, which service a ticket was requested for; krbtgt is the ticket-granting service itself, central to attacks such as Kerberoasting, so analysts watch it.</dd>
+      <dt>Status and Message</dt>
+      <dd>Success or Failure, and the full human-readable event text. Every other column is a parsed field from Message; that parsing is much of what a SIEM does.</dd>
+    </dl>
+
+    <h3>Event codes worth memorising</h3>
+    <table class="ref-table">
+      <thead><tr><th>Event code</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>4624</td><td>Successful logon</td></tr>
+        <tr><td>4625</td><td>Failed logon</td></tr>
+        <tr><td>4688</td><td>Process created</td></tr>
+        <tr><td>4720</td><td>Account created</td></tr>
+        <tr><td>4740</td><td>Account locked out</td></tr>
+        <tr><td>4672</td><td>Special privileges assigned</td></tr>
+        <tr><td>4768, 4769, 4771</td><td>Kerberos ticket events</td></tr>
+        <tr><td>1102</td><td>Audit log cleared; almost always triggers investigation, because attackers clear logs to cover their tracks</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Logon type codes</h3>
+    <table class="ref-table">
+      <thead><tr><th>Logon type</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>2</td><td>At the keyboard</td></tr>
+        <tr><td>3</td><td>Over the network</td></tr>
+        <tr><td>5</td><td>A service</td></tr>
+        <tr><td>7</td><td>Unlocking a screen</td></tr>
+        <tr><td>10</td><td>Remote Desktop; a favourite attacker pathway, watch it</td></tr>
+        <tr><td>11</td><td>Cached credentials offline, typical of laptops</td></tr>
+      </tbody>
+    </table>
+  </article>
+
+  <!-- PART F -->
+  <article class="part container-course" id="part-f">
+    <div class="part-header">
+      <span><span class="part-num">PART F</span> &nbsp;//&nbsp; DAX</span>
+      <span>ONE LINE THAT CHANGES EVERYTHING</span>
+    </div>
+    <h2>Your first measure</h2>
+    <p>Reach for a Y-axis field and you will discover this table has no EventID. That absence is deliberate: Power BI has no built-in "number of rows" field, so the count must be created.</p>
+    <p>The quick way: drag any column with no blanks (host works) into the Y axis; text columns default to Count. But beware the trap: Count skips blanks, so Count of IpAddress silently counts only events that have an IP; a wrong total that looks right. (Used knowingly, that same behaviour is legitimate; Count of ProcessName counts only process events.)</p>
+    <p>The proper way, and your first line of DAX: <strong>Modeling ribbon &gt; New measure</strong>, then</p>
+    <pre>Total Events = COUNTROWS(NetworkEvents)</pre>
+    <p>The measure appears in the Data pane with a calculator icon; use it as the Y axis everywhere from now. It has no null trap, is reusable in every visual, and reads properly in tooltips. Real SOC dashboards are stacks of measures like this filtered different ways: failed logons, events per host, after-hours activity.</p>
+  </article>
+
+  <!-- PART G -->
+  <article class="part container-course" id="part-g">
+    <div class="part-header">
+      <span><span class="part-num">PART G</span> &nbsp;//&nbsp; CROSS-FILTERING</span>
+      <span>WHERE POWER BI STOPS BEING EXCEL</span>
+    </div>
+    <h2>The interactive page</h2>
+    <p>An honest admission: everything so far could be done in Excel. The difference arrives only when several visuals share a page, so build four on one page over the Windows data:</p>
+    <ul>
+      <li>The stacked column chart: events by day (_time drilled to Day), Category as legend, Total Events on Y</li>
+      <li>A bar chart: TargetUserName on the axis, Total Events as values</li>
+      <li>A table: EventCode and EventName (from the lookup, exercising the relationship) with Total Events</li>
+      <li>A slicer holding Status</li>
+    </ul>
+    <p>Then click things, in this order, and notice what each click asks:</p>
+    <ol class="steps">
+      <li>Click <strong>Failure</strong> in the slicer: every visual re-filters at once; the timeline shows when failures cluster, the bar chart shows which accounts they hammer, the table shows they are mostly 4625s and 4771s.</li>
+      <li>Click the <strong>4625</strong> row in the table: the bar chart now answers "who is being brute-forced?"</li>
+      <li>Click one suspicious day in the timeline: everything narrows to that day.</li>
+      <li>Ctrl-click stacks filters.</li>
+    </ol>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// the framing that lands</span>
+      <p>An Excel chart is a printed answer to one pre-decided question; a Power BI page answers questions you had not thought of yet when you built it. That is what a SIEM dashboard is for; an analyst sees a spike, clicks it, and pivots to who, what and where in seconds.</p>
+    </div>
+
+    <p>Two quieter points to bank: <strong>scale</strong> (Excel struggles beyond a million rows; Power BI models handle tens of millions, and SIEM exports get there fast) and <strong>refresh</strong> (save new data over the old file, click Refresh once, and every visual, measure and relationship rebuilds; the report is a machine built once, not a document redone monthly).</p>
+  </article>
+
+  <!-- PART H -->
+  <article class="part container-course" id="part-h">
+    <div class="part-header">
+      <span><span class="part-num">PART H</span> &nbsp;//&nbsp; LAYOUT &middot; FORMATTING</span>
+      <span>FUNCTION FIRST, THEN POLISH</span>
+    </div>
+    <h2>From clumsy to CISO-ready; layout, formatting and page behaviour</h2>
+    <p>Every first four-visual page works and looks terrible: a giant slicer eating a quarter of the canvas, visuals of random sizes, nothing aligned. That is fine; function first. This part turns it into something you would put in front of a CISO, and demystifies how pages behave along the way.</p>
+
+    <div class="stumble">
+      <span class="stumble-label">// stumbling block</span>
+      <h3>Understanding what a page actually is</h3>
+      <p>A Power BI page is not a document that grows as you add content; it is a fixed-size canvas, like a PowerPoint slide, 16:9 by default. Visuals live at fixed positions on that canvas, and when the window resizes, the whole canvas scales. This explains two things that confuse beginners: why visuals seem to shrink or grow when the window changes (check the View ribbon &gt; Page view; Fit to page scales everything, Actual size does not), and why running out of room means either making visuals smaller, changing the canvas size (click empty canvas &gt; Format page &gt; Canvas settings, where you can set a custom height for a taller scrolling page), or adding a new page with the plus tab at the bottom, exactly like adding a slide.</p>
+      <p>Multi-page reports are normal: a CISO summary page, an investigation page, a raw data page. Slicers and filters only affect their own page unless you deliberately sync them (View ribbon &gt; Sync slicers), which is worth knowing exists but not building on day one.</p>
+    </div>
+
+    <h3>Tame the giant slicer</h3>
+    <p>Select the slicer, open Format visual, and under Slicer settings change Style from Vertical list to <strong>Dropdown</strong>; it collapses to a single neat row that expands on click. (Tile style suits touch screens and short lists like Severity; the vertical list only earns its space when the list is short and constantly used.) Under Selection you can enable Show "Select all" and multi-select behaviour. Then resize it to a slim strip. The convention on operations dashboards: slicers live in a consistent strip across the top or down the left edge, never floating mid-canvas.</p>
+
+    <h3>Set the scene: theme and background</h3>
+    <p>Do the big moves before fiddling with individual visuals. On the View ribbon, open the Themes gallery and try a few; one click restyles every visual on every page, which is the point: colour decisions belong to the theme, not to twenty separate format panes. Choose Customise current theme to set your own palette and default font.</p>
+    <p>SOC dashboards are traditionally dark (screens in a dim room, red alerts that glow), so try it: click empty canvas &gt; Format page &gt; Canvas background, set a dark navy, and pull transparency to zero. If you go dark, check every visual's text is still readable; the built-in Dark theme handles most of it for you. There is no shame in staying light; NT audiences reading in bright rooms may prefer it. Pick one and be consistent.</p>
+
+    <h3>Titles, borders and breathing room</h3>
+    <p>For each visual, under Format visual &gt; General: give it a short title written as the question it answers ("Failed logons by account", not "Bar chart"). Turn off clutter that repeats what the title says; axis titles and legends earn their place or go. Under Effects, a subtle background, rounded corners on the visual border, and a faint shadow lift each visual into a card; apply identical settings to all visuals so they read as a set. This is exactly the tile look every commercial SOC product uses.</p>
+
+    <h3>Alignment: the difference between amateur and professional</h3>
+    <p>Ctrl-click to select several visuals, then use the <strong>Format</strong> ribbon (the one that appears when visuals are selected) &gt; Align, and Distribute horizontally or vertically. Nothing signals "clumsy" faster than near-aligned edges; nothing fixes it faster than these two menus. Turn on View ribbon &gt; Gridlines and Snap to grid before moving anything else.</p>
+    <p>A layout that reliably works, top to bottom: a slim KPI card row across the top (built in Part J), the timeline chart full width beneath it, the detail visuals (bar chart, table, matrix) in a row below, slicers top-right. Executives read in an F pattern; put the headline numbers where the eyes land first.</p>
+
+    <h3>Control what clicks do</h3>
+    <p>By default every visual cross-filters or cross-highlights every other. You can direct this: select a visual &gt; Format ribbon &gt; <strong>Edit interactions</strong>, and every other visual sprouts small icons letting you choose filter (the clicked selection removes everything else), highlight (dims the rest, keeping context) or none. Highlight is the default for column charts and often the better story-teller; filter is cleaner for tables. Knowing this menu exists also cures the occasional "why did that chart not change?" mystery: someone turned an interaction off.</p>
+  </article>
+
+  <!-- PART I -->
+  <article class="part container-course" id="part-i">
+    <div class="part-header">
+      <span><span class="part-num">PART I</span> &nbsp;//&nbsp; CONDITIONAL FORMATTING</span>
+      <span>EXECUTIVES SCAN FOR RED</span>
+    </div>
+    <h2>The CISO heatmap</h2>
+    <p>Executives do not read walls of numbers; they scan for red cells and ask why. This part builds that view, and teaches the design rule underneath it: colour gradients are for quantities (how many events); fixed colours are for categories (Critical is always red). Mixing them up produces confusing dashboards.</p>
+
+    <div class="stumble">
+      <span class="stumble-label">// stumbling block</span>
+      <h3>Finding the Matrix visual</h3>
+      <p>The Matrix is not on any ribbon; it is in the icon gallery of the Visualisations pane, beside the Table icon. Click empty canvas first (so an existing visual is not converted), hover the icons to read tooltips, and choose Matrix. Table is flat rows; Matrix pivots one field down the side and another across the top, with values at the intersections; it is Power BI's PivotTable.</p>
+    </div>
+
+    <p><strong>Build:</strong> host into Rows, Category into Columns, Total Events into Values.</p>
+    <p><strong>Paint:</strong> with the matrix selected, Format visual (paintbrush) &gt; Cell elements, confirm the series is Total Events, switch Background colour on, click the <strong>fx</strong> button. Format style Gradient, turn on Add a middle colour, set minimum green, middle orange, maximum red. (Alternative route: dropdown arrow on Total Events in the Values well &gt; Conditional formatting &gt; Background colour.)</p>
+    <p>The result reads instantly: most cells green, a few burning orange to red. The domain controller glows under Account Logon because all Kerberos authentication flows through it; that is expected. Any workstation glowing in unexpected columns is a question.</p>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// refinements worth discussing</span>
+      <p>Switching from Gradient to Rules sets explicit thresholds (green under an agreed number, red above), which executives often prefer because a gradient always makes something reddest, even in a quiet month. And pure green-to-red is hard on colour-blind readers, roughly 8 percent of men; mature dashboards often use white-to-red instead, keeping green for an explicit good state.</p>
+    </div>
+  </article>
+
+  <!-- PART J -->
+  <article class="part container-course" id="part-j">
+    <div class="part-header">
+      <span><span class="part-num">PART J</span> &nbsp;//&nbsp; ADVANCED VISUALS</span>
+      <span>ALL BUILT-IN; NO DOWNLOADS</span>
+    </div>
+    <h2>Visuals that make it remarkable</h2>
+    <p>With layout under control, four additions turn a competent report into a memorable one. All use only built-in visuals; no marketplace downloads needed.</p>
+
+    <h3>The KPI card row</h3>
+    <p>Real SOC dashboards lead with headline numbers. Build three more measures (Modeling ribbon &gt; New measure):</p>
+    <pre>Failed Logons = CALCULATE([Total Events], NetworkEvents[EventCode] = 4625)
+Hosts Reporting = DISTINCTCOUNT(NetworkEvents[host])
+Log Clears = CALCULATE([Total Events], NetworkEvents[EventCode] = 1102)</pre>
+    <p>CALCULATE is the workhorse of DAX: it takes a measure and applies a filter to it, and those three lines are the template for almost every security metric you will ever write. Drop each measure into a <strong>Card</strong> visual and line the cards across the top of the page.</p>
+    <p>The Log Clears card is the teaching moment: it should read zero on a healthy network, so apply conditional formatting to its text colour (the fx route, Rules style: grey at zero, red above zero) and it becomes a silent alarm that lights up only when someone has been covering their tracks. Cards respond to slicers and cross-filtering like everything else, so clicking a host in the heatmap re-computes the headline numbers for that machine alone.</p>
+
+    <h3>The Smart Narrative</h3>
+    <p>In the visual gallery, the icon that looks like a text block with a lightning bolt is <strong>Smart narrative</strong>. Click empty canvas, add it, and Power BI writes a plain-language summary of what is on the page: totals, trends, largest categories. The magic is that the text is live: cross-filter to Failures, or click one account, and the paragraph rewrites itself to describe the filtered picture. You can edit the text freely and insert your own dynamic values (the +Value button accepts natural-language questions or measures), so a practical pattern is an auto-updating shift summary in a corner of the CISO page: "There were [Total Events] events across [Hosts Reporting] hosts, including [Failed Logons] failed logons."</p>
+    <p>Set expectations: the generated prose is statistical boilerplate ("Total Events trended up"), not analysis, and it will happily narrate the unremarkable. Treat it as a draft narrator that never sleeps; the analyst still decides what matters. Its real value is proving that the page is one live model, not a collage of pictures.</p>
+
+    <h3>The decomposition tree</h3>
+    <p>If one visual earns the word remarkable for security work, it is this. Add a <strong>Decomposition tree</strong> from the gallery: put Total Events in Analyze, then load Explain by with Category, EventName (from the lookup table), host, TargetUserName and Status. Click the plus beside the total and choose a dimension to split by, then keep clicking plus on any branch to split again, in any order: Category, then which event, then which machine, then which account. This is precisely the drill-down an analyst performs during an investigation, made physical. The AI options in the plus menu (High value, Low value) let Power BI choose the most interesting branch for you. Free-explore here; you may find threads of the planted attack story without being told where to look.</p>
+
+    <h3>Anomaly detection on the timeline</h3>
+    <p>Swap a copy of the events-per-day chart to a <strong>line chart</strong>, open the Analytics pane (the magnifying-glass icon beside Format), and under Find anomalies click Add. Power BI marks the days that deviate from the expected range and, when you click an anomaly marker, offers possible explanations drawn from the other fields (feature behaviour varies a little by version). On this dataset the attack days should surface as marked anomalies, which lands a serious point: this is exactly what a SIEM's detection layer does at industrial scale; flag the abnormal, then let a human ask why.</p>
+  </article>
+
+  <!-- PART K -->
+  <article class="part container-course" id="part-k">
+    <div class="part-header">
+      <span><span class="part-num">PART K</span> &nbsp;//&nbsp; CAPSTONE</span>
+      <span>USE ONLY THE DASHBOARD YOU BUILT</span>
+    </div>
+    <h2>Hunt the intruder</h2>
+    <p>The Windows dataset contains a planted attack story. Using only the dashboard built today, hunt it. Here is the method, not the answers:</p>
+    <ol class="steps">
+      <li>Filter to Failures and find the account being hammered with 4625 failed logons; note the day and source.</li>
+      <li>Clear the filter and click that account: did a success follow the failures? The failure-run-then-success pattern is the classic brute-force breakthrough.</li>
+      <li>Check what that account did next: look for process events, and specifically for executables running from C:\Users\Public\Transfer (stage_2.exe, stage_3.exe); staging behaviour.</li>
+      <li>Sweep for the cover-up: any 1102 audit-log-cleared events?</li>
+      <li>Check account lockouts (4740) and account creations (4720) around the same window.</li>
+      <li>Use the heatmap to spot which machines ran hot, and the timeline to order the story.</li>
+    </ol>
+    <p><strong>Deliverable:</strong> write a five-sentence incident summary: what happened, which account, which machines, in what order, and what you would check next. Writing the narrative from clicks is the skill; the dashboard is just how you got there.</p>
+  </article>
+
+  <!-- FACILITATOR NOTES -->
+  <section class="facilitator container-course" id="facilitators">
+    <div class="section-eyebrow">// running this as a workshop</div>
+    <h2>Delivery notes for facilitators</h2>
+    <p>Self-paced learners can skip this section; it is for anyone delivering the course to a group.</p>
+    <p>The stumbling blocks on this page are not asides; they are the curriculum. Each one was hit in live use by a genuine beginner, and pre-empting them on slides robs learners of the recovery skill. Let them hit the four-options Navigator, the hidden Data pane and the one-giant-bar chart, then teach the fix.</p>
+    <p>The star schema explanation in Part C works best delivered verbally, in character as the senior analyst, before any diagram is shown.</p>
+    <p>The "wow" is reliably Part G, not any single visual. Do not let the morning run long; learners who reach the interactive page convert, and learners who stop at single charts leave thinking Power BI is Excel with extra steps.</p>
+    <p>Timing that worked in development: Parts A to D before lunch; E to K after. Part E's column guide can compress if the group has done Cyber Security Awareness. If the afternoon runs long, Part J is the flex section: the KPI cards and decomposition tree are the priorities, and the Smart Narrative and anomaly detection can become a five-minute demonstration rather than a build.</p>
+    <p>The formatting work in Part H lands best on the learner's own clumsy page, not a prepared one; the before-and-after on their own work is the persuasion.</p>
+    <p>Two version cautions: exact Power BI pane labels shift between monthly releases (Data versus Fields, Colours versus Data colours); sanity-check against the installed version before delivery. The anomaly detection feature's behaviour has also changed across releases; test it on the installed version, and simply drop it if absent, as nothing downstream depends on it.</p>
+    <p>If you need to regenerate similar data, ask a capable AI assistant for something like: "Create a synthetic Excel dataset of Windows Security event log data as it would appear in Splunk, with columns _time, host, EventCode, Category, SubjectUserName, TargetUserName, LogonType, IpAddress, ProcessName, Status and Message, covering common event codes such as 4624, 4625, 4688, 4720 and 1102, across about 25 machines and 4,000 rows, and hide a simulated brute-force and malware staging attack inside it."</p>
+  </section>
+
+  <div class="container-course">
+    <p class="last-updated">Last updated 30 July 2026</p>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="../">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="../powerbi-siem/">Power BI for Cyber Security</a></li>
+          <li><a href="../pandanus-reach/">Power Query</a></li>
+          <li><a href="../#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="../#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/cookie-notice" target="_blank" rel="noopener">Cookies</a> | <a href="mailto:webservices@cdu.edu.au">Feedback</a></span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
