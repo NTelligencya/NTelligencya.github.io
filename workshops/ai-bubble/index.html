@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bubble Trouble: Making Sense of the AI Economy &middot; Workshops &middot; NTell World Ink</title>
+<meta name="description" content="A one-hour workshop on the AI economy: why the bubble question has no tidy answer, circular financing, the US-China contest, information warfare, the military dimension, and what it all means for Northern Territory organisations. Presenter slides for the NT World Ink AI Special Topic Workshops.">
+
+<!-- "AFTER DARK" design: ntworldink dark theme, teal + ochre accents. Headings: Cormorant Garamond. Scaffold shared with the other workshop decks. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --stage-bg: #050506;
+    --slide-bg: #0B0B0E;
+    --card: #131318;
+    --card-2: #17171D;
+    --line: #26262F;
+    --text: #ECEAE4;
+    --text-2: #B9B6AD;
+    --text-3: #7C796F;
+    --accent: #1AC9C9;          /* teal */
+    --accent-soft: #6FE3E3;
+    --accent-wash: rgba(26,201,201,0.08);
+    --warm: #E08A3C;            /* ochre */
+    --warm-wash: rgba(224,138,60,0.10);
+    --bad: #E05B4A;
+    --bad-wash: rgba(224,91,74,0.10);
+    --good: #4CC98A;
+    --good-wash: rgba(76,201,138,0.10);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Manrope', 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== FIXED 16:9 STAGE ===== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, svg { max-width: 100%; max-height: 100%; }
+a { color: var(--accent-soft); text-decoration: none; }
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .edit-toggle, .edit-hotzone { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===== SLIDE SCAFFOLD ===== */
+.topbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 62px;
+    background: #08080A; color: var(--text-2); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 24px; padding: 0 44px;
+    font: 500 18px var(--font-mono); letter-spacing: .06em; z-index: 3;
+}
+.topbar .chip {
+    background: var(--accent); color: #04211F; border-radius: 5px;
+    padding: 4px 14px; font-weight: 500; letter-spacing: .1em;
+}
+.topbar .chip.warm { background: var(--warm); color: #2A1503; }
+.topbar .chip.bad { background: var(--bad); color: #2B0C07; }
+.topbar .crumb { opacity: .8; }
+.topbar .sect { margin-left: auto; font-size: 15px; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); }
+
+.foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+    background: #08080A; border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 44px; z-index: 3;
+}
+.foot .brand { font: 700 22px var(--font-body); color: var(--text); letter-spacing: -0.01em; }
+.foot .brand .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 18px; letter-spacing: .08em; }
+.foot .pg { font: 500 17px var(--font-mono); letter-spacing: .12em; color: var(--text-3); }
+
+.body {
+    position: absolute; inset: 62px 120px 70px 120px;
+    display: flex; flex-direction: column; justify-content: center; z-index: 2;
+}
+.kicker { font: 500 19px var(--font-mono); letter-spacing: .28em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+.kicker.warm { color: var(--warm); }
+.kicker.bad { color: var(--bad); }
+h1 { font: 500 118px/1.02 var(--font-display); letter-spacing: -0.01em; color: var(--text); }
+h2 { font: 500 76px/1.06 var(--font-display); letter-spacing: -0.008em; color: var(--text); }
+h2 .hl { background: linear-gradient(transparent 64%, var(--accent-wash) 64%); color: var(--accent-soft); }
+h2 .hlw { background: linear-gradient(transparent 64%, var(--warm-wash) 64%); color: var(--warm); }
+.lede { font: 400 30px/1.55 var(--font-body); color: var(--text-2); max-width: 1360px; }
+.lede b { font-weight: 700; color: var(--text); }
+.muted { color: var(--text-3); }
+
+/* Cards */
+.dcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    border-top: 5px solid var(--accent);
+    padding: 38px 42px;
+}
+.dcard.warm { border-top-color: var(--warm); }
+.dcard.bad { border-top-color: var(--bad); }
+.dcard.good { border-top-color: var(--good); }
+.dcard .ctag { font: 500 16px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.dcard.warm .ctag { color: var(--warm); }
+.dcard.bad .ctag { color: var(--bad); }
+.dcard.good .ctag { color: var(--good); }
+.dcard h3 { font: 600 33px/1.2 var(--font-display); color: var(--text); margin-bottom: 14px; }
+.dcard p { font: 400 24px/1.5 var(--font-body); color: var(--text-2); }
+.dcard p b { font-weight: 700; color: var(--text); }
+
+/* Step rows */
+.rows { display: flex; flex-direction: column; }
+.row {
+    display: flex; align-items: center; gap: 34px; padding: 24px 12px;
+    border-bottom: 1px solid var(--line); font: 400 28px/1.45 var(--font-body); color: var(--text-2);
+}
+.row:last-child { border-bottom: none; }
+.row .n {
+    min-width: 58px; height: 58px; border-radius: 50%; flex: 0 0 58px;
+    background: var(--accent); color: #04211F;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 23px var(--font-mono);
+}
+.row .n.warm { background: var(--warm); color: #2A1503; }
+.row .n.bad { background: var(--bad); color: #2B0C07; }
+.row .n.good { background: var(--good); color: #06291A; }
+.row b { font-weight: 700; color: var(--text); }
+.row .tag { margin-left: auto; font: 500 16px var(--font-mono); letter-spacing: .12em; color: var(--accent-soft); background: var(--accent-wash); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Verdict strips */
+.strip { border-radius: 10px; padding: 26px 36px; font: 400 26px/1.5 var(--font-body); }
+.strip b { font-weight: 700; }
+.strip.good { background: var(--good-wash); border-left: 1px solid var(--good); color: #CDEBDB; }
+.strip.bad { background: var(--bad-wash); border-left: 1px solid var(--bad); color: #F2D4CE; }
+.strip.warn { background: var(--warm-wash); border-left: 1px solid var(--warm); color: #F0DCC6; }
+.strip.teal { background: var(--accent-wash); border-left: 1px solid var(--accent); color: #CFEDEA; }
+
+/* Story (vignette) slides */
+.story-tag {
+    display: inline-block; font: 500 17px var(--font-mono); letter-spacing: .24em; text-transform: uppercase;
+    color: var(--warm); border: 1px solid var(--warm); border-radius: 999px; padding: 10px 26px; margin-bottom: 40px;
+}
+.story {
+    font: 400 46px/1.45 var(--font-display); font-style: italic; color: var(--text);
+    max-width: 1500px;
+}
+.story b { font-weight: 600; color: var(--warm); font-style: normal; }
+.story-close { font: 400 30px/1.5 var(--font-body); color: var(--text-2); margin-top: 44px; max-width: 1400px; }
+.story-close b { color: var(--text); font-weight: 700; }
+
+/* Stat tiles */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 40px 42px; border-top: 5px solid var(--warm);
+}
+.stat .big { font: 600 84px/1 var(--font-display); color: var(--warm); margin-bottom: 16px; }
+.stat .lbl { font: 400 23px/1.45 var(--font-body); color: var(--text-2); }
+.stat .lbl b { color: var(--text); font-weight: 700; }
+
+/* Message mock */
+.msgbox {
+    background: var(--card); border: 1px dashed var(--line); border-radius: 12px;
+    font: 400 24px/1.6 var(--font-mono); color: var(--text-2); padding: 30px 34px;
+}
+.msgbox .from { color: var(--warm); font-size: 18px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+
+.cite { font: 400 17px/1.6 var(--font-mono); color: var(--text-3); letter-spacing: .02em; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; }
+
+/* Reveal animation */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.r1 { transition-delay: .08s; } .r2 { transition-delay: .2s; } .r3 { transition-delay: .32s; }
+.r4 { transition-delay: .44s; } .r5 { transition-delay: .56s; } .r6 { transition-delay: .68s; }
+.r7 { transition-delay: .8s; }
+
+
+/* Site logo (matches styles.css .brand on the main site) */
+.foot .brand { display: flex; align-items: center; gap: 14px; }
+.foot .brand-mark { width: 34px; height: 34px; position: relative; flex: 0 0 34px; }
+.foot .brand-mark::before, .foot .brand-mark::after { content: ''; position: absolute; inset: 5px; border: 1.5px solid var(--accent); border-radius: 4px; }
+.foot .brand-mark::after { transform: rotate(45deg); border-color: #4DDCDC; opacity: 0.5; }
+.foot .brand-name { font-family: var(--font-display); font-weight: 500; font-size: 27px; letter-spacing: .04em; color: var(--text); }
+.foot .brand-name .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 16px; letter-spacing: .08em; }
+
+/* Illustrative bench chart (slide 2) */
+.bc-row { display: flex; align-items: center; gap: 20px; margin-bottom: 13px; }
+.bc-label { width: 250px; font: 600 23px var(--font-body); color: var(--text); text-align: right; line-height: 1.15; }
+.bc-label small { display: block; font: 500 14px var(--font-mono); color: var(--text-3); letter-spacing: .04em; }
+.bc-track { flex: 1; height: 30px; background: var(--card-2); border-radius: 5px; overflow: hidden; }
+.bc-bar { height: 100%; background: var(--accent); opacity: .82; border-radius: 0 4px 4px 0; }
+.bc-bar.warm { background: var(--warm); }
+.chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.chip-m { font: 500 17px var(--font-mono); letter-spacing: .08em; color: var(--accent-soft); background: var(--accent-wash); border: 1px solid var(--line); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Video finale */
+.video-wrap { width: 1420px; height: 798px; margin: 30px auto 0; background: #000; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; position: relative; }
+.video-wrap iframe { width: 100%; height: 100%; border: 0; }
+.yt-facade { width: 100%; height: 100%; border: 0; padding: 0; cursor: pointer; background: #000; position: relative; display: block; }
+.yt-facade img { width: 100%; height: 100%; object-fit: cover; opacity: .75; }
+.yt-facade .playbtn { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 120px; height: 84px; background: rgba(8,8,10,.82); border: 1.5px solid var(--accent); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+.yt-facade .playbtn::after { content: ''; border-style: solid; border-width: 20px 0 20px 34px; border-color: transparent transparent transparent var(--accent); }
+
+/* Edit affordance */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 90px; height: 90px; z-index: 1200; }
+.edit-toggle {
+    position: fixed; top: 74px; left: 18px; z-index: 1201; width: 44px; height: 44px;
+    border-radius: 10px; border: 1px solid var(--line); background: rgba(19,19,24,.9); color: var(--text);
+    font: 600 15px var(--font-mono); cursor: pointer; opacity: 0; transition: opacity .3s;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; }
+body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+    <!-- ===== SLIDE 1 : TITLE ===== -->
+    <section class="slide" aria-label="Title">
+        <div class="topbar"><span class="chip">WORKSHOP</span><span class="crumb">ntworldink.com</span><span class="sect">August 2026</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="kicker reveal r1">AI Special Topic Workshops &middot; A One-Hour Session</div>
+            <h1 class="reveal r2">Bubble Trouble:<br>Making Sense of the AI Economy</h1>
+            <p class="lede reveal r3" style="margin-top:36px;font-size:34px;font-style:italic;font-family:var(--font-display)">Everyone is asking whether AI is a bubble. This hour explains why that question has no tidy answer: economics, geopolitics, information warfare and military competition are all tangled together.</p>
+            <p class="lede muted reveal r4" style="margin-top:24px;font-size:23px">Figures in this deck are from 2024 to 2025 reporting; markets move fast, so treat every number as a snapshot, not a forecast.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">01 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 2 : THE QUESTION ===== -->
+    <section class="slide" aria-label="The question">
+        <div class="topbar"><span class="chip">THE QUESTION</span><span class="crumb">more than a market story</span><span class="sect">Are we in a bubble?</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The question everyone asks about the AI economy</div>
+            <h2 class="reveal r2">"Is AI a bubble?" can't be answered by <span class="hl">stock prices alone</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">The instinct</div><h3>Treat it like any market story</h3><p>Watch the share prices, compare the price-to-earnings ratios, wait for the correction. That works for ordinary manias; tulips, railway shares, crypto tokens.</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">The reality</div><h3>Four stories tangled into one</h3><p>Governments frame AI as <b>national security</b>, which keeps money flowing regardless of commercial returns. The same tools reshape the <b>information environment</b> that investors rely on. Each dimension feeds the others.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>The frame for this hour:</b> the AI bubble is what policy researchers call a wicked problem; a challenge with many stakeholders, conflicting incentives and no clean answer. The goal today isn't a verdict; it's a map.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">02 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 3 : THE NUMBERS ===== -->
+    <section class="slide" aria-label="The numbers">
+        <div class="topbar"><span class="chip">SCALE</span><span class="crumb">how big is this, really?</span><span class="sect">The numbers</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">First, grasp the scale</div>
+            <h2 class="reveal r2">A buildout with <span class="hl">no historical precedent</span></h2>
+            <div class="stats" style="margin-top:44px">
+                <div class="stat reveal r3"><div class="big">~$400B</div><div class="lbl"><b>Projected AI infrastructure spending in 2025</b> by the big technology companies; data centres, chips and power.</div></div>
+                <div class="stat reveal r4"><div class="big">~80%</div><div class="lbl"><b>Share of American stock market gains</b> accounted for by AI-related enterprises in late 2025.</div></div>
+                <div class="stat reveal r5"><div class="big">10 mths</div><div class="lbl">Tech companies are collectively funding <b>the equivalent of a new Apollo program every ten months</b>; by nominal dollars, more than any group of firms has ever spent on a single buildout.</div></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:44px"><b>And the concentration:</b> the top five companies made up around 30% of the entire S&amp;P 500, AI capital spending reached about 1.1% of US GDP in mid 2025, and the IMF warned of global economic impacts if valuations correct sharply. When something this big wobbles, everyone feels it.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">03 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 4 : THE STRANGE BOOKS ===== -->
+    <section class="slide" aria-label="The strange books">
+        <div class="topbar"><span class="chip warm">FOLLOW THE MONEY</span><span class="crumb">revenue vs losses</span><span class="sect">The strange books</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">Now look closer at the accounts</div>
+            <h2 class="reveal r2">Record spending, <span class="hlw">record losses</span></h2>
+            <div class="stats" style="margin-top:44px">
+                <div class="stat reveal r3"><div class="big">$13B</div><div class="lbl"><b>OpenAI's projected revenue for 2025;</b> extraordinary growth for a company that barely sold anything three years earlier.</div></div>
+                <div class="stat reveal r4"><div class="big">$13.5B</div><div class="lbl"><b>OpenAI's net loss in the first half of 2025 alone;</b> more than a year's projected revenue, gone in six months.</div></div>
+                <div class="stat reveal r5"><div class="big">498</div><div class="lbl"><b>AI "unicorns"</b>; start-ups valued above one billion dollars, most with little or no profit to show yet.</div></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:44px"><b>The bull case and the bear case use the same numbers:</b> believers see an Amazon-style land grab where losses now buy dominance later; sceptics see valuations priced for a future that may never arrive. Both can point at this slide.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">04 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 5 : CIRCULAR FINANCING ===== -->
+    <section class="slide" aria-label="Circular financing">
+        <div class="topbar"><span class="chip warm">FOLLOW THE MONEY</span><span class="crumb">who is actually buying?</span><span class="sect">Circular financing</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">The pattern that worries the analysts</div>
+            <h2 class="reveal r2">The money going in circles: <span class="hlw">hyperscalers buying from each other</span></h2>
+            <div class="rows" style="margin-top:38px;max-width:1660px">
+                <div class="row reveal r3"><span class="n warm">&middot;</span><span><b>Microsoft invests in OpenAI</b>, and OpenAI pays Microsoft for the cloud computing it runs on; a significant slice of "AI revenue" is the same dollars changing hands.</span></div>
+                <div class="row reveal r4"><span class="n warm">&middot;</span><span><b>Google, Amazon and Microsoft all buy NVIDIA chips</b> while building competing AI products; the chip maker's boom is everyone else's capital expense.</span></div>
+                <div class="row reveal r5"><span class="n warm">&middot;</span><span>This circular flow makes it hard to see <b>genuine external demand</b>; how much of the AI economy is customers, and how much is the industry buying from itself?</span></div>
+            </div>
+            <div class="msgbox reveal r6" style="margin-top:36px;max-width:1660px"><div class="from">Goldman Sachs Research, 2025</div>"The AI revenue buildup is currently still too concentrated, with hyperscalers cannibalising their own demand for AI. Unless we see more evidence of revenue diversification, AI revenue buildout and therefore valuation resilience may come under pressure."</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">05 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 6 : WICKED PROBLEM ===== -->
+    <section class="slide" aria-label="What a wicked problem is">
+        <div class="topbar"><span class="chip">KEY IDEA</span><span class="crumb">borrowed from policy research</span><span class="sect">Wicked problems</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The idea that organises this whole hour</div>
+            <h2 class="reveal r2">What makes a problem <span class="hl">"wicked"</span>?</h2>
+            <p class="lede reveal r3" style="margin-top:32px">A "wicked problem" in policy terms is a challenge that resists simple solutions. The AI bubble ticks every box:</p>
+            <div class="rows" style="margin-top:28px;max-width:1660px">
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>No clear problem definition;</b> is the problem overinvestment, underinvestment, or investment in the wrong things? Depends who you ask.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Many stakeholders with conflicting values;</b> a venture capitalist, a Pentagon strategist, a social media platform and a Chinese planner all want different truths.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Incomplete information;</b> the key numbers (real demand, real capability, real returns) are exactly the ones nobody can verify.</span></div>
+                <div class="row reveal r6"><span class="n">&middot;</span><span><b>Interconnected causes and effects;</b> pull one thread (say, export controls) and three other dimensions move. And the stakes for getting it wrong are high.</span></div>
+            </div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">06 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 7 : FOUR DIMENSIONS ===== -->
+    <section class="slide" aria-label="Four dimensions">
+        <div class="topbar"><span class="chip">THE MAP</span><span class="crumb">four lenses on one problem</span><span class="sect">Four dimensions</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The map for the rest of the session</div>
+            <h2 class="reveal r2">Four dimensions, <span class="hl">deeply intertwined</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch;gap:34px">
+                <div class="dcard reveal r3"><div class="ctag">Economic</div><h3>The money</h3><p>Investment flows, market valuations, circular financing, and the awkward question of when returns arrive.</p></div>
+                <div class="dcard warm reveal r3"><div class="ctag">Geopolitical</div><h3>The great powers</h3><p>US-China competition, chip export controls, supply chain choke points and strategic autonomy.</p></div>
+                <div class="dcard bad reveal r4"><div class="ctag">Information</div><h3>The stories</h3><p>Misinformation amplification, algorithmic curation, and narrative warfare about what AI can actually do.</p></div>
+                <div class="dcard good reveal r4"><div class="ctag">Military</div><h3>The arms race</h3><p>Autonomous systems, intelligence analysis, and deterrence calculations that don't care about quarterly earnings.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:40px"><b>Why four lenses:</b> each dimension creates its own incentives to inflate or deflate AI claims. Consensus on "the truth about AI" is hard because the players are being rewarded for different answers.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">07 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 8 : GEOPOLITICS ===== -->
+    <section class="slide" aria-label="The geopolitical dimension">
+        <div class="topbar"><span class="chip warm">DIMENSION</span><span class="crumb">great power competition</span><span class="sect">Geopolitical</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">The geopolitical dimension</div>
+            <h2 class="reveal r2">A supply chain with <span class="hlw">three choke points</span></h2>
+            <div class="grid3" style="margin-top:40px">
+                <div class="dcard warm reveal r3"><div class="ctag">Taiwan</div><h3>TSMC</h3><p>Manufactures roughly <b>90% of the world's most advanced chips</b>. There is no quick substitute anywhere on earth.</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">United States</div><h3>NVIDIA</h3><p>Dominates the AI accelerator market; the US uses export controls on these chips to slow China's AI development.</p></div>
+                <div class="dcard warm reveal r5"><div class="ctag">Netherlands</div><h3>ASML</h3><p>The <b>sole supplier</b> of the extreme ultraviolet lithography machines needed to make advanced chips at all.</p></div>
+            </div>
+            <div class="rows" style="margin-top:32px;max-width:1660px">
+                <div class="row reveal r6"><span class="n warm">&middot;</span><span><b>Critical minerals:</b> China processes 60 to 90% of many minerals AI hardware depends on; Australia's rare earth deposits are both an opportunity and a strategic exposure.</span></div>
+                <div class="row reveal r7"><span class="n warm">&middot;</span><span><b>The DeepSeek complication:</b> China's DeepSeek showed serious AI can be built despite export restrictions, and at far lower cost than western estimates; awkward for the controls narrative and for high-cost western business models at once.</span></div>
+            </div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">08 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 9 : INFORMATION ===== -->
+    <section class="slide" aria-label="The information dimension">
+        <div class="topbar"><span class="chip bad">DIMENSION</span><span class="crumb">who do you believe?</span><span class="sect">Information</span></div>
+        <div class="body">
+            <div class="kicker bad reveal r1">The information ecosystem dimension</div>
+            <h2 class="reveal r2">The same technology is <span class="hlw">rewiring what we believe</span></h2>
+            <p class="lede reveal r3" style="margin-top:22px">Researchers describe three interconnected actors in misinformation spread; AI turbocharges all of them, plus the tools meant to catch it:</p>
+            <div class="grid2" style="margin-top:22px;align-items:stretch;gap:26px">
+                <div class="dcard bad reveal r4"><div class="ctag">Publishers</div><h3>Making it is now cheap</h3><p>AI slashes the cost of producing false content: fake articles, deepfake video, synthetic audio.</p></div>
+                <div class="dcard bad reveal r4"><div class="ctag">People</div><h3>Telling is now hard</h3><p>Individuals increasingly cannot distinguish AI-generated content from authentic material, especially under stress or cognitive load.</p></div>
+                <div class="dcard bad reveal r5"><div class="ctag">Platforms</div><h3>Spreading is the business</h3><p>Engagement-optimised algorithms promote sensational and divisive content; misinformation included.</p></div>
+                <div class="dcard bad reveal r5"><div class="ctag">Detection</div><h3>The referee hallucinates</h3><p>AI-based detection delivers mixed results, and AI's own hallucinations mean it can't be trusted to fact-check itself.</p></div>
+            </div>
+            <div class="strip bad reveal r6" style="margin-top:32px"><b>The slow damage:</b> as synthetic content spreads, people lose the ability to trust any source; and that uncertainty corrodes not just politics but economic decisions, science and social cohesion. Including, circularly, decisions about AI investment itself.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">09 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 10 : MILITARY ===== -->
+    <section class="slide" aria-label="The military dimension">
+        <div class="topbar"><span class="chip good">DIMENSION</span><span class="crumb">spending that ignores ROI</span><span class="sect">Military</span></div>
+        <div class="body">
+            <div class="kicker reveal r1" style="color:var(--good)">The military dimension</div>
+            <h2 class="reveal r2">An arms race that <span class="hl">doesn't read earnings reports</span></h2>
+            <div class="rows" style="margin-top:38px;max-width:1660px">
+                <div class="row reveal r3"><span class="n good">&middot;</span><span><b>Both the US and China</b> are deploying AI across air, land, sea and space operations; drones, underwater vehicles, ground robots, and intelligence systems that digest vast imagery and intercepted communications.</span></div>
+                <div class="row reveal r4"><span class="n good">&middot;</span><span><b>RAND Corporation researchers</b> identify five hard national security problems that artificial general intelligence could create, including new risks of US-China conflict.</span></div>
+                <div class="row reveal r5"><span class="n good">&middot;</span><span><b>The guardrails are voluntary:</b> Pentagon AI guidelines (2021, updated 2023) and a US-led declaration on military AI joined by over 50 countries; but neither the US nor China has accepted binding limits.</span></div>
+            </div>
+            <div class="msgbox reveal r6" style="margin-top:34px;max-width:1660px"><div class="from">Beyond the Horizon ISSG</div>"The rapid pace of AI development, particularly in autonomous weapons, cyber warfare, and intelligence analysis, has triggered an arms race reminiscent of the Cold War nuclear buildup."</div>
+            <div class="strip good reveal r7" style="margin-top:28px"><b>The bubble connection:</b> if AI is framed as national survival, spending continues whatever the commercial returns; which props up the economics, which reinforces the framing.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">10 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 11 : COMPETING INCENTIVES ===== -->
+    <section class="slide" aria-label="Competing incentives">
+        <div class="topbar"><span class="chip warm">KEY SKILL</span><span class="crumb">who benefits from this narrative?</span><span class="sect">Incentives</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">The one question to carry out of this room</div>
+            <h2 class="reveal r2">Every AI claim has <span class="hlw">a beneficiary</span></h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard warm reveal r3"><div class="ctag">Incentives to inflate</div><h3>"AI changes everything, invest now"</h3><p><b>AI companies</b> attracting investment and justifying valuations &middot; <b>defence contractors</b> securing funding &middot; <b>governments</b> justifying security spending and deterring adversaries &middot; <b>content creators</b> farming engagement from hype.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Incentives to deflate</div><h3>"It's all hype, stay away"</h3><p><b>Short sellers</b> profiting from falling valuations &middot; <b>competitors</b> undermining rivals' perceived lead &middot; <b>safety researchers</b> wanting development slowed &middot; <b>threatened industries</b> defending existing business models.</p></div>
+            </div>
+            <div class="strip warn reveal r5" style="margin-top:44px"><b>The habit:</b> almost every piece of AI news is shaped by someone's agenda. That doesn't make all claims equally suspect; it means the first question is always <b>"who benefits from this narrative?"</b></div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">11 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 12 : FEEDBACK LOOPS ===== -->
+    <section class="slide" aria-label="How the dimensions interconnect">
+        <div class="topbar"><span class="chip">THE KNOT</span><span class="crumb">why it resists prediction</span><span class="sect">Feedback loops</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Why this is one problem, not four</div>
+            <h2 class="reveal r2">Each dimension <span class="hl">amplifies the others</span></h2>
+            <div class="rows" style="margin-top:38px;max-width:1660px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>Economic &rarr; geopolitical:</b> stock valuations justify government AI spending; corporate lobbying shapes export controls and industrial policy.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Geopolitical &rarr; military:</b> US-China competition accelerates military AI; export controls decide who gets advanced capability.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Military &rarr; information:</b> military AI enables sophisticated influence operations; defence funding shapes which research (and which narratives) get amplified.</span></div>
+                <div class="row reveal r6"><span class="n">&middot;</span><span><b>Information &rarr; economic:</b> hype narratives drive investment decisions; misinformation about capability inflates valuations. And around it goes.</span></div>
+            </div>
+            <div class="strip teal reveal r7" style="margin-top:38px"><b>The loop in one sentence:</b> inflated valuations justify security spending, which reinforces the "AI is everything" narrative, which attracts more investment. Breaking in anywhere requires understanding all four dimensions at once; that's what makes it wicked.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">12 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 13 : EVEN THE INSIDERS ===== -->
+    <section class="slide" aria-label="Even the insiders say bubble">
+        <div class="topbar"><span class="chip warm">STRANGE BUT TRUE</span><span class="crumb">listen to the boosters</span><span class="sect">Insider verdicts</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">The strangest evidence of all</div>
+            <h2 class="reveal r2">The people <span class="hlw">selling the boom</span> keep saying "bubble"</h2>
+            <div class="grid2" style="margin-top:40px;gap:30px;align-items:stretch">
+                <div class="msgbox reveal r3"><div class="from">Sam Altman &middot; OpenAI</div>"Are we in a phase where investors as a whole are overexcited about AI? My opinion is yes."</div>
+                <div class="msgbox reveal r4"><div class="from">Sundar Pichai &middot; Google</div>"There are elements of irrationality in the AI market right now."</div>
+                <div class="msgbox reveal r5"><div class="from">Jamie Dimon &middot; JP Morgan</div>"AI is real... but some money invested now will be wasted."</div>
+                <div class="msgbox reveal r6"><div class="from">Australian Financial Review &middot; September 2025</div>"If we really are in another share-market bubble, it's surely the most anticipated example in history."</div>
+            </div>
+            <div class="strip warn reveal r7" style="margin-top:36px"><b>Read it through the incentives lens:</b> when the CEOs with the most to gain from hype are managing expectations downward, they may be hedging reputations ahead of a correction; or sincerely warning. Either way, "even the insiders say bubble" is itself a narrative worth interrogating. Ray Dalio of Bridgewater has raised similar warnings about AI investment moving too fast.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">13 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 14 : DOT-COM PARALLEL ===== -->
+    <section class="slide" aria-label="The dot-com parallel">
+        <div class="topbar"><span class="chip">HISTORY</span><span class="crumb">1999 called</span><span class="sect">The dot-com rhyme</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The parallel everyone reaches for</div>
+            <h2 class="reveal r2">The dot-com bubble: <span class="hl">the technology was real anyway</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">Then</div><h3>1999 to 2000</h3><p>Revolutionary technology, massive investment, circular financing between firms; then a <b>78% collapse in the NASDAQ</b>. The internet still changed the world; most of the 1999 companies didn't live to see it.</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">The infrastructure echo</div><h3>Fibre then, data centres now</h3><p>As author Bethany McLean notes, the 1990s fibre-optic overbuild left infrastructure that sat <b>unneeded for decades</b>. Today's question: will the current data centre boom rhyme with that; useful eventually, ruinous for whoever paid?</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>The takeaway from history:</b> "bubble" and "real revolution" are not opposites. The dot-com crash and the internet's triumph both happened. AI could follow the same script; a financial reckoning and a genuine transformation, in either order.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">14 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 15 : NT IMPLICATIONS ===== -->
+    <section class="slide" aria-label="What it means for the NT">
+        <div class="topbar"><span class="chip">CLOSER TO HOME</span><span class="crumb">from Wall Street to the Territory</span><span class="sect">NT implications</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Why any of this matters north of the Berrimah Line</div>
+            <h2 class="reveal r2" style="font-size:64px">Bubble dynamics <span class="hl">reach the Territory</span> in five ways</h2>
+            <div class="rows" style="margin-top:34px;max-width:1680px;font-size:25px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>Buying AI:</b> vendor claims are shaped by bubble incentives. The Australian Government's 2024 Copilot trial found real productivity gains, but more modest than the marketing suggested; evaluate before you procure.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Workforce:</b> the same Copilot evaluation flagged that AI efficiencies could fall hardest on administrative roles; women hold about 75% of the potentially affected roles in the APS.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Information integrity:</b> remote NT communities with limited connectivity can be especially exposed to misinformation; media literacy is bubble insurance.</span></div>
+                <div class="row reveal r6"><span class="n">&middot;</span><span><b>Indigenous data sovereignty:</b> the Copilot trial also noted outputs biased toward western norms; AI adoption must respect Indigenous Cultural and Intellectual Property frameworks.</span></div>
+                <div class="row reveal r7"><span class="n">&middot;</span><span><b>Strategic resources:</b> the NT's critical minerals connect directly to the AI supply chain contest; Australia's rare earth agreements with the US create opportunity and geopolitical exposure at once.</span></div>
+            </div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">15 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 16 : TAKEAWAYS ===== -->
+    <section class="slide" aria-label="Takeaways">
+        <div class="topbar"><span class="chip">TAKEAWAY</span><span class="crumb">the map, folded up</span><span class="sect">Takeaways</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The takeaway: five things to remember</div>
+            <h2 class="reveal r2">Reading the AI economy <span class="hl">without panic</span></h2>
+            <div class="rows" style="margin-top:38px;max-width:1660px;font-size:26px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>It's not just a market story;</b> economics, geopolitics, information and military competition are one tangled system.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Ask who benefits;</b> every claim about AI capability, up or down, has someone rewarded for your believing it.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Watch the circular money;</b> revenue between hyperscalers is not the same as demand from customers.</span></div>
+                <div class="row reveal r6"><span class="n">&middot;</span><span><b>Bubble and revolution can both be true;</b> the dot-com crash didn't stop the internet, and an AI correction wouldn't stop AI.</span></div>
+                <div class="row reveal r7"><span class="n">&middot;</span><span><b>Act locally;</b> for NT organisations this means sceptical procurement, watching workforce impacts, and building media literacy before you need it.</span></div>
+            </div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">16 / 17</span></div>
+    </section>
+
+    <!-- ===== SLIDE 17 : SOURCES ===== -->
+    <section class="slide" aria-label="Sources">
+        <div class="topbar"><span class="chip">SOURCES</span><span class="crumb">where this comes from</span><span class="sect">References</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Sources used</div>
+            <h2 class="reveal r2" style="font-size:62px">Where this deck's claims come from</h2>
+            <div class="rows reveal r3" style="margin-top:34px;max-width:1680px">
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Goldman Sachs Research</b> (2025): the circular-financing warning quoted on the money slides, and the analysis of AI spending approaching productivity limits</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Market and company figures</b> (2025 reporting): ~$400B projected AI infrastructure spend, ~80% of US market gains, ~30% top-five S&amp;P concentration, ~1.1% of US GDP (Q2 2025), OpenAI's $13B projected revenue and $13.5B H1 loss, 498 AI unicorns, and the IMF valuation warning</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>RAND Corporation</b>: the five hard national security problems AGI could create &middot; <b>Beyond the Horizon ISSG</b>: the arms-race assessment quoted on the military slide</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Australian Government Microsoft 365 Copilot trial evaluation</b> (2024): the productivity, workforce (75% of affected APS roles held by women) and cultural-bias findings on the NT slide</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Australian Financial Review</b> (September 2025): "the most anticipated example in history" &middot; executive remarks by Sam Altman, Sundar Pichai, Jamie Dimon and Ray Dalio as reported in 2025 coverage</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Bethany McLean</b> on the 1990s fibre-optic overbuild, and standard accounts of the 1999 to 2000 dot-com collapse (NASDAQ down 78%)</span></div>
+            </div>
+            <p class="lede muted reveal r4" style="margin-top:30px;font-size:22px">Prepared August 2026 for the NT World Ink AI Special Topic Workshops, from the NT World Ink research file on the AI bubble. Market figures age quickly; treat them as a late-2025 snapshot.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">17 / 17</span></div>
+    </section>
+
+</main>
+</div>
+
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">ED</button>
+
+<script>
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.wheelLock = false;
+        this.setupStageScale(); this.setupKeyboardNav(); this.setupWheelNav(); this.setupTouchNav();
+        this.showSlide(0);
+    }
+    setupStageScale() {
+        const scale = () => {
+            const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * f) / 2, y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale(); window.addEventListener('resize', scale);
+    }
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (document.body.classList.contains('editing') || e.target.isContentEditable) return;
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.showSlide(0); break;
+                case 'End': e.preventDefault(); this.showSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+    setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (this.wheelLock || Math.abs(e.deltaY) < 12) return;
+            this.wheelLock = true;
+            e.deltaY > 0 ? this.next() : this.prev();
+            setTimeout(() => { this.wheelLock = false; }, 650);
+        }, { passive: true });
+    }
+    setupTouchNav() {
+        let sx = 0, sy = 0;
+        window.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchend', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? this.next() : this.prev();
+        }, { passive: true });
+    }
+    next() { this.showSlide(this.currentSlide + 1); }
+    prev() { this.showSlide(this.currentSlide - 1); }
+    showSlide(i) {
+        this.currentSlide = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.slides.forEach((s, k) => {
+            s.classList.toggle('active', k === this.currentSlide);
+            s.classList.toggle('visible', k === this.currentSlide);
+        });
+    }
+}
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storeKey = 'ai-bubble-deck-edits-v1';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.hotzone = document.getElementById('editHotzone');
+        this.restore(); this.wire();
+    }
+    wire() {
+        let t = null;
+        const show = () => { clearTimeout(t); this.toggleBtn.classList.add('show'); };
+        const hide = () => { t = setTimeout(() => { if (!this.isActive) this.toggleBtn.classList.remove('show'); }, 400); };
+        this.hotzone.addEventListener('mouseenter', show); this.hotzone.addEventListener('mouseleave', hide);
+        this.toggleBtn.addEventListener('mouseenter', show); this.toggleBtn.addEventListener('mouseleave', hide);
+        this.hotzone.addEventListener('click', () => this.toggle()); this.toggleBtn.addEventListener('click', () => this.toggle());
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable && !e.metaKey && !e.ctrlKey) this.toggle();
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.download(); }
+        });
+        document.getElementById('deckStage').addEventListener('input', () => this.save());
+    }
+    toggle() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('show', true);
+        document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide .row span:not(.n), .slide .crumb, .slide .strip, .slide .kicker, .slide .story, .slide .story-close, .slide .stat .big, .slide .stat .lbl, .slide .msgbox')
+            .forEach(el => { this.isActive ? el.setAttribute('contenteditable', 'true') : el.removeAttribute('contenteditable'); });
+    }
+    save() {
+        const d = [...document.querySelectorAll('.slide')].map(s => s.innerHTML);
+        try { localStorage.setItem(this.storeKey, JSON.stringify(d)); } catch (e) {}
+    }
+    restore() {
+        try {
+            const d = JSON.parse(localStorage.getItem(this.storeKey) || 'null');
+            if (!d) return;
+            const s = document.querySelectorAll('.slide');
+            if (d.length === s.length) s.forEach((sl, i) => { sl.innerHTML = d[i]; });
+        } catch (e) {}
+    }
+    download() {
+        const c = document.documentElement.cloneNode(true);
+        c.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        c.querySelectorAll('body').forEach(b => b.classList.remove('editing'));
+        const blob = new Blob(['<!DOCTYPE html>\n' + c.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'ai-bubble.html'; a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+function ytPlay(btn, id) {
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    btn.parentNode.replaceChild(f, btn);
+}
+new SlidePresentation(); new InlineEditor();
+</script>
+</body>
+</html>

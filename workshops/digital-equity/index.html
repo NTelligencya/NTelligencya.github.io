@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Price of Thinking: AI Subscriptions and the New Digital Divide &middot; Workshops &middot; NTell World Ink</title>
+<meta name="description" content="A one-hour workshop on digital equity and AI subscription costs: the third digital divide, what enterprise AI really costs, learning-optimised AI modes, the SOLAx WhatsApp academy, and equity strategies for the Northern Territory. Presenter slides for the NT World Ink AI Special Topic Workshops.">
+
+<!-- "AFTER DARK" design: ntworldink dark theme, teal + ochre accents. Headings: Cormorant Garamond. Scaffold shared with the other workshop decks. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --stage-bg: #050506;
+    --slide-bg: #0B0B0E;
+    --card: #131318;
+    --card-2: #17171D;
+    --line: #26262F;
+    --text: #ECEAE4;
+    --text-2: #B9B6AD;
+    --text-3: #7C796F;
+    --accent: #1AC9C9;          /* teal */
+    --accent-soft: #6FE3E3;
+    --accent-wash: rgba(26,201,201,0.08);
+    --warm: #E08A3C;            /* ochre */
+    --warm-wash: rgba(224,138,60,0.10);
+    --bad: #E05B4A;
+    --bad-wash: rgba(224,91,74,0.10);
+    --good: #4CC98A;
+    --good-wash: rgba(76,201,138,0.10);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Manrope', 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== FIXED 16:9 STAGE ===== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, svg { max-width: 100%; max-height: 100%; }
+a { color: var(--accent-soft); text-decoration: none; }
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .edit-toggle, .edit-hotzone { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===== SLIDE SCAFFOLD ===== */
+.topbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 62px;
+    background: #08080A; color: var(--text-2); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 24px; padding: 0 44px;
+    font: 500 18px var(--font-mono); letter-spacing: .06em; z-index: 3;
+}
+.topbar .chip {
+    background: var(--accent); color: #04211F; border-radius: 5px;
+    padding: 4px 14px; font-weight: 500; letter-spacing: .1em;
+}
+.topbar .chip.warm { background: var(--warm); color: #2A1503; }
+.topbar .chip.bad { background: var(--bad); color: #2B0C07; }
+.topbar .crumb { opacity: .8; }
+.topbar .sect { margin-left: auto; font-size: 15px; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); }
+
+.foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+    background: #08080A; border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 44px; z-index: 3;
+}
+.foot .brand { font: 700 22px var(--font-body); color: var(--text); letter-spacing: -0.01em; }
+.foot .brand .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 18px; letter-spacing: .08em; }
+.foot .pg { font: 500 17px var(--font-mono); letter-spacing: .12em; color: var(--text-3); }
+
+.body {
+    position: absolute; inset: 62px 120px 70px 120px;
+    display: flex; flex-direction: column; justify-content: center; z-index: 2;
+}
+.kicker { font: 500 19px var(--font-mono); letter-spacing: .28em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+.kicker.warm { color: var(--warm); }
+.kicker.bad { color: var(--bad); }
+h1 { font: 500 118px/1.02 var(--font-display); letter-spacing: -0.01em; color: var(--text); }
+h2 { font: 500 76px/1.06 var(--font-display); letter-spacing: -0.008em; color: var(--text); }
+h2 .hl { background: linear-gradient(transparent 64%, var(--accent-wash) 64%); color: var(--accent-soft); }
+h2 .hlw { background: linear-gradient(transparent 64%, var(--warm-wash) 64%); color: var(--warm); }
+.lede { font: 400 30px/1.55 var(--font-body); color: var(--text-2); max-width: 1360px; }
+.lede b { font-weight: 700; color: var(--text); }
+.muted { color: var(--text-3); }
+
+/* Cards */
+.dcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    border-top: 5px solid var(--accent);
+    padding: 38px 42px;
+}
+.dcard.warm { border-top-color: var(--warm); }
+.dcard.bad { border-top-color: var(--bad); }
+.dcard.good { border-top-color: var(--good); }
+.dcard .ctag { font: 500 16px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.dcard.warm .ctag { color: var(--warm); }
+.dcard.bad .ctag { color: var(--bad); }
+.dcard.good .ctag { color: var(--good); }
+.dcard h3 { font: 600 33px/1.2 var(--font-display); color: var(--text); margin-bottom: 14px; }
+.dcard p { font: 400 24px/1.5 var(--font-body); color: var(--text-2); }
+.dcard p b { font-weight: 700; color: var(--text); }
+
+/* Step rows */
+.rows { display: flex; flex-direction: column; }
+.row {
+    display: flex; align-items: center; gap: 34px; padding: 24px 12px;
+    border-bottom: 1px solid var(--line); font: 400 28px/1.45 var(--font-body); color: var(--text-2);
+}
+.row:last-child { border-bottom: none; }
+.row .n {
+    min-width: 58px; height: 58px; border-radius: 50%; flex: 0 0 58px;
+    background: var(--accent); color: #04211F;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 23px var(--font-mono);
+}
+.row .n.warm { background: var(--warm); color: #2A1503; }
+.row .n.bad { background: var(--bad); color: #2B0C07; }
+.row .n.good { background: var(--good); color: #06291A; }
+.row b { font-weight: 700; color: var(--text); }
+.row .tag { margin-left: auto; font: 500 16px var(--font-mono); letter-spacing: .12em; color: var(--accent-soft); background: var(--accent-wash); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Verdict strips */
+.strip { border-radius: 10px; padding: 26px 36px; font: 400 26px/1.5 var(--font-body); }
+.strip b { font-weight: 700; }
+.strip.good { background: var(--good-wash); border-left: 1px solid var(--good); color: #CDEBDB; }
+.strip.bad { background: var(--bad-wash); border-left: 1px solid var(--bad); color: #F2D4CE; }
+.strip.warn { background: var(--warm-wash); border-left: 1px solid var(--warm); color: #F0DCC6; }
+.strip.teal { background: var(--accent-wash); border-left: 1px solid var(--accent); color: #CFEDEA; }
+
+/* Story (vignette) slides */
+.story-tag {
+    display: inline-block; font: 500 17px var(--font-mono); letter-spacing: .24em; text-transform: uppercase;
+    color: var(--warm); border: 1px solid var(--warm); border-radius: 999px; padding: 10px 26px; margin-bottom: 40px;
+}
+.story {
+    font: 400 46px/1.45 var(--font-display); font-style: italic; color: var(--text);
+    max-width: 1500px;
+}
+.story b { font-weight: 600; color: var(--warm); font-style: normal; }
+.story-close { font: 400 30px/1.5 var(--font-body); color: var(--text-2); margin-top: 44px; max-width: 1400px; }
+.story-close b { color: var(--text); font-weight: 700; }
+
+/* Stat tiles */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 40px 42px; border-top: 5px solid var(--warm);
+}
+.stat .big { font: 600 84px/1 var(--font-display); color: var(--warm); margin-bottom: 16px; }
+.stat .lbl { font: 400 23px/1.45 var(--font-body); color: var(--text-2); }
+.stat .lbl b { color: var(--text); font-weight: 700; }
+
+/* Message mock */
+.msgbox {
+    background: var(--card); border: 1px dashed var(--line); border-radius: 12px;
+    font: 400 24px/1.6 var(--font-mono); color: var(--text-2); padding: 30px 34px;
+}
+.msgbox .from { color: var(--warm); font-size: 18px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+
+.cite { font: 400 17px/1.6 var(--font-mono); color: var(--text-3); letter-spacing: .02em; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; }
+
+/* Reveal animation */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.r1 { transition-delay: .08s; } .r2 { transition-delay: .2s; } .r3 { transition-delay: .32s; }
+.r4 { transition-delay: .44s; } .r5 { transition-delay: .56s; } .r6 { transition-delay: .68s; }
+.r7 { transition-delay: .8s; }
+
+
+/* Site logo (matches styles.css .brand on the main site) */
+.foot .brand { display: flex; align-items: center; gap: 14px; }
+.foot .brand-mark { width: 34px; height: 34px; position: relative; flex: 0 0 34px; }
+.foot .brand-mark::before, .foot .brand-mark::after { content: ''; position: absolute; inset: 5px; border: 1.5px solid var(--accent); border-radius: 4px; }
+.foot .brand-mark::after { transform: rotate(45deg); border-color: #4DDCDC; opacity: 0.5; }
+.foot .brand-name { font-family: var(--font-display); font-weight: 500; font-size: 27px; letter-spacing: .04em; color: var(--text); }
+.foot .brand-name .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 16px; letter-spacing: .08em; }
+
+/* Illustrative bench chart (slide 2) */
+.bc-row { display: flex; align-items: center; gap: 20px; margin-bottom: 13px; }
+.bc-label { width: 250px; font: 600 23px var(--font-body); color: var(--text); text-align: right; line-height: 1.15; }
+.bc-label small { display: block; font: 500 14px var(--font-mono); color: var(--text-3); letter-spacing: .04em; }
+.bc-track { flex: 1; height: 30px; background: var(--card-2); border-radius: 5px; overflow: hidden; }
+.bc-bar { height: 100%; background: var(--accent); opacity: .82; border-radius: 0 4px 4px 0; }
+.bc-bar.warm { background: var(--warm); }
+.chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.chip-m { font: 500 17px var(--font-mono); letter-spacing: .08em; color: var(--accent-soft); background: var(--accent-wash); border: 1px solid var(--line); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Video finale */
+.video-wrap { width: 1420px; height: 798px; margin: 30px auto 0; background: #000; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; position: relative; }
+.video-wrap iframe { width: 100%; height: 100%; border: 0; }
+.yt-facade { width: 100%; height: 100%; border: 0; padding: 0; cursor: pointer; background: #000; position: relative; display: block; }
+.yt-facade img { width: 100%; height: 100%; object-fit: cover; opacity: .75; }
+.yt-facade .playbtn { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 120px; height: 84px; background: rgba(8,8,10,.82); border: 1.5px solid var(--accent); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+.yt-facade .playbtn::after { content: ''; border-style: solid; border-width: 20px 0 20px 34px; border-color: transparent transparent transparent var(--accent); }
+
+/* Edit affordance */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 90px; height: 90px; z-index: 1200; }
+.edit-toggle {
+    position: fixed; top: 74px; left: 18px; z-index: 1201; width: 44px; height: 44px;
+    border-radius: 10px; border: 1px solid var(--line); background: rgba(19,19,24,.9); color: var(--text);
+    font: 600 15px var(--font-mono); cursor: pointer; opacity: 0; transition: opacity .3s;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; }
+body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+    <!-- ===== SLIDE 1 : TITLE ===== -->
+    <section class="slide" aria-label="Title">
+        <div class="topbar"><span class="chip">WORKSHOP</span><span class="crumb">ntworldink.com</span><span class="sect">August 2026</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="kicker reveal r1">AI Special Topic Workshops &middot; A One-Hour Session</div>
+            <h1 class="reveal r2">The Price of Thinking:<br>AI Subscriptions and the New Digital Divide</h1>
+            <p class="lede reveal r3" style="margin-top:36px;font-size:34px;font-style:italic;font-family:var(--font-display)">The best AI tools now sit behind subscriptions that cost more than a phone plan. This hour is about who gets access, who gets left out, and what that does to education and opportunity.</p>
+            <p class="lede muted reveal r4" style="margin-top:24px;font-size:23px">Prices and access programs in this deck were current when researched in 2025; both change often, so check the linked pricing pages for today's numbers.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">01 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 2 : THREE DIVIDES ===== -->
+    <section class="slide" aria-label="The third digital divide">
+        <div class="topbar"><span class="chip">KEY IDEA</span><span class="crumb">a divide with three layers</span><span class="sect">The third divide</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The idea that frames this hour</div>
+            <h2 class="reveal r2">Researchers warn of a <span class="hl">third digital divide</span></h2>
+            <div class="grid3" style="margin-top:44px">
+                <div class="dcard reveal r3"><div class="ctag">First divide</div><h3>Devices and connection</h3><p>The gap everyone knows: who has a computer and internet access at all. Still unresolved in much of the NT.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Second divide</div><h3>Skills to use them</h3><p>Access alone isn't enough; digital literacy decides who can actually turn connection into capability.</p></div>
+                <div class="dcard warm reveal r5"><div class="ctag">Third divide</div><h3>Advanced AI + instruction</h3><p>The new gap: those with <b>premium AI tools and quality instruction</b> in using them, versus those with technology access only; or none at all.</p></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:44px"><b>Why it compounds:</b> students at wealthy institutions don't just get better AI tools; they get guidance on ethical use, curriculum integration and critical AI literacy. Everyone else navigates alone, or is excluded entirely.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">02 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 3 : THE ACCESS GAP ===== -->
+    <section class="slide" aria-label="The access gap">
+        <div class="topbar"><span class="chip warm">THE GAP</span><span class="crumb">who has access today</span><span class="sect">The access gap</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">The gap, measured</div>
+            <h2 class="reveal r2">Most institutions offer <span class="hlw">no official AI access at all</span></h2>
+            <div class="stats" style="margin-top:44px">
+                <div class="stat reveal r3"><div class="big">27%</div><div class="lbl"><b>US colleges with campus-wide AI licences</b> for students; the rest leave students to fend for themselves.</div></div>
+                <div class="stat reveal r4"><div class="big">&gt;50%</div><div class="lbl"><b>Institutions offering no official AI access at all;</b> a situation playing out similarly in Australia.</div></div>
+                <div class="stat reveal r5"><div class="big">#1</div><div class="lbl"><b>Cost is the top barrier</b> cited by campus technology leaders for not providing generative AI tools (Inside Higher Ed, 2025); many less-funded schools describe themselves as "paralysed" by it.</div></div>
+            </div>
+            <div class="strip teal reveal r6" style="margin-top:44px"><b>The contrast:</b> an Ivy League student may get unlimited flagship-model access through a university account while a community college student relies on limited free tiers. Same assessment standards; very different toolkits.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">03 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 4 : WHAT IT COSTS ===== -->
+    <section class="slide" aria-label="What enterprise AI costs">
+        <div class="topbar"><span class="chip warm">THE MONEY</span><span class="crumb">why institutions balk</span><span class="sect">What it costs</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">The numbers behind the paralysis</div>
+            <h2 class="reveal r2">Enterprise AI: <span class="hlw">a quarter of a million dollars</span> and up</h2>
+            <div class="stats" style="margin-top:44px">
+                <div class="stat reveal r3"><div class="big">~$60</div><div class="lbl"><b>ChatGPT Enterprise,</b> per user per month; before training, support or integration costs.</div></div>
+                <div class="stat reveal r4"><div class="big">$42.50+</div><div class="lbl"><b>Microsoft Copilot:</b> $42.50 to $87 per user per month once the required Microsoft 365 licences are counted.</div></div>
+                <div class="stat reveal r5"><div class="big">$255K+</div><div class="lbl"><b>Annual cost for a 500-user organisation:</b> roughly $255,000 to $522,000 depending on the stack chosen.</div></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:44px"><b>The partial good news:</b> Google bundles many AI features free into Workspace for Education, and Microsoft folds AI into existing education licences where it can. For schools already inside those ecosystems, the door is ajar; for everyone else, the price list stands.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">04 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 5 : POOLING ===== -->
+    <section class="slide" aria-label="Pooling and negotiating">
+        <div class="topbar"><span class="chip">WORKAROUNDS</span><span class="crumb">how the underfunded cope</span><span class="sect">Pooling power</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">What resourceful institutions are doing about it</div>
+            <h2 class="reveal r2">Buying together beats <span class="hl">buying alone</span></h2>
+            <div class="rows" style="margin-top:40px;max-width:1660px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>Consortium buying:</b> programs like Internet2's NET+ help institutions pool resources for enterprise AI licences instead of negotiating solo.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>System-wide deals:</b> state university systems negotiate agreements across every campus at once, using scale to move the price.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Means-tested access:</b> some experts propose full premium AI free for students on financial aid; the same logic as existing software discount programs that once spread Microsoft Office and Adobe through education.</span></div>
+            </div>
+            <div class="strip teal reveal r6" style="margin-top:40px"><b>The precedent:</b> premium software becoming a standard, subsidised academic resource has happened before. The open question this hour keeps returning to: should AI access be treated like a library database; just part of what an institution provides?</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">05 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 6 : THE COVID LESSON ===== -->
+    <section class="slide" aria-label="The COVID lesson">
+        <div class="topbar"><span class="chip">EVIDENCE</span><span class="crumb">technology alone never fixed it</span><span class="sect">The human factor</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The evidence from the last big experiment</div>
+            <h2 class="reveal r2">COVID's lesson: <span class="hl">access without humans isn't enough</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">What happened</div><h3>Devices didn't close the gap</h3><p>During the pandemic, even where devices and internet were universal, achievement gaps persisted. The hardware arrived; the outcomes didn't follow.</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">What mattered</div><h3>Human support did</h3><p>Research from <b>Ghana, Indonesia, Poland, Saudi Arabia and the United States</b> found parental and tutor involvement remained crucial for learning outcomes, regardless of the technology available.</p></div>
+            </div>
+            <div class="strip warn reveal r5" style="margin-top:44px"><b>Applied to AI:</b> handing out subscriptions is the easy half. The third digital divide is about tools <b>plus instruction</b>; equity programs that fund licences but not teaching support are repeating the pandemic's mistake.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">06 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 7 : LEARNING MODES ===== -->
+    <section class="slide" aria-label="Learning-optimised AI">
+        <div class="topbar"><span class="chip good">THE GOOD NEWS</span><span class="crumb">AI built to teach, not just answer</span><span class="sect">Learning modes</span></div>
+        <div class="body">
+            <div class="kicker reveal r1" style="color:var(--good)">The encouraging development</div>
+            <h2 class="reveal r2">The big providers now ship <span class="hl">learning-optimised modes</span></h2>
+            <div class="grid3" style="margin-top:44px">
+                <div class="dcard good reveal r3"><div class="ctag">OpenAI</div><h3>Study Mode</h3><p>Guides students through problems step by step with Socratic questioning: "How would you approach this?", "What evidence supports your conclusion?"; understanding before answers.</p></div>
+                <div class="dcard good reveal r4"><div class="ctag">Google</div><h3>Guided Learning</h3><p>Gemini breaks complex topics down, adapts to the student, pulls in diagrams and videos, and generates personalised flashcards and study guides from course materials.</p></div>
+                <div class="dcard good reveal r5"><div class="ctag">Anthropic</div><h3>Claude for Education</h3><p>Learning mode within Projects develops independent thinking through guided exploration; core concepts and structured templates rather than direct answers.</p></div>
+            </div>
+            <div class="strip good reveal r6" style="margin-top:44px"><b>The pedagogy is real:</b> these modes draw on established research, Socratic method and adaptive learning theory. The stated goal is capable, independent thinkers; not AI dependency.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">07 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 8 : THE CATCH ===== -->
+    <section class="slide" aria-label="The catch">
+        <div class="topbar"><span class="chip warm">THE CATCH</span><span class="crumb">read the fine print</span><span class="sect">Limits &amp; freebies</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">Before anyone declares the problem solved</div>
+            <h2 class="reveal r2">Two catches, <span class="hlw">one loophole</span></h2>
+            <div class="rows" style="margin-top:40px;max-width:1660px">
+                <div class="row reveal r3"><span class="n warm">&middot;</span><span><b>Same engine underneath:</b> learning modes still run general models trained on internet data, not curated educational materials; the tutoring is a layer, not a different brain.</span></div>
+                <div class="row reveal r4"><span class="n warm">&middot;</span><span><b>The escape hatch:</b> students can switch back to the regular chat interface any time; the pedagogical guardrails are optional, and everyone knows it.</span></div>
+                <div class="row reveal r5"><span class="n warm">&middot;</span><span><b>Student freebies exist but expire:</b> OpenAI offered US and Canadian students free ChatGPT Plus through 2025; Google has offered students a free year of AI Pro in several countries. Generous, time-boxed, and unevenly distributed by geography.</span></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:40px"><b>The equity angle:</b> discount programs concentrated in North America don't do much for a student in Tennant Creek. Watch what's offered <b>here</b>, not what's announced in a US press release.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">08 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 9 : STORY, SOLAX ===== -->
+    <section class="slide" aria-label="The SOLAx story">
+        <div class="topbar"><span class="chip warm">TRUE STORY</span><span class="crumb">education by WhatsApp</span><span class="sect">SOLAx</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="story-tag reveal r1">A true story about doing more with less</div>
+            <p class="story reveal r2">After the Taliban banned secondary education for girls in 2021, the number of Afghan girls openly attending secondary school fell from <b>1.1 million to zero</b> by 2024. SOLAx, co-founded by Mati Amin, rebuilt a school inside the one piece of technology those girls still had: <b>WhatsApp</b>.</p>
+            <p class="story-close reveal r3">A smartphone and a basic connection is the whole entry requirement. Daily, asynchronous coursework arrives in three languages (English, Dari and Pashto); families can enrol several children from a single shared device; and the platform reaches girls inside their homes. Where sophisticated learning platforms fail on poor connectivity, a messaging app succeeds; <b>innovation that works within constraints instead of wishing them away</b>.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">09 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 10 : SOLAX LESSONS ===== -->
+    <section class="slide" aria-label="Lessons for the NT">
+        <div class="topbar"><span class="chip">CLOSER TO HOME</span><span class="crumb">what SOLAx teaches the Territory</span><span class="sect">NT lessons</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Reading SOLAx from the Northern Territory</div>
+            <h2 class="reveal r2">Design for the technology <span class="hl">people already have</span></h2>
+            <div class="rows" style="margin-top:40px;max-width:1660px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>Content over interface:</b> SOLAx prioritises delivery over polish, so it works in low-bandwidth environments; the same trade-off suits remote NT communities where connectivity is thin and data is dear.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Shared devices are a feature:</b> designing for one account per household, not per person, matches how technology is actually used in many communities.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Repurpose existing platforms:</b> partnering with Meta to use WhatsApp's API beat building an app nobody could download; which familiar platforms could carry education and services in remote Australia?</span></div>
+            </div>
+            <div class="strip teal reveal r6" style="margin-top:40px"><b>The proof of concept:</b> SOLAx is both immediate crisis relief and a demonstration that low-tech delivery can carry serious education. Equity solutions don't have to start with premium subscriptions.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">10 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 11 : FOUR DIMENSIONS ===== -->
+    <section class="slide" aria-label="Four dimensions of digital equity">
+        <div class="topbar"><span class="chip">FRAMEWORK</span><span class="crumb">what a real strategy covers</span><span class="sect">Four dimensions</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">What a serious equity strategy has to cover</div>
+            <h2 class="reveal r2">Digital equity has <span class="hl">four dimensions</span>, not one</h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch;gap:30px">
+                <div class="dcard reveal r3"><div class="ctag">Digital literacy</div><h3>Skills, including critical AI literacy</h3><p>Teacher training and community programs; the ability to evaluate AI outputs, understand bias, and use AI strategically rather than as a shortcut to thinking (Digital Promise).</p></div>
+                <div class="dcard reveal r3"><div class="ctag">Affordability</div><h3>Who can pay, and who shouldn't have to</h3><p>Bulk licensing, consortium deals, means-tested access; treating cost as a policy problem, not a fixed fact.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Culturally sensitive content</div><h3>Built in from the outset</h3><p>Culturally relevant content, multilingual support, respect for different learning traditions and knowledge systems; one-size-fits-all platforms quietly exclude.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">Infrastructure</div><h3>The unfinished first divide</h3><p>Connectivity and devices still gate everything else; in the NT this dimension is nowhere near solved.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:32px"><b>The systems lesson:</b> the research is consistent that these four move together; and the European experience suggests coordinated national strategies beat fragmented institution-by-institution fixes.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">11 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 12 : THE OPEN QUESTION ===== -->
+    <section class="slide" aria-label="The open question">
+        <div class="topbar"><span class="chip warm">DISCUSSION</span><span class="crumb">over to the room</span><span class="sect">The open question</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="story-tag reveal r1">For discussion</div>
+            <p class="story reveal r2">Should access to AI tools be treated as a <b>basic academic resource</b>; like the library, the databases, the journals; rather than a premium add-on for those who can pay?</p>
+            <p class="story-close reveal r3">And if so: who pays, in a landscape where a 500-seat licence costs as much as several teachers' salaries? What should public policy do to keep AI access from widening achievement gaps across Australian communities; and what would a Territory-shaped answer look like, given the SOLAx lesson that <b>the best delivery platform is the one people already have</b>?</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">12 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 13 : TAKEAWAYS ===== -->
+    <section class="slide" aria-label="Takeaways">
+        <div class="topbar"><span class="chip">TAKEAWAY</span><span class="crumb">the hour in five lines</span><span class="sect">Takeaways</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The takeaway: five things to remember</div>
+            <h2 class="reveal r2">The price of thinking, <span class="hl">summed up</span></h2>
+            <div class="rows" style="margin-top:38px;max-width:1660px;font-size:26px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>The third divide is tools plus instruction;</b> premium AI access with guidance versus free tiers without it compounds existing advantage.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>Cost is the gatekeeper;</b> enterprise AI runs to hundreds of thousands a year, and it's the number-one reason institutions opt out.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>Humans remain the active ingredient;</b> every study says support and teaching matter more than the technology's sophistication.</span></div>
+                <div class="row reveal r6"><span class="n">&middot;</span><span><b>Learning modes help but don't solve;</b> they're a welcome layer over general models, and students can switch them off.</span></div>
+                <div class="row reveal r7"><span class="n">&middot;</span><span><b>Constraint breeds design;</b> SOLAx reached students through WhatsApp; equity in the NT may look less like subscriptions and more like meeting people on the platforms they already use.</span></div>
+            </div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">13 / 14</span></div>
+    </section>
+
+    <!-- ===== SLIDE 14 : SOURCES ===== -->
+    <section class="slide" aria-label="Sources">
+        <div class="topbar"><span class="chip">SOURCES</span><span class="crumb">where this comes from</span><span class="sect">References</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Sources used</div>
+            <h2 class="reveal r2" style="font-size:62px">Where this deck's claims come from</h2>
+            <div class="rows reveal r3" style="margin-top:34px;max-width:1680px">
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Brookings</b>, "AI and the next digital divide in education": <a href="https://www.brookings.edu/articles/ai-and-the-next-digital-divide-in-education/" target="_blank" rel="noopener">brookings.edu</a> &middot; <b>ICTworks</b> third digital divide analysis: <a href="https://www.ictworks.org/ai-exacerbating-third-digital-divide/" target="_blank" rel="noopener">ictworks.org</a></span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>EDUCAUSE 2025 AI Landscape Study</b>: <a href="https://www.educause.edu/content/2025/2025-educause-ai-landscape-study/introduction-and-key-findings" target="_blank" rel="noopener">educause.edu</a> (the 27% and no-access figures; cost as the top barrier reported via Inside Higher Ed's 2025 survey)</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Digital Promise</b>, "How AI for education can address digital equity" (20 February 2024): <a href="https://digitalpromise.org/2024/02/20/how-ai-for-education-can-address-digital-equity/" target="_blank" rel="noopener">digitalpromise.org</a> &middot; <b>OECD</b>, "The potential impact of AI on equity and inclusion in education" (August 2024): <a href="https://www.oecd.org/content/dam/oecd/en/publications/reports/2024/08/the-potential-impact-of-artificial-intelligence-on-equity-and-inclusion-in-education_0d7e9e00/15df715b-en.pdf" target="_blank" rel="noopener">oecd.org</a></span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Pricing and learning modes</b> (as at 2025): <a href="https://openai.com/chatgpt/pricing/" target="_blank" rel="noopener">OpenAI pricing</a> and <a href="https://openai.com/index/chatgpt-study-mode/" target="_blank" rel="noopener">Study Mode</a> &middot; <a href="https://one.google.com/about/google-ai-plans/" target="_blank" rel="noopener">Google AI plans</a> and <a href="https://blog.google/products/gemini/new-gemini-tools-students-august-2025/" target="_blank" rel="noopener">Gemini student tools (August 2025)</a> &middot; <a href="https://www.anthropic.com/pricing" target="_blank" rel="noopener">Anthropic pricing</a> and <a href="https://www.anthropic.com/solutions/education" target="_blank" rel="noopener">Claude for Education</a></span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>SOLAx</b>: <a href="https://www.solax.org/" target="_blank" rel="noopener">solax.org</a> &middot; <a href="https://www.sola-afghanistan.org/introducing-solax" target="_blank" rel="noopener">SOLA, "Introducing SOLAx"</a> &middot; Mati Amin's <a href="https://fellows.echoinggreen.org/fellow/mati-amin/" target="_blank" rel="noopener">Echoing Green fellow profile</a> &middot; Brookings event, <a href="https://www.brookings.edu/events/ai-and-education-in-crisis-contexts/" target="_blank" rel="noopener">AI and education in crisis contexts</a></span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Academic reviews</b>: digital divide dimensions in <a href="https://www.emerald.com/insight/content/doi/10.1108/dts-04-2024-0054/full/html" target="_blank" rel="noopener">Digital Transformation and Society (2024)</a> &middot; <a href="https://www.researchgate.net/publication/390048519_Digital_Divide_in_AI-Powered_Education_Challenges_and_Solutions_for_Equitable_Learning" target="_blank" rel="noopener">"Digital Divide in AI-Powered Education" (2025)</a></span></div>
+            </div>
+            <p class="lede muted reveal r4" style="margin-top:30px;font-size:22px">Prepared August 2026 for the NT World Ink AI Special Topic Workshops. Subscription prices and student offers change frequently; verify against the linked pages.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">14 / 14</span></div>
+    </section>
+
+</main>
+</div>
+
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">ED</button>
+
+<script>
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.wheelLock = false;
+        this.setupStageScale(); this.setupKeyboardNav(); this.setupWheelNav(); this.setupTouchNav();
+        this.showSlide(0);
+    }
+    setupStageScale() {
+        const scale = () => {
+            const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * f) / 2, y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale(); window.addEventListener('resize', scale);
+    }
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (document.body.classList.contains('editing') || e.target.isContentEditable) return;
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.showSlide(0); break;
+                case 'End': e.preventDefault(); this.showSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+    setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (this.wheelLock || Math.abs(e.deltaY) < 12) return;
+            this.wheelLock = true;
+            e.deltaY > 0 ? this.next() : this.prev();
+            setTimeout(() => { this.wheelLock = false; }, 650);
+        }, { passive: true });
+    }
+    setupTouchNav() {
+        let sx = 0, sy = 0;
+        window.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchend', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? this.next() : this.prev();
+        }, { passive: true });
+    }
+    next() { this.showSlide(this.currentSlide + 1); }
+    prev() { this.showSlide(this.currentSlide - 1); }
+    showSlide(i) {
+        this.currentSlide = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.slides.forEach((s, k) => {
+            s.classList.toggle('active', k === this.currentSlide);
+            s.classList.toggle('visible', k === this.currentSlide);
+        });
+    }
+}
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storeKey = 'digital-equity-deck-edits-v1';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.hotzone = document.getElementById('editHotzone');
+        this.restore(); this.wire();
+    }
+    wire() {
+        let t = null;
+        const show = () => { clearTimeout(t); this.toggleBtn.classList.add('show'); };
+        const hide = () => { t = setTimeout(() => { if (!this.isActive) this.toggleBtn.classList.remove('show'); }, 400); };
+        this.hotzone.addEventListener('mouseenter', show); this.hotzone.addEventListener('mouseleave', hide);
+        this.toggleBtn.addEventListener('mouseenter', show); this.toggleBtn.addEventListener('mouseleave', hide);
+        this.hotzone.addEventListener('click', () => this.toggle()); this.toggleBtn.addEventListener('click', () => this.toggle());
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable && !e.metaKey && !e.ctrlKey) this.toggle();
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.download(); }
+        });
+        document.getElementById('deckStage').addEventListener('input', () => this.save());
+    }
+    toggle() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('show', true);
+        document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide .row span:not(.n), .slide .crumb, .slide .strip, .slide .kicker, .slide .story, .slide .story-close, .slide .stat .big, .slide .stat .lbl, .slide .msgbox')
+            .forEach(el => { this.isActive ? el.setAttribute('contenteditable', 'true') : el.removeAttribute('contenteditable'); });
+    }
+    save() {
+        const d = [...document.querySelectorAll('.slide')].map(s => s.innerHTML);
+        try { localStorage.setItem(this.storeKey, JSON.stringify(d)); } catch (e) {}
+    }
+    restore() {
+        try {
+            const d = JSON.parse(localStorage.getItem(this.storeKey) || 'null');
+            if (!d) return;
+            const s = document.querySelectorAll('.slide');
+            if (d.length === s.length) s.forEach((sl, i) => { sl.innerHTML = d[i]; });
+        } catch (e) {}
+    }
+    download() {
+        const c = document.documentElement.cloneNode(true);
+        c.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        c.querySelectorAll('body').forEach(b => b.classList.remove('editing'));
+        const blob = new Blob(['<!DOCTYPE html>\n' + c.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'digital-equity.html'; a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+function ytPlay(btn, id) {
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    btn.parentNode.replaceChild(f, btn);
+}
+new SlidePresentation(); new InlineEditor();
+</script>
+</body>
+</html>

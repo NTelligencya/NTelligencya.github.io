@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Brain on Autocomplete: Why Writing Still Matters &middot; Workshops &middot; NTell World Ink</title>
+<meta name="description" content="A one-hour workshop on the cognitive cost of AI writing: the MIT cognitive debt study, writing as brain exercise, five thousand years of writing history from Sumerian clay tablets to the scribal elite, and how to use AI without outsourcing your thinking. Presenter slides for the NT World Ink AI Special Topic Workshops.">
+
+<!-- "AFTER DARK" design: ntworldink dark theme, teal + ochre accents. Headings: Cormorant Garamond. Scaffold shared with the other workshop decks. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --stage-bg: #050506;
+    --slide-bg: #0B0B0E;
+    --card: #131318;
+    --card-2: #17171D;
+    --line: #26262F;
+    --text: #ECEAE4;
+    --text-2: #B9B6AD;
+    --text-3: #7C796F;
+    --accent: #1AC9C9;          /* teal */
+    --accent-soft: #6FE3E3;
+    --accent-wash: rgba(26,201,201,0.08);
+    --warm: #E08A3C;            /* ochre */
+    --warm-wash: rgba(224,138,60,0.10);
+    --bad: #E05B4A;
+    --bad-wash: rgba(224,91,74,0.10);
+    --good: #4CC98A;
+    --good-wash: rgba(76,201,138,0.10);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Manrope', 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===== FIXED 16:9 STAGE ===== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, svg { max-width: 100%; max-height: 100%; }
+a { color: var(--accent-soft); text-decoration: none; }
+
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .edit-toggle, .edit-hotzone { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===== SLIDE SCAFFOLD ===== */
+.topbar {
+    position: absolute; top: 0; left: 0; right: 0; height: 62px;
+    background: #08080A; color: var(--text-2); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 24px; padding: 0 44px;
+    font: 500 18px var(--font-mono); letter-spacing: .06em; z-index: 3;
+}
+.topbar .chip {
+    background: var(--accent); color: #04211F; border-radius: 5px;
+    padding: 4px 14px; font-weight: 500; letter-spacing: .1em;
+}
+.topbar .chip.warm { background: var(--warm); color: #2A1503; }
+.topbar .chip.bad { background: var(--bad); color: #2B0C07; }
+.topbar .crumb { opacity: .8; }
+.topbar .sect { margin-left: auto; font-size: 15px; letter-spacing: .18em; text-transform: uppercase; color: var(--text-3); }
+
+.foot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+    background: #08080A; border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 44px; z-index: 3;
+}
+.foot .brand { font: 700 22px var(--font-body); color: var(--text); letter-spacing: -0.01em; }
+.foot .brand .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 18px; letter-spacing: .08em; }
+.foot .pg { font: 500 17px var(--font-mono); letter-spacing: .12em; color: var(--text-3); }
+
+.body {
+    position: absolute; inset: 62px 120px 70px 120px;
+    display: flex; flex-direction: column; justify-content: center; z-index: 2;
+}
+.kicker { font: 500 19px var(--font-mono); letter-spacing: .28em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+.kicker.warm { color: var(--warm); }
+.kicker.bad { color: var(--bad); }
+h1 { font: 500 118px/1.02 var(--font-display); letter-spacing: -0.01em; color: var(--text); }
+h2 { font: 500 76px/1.06 var(--font-display); letter-spacing: -0.008em; color: var(--text); }
+h2 .hl { background: linear-gradient(transparent 64%, var(--accent-wash) 64%); color: var(--accent-soft); }
+h2 .hlw { background: linear-gradient(transparent 64%, var(--warm-wash) 64%); color: var(--warm); }
+.lede { font: 400 30px/1.55 var(--font-body); color: var(--text-2); max-width: 1360px; }
+.lede b { font-weight: 700; color: var(--text); }
+.muted { color: var(--text-3); }
+
+/* Cards */
+.dcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    border-top: 5px solid var(--accent);
+    padding: 38px 42px;
+}
+.dcard.warm { border-top-color: var(--warm); }
+.dcard.bad { border-top-color: var(--bad); }
+.dcard.good { border-top-color: var(--good); }
+.dcard .ctag { font: 500 16px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+.dcard.warm .ctag { color: var(--warm); }
+.dcard.bad .ctag { color: var(--bad); }
+.dcard.good .ctag { color: var(--good); }
+.dcard h3 { font: 600 33px/1.2 var(--font-display); color: var(--text); margin-bottom: 14px; }
+.dcard p { font: 400 24px/1.5 var(--font-body); color: var(--text-2); }
+.dcard p b { font-weight: 700; color: var(--text); }
+
+/* Step rows */
+.rows { display: flex; flex-direction: column; }
+.row {
+    display: flex; align-items: center; gap: 34px; padding: 24px 12px;
+    border-bottom: 1px solid var(--line); font: 400 28px/1.45 var(--font-body); color: var(--text-2);
+}
+.row:last-child { border-bottom: none; }
+.row .n {
+    min-width: 58px; height: 58px; border-radius: 50%; flex: 0 0 58px;
+    background: var(--accent); color: #04211F;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 23px var(--font-mono);
+}
+.row .n.warm { background: var(--warm); color: #2A1503; }
+.row .n.bad { background: var(--bad); color: #2B0C07; }
+.row .n.good { background: var(--good); color: #06291A; }
+.row b { font-weight: 700; color: var(--text); }
+.row .tag { margin-left: auto; font: 500 16px var(--font-mono); letter-spacing: .12em; color: var(--accent-soft); background: var(--accent-wash); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Verdict strips */
+.strip { border-radius: 10px; padding: 26px 36px; font: 400 26px/1.5 var(--font-body); }
+.strip b { font-weight: 700; }
+.strip.good { background: var(--good-wash); border-left: 1px solid var(--good); color: #CDEBDB; }
+.strip.bad { background: var(--bad-wash); border-left: 1px solid var(--bad); color: #F2D4CE; }
+.strip.warn { background: var(--warm-wash); border-left: 1px solid var(--warm); color: #F0DCC6; }
+.strip.teal { background: var(--accent-wash); border-left: 1px solid var(--accent); color: #CFEDEA; }
+
+/* Story (vignette) slides */
+.story-tag {
+    display: inline-block; font: 500 17px var(--font-mono); letter-spacing: .24em; text-transform: uppercase;
+    color: var(--warm); border: 1px solid var(--warm); border-radius: 999px; padding: 10px 26px; margin-bottom: 40px;
+}
+.story {
+    font: 400 46px/1.45 var(--font-display); font-style: italic; color: var(--text);
+    max-width: 1500px;
+}
+.story b { font-weight: 600; color: var(--warm); font-style: normal; }
+.story-close { font: 400 30px/1.5 var(--font-body); color: var(--text-2); margin-top: 44px; max-width: 1400px; }
+.story-close b { color: var(--text); font-weight: 700; }
+
+/* Stat tiles */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 40px 42px; border-top: 5px solid var(--warm);
+}
+.stat .big { font: 600 84px/1 var(--font-display); color: var(--warm); margin-bottom: 16px; }
+.stat .lbl { font: 400 23px/1.45 var(--font-body); color: var(--text-2); }
+.stat .lbl b { color: var(--text); font-weight: 700; }
+
+/* Message mock */
+.msgbox {
+    background: var(--card); border: 1px dashed var(--line); border-radius: 12px;
+    font: 400 24px/1.6 var(--font-mono); color: var(--text-2); padding: 30px 34px;
+}
+.msgbox .from { color: var(--warm); font-size: 18px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; }
+
+.cite { font: 400 17px/1.6 var(--font-mono); color: var(--text-3); letter-spacing: .02em; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; }
+
+/* Reveal animation */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.r1 { transition-delay: .08s; } .r2 { transition-delay: .2s; } .r3 { transition-delay: .32s; }
+.r4 { transition-delay: .44s; } .r5 { transition-delay: .56s; } .r6 { transition-delay: .68s; }
+.r7 { transition-delay: .8s; }
+
+
+/* Site logo (matches styles.css .brand on the main site) */
+.foot .brand { display: flex; align-items: center; gap: 14px; }
+.foot .brand-mark { width: 34px; height: 34px; position: relative; flex: 0 0 34px; }
+.foot .brand-mark::before, .foot .brand-mark::after { content: ''; position: absolute; inset: 5px; border: 1.5px solid var(--accent); border-radius: 4px; }
+.foot .brand-mark::after { transform: rotate(45deg); border-color: #4DDCDC; opacity: 0.5; }
+.foot .brand-name { font-family: var(--font-display); font-weight: 500; font-size: 27px; letter-spacing: .04em; color: var(--text); }
+.foot .brand-name .dot { color: var(--accent); }
+.foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 16px; letter-spacing: .08em; }
+
+/* Illustrative bench chart (slide 2) */
+.bc-row { display: flex; align-items: center; gap: 20px; margin-bottom: 13px; }
+.bc-label { width: 250px; font: 600 23px var(--font-body); color: var(--text); text-align: right; line-height: 1.15; }
+.bc-label small { display: block; font: 500 14px var(--font-mono); color: var(--text-3); letter-spacing: .04em; }
+.bc-track { flex: 1; height: 30px; background: var(--card-2); border-radius: 5px; overflow: hidden; }
+.bc-bar { height: 100%; background: var(--accent); opacity: .82; border-radius: 0 4px 4px 0; }
+.bc-bar.warm { background: var(--warm); }
+.chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.chip-m { font: 500 17px var(--font-mono); letter-spacing: .08em; color: var(--accent-soft); background: var(--accent-wash); border: 1px solid var(--line); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+
+/* Video finale */
+.video-wrap { width: 1420px; height: 798px; margin: 30px auto 0; background: #000; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; position: relative; }
+.video-wrap iframe { width: 100%; height: 100%; border: 0; }
+.yt-facade { width: 100%; height: 100%; border: 0; padding: 0; cursor: pointer; background: #000; position: relative; display: block; }
+.yt-facade img { width: 100%; height: 100%; object-fit: cover; opacity: .75; }
+.yt-facade .playbtn { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 120px; height: 84px; background: rgba(8,8,10,.82); border: 1.5px solid var(--accent); border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+.yt-facade .playbtn::after { content: ''; border-style: solid; border-width: 20px 0 20px 34px; border-color: transparent transparent transparent var(--accent); }
+
+/* Edit affordance */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 90px; height: 90px; z-index: 1200; }
+.edit-toggle {
+    position: fixed; top: 74px; left: 18px; z-index: 1201; width: 44px; height: 44px;
+    border-radius: 10px; border: 1px solid var(--line); background: rgba(19,19,24,.9); color: var(--text);
+    font: 600 15px var(--font-mono); cursor: pointer; opacity: 0; transition: opacity .3s;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; }
+body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+    <!-- ===== SLIDE 1 : TITLE ===== -->
+    <section class="slide" aria-label="Title">
+        <div class="topbar"><span class="chip">WORKSHOP</span><span class="crumb">ntworldink.com</span><span class="sect">August 2026</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="kicker reveal r1">AI Special Topic Workshops &middot; A One-Hour Session</div>
+            <h1 class="reveal r2">Your Brain on Autocomplete:<br>Why Writing Still Matters</h1>
+            <p class="lede reveal r3" style="margin-top:36px;font-size:34px;font-style:italic;font-family:var(--font-display)">When we hand our writing to AI, what happens to the thinking that writing used to do? This hour spans brand-new brain research and five thousand years of history to find out.</p>
+            <p class="lede muted reveal r4" style="margin-top:24px;font-size:23px">The neuroscience here is young; treat the early studies as warning lights, not settled law.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">01 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 2 : THE SCALE ===== -->
+    <section class="slide" aria-label="The scale of AI writing">
+        <div class="topbar"><span class="chip">START HERE</span><span class="crumb">this already happened</span><span class="sect">The scale</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Before the debate: the adoption is already near-total</div>
+            <h2 class="reveal r2">AI writing isn't coming; <span class="hl">it's here</span></h2>
+            <div class="grid2" style="margin-top:44px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">The number</div><h3>86 to 92% of students worldwide</h3><p>now use AI tools in their studies. Whatever we decide about AI and writing, we're deciding it <b>after</b> mass adoption, not before.</p></div>
+                <div class="dcard warm reveal r4"><div class="ctag">The new term</div><h3>"Cognitive debt"</h3><p>Researchers' name for what may build up when we outsource mental work to AI: the writing gets done, but the <b>thinking that writing used to exercise</b> quietly goes untrained; a debt that comes due when the tool is taken away.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>The question of the hour:</b> writing isn't just communication; it may be a form of mental exercise that builds and maintains critical thinking. To know what we'd lose, we first need to understand what writing does to a brain; and what it did for our species.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">02 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 3 : THE DEBATE ===== -->
+    <section class="slide" aria-label="The debate">
+        <div class="topbar"><span class="chip">THE DEBATE</span><span class="crumb">two honest positions</span><span class="sect">Evolution or erosion?</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Both sides, stated fairly</div>
+            <h2 class="reveal r2">Educational evolution, or <span class="hlw">cognitive erosion</span>?</h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard good reveal r3"><div class="ctag">The optimist's case</div><h3>Calculators, again</h3><p><b>Cognitive offloading:</b> as calculators freed us from arithmetic for higher maths, AI can absorb routine writing while students do the harder reasoning &middot; <b>personalised feedback</b> and rapid iteration &middot; skills <b>rebalance</b> toward prompting and critical evaluation &middot; and AI assistance <b>levels the field</b> for students with learning difficulties and non-native speakers.</p></div>
+                <div class="dcard bad reveal r4"><div class="ctag">The pessimist's case</div><h3>This time the offload is thinking itself</h3><p><b>Measurable neural changes:</b> early research finds weaker connectivity and reduced recall after AI-assisted writing &middot; the <b>18 to 25 window</b> of brain development makes dependency risky &middot; writing engages multiple brain systems <b>nothing else replicates</b> &middot; and AI-assisted text shows striking <b>homogeneity</b>; a possible "intellectual monoculture".</p></div>
+            </div>
+            <div class="strip warn reveal r5" style="margin-top:40px"><b>The stakes:</b> Generation Alpha, born entirely in the digital age, may never build traditional writing-and-thinking skills at all. That's either a rebalancing or a permanent shift; this hour looks at the evidence for each.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">03 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 4 : BRAIN GYM ===== -->
+    <section class="slide" aria-label="Writing as brain exercise">
+        <div class="topbar"><span class="chip">BRAIN SCIENCE</span><span class="crumb">what writing does in there</span><span class="sect">The workout</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">What's actually happening when you write</div>
+            <h2 class="reveal r2">Writing is <span class="hl">a gym session for the brain</span></h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">The symphony</div><h3>Four systems, one task</h3><p><b>Working memory</b> holds ideas while you arrange them &middot; <b>language centres</b> hunt words and grammar &middot; <b>motor systems</b> coordinate the typing or handwriting &middot; <b>executive control</b> conducts it all simultaneously. Few everyday activities demand this much coordination.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">The evidence</div><h3>Neural highways, literally</h3><p>Brain scans show regular writers have <b>stronger connections between these regions</b>; the white matter tracts linking them become measurably more robust with practice. Not a metaphor; anatomy.</p></div>
+            </div>
+            <div class="strip warn reveal r5" style="margin-top:44px"><b>The critical window:</b> the prefrontal cortex doesn't fully mature until the mid-twenties, so ages 18 to 25 are especially sensitive to how cognitive skills are built; or neglected. Pathways formed then can last a lifetime, for better or worse.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">04 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 5 : THE MIT STUDY ===== -->
+    <section class="slide" aria-label="The MIT cognitive debt study">
+        <div class="topbar"><span class="chip warm">THE RESEARCH</span><span class="crumb">54 students, four months</span><span class="sect">Cognitive debt</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">The study that named the problem</div>
+            <h2 class="reveal r2">MIT's "cognitive debt" experiment: <span class="hlw">the early warning</span></h2>
+            <p class="lede reveal r3" style="margin-top:28px">MIT researchers tracked 54 students over four months, comparing essay writing with ChatGPT, with search engines, and with brains alone. The AI group showed weaker brain-wave patterns associated with memory and deep thinking; and when later asked to write unassisted, their brains struggled to re-engage those networks.</p>
+            <div class="stats" style="margin-top:32px">
+                <div class="stat reveal r4"><div class="big">83.3%</div><div class="lbl"><b>of AI users couldn't recall a single quote</b> from essays they had just written.</div></div>
+                <div class="stat reveal r5"><div class="big">68.9%</div><div class="lbl"><b>reported feeling "lazier"</b> after using AI tools for their work.</div></div>
+                <div class="stat reveal r6"><div class="big">27.7%</div><div class="lbl"><b>experienced difficulty making decisions</b> after extended AI use.</div></div>
+            </div>
+            <div class="strip warn reveal r7" style="margin-top:36px"><b>And the sameness problem:</b> AI users produced more similar, less original essays; consistent homogeneity in topics and language. One small study proves nothing on its own; but as a first data point on "cognitive debt", it points exactly where the pessimists feared.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">05 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 6 : THE PIVOT ===== -->
+    <section class="slide" aria-label="The pivot to history">
+        <div class="topbar"><span class="chip">THE LONG VIEW</span><span class="crumb">five thousand years back</span><span class="sect">Why history?</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="story-tag reveal r1">Changing the lens</div>
+            <p class="story reveal r2">To understand what we might lose, look at what humanity gained. Before writing, memory, tradition and law lived only in <b>the voices of the living</b>. Writing untethered knowledge from individual humans; it could suddenly be stored, sent across distances, and preserved beyond death.</p>
+            <p class="story-close reveal r3">Writing is the original cognitive technology; the first time our species outsourced part of its mind to an external tool. That makes its five-thousand-year history <b>the best case study we have</b> for what happens next; so the middle of this hour belongs to clay tablets, scribes and one very sassy Mesopotamian.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">06 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 7 : BORN OF GRAIN ===== -->
+    <section class="slide" aria-label="The pragmatic origins of writing">
+        <div class="topbar"><span class="chip">ORIGINS</span><span class="crumb">circa 3000 BCE</span><span class="sect">Born of grain</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">How writing actually began</div>
+            <h2 class="reveal r2">Writing was invented for <span class="hl">accounting, not poetry</span></h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard reveal r3"><div class="ctag">The first records</div><h3>Grain, livestock, labour</h3><p>The earliest inscriptions are not epics; they're <b>stocktakes</b>. Sumerian pictographs pressed into clay around 3000 BCE tracked commodities and labour for temple administrators.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">The first supply chain</div><h3>Commerce demanded it</h3><p>The Old Assyrian trade network ran on letters and contracts: textiles and tin travelling to Anatolia to be exchanged for silver, with partnerships, shipments and disputes managed <b>in writing, across hundreds of miles</b>.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>The pattern to notice:</b> writing spread because it solved practical problems of complex societies; tracking wealth, administering states, projecting power. The literature came later. Cognitive technologies are adopted for convenience; their deeper effects arrive uninvited.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">07 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 8 : POWER AND DAILY LIFE ===== -->
+    <section class="slide" aria-label="Writing as power and daily life">
+        <div class="topbar"><span class="chip">ORIGINS</span><span class="crumb">kings and shopping lists</span><span class="sect">Power &amp; daily life</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">What people used it for, once they had it</div>
+            <h2 class="reveal r2">From <span class="hl">royal law</span> to shopping for salt</h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard warm reveal r3"><div class="ctag">The state</div><h3>Hammurabi's basalt billboard</h3><p>The Laws of Hammurabi, carved on a monumental stone slab, were as much politics as law: topped with the king receiving the code from the sun-god Shamash, <b>divine authority made permanent and public</b> through writing.</p></div>
+                <div class="dcard reveal r4"><div class="ctag">The street</div><h3>Ostraca: notes on broken pots</h3><p>Cheap pottery shards carried the everyday: instructions to buy salt, directions for mixing dough, sheep-shearing notes, family finances, and a farm labourer's petition for the return of a confiscated garment.</p></div>
+            </div>
+            <div class="strip teal reveal r5" style="margin-top:44px"><b>The "literacy service economy":</b> most people couldn't read or write, but they used writing constantly; by hiring public scribes. Sound familiar? Outsourcing the skill while consuming its product is not a new arrangement.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">08 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 9 : THE SCRIBAL ELITE ===== -->
+    <section class="slide" aria-label="The scribal elite">
+        <div class="topbar"><span class="chip warm">THE GATEKEEPERS</span><span class="crumb">who could actually write</span><span class="sect">The scribal elite</span></div>
+        <div class="body">
+            <div class="kicker warm reveal r1">Writing's first monopoly</div>
+            <h2 class="reveal r2">Literacy was <span class="hlw">a profession, not a skill</span></h2>
+            <div class="stats" style="margin-top:44px">
+                <div class="stat reveal r3"><div class="big">&lt;5%</div><div class="lbl"><b>of Mesopotamia's population</b> could read and write; the great civilisations of the Near East remained overwhelmingly oral.</div></div>
+                <div class="stat reveal r4"><div class="big">&lt;7%</div><div class="lbl"><b>literacy in ancient Egypt,</b> and that's the generous estimate.</div></div>
+                <div class="stat reveal r5"><div class="big">Years</div><div class="lbl"><b>of rigorous training</b> to become a scribe: memorising canonical texts, omen series and rituals in schools attached to temples and royal courts.</div></div>
+            </div>
+            <div class="strip warn reveal r6" style="margin-top:44px"><b>And here's the twist:</b> scribes were not authors. Originality wasn't the job; their duty was to preserve and transmit the "stream of tradition"; copying, compiling, revising. The guardians of writing were <b>trained specifically not to think for themselves</b> on the page.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">09 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 10 : THE MAYA WARNING ===== -->
+    <section class="slide" aria-label="The Maya warning">
+        <div class="topbar"><span class="chip bad">A WARNING</span><span class="crumb">how knowledge dies</span><span class="sect">The Maya books</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="story-tag reveal r1">A historical warning</div>
+            <p class="story reveal r2">In the 16th century, Spanish authorities burned the books of the Maya. Of thousands of volumes holding a civilisation's mathematics and astronomy, <b>four survive today</b>.</p>
+            <p class="story-close reveal r3">When the small class who guarded written knowledge was eliminated, the knowledge went with them; within a generation, no one could read what remained. Cognitive technologies feel permanent and <b>disappear astonishingly fast</b> when the humans who embody the skill stop practising it. Keep that in mind whenever someone says a skill no longer needs to live in human heads because the tool will always be there.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">10 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 11 : STORY, SIN-ERIBAM ===== -->
+    <section class="slide" aria-label="The Sin-eribam complaint">
+        <div class="topbar"><span class="chip warm">TRUE STORY</span><span class="crumb">throwing shade since 1800 BCE</span><span class="sect">Ancient complaints</span></div>
+        <div class="body" style="align-items:flex-start">
+            <div class="story-tag reveal r1">Some things never change</div>
+            <div class="msgbox reveal r2" style="max-width:1500px;font-size:30px;line-height:1.6"><div class="from">Sin-eribam to Sin-magir &middot; 2nd millennium BCE, pressed into clay</div>"This is good behaviour; I write to you repeatedly and you pay no attention!!!"</div>
+            <p class="story-close reveal r3" style="margin-top:40px">Nearly four thousand years ago, a Mesopotamian was so exasperated at being left on read that he <b>carved his complaint into clay</b> with a reed stylus; cuneiform, "wedge-shaped", a system of over a thousand signs. The technology of communication keeps changing; the human urge to document our grievances is apparently eternal. Writing has always been personal, emotional and social; not just administrative.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">11 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 12 : FINDING BALANCE ===== -->
+    <section class="slide" aria-label="Finding the balance">
+        <div class="topbar"><span class="chip good">PRACTICAL</span><span class="crumb">not banning, balancing</span><span class="sect">Finding balance</span></div>
+        <div class="body">
+            <div class="kicker reveal r1" style="color:var(--good)">Back to the present: what educators are trying</div>
+            <h2 class="reveal r2">The goal is <span class="hl">strategic use</span>, not prohibition</h2>
+            <div class="grid2" style="margin-top:40px;align-items:stretch">
+                <div class="dcard good reveal r3"><div class="ctag">The traffic light system</div><h3>Colour-coded assignments</h3><p><b>Red:</b> no AI permitted; this is deliberate cognitive exercise &middot; <b>Amber:</b> limited AI with full disclosure &middot; <b>Green:</b> AI encouraged with proper citation. Students learn <b>when</b> the mental workout matters, not just whether AI is "allowed".</p></div>
+                <div class="dcard good reveal r4"><div class="ctag">Assessment alternatives</div><h3>Testing the thinking, not the typing</h3><p><b>Oral assessments</b> that probe real understanding &middot; <b>process-focused evaluation</b> of how students think, not just final products &middot; <b>collaborative problem-solving</b> AI can't sit in on &middot; <b>performance-based tasks</b> in real-world contexts.</p></div>
+            </div>
+            <div class="strip good reveal r5" style="margin-top:44px"><b>The principle underneath:</b> like maths keeping arithmetic requirements despite calculators, education may need <b>writing-protected spaces</b>; deliberately inefficient zones where the point is the exercise, not the output.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">12 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 13 : PERSONAL STRATEGIES ===== -->
+    <section class="slide" aria-label="Personal strategies">
+        <div class="topbar"><span class="chip good">PRACTICAL</span><span class="crumb">for your own brain</span><span class="sect">Your move</span></div>
+        <div class="body">
+            <div class="kicker reveal r1" style="color:var(--good)">Cognitive fitness for individuals</div>
+            <h2 class="reveal r2">Keep the <span class="hl">partnership the right way around</span></h2>
+            <div class="rows" style="margin-top:40px;max-width:1660px">
+                <div class="row reveal r3"><span class="n good">&middot;</span><span><b>Start yourself, then bring in AI;</b> do the first thinking unassisted, and use AI for research and editing rather than initial ideas.</span></div>
+                <div class="row reveal r4"><span class="n good">&middot;</span><span><b>Keep unassisted sessions in the diary;</b> regularly write without any digital help, and keep handwriting for reflection and planning.</span></div>
+                <div class="row reveal r5"><span class="n good">&middot;</span><span><b>Interrogate, don't accept;</b> work to understand AI outputs rather than passing them along; the understanding is where the exercise lives.</span></div>
+            </div>
+            <div class="strip good reveal r6" style="margin-top:40px"><b>The one-line rule:</b> use AI to enhance your capabilities, not to replace your thinking. Cognitive partnership means human intelligence guides and AI amplifies; not the other way around.</div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">13 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 14 : TAKEAWAYS ===== -->
+    <section class="slide" aria-label="Takeaways">
+        <div class="topbar"><span class="chip">TAKEAWAY</span><span class="crumb">the hour in five lines</span><span class="sect">Takeaways</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">The takeaway: five things to remember</div>
+            <h2 class="reveal r2">Why writing <span class="hl">still matters</span></h2>
+            <div class="rows" style="margin-top:38px;max-width:1660px;font-size:26px">
+                <div class="row reveal r3"><span class="n">&middot;</span><span><b>Writing is exercise, not just output;</b> it coordinates memory, language, motor and executive systems in ways little else does.</span></div>
+                <div class="row reveal r4"><span class="n">&middot;</span><span><b>The early evidence points to real cognitive debt;</b> weaker engagement, poorer recall and more homogeneous work in AI-assisted writers; young, still-developing brains have the most at stake.</span></div>
+                <div class="row reveal r5"><span class="n">&middot;</span><span><b>History says outsourcing thinking is an old habit;</b> for millennia most humans hired scribes; literacy for everyone is the recent, precious exception.</span></div>
+                <div class="row reveal r6"><span class="n">&middot;</span><span><b>Knowledge kept only in tools is fragile;</b> the Maya libraries fell from thousands of books to four when the readers were gone.</span></div>
+                <div class="row reveal r7"><span class="n">&middot;</span><span><b>The choice is structural, not personal willpower;</b> traffic-light rules, writing-protected spaces and process-based assessment keep the exercise in education while using AI where it truly helps.</span></div>
+            </div>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">14 / 15</span></div>
+    </section>
+
+    <!-- ===== SLIDE 15 : SOURCES ===== -->
+    <section class="slide" aria-label="Sources">
+        <div class="topbar"><span class="chip">SOURCES</span><span class="crumb">where this comes from</span><span class="sect">References</span></div>
+        <div class="body">
+            <div class="kicker reveal r1">Sources used</div>
+            <h2 class="reveal r2" style="font-size:62px">Where this deck's claims come from</h2>
+            <div class="rows reveal r3" style="margin-top:34px;max-width:1680px">
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>MIT Media Lab, "Your Brain on ChatGPT"</b> (2025): the four-month, 54-student EEG study behind the cognitive-debt findings; the 83.3% recall, 68.9% laziness and 27.7% decision-difficulty figures, and the homogeneity result</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Global student AI-use surveys</b> (2024 to 2025 reporting): the 86 to 92% adoption range quoted on the scale slide</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Neuroscience of writing</b>: peer-reviewed work on white-matter changes with writing practice and prefrontal maturation through the mid-twenties, as compiled in the NT World Ink research file for this topic</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Ancient history material</b>: standard scholarship on Sumerian pictographs and cuneiform (circa 3000 to 2500 BCE), the Old Assyrian trade network, the Laws of Hammurabi, Aramaic and Hebrew ostraca, Mesopotamian and Egyptian scribal schools and literacy estimates, the surviving Maya codices, and the Sin-eribam letter (2nd millennium BCE)</span></div>
+                <div class="row" style="font-size:21px;padding:14px 12px"><span><b>Assessment practice</b>: the traffic-light AI system and alternative assessment approaches as adopted across universities from 2023 onward</span></div>
+            </div>
+            <p class="lede muted reveal r4" style="margin-top:30px;font-size:22px">Prepared August 2026 for the NT World Ink AI Special Topic Workshops. The neuroscience of AI-assisted writing is new and moving; expect these findings to be tested, refined and argued with.</p>
+        </div>
+    <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">15 / 15</span></div>
+    </section>
+
+</main>
+</div>
+
+<div class="edit-hotzone" id="editHotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">ED</button>
+
+<script>
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.currentSlide = 0;
+        this.stage = document.getElementById('deckStage');
+        this.wheelLock = false;
+        this.setupStageScale(); this.setupKeyboardNav(); this.setupWheelNav(); this.setupTouchNav();
+        this.showSlide(0);
+    }
+    setupStageScale() {
+        const scale = () => {
+            const f = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * f) / 2, y = (window.innerHeight - 1080 * f) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+        };
+        scale(); window.addEventListener('resize', scale);
+    }
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (document.body.classList.contains('editing') || e.target.isContentEditable) return;
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp': e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.showSlide(0); break;
+                case 'End': e.preventDefault(); this.showSlide(this.slides.length - 1); break;
+            }
+        });
+    }
+    setupWheelNav() {
+        window.addEventListener('wheel', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            if (this.wheelLock || Math.abs(e.deltaY) < 12) return;
+            this.wheelLock = true;
+            e.deltaY > 0 ? this.next() : this.prev();
+            setTimeout(() => { this.wheelLock = false; }, 650);
+        }, { passive: true });
+    }
+    setupTouchNav() {
+        let sx = 0, sy = 0;
+        window.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        window.addEventListener('touchend', (e) => {
+            if (document.body.classList.contains('editing')) return;
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? this.next() : this.prev();
+        }, { passive: true });
+    }
+    next() { this.showSlide(this.currentSlide + 1); }
+    prev() { this.showSlide(this.currentSlide - 1); }
+    showSlide(i) {
+        this.currentSlide = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.slides.forEach((s, k) => {
+            s.classList.toggle('active', k === this.currentSlide);
+            s.classList.toggle('visible', k === this.currentSlide);
+        });
+    }
+}
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.storeKey = 'cognitive-cost-deck-edits-v1';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.hotzone = document.getElementById('editHotzone');
+        this.restore(); this.wire();
+    }
+    wire() {
+        let t = null;
+        const show = () => { clearTimeout(t); this.toggleBtn.classList.add('show'); };
+        const hide = () => { t = setTimeout(() => { if (!this.isActive) this.toggleBtn.classList.remove('show'); }, 400); };
+        this.hotzone.addEventListener('mouseenter', show); this.hotzone.addEventListener('mouseleave', hide);
+        this.toggleBtn.addEventListener('mouseenter', show); this.toggleBtn.addEventListener('mouseleave', hide);
+        this.hotzone.addEventListener('click', () => this.toggle()); this.toggleBtn.addEventListener('click', () => this.toggle());
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable && !e.metaKey && !e.ctrlKey) this.toggle();
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.download(); }
+        });
+        document.getElementById('deckStage').addEventListener('input', () => this.save());
+    }
+    toggle() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.toggleBtn.classList.toggle('show', true);
+        document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide .row span:not(.n), .slide .crumb, .slide .strip, .slide .kicker, .slide .story, .slide .story-close, .slide .stat .big, .slide .stat .lbl, .slide .msgbox')
+            .forEach(el => { this.isActive ? el.setAttribute('contenteditable', 'true') : el.removeAttribute('contenteditable'); });
+    }
+    save() {
+        const d = [...document.querySelectorAll('.slide')].map(s => s.innerHTML);
+        try { localStorage.setItem(this.storeKey, JSON.stringify(d)); } catch (e) {}
+    }
+    restore() {
+        try {
+            const d = JSON.parse(localStorage.getItem(this.storeKey) || 'null');
+            if (!d) return;
+            const s = document.querySelectorAll('.slide');
+            if (d.length === s.length) s.forEach((sl, i) => { sl.innerHTML = d[i]; });
+        } catch (e) {}
+    }
+    download() {
+        const c = document.documentElement.cloneNode(true);
+        c.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        c.querySelectorAll('body').forEach(b => b.classList.remove('editing'));
+        const blob = new Blob(['<!DOCTYPE html>\n' + c.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = 'cognitive-cost.html'; a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+function ytPlay(btn, id) {
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    btn.parentNode.replaceChild(f, btn);
+}
+new SlidePresentation(); new InlineEditor();
+</script>
+</body>
+</html>
