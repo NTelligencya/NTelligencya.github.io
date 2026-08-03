@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Putting a website online, explained · NT World Ink</title>
+<meta name="description" content="An interactive walkthrough of publishing a static website; from buying the domain to the padlock going green, explaining what each step actually does.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* THEME: ntworldink dark. Baskerville on black, one amber accent, restrained. */
+    --page: #000000; --panel: #0a0a0a; --panel-2: #101010;
+    --accent: #e0983c; --accent-bright: #f2ab52; --accent-dim: #8a6a3a;
+    --ink-head: #f4f4f2; --ink-body: #d5d8d9; --ink-muted: #9a9d9e; --ink-dim: #6a6d6e;
+    --hairline: rgba(240,240,235,.12); --hairline-strong: rgba(240,240,235,.22);
+    --glow: rgba(240,235,225,.12);
+    --ok: #7bb37b;
+    --display: "Libre Baskerville", Baskerville, "Times New Roman", serif;
+    --serif: "Libre Baskerville", Baskerville, Georgia, serif;
+    --mono: Consolas, "SF Mono", ui-monospace, "Liberation Mono", monospace;
+    --radius: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { background: var(--page); color: var(--ink-head); font-family: var(--serif); overflow: hidden; }
+  #stage { height: 100vh; display: flex; flex-direction: column; }
+
+  header {
+    display: flex; justify-content: space-between; align-items: center; gap: 28px; flex-wrap: wrap;
+    flex-shrink: 0; padding: 18px 36px; border-bottom: 1px solid var(--hairline);
+  }
+  header .brand { font-size: 14px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-head); }
+  header .crumb { color: var(--accent-dim); font-size: 13px; }
+  header .modtag { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent-dim); }
+  footer { flex-shrink: 0; display: flex; justify-content: center; align-items: center; gap: 10px; padding: 18px; border-top: 1px solid var(--hairline); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); transition: background .3s, box-shadow .3s; }
+  .dot.on { background: var(--accent); box-shadow: 0 0 8px var(--glow); }
+  main { flex: 1; display: flex; padding: 16px 60px; overflow: auto; }
+  .beat { display: none; max-width: 1080px; width: 100%; margin: auto; animation: rise .45s ease; }
+  .beat.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .navhint { position: fixed; right: 28px; bottom: 16px; color: var(--ink-dim); font-size: 12px; letter-spacing: .5px; }
+
+  .eyebrow { color: var(--ink-muted); font-size: 13px; letter-spacing: .26em; text-transform: uppercase; margin-bottom: 14px; }
+  h1 { font-family: var(--display); font-weight: 700; font-size: 42px; line-height: 1.16; color: var(--ink-head); letter-spacing: .01em; }
+  h2 { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1.22; margin-bottom: 22px; color: var(--ink-head); }
+  .lede { font-size: 20px; line-height: 1.62; color: var(--ink-body); margin-top: 18px; max-width: 800px; }
+  .myth { display: inline-block; margin-top: 24px; padding: 9px 20px; border: 1px solid var(--accent); border-radius: 24px; color: var(--accent-bright); font-size: 16px; }
+  .callout { border-left: 3px solid var(--accent); background: var(--panel); padding: 24px 30px; border-radius: 0 var(--radius) var(--radius) 0; font-size: 22px; line-height: 1.5; max-width: 900px; color: var(--ink-body); }
+  .callout strong { font-weight: 400; color: var(--ink-head); text-shadow: 0 0 14px rgba(244,244,242,.2); }
+  .callout .mono { font-family: var(--mono); font-size: .82em; color: var(--accent-bright); }
+  .caption { color: var(--ink-muted); font-size: 15px; margin-top: 20px; max-width: 900px; line-height: 1.6; }
+  .cite { color: var(--ink-dim); font-size: 13px; margin-top: 14px; line-height: 1.7; max-width: 920px; }
+  .qline { margin-top: 30px; font-size: 20px; color: var(--ink-muted); }
+  .btn { display: inline-block; margin-top: 26px; padding: 11px 26px; background: var(--accent); color: #140d03; border: 1px solid var(--accent); border-radius: var(--radius); font-size: 15px; font-family: var(--display); font-weight: 700; cursor: pointer; }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--hairline-strong); font-weight: 400; }
+  .btn.ghost:hover { color: var(--accent-bright); border-color: var(--accent); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn:focus-visible, .menu-item:focus-visible, .insp-card:focus-visible, .stepbtn:focus-visible, .revbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .mono { font-family: var(--mono); }
+
+  .menu-item {
+    display: flex; align-items: baseline; gap: 22px; width: 100%; background: var(--panel);
+    border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 26px; margin-bottom: 12px;
+    cursor: pointer; text-align: left; color: var(--ink-head); font-family: inherit; transition: border-color .2s, box-shadow .25s;
+  }
+  .menu-item:hover { border-color: var(--accent-dim); box-shadow: 0 0 24px -10px var(--glow); }
+  .menu-item .num { color: var(--accent-dim); font-size: 14px; letter-spacing: .2em; font-family: var(--mono); }
+  .menu-item .name { font-size: 22px; flex: 1; font-family: var(--display); font-weight: 700; }
+  .menu-item .state { color: var(--accent-dim); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
+
+  /* Clickable inspector */
+  .insp-row { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+  .insp-card {
+    flex: 1; min-width: 190px; text-align: left; background: var(--panel); border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius); padding: 20px 22px; cursor: pointer; font-family: inherit; color: inherit;
+    display: flex; flex-direction: column; gap: 8px; transition: border-color .2s, box-shadow .2s;
+  }
+  .insp-card:hover { border-color: var(--accent-dim); }
+  .insp-card.on { border-color: var(--accent); box-shadow: 0 0 20px -8px var(--glow); }
+  .insp-card .ic { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-dim); }
+  .insp-card .it { font-size: 22px; color: var(--ink-head); font-family: var(--display); font-weight: 700; }
+  .insp-card .isub { font-size: 15px; color: var(--ink-muted); }
+  .insp-note { margin-top: 22px; font-size: 18px; line-height: 1.6; color: var(--ink-body); max-width: 820px; min-height: 96px; }
+  .insp-note .t { color: var(--accent-bright); }
+  .insp-note .mono { font-family: var(--mono); font-size: .9em; color: var(--accent-bright); }
+
+  /* Reveal */
+  .revwrap { margin-top: 6px; }
+  .reveal-ans { display: none; margin-top: 18px; font-size: 21px; line-height: 1.55; color: var(--ink-head); max-width: 860px; }
+  .reveal-ans.shown { display: block; animation: rise .4s ease; }
+  .reveal-ans strong { color: var(--accent-bright); font-weight: 400; }
+  .reveal-ans .note { display: block; font-size: 15px; color: var(--ink-muted); margin-top: 10px; }
+
+  /* Staggered list */
+  .steps { margin-top: 6px; max-width: 900px; }
+  .stp {
+    display: grid; grid-template-columns: 54px 1fr; gap: 20px; align-items: start; padding: 15px 0;
+    border-bottom: 1px solid var(--hairline);
+    opacity: 0; transform: translateY(8px); transition: opacity .5s, transform .5s;
+  }
+  .stp.shown { opacity: 1; transform: none; }
+  .stp:last-child { border-bottom: none; }
+  .stp .n { font-family: var(--mono); font-size: 20px; color: var(--accent); }
+  .stp.ok .n { color: var(--ok); }
+  .stp .h { font-size: 20px; color: var(--ink-head); font-family: var(--display); font-weight: 700; }
+  .stp .p { font-size: 16px; line-height: 1.55; color: var(--ink-muted); margin-top: 4px; }
+  .stp .p .mono { font-family: var(--mono); color: var(--accent-bright); font-size: .92em; }
+
+  /* Trace-a-visit flagship */
+  .trace-chain { display: flex; align-items: stretch; gap: 0; margin-top: 8px; flex-wrap: wrap; }
+  .tnode {
+    flex: 1; min-width: 120px; border: 1px solid var(--hairline); border-radius: var(--radius);
+    padding: 16px 14px; text-align: center; background: var(--panel);
+    display: flex; flex-direction: column; gap: 6px; transition: border-color .3s, box-shadow .3s, background .3s;
+  }
+  .tnode .tl { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); }
+  .tnode .tn { font-size: 18px; color: var(--ink-muted); font-family: var(--display); font-weight: 700; }
+  .tnode.on { border-color: var(--accent); background: var(--panel-2); box-shadow: 0 0 22px -8px var(--glow); }
+  .tnode.on .tn { color: var(--accent-bright); }
+  .tnode.done .tn { color: var(--ink-body); }
+  .tarrow { display: flex; align-items: center; color: var(--ink-dim); font-size: 22px; padding: 0 6px; }
+  .trace-controls { display: flex; align-items: center; gap: 14px; margin-top: 22px; }
+  .stepbtn { padding: 10px 24px; background: var(--accent); color: #140d03; border: 1px solid var(--accent); border-radius: var(--radius); font-size: 15px; font-family: var(--display); font-weight: 700; cursor: pointer; }
+  .stepbtn.restart { background: transparent; color: var(--accent); border-color: var(--hairline-strong); font-weight: 400; }
+  .stepbtn:disabled { opacity: .4; cursor: default; }
+  .trace-progress { font-size: 13px; letter-spacing: .1em; color: var(--ink-dim); font-family: var(--mono); }
+  .trace-note { margin-top: 20px; font-size: 19px; line-height: 1.6; color: var(--ink-body); max-width: 860px; min-height: 92px; }
+  .trace-note .t { color: var(--accent-bright); }
+  .trace-note .mono { font-family: var(--mono); font-size: .9em; color: var(--accent-bright); }
+
+  .linkrow { display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
+  .linkrow a { flex: 1; min-width: 220px; padding: 16px 20px; border: 1px solid var(--hairline); border-radius: var(--radius); display: flex; flex-direction: column; gap: 6px; color: inherit; text-decoration: none; transition: border-color .2s; }
+  .linkrow a:hover { border-color: var(--accent); }
+  .linkrow .sect { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-dim); }
+  .linkrow .ttl { font-size: 19px; color: var(--accent-bright); font-family: var(--display); font-weight: 700; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beat, .reveal-ans.shown { animation: none; }
+    .stp, .tnode { transition: none; }
+  }
+  @media (max-width: 900px) {
+    h1 { font-size: 32px; } h2 { font-size: 24px; }
+    main { padding: 0 22px; }
+    .trace-chain { flex-direction: column; } .tarrow { transform: rotate(90deg); padding: 4px 0; }
+    .insp-row { flex-direction: column; }
+    .stp { grid-template-columns: 40px 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <header>
+    <span class="brand">NT World Ink <span class="crumb">· Presentations</span></span>
+    <span class="modtag" id="hdrRight">Press M for menu</span>
+  </header>
+  <main id="main">
+
+    <!-- ============ MENU ============ -->
+    <section class="beat" data-scene="menu">
+      <div class="eyebrow">An interactive walkthrough</div>
+      <h1>Putting a website online, explained</h1>
+      <p class="lede">Publishing a site feels like one big technical act you either know or you do not. It is actually four small, separable pieces; a name, a host, the plumbing that connects them, and a lock. This walks you through all four, from buying the domain to the padlock going green, and explains what each step is really doing so the next time is not a mystery.</p>
+      <div style="margin-top:36px">
+        <button class="menu-item" onclick="goModule(1)"><span class="num">01</span><span class="name">The four pieces</span><span class="state">Start</span></button>
+        <button class="menu-item" onclick="goModule(2)"><span class="num">02</span><span class="name">The name: buying a domain</span><span class="state">Start</span></button>
+        <button class="menu-item" onclick="goModule(3)"><span class="num">03</span><span class="name">The host: GitHub Pages</span><span class="state">Start</span></button>
+        <button class="menu-item" onclick="goModule(4)"><span class="num">04</span><span class="name">The plumbing: DNS</span><span class="state">Start</span></button>
+        <button class="menu-item" onclick="goModule(5)"><span class="num">05</span><span class="name">The lock: HTTPS and going live</span><span class="state">Start</span></button>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 1 ============ -->
+    <section class="beat" data-scene="m1">
+      <div class="eyebrow">Module 01</div>
+      <h1>The four pieces</h1>
+      <div class="myth">Myth we'll unpick: "putting a site online is one technical act"</div>
+      <p class="lede">It is four, and they are independent. Muddle them together and it feels like magic; separate them and each one is a single, boring, understandable job.</p>
+    </section>
+
+    <section class="beat" data-scene="m1">
+      <h2>Think of it as opening a shop</h2>
+      <div class="callout">A website going live needs the same four things a shop does. A <strong>name over the door</strong> so people can refer to you; the <strong>premises</strong> where the stock actually sits; an entry in the <strong>street directory</strong> so someone with the name can find the premises; and a <strong>lock on the door</strong> so people trust it is really your shop and not a copy. Nobody expects the sign-writer, the landlord, the council directory and the locksmith to be the same person. Online they are not either.</div>
+      <p class="caption">Keep that shop in mind. Every step below is one of those four jobs, done by a different service.</p>
+    </section>
+
+    <section class="beat" data-scene="m1" data-onenter="resetPieces">
+      <h2>The four pieces, and who does each</h2>
+      <div class="insp-row no-advance">
+        <button class="insp-card" data-p="0" onclick="piecePick(0)"><span class="ic">The name</span><span class="it">Domain</span><span class="isub">the address people type</span></button>
+        <button class="insp-card" data-p="1" onclick="piecePick(1)"><span class="ic">The premises</span><span class="it">Host</span><span class="isub">where the files live</span></button>
+        <button class="insp-card" data-p="2" onclick="piecePick(2)"><span class="ic">The directory</span><span class="it">DNS</span><span class="isub">name to premises</span></button>
+        <button class="insp-card" data-p="3" onclick="piecePick(3)"><span class="ic">The lock</span><span class="it">HTTPS</span><span class="isub">trust and encryption</span></button>
+      </div>
+      <div class="insp-note" id="pieceNote"></div>
+    </section>
+
+    <section class="beat" data-scene="m1">
+      <h2>Why this is good news</h2>
+      <div class="callout">Because the four are separate, a problem is never "the website is broken"; it is always one of the four pieces. The name is fine but the directory entry is missing. The premises work but the lock has not been cut yet. That last one is exactly where this guide will leave you, and it is the most common place to think something has gone wrong when nothing has.</div>
+      <p class="qline">So let us buy the name first.</p>
+    </section>
+
+    <!-- ============ MODULE 2 ============ -->
+    <section class="beat" data-scene="m2">
+      <div class="eyebrow">Module 02</div>
+      <h1>The name: buying a domain</h1>
+      <div class="myth">Myth we'll unpick: "you buy a domain and own it forever"</div>
+      <p class="lede">You rent it, a year at a time, from a company whose one job is to book that name in your name.</p>
+    </section>
+
+    <section class="beat" data-scene="m2">
+      <h2>Registrar, registry, and you</h2>
+      <div class="callout">There is a single global list of who holds every <strong class="mono">.com</strong>, kept by a registry. You do not talk to the registry; you go through a <strong>registrar</strong>, a licensed reseller like Namecheap, and pay them a yearly fee to reserve your name and keep it in your account. That is the whole transaction. When Namecheap said your domain was "available", it meant nobody else was currently renting it.</div>
+      <p class="caption">The whole system sits under a non-profit called ICANN, which is why a name bought at any registrar works the same everywhere. You are never locked to Namecheap; a domain can be moved between registrars.</p>
+    </section>
+
+    <section class="beat" data-scene="m2" data-onenter="resetBought">
+      <h2>So what did you actually buy?</h2>
+      <div class="revwrap">
+        <p style="font-size:20px;color:var(--ink-muted);max-width:820px;line-height:1.5">Not a website. Not storage. Not even a page. Reveal what the money actually bought you.</p>
+        <div class="reveal-ans" id="boughtAns">The exclusive right to <strong>point that name wherever you like</strong>.<span class="note">A domain on its own shows nothing; it is an address with no building behind it yet. Its power is that you, and only you, get to say which premises it points at. That pointing is Module 04. Everything else you own here follows from it.</span></div>
+        <button class="btn ghost revbtn" id="boughtBtn" onclick="boughtReveal()">Reveal</button>
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m2">
+      <h2>Two housekeeping notes worth knowing</h2>
+      <div class="callout">First, it renews yearly, and if you let it lapse the name goes back on the market; set it to auto-renew and diarise it. Second, your name and address are attached to a domain by default and can be looked up publicly; most registrars, Namecheap included, offer free <strong>WHOIS privacy</strong> that hides them behind a proxy. Turn it on.</div>
+      <p class="qline">You have the name. Now it needs premises to point at.</p>
+    </section>
+
+    <!-- ============ MODULE 3 ============ -->
+    <section class="beat" data-scene="m3">
+      <div class="eyebrow">Module 03</div>
+      <h1>The host: GitHub Pages</h1>
+      <div class="myth">Myth we'll unpick: "a website needs a hosting company and a server you rent"</div>
+      <p class="lede">For a site that is just files, it does not. GitHub will hold the files and hand them out as a website, for free.</p>
+    </section>
+
+    <section class="beat" data-scene="m3">
+      <h2>What GitHub actually is</h2>
+      <div class="callout">Underneath the jargon, GitHub is a <strong>filing cabinet with a time machine</strong>. Each project lives in a <strong>repository</strong>, a folder that also remembers every version of itself, so you can change things fearlessly and roll back. <strong>GitHub Pages</strong> is a switch on that folder that says "do not just store these files, serve them to the public as a website". Because your site is plain HTML, that is all the hosting it needs.</div>
+      <p class="caption">This is why there is no separate hosting bill and no server to manage. The same account that stores your work also publishes it.</p>
+    </section>
+
+    <section class="beat" data-scene="m3" data-onenter="resetLoop">
+      <h2>The loop you will use forever</h2>
+      <div class="steps" id="loopList">
+        <div class="stp"><span class="n">1</span><span><span class="h">Edit</span><span class="p">Change the files on your computer, in whatever tool you like. Nothing is live yet; this is just your local copy.</span></span></div>
+        <div class="stp"><span class="n">2</span><span><span class="h">Commit</span><span class="p">Tell GitHub Desktop "save this set of changes as a version", with a short note. The time machine records a point you can return to.</span></span></div>
+        <div class="stp"><span class="n">3</span><span><span class="h">Push</span><span class="p">Send that version up to GitHub. Your online copy now matches your computer.</span></span></div>
+        <div class="stp ok"><span class="n">4</span><span><span class="h">Deploy</span><span class="p">Pages notices the change and rebuilds the public site within a minute or two. You do nothing; it just happens.</span></span></div>
+      </div>
+      <p class="qline">Edit, commit, push. Three moves, and the fourth is automatic.</p>
+    </section>
+
+    <section class="beat" data-scene="m3">
+      <h2>The one fork in the road: public or private</h2>
+      <div class="callout">Pages runs free from a <strong>public</strong> repository, where anyone can read the source files. Serving from a <strong>private</strong> one, hidden from view, needs a paid plan. That is the "upgrade or make this repository public" wall people hit. For a site you intend to publish openly anyway, public is the free and sensible choice; just know the source, including any unfinished drafts, is visible to anyone who goes looking in the repository.</div>
+      <p class="qline">The premises are ready. Now connect the name to them.</p>
+    </section>
+
+    <!-- ============ MODULE 4 ============ -->
+    <section class="beat" data-scene="m4">
+      <div class="eyebrow">Module 04</div>
+      <h1>The plumbing: DNS</h1>
+      <div class="myth">Myth we'll unpick: "DNS is scary, and it is instant"</div>
+      <p class="lede">It is neither. It is a public address book, and it is the one step that deliberately takes its time.</p>
+    </section>
+
+    <section class="beat" data-scene="m4">
+      <h2>DNS is the street directory</h2>
+      <div class="callout">Your domain name means nothing to a computer; computers find each other by numbers called IP addresses. <strong>DNS</strong>, the Domain Name System, is the directory that translates the name a human types into the number a machine needs. When you add records at Namecheap, you are writing your domain's entry in that directory: <strong>this name lives at these numbers</strong>. Until you do, the name points nowhere.</div>
+      <p class="caption">You already did this: the A records and the CNAME. The next screen shows exactly what each one told the directory.</p>
+    </section>
+
+    <section class="beat" data-scene="m4" data-onenter="resetTrace">
+      <h2>Follow one visitor, hop by hop</h2>
+      <div class="trace-chain no-advance" id="traceChain">
+        <div class="tnode" data-node="0"><span class="tl">Step</span><span class="tn">You</span></div>
+        <div class="tarrow">&rarr;</div>
+        <div class="tnode" data-node="1"><span class="tl">Directory</span><span class="tn">DNS</span></div>
+        <div class="tarrow">&rarr;</div>
+        <div class="tnode" data-node="2"><span class="tl">Premises</span><span class="tn">GitHub Pages</span></div>
+        <div class="tarrow">&rarr;</div>
+        <div class="tnode" data-node="3"><span class="tl">Your folder</span><span class="tn">The repo</span></div>
+        <div class="tarrow">&rarr;</div>
+        <div class="tnode" data-node="4"><span class="tl">Result</span><span class="tn">The page</span></div>
+      </div>
+      <div class="trace-controls no-advance">
+        <button class="stepbtn" id="traceStep" onclick="traceNext()">Step through it</button>
+        <button class="stepbtn restart" id="traceRestart" onclick="traceReset()">Restart</button>
+        <span class="trace-progress" id="traceProg"></span>
+      </div>
+      <div class="trace-note" id="traceNote"></div>
+    </section>
+
+    <section class="beat" data-scene="m4" data-onenter="resetRecords">
+      <h2>The records you wrote, and why</h2>
+      <div class="insp-row no-advance">
+        <button class="insp-card" data-r="0" onclick="recPick(0)"><span class="ic">Host @</span><span class="it">Four A records</span><span class="isub">the bare name to GitHub</span></button>
+        <button class="insp-card" data-r="1" onclick="recPick(1)"><span class="ic">Host www</span><span class="it">One CNAME</span><span class="isub">the www version</span></button>
+        <button class="insp-card" data-r="2" onclick="recPick(2)"><span class="ic">Watch out</span><span class="it">The default trap</span><span class="isub">what to delete first</span></button>
+      </div>
+      <div class="insp-note" id="recNote"></div>
+    </section>
+
+    <section class="beat" data-scene="m4">
+      <h2>Why it is not instant</h2>
+      <div class="callout">Directories all over the world keep copies of DNS entries so lookups are fast, and those copies only refresh every so often. When you add a record, you are waiting for that refresh to ripple outwards; this is <strong>propagation</strong>, and it can take anywhere from minutes to a day. Nothing is stuck; the world is simply catching up to what you wrote.</div>
+      <p class="caption">GitHub's own documentation notes changes can take up to 24 hours. It is usually far quicker, but "up to a day" is the honest promise.</p>
+      <p class="qline">Name, premises, directory: connected. One piece left, the lock.</p>
+    </section>
+
+    <!-- ============ MODULE 5 ============ -->
+    <section class="beat" data-scene="m5">
+      <div class="eyebrow">Module 05</div>
+      <h1>The lock: HTTPS and going live</h1>
+      <div class="myth">Myth we'll unpick: "'not eligible for HTTPS' means something is broken"</div>
+      <p class="lede">It almost never does. It means the lock is being cut, and the locksmith cannot start until the directory entry has settled.</p>
+    </section>
+
+    <section class="beat" data-scene="m5">
+      <h2>What the padlock is</h2>
+      <div class="callout">The padlock is a <strong>certificate</strong>. It does two jobs: it scrambles the traffic between visitor and site so nobody in between can read it, and it proves the site really is yours and not an impostor. GitHub gets you one automatically and free from a service called <strong>Let's Encrypt</strong>. The catch is that Let's Encrypt will only issue it once it can independently see your domain pointing at GitHub; the proof depends on the DNS you just set.</div>
+      <p class="caption">So the certificate cannot come first. It is the last piece precisely because it verifies all the others.</p>
+    </section>
+
+    <section class="beat" data-scene="m5" data-onenter="resetOrder">
+      <h2>The order it happens in</h2>
+      <div class="steps" id="orderList">
+        <div class="stp"><span class="n">1</span><span><span class="h">You save the records</span><span class="p">The A records and CNAME at Namecheap. Done in a moment; this is the only part in your hands.</span></span></div>
+        <div class="stp"><span class="n">2</span><span><span class="h">DNS propagates</span><span class="p">The world's directories pick up your entry. Minutes to hours.</span></span></div>
+        <div class="stp"><span class="n">3</span><span><span class="h">GitHub verifies</span><span class="p">Pages checks that the domain now resolves to its servers. Until this passes, you see "not eligible for HTTPS", which is a status, not a fault.</span></span></div>
+        <div class="stp"><span class="n">4</span><span><span class="h">The certificate issues</span><span class="p">Let's Encrypt mints the lock. Usually within an hour of DNS being visible.</span></span></div>
+        <div class="stp ok"><span class="n">5</span><span><span class="h">You tick Enforce HTTPS</span><span class="p">The box un-greys itself when ready. Tick it, and every visitor gets the padlock. Live.</span></span></div>
+      </div>
+      <p class="qline">If you are reading this while step 3 sits waiting, you are exactly on schedule.</p>
+    </section>
+
+    <section class="beat" data-scene="m5">
+      <h2>The one thing that is actually a fault</h2>
+      <div class="callout">If hours pass and a DNS checker still shows nothing, or shows a registrar parking page instead of GitHub's numbers, that is the real signal to act; and it is almost always one cause. The registrar's <strong>default records were not deleted</strong>, so its parking entry is still answering for your name and drowning out the ones you added. Remove those, keep only your four A records and the one CNAME, and the wait resumes properly.</div>
+      <p class="caption">That single gotcha accounts for most "it will not go live" cases. Everything else is patience.</p>
+    </section>
+
+    <section class="beat" data-scene="m5">
+      <h2>Why this matters</h2>
+      <div class="callout">You now hold the whole map. A site online is a <strong>name</strong> you rent, <strong>premises</strong> that serve your files, a <strong>directory</strong> that connects the two, and a <strong>lock</strong> that proves and protects it. Next time nothing will be magic; it will be a four-item checklist, and when something waits, you will know which piece is waiting and why.</div>
+      <div class="linkrow">
+        <a href="../"><span class="sect">NT World Ink</span><span class="ttl">Back to presentations</span></a>
+      </div>
+      <p class="cite">Sources used: the GitHub Pages apex A records (185.199.108 to 111 .153), the www CNAME to your username's github.io, the CNAME file behaviour and the "up to 24 hours" propagation note are from GitHub Docs, "Managing a custom domain for your GitHub Pages site" and "Securing your GitHub Pages site with HTTPS", checked 3 August 2026. The free certificate is issued by Let's Encrypt, as GitHub documents. The public-repository-free, private-repository-paid rule for Pages is per GitHub's own settings and documentation. The registrar and registry structure under ICANN, and the default parking-record behaviour of registrars including Namecheap, are standard and widely documented. No figure in this deck is invented; where timing is uncertain it is given as a range.</p>
+      <button class="btn ghost" style="margin-top:30px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+  </main>
+  <footer id="dots"></footer>
+</div>
+<div class="navhint">&larr; &rarr; or space &nbsp;|&nbsp; M menu</div>
+
+<script>
+  'use strict';
+
+  const beats = Array.from(document.querySelectorAll('.beat'));
+  let idx = 0;
+  const sceneTitles = {
+    m1: 'Module 01 · The four pieces',
+    m2: 'Module 02 · The name: buying a domain',
+    m3: 'Module 03 · The host: GitHub Pages',
+    m4: 'Module 04 · The plumbing: DNS',
+    m5: 'Module 05 · The lock: HTTPS and going live'
+  };
+
+  function show(i) {
+    idx = Math.max(0, Math.min(i, beats.length - 1));
+    beats.forEach((b, n) => b.classList.toggle('active', n === idx));
+    const scene = beats[idx].dataset.scene;
+    document.getElementById('hdrRight').textContent = scene === 'menu' ? 'Press M for menu' : sceneTitles[scene];
+    const dots = document.getElementById('dots');
+    dots.innerHTML = '';
+    if (scene !== 'menu') {
+      const mb = beats.filter(b => b.dataset.scene === scene);
+      const pos = mb.indexOf(beats[idx]);
+      mb.forEach((_, n) => { const d = document.createElement('div'); d.className = 'dot' + (n === pos ? ' on' : ''); dots.appendChild(d); });
+    }
+    const hook = beats[idx].dataset.onenter;
+    if (hook && onEnterHooks[hook]) onEnterHooks[hook]();
+  }
+  function goMenu() { show(0); }
+  function goModule(n) { const i = beats.findIndex(b => b.dataset.scene === 'm' + n); if (i > -1) show(i); }
+  function next() { if (idx < beats.length - 1) show(idx + 1); }
+  function prev() { if (idx > 0) show(idx - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') prev();
+    else if (e.key === 'm' || e.key === 'M') goMenu();
+    else if (e.key >= '1' && e.key <= '5') goModule(Number(e.key));
+  });
+  document.getElementById('main').addEventListener('click', e => {
+    if (e.target.closest('button, a, input, .no-advance')) return;
+    next();
+  });
+
+  function staggerShow(els, delay) {
+    els.forEach((el, i) => { el.classList.remove('shown'); setTimeout(() => el.classList.add('shown'), 150 + i * delay); });
+  }
+
+  /* ---- Module 1: four pieces inspector ---- */
+  const PIECES = [
+    { note: '<span class="t">Domain, the name.</span> The address a person types, like <span class="mono">aksarium.com</span>. You rent it from a registrar. On its own it does nothing; it is a label waiting to be pointed somewhere. That is Module 02.' },
+    { note: '<span class="t">Host, the premises.</span> The computer that actually holds your files and hands them to anyone who asks. Here it is GitHub Pages, which serves your folder to the public for free. That is Module 03.' },
+    { note: '<span class="t">DNS, the directory.</span> The public address book that turns the typed name into the host\'s numeric address, so a visitor with the name can reach the premises. You write your entry in it at Namecheap. That is Module 04.' },
+    { note: '<span class="t">HTTPS, the lock.</span> The certificate that encrypts the traffic and proves the site is genuinely yours, shown as the padlock. Issued free, but only once the directory entry is in place. That is Module 05.' }
+  ];
+  let pieceActive = null;
+  function piecePick(n) {
+    pieceActive = n === pieceActive ? null : n;
+    document.querySelectorAll('[data-p]').forEach((c, i) => c.classList.toggle('on', i === pieceActive));
+    document.getElementById('pieceNote').innerHTML = pieceActive === null
+      ? 'Click a piece. Each is a separate job, done by a different service; the rest of the guide takes them one at a time.'
+      : PIECES[pieceActive].note;
+  }
+  function resetPieces() { pieceActive = null; piecePick(null); }
+
+  /* ---- Module 2: reveal ---- */
+  function boughtReveal() { document.getElementById('boughtAns').classList.add('shown'); document.getElementById('boughtBtn').style.display = 'none'; }
+  function resetBought() { document.getElementById('boughtAns').classList.remove('shown'); document.getElementById('boughtBtn').style.display = ''; }
+
+  /* ---- Module 3: the loop ---- */
+  function resetLoop() { staggerShow(Array.from(document.querySelectorAll('#loopList .stp')), 400); }
+
+  /* ---- Module 4: trace a visit (flagship) ---- */
+  const TRACE = [
+    { node: 0, html: '<span class="t">You type <span class="mono">aksarium.com</span> and press enter.</span> Your browser has a name and nothing else; it does not yet know a single computer to talk to.' },
+    { node: 1, html: '<span class="t">The browser asks DNS.</span> It looks up your domain in the directory and reads the A record you wrote, which answers: this name lives at <span class="mono">185.199.108.153</span>, one of GitHub\'s addresses.' },
+    { node: 2, html: '<span class="t">It knocks on GitHub Pages.</span> The browser connects to that address and says, in effect, "I am here for <span class="mono">aksarium.com</span>."' },
+    { node: 3, html: '<span class="t">GitHub finds your folder.</span> It checks which repository has claimed that domain, matches the <span class="mono">CNAME</span> file in your repo, and pulls out your <span class="mono">index.html</span>.' },
+    { node: 4, html: '<span class="t">Your page comes back.</span> GitHub sends the files, the browser draws them, and if the certificate is in place the padlock shows the trip was encrypted and verified. That whole round trip took a fraction of a second.' }
+  ];
+  let traceStep = 0;
+  function traceRender() {
+    document.querySelectorAll('#traceChain .tnode').forEach((el, i) => {
+      el.classList.toggle('on', i === TRACE[traceStep].node);
+      el.classList.toggle('done', i < TRACE[traceStep].node);
+    });
+    document.getElementById('traceNote').innerHTML = TRACE[traceStep].html;
+    document.getElementById('traceProg').textContent = 'Step ' + (traceStep + 1) + ' of ' + TRACE.length;
+    document.getElementById('traceStep').disabled = traceStep >= TRACE.length - 1;
+  }
+  function traceNext() { if (traceStep < TRACE.length - 1) { traceStep++; traceRender(); } }
+  function traceReset() { traceStep = 0; traceRender(); }
+  function resetTrace() { traceStep = 0; traceRender(); }
+
+  /* ---- Module 4: records inspector ---- */
+  const RECS = [
+    { note: '<span class="t">Four A records, Host <span class="mono">@</span>.</span> The <span class="mono">@</span> means the bare domain, <span class="mono">aksarium.com</span> with no www. Each A record points it at one of GitHub\'s four addresses (<span class="mono">185.199.108</span> through <span class="mono">111 .153</span>). Four, not one, so that if a server is busy the others still answer; it is redundancy, not repetition.' },
+    { note: '<span class="t">One CNAME, Host <span class="mono">www</span>.</span> This covers the <span class="mono">www.</span> version of your name. A CNAME points a name at another name rather than a number: here, <span class="mono">www</span> to <span class="mono">ntelligencya.github.io</span>. GitHub then sends www visitors to the same place as the bare domain.' },
+    { note: '<span class="t">The default trap.</span> Registrars ship a new domain with their own placeholder records, usually a parking page. If you leave those in, they keep answering for your name and fight the records you added. Delete the defaults first; keep only your four A records and the one CNAME. This is the single most common reason a new domain "will not connect".' }
+  ];
+  let recActive = null;
+  function recPick(n) {
+    recActive = n === recActive ? null : n;
+    document.querySelectorAll('[data-r]').forEach((c, i) => c.classList.toggle('on', i === recActive));
+    document.getElementById('recNote').innerHTML = recActive === null
+      ? 'Click a record to see what it told the directory, and why it is shaped the way it is.'
+      : RECS[recActive].note;
+  }
+  function resetRecords() { recActive = null; recPick(null); }
+
+  /* ---- Module 5: order of operations ---- */
+  function resetOrder() { staggerShow(Array.from(document.querySelectorAll('#orderList .stp')), 450); }
+
+  const onEnterHooks = {
+    resetPieces: resetPieces, resetBought: resetBought, resetLoop: resetLoop,
+    resetTrace: resetTrace, resetRecords: resetRecords, resetOrder: resetOrder
+  };
+
+  show(0);
+</script>
+</body>
+</html>
