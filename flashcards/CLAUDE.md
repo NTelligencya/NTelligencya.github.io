@@ -42,7 +42,7 @@ SD authors in CSV, because that is what NotebookLM, Excel and Anki produce. The 
 - Put `sets/<slug>.csv` beside it, with a `Front,Back` header row.
 - Run `node flashcards/convert.js` from the repo root. It writes `sets/<slug>.json`, sets the card count, and marks the set `ready`.
 - Run `node flashcards/gen-pages.js` to write the player and list pages for every ready set.
-- Run `node tools/build-index.js --sync --dates-from-git` and commit the regenerated `search-index.json` and `sitemap.xml`.
+- Run `node tools/build-index.js --sync` and `node tools/add-search.js`, then commit the regenerated `search-index.json` and `sitemap.xml`. See the Findability section of the root `CLAUDE.md`.
 
 `convert.js` normalises US spellings and em-dashes to the site's Australian English rule. Extend its `SPELLING` table as more turn up; it is the cheapest place to catch them. Capitalised `-ization` forms are deliberately absent from that table: the ISM's own proper nouns, "International Organization for Standardization" and "Route Origin Authorization", must be reproduced as published.
 

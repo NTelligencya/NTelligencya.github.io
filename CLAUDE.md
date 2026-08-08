@@ -1,4 +1,4 @@
-# CLAUDE.md — NT World Ink: Workshops and Resources build plan
+# CLAUDE.md, NT World Ink: Workshops and Resources build plan
 
 Master plan for two builds on ntworldink.com (repo NTelligencya.github.io), agreed with SD on 25 July 2026: the AI Special Topic Workshops catalogue (eleven 1-hour topics) and the Resources section (five category pages plus hub). Work happens over multiple sessions; update the status checkboxes here as pages are completed.
 
@@ -154,6 +154,7 @@ Wiring: a "Flashcards" nav item after "Resources" on the eight pages whose nav c
 - DONE 29 July 2026: Global AI World Tour workshop deck (/workshops/global-ai-world-tour/), built ahead of order at SD's request.
 - DONE 2 August 2026: Session D, all four no-new-research workshop decks (AI Bubble at /workshops/ai-bubble/, Digital Equity at /workshops/digital-equity/, Cognitive Cost at /workshops/cognitive-cost/, Caring for Your Data at /workshops/caring-for-your-data/), plus their four front-page cards and the coming-soon trim. Six of eleven workshops now built.
 - DONE 2 August 2026 (second session): Defining AI Literacy deck (/workshops/defining-ai-literacy/, 20 slides) with the NAIC declaring-use section folded in; AI in the NT topic dropped at SD's decision. Seven of the ten remaining topics now built.
+- DONE 8 August 2026 (other sessions): two presentations added, "Are you a robot? CAPTCHAs explained" at /presentations/captchas-explained/ and "How email works" at /presentations/how-email-works/, both linked from /presentations/index.html; the flashcards section at /flashcards/ (see its own section above and its own CLAUDE.md); and the brand assets under /assets/brand/ (see below).
 - NEXT: Watermarking (needs new research: SynthID, Meta provenance, Pangram; SD to vet new links), Philosophical Futures (video embed + source list ready), Agentic AI (plus its /presentations/ explainer version).
 
 ## Approvals log
@@ -162,14 +163,81 @@ All approved by SD on 25 July 2026: the eleven hook titles; the benchmark shortl
 
 Awaiting SD (from 2 August 2026): review the Caring for Your Data platform-settings slides for currency (source data is late 2025); optionally supply vetted links for the MIT "Your Brain on ChatGPT" study and related research on the Cognitive Cost sources slide (source page's academic links looked unreliable, so none were carried over); decide whether the AI Privacy & Terms Evaluator Claude Project from the data-privacy source page should become a resource somewhere.
 
-## Findability: site search, site index, generated index and sitemap
 
-Built 8 August 2026. Three parts, all data-driven from one generated file.
+## Brand assets (/assets/brand/)
 
-`tools/build-index.js` generates `search-index.json` (158 entries) and `sitemap.xml`. Zero dependencies. Run it by hand after adding, moving or renaming pages, then commit both outputs; there is no build step on GitHub Pages, so they are checked-in artefacts. Usual run: `node tools/build-index.js --sync --dates-from-git`. Hand-maintained values (topic, published, and any title or type override) live in `tools/index-meta.json`, keyed by URL; the script reads it and never writes over it. Full notes in `tools/README.md`.
+Added 8 August 2026. The ornate NT cover mark, cut into usable files, with full notes in `assets/brand/README.md`: which file to use where, minimum sizes, clear space, the resolution ceiling, and the colours.
 
-`search.js` at the repo root injects the search field into `header.site` and filters the index in the browser. It is on the 98 pages that carry the shared header, added by `tools/add-search.js` (idempotent; re-run it after building new content pages). The slide decks under `/workshops/`, `/presentations/` and `/simulations/` have their own full-screen chrome and no site nav, so they carry no search field. Styles live in `styles.css` section 24.
+The short version for anyone building a page: this is the **cover mark**, for the top of a printed deck, a social card or a title slide, and it needs at least 120 pixels. It is **not** the site mark. The header and the favicon keep the CSS star in `styles.css` (`.brand-mark`), which stays legible at 16 pixels. Do not swap one for the other.
 
-`/index/` is the human-readable site map, and a second deliberate exception to the no-JS house rule alongside `/references/`: shared `styles.css` for the chrome, `site-index.css` for the page, `site-index.js` for the data and filtering. It reads the same `search-index.json`.
+### Social card and icons
 
-Client areas, decided with SD 8 August 2026: they appear in the site's own search and index, marked with a "hidden" pill, and are kept reasonably out of search engines by four measures together. Each page carries `noindex,nofollow`; `/roper-gulf/` had none and was given them this day. They are excluded from `sitemap.xml`. `robots.txt` disallows `/search-index.json`, which does not affect the site's own search because robots.txt governs crawlers, not browsers. Links to hidden pages carry `rel="nofollow"`, and the hidden rows on `/index/` are drawn in the browser rather than written into the HTML. This is not privacy: anyone with a URL can still read the page, and a scraper that ignores robots.txt can still read the JSON. If any of that content must not be readable by a stranger, it needs a login, which GitHub Pages cannot provide.
+Built 8 August 2026 from these files. `assets/brand/ntwi-social-card.png` is the 1200 by 630 card every page shares: the lockup on the site's near-black ground, the tagline, the homepage lead paragraph and the domain. It was rendered from an HTML template, so it can be rebuilt or restyled rather than retouched.
+
+The icons follow the README's rule that the site mark is the CSS star, not the ornate mark: `favicon.svg` redraws `.brand-mark` with slightly heavier strokes so it survives at 16 pixels, with `favicon-32.png` as a fallback and `apple-touch-icon.png` at 180 pixels on a solid dark ground.
+
+`tools/add-meta.js` writes the Open Graph and Twitter tags, the canonical URL and the icon links into all 166 pages, decks included, in a marked block it rewrites on each run. Titles come from `search-index.json`, so a title shortened in `index-meta.json` is the one that shows when a link is shared.
+
+One card serves every page. Per-section cards would need one image per section and a change to `CARD` in the script.
+
+Still outstanding: 44 pages have no `<meta name="description">` and fall back to the site default, so they all share the same preview text. Most are simulation tools. `node tools/add-meta.js --dry-run` lists them.
+
+
+## Findability: search, site index, and the generated index and sitemap
+
+Built 8 August 2026. Site search in the shared header, a site index page at `/index/`, and `sitemap.xml`. All three are driven by one generated file, `search-index.json`, currently 165 entries.
+
+### After adding, moving or renaming any page
+
+Run both of these from the repo root, then commit the regenerated files together with the page changes:
+
+- `node tools/build-index.js --sync` rewrites `search-index.json` and `sitemap.xml`, and adds a stub to `tools/index-meta.json` for anything it has not seen before. Published dates come from git by default; there is a `--no-git-dates` switch, and using it leaves most pages undated
+- `node tools/add-search.js` adds the search field and the Index nav link to any new page carrying `<header class="site">`
+- `node tools/add-meta.js` writes the social preview tags and icon links into every page's `<head>`. Run it after the index build, since it takes its titles from `search-index.json`
+
+Both are idempotent, so running them when nothing has changed does no harm. The build prints a report: pages indexed, how many are hidden, the breakdown by type, and a list of any page with no published date. A page with no date cannot appear in a recently-published list, and an uncommitted page has no date until it is committed.
+
+`search-index.json` and `sitemap.xml` must be committed. GitHub Pages has no build step, so they are checked-in artefacts; leave them out of a commit and the site search keeps serving the previous list.
+
+### The pieces
+
+`tools/build-index.js` walks the repo, reads each page's `<title>` and `noindex` state, derives section, type and a fallback topic from the path, and merges the hand-maintained values. Zero dependencies. Full notes in `tools/README.md`.
+
+`tools/index-meta.json` holds everything the script cannot work out by reading a page, keyed by URL. Any of `title`, `section`, `type`, `topic`, `published` and `hidden` can be set; anything absent is derived. The script reads this file and never writes over it, so hand-set values survive regeneration.
+
+`search.js` at the repo root injects the field into `header.site` and filters the index in the browser. Styles are in `styles.css` section 24, including the `.idx-pill` classes shared with the index page.
+
+`/index/` is the human-readable site map, and a documented exception to the no-JS house rule alongside `/references/` and `/flashcards/`: shared `styles.css` for the chrome, `site-index.css` for the page, `site-index.js` for the data and filtering.
+
+### Correcting an entry
+
+Fix it in `tools/index-meta.json`, never by special-casing the script. Use a `title` override when a page's own `<title>` is longer than it should read in a search result, and a `type` override for pages that sit oddly in their folder, such as the plain-English glossaries inside course folders, which are Resources rather than Lessons.
+
+Topics are a fixed list of sixteen, in `TOPICS` in `tools/build-index.js`. The per-folder topic defaults in the same file are a starting point, not a judgement; correct them per page in `index-meta.json`.
+
+### Adding a new content type or section
+
+Flashcards, added 8 August 2026, is the worked example. A new type needs four edits, and all four are one-liners:
+
+- a rule in `RULES` in `tools/build-index.js`, giving the path prefix its section, type and fallback topic
+- the type name in `TYPES` in the same file, or the build reports it as unknown
+- the chip in `CHIPS` in `index/site-index.js`
+- the group in `GROUPS` in the same file, or the pages are indexed but never drawn on `/index/`
+
+A new section that reuses an existing type needs only the first of these.
+
+### Client areas
+
+Decided with SD on 8 August 2026: findable in the site's own search and index, marked with a "hidden" pill, and kept reasonably out of search engines by four measures working together. Every page under `/cdu-ai-staff/`, `/alice-springs-arn/` and `/roper-gulf/` carries `noindex,nofollow`; `/roper-gulf/` had none and was given them that day. They are excluded from `sitemap.xml`. `robots.txt` disallows `/search-index.json`, which does not affect the site's own search, because robots.txt governs crawlers and not browsers. Links to hidden pages carry `rel="nofollow"`, and the hidden rows on `/index/` are drawn in the browser rather than written into the HTML.
+
+Say so plainly if it comes up: this is not privacy. Anyone with a URL can still read the page, and a scraper that ignores robots.txt can still read the JSON. Content that must not be readable by a stranger needs a login, which GitHub Pages cannot provide.
+
+The `hidden` flag is set by a `noindex` tag on the page or by a path in `HIDDEN_PREFIXES` in `tools/build-index.js`. A new client area needs its prefix added there, and `noindex` on its pages.
+
+### Traps worth knowing
+
+Published dates come from each file's first commit. Do not add `--follow` back to that git call: these pages share a header and footer, so a brand-new page reads as a rename of an older one and inherits its date. The new `/index/` page came out dated 27 July that way before it was removed.
+
+The slide decks under `/workshops/`, `/presentations/` and `/simulations/` carry no search field. They run their own full-screen chrome with no site nav, so there is nowhere to put one. `tools/add-search.js` skips them by design, which is why its report shows a large "no site header" count.
+
+Directories named `assets` are skipped by both tools, along with `_to_delete/`, `digitalliteracy/`, `*-original.html` and the two redirect stubs under `/resources/`. The lists are at the top of each script.

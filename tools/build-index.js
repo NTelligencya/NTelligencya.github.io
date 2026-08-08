@@ -13,10 +13,15 @@
  *   node tools/build-index.js              build both files
  *   node tools/build-index.js --sync       also add stubs for new pages to
  *                                          tools/index-meta.json
- *   node tools/build-index.js --dates-from-git
- *                                          backfill missing published dates
- *                                          from each file's first commit
  *   node tools/build-index.js --dry-run    report only, write nothing
+ *   node tools/build-index.js --no-git-dates
+ *                                          skip the git lookup for published
+ *                                          dates (only useful outside a repo)
+ *
+ * Any published date not set by hand in tools/index-meta.json is filled from
+ * the file's first commit. That happens by default; --no-git-dates turns it
+ * off, which leaves most pages undated and empties any recently-published
+ * list, so reach for it only when git is unavailable.
  *
  * Hand-maintained values (topic, published, and any title or type override)
  * live in tools/index-meta.json, keyed by URL. They survive regeneration;
@@ -459,7 +464,9 @@ function main() {
   const args = process.argv.slice(2);
   const options = {
     sync: args.includes('--sync'),
-    datesFromGit: args.includes('--dates-from-git'),
+    // On by default. Leaving it off silently drops the date from every page
+    // that has not been given one by hand, which is most of them.
+    datesFromGit: !args.includes('--no-git-dates'),
     dryRun: args.includes('--dry-run'),
   };
 
