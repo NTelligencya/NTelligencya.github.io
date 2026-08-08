@@ -405,13 +405,37 @@ nav.site-nav a:hover { color: var(--text); }
   text-align: center;
 }
 
-.banner-tagline {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--accent-2);
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  margin-bottom: 20px;
+/* The home page mounts the site search here, under the masthead.
+   Rules for the field itself live in section 24; these only widen it
+   and re-hang the results panel, which is a child of .hero-search
+   rather than of header.site. */
+.hero-search {
+  position: relative;
+  max-width: 520px;
+  margin: 0 auto 30px;
+  text-align: left;
+}
+
+.hero-search .site-search { width: 100%; }
+
+.hero-search .site-search-input {
+  padding: 15px 46px 15px 44px;
+  font-size: 16px;
+  border-radius: 12px;
+  background: rgba(10, 14, 18, 0.82);
+}
+
+.hero-search .site-search-icon { top: 16px; left: 16px; width: 17px; height: 17px; }
+.hero-search .site-search-key  { top: 15px; right: 14px; }
+
+.hero-search .site-search-panel {
+  top: calc(100% + 8px);
+  left: 0;
+  right: auto;
+  width: 100%;
+  max-width: none;
+  border-top: 1px solid var(--rule-2);
+  border-radius: 14px;
 }
 
 .banner-cta .lead {
@@ -1125,6 +1149,7 @@ footer.site {
   /* Banner */
   .banner-img       { max-height: 340px; }
   .banner-cta       { padding: 28px 20px 64px; }
+  .hero-search      { max-width: none; }
   .banner-cta .lead { font-size: 16px; }
 
   /* Accordion */
