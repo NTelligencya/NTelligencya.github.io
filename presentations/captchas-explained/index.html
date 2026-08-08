@@ -80,12 +80,12 @@
 
   .menu-item {
     display: flex; align-items: baseline; gap: 22px; width: 100%; background: var(--panel);
-    border: 1px solid var(--hairline); border-radius: var(--radius); padding: 13px 26px; margin-bottom: 8px;
+    border: 1px solid var(--hairline); border-radius: var(--radius); padding: 11px 26px; margin-bottom: 7px;
     cursor: pointer; text-align: left; color: var(--ink-head); font-family: inherit; transition: border-color .2s, box-shadow .25s;
   }
   .menu-item:hover { border-color: var(--accent-dim); box-shadow: 0 0 24px -10px var(--glow); }
   .menu-item .num { color: var(--accent-dim); font-size: 14px; letter-spacing: .2em; font-family: var(--mono); }
-  .menu-item .name { font-size: 26px; flex: 1; font-family: var(--display); font-weight: 400; }
+  .menu-item .name { font-size: 25px; flex: 1; font-family: var(--display); font-weight: 400; }
   .menu-item .state { color: var(--accent-dim); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
 
   /* Clickable inspector */
@@ -222,39 +222,6 @@
     border-radius: 20px; font-family: var(--mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-muted);
   }
 
-  /* Darknet gallery chrome */
-  .keypad { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-  .kbtn {
-    min-width: 34px; padding: 7px 10px; border: 1px solid var(--mock-line); border-radius: 5px; background: var(--mock-face);
-    color: var(--mock-ink); font-family: inherit; font-size: 15px; cursor: pointer;
-  }
-  .kbtn:hover { border-color: var(--mock-blue); }
-  .kbtn.wide { min-width: 62px; color: var(--mock-ink-soft); font-size: 13px; }
-  .kbtn:focus-visible, .oddtile:focus-visible, .urlpick:focus-visible { outline: 2px solid var(--mock-blue); outline-offset: 2px; }
-  .countdown { font-family: var(--mono); font-size: 13px; color: var(--mock-ink-soft); margin-top: 10px; }
-  .countdown.low { color: #a33a2c; }
-  .mock select {
-    padding: 7px 9px; border: 1px solid var(--mock-line); border-radius: 5px; font-size: 14px; font-family: inherit;
-    color: var(--mock-ink); background: #fff; max-width: 100%;
-  }
-  .mockq { font-size: 13.5px; color: var(--mock-ink-soft); margin-top: 12px; margin-bottom: 5px; }
-  .boxrow { display: flex; gap: 7px; margin-top: 12px; }
-  .cbox {
-    width: 44px; height: 50px; border: 1px solid var(--mock-line); border-radius: 5px; background: #fff;
-    display: flex; align-items: center; justify-content: center; font-size: 21px; color: var(--mock-ink); position: relative;
-  }
-  .cbox.active { border-color: var(--mock-blue); box-shadow: 0 0 0 2px rgba(43,108,176,.22); }
-  .cbox.active::after { content: ""; position: absolute; bottom: -11px; left: 50%; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: var(--mock-blue); }
-  .oddgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 12px; }
-  .oddtile { padding: 0; border: 1px solid var(--mock-line); background: #e8ebef; cursor: pointer; aspect-ratio: 1 / 1; overflow: hidden; }
-  .oddtile svg { display: block; width: 100%; height: 100%; }
-  .oddtile.sel { border-color: var(--mock-blue); box-shadow: inset 0 0 0 3px rgba(43,108,176,.34); }
-  .urlpick {
-    display: block; width: 100%; text-align: left; margin-top: 7px; padding: 9px 11px; border: 1px solid var(--mock-line);
-    border-radius: 5px; background: #fff; font-family: var(--mono); font-size: 12.5px; color: var(--mock-ink-soft); cursor: pointer; word-break: break-all;
-  }
-  .urlpick.on { border-color: var(--mock-blue); background: #eef4fb; color: var(--mock-ink); }
-
   /* Reasoning-depth bars */
   .depth { margin-top: 8px; max-width: 720px; }
   .dbar { display: grid; grid-template-columns: 190px 1fr 62px; gap: 16px; align-items: center; padding: 9px 0;
@@ -268,10 +235,13 @@
   .dbar.you .dval, .dbar.you .dlab { color: var(--accent-bright); }
 
   /* Credited screenshot figure, for hosted images with a source line */
-  .shot { margin-top: 20px; max-width: 520px; }
-  .shot img { display: block; width: 100%; border: 1px solid var(--hairline-strong); border-radius: var(--radius); background: var(--panel); }
-  .shot figcaption { margin-top: 10px; font-size: 14px; line-height: 1.6; color: var(--ink-muted); }
-  .shot figcaption .credit { display: block; margin-top: 5px; font-size: 12.5px; color: var(--ink-dim); }
+  .shot { margin: 0; width: 430px; max-width: 100%; flex: 0 0 auto; }
+  .shot img {
+    display: block; width: auto; max-width: 100%; max-height: 50vh; margin: 0 auto;
+    border: 1px solid var(--hairline-strong); border-radius: var(--radius); background: var(--panel-2);
+  }
+  .shot figcaption { margin-top: 12px; font-size: 14px; line-height: 1.6; color: var(--ink-muted); }
+  .shot figcaption .credit { display: block; margin-top: 6px; font-size: 12.5px; color: var(--ink-dim); }
 
   @media (prefers-reduced-motion: reduce) {
     .beat, .reveal-ans.shown { animation: none; }
@@ -302,8 +272,8 @@
     <section class="beat" data-scene="menu">
       <div class="eyebrow">An interactive walkthrough</div>
       <h1>Are you a robot?</h1>
-      <p class="lede">Squint at the letters. Tick the box. Find the buses. Everyone has done it; almost nobody has been told why. This walks through where these tests came from, what the box is really reading while you look at it, why machines now pass them faster than you do, and what happens to a web where most of the traffic is no longer human. Twelve working recreations to click along the way.</p>
-      <div style="margin-top:22px">
+      <p class="lede">Squint at the letters. Tick the box. Find the buses. Everyone has done it; almost nobody has been told why. This walks through where these tests came from, what the box is really reading while you look at it, why machines now pass them faster than you do, and what happens to a web where most of the traffic is no longer human. Six working recreations to click along the way, and an advanced module on the other end of the arms race.</p>
+      <div style="margin-top:18px">
         <button class="menu-item" onclick="goModule(1)"><span class="num">01</span><span class="name">Why there is a gate at all</span><span class="state">Start</span></button>
         <button class="menu-item" onclick="goModule(2)"><span class="num">02</span><span class="name">A short history, and the unpaid work</span><span class="state">Start</span></button>
         <button class="menu-item" onclick="goModule(3)"><span class="num">03</span><span class="name">The gallery: six kinds of test</span><span class="state">Start</span></button>
@@ -458,7 +428,7 @@
     </section>
 
     <section class="beat" data-scene="m4" data-onenter="resetDark">
-      <h2>Six from the other side</h2>
+      <h2>Eight from the other side</h2>
       <div class="chiprow-select" id="darkChips"></div>
       <div class="gallery no-advance">
         <div id="darkMock"></div>
@@ -480,8 +450,8 @@
 
     <section class="beat" data-scene="m4">
       <h2>What stacks up</h2>
-      <div class="callout">Read the six together and the method is layering. Visual distortion, plus an instruction you have to parse, plus a script your keyboard may not have, plus a countdown, plus an image that will not hold still. Any one layer is beatable on its own. The combination is what breaks a pipeline, because the pipeline has to survive all of them at once. DarkOwl adds an observation worth keeping: <strong>"typically, the more advanced the CAPTCHA, the more involved the other protocols of a darknet market or forum will be"</strong>. The puzzle at the door is a readable signal of the operational security behind it.</div>
-      <p class="caption">Two mechanisms described in the same article are not rebuilt here. Arithmetic gates, sometimes deliberately awkward sums, shift the challenge from perception to symbolic reasoning, a different model capability. Missing-element puzzles ask which hieroglyph is absent from a set, which is harder than spotting something present, because you have to hold the complete set in mind before you can notice a gap.</p>
+      <div class="callout">Read the eight together and the method is layering. Visual distortion, plus an instruction you have to parse, plus a script your keyboard may not have, plus a countdown, plus an image that will not hold still. Any one layer is beatable on its own. The combination is what breaks a pipeline, because the pipeline has to survive all of them at once. DarkOwl adds an observation worth keeping: <strong>"typically, the more advanced the CAPTCHA, the more involved the other protocols of a darknet market or forum will be"</strong>. The puzzle at the door is a readable signal of the operational security behind it.</div>
+      <p class="caption">One mechanism described in the same article is not shown here. Arithmetic gates, sometimes deliberately awkward sums, shift the challenge from perception to symbolic reasoning, which is a different model capability again. All eight screenshots above are DarkOwl's, reproduced with their permission and credited on each one; the full article is linked at the end of this deck. Usernames and site addresses have been redacted from the images.
       <p class="qline">Back to the surface web, and to what the ordinary tick box was reading all along.</p>
     </section>
 
@@ -637,10 +607,11 @@
       <div class="callout">The squiggle was never really asking whether you are human. It was asking whether letting you through is worth the risk, and for most of its life it answered that question by looking you up rather than testing you. That approach is finishing, not because it got annoying but because it stopped working and because most of the traffic it was built to sort is now automated and often legitimate. What replaces it decides something larger than whether you have to find the buses: <strong>whether the open web can tell who is at the door without knowing who you are</strong>. Next time a box asks if you are a robot, you will know it already has an opinion.</div>
       <div class="linkrow">
         <a href="https://cybersecurityink.com/posts/coming-soon-to-the-internet-near-you/" target="_blank" rel="noopener"><span class="sect">Companion commentary</span><span class="ttl">Coming soon to the internet near you</span></a>
+        <a href="https://www.darkowl.com/blog-content/cracking-the-code-exploring-the-sophistication-of-captchas/" target="_blank" rel="noopener"><span class="sect">Module 04 screenshots</span><span class="ttl">DarkOwl: Cracking the Code</span></a>
         <a href="/simulations/"><span class="sect">NT World Ink</span><span class="ttl">Simulation tools catalogue</span></a>
         <a href="/presentations/"><span class="sect">NT World Ink</span><span class="ttl">Back to presentations</span></a>
       </div>
-      <p class="cite">Sources used. Origin: US Patent 6,195,698 B1, filed 13 April 1998. Von Ahn, Blum, Hopper and Langford, "CAPTCHA: Using Hard AI Problems for Security", Eurocrypt 2003. Mori and Malik, "Recognizing Objects in Adversarial Clutter", CVPR 2003. reCAPTCHA: Carnegie Mellon, "Stop Spam, Read Books", 24 May 2007; von Ahn et al., Science vol. 321, 12 September 2008; Google, "Teaching computers to read", 16 September 2009. The tick box and after: Google Online Security Blog, "Are you a robot? Introducing No CAPTCHA reCAPTCHA", 3 December 2014, and "Introducing reCAPTCHA v3", 29 October 2018; Google reCAPTCHA v3 developer documentation for the 0.0 to 1.0 score and the 0.5 default threshold. Cloudflare: "Moving from reCAPTCHA to hCaptcha", 8 April 2020; Turnstile press release, 28 September 2022; "Turnstile is free for everyone", 29 September 2023; "Eliminating CAPTCHAs on iPhones and Macs using new standard", 8 June 2022; "The age of agents: cryptographically recognizing agent traffic", 28 August 2025. Privacy Pass: RFC 9576, 9577 and 9578, June 2024; Apple WWDC22 session 10077. Street View labels: Google spokesperson to TechCrunch, 29 March 2012, and Google Online Security Blog, 16 April 2014. Signals: Sivakorn, Polakis and Keromytis, Black Hat Asia 2016. Effectiveness: Searles et al., USENIX Security 2023; Plesner, Vontobel and Wattenhofer, "Breaking reCAPTCHAv2", arXiv 2409.08831, September 2024. Solving-service prices retrieved 8 August 2026. Proof of work: LWN, "Anubis sends AI scraperbots to a well-deserved fate", 10 July 2025. Accessibility: W3C, "Inaccessibility of CAPTCHA", 16 December 2021; W3C, Understanding SC 1.1.1, WCAG 2.2. Traffic: Cloudflare Radar; Thales 2026 Bad Bot Report, 29 April 2026; Cloudflare Radar 2025 Year in Review, 15 December 2025. Clicks: Pew Research Center, 22 July 2025. Personhood credentials: Adler, Hitzig, Jain, South and others, arXiv 2408.07892, August 2024. Darknet designs, Module 04: DarkOwl Content Team, "Cracking the Code: Exploring the Sophistication of CAPTCHAs", 18 April 2024; every example in that module is DarkOwl's observation and is attributed to them rather than stated as established fact, and no site address or means of access appears anywhere on this page. Reasoning depth: Luo, Li, Liu, Cui, Zhao and Shen, "Open CaptchaWorld: A Comprehensive Web-based Platform for Testing and Benchmarking Multimodal LLM Agents", arXiv:2505.24878v1, 30 May 2025, for the 2.94-step human average across 225 puzzles, the 5.05 and 4.15 model estimates, and the 93.3 against 40.0 per cent solve rates. The TaskRabbit episode, Module 07: OpenAI, GPT-4 System Card, March 2023, section on the Alignment Research Center's preliminary red-teaming, from which all quotations are taken directly; the accessible secondary account is IFLScience, Jack Dunhill, 16 March 2023. Three things are deliberately not claimed here: that reCAPTCHA image grids train self-driving cars, which Google has never confirmed; any aggregate figure for human hours spent on CAPTCHAs, because every circulating number traces back to an estimate by an interested party rather than a measurement; and that the TaskRabbit episode shows a model acting on its own initiative, which the system card's own account of the experiment does not support.</p>
+      <p class="cite">Sources used. Origin: US Patent 6,195,698 B1, filed 13 April 1998. Von Ahn, Blum, Hopper and Langford, "CAPTCHA: Using Hard AI Problems for Security", Eurocrypt 2003. Mori and Malik, "Recognizing Objects in Adversarial Clutter", CVPR 2003. reCAPTCHA: Carnegie Mellon, "Stop Spam, Read Books", 24 May 2007; von Ahn et al., Science vol. 321, 12 September 2008; Google, "Teaching computers to read", 16 September 2009. The tick box and after: Google Online Security Blog, "Are you a robot? Introducing No CAPTCHA reCAPTCHA", 3 December 2014, and "Introducing reCAPTCHA v3", 29 October 2018; Google reCAPTCHA v3 developer documentation for the 0.0 to 1.0 score and the 0.5 default threshold. Cloudflare: "Moving from reCAPTCHA to hCaptcha", 8 April 2020; Turnstile press release, 28 September 2022; "Turnstile is free for everyone", 29 September 2023; "Eliminating CAPTCHAs on iPhones and Macs using new standard", 8 June 2022; "The age of agents: cryptographically recognizing agent traffic", 28 August 2025. Privacy Pass: RFC 9576, 9577 and 9578, June 2024; Apple WWDC22 session 10077. Street View labels: Google spokesperson to TechCrunch, 29 March 2012, and Google Online Security Blog, 16 April 2014. Signals: Sivakorn, Polakis and Keromytis, Black Hat Asia 2016. Effectiveness: Searles et al., USENIX Security 2023; Plesner, Vontobel and Wattenhofer, "Breaking reCAPTCHAv2", arXiv 2409.08831, September 2024. Solving-service prices retrieved 8 August 2026. Proof of work: LWN, "Anubis sends AI scraperbots to a well-deserved fate", 10 July 2025. Accessibility: W3C, "Inaccessibility of CAPTCHA", 16 December 2021; W3C, Understanding SC 1.1.1, WCAG 2.2. Traffic: Cloudflare Radar; Thales 2026 Bad Bot Report, 29 April 2026; Cloudflare Radar 2025 Year in Review, 15 December 2025. Clicks: Pew Research Center, 22 July 2025. Personhood credentials: Adler, Hitzig, Jain, South and others, arXiv 2408.07892, August 2024. Darknet designs, Module 04: DarkOwl Content Team, "Cracking the Code: Exploring the Sophistication of CAPTCHAs", 18 April 2024; every example in that module is DarkOwl's observation and is attributed to them rather than stated as established fact. The eight screenshots are DarkOwl's own, reproduced with permission and credited individually; usernames and site addresses have been redacted from them, and no site address or means of access appears anywhere on this page. Reasoning depth: Luo, Li, Liu, Cui, Zhao and Shen, "Open CaptchaWorld: A Comprehensive Web-based Platform for Testing and Benchmarking Multimodal LLM Agents", arXiv:2505.24878v1, 30 May 2025, for the 2.94-step human average across 225 puzzles, the 5.05 and 4.15 model estimates, and the 93.3 against 40.0 per cent solve rates. The TaskRabbit episode, Module 07: OpenAI, GPT-4 System Card, March 2023, section on the Alignment Research Center's preliminary red-teaming, from which all quotations are taken directly; the accessible secondary account is IFLScience, Jack Dunhill, 16 March 2023. Three things are deliberately not claimed here: that reCAPTCHA image grids train self-driving cars, which Google has never confirmed; any aggregate figure for human hours spent on CAPTCHAs, because every circulating number traces back to an estimate by an interested party rather than a measurement; and that the TaskRabbit episode shows a model acting on its own initiative, which the system card's own account of the experiment does not support.</p>
       <button class="btn ghost" style="margin-top:28px" onclick="goMenu()">Back to menu</button>
     </section>
 
@@ -1125,354 +1096,91 @@
   function resetFuture() { futActive = null; futPick(null); }
 
 
-  /* ---- Module 4: the darknet gallery ---- */
-  let darkTimers = [];
-  function darkStop() { darkTimers.forEach(t => clearInterval(t)); darkTimers = []; }
-  function darkSet(html) { const el = document.getElementById('darkMock'); if (el) el.innerHTML = html; }
-  function darkVerdict(id, ok, msg) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.className = 'verdict ' + (ok ? 'pass' : 'fail');
-    el.textContent = msg;
-  }
-  function warpInto(target, chars, opts) {
-    const g = document.getElementById(target);
-    if (!g) return;
-    let out = '', x = opts.x0;
-    chars.forEach((c, i) => {
-      const rot = Math.sin((i + 1) * 1.7) * (opts.rot || 16);
-      const dy = Math.cos((i + 1) * 1.1) * (opts.dy || 6);
-      out += '<text x="' + x.toFixed(1) + '" y="' + (opts.y + dy).toFixed(1) + '" font-family="Georgia, serif" font-size="' + opts.size + '" ' +
-             'fill="' + (opts.fills && opts.fills[i] ? opts.fills[i] : '#2b3140') + '" ' +
-             'transform="rotate(' + rot.toFixed(1) + ' ' + x.toFixed(1) + ' ' + (opts.y + dy).toFixed(1) + ')">' + esc(c) + '</text>';
-      x += opts.step;
-    });
-    g.innerHTML = out;
-  }
 
-  /* A. Cyrillic entry, as used by the Russian-language market DarkOwl names */
-  const CYR_ANSWER = ['Ж', 'У', 'К', 'В', 'Ы'];
-  const CYR_KEYS = ['А', 'Б', 'В', 'Ж', 'К', 'Л', 'Н', 'П', 'У', 'Ф', 'Ы', 'Э'];
-  function buildCyr() {
-    const keys = CYR_KEYS.map(c => '<button class="kbtn" onclick="cyrKey(\'' + c + '\')">' + c + '</button>').join('');
-    darkSet(
-      '<div class="mock">' +
-        '<div class="mock-label">Введите символы с картинки</div>' +
-        '<svg viewBox="0 0 320 78" width="100%" height="78" role="img" aria-label="Five distorted Cyrillic characters">' +
-          '<rect width="320" height="78" fill="#f4f5f7"/>' +
-          '<g id="cyrInk"></g>' +
-          '<path d="M6 54 C 90 26, 170 70, 250 38 S 306 56, 314 44" stroke="#8b93a1" stroke-width="1.4" fill="none"/>' +
-        '</svg>' +
-        '<div class="mock-strip">' +
-          '<input type="text" id="cyrIn" autocomplete="off" spellcheck="false" aria-label="Enter the Cyrillic characters you can see">' +
-          '<button class="mockbtn" onclick="cyrCheck()">Проверить</button>' +
-        '</div>' +
-        '<div class="keypad" aria-label="Cyrillic character picker">' + keys +
-          '<button class="kbtn wide" onclick="cyrClear()">Clear</button></div>' +
-        '<div class="verdict" id="cyrVerdict"></div>' +
-        '<div class="brandline">A recreation, built for this page. The picker stands in for switching your keyboard.</div>' +
-      '</div>');
-    warpInto('cyrInk', CYR_ANSWER, { x0: 34, y: 52, size: 33, step: 52, rot: 20, dy: 7 });
-  }
-  function cyrKey(c) { const i = document.getElementById('cyrIn'); if (i) i.value += c; }
-  function cyrClear() {
-    const i = document.getElementById('cyrIn');
-    if (i) i.value = '';
-    const v = document.getElementById('cyrVerdict');
-    if (v) { v.className = 'verdict'; v.textContent = ''; }
-  }
-  function cyrCheck() {
-    const v = (document.getElementById('cyrIn').value || '').toUpperCase().replace(/\s+/g, '');
-    if (v === CYR_ANSWER.join('')) darkVerdict('cyrVerdict', true, 'Correct. Note what you had to do to get here, and that a solving pipeline has to do the same.');
-    else if (/^[A-Z0-9]+$/.test(v) && v.length) darkVerdict('cyrVerdict', false, 'Those are Latin characters. The field will not take them, which is the entire point.');
-    else darkVerdict('cyrVerdict', false, 'Not the sequence shown. Five characters, in the order they appear.');
-  }
+  /* ---- Module 4: the darknet gallery, real screenshots ---- */
+  const DARKSTOP_NOOP = true;
+  function darkStop() { /* no timers in this module; kept so stopAllTimers stays uniform */ }
 
-  /* B. Mutating pixels plus a second puzzle, under a countdown */
-  const KERB = { img: 'bicycle', phrase: 'K7R2M9', pos: 3, chr: 'R' };
-  let kerbLeft = 20;
-  function buildKerb() {
-    darkStop();
-    darkSet(
-      '<div class="mock">' +
-        '<div class="mock-label">Complete both, before the timer runs out</div>' +
-        '<svg viewBox="0 0 320 118" width="100%" height="118" role="img" aria-label="A grainy photograph that keeps changing, showing a bicycle">' +
-          '<rect width="320" height="118" fill="#dfe4ea"/>' +
-          '<g opacity="0.9">' +
-            '<circle cx="96" cy="76" r="26" fill="none" stroke="#3b4250" stroke-width="5"/>' +
-            '<circle cx="216" cy="76" r="26" fill="none" stroke="#3b4250" stroke-width="5"/>' +
-            '<path d="M96 76 L146 76 L170 36 L216 76 M146 76 L176 76 L170 36" fill="none" stroke="#3b4250" stroke-width="5"/>' +
-            '<path d="M152 34 L190 34" stroke="#3b4250" stroke-width="5"/>' +
-          '</g>' +
-          '<g id="kerbNoise"></g>' +
-        '</svg>' +
-        '<div class="mockq">What is in the image?</div>' +
-        '<select id="kerbImg" aria-label="What is in the image"><option value="">Choose...</option><option value="teapot">a teapot</option><option value="bicycle">a bicycle</option><option value="guitar">a guitar</option><option value="umbrella">an umbrella</option></select>' +
-        '<div class="mockq">Select character number ' + KERB.pos + ' of <span class="mono" style="color:#1f2430">' + KERB.phrase + '</span></div>' +
-        '<select id="kerbChr" aria-label="Select the character"><option value="">Choose...</option><option value="K">K</option><option value="7">7</option><option value="R">R</option><option value="2">2</option><option value="M">M</option><option value="9">9</option></select>' +
-        '<div class="countdown" id="kerbClock">Expires in 20 s</div>' +
-        '<div class="mock-strip"><button class="mockbtn" onclick="kerbCheck()">Verify</button>' +
-          '<button class="mockbtn sec" onclick="buildKerb()">New challenge</button></div>' +
-        '<div class="verdict" id="kerbVerdict"></div>' +
-        '<div class="brandline">A recreation, built for this page. The grain is regenerated four times a second.</div>' +
-      '</div>');
-    kerbNoise();
-    kerbLeft = 20;
-    darkTimers.push(setInterval(kerbNoise, 260));
-    darkTimers.push(setInterval(() => {
-      kerbLeft -= 1;
-      const c = document.getElementById('kerbClock');
-      if (!c) return;
-      if (kerbLeft <= 0) {
-        c.className = 'countdown low';
-        c.textContent = 'Expired. A real one would now hand you a fresh challenge, with no explanation.';
-        darkStop();
-        return;
-      }
-      c.className = 'countdown' + (kerbLeft <= 6 ? ' low' : '');
-      c.textContent = 'Expires in ' + kerbLeft + ' s';
-    }, 1000));
-  }
-  function kerbNoise() {
-    const g = document.getElementById('kerbNoise');
-    if (!g) { darkStop(); return; }
-    let s = '';
-    for (let i = 0; i < 240; i++) {
-      const x = Math.random() * 320, y = Math.random() * 118;
-      s += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + (2 + Math.random() * 4).toFixed(1) + '" height="' + (2 + Math.random() * 4).toFixed(1) + '" fill="' + (Math.random() > 0.5 ? '#ffffff' : '#7f8794') + '" opacity="0.5"/>';
-    }
-    g.innerHTML = s;
-  }
-  function kerbCheck() {
-    if (kerbLeft <= 0) { darkVerdict('kerbVerdict', false, 'Too late. Start a new challenge.'); return; }
-    const a = document.getElementById('kerbImg').value, b = document.getElementById('kerbChr').value;
-    if (a === KERB.img && b === KERB.chr) darkVerdict('kerbVerdict', true, 'Through, with ' + kerbLeft + ' seconds to spare. A single captured frame would not have been enough.');
-    else darkVerdict('kerbVerdict', false, 'Not both. Two puzzles, one clock; that is the design.');
-  }
-
-  /* C. A CAPTCHA that authenticates the site as well as the visitor */
-  const URLC = { chars: ['F', '7', 'K', '2', 'Q', 'B'], hiIdx: [2, 3, 4], good: 1 };
-  const URLC_OPTIONS = [
-    'https://example-forum.invalid/login',
-    'https://k2q.example-forum.invalid/login'
-  ];
-  let urlPick = null;
-  function buildUrlc() {
-    const opts = URLC_OPTIONS.map((u, i) => '<button class="urlpick" data-u="' + i + '" onclick="urlSet(' + i + ')">' + u + '</button>').join('');
-    darkSet(
-      '<div class="mock">' +
-        '<div class="mock-label">Enter the characters. The highlighted ones must also appear in the address.</div>' +
-        '<svg viewBox="0 0 320 78" width="100%" height="78" role="img" aria-label="Six distorted characters, three of them highlighted">' +
-          '<rect width="320" height="78" fill="#f4f5f7"/>' +
-          '<g id="urlInk"></g>' +
-          '<path d="M8 56 C 90 30, 168 68, 248 40 S 304 54, 314 46" stroke="#8b93a1" stroke-width="1.3" fill="none"/>' +
-        '</svg>' +
-        '<div class="mock-strip">' +
-          '<input type="text" id="urlIn" autocomplete="off" spellcheck="false" aria-label="Type the six characters">' +
-          '<button class="mockbtn" onclick="urlCheck()">Verify</button>' +
-        '</div>' +
-        '<div class="mockq">Which address are you on?</div>' + opts +
-        '<div class="verdict" id="urlVerdict"></div>' +
-        '<div class="brandline">A recreation, built for this page. Both addresses are fictional and do not resolve.</div>' +
-      '</div>');
-    const fills = URLC.chars.map((c, i) => URLC.hiIdx.indexOf(i) > -1 ? '#c2410c' : '#2b3140');
-    warpInto('urlInk', URLC.chars, { x0: 26, y: 52, size: 30, step: 47, rot: 15, dy: 6, fills: fills });
-    urlPick = null;
-  }
-  function urlSet(i) {
-    urlPick = i;
-    document.querySelectorAll('[data-u]').forEach((b, n) => b.classList.toggle('on', n === i));
-  }
-  function urlCheck() {
-    const v = (document.getElementById('urlIn').value || '').toUpperCase().replace(/\s+/g, '');
-    if (v !== URLC.chars.join('')) { darkVerdict('urlVerdict', false, 'Not the six characters shown.'); return; }
-    if (urlPick === null) { darkVerdict('urlVerdict', false, 'Characters right. Now the second half: which address are you actually on?'); return; }
-    if (urlPick === URLC.good) darkVerdict('urlVerdict', true, 'Both right. The highlighted trio appears in the address, so the site has just proved itself to you at the same moment you proved yourself to it.');
-    else darkVerdict('urlVerdict', false, 'That address is missing the highlighted characters. On a real one you have landed on a copy of the site, and the puzzle just told you so.');
-  }
-
-  /* D. Entry order dictated by a moving indicator */
-  const SEQ = ['H', '4', 'P', 'R', '9', 'T'];
-  const SEQ_KEYS = ['H', '4', 'P', 'R', '9', 'T', 'B', 'X', '3', 'W'];
-  let seqSlots = [], seqActive = 0;
-  function buildSeq() {
-    const keys = SEQ_KEYS.map(c => '<button class="kbtn" onclick="seqKey(\'' + c + '\')">' + c + '</button>').join('');
-    darkSet(
-      '<div class="mock">' +
-        '<div class="mock-label">Fill the marked box. The marker moves.</div>' +
-        '<svg viewBox="0 0 320 70" width="100%" height="70" role="img" aria-label="Six distorted characters">' +
-          '<rect width="320" height="70" fill="#f4f5f7"/>' +
-          '<g id="seqInk"></g>' +
-        '</svg>' +
-        '<div class="boxrow" id="seqBoxes"></div>' +
-        '<div class="keypad">' + keys + '<button class="kbtn wide" onclick="buildSeq()">Reset</button></div>' +
-        '<div class="mock-strip" style="justify-content:flex-end"><button class="mockbtn" onclick="seqCheck()">Verify</button></div>' +
-        '<div class="verdict" id="seqVerdict"></div>' +
-        '<div class="brandline">A recreation, built for this page</div>' +
-      '</div>');
-    warpInto('seqInk', SEQ, { x0: 24, y: 47, size: 27, step: 47, rot: 13, dy: 5 });
-    seqSlots = ['', '', '', '', '', ''];
-    seqActive = 2;
-    seqDraw();
-  }
-  function seqDraw() {
-    const w = document.getElementById('seqBoxes');
-    if (!w) return;
-    w.innerHTML = seqSlots.map((v, i) => '<div class="cbox' + (i === seqActive ? ' active' : '') + '">' + esc(v) + '</div>').join('');
-  }
-  function seqKey(c) {
-    if (seqActive < 0) return;
-    seqSlots[seqActive] = c;
-    const empty = seqSlots.map((v, i) => v ? -1 : i).filter(i => i > -1);
-    seqActive = empty.length ? empty[Math.floor(Math.random() * empty.length)] : -1;
-    seqDraw();
-  }
-  function seqCheck() {
-    const ok = seqSlots.every((v, i) => v === SEQ[i]);
-    if (ok) darkVerdict('seqVerdict', true, 'Correct. Reading order and entry order came apart, and most automated solvers assume they are the same thing.');
-    else darkVerdict('seqVerdict', false, 'Not the sequence. Each character belongs in its own position, whatever order you were asked for it in.');
-  }
-
-  /* E. Odd one out: category reasoning rather than object recognition */
-  const ODD_ANSWER = 4;
-  const ODD_SVG = [
-    '<svg viewBox="0 0 60 60"><g id="bg"></g><ellipse cx="27" cy="30" rx="17" ry="10" fill="#3f5f8f"/><path d="M44 30 L56 21 L56 39 Z" fill="#3f5f8f"/><circle cx="18" cy="27" r="2" fill="#fff"/></svg>',
-    '<svg viewBox="0 0 60 60"><circle cx="28" cy="30" r="13" fill="#8f4f3f"/><circle cx="38" cy="22" r="7" fill="#8f4f3f"/><path d="M44 22 L54 25 L44 27 Z" fill="#d8b23f"/><path d="M20 30 q10 8 20 2" fill="none" stroke="#6b3a2e" stroke-width="2"/><circle cx="40" cy="20" r="1.6" fill="#fff"/><path d="M22 42 L20 52 M32 42 L32 52" stroke="#6b3a2e" stroke-width="2"/></svg>',
-    '<svg viewBox="0 0 60 60"><ellipse cx="20" cy="22" rx="11" ry="13" fill="#6a4f8f"/><ellipse cx="40" cy="22" rx="11" ry="13" fill="#6a4f8f"/><ellipse cx="20" cy="40" rx="9" ry="10" fill="#7d61a3"/><ellipse cx="40" cy="40" rx="9" ry="10" fill="#7d61a3"/><rect x="28" y="16" width="4" height="30" rx="2" fill="#3a3040"/><path d="M30 16 L24 8 M30 16 L36 8" stroke="#3a3040" stroke-width="1.6"/></svg>',
-    '<svg viewBox="0 0 60 60"><path d="M8 44 q4 -12 18 -10 l6 1" fill="none" stroke="#7a5a3a" stroke-width="6" stroke-linecap="round"/><circle cx="38" cy="30" r="15" fill="none" stroke="#8a6a3a" stroke-width="5"/><circle cx="38" cy="30" r="7" fill="none" stroke="#8a6a3a" stroke-width="5"/><path d="M10 40 L6 30 M14 40 L12 29" stroke="#7a5a3a" stroke-width="2"/></svg>',
-    '<svg viewBox="0 0 60 60"><path d="M30 52 C 30 34, 30 20, 30 10" stroke="#4f7a3a" stroke-width="3" fill="none"/><path d="M30 26 C 12 26, 8 12, 26 10 C 34 9, 33 22, 30 26 Z" fill="#4f8b56"/><path d="M30 38 C 48 38, 52 24, 34 22 C 26 21, 27 34, 30 38 Z" fill="#5c9a63"/></svg>',
-    '<svg viewBox="0 0 60 60"><ellipse cx="30" cy="34" rx="15" ry="17" fill="#3a4049"/><ellipse cx="30" cy="30" rx="6" ry="14" fill="#565e6b"/><circle cx="30" cy="15" r="7" fill="#3a4049"/><path d="M26 9 L22 3 M34 9 L38 3" stroke="#3a4049" stroke-width="2"/><path d="M15 30 L6 26 M45 30 L54 26 M15 40 L6 42 M45 40 L54 42" stroke="#3a4049" stroke-width="2"/></svg>'
-  ];
-  let oddSel = null;
-  function buildOdd() {
-    const tiles = ODD_SVG.map((s, i) => '<button class="oddtile" data-o="' + i + '" onclick="oddPick(' + i + ')" aria-label="Image ' + (i + 1) + '">' + s + '</button>').join('');
-    darkSet(
-      '<div class="mock" style="background:repeating-linear-gradient(45deg,#eef0f3 0 9px,#e2e6ec 9px 18px)">' +
-        '<div class="mock-label" style="background:#fff;padding:6px 8px;border-radius:4px">Выберите лишнее &middot; Pick the odd one out</div>' +
-        '<div class="oddgrid">' + tiles + '</div>' +
-        '<div class="mock-strip" style="justify-content:flex-end"><button class="mockbtn sec" onclick="buildOdd()">Reset</button>' +
-          '<button class="mockbtn" onclick="oddCheck()">Verify</button></div>' +
-        '<div class="verdict" id="oddVerdict" style="background:#fff;padding:4px 6px;border-radius:4px"></div>' +
-        '<div class="brandline" style="background:#fff;padding:4px 6px;border-radius:4px">A recreation, built for this page</div>' +
-      '</div>');
-    oddSel = null;
-  }
-  function oddPick(i) {
-    oddSel = i === oddSel ? null : i;
-    document.querySelectorAll('[data-o]').forEach((b, n) => b.classList.toggle('sel', n === oddSel));
-  }
-  function oddCheck() {
-    if (oddSel === null) { darkVerdict('oddVerdict', false, 'Pick one.'); return; }
-    if (oddSel === ODD_ANSWER) darkVerdict('oddVerdict', true, 'The plant, among five animals. You did not recognise six objects; you sorted them into two categories and found the category with one member.');
-    else darkVerdict('oddVerdict', false, 'Not that one. The question is not what each picture is, it is which one belongs to a different kind of thing.');
-  }
-
-  /* F. Reading a cluttered clock face, against a clock */
-  const CLOCK = { h: 2, m: 40 };
-  let clockLeft = 60;
-  function buildClock() {
-    darkStop();
-    let clutter = '';
-    const shapes = [[38, 34, 'rect'], [104, 42, 'tri'], [70, 96, 'rect'], [122, 92, 'circ'], [56, 66, 'tri'], [96, 22, 'circ'], [30, 88, 'circ'], [118, 62, 'tri']];
-    shapes.forEach((s, i) => {
-      const c = ['#d8b23f', '#7fa8c9', '#cf8f7c', '#8fbf96'][i % 4];
-      if (s[2] === 'rect') clutter += '<rect x="' + s[0] + '" y="' + s[1] + '" width="16" height="12" fill="' + c + '" opacity="0.72" transform="rotate(' + (i * 23) + ' ' + s[0] + ' ' + s[1] + ')"/>';
-      else if (s[2] === 'tri') clutter += '<path d="M' + s[0] + ' ' + s[1] + ' l14 3 l-8 12 z" fill="' + c + '" opacity="0.72"/>';
-      else clutter += '<circle cx="' + s[0] + '" cy="' + s[1] + '" r="8" fill="' + c + '" opacity="0.72"/>';
-    });
-    let marks = '';
-    for (let i = 0; i < 12; i++) {
-      const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
-      marks += '<circle cx="' + (80 + Math.cos(a) * 58).toFixed(1) + '" cy="' + (66 + Math.sin(a) * 52).toFixed(1) + '" r="2.4" fill="#3b4250"/>';
-    }
-    const ha = ((CLOCK.h % 12) / 12 + CLOCK.m / 720) * Math.PI * 2 - Math.PI / 2;
-    const ma = (CLOCK.m / 60) * Math.PI * 2 - Math.PI / 2;
-    darkSet(
-      '<div class="mock">' +
-        '<div class="mock-label">What time is shown? Format 9:05</div>' +
-        '<svg viewBox="0 0 160 132" width="100%" height="188" role="img" aria-label="A cluttered analogue clock face">' +
-          '<rect width="160" height="132" fill="#f4f5f7"/>' +
-          '<ellipse cx="80" cy="66" rx="64" ry="58" fill="#ffffff" stroke="#3b4250" stroke-width="2"/>' +
-          marks +
-          '<line x1="80" y1="66" x2="' + (80 + Math.cos(ha) * 30).toFixed(1) + '" y2="' + (66 + Math.sin(ha) * 27).toFixed(1) + '" stroke="#1f2430" stroke-width="4.5" stroke-linecap="round"/>' +
-          '<line x1="80" y1="66" x2="' + (80 + Math.cos(ma) * 46).toFixed(1) + '" y2="' + (66 + Math.sin(ma) * 42).toFixed(1) + '" stroke="#1f2430" stroke-width="3" stroke-linecap="round"/>' +
-          '<circle cx="80" cy="66" r="3.4" fill="#1f2430"/>' +
-          clutter +
-        '</svg>' +
-        '<div class="mock-strip">' +
-          '<input type="text" id="clockIn" autocomplete="off" spellcheck="false" aria-label="Enter the time shown">' +
-          '<button class="mockbtn" onclick="clockCheck()">Verify</button>' +
-        '</div>' +
-        '<div class="countdown" id="clockClock">60 s remaining</div>' +
-        '<div class="brandline">A recreation, built for this page</div>' +
-        '<div class="verdict" id="clockVerdict"></div>' +
-      '</div>');
-    clockLeft = 60;
-    darkTimers.push(setInterval(() => {
-      clockLeft -= 1;
-      const c = document.getElementById('clockClock');
-      if (!c) { darkStop(); return; }
-      if (clockLeft <= 0) { c.className = 'countdown low'; c.textContent = 'Out of time.'; darkStop(); return; }
-      c.className = 'countdown' + (clockLeft <= 15 ? ' low' : '');
-      c.textContent = clockLeft + ' s remaining';
-    }, 1000));
-  }
-  function clockCheck() {
-    if (clockLeft <= 0) { darkVerdict('clockVerdict', false, 'Out of time. A real one would issue a fresh face.'); return; }
-    const raw = (document.getElementById('clockIn').value || '').trim();
-    const m = raw.match(/^(\d{1,2})\s*[:.\s]\s*(\d{1,2})$/);
-    if (!m) { darkVerdict('clockVerdict', false, 'Enter it as hours then minutes, for example 9:05.'); return; }
-    const hh = Number(m[1]) % 12, mm = Number(m[2]);
-    if (hh === CLOCK.h % 12 && mm === CLOCK.m) darkVerdict('clockVerdict', true, 'Correct, with ' + clockLeft + ' seconds left. Reading an analogue face is a skill a model has to have been taught, and the clutter is there to break the shortcut.');
-    else darkVerdict('clockVerdict', false, 'Not the time shown. The shapes are not decoration; they are there to sit where you were about to look.');
-  }
+  const CREDIT = 'Screenshot: DarkOwl, "Cracking the Code: Exploring the Sophistication of CAPTCHAs", 18 April 2024.';
 
   const DARK = [
     {
       chip: 'A different alphabet',
-      note: '<span class="t">Language as a gate.</span> A Russian-language market DarkOwl names requires the answer in <span class="mono">Cyrillic</span>. A visitor without a Russian keyboard has to change their input settings or copy characters out of a character tool before they can even begin.' +
-        '<span class="sub">The teaching point is not the alphabet, it is the pipeline. Optical character recognition plus automatic typing assumes one script and one keyboard layout; make the answer script something else and the whole chain needs localising. DarkOwl describes deliberate language-gating as an emerging tactic on these sites rather than an accident of where they happen to be hosted.</span>',
-      build: buildCyr
+      img: 'assets/omg-cyrillic.png',
+      alt: 'A login form headed Вход, with a distorted-text CAPTCHA whose characters are Cyrillic, and the answer typed into the field below in Cyrillic.',
+      cap: 'A Russian-language market. The form is ordinary; the answer has to go in in Cyrillic.',
+      note: '<span class="t">Language as a gate.</span> Everything about this challenge is the format the whole web has used since 2000, with one change: the characters are not in your alphabet, and the field will not take a transliteration.' +
+        '<span class="sub">The teaching point is the pipeline, not the alphabet. Optical character recognition plus automatic typing assumes one script and one keyboard layout; make the answer script something else and the whole chain needs localising. A visitor without a Russian keyboard has to change their input settings or copy characters out of a character tool first. DarkOwl describes deliberate language-gating as an emerging tactic on these sites rather than an accident of where they happen to be hosted.</span>'
     },
     {
-      chip: 'An image that will not hold still',
-      note: '<span class="t">Mutation, paired, timed.</span> One market runs two puzzles at once: identify what is in an image whose pixels keep changing while you look at it, and pick a character out of a phrase, both from dropdowns, both before a timer expires.' +
-        '<span class="sub">A moving target defeats capture-and-solve, which is how most automated solving works: grab one frame, send it away, type back the answer. Here the frame is stale by the time it arrives. Add a second puzzle of a different kind and a countdown, and the attacker needs a solver that is fast, concurrent and multi-modal rather than merely accurate.</span>',
-      build: buildKerb
+      chip: 'Two puzzles, one clock',
+      img: 'assets/kerberos-two-factors.png',
+      alt: 'A CAPTCHA in two halves. Factor 1 asks what is literally associated with the picture, showing a photograph of a dog above a dropdown. Factor 2 shows five distorted characters with three pointing hands above three dropdown boxes.',
+      cap: 'The Kerberos marketplace ran both halves at once, each answered from a dropdown, both against a countdown.',
+      note: '<span class="t">Mutation, paired, timed.</span> Factor one asks what is <em>associated</em> with the picture rather than what is in it, and the pixels in that picture keep changing while you look. Factor two hands you five characters and three pointing fingers, and asks for only the three they indicate.' +
+        '<span class="sub">A moving target defeats capture-and-solve, which is how most automated solving works: grab one frame, send it away, type back the answer. Here the frame is stale by the time it arrives. Then note factor two: the answer is not the string, it is a subset of the string chosen by an on-screen indicator, so a solver has to read the interface as well as the image. Two kinds of puzzle, one countdown.</span>'
     },
     {
       chip: 'The puzzle checks the site',
-      note: '<span class="t">Two-way authentication, in one widget.</span> The CAPTCHA on the now-seized Kingdom Marketplace highlighted which characters should also appear in the address you are visiting.' +
-        '<span class="sub">This is the cleverest design in the set. Cloned sites are the standing threat on the darknet, because a visitor has no certificate authority, no brand recognition and no search result to fall back on. So the puzzle does double duty: while you are proving you are a person, it is proving the page is the real one. A phishing copy cannot reproduce the highlighted characters in its own address without giving itself away.</span>',
-      build: buildUrlc
+      img: 'assets/kingdom-url-check.png',
+      alt: 'A CAPTCHA banner reading "if your search bar\'s url differs from one below then you are on a phishing site", with coloured letters overlaid on a striped background and the address line blacked out.',
+      cap: 'The seized Kingdom Marketplace. The address line is redacted here; on the live site it was the whole point.',
+      note: '<span class="t">Two-way authentication, in one widget.</span> Read the instruction at the top. The puzzle is not only asking you to prove you are a person; it is publishing the address you ought to be on, so you can check the one in your own address bar against it.' +
+        '<span class="sub">This is the cleverest design in the set, and it exists because of a problem the surface web solved long ago. A visitor here has no certificate authority to lean on, no brand recognition, no search result to sanity-check against. Cloned sites are the standing threat. So the widget does double duty: while you prove yourself to the site, the site proves itself to you. A phishing copy cannot reproduce the address without giving itself away.</span>'
     },
     {
       chip: 'Out of order',
-      note: '<span class="t">Reading order is not entry order.</span> Some of these require the characters in an order dictated by whichever box is currently active, with a marker that jumps as you type.' +
-        '<span class="sub">Nearly every automated solver treats a text CAPTCHA as one string: read left to right, submit left to right. Decoupling the two breaks that assumption without making the reading any harder. It costs a person a few seconds of attention. It costs a scripted solver a rewrite, because the interface state now has to be tracked between keystrokes.</span>',
-      build: buildSeq
+      img: 'assets/non-sequential-entry.png',
+      alt: 'A sign-up form with nine distorted characters in a row, one of them circled, above six entry boxes. The last box is highlighted and holds the circled character.',
+      cap: 'The circled character belongs in the highlighted box. The circle moves as you fill the boxes.',
+      note: '<span class="t">Reading order is not entry order.</span> Nine characters are shown and only six are wanted. Which one you type next is dictated by the box that is currently active, and the circle jumps as you go.' +
+        '<span class="sub">Nearly every automated solver treats a text CAPTCHA as one string: read left to right, submit left to right. Decoupling the two breaks that assumption without making the reading any harder for a person. It costs you a few seconds of attention. It costs a scripted solver a rewrite, because the interface state now has to be tracked between keystrokes rather than read once at the start.</span>'
+    },
+    {
+      chip: 'A moving window',
+      img: 'assets/moving-circle-entry.png',
+      alt: 'A page headed DDOS Mitigation with a countdown reading 51 seconds left, a circular window showing one blurred character, and six empty boxes below with the first one active.',
+      cap: 'Only one character is visible at a time, through a window that moves; fifty-one seconds remained when this was captured.',
+      note: '<span class="t">One character at a time.</span> The whole string is never on screen. A circular window exposes a single character, and moves on as you enter each one, under a one-minute clock.' +
+        '<span class="sub">Note the heading: the operator calls this DDOS mitigation, which is the other half of why these exist. It also defeats the single most common attack shape, the one screenshot sent to a solving service, because there is no single screenshot that contains the answer. A solver would have to drive the interface, capture repeatedly, and reassemble, all inside the timer. DarkOwl notes that tailored versions of this design circulate widely between sites.</span>'
     },
     {
       chip: 'The odd one out',
-      note: '<span class="t">Category, not recognition.</span> A Russian-language forum asks you to pick the odd one out from a set of images laid over a deliberately busy background; five animals and a plant.' +
-        '<span class="sub">Object detection alone does not answer this. A model can label all six correctly and still have no idea which one is the answer, because the question is about the relation between them. That is a different capability, and it is the same shift that makes the arithmetic gates on other sites effective: move the work from perception to reasoning, where the automation is weaker.</span>',
-      build: buildOdd
+      img: 'assets/rutor-odd-one-out.jpg',
+      alt: 'Five small photographs scattered over a busy pastel tiled background: a dog, a lion, a potted plant, a raccoon and a hedgehog.',
+      cap: 'RuTOR. Four animals and a pot plant, laid over a background designed to defeat edge detection.',
+      note: '<span class="t">Category, not recognition.</span> Nothing here is hard to see. A dog, a lion, a raccoon, a hedgehog, and a plant in a pot. The question is which one does not belong with the others.' +
+        '<span class="sub">Object detection alone does not answer it. A model can label all five correctly and still have no idea which is the answer, because the question is about the relation between them rather than the contents of any one. Look at the background too: the pastel tiling is not decoration, it is there to give a segmentation model thousands of plausible edges to chew on before it finds the five that matter.</span>'
+    },
+    {
+      chip: 'What is missing',
+      img: 'assets/hieroglyph-missing.png',
+      alt: 'A CAPTCHA showing a row of hieroglyph tiles, then the same row with one replaced by a question mark, then a grid of twenty hieroglyphs to choose the missing one from.',
+      cap: 'One hieroglyph has been removed. Find it in the grid of twenty below and click it.',
+      note: '<span class="t">Absence is harder than presence.</span> You are shown a set, then the same set with a gap, then twenty candidates. The answer is the one that used to be there.' +
+        '<span class="sub">Every CAPTCHA in the first half of this deck asks you to find something that is present. This one asks you to notice something that is not, which means holding the complete original set in memory, comparing it against the altered set, and only then searching the grid. That is three steps where the picture-grid CAPTCHA has one, and none of them is the kind of perception task a vision model is trained on.</span>'
     },
     {
       chip: 'Tell the time',
-      note: '<span class="t">A real-world skill, cluttered, timed.</span> AlphaBay asked visitors to read an analogue clock face, with shapes scattered across it, inside one minute.' +
-        '<span class="sub">Three things at once: fine-grained visual discrimination against deliberate noise, a learned human skill that has to be taught to a model rather than pattern-matched, and time pressure. It also quietly filters for a certain kind of visitor. Anyone who reads an analogue face slowly, for any reason, is now less welcome, which on this side of the web is a feature.</span>',
-      build: buildClock
+      img: 'assets/alphabay-clock.png',
+      alt: 'An AlphaBay Market page asking the visitor to select the time shown on a clock face, which is overlaid with a blue triangle, a green ellipse and a green square, above hour and minute dropdowns and a countdown reading 58:59.',
+      cap: 'AlphaBay. Shapes are drawn across the face to sit exactly where the hands are.',
+      note: '<span class="t">A real-world skill, cluttered, timed.</span> Read the clock, choose the hour and the minute from two dropdowns, and do it before the counter runs down.' +
+        '<span class="sub">Three things at once. Fine-grained visual discrimination against deliberate noise, since the triangle and the square are positioned to be mistaken for hands. A learned human skill, because reading an analogue face is taught rather than obvious, and a model has to have been trained on it specifically. And time pressure on top. It also quietly filters its own visitors: anyone who reads an analogue face slowly, for any reason, is now less welcome, which on this side of the web is a feature rather than a fault.</span>'
     }
   ];
 
   let darkActive = 0;
   function darkRender(n) {
-    darkStop();
     darkActive = n;
     document.querySelectorAll('#darkChips .chipbtn').forEach((c, i) => c.classList.toggle('on', i === n));
-    DARK[n].build();
-    document.getElementById('darkNote').innerHTML = DARK[n].note;
+    const g = DARK[n];
+    document.getElementById('darkMock').innerHTML =
+      '<figure class="shot">' +
+        '<img src="' + g.img + '" alt="' + esc(g.alt) + '">' +
+        '<figcaption>' + g.cap + '<span class="credit">' + CREDIT + '</span></figcaption>' +
+      '</figure>';
+    document.getElementById('darkNote').innerHTML = g.note;
   }
   function resetDark() {
     const wrap = document.getElementById('darkChips');
