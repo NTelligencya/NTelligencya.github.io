@@ -172,13 +172,15 @@ The short version for anyone building a page: this is the **cover mark**, for th
 
 ### Social card and icons
 
-Built 8 August 2026 from these files. `assets/brand/ntwi-social-card.png` is the 1200 by 630 card every page shares: the lockup on the site's near-black ground, the tagline, the homepage lead paragraph and the domain. It was rendered from an HTML template, so it can be rebuilt or restyled rather than retouched.
+Built 8 August 2026 from these files. `assets/brand/ntwi-social-card.png` is the 1200 by 630 card every page shares: a centred composition, the lockup over the tagline, then the three subjects and the domain, on the site's near-black ground with a symmetrical teal glow. The source is `tools/social-card/social-card.html`, rendered to a PNG rather than retouched, with its own README covering how to render it and what the card must keep. The first cut was left-weighted and read as dead space at thumbnail size; link previews are small, so check any change at about a fifth of full size before committing it.
 
 The icons follow the README's rule that the site mark is the CSS star, not the ornate mark: `favicon.svg` redraws `.brand-mark` with slightly heavier strokes so it survives at 16 pixels, with `favicon-32.png` as a fallback and `apple-touch-icon.png` at 180 pixels on a solid dark ground.
 
 `tools/add-meta.js` writes the Open Graph and Twitter tags, the canonical URL and the icon links into all 166 pages, decks included, in a marked block it rewrites on each run. Titles come from `search-index.json`, so a title shortened in `index-meta.json` is the one that shows when a link is shared.
 
 One card serves every page. Per-section cards would need one image per section and a change to `CARD` in the script.
+
+Platforms cache link previews, so a page shared before the tags went live keeps showing the old blank preview until it is scraped again. Adding a query string such as `?v=2` to the URL is the quick way to check the current state.
 
 Still outstanding: 44 pages have no `<meta name="description">` and fall back to the site default, so they all share the same preview text. Most are simulation tools. `node tools/add-meta.js --dry-run` lists them.
 

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<!-- Source for assets/brand/ntwi-social-card.png. See README.md in this folder. -->
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+
+  :root {
+    --bg:#0a0a0c; --text:#f5f5f7; --text-2:#9b9ba0; --text-3:#6b6b70;
+    --accent:#1ac9c9; --accent-2:#4ddcdc; --rule:#1f1f23;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1200px; height:630px; background:var(--bg); overflow:hidden; }
+
+  .card {
+    position:relative; width:1200px; height:630px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+  }
+
+  /* Symmetrical glow, so neither side out-weighs the other */
+  .glow {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-56%);
+    width:1100px; height:820px;
+    background:radial-gradient(ellipse at center, rgba(26,201,201,0.15) 0%, rgba(26,201,201,0.045) 40%, rgba(26,201,201,0) 68%);
+  }
+
+  .frame {
+    position:absolute; inset:36px; border:1px solid var(--rule); border-radius:16px;
+  }
+  .frame span {
+    position:absolute; width:28px; height:28px; border:1px solid rgba(26,201,201,0.5);
+  }
+  .frame span:nth-child(1){ top:-1px; left:-1px; border-right:none; border-bottom:none; border-radius:16px 0 0 0; }
+  .frame span:nth-child(2){ top:-1px; right:-1px; border-left:none; border-bottom:none; border-radius:0 16px 0 0; }
+  .frame span:nth-child(3){ bottom:-1px; left:-1px; border-right:none; border-top:none; border-radius:0 0 0 16px; }
+  .frame span:nth-child(4){ bottom:-1px; right:-1px; border-left:none; border-top:none; border-radius:0 0 16px 0; }
+
+  .inner { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
+
+  .lockup { width:700px; display:block; }
+
+  .tagline {
+    font-family:'JetBrains Mono', monospace; font-size:16px; letter-spacing:0.36em;
+    text-transform:uppercase; color:var(--accent-2); margin-top:30px;
+  }
+
+  .divider {
+    width:120px; height:1px; background:var(--rule); margin:34px 0;
+    position:relative;
+  }
+  .divider::after {
+    content:''; position:absolute; left:50%; top:-2px; transform:translateX(-50%) rotate(45deg);
+    width:5px; height:5px; background:var(--accent); border-radius:1px;
+  }
+
+  .subjects {
+    font-family:'Manrope', sans-serif; font-size:29px; font-weight:500; color:var(--text);
+    letter-spacing:0.005em;
+  }
+  .subjects .sep { color:var(--accent); font-weight:400; margin:0 14px; }
+
+  .lead {
+    font-family:'Manrope', sans-serif; font-size:20px; font-weight:400; color:var(--text-2);
+    margin-top:20px;
+  }
+
+  .domain {
+    margin-top:38px;
+    font-family:'JetBrains Mono', monospace; font-size:14px; letter-spacing:0.22em;
+    text-transform:uppercase; color:var(--accent);
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="glow"></div>
+    <div class="frame"><span></span><span></span><span></span><span></span></div>
+
+    <div class="inner">
+      <img class="lockup" src="../../assets/brand/ntwi-logo-lockup-transparent.png" alt="ntworld.ink">
+      <div class="tagline">connect &middot; create &middot; leave a mark</div>
+      <div class="divider"></div>
+      <div class="subjects">Cybersecurity<span class="sep">&middot;</span>AI literacy<span class="sep">&middot;</span>Digital skills</div>
+      <p class="lead">Real datasets; real exercises; everything downloadable and yours to keep.</p>
+      <div class="domain">ntworldink.com</div>
+    </div>
+  </div>
+</body>
+</html>
