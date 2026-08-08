@@ -133,6 +133,20 @@ To add a resource: add one object to the `DATA` array. Order does not matter (th
 
 History: the merged content from the old Websites and Tools page, and the retired Articles and Papers page, are preserved in git commit 48a33e6. The old URLs `/resources/websites-and-tools.html` and `/resources/articles-and-papers.html` now serve redirect stubs.
 
+## Flashcards (/flashcards/)
+
+Added 8 August 2026 from the `design_handoff_flashcards` bundle. Terminology sets that can be drilled as flashcards or read as a searchable glossary. Three page types: the catalogue at `/flashcards/`, a study player at `/flashcards/<slug>/`, and the same set as an A-to-Z glossary at `/flashcards/<slug>/list/`. The list view is the only one a search engine can index, since the player draws one card at a time from JSON.
+
+This is a THIRD deliberate exception to the no-page-CSS-or-JS house rule, alongside `/references/` and `/index/`, and is built the same way: shared `styles.css` for the chrome, one page CSS file, one page JS file. Everything else applies as usual; Australian English, no em-dashes, indexable, last-updated line, CDU copyright footer.
+
+Files: `flashcards/index.html`, `flashcards/flashcards.css`, `flashcards/flashcards.js`, `flashcards/convert.js` (CSV to JSON), `flashcards/gen-pages.js` (writes the player and list pages), `flashcards/sets/` (the manifest, the editable CSVs and the generated JSON). Full maintenance notes are in `flashcards/CLAUDE.md`.
+
+Three sets are live: Microsoft Security and Copilot Governance (80 cards, from SD's NotebookLM export), ISM Abbreviations (106) and ISM Cyber Security Terms (248), both extracted from the ASD Information Security Manual terminology PDF of June 2026 and republished under CC BY 4.0 with the attribution line on each list view. Three more sit in the manifest with `ready: false` and no data yet: `tech-words` and `excel-words`, which can be scraped from the two plain-English glossary pages, and `networking`, which needs a content decision from SD first. A set with `ready: false` stays out of the catalogue, so nothing links to a page that does not exist.
+
+SD's decisions, 8 August 2026: no round splitting, so each set is one deck however long it is (progress is kept, so a long set can be left and resumed); and only the three cyber security sets in this pass.
+
+Wiring: a "Flashcards" nav item after "Resources" on the eight pages whose nav carries a Resources link, added by the idempotent `tools/add-flashcards-nav.js`; a footer library link on `index.html`; and a new `Flashcards` type in `tools/build-index.js` and `index/site-index.js`, so the seven pages appear in site search, `/index/` and `sitemap.xml`. The cross-links from `/cybersecurity/tech-words-in-plain-english.html` and `/excel/excel-words-in-plain-english.html` are NOT built yet; they wait on those two sets.
+
 ## Build order (suggested; SD may reshuffle)
 
 - DONE 25 July 2026: Session A, resources scaffolding (hub, four migrated category pages, resources CLAUDE.md, nav "Resources" links, add-resource skill delivered).

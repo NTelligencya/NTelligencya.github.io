@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>References · NT World Ink</title>
-<meta name="description" content="A personal, filterable reference shelf: search or filter by category, sort A to Z, and copy a title, note and clean link ready to paste into an email.">
+<title>ISM Abbreviations flashcards · NT World Ink</title>
+<meta name="description" content="Drill the ISM Abbreviations set as flashcards. 106 cards, in the browser, with your progress kept on your own device.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css">
-<link rel="stylesheet" href="references.css">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/flashcards/flashcards.css">
 </head>
-<body>
+<body data-fc="player" data-slug="ism-abbreviations">
 <div class="noise-overlay"></div>
 
 <!-- =============== HEADER =============== -->
@@ -35,60 +35,49 @@
   </div>
 </header>
 
-<!-- =============== BREADCRUMB =============== -->
-<div class="container">
-  <nav class="breadcrumb">
-    <a href="/">ntworld.ink</a>
-    <span class="sep">/</span>
-    <a href="/resources/">resources</a>
-    <span class="sep">/</span>
-    <span>references</span>
-  </nav>
-</div>
-
-<!-- =============== PAGE MASTHEAD =============== -->
-<div class="container">
-  <div class="page-masthead">
-    <div class="series-label">Resources · Reference library</div>
-    <h1>References</h1>
-    <p class="subtitle">A comprehensive, filterable library of AI, cyber security and digital-literacy references. Search or filter by category, sort A to Z by title, and copy any entry as a title, note and clean link ready to paste into an email.</p>
-    <div class="page-meta">
-      <span class="page-meta-item">ENTRIES · <strong><span id="rl-total">0</span> across 7 categories</strong></span>
+<!-- =============== STUDY BAR =============== -->
+<div class="fc-studybar">
+  <div class="container fc-studybar-inner">
+    <div class="fc-studybar-left">
+      <a class="fc-back" href="/flashcards/">&larr; All sets</a>
+      <span class="fc-divider"></span>
+      <h1 class="fc-studybar-title">ISM Abbreviations</h1>
+    </div>
+    <div class="fc-controls">
+      <button class="fc-chip" id="fc-dir" type="button">Term first</button>
+      <button class="fc-chip" id="fc-shuffle" type="button">Shuffle</button>
+      <button class="fc-chip" id="fc-restart" type="button">Restart</button>
     </div>
   </div>
 </div>
 
-<!-- =============== REFERENCE LIBRARY (interactive; documented exception to the no-JS house rule) =============== -->
-<div class="content-body">
-  <div class="container">
-    <div class="rl-wrap">
-
-      <div class="rl-controls">
-        <div class="rl-controls-row">
-          <div class="rl-search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input id="rl-q" type="search" placeholder="Search by title or note" autocomplete="off" aria-label="Search references">
-            <button class="rl-clear" id="rl-clear" aria-label="Clear search">&times;</button>
-          </div>
-          <div class="rl-sortwrap">
-            <label for="rl-sort">Sort</label>
-            <select id="rl-sort" aria-label="Sort order">
-              <option value="az">Title (A to Z)</option>
-              <option value="za">Title (Z to A)</option>
-              <option value="cat">Category, then title</option>
-            </select>
-          </div>
-        </div>
-        <div class="rl-chips" id="rl-chips" role="group" aria-label="Filter by category"></div>
-      </div>
-
-      <p class="rl-count" id="rl-count"></p>
-      <div class="rl-list" id="rl-list"></div>
-
-    </div>
-
-    <div class="last-updated" style="max-width:1040px;">Last updated: 27 July 2026</div>
+<!-- =============== PROGRESS =============== -->
+<div class="container fc-progress">
+  <div class="fc-progress-row">
+    <span class="fc-label" id="fc-remaining">106 of 106 remaining</span>
+    <span class="fc-progress-right fc-label">
+      <span class="fc-got" id="fc-got">0 got it</span>
+      <span class="fc-repeat" id="fc-repeat">0 to repeat</span>
+    </span>
   </div>
+  <div class="fc-bar"><div class="fc-bar-fill" id="fc-bar-fill"></div></div>
+</div>
+
+<!-- =============== CARD =============== -->
+<div class="container fc-stage">
+  <div class="fc-card" id="fc-card" role="button" tabindex="0" aria-label="Flashcard. Press space or Enter to reveal the other side.">
+    <div class="fc-face-label" id="fc-face-label">Question</div>
+    <div class="fc-face-text is-medium" id="fc-face-text" aria-live="polite">Loading the set&hellip;</div>
+    <div class="fc-hint" id="fc-hint">Click, or press space, to reveal</div>
+  </div>
+  <div class="fc-answers" id="fc-answers"></div>
+  <div class="fc-keys fc-label" id="fc-keys">
+    <span>space &middot; flip</span>
+    <span>1 &middot; again</span>
+    <span>2 &middot; got it</span>
+    <span>r &middot; restart</span>
+  </div>
+    <div class="last-updated">Last updated: 8 August 2026</div>
 </div>
 
 <!-- =============== FOOTER =============== -->
@@ -109,6 +98,7 @@
           <li><a href="/simulations/">Simulation Tools Catalogue</a></li>
           <li><a href="/presentations/">Presentations</a></li>
           <li><a href="/resources/">Resources</a></li>
+          <li><a href="/flashcards/">Flashcards</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -122,12 +112,12 @@
     <div class="footer-bottom">
       <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
       Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/cookie-notice" target="_blank" rel="noopener">Cookies</a> | <a href="mailto:webservices@cdu.edu.au">Feedback</a></span>
-      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 &middot; 2026</span>
     </div>
   </div>
 </footer>
 
-<script src="references.js"></script>
+<script src="/flashcards/flashcards.js"></script>
 <script src="/search.js" defer></script>
 </body>
 </html>

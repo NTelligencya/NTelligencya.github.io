@@ -13,6 +13,7 @@
     /* THEME: ntworldink dark. Site typography (Cormorant Garamond display, Manrope body, JetBrains Mono), one amber accent, restrained. */
     --page: #000000; --panel: #0a0a0a; --panel-2: #101010;
     --accent: #e0983c; --accent-bright: #f2ab52; --accent-dim: #8a6a3a;
+    --brand: #1ac9c9; --brand-2: #4ddcdc;   /* site identity teal, for the header mark only */
     --ink-head: #f4f4f2; --ink-body: #d5d8d9; --ink-muted: #9a9d9e; --ink-dim: #6a6d6e;
     --hairline: rgba(240,240,235,.12); --hairline-strong: rgba(240,240,235,.22);
     --glow: rgba(240,235,225,.12);
@@ -33,6 +34,17 @@
   }
   header .brand { font-size: 14px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-head); }
   header .crumb { color: var(--accent-dim); font-size: 13px; }
+
+  /* Brand lockup in the deck header: the site mark, drawn in CSS, plus the wordmark.
+     The rotated square's side must be <= box / 1.414 or its points get clipped;
+     at a 26px box that means inset 4px, giving an 18px square on a 25.5px diagonal. */
+  header .lockup { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+  header .mark { width: 26px; height: 26px; position: relative; flex: 0 0 26px; }
+  header .mark::before, header .mark::after {
+    content: ""; position: absolute; inset: 4px; border: 1.5px solid var(--brand); border-radius: 3px;
+  }
+  header .mark::after { transform: rotate(45deg); border-color: var(--brand-2); opacity: .5; }
+  header .lockup:hover .mark::after { opacity: .8; }
   header .modtag { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent-dim); }
   footer { flex-shrink: 0; display: flex; justify-content: center; align-items: center; gap: 10px; padding: 18px; border-top: 1px solid var(--hairline); }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); transition: background .3s, box-shadow .3s; }
@@ -153,7 +165,7 @@
 <body>
 <div id="stage">
   <header>
-    <span class="brand">NT World Ink <span class="crumb">· Presentations</span></span>
+    <a class="lockup" href="/presentations/" aria-label="NT World Ink presentations"><span class="mark" aria-hidden="true"></span><span class="brand">NT World Ink <span class="crumb">&middot; Presentations</span></span></a>
     <span class="modtag" id="hdrRight">Press M for menu</span>
   </header>
   <main id="main">
