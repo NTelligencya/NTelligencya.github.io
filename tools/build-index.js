@@ -153,6 +153,7 @@ const RULES = [
     hub: { section: 'Course library', type: 'Course' } },
 
   // Standalone sections.
+  { prefix: '/index/',         section: 'Site index',    type: 'Resource',     topic: 'AI basics & literacy' },
   { prefix: '/workshops/',     section: 'Workshops',     type: 'Workshop',     topic: 'AI policy, law & economics' },
   { prefix: '/presentations/', section: 'Presentations', type: 'Presentation', topic: 'AI basics & literacy' },
   { prefix: '/resources/',     section: 'Resources',     type: 'Resource',     topic: 'AI basics & literacy' },
@@ -283,12 +284,19 @@ function isHidden(url, noindex) {
   return HIDDEN_PREFIXES.some((prefix) => url.startsWith(prefix));
 }
 
-/** First-commit date for a file, as an ISO day. Returns null if git is unusable. */
+/**
+ * First-commit date for a file, as an ISO day. Returns null if git is unusable
+ * or the file has never been committed.
+ *
+ * Deliberately no --follow. Rename detection sounds useful, but these pages
+ * share a header and footer, so a brand-new page reads as a rename of an older
+ * one and inherits its date. An uncommitted page is better left undated.
+ */
 function gitAddedDate(relPath) {
   try {
     const out = execFileSync(
       'git',
-      ['log', '--diff-filter=A', '--follow', '--format=%aI', '-1', '--', relPath],
+      ['log', '--diff-filter=A', '--format=%aI', '-1', '--', relPath],
       { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
     ).trim();
     return out ? out.slice(0, 10) : null;

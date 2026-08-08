@@ -147,3 +147,15 @@ History: the merged content from the old Websites and Tools page, and the retire
 All approved by SD on 25 July 2026: the eleven hook titles; the benchmark shortlist (with IMO 2026 AI results left out); workshop pages indexable with the small CDU copyright footer and no internal-CDU framing; UNESCO (not OECD) labelling for the world tour readiness reports.
 
 Awaiting SD (from 2 August 2026): review the Caring for Your Data platform-settings slides for currency (source data is late 2025); optionally supply vetted links for the MIT "Your Brain on ChatGPT" study and related research on the Cognitive Cost sources slide (source page's academic links looked unreliable, so none were carried over); decide whether the AI Privacy & Terms Evaluator Claude Project from the data-privacy source page should become a resource somewhere.
+
+## Findability: site search, site index, generated index and sitemap
+
+Built 8 August 2026. Three parts, all data-driven from one generated file.
+
+`tools/build-index.js` generates `search-index.json` (158 entries) and `sitemap.xml`. Zero dependencies. Run it by hand after adding, moving or renaming pages, then commit both outputs; there is no build step on GitHub Pages, so they are checked-in artefacts. Usual run: `node tools/build-index.js --sync --dates-from-git`. Hand-maintained values (topic, published, and any title or type override) live in `tools/index-meta.json`, keyed by URL; the script reads it and never writes over it. Full notes in `tools/README.md`.
+
+`search.js` at the repo root injects the search field into `header.site` and filters the index in the browser. It is on the 98 pages that carry the shared header, added by `tools/add-search.js` (idempotent; re-run it after building new content pages). The slide decks under `/workshops/`, `/presentations/` and `/simulations/` have their own full-screen chrome and no site nav, so they carry no search field. Styles live in `styles.css` section 24.
+
+`/index/` is the human-readable site map, and a second deliberate exception to the no-JS house rule alongside `/references/`: shared `styles.css` for the chrome, `site-index.css` for the page, `site-index.js` for the data and filtering. It reads the same `search-index.json`.
+
+Client areas, decided with SD 8 August 2026: they appear in the site's own search and index, marked with a "hidden" pill, and are kept reasonably out of search engines by four measures together. Each page carries `noindex,nofollow`; `/roper-gulf/` had none and was given them this day. They are excluded from `sitemap.xml`. `robots.txt` disallows `/search-index.json`, which does not affect the site's own search because robots.txt governs crawlers, not browsers. Links to hidden pages carry `rel="nofollow"`, and the hidden rows on `/index/` are drawn in the browser rather than written into the HTML. This is not privacy: anyone with a URL can still read the page, and a scraper that ignores robots.txt can still read the JSON. If any of that content must not be readable by a stranger, it needs a login, which GitHub Pages cannot provide.
