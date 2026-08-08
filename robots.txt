@@ -1,6 +1,16 @@
 # NTell World Ink
-# Course pages under /cdu-ai-staff/ and /alice-springs-arn/ are kept out of
-# search results by a noindex meta tag on each page, not by disallowing them.
-# Crawling is intentionally allowed so crawlers can read and honour noindex.
+#
+# Client-area pages under /cdu-ai-staff/, /alice-springs-arn/ and /roper-gulf/
+# are kept out of search results by a noindex meta tag on each page, not by
+# disallowing them. Crawling is intentionally allowed so crawlers can read and
+# honour that tag. They are also left out of sitemap.xml.
+#
+# /search-index.json is the data behind the site's own search and the site
+# index page. It lists client-area titles and URLs, so it is disallowed here.
+# This does not affect the site's search: robots.txt governs crawlers, not
+# browsers, so the file still loads for visitors.
 User-agent: *
 Allow: /
+Disallow: /search-index.json
+
+Sitemap: https://ntworldink.com/sitemap.xml
