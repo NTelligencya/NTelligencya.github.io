@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visio in Four Hours: Networks, Flows and Site Plans &middot; NTell World Ink</title>
+<meta name="description" content="A four-hour Visio course built around the diagrams people actually have to produce. Draw a network from scratch, learn the conventions that make a diagram readable, generate a flowchart from a table, sketch a site map and a wireframe, and write the same diagrams as text with Mermaid.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  /* ============================================================
+     PAGE-SCOPED ADDITIONS, Visio course
+     Reuses tokens from styles.css (--accent, --bg-2, --rule etc).
+     Mirrors the Power BI SIEM course page structure.
+     ============================================================ */
+
+  .container-course {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Contents block */
+  .course-toc {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin: 32px auto 56px;
+  }
+
+  .course-toc h2 { font-size: 24px; margin: 0 0 14px; padding: 0; border: none; }
+
+  .course-toc ul {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .course-toc ul li {
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .course-toc ul li:last-child { border-bottom: none; }
+
+  .course-toc ul li .toc-time {
+    color: var(--accent);
+    font-weight: 500;
+    min-width: 62px;
+  }
+
+  .course-toc ul li a { color: var(--text); flex: 1; text-decoration: none; }
+  .course-toc ul li a:hover { color: var(--accent-2); }
+
+  .course-toc ul li::after {
+    content: attr(data-skill);
+    color: var(--text-3);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Course blocks */
+  .part { padding-top: 48px; margin-bottom: 8px; }
+
+  .part-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border-top: 1px solid var(--rule);
+    padding-top: 18px;
+    margin-bottom: 6px;
+  }
+
+  .part-header .part-time { color: var(--accent); font-weight: 500; }
+  .part h2 { margin-top: 6px; }
+
+  /* Stumbling block callout */
+  .stumble {
+    background: rgba(224, 158, 62, 0.05);
+    border: 1px solid rgba(224, 158, 62, 0.25);
+    border-left: 3px solid #e09e3e;
+    border-radius: 10px;
+    padding: 22px 26px 16px;
+    margin: 28px 0;
+  }
+
+  .stumble .stumble-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #e09e3e;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .stumble h3 { font-size: 19px; margin: 0 0 10px; }
+  .stumble p { font-size: 15px; }
+  .stumble p:last-child { margin-bottom: 6px; }
+
+  /* Aside callout */
+  .analyst-aside {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 22px 26px 16px;
+    margin: 28px 0;
+  }
+
+  .analyst-aside .aside-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .analyst-aside p { font-size: 15px; }
+  .analyst-aside p:last-child { margin-bottom: 6px; }
+
+  /* Code blocks */
+  .part pre, .facilitator pre {
+    background: var(--bg-3);
+    border: 1px solid var(--rule-2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--accent-2);
+    overflow-x: auto;
+    margin: 18px 0;
+  }
+
+  /* Reference tables */
+  table.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 20px 0 26px;
+  }
+
+  table.ref-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    text-align: left;
+    font-weight: 500;
+    padding: 8px 14px 8px 0;
+    border-bottom: 1px solid var(--rule-2);
+  }
+
+  table.ref-table td {
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--rule);
+    color: var(--text-2);
+    vertical-align: top;
+  }
+
+  table.ref-table td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* The schema table renders every cell in mono */
+  table.schema-table td { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+  table.schema-table td:nth-child(2) { font-family: 'Manrope', sans-serif; font-size: 14px; }
+  table.schema-table td:first-child { color: var(--accent-2); }
+
+  /* Build steps */
+  ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 20px 0; }
+
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 12px 0 12px 52px;
+    border-bottom: 1px dotted var(--rule);
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  ol.steps li:last-child { border-bottom: none; }
+
+  ol.steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* Diagram figure */
+  figure.diagram {
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-radius: 12px;
+    padding: 28px 24px 18px;
+    margin: 28px 0;
+    text-align: center;
+  }
+
+  figure.diagram svg { max-width: 100%; height: auto; }
+
+  figure.diagram figcaption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-top: 18px;
+  }
+
+  /* Facilitator notes */
+  .facilitator {
+    background: var(--bg-2);
+    border: 1px dashed var(--rule-2);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 56px auto 40px;
+  }
+
+  .facilitator h2 { font-size: 26px; padding: 0; margin: 0 0 14px; border: none; }
+  .facilitator p, .facilitator li { font-size: 15px; }
+  .facilitator h3 { font-size: 18px; margin: 24px 0 8px; }
+
+  /* Outcome list */
+  ul.outcomes {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 28px;
+  }
+
+  ul.outcomes li {
+    position: relative;
+    padding: 8px 0 8px 22px;
+    color: var(--text-2);
+    font-size: 14.5px;
+    line-height: 1.6;
+    border-bottom: 1px dotted var(--rule);
+  }
+
+  ul.outcomes li::before {
+    content: "//";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    top: 11px;
+  }
+
+  /* Convention checklist */
+  ul.checklist { list-style: none; padding: 0; margin: 20px 0; }
+
+  ul.checklist li {
+    position: relative;
+    padding: 10px 0 10px 30px;
+    border-bottom: 1px dotted var(--rule);
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  ul.checklist li:last-child { border-bottom: none; }
+
+  ul.checklist li::before {
+    content: "\2610";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    color: var(--accent);
+    font-size: 15px;
+  }
+
+  .last-updated {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin: 48px 0 40px;
+  }
+
+  @media (max-width: 720px) {
+    .container-course { padding: 0 20px; }
+    .course-toc, .facilitator, figure.diagram { padding: 24px 20px; }
+    ul.outcomes { grid-template-columns: 1fr; }
+    ol.steps li { padding-left: 44px; }
+    table.ref-table td:first-child { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../#library">Library</a>
+      <a href="../#about">About</a>
+      <a href="../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="container-course">
+  <nav class="breadcrumb">
+    <a href="../">Home</a>
+    <span class="sep">/</span>
+    <a href="../#library">Library</a>
+    <span class="sep">/</span>
+    <span>Visio in Four Hours</span>
+  </nav>
+</div>
+
+<!-- PAGE MASTHEAD -->
+<section class="page-masthead container-course">
+  <div class="series-label">Course Library &middot; Digital Skills Stream</div>
+  <h1>Visio in Four Hours: Networks, Flows and Site Plans</h1>
+  <p class="subtitle">Four hours of Visio, built around the diagrams people actually have to produce.</p>
+
+  <div class="page-meta">
+    <span class="page-meta-item">DURATION &middot; <strong>4 hours, one sitting</strong></span>
+    <span class="page-meta-item">LEVEL &middot; <strong>Beginner to intermediate</strong></span>
+    <span class="page-meta-item">FORMAT &middot; <strong>Single-page course, nothing to download</strong></span>
+  </div>
+</section>
+
+<main class="content-body">
+
+  <!-- WHY -->
+  <section class="container-course" id="why">
+    <div class="section-eyebrow">// why this course exists</div>
+    <h2>Most Visio training teaches you the ribbon. You forget the ribbon.</h2>
+    <p>The usual approach to Visio is a tour of its menus: here is the Home tab, here is the Insert tab, here are twenty-five features in the order Microsoft happened to arrange them. It is thorough, and almost none of it survives contact with a six-month gap.</p>
+    <p>What survives is having drawn something. So this course draws three things, and picks up the features as each drawing needs them. You will finish with a network diagram good enough to hand to somebody, a site map and wireframe for a small website, and a clear idea of when a diagram should be drawn at all rather than generated from something you already have.</p>
+    <p>Everything that does not earn its place inside a drawing is on the <a href="../simulations/syntax-crammers/visio.html">Visio quick-reference crammer</a> instead. That is the page to open in six months when you have forgotten where Change Shape lives.</p>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// before you start</span>
+      <p>You need <strong>Visio desktop</strong>, which is a paid Microsoft product and is not included in most Microsoft 365 subscriptions. Visio for the web has a smaller feature set; the table-driven section in particular needs the desktop application. If you do not have a licence, the final section of this course covers Mermaid, which does much of the same work in a browser for nothing. No Visio experience is assumed.</p>
+    </div>
+
+    <div class="section-eyebrow" style="margin-top:40px;">// what you will learn</div>
+    <ul class="outcomes">
+      <li>Choose a template and stencil deliberately rather than starting from a blank flowchart out of habit</li>
+      <li>Connect shapes so the connectors survive being moved, using shape glue rather than point glue</li>
+      <li>Align, group and format shapes without nudging anything by hand</li>
+      <li>Draw a small local network and label it to a convention someone else can read</li>
+      <li>Separate a logical view from a physical view using layers on a single drawing</li>
+      <li>Attach asset data to a device shape, and pull that data from a spreadsheet</li>
+      <li>Read a Data Visualizer table and explain how each column becomes part of the diagram</li>
+      <li>Build a site map and a wireframe for a small website and explain the difference</li>
+      <li>Write a flowchart in Mermaid and render it in the browser, in a repository or in your notes</li>
+      <li>Decide which of the three approaches a given diagram deserves</li>
+    </ul>
+  </section>
+
+  <!-- CONTENTS -->
+  <section class="course-toc container-course" id="contents">
+    <div class="section-eyebrow">// contents</div>
+    <h2>Course map</h2>
+    <ul>
+      <li data-skill="MECHANICS"><span class="toc-time">40 MIN</span><a href="#drawing">Drawing by doing</a></li>
+      <li data-skill="NETWORKING"><span class="toc-time">75 MIN</span><a href="#topology">Topology and conventions</a></li>
+      <li data-skill="DATA VISUALIZER"><span class="toc-time">30 MIN</span><a href="#from-a-table">Diagrams from a table</a></li>
+      <li data-skill="WEB PLANNING"><span class="toc-time">40 MIN</span><a href="#wireframes">Wireframes and site maps</a></li>
+      <li data-skill="MERMAID"><span class="toc-time">30 MIN</span><a href="#in-text">The same diagram in text</a></li>
+    </ul>
+  </section>
+
+  <!-- DRAWING BY DOING -->
+  <article class="part container-course" id="drawing">
+    <div class="part-header">
+      <span><span class="part-time">40 MINUTES</span> &nbsp;//&nbsp; MECHANICS</span>
+      <span>HANDS ON</span>
+    </div>
+    <h2>Drawing by doing</h2>
+    <p>Open Visio and go to <strong>File &gt; New</strong>. Type <code>network</code> in the search box, choose <strong>Basic Network Diagram</strong>, then Create.</p>
+    <p>Almost every Visio tutorial opens on a flowchart. This one does not, because the network template is where the rest of the morning lives and because a network is a better first drawing: the shapes mean something, so you notice immediately when you have used the wrong one.</p>
+    <p>You are now looking at three regions. Stencils on the left, holding the shapes available to this template. The canvas in the middle. The ribbon along the top. Most of what you need is on the Home tab.</p>
+
+    <h3>Getting shapes onto the page</h3>
+    <ol class="steps">
+      <li>Drag a shape from the stencil onto the canvas. As it approaches other shapes, faint guide lines appear; that is the Dynamic Grid, and it is doing your alignment for you. If you cannot see it, turn it on under <strong>View &gt; Dynamic Grid</strong>.</li>
+      <li>Hold <strong>Ctrl</strong> and drag an existing shape to copy it. Faster than copy and paste, and it keeps the formatting.</li>
+      <li>Click any shape and start typing to label it. There is no separate text mode to enter.</li>
+      <li>Select several shapes, then <strong>Home &gt; Align</strong> and <strong>Home &gt; Position</strong> to tidy a row properly. Nudging shapes by hand is the slowest way to a messy drawing.</li>
+      <li>For exact placement, open <strong>View &gt; Task Panes &gt; Size &amp; Position</strong>. Type coordinates rather than dragging when something has to sit precisely.</li>
+    </ol>
+
+    <h3>Connecting them</h3>
+    <p>The Connector tool is on the Home tab, or press <strong>Ctrl+3</strong>. Press <strong>Ctrl+1</strong> to go back to the Pointer tool afterwards; forgetting to do this is the single most common source of "why is Visio drawing lines everywhere".</p>
+    <p>There is also AutoConnect: hover over a shape and blue arrows appear on its four sides. Click an arrow and Visio adds a connected shape in that direction. It is the fastest way to build a chain, and you can turn it on or off under <strong>View &gt; AutoConnect</strong>.</p>
+
+    <div class="stumble">
+      <span class="stumble-label">// stumbling block</span>
+      <h3>The connector that will not stay attached</h3>
+      <p>When you drag a connector towards a shape, watch what highlights. If a small green square appears on one point of the shape, you are gluing to <strong>that point</strong>; the connector will stay pinned there even if it means routing around the outside of the drawing. If the whole shape outlines in green, you are gluing to <strong>the shape</strong>, and Visio is free to move the connection to whichever side makes sense.</p>
+      <p>Nine times out of ten you want shape glue, because it survives rearrangement. Point glue is for when the end of the line genuinely matters, for example connecting to a specific port on a switch.</p>
+    </div>
+
+    <h3>Formatting without repeating yourself</h3>
+    <p>Format one shape the way you want it, then use <strong>Home &gt; Format Painter</strong> to copy that formatting to another. Double-click the Format Painter to lock it on for several shapes; click it again to release.</p>
+    <p>Once a cluster of shapes belongs together, select them and use <strong>Home &gt; Group</strong> so they move as one. Grouping a rack of servers or a branch office saves a great deal of grief later.</p>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// exercise</span>
+      <p>Build a small network: a modem, a firewall, a switch, two desktops, a printer and a wireless access point. Label every shape. Connect them so the topology is honest. Do not worry yet about whether it is presentable; the next section fixes that.</p>
+    </div>
+  </article>
+
+  <!-- TOPOLOGY -->
+  <article class="part container-course" id="topology">
+    <div class="part-header">
+      <span><span class="part-time">75 MINUTES</span> &nbsp;//&nbsp; NETWORKING</span>
+      <span>THE LONGEST SECTION, AND THE POINT OF THE DAY</span>
+    </div>
+    <h2>Topology and conventions</h2>
+    <p>You have a drawing. Whether it is a <em>diagram</em> depends entirely on what happens next.</p>
+    <p>A network diagram has one job: to let somebody who was not in the room understand the network. Almost every failure to do that comes from the same handful of omissions, and they are all cheap to fix.</p>
+
+    <h3>Use the shape that means the thing</h3>
+    <p>Open <strong>More Shapes &gt; Network</strong> and you will find several stencils: Network and Peripherals, Computers and Monitors, Detailed Network Diagram shapes, and Rack-mounted equipment. The icons are conventional, which is the point. A router icon means a router. If you use a router icon for a layer 3 switch because it looked about right, you have told the reader something false.</p>
+    <p>Pick your icons once, at the start, and stay consistent across the whole drawing. Two different icons for the same class of device is the most common thing that makes a diagram read as amateur.</p>
+
+    <h3>Label the links, not just the boxes</h3>
+    <p>Most beginner diagrams name every device and say nothing at all about what runs between them. The connections are usually where the reader's actual question lives.</p>
+    <table class="ref-table">
+      <tr><th>Label</th><th>When it matters</th></tr>
+      <tr><td>Device name</td><td>Always. Use the real hostname if there is one.</td></tr>
+      <tr><td>Management IP</td><td>Any diagram someone might have to work from.</td></tr>
+      <tr><td>Subnet or VLAN</td><td>Whenever the drawing spans more than one.</td></tr>
+      <tr><td>Link speed</td><td>Whenever the speeds differ, which is most of the time.</td></tr>
+      <tr><td>Interface names</td><td>When the reader will configure something; put them at both ends.</td></tr>
+      <tr><td>Media type</td><td>When fibre and copper are mixed, or when a link is wireless.</td></tr>
+    </table>
+    <p>To label a connector, click it and type, exactly as with a shape.</p>
+
+    <h3>The legend and the title block</h3>
+    <p>Two boxes that take five minutes and do more for readability than any amount of formatting.</p>
+    <p>The <strong>legend</strong> sits in a corner and lists every icon type you have used, with one line of plain English each. It exists because your reader does not necessarily share your icon vocabulary.</p>
+    <p>The <strong>title block</strong> carries the diagram name, who drew it, the date, the version, and one line on scope. That last line is the one people leave out and then regret: say what the diagram does <em>not</em> show. "Physical connections only; no VPN or cloud services" prevents an entire category of misunderstanding.</p>
+
+    <div class="stumble">
+      <span class="stumble-label">// where marks and credibility get lost</span>
+      <h3>The checklist</h3>
+      <p>Run this over any diagram before you hand it in or send it on.</p>
+      <ul class="checklist">
+        <li>One icon per class of device, used consistently throughout</li>
+        <li>Every device labelled with a name someone else would recognise</li>
+        <li>Every link labelled with whatever the reader would need to know about it</li>
+        <li>A legend covering every icon used</li>
+        <li>A title block with name, author, date, version and scope</li>
+        <li>No crossed connectors that could have been avoided by moving a shape</li>
+        <li>Text large enough to read when the page is printed at A4</li>
+        <li>The drawing fits one page; check under File &gt; Print &gt; Page Setup</li>
+      </ul>
+    </div>
+
+    <h3>Two views of one network: layers</h3>
+    <p>A physical diagram and a logical diagram usually describe the same equipment and are usually kept as two separate files that drift apart. Visio's layers let them be one file.</p>
+    <ol class="steps">
+      <li>Open <strong>Home &gt; Layers &gt; Layer Properties</strong> and create two layers, for example Physical and Logical.</li>
+      <li>Select the shapes belonging to one view, then <strong>Home &gt; Layers &gt; Assign to Layer</strong>.</li>
+      <li>In Layer Properties, untick Visible on one layer to show the other view on its own.</li>
+    </ol>
+    <p>Layers also carry a Lock setting, which is separate from visibility; hiding a layer does not protect it from editing. Lock the background layer when you are working on top of it.</p>
+
+    <h3>Shape Data: the part that makes it an asset register</h3>
+    <p>Every Visio shape can carry structured data behind it. Right-click a shape, then <strong>Data &gt; Shape Data</strong> to see what is already there; <strong>Data &gt; Define Shape Data</strong> to add your own fields.</p>
+    <p>On a network device the useful fields are obvious: management IP, model, serial number, firmware version, physical location, owner, warranty expiry. Fill those in and the drawing stops being a picture and starts being a small asset register that happens to be shaped like the network.</p>
+    <p>You do not have to type them one at a time. <strong>Data &gt; Quick Import</strong> reads a spreadsheet and shows its rows in a pane on the right; drag a row onto a shape and the fields attach. Visio can also read from Access and SQL Server.</p>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// exercise</span>
+      <p>Redraw your network from the first section properly. Consistent icons, labelled links, a legend, a title block, two layers, and Shape Data on at least the switch and the firewall. Then run the checklist over it. This drawing is the one worth keeping.</p>
+    </div>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// practise the topology first</span>
+      <p>If you want to work out the topology before you draw it, the <a href="../simulations/networking/05-lan-builder.html">LAN Builder</a> in the simulations catalogue lets you assemble a network in the browser. The <a href="../simulations/networking/01-device-explorer.html">Device Explorer</a> covers what each device actually does, and the <a href="../simulations/networking/04-ip-calculator.html">IP Calculator</a> handles the addressing. Sort the network out there, then draw it here.</p>
+    </div>
+  </article>
+
+  <!-- FROM A TABLE -->
+  <article class="part container-course" id="from-a-table">
+    <div class="part-header">
+      <span><span class="part-time">30 MINUTES</span> &nbsp;//&nbsp; DATA VISUALIZER</span>
+      <span>DEMONSTRATION, NOT AN EXERCISE</span>
+    </div>
+    <h2>Diagrams from a table</h2>
+    <p>Nobody follows along in this section. Watch it, understand the shape of it, and come back to it another day when you have a real process to draw. It is a feature that rewards a quiet afternoon and punishes an attempt to learn it at the same time as everything else.</p>
+    <p>Visio's <strong>Data Visualizer</strong> generates a flowchart from a table. You do not draw the diagram; you describe the process in rows and columns, and Visio draws it. Change the table, refresh, and the drawing updates.</p>
+
+    <h3>The payoff, first</h3>
+    <p>The demonstration worth watching is not the wizard. It is this: a finished flowchart on screen, a spreadsheet open beside it, one cell edited, then <strong>Data &gt; Refresh All</strong>, and the diagram redraws itself. That is the whole argument for the feature. A process that changes every few months stops being a drawing you maintain and becomes a table you edit.</p>
+
+    <h3>The schema</h3>
+    <p>Everything the diagram knows comes from these columns. This is the transferable part; if you remember nothing else from this section, remember that the table is the diagram.</p>
+    <table class="ref-table schema-table">
+      <tr><th>Column</th><th>What it does</th><th>Example</th></tr>
+      <tr><td>Process Step ID</td><td>Unique identifier for the row. Connectors point at these, so the values must not repeat.</td><td>3</td></tr>
+      <tr><td>Description</td><td>The text that appears inside the shape.</td><td>Details complete?</td></tr>
+      <tr><td>Next Step ID</td><td>Which row or rows this step connects to. Comma-separate for a branch.</td><td>4,5</td></tr>
+      <tr><td>Connector Label</td><td>Text on the arrow. Comma-separated in the same order as Next Step ID.</td><td>Yes,No</td></tr>
+      <tr><td>Shape Type</td><td>Which shape to draw: Start/End, Process, Decision, Document or Data.</td><td>Decision</td></tr>
+      <tr><td>Function</td><td>The swimlane the step belongs to. Cross-functional diagrams only; leave the column out otherwise.</td><td>Service Desk</td></tr>
+    </table>
+
+    <h3>A worked example</h3>
+    <p>Six rows, one decision, one loop back. Small enough to read whole.</p>
+    <table class="ref-table schema-table">
+      <tr><th>Step ID</th><th>Description</th><th>Next</th><th>Label</th><th>Shape Type</th></tr>
+      <tr><td>1</td><td>Request received</td><td>2</td><td></td><td>Start/End</td></tr>
+      <tr><td>2</td><td>Check request details</td><td>3</td><td></td><td>Process</td></tr>
+      <tr><td>3</td><td>Details complete?</td><td>4,5</td><td>Yes,No</td><td>Decision</td></tr>
+      <tr><td>4</td><td>Assign to team</td><td>6</td><td></td><td>Process</td></tr>
+      <tr><td>5</td><td>Return to requester</td><td>2</td><td></td><td>Process</td></tr>
+      <tr><td>6</td><td>Request closed</td><td></td><td></td><td>Start/End</td></tr>
+    </table>
+    <p>Read row three across and the idea lands whole: this step is a diamond, it branches two ways, the branches go to rows four and five, and the arrows carry the labels Yes and No in that order. Row five points back at row two, which is how you write a loop.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 660 420" role="img" aria-labelledby="dvtitle dvdesc" xmlns="http://www.w3.org/2000/svg">
+        <title id="dvtitle">Flowchart generated from the six-row table</title>
+        <desc id="dvdesc">Request received leads to Check request details, then a decision, Details complete. Yes leads to Assign to team and then Request closed. No leads to Return to requester, which loops back to Check request details.</desc>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b6b70"/>
+          </marker>
+        </defs>
+        <g fill="none" stroke="#6b6b70" stroke-width="1.4" marker-end="url(#arrow)">
+          <path d="M 240 58 L 240 88"/>
+          <path d="M 240 126 L 240 153"/>
+          <path d="M 240 227 L 240 258"/>
+          <path d="M 240 296 L 240 326"/>
+          <path d="M 327 190 L 508 190 L 508 254"/>
+          <path d="M 508 292 L 508 386 L 120 386 L 120 108 L 148 108"/>
+        </g>
+        <g font-family="'JetBrains Mono', monospace" font-size="11" fill="#1ac9c9">
+          <text x="250" y="249">Yes</text>
+          <text x="380" y="182">No</text>
+        </g>
+        <g stroke="#2a2a30" stroke-width="1.2" fill="#17171b">
+          <rect x="150" y="22" width="180" height="36" rx="18"/>
+          <rect x="150" y="90" width="180" height="36" rx="4"/>
+          <path d="M 240 153 L 327 190 L 240 227 L 153 190 z"/>
+          <rect x="150" y="260" width="180" height="36" rx="4"/>
+          <rect x="150" y="328" width="180" height="36" rx="18"/>
+          <rect x="418" y="256" width="180" height="36" rx="4"/>
+        </g>
+        <g font-family="'Manrope', sans-serif" font-size="13" fill="#f5f5f7" text-anchor="middle">
+          <text x="240" y="45">Request received</text>
+          <text x="240" y="113">Check request details</text>
+          <text x="240" y="195">Details complete?</text>
+          <text x="240" y="283">Assign to team</text>
+          <text x="240" y="351">Request closed</text>
+          <text x="508" y="279">Return to requester</text>
+        </g>
+      </svg>
+      <figcaption>What those six rows draw</figcaption>
+    </figure>
+
+    <h3>Running the wizard</h3>
+    <ol class="steps">
+      <li><strong>File &gt; New</strong>, search <code>Data Visualizer</code>, and choose <strong>Data Visualizer Basic Flowchart</strong>. The cross-functional version is the same wizard with one extra step for swimlanes.</li>
+      <li>Visio opens a blank canvas and launches the Create Diagram From Data wizard. If it does not, use <strong>Data &gt; Create from Data &gt; Excel Workbook</strong>.</li>
+      <li>Point it at the workbook and tick "My data has headers".</li>
+      <li>Map the columns. Visio matches them by name and usually gets it right on its own.</li>
+      <li>Map the shape types. Your Shape Type values are matched to Visio shapes; fix anything showing as Unmapped.</li>
+      <li>Finish, and give it a few seconds on anything larger than the example above.</li>
+    </ol>
+
+    <div class="stumble">
+      <span class="stumble-label">// what to know before you try it alone</span>
+      <h3>Four things that catch people</h3>
+      <p><strong>The auto-layout is functional, not pretty.</strong> <strong>Design &gt; Re-Layout Page</strong> offers several arrangements; try them all before you start moving shapes by hand.</p>
+      <p><strong>Edit cells, do not add or remove rows,</strong> while a diagram is open and linked. Changing existing values refreshes cleanly; changing the shape of the table confuses the link.</p>
+      <p><strong>Swimlanes are where people come unstuck.</strong> The lane-ordering step lists your lanes alphabetically and you have to drag them into the order the process actually runs. Do that one on your own time, slowly, not in a workshop.</p>
+      <p><strong>This is a desktop feature.</strong> Visio for the web's support for Data Visualizer is limited; run it on the desktop application.</p>
+    </div>
+  </article>
+
+  <!-- WIREFRAMES -->
+  <article class="part container-course" id="wireframes">
+    <div class="part-header">
+      <span><span class="part-time">40 MINUTES</span> &nbsp;//&nbsp; WEB PLANNING</span>
+      <span>HANDS ON</span>
+    </div>
+    <h2>Wireframes and site maps</h2>
+    <p>People building their first website usually start by choosing a theme, then discover three weeks later that they do not know what pages the site has. Both of the drawings in this section exist to prevent that, and they answer different questions.</p>
+    <p>A <strong>site map</strong> answers "what pages exist and how do they relate". It is the whole site at once, and nothing on it describes what any page looks like.</p>
+    <p>A <strong>wireframe</strong> answers "what is on this one page and roughly where". It is one page at a time, deliberately grey and unstyled, because the moment you add colour people start discussing colour instead of structure.</p>
+
+    <h3>The site map</h3>
+    <p><strong>File &gt; New</strong>, search <code>web</code>, and choose the <strong>Conceptual Web Site</strong> template. It opens three stencils: Conceptual Web Site Shapes for pages and page groups, Web Site Map Shapes for the more specific elements such as forms, controls and multimedia, and Callouts for annotation.</p>
+    <ol class="steps">
+      <li>Drop a home page shape at the top and name it.</li>
+      <li>Add a page shape for each top-level section and connect them to home.</li>
+      <li>Add second-level pages under their sections. Stop at the point where the pages become repetitive; a site map showing forty near-identical product pages tells nobody anything, so use one shape and label it "product pages, one per item".</li>
+      <li>Mark the pages that do something rather than just showing text: forms, logins, downloads, embedded video. The Web Site Map stencil has shapes for these, and they are what turn a site map into a build estimate.</li>
+      <li>Use a Callout on anything that needs a note, for example which pages need to exist before launch and which can follow.</li>
+    </ol>
+
+    <h3>The wireframe</h3>
+    <p>Wireframes are built from plain rectangles, lines and text, plus the control shapes from the Web Site Map stencil. Keep everything greyscale. Use a box with a cross through it for an image, a horizontal rule for a line of text, and a labelled rectangle for anything interactive.</p>
+    <p>Do one page in detail, and choose the hardest one; usually the home page or whichever page has the most going on. If the difficult page works as a wireframe, the simple ones follow the same grid.</p>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// what a wireframe is for</span>
+      <p>The value is not the picture. It is that a wireframe forces decisions that would otherwise get made accidentally halfway through the build: what is above the fold, what the one primary action on the page is, what happens on a phone, and what is genuinely necessary rather than merely traditional. Showing a client a grey wireframe gets you a conversation about structure. Showing them a coloured mockup gets you a conversation about the shade of blue.</p>
+    </div>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// exercise</span>
+      <p>Take a website you know well, ideally a small one, perhaps your own or your organisation's. Draw its site map as it exists now. Then draw the site map as it should be. The difference between those two drawings is usually the most useful thing anyone produces all day.</p>
+    </div>
+  </article>
+
+  <!-- IN TEXT -->
+  <article class="part container-course" id="in-text">
+    <div class="part-header">
+      <span><span class="part-time">30 MINUTES</span> &nbsp;//&nbsp; MERMAID</span>
+      <span>NO VISIO LICENCE NEEDED</span>
+    </div>
+    <h2>The same diagram in text</h2>
+    <p>Visio is not the only way to produce a diagram, and for a large class of diagrams it is not the best one. <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a> is a small text language that renders as a diagram. You write a description, and something else draws it.</p>
+    <p>Here is the entire flowchart from the table section, written as text.</p>
+    <pre>flowchart TD
+  A([Request received]) --&gt; B[Check request details]
+  B --&gt; C{Details complete?}
+  C --&gt;|Yes| D[Assign to team]
+  C --&gt;|No| E[Return to requester]
+  E --&gt; B
+  D --&gt; F([Request closed])</pre>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 660 420" role="img" aria-labelledby="mmtitle mmdesc" xmlns="http://www.w3.org/2000/svg">
+        <title id="mmtitle">The same flowchart, rendered from Mermaid</title>
+        <desc id="mmdesc">An identical diagram to the one generated from the table: Request received, Check request details, a decision, Assign to team or Return to requester, and Request closed.</desc>
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b6b70"/>
+          </marker>
+        </defs>
+        <g fill="none" stroke="#6b6b70" stroke-width="1.4" marker-end="url(#arrow2)">
+          <path d="M 240 58 L 240 88"/>
+          <path d="M 240 126 L 240 153"/>
+          <path d="M 240 227 L 240 258"/>
+          <path d="M 240 296 L 240 326"/>
+          <path d="M 327 190 L 508 190 L 508 254"/>
+          <path d="M 508 292 L 508 386 L 120 386 L 120 108 L 148 108"/>
+        </g>
+        <g font-family="'JetBrains Mono', monospace" font-size="11" fill="#1ac9c9">
+          <text x="250" y="249">Yes</text>
+          <text x="380" y="182">No</text>
+        </g>
+        <g stroke="#2a2a30" stroke-width="1.2" fill="#17171b">
+          <rect x="150" y="22" width="180" height="36" rx="18"/>
+          <rect x="150" y="90" width="180" height="36" rx="4"/>
+          <path d="M 240 153 L 327 190 L 240 227 L 153 190 z"/>
+          <rect x="150" y="260" width="180" height="36" rx="4"/>
+          <rect x="150" y="328" width="180" height="36" rx="18"/>
+          <rect x="418" y="256" width="180" height="36" rx="4"/>
+        </g>
+        <g font-family="'Manrope', sans-serif" font-size="13" fill="#f5f5f7" text-anchor="middle">
+          <text x="240" y="45">Request received</text>
+          <text x="240" y="113">Check request details</text>
+          <text x="240" y="195">Details complete?</text>
+          <text x="240" y="283">Assign to team</text>
+          <text x="240" y="351">Request closed</text>
+          <text x="508" y="279">Return to requester</text>
+        </g>
+      </svg>
+      <figcaption>Same picture, seven lines of text</figcaption>
+    </figure>
+
+    <h3>Enough syntax to be useful</h3>
+    <table class="ref-table">
+      <tr><th>Write this</th><th>To get</th></tr>
+      <tr><td>flowchart TD</td><td>A flowchart running top down. LR runs left to right.</td></tr>
+      <tr><td>A[Some text]</td><td>A rectangle. A is the node's short name, used to join things up.</td></tr>
+      <tr><td>A(Some text)</td><td>A rectangle with rounded corners.</td></tr>
+      <tr><td>A([Some text])</td><td>A stadium shape, conventionally used for start and end.</td></tr>
+      <tr><td>A{Some text}</td><td>A diamond, for a decision.</td></tr>
+      <tr><td>A[(Some text)]</td><td>A cylinder, for a database or store.</td></tr>
+      <tr><td>A --&gt; B</td><td>An arrow from A to B.</td></tr>
+      <tr><td>A --&gt;|Yes| B</td><td>An arrow carrying a label.</td></tr>
+      <tr><td>A --- B</td><td>A line with no arrowhead.</td></tr>
+      <tr><td>subgraph Name</td><td>Opens a labelled box around several nodes; close it with end.</td></tr>
+    </table>
+    <p>Once a node has been named you can refer to it by its short name alone, which is why <code>E --&gt; B</code> is enough to draw the loop back.</p>
+
+    <h3>Where it renders</h3>
+    <p>Mermaid is not a program you install. It is text that other tools know how to draw.</p>
+    <ul class="checklist">
+      <li><a href="https://mermaid.live/" target="_blank" rel="noopener">The Mermaid live editor</a>, which draws as you type and exports an image. The quickest way to try any of this.</li>
+      <li>GitHub renders Mermaid inside a fenced code block in any Markdown file; see <a href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams" target="_blank" rel="noopener">GitHub's own documentation</a>.</li>
+      <li>Obsidian, Notion and several other note applications render it in a code block, so a diagram can live inside your notes rather than beside them.</li>
+      <li>Visual Studio Code renders it in the Markdown preview with an extension installed.</li>
+    </ul>
+
+    <h3>Asking an assistant for it</h3>
+    <p>Mermaid is text, which means an AI assistant can write it. Ask Copilot, or any other assistant, for "a Mermaid flowchart of this process" and paste in the steps; you will get back something close, which you then edit. This is the practical reason to learn the syntax even if you never write one from scratch: you need to be able to read what comes back and correct it.</p>
+    <p>Two cautions. Assistants sometimes produce syntax from a different version and it will simply fail to render; the live editor will tell you which line. And they are prone to inventing steps that sound plausible, so check the diagram against the process rather than against how tidy it looks.</p>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// the judgment call</span>
+      <p>Reach for <strong>Visio</strong> when the diagram is a deliverable in its own right: something going into a tender, a report, a client hand-over, or anything needing precise layout and a house look.</p>
+      <p>Reach for <strong>Mermaid</strong> when the diagram documents something that changes, and needs to live beside the thing it documents. Updating it is a text edit, which means it might actually stay current, which is more than most diagrams manage.</p>
+      <p>And notice that the table section and this one are the same idea in different clothes. A table a spreadsheet can hold, or text a document can hold; either way the source is the thing you maintain, and the picture is generated. That is the difference between a diagram you own and a diagram that owns you.</p>
+    </div>
+
+    <div class="analyst-aside">
+      <span class="aside-label">// go further</span>
+      <p>This section has its own walkthrough, <a href="../presentations/diagrams-as-text/">Diagrams You Write Instead of Draw</a>, with an editor built into the page so you can type Mermaid and watch it redraw. It needs no Visio licence, so it is the part of this course to send to anyone who cannot follow the rest.</p>
+    </div>
+  </article>
+
+  <!-- FACILITATOR NOTES -->
+  <section class="facilitator container-course" id="facilitators">
+    <div class="section-eyebrow">// running this as a workshop</div>
+    <h2>Delivery notes for facilitators</h2>
+    <p>Self-paced learners can skip this section; it is for anyone delivering the course to a group.</p>
+
+    <h3>Timing</h3>
+    <p>The five sections total three hours thirty-five, which leaves twenty-five minutes across two breaks in a four-hour session. There is no slack in that, so know in advance which section flexes. Wireframes and site maps is the one; it is built to detach and can be shortened to twenty minutes by dropping the wireframe half and keeping the site map.</p>
+    <p>Topology and conventions is the section to protect. It is the longest for a reason, and a group that finishes it properly will forgive a rushed ending.</p>
+
+    <h3>Order</h3>
+    <p>Opening on the network template rather than a flowchart is deliberate. It puts the first drawing in the same domain as the second section, so the mechanics are not learnt twice, and it gives the group something whose correctness they can judge for themselves.</p>
+
+    <h3>The Data Visualizer section</h3>
+    <p>Announce at the start of it that nobody is following along. Said clearly, the room relaxes and watches. Left unsaid, half of them will be lost in a wizard while you are three steps ahead, and the rest of the session suffers for it.</p>
+    <p>Do not demonstrate swimlanes live. The lane-ordering step is fiddly, it is where attention breaks, and nothing else in the course depends on it.</p>
+    <p>Lead with the refresh, not the wizard. The moment worth their attention is a cell changing and a diagram redrawing; the six wizard screens are only interesting once somebody wants the outcome.</p>
+
+    <h3>With an IT student cohort</h3>
+    <p>The checklist in the topology section is the part that translates directly into marks. Diagrams in assessed work lose points for inconsistent icons, unlabelled links and missing legends far more often than for anything conceptual. Run the checklist over one of their own existing diagrams if you have one to hand.</p>
+
+    <h3>Licences</h3>
+    <p>Establish who has Visio desktop before you start, not at the third section. If a meaningful part of the room does not, restructure on the spot: run the first two sections as demonstration with the group watching, and give the Mermaid section the time instead, since everybody can do that one.</p>
+
+    <h3>Version drift</h3>
+    <p>Ribbon labels and template names shift between Visio releases. Check the installed version's wording against this page before delivery, particularly the Data Visualizer template names and the Layers menu location.</p>
+  </section>
+
+  <div class="container-course">
+    <p class="last-updated">Last updated 4 August 2026</p>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="../">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="../visio/">Visio in Four Hours</a></li>
+          <li><a href="../powerbi-siem/">Power BI for Cyber Security</a></li>
+          <li><a href="../#library">All courses</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="../#about">About</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/cookie-notice" target="_blank" rel="noopener">Cookies</a> | <a href="mailto:webservices@cdu.edu.au">Feedback</a></span>
+      <span style="font-family:'JetBrains Mono',monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

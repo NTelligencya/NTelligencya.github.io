@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Visio Crammer: an interactive trainer that drills the Visio shortcuts and menu paths worth remembering, in three passes: learn, copy, recall.">
+<title>Visio Crammer &middot; NT World Ink</title>
+<style>
+  :root {
+    /* THEME TOKENS; replaced per subject. This deck: Visio violet. */
+    --bg: #2a1f3d;
+    --bg-deep: #1d1529;
+    --panel: #3a2a54;
+    --ink: #f1ebf8;
+    --dim: #bdaad3;
+    --caret: #ffe066;
+    --ok: #8ce0a8;
+    --bad: #ff8a8a;
+    --accent: #b98cf0;
+    --rule: rgba(189,170,211,0.24);
+    --mono: "Cascadia Code", "Consolas", ui-monospace, Menlo, monospace;
+    --sigil-text: "visio >";
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: radial-gradient(ellipse at 50% -10%, #3a2a54 0%, #2a1f3d 50%, #1d1529 100%);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 15px; line-height: 1.5;
+    min-height: 100%; display: flex; flex-direction: column; align-items: center;
+  }
+  .wrap { width: 100%; max-width: 820px; padding: 22px 18px 80px; }
+  .titlebar {
+    display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+    background: var(--bg-deep); border: 1px solid var(--rule); border-bottom: none; border-radius: 8px 8px 0 0;
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+  .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
+  .titlebar .name { margin-left: 6px; color: var(--dim); font-size: 12.5px; letter-spacing: 0.04em; }
+  .tbnav { margin-left: auto; background: none; border: 1px solid var(--rule); font-size: 11.5px; padding: 3px 10px; color: var(--dim); border-radius: 4px; }
+  .tbnav:hover { color: var(--ink); }
+  .console {
+    background: rgba(0,0,0,0.30); border: 1px solid var(--rule); border-radius: 0 0 8px 8px;
+    padding: 22px 22px 26px; min-height: 320px; backdrop-filter: blur(2px);
+  }
+  .stripwrap { margin: 18px 2px 0; }
+  .stripmeta { display: flex; justify-content: space-between; align-items: baseline; color: var(--dim); font-size: 12px; margin-bottom: 6px; letter-spacing: 0.03em; }
+  .strip { height: 6px; width: 100%; background: rgba(127,127,127,0.18); border-radius: 4px; overflow: hidden; }
+  .strip > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--ok)); transition: width .35s ease; }
+  .eyebrow { color: var(--accent); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .eyebrow .pill { border: 1px solid var(--rule); border-radius: 999px; padding: 2px 9px; color: var(--dim); letter-spacing: 0.06em; font-size: 11px; }
+  .eyebrow .pill.topic { text-transform: none; }
+  .desc { font-size: 16px; line-height: 1.55; margin: 0 0 4px; color: var(--ink); }
+  .syntaxbox { margin: 18px 0 6px; padding: 16px 18px; background: rgba(0,0,0,0.34); border: 1px solid var(--rule); border-left: 1px solid var(--accent); border-radius: 4px; font-size: 17px; color: var(--ink); overflow-x: auto; white-space: pre; }
+  .label { color: var(--dim); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+  .note { color: var(--dim); font-size: 13px; margin-top: 14px; }
+  .note b { color: var(--ink); font-weight: 600; }
+  .alias { color: var(--caret); }
+  .promptline { margin-top: 22px; }
+  .ps { display: flex; align-items: center; gap: 0; background: rgba(0,0,0,0.34); border: 1px solid var(--rule); border-radius: 4px; padding: 12px 14px; font-size: 16.5px; }
+  .ps .sigil { color: var(--ok); white-space: nowrap; user-select: none; }
+  .ps .sigil::after { content: var(--sigil-text); }
+  .ps input { flex: 1; background: transparent; border: none; outline: none; color: var(--ink); font-family: var(--mono); font-size: 16.5px; padding: 0 0 0 8px; caret-color: var(--caret); min-width: 0; }
+  .ps textarea { flex: 1; background: transparent; border: none; outline: none; color: var(--ink); font-family: var(--mono); font-size: 16.5px; padding: 0 0 0 8px; caret-color: var(--caret); resize: vertical; min-height: 1.5em; line-height: 1.5; min-width: 0; }
+  .ps.correct { border-color: var(--ok); box-shadow: 0 0 0 1px var(--ok) inset; }
+  .ps.wrong { border-color: var(--bad); box-shadow: 0 0 0 1px var(--bad) inset; }
+  .ps.multiline { align-items: flex-start; }
+  .target { margin-top: 12px; font-size: 16.5px; color: var(--dim); padding: 10px 14px; border: 1px dashed var(--rule); border-radius: 4px; background: rgba(0,0,0,0.28); white-space: pre; overflow-x: auto; }
+  .target .hit { color: var(--ok); }
+  .target .miss { color: var(--bad); text-decoration: underline; }
+  .feedback { margin-top: 14px; font-size: 14px; min-height: 22px; }
+  .feedback.ok { color: var(--ok); }
+  .feedback.bad { color: var(--bad); }
+  .row { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  button { font-family: var(--mono); font-size: 14px; cursor: pointer; background: var(--panel); color: var(--ink); border: 1px solid var(--rule); border-radius: 5px; padding: 9px 16px; transition: background .15s, border-color .15s, transform .05s; }
+  button:hover { border-color: var(--accent); filter: brightness(1.12); }
+  button:active { transform: translateY(1px); }
+  button.primary { background: var(--accent); color: var(--bg-deep); border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { filter: brightness(1.1); }
+  button.ghost { background: transparent; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button:focus-visible { outline: 2px solid var(--caret); outline-offset: 2px; }
+  .spacer { flex: 1; }
+  kbd { font-family: var(--mono); font-size: 11.5px; background: rgba(0,0,0,0.4); color: var(--dim); border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 4px; padding: 1px 6px; }
+  .center { text-align: center; padding: 8px 0 4px; }
+  h1.brand { font-size: 26px; margin: 4px 0 6px; letter-spacing: 0.01em; font-weight: 600; }
+  h1.brand .gt { color: var(--ok); }
+  .tagline { color: var(--dim); font-size: 14px; margin: 0 0 18px; }
+  /* --- contents dashboard --- */
+  .statrow { display: flex; gap: 12px; justify-content: center; margin: 2px 0 22px; flex-wrap: wrap; }
+  .stat { border: 1px solid var(--rule); border-radius: 6px; padding: 9px 18px 8px; min-width: 104px; text-align: center; background: rgba(0,0,0,0.22); }
+  .stat .v { font-size: 22px; font-weight: 600; line-height: 1.25; }
+  .stat .k { color: var(--dim); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px; }
+  .toc { border: 1px solid var(--rule); border-radius: 6px; background: rgba(0,0,0,0.22); overflow: hidden; margin-top: 8px; }
+  .cat + .cat { border-top: 1px solid var(--rule); }
+  .cathead { display: flex; align-items: center; }
+  .catmain { flex: 1; display: flex; align-items: center; gap: 10px; background: none; border: none; border-radius: 0; padding: 11px 12px; text-align: left; font-size: 14px; color: var(--ink); min-width: 0; }
+  .catmain:hover { background: rgba(255,255,255,0.045); border-color: transparent; filter: none; }
+  .tri { color: var(--dim); font-size: 11px; width: 13px; flex: none; transition: transform .15s; display: inline-block; }
+  .cat.open .tri { transform: rotate(90deg); }
+  .catname { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .catmeta { margin-left: auto; display: flex; align-items: center; gap: 12px; flex: none; }
+  .catbar { width: 84px; height: 5px; background: rgba(127,127,127,0.18); border-radius: 3px; overflow: hidden; }
+  .catbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--ok)); }
+  .catcount { color: var(--dim); font-size: 12px; white-space: nowrap; min-width: 78px; text-align: right; }
+  .drill { margin-right: 10px; padding: 5px 13px; font-size: 12.5px; flex: none; }
+  .catcards { display: none; padding: 2px 14px 12px 35px; }
+  .cat.open .catcards { display: block; }
+  .cc { display: flex; align-items: baseline; gap: 9px; padding: 3.5px 0; font-size: 13px; min-width: 0; }
+  .cdot { width: 8px; height: 8px; border-radius: 50%; flex: none; align-self: center; border: 1px solid var(--dim); background: transparent; }
+  .cdot.clean { background: var(--ok); border-color: var(--ok); }
+  .cdot.retry { background: var(--caret); border-color: var(--caret); }
+  .ccmd { color: var(--accent); flex: none; }
+  .ccd { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .legend { color: var(--dim); font-size: 11.5px; margin-top: 8px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend .cdot { display: inline-block; vertical-align: middle; margin-right: 5px; }
+  details.how { margin-top: 20px; color: var(--dim); font-size: 13px; border: 1px solid var(--rule); border-radius: 6px; padding: 10px 14px; background: rgba(0,0,0,0.18); }
+  details.how summary { cursor: pointer; color: var(--ink); font-size: 13px; letter-spacing: 0.04em; }
+  details.how ol { margin: 10px 0 4px; padding-left: 20px; }
+  details.how li { margin: 6px 0; }
+  details.how li b { color: var(--ink); }
+  .resetline { margin-top: 14px; text-align: center; }
+  .resetline button { background: none; border: none; color: var(--dim); font-size: 11.5px; text-decoration: underline; padding: 4px 6px; }
+  .resetline button:hover { color: var(--bad); filter: none; }
+  .summary-grid { display: flex; gap: 26px; justify-content: center; margin: 18px 0 8px; flex-wrap: wrap; }
+  .summary-grid .k { color: var(--dim); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .summary-grid .v { font-size: 30px; font-weight: 600; }
+  .hide { display: none !important; }
+  .small { font-size: 12.5px; color: var(--dim); }
+  .toughlist { text-align: left; max-width: 560px; margin: 10px auto 0; }
+  .toughlist .ti { padding: 6px 0; border-bottom: 1px solid var(--rule); }
+  .toughlist code { color: var(--caret); }
+  @media (max-width: 560px) {
+    body { font-size: 14px; }
+    .wrap { padding: 12px 10px 60px; }
+    .console { padding: 16px 13px 20px; }
+    .syntaxbox { font-size: 15px; padding: 12px 13px; }
+    .ps, .ps input, .ps textarea, .target { font-size: 15px; }
+    .catbar { display: none; }
+    .catcount { min-width: 0; }
+    .catcards { padding-left: 24px; }
+    .summary-grid { gap: 16px; }
+    h1.brand { font-size: 21px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="titlebar">
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="name">Visio; shortcuts and menu paths</span>
+    <button class="tbnav hide" id="tbHome" title="End this session and return to the contents page">&#9776; contents</button>
+  </div>
+  <div class="console" id="console"></div>
+  <div class="stripwrap" id="stripwrap" style="visibility:hidden">
+    <div class="stripmeta"><span id="stripleft">deck</span><span id="stripright">0 / 0 learned</span></div>
+    <div class="strip"><i id="stripfill"></i></div>
+  </div>
+</div>
+<script>
+/* ============================================================
+   SYNTAX CRAMMER; generic engine
+   Generated for subject: Visio
+   Matching mode: forgiving   (strict | forgiving)
+   ============================================================ */
+
+const SUBJECT = "Visio";
+const MATCH_MODE = "forgiving";   // "strict" or "forgiving"
+const MULTILINE = false;        // true => use a textarea (Python/JSON blocks)
+
+/* DECK is injected here. Each: { cmd, cat, syntax, desc, note } */
+const DECK = [
+  {
+    "cmd": "Pointer tool",
+    "cat": "Tools and selection",
+    "syntax": "Ctrl+1",
+    "desc": "Return to the ordinary selection cursor.",
+    "note": "The single most useful shortcut in Visio. If Visio is drawing lines or boxes when you did not ask it to, you are still holding another tool; press Ctrl+1."
+  },
+  {
+    "cmd": "Text tool",
+    "cat": "Tools and selection",
+    "syntax": "Ctrl+2",
+    "desc": "Switch to the text cursor, for editing text blocks on their own.",
+    "note": "You rarely need it to add text, since clicking a shape and typing works. You do need it to move or rotate a text block independently of its shape."
+  },
+  {
+    "cmd": "Connector tool",
+    "cat": "Tools and selection",
+    "syntax": "Ctrl+3",
+    "desc": "Draw connectors between shapes by dragging from one to another.",
+    "note": "Remember to press Ctrl+1 afterwards. Leaving the connector tool active is the classic beginner trap."
+  },
+  {
+    "cmd": "Line tool",
+    "cat": "Tools and selection",
+    "syntax": "Ctrl+6",
+    "desc": "Draw a straight line that is not a connector.",
+    "note": "A line is decoration; a connector is a relationship that survives shapes being moved. Do not use one for the other."
+  },
+  {
+    "cmd": "Rectangle tool",
+    "cat": "Tools and selection",
+    "syntax": "Ctrl+8",
+    "desc": "Draw a plain rectangle.",
+    "note": "Hold Shift while dragging to get a perfect square. The workhorse for wireframes."
+  },
+  {
+    "cmd": "Ellipse tool",
+    "cat": "Tools and selection",
+    "syntax": "Ctrl+9",
+    "desc": "Draw an ellipse.",
+    "note": "Hold Shift while dragging for a perfect circle."
+  },
+  {
+    "cmd": "Access keys",
+    "cat": "Tools and selection",
+    "syntax": "Alt",
+    "desc": "Light up a keyboard letter for every ribbon tab, then for every command on it.",
+    "note": "Gives you a keyboard route to anything on the ribbon without memorising a shortcut. Press Escape a few times to clear them."
+  },
+  {
+    "cmd": "Undo",
+    "cat": "Tools and selection",
+    "syntax": "Ctrl+Z",
+    "desc": "Undo the last action.",
+    "note": "Redo is Ctrl+Y in Visio, not Ctrl+Shift+Z."
+  },
+  {
+    "cmd": "Help",
+    "cat": "Getting around",
+    "syntax": "F1",
+    "desc": "Open the Help pane.",
+    "note": ""
+  },
+  {
+    "cmd": "Format Shape pane",
+    "cat": "Getting around",
+    "syntax": "F3",
+    "desc": "Open the Format Shape task pane for the selected shape.",
+    "note": "Everything about fill, line and effects lives here. Faster than hunting the ribbon."
+  },
+  {
+    "cmd": "Full screen",
+    "cat": "Getting around",
+    "syntax": "F5",
+    "desc": "Show the drawing full screen with no ribbon or stencils.",
+    "note": "The presentation view. Escape returns you to normal."
+  },
+  {
+    "cmd": "Zoom in",
+    "cat": "Getting around",
+    "syntax": "Alt+F6",
+    "desc": "Zoom in on the drawing.",
+    "note": "Zoom out is Alt+Shift+F6."
+  },
+  {
+    "cmd": "Pan and Zoom pane",
+    "cat": "Getting around",
+    "syntax": "View > Task Panes > Pan & Zoom",
+    "desc": "Show a small overview of the whole drawing with a movable viewport box.",
+    "note": "Worth opening on any diagram too big to see at once; you navigate from the thumbnail instead of scrolling."
+  },
+  {
+    "cmd": "Duplicate a shape",
+    "cat": "Shapes and text",
+    "syntax": "Ctrl+drag",
+    "desc": "Drag a copy of an existing shape, keeping its formatting.",
+    "note": "Faster than copy and paste, and it keeps everything you have already formatted."
+  },
+  {
+    "cmd": "Perfect square or circle",
+    "cat": "Shapes and text",
+    "syntax": "Shift+drag",
+    "desc": "Constrain a rectangle to a square, or an ellipse to a circle, while drawing.",
+    "note": ""
+  },
+  {
+    "cmd": "Add a text box",
+    "cat": "Shapes and text",
+    "syntax": "Insert > Text Box",
+    "desc": "Place free-standing text anywhere on the page, attached to no shape.",
+    "note": "Use for titles, legends and notes. Text that belongs to a shape should be typed into the shape instead."
+  },
+  {
+    "cmd": "Change a shape",
+    "cat": "Shapes and text",
+    "syntax": "Home > Change Shape",
+    "desc": "Swap a shape for a different one, keeping its text, position and connectors.",
+    "note": "The fix for drawing the whole diagram then realising the icons are wrong. Do not delete and redraw."
+  },
+  {
+    "cmd": "Size and Position pane",
+    "cat": "Shapes and text",
+    "syntax": "View > Task Panes > Size & Position",
+    "desc": "Type exact width, height and coordinates for the selected shape.",
+    "note": "The way to get precise without nudging. Also the fastest way to make several shapes exactly the same size."
+  },
+  {
+    "cmd": "Group shapes",
+    "cat": "Shapes and text",
+    "syntax": "Home > Group",
+    "desc": "Bind several shapes together so they move and format as one.",
+    "note": "Right-click and Group does the same thing. Ungroup is in the same menu."
+  },
+  {
+    "cmd": "Insert a picture",
+    "cat": "Shapes and text",
+    "syntax": "Insert > Pictures",
+    "desc": "Place an image file on the drawing.",
+    "note": "Insert > Online Pictures takes a URL instead."
+  },
+  {
+    "cmd": "Add a callout",
+    "cat": "Shapes and text",
+    "syntax": "Insert > Callout",
+    "desc": "Attach an annotation bubble to a shape.",
+    "note": "The callout stays attached when the shape moves, which a plain text box will not do."
+  },
+  {
+    "cmd": "Add a ScreenTip",
+    "cat": "Shapes and text",
+    "syntax": "Insert > ScreenTip",
+    "desc": "Add hover text to a shape.",
+    "note": "Only visible on screen, never in print. Useful for detail that would clutter the drawing."
+  },
+  {
+    "cmd": "Turn AutoConnect on",
+    "cat": "Connectors",
+    "syntax": "View > AutoConnect",
+    "desc": "Show the blue arrows around a hovered shape that add a connected shape in one click.",
+    "note": "The fastest way to build a chain of shapes. Turn it off when it starts getting in the way of precise work."
+  },
+  {
+    "cmd": "More connector types",
+    "cat": "Connectors",
+    "syntax": "More Shapes > Visio Extras > Connectors",
+    "desc": "Open a stencil of alternative connector styles.",
+    "note": "Where to go when the default line is not saying enough; dashed, double-headed and directional variants."
+  },
+  {
+    "cmd": "Label a connector",
+    "cat": "Connectors",
+    "syntax": "Click the connector and type",
+    "desc": "Put text on a line, exactly as you would on a shape.",
+    "note": "Unlabelled connectors are the most common omission in a network or process diagram."
+  },
+  {
+    "cmd": "Dynamic grid",
+    "cat": "Layout and alignment",
+    "syntax": "View > Dynamic Grid",
+    "desc": "Show the guide lines that appear as a shape lines up with its neighbours.",
+    "note": "This is the feature doing your alignment for you as you drag. If shapes are landing crooked, check it is on."
+  },
+  {
+    "cmd": "Rulers and grid",
+    "cat": "Layout and alignment",
+    "syntax": "View > Rulers",
+    "desc": "Show or hide the rulers; the Grid tickbox sits beside it.",
+    "note": ""
+  },
+  {
+    "cmd": "Align shapes",
+    "cat": "Layout and alignment",
+    "syntax": "Home > Align",
+    "desc": "Line up selected shapes on an edge or a centre line.",
+    "note": "Home > Position beside it spaces them evenly. Between them they replace all hand-nudging."
+  },
+  {
+    "cmd": "Re-layout a page",
+    "cat": "Layout and alignment",
+    "syntax": "Design > Re-Layout Page",
+    "desc": "Reflow the whole drawing using one of several automatic layouts.",
+    "note": "Mostly used on generated diagrams. Try every option before moving anything by hand."
+  },
+  {
+    "cmd": "Quick Styles",
+    "cat": "Formatting",
+    "syntax": "Home > Quick Styles",
+    "desc": "Apply a preset combination of fill, line and effect.",
+    "note": ""
+  },
+  {
+    "cmd": "Effects",
+    "cat": "Formatting",
+    "syntax": "Home > Effects",
+    "desc": "Add shadow, glow, reflection or soft edges to a shape.",
+    "note": "Restraint pays. A technical diagram with shadows on everything reads as decorated, not designed."
+  },
+  {
+    "cmd": "Format Painter",
+    "cat": "Formatting",
+    "syntax": "Home > Format Painter",
+    "desc": "Copy the formatting of one shape onto another.",
+    "note": "Double-click it to lock it on for several shapes in a row; click it again to release."
+  },
+  {
+    "cmd": "Themes",
+    "cat": "Formatting",
+    "syntax": "Design > Themes",
+    "desc": "Change the colour and font scheme of the whole drawing at once.",
+    "note": "Variants beside it adjust the chosen theme without leaving it."
+  },
+  {
+    "cmd": "Backgrounds",
+    "cat": "Formatting",
+    "syntax": "Design > Backgrounds",
+    "desc": "Add a background to the drawing.",
+    "note": "Adding one creates a separate background tab at the bottom of the window, which you edit independently of the drawing itself."
+  },
+  {
+    "cmd": "See a shape's data",
+    "cat": "Data and layers",
+    "syntax": "Right-click > Data > Shape Data",
+    "desc": "Show the structured fields stored behind the selected shape.",
+    "note": "Every Visio shape can carry data. On a network device this is where the IP, model and serial belong."
+  },
+  {
+    "cmd": "Add data fields",
+    "cat": "Data and layers",
+    "syntax": "Right-click > Data > Define Shape Data",
+    "desc": "Create new fields on a shape, with a name and a type.",
+    "note": ""
+  },
+  {
+    "cmd": "Import a spreadsheet",
+    "cat": "Data and layers",
+    "syntax": "Data > Quick Import",
+    "desc": "Bring rows from a workbook into a pane, ready to drag onto shapes.",
+    "note": "Visio can also read from Access and SQL Server. Dragging a row onto a shape attaches the whole record."
+  },
+  {
+    "cmd": "Generate a diagram from data",
+    "cat": "Data and layers",
+    "syntax": "Data > Create from Data > Excel Workbook",
+    "desc": "Start the Data Visualizer wizard, which draws a flowchart from a table.",
+    "note": "Desktop only; the web version's support is limited. Also reachable by starting from a Data Visualizer template."
+  },
+  {
+    "cmd": "Refresh linked data",
+    "cat": "Data and layers",
+    "syntax": "Data > Refresh All",
+    "desc": "Redraw a generated diagram after its source table has changed.",
+    "note": "The payoff of the whole Data Visualizer feature. Edit cells rather than adding or removing rows while a diagram is linked."
+  },
+  {
+    "cmd": "Layer properties",
+    "cat": "Data and layers",
+    "syntax": "Home > Layers > Layer Properties",
+    "desc": "Create layers, and set each one's visibility, printing and lock state.",
+    "note": "Hiding a layer does not lock it. They are separate tickboxes and both are useful."
+  },
+  {
+    "cmd": "Assign shapes to a layer",
+    "cat": "Data and layers",
+    "syntax": "Home > Layers > Assign to Layer",
+    "desc": "Put the selected shapes onto a named layer.",
+    "note": "Two layers on one drawing is how you keep a logical and a physical view of the same network in a single file."
+  },
+  {
+    "cmd": "Search for a shape",
+    "cat": "Stencils",
+    "syntax": "Type in the Shapes search box",
+    "desc": "Find a shape by name across all installed stencils.",
+    "note": "Quicker than browsing when you know what the thing is called."
+  },
+  {
+    "cmd": "Browse more stencils",
+    "cat": "Stencils",
+    "syntax": "More Shapes",
+    "desc": "Open the menu of shape categories not loaded by the current template.",
+    "note": "Network, Software and Database, Engineering, Maps and Floor Plans, and more."
+  },
+  {
+    "cmd": "Favourites stencil",
+    "cat": "Stencils",
+    "syntax": "More Shapes > My Shapes > Favorites",
+    "desc": "Open your own stencil of saved shapes, available in any drawing.",
+    "note": "Save it after adding shapes or they will not persist. Note Visio spells the menu item the American way."
+  },
+  {
+    "cmd": "Copy a stencil to edit",
+    "cat": "Stencils",
+    "syntax": "Right-click the stencil > Save As",
+    "desc": "Make your own editable copy of a built-in stencil.",
+    "note": "Built-in stencils are read-only. Copy first, then customise the copy."
+  },
+  {
+    "cmd": "Print preview",
+    "cat": "Sharing and printing",
+    "syntax": "File > Print",
+    "desc": "Open print preview, where the page setup options also live.",
+    "note": "Always look before printing. Visio drawings spill onto a second page more readily than any other Office document."
+  },
+  {
+    "cmd": "Fit the drawing to one page",
+    "cat": "Sharing and printing",
+    "syntax": "File > Print > Page Setup",
+    "desc": "Scale the drawing so it prints on a single sheet.",
+    "note": "Also where headers and footers are set."
+  },
+  {
+    "cmd": "Paste a live link into Word",
+    "cat": "Sharing and printing",
+    "syntax": "Home > Paste > Paste Special > Paste Link",
+    "desc": "Place the diagram in another Office document so it updates when the Visio file changes.",
+    "note": "Copy from Visio with nothing selected to take the whole page. The same trick works in reverse, pasting into Visio."
+  },
+  {
+    "cmd": "Link one diagram to another",
+    "cat": "Sharing and printing",
+    "syntax": "Insert > Link",
+    "desc": "Turn a shape into a jump to another Visio file or page.",
+    "note": "Follow the link with Ctrl+click. This is how a multi-site network diagram is navigated."
+  },
+  {
+    "cmd": "Basic Network Diagram",
+    "cat": "Templates worth knowing",
+    "syntax": "File > New > Basic Network Diagram",
+    "desc": "Start a network drawing with the network stencils loaded.",
+    "note": "Detailed Network Diagram is the same idea with a much larger equipment set."
+  },
+  {
+    "cmd": "Conceptual Web Site",
+    "cat": "Templates worth knowing",
+    "syntax": "File > New > Conceptual Web Site",
+    "desc": "Start a site map with the web planning stencils loaded.",
+    "note": "Opens three stencils: Conceptual Web Site Shapes, Web Site Map Shapes and Callouts."
+  },
+  {
+    "cmd": "Data Visualizer Basic Flowchart",
+    "cat": "Templates worth knowing",
+    "syntax": "File > New > Data Visualizer Basic Flowchart",
+    "desc": "Start a flowchart that will be generated from a table.",
+    "note": "The Cross-Functional version is the same wizard plus a swimlane mapping step."
+  },
+  {
+    "cmd": "Organization Chart",
+    "cat": "Templates worth knowing",
+    "syntax": "File > New > Organization Chart",
+    "desc": "Start an org chart with its own stencils and wizard.",
+    "note": "Cancel the wizard if you would rather drag shapes in by hand."
+  },
+  {
+    "cmd": "Basic Flowchart",
+    "cat": "Templates worth knowing",
+    "syntax": "File > New > Basic Flowchart",
+    "desc": "Start an ordinary flowchart drawn by hand.",
+    "note": "The default first template in most Visio tutorials, and rarely the one you actually want."
+  }
+];
+
+/* Topics, in order of first appearance in the deck. Each -> list of deck indices. */
+const TOPICS = (() => {
+  const m = new Map();
+  DECK.forEach((c, i) => {
+    const k = c.cat || "General";
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push(i);
+  });
+  return Array.from(m, ([name, idxs]) => ({ name, idxs }));
+})();
+
+/* ---- per-card progress, persisted across visits ----
+   prog[cmd] = { r: "clean" | "retry", t: epoch-ms }
+   "clean" = recalled first try last time; "retry" = needed another go. */
+const PKEY = "syntax-crammer::" + SUBJECT;
+function loadProg() { try { return JSON.parse(localStorage.getItem(PKEY)) || {}; } catch (e) { return {}; } }
+function saveProg(p) { try { localStorage.setItem(PKEY, JSON.stringify(p)); } catch (e) {} }
+function recordResult(cmd, clean) {
+  const p = loadProg();
+  p[cmd] = { r: clean ? "clean" : "retry", t: Date.now() };
+  saveProg(p);
+}
+
+/* ---- state ---- */
+let queue = [], card = null, stage = "learn";
+let learnedSet = new Set(), attempts = 0, hits = 0, missCount = {};
+let scopeTopic = null;      // null = full deck, otherwise a topic name
+let sessionTotal = 0;
+
+const consoleEl = document.getElementById('console');
+const stripwrap = document.getElementById('stripwrap');
+const stripfill = document.getElementById('stripfill');
+const stripleft = document.getElementById('stripleft');
+const stripright = document.getElementById('stripright');
+const tbHome = document.getElementById('tbHome');
+tbHome.onclick = renderStart;
+
+/* one managed document-level Enter handler, so stale ones never stack up */
+let enterHandler = null;
+function onGlobalEnter(fn) {
+  if (enterHandler) { document.removeEventListener('keydown', enterHandler); enterHandler = null; }
+  if (!fn) return;
+  enterHandler = (e) => {
+    if (e.key !== "Enter") return;
+    if (e.target.closest && e.target.closest("button, a, input, textarea, summary")) return;
+    e.preventDefault(); fn();
+  };
+  document.addEventListener('keydown', enterHandler);
+}
+
+/* ---- matching ---- */
+function normalise(s) {
+  if (MATCH_MODE === "strict") return s;
+  // forgiving: unify quotes, collapse whitespace, and ignore the optional spaces
+  // formula languages allow around brackets, commas and operators, so
+  // "= SUMIF( A, B )" matches "=SUMIF(A,B)". Crucially, spaces *inside* a quoted
+  // string are preserved, because there a space can be the answer (e.g. the
+  // ", " delimiter in TEXTJOIN).
+  let s2 = s
+    .toLowerCase()
+    .replace(/\r\n/g, "\n")
+    .replace(/[‘’]/g, "'")          // curly single quotes -> straight
+    .replace(/[“”]/g, '"')          // curly double quotes -> straight
+    .replace(/[ \t]+/g, " ")
+    .trim()
+    .replace(/;+\s*$/g, "");                   // ignore a trailing semicolon
+  // Split on quoted runs ("..." or '...'); only tidy the parts OUTSIDE quotes.
+  const parts = s2.split(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g);
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 0) {  // even indices are the unquoted segments
+      parts[i] = parts[i].replace(/\s*([(),=+\-*/<>!&\[\]{}:;])\s*/g, "$1");
+    }
+    // odd indices are quoted strings: left exactly as typed
+  }
+  return parts.join("");
+}
+function isMatch(typed, target) { return normalise(typed) === normalise(target); }
+
+/* ---- contents / dashboard (start screen) ---- */
+function renderStart() {
+  stripwrap.style.visibility = "hidden";
+  tbHome.classList.add('hide');
+  const prog = loadProg();
+  const masteredTotal = DECK.filter(c => (prog[c.cmd] || {}).r === "clean").length;
+  const anyProgress = Object.keys(prog).length > 0;
+  const modeWord = MATCH_MODE === "strict"
+    ? "Matching is strict: spelling, capitals, spaces and punctuation all count."
+    : "Matching is forgiving on spacing and quote style, but the structure must be right.";
+
+  const topicRows = TOPICS.map((t, ti) => {
+    const clean = t.idxs.filter(i => (prog[DECK[i].cmd] || {}).r === "clean").length;
+    const pct = Math.round(clean / t.idxs.length * 100);
+    const cardRows = t.idxs.map(i => {
+      const c = DECK[i];
+      const st = (prog[c.cmd] || {}).r;
+      return `<div class="cc"><span class="cdot ${st || ""}"></span><code class="ccmd">${escapeHtml(c.cmd)}</code><span class="ccd">${c.desc}</span></div>`;
+    }).join("");
+    return `
+      <div class="cat" id="cat${ti}">
+        <div class="cathead">
+          <button class="catmain" data-ti="${ti}" aria-expanded="false" aria-controls="catcards${ti}">
+            <span class="tri">&#9656;</span>
+            <span class="catname">${escapeHtml(t.name)}</span>
+            <span class="catmeta">
+              <span class="catbar"><i style="width:${pct}%"></i></span>
+              <span class="catcount">${clean ? clean + "/" + t.idxs.length + " &#10003;" : t.idxs.length + " cards"}</span>
+            </span>
+          </button>
+          <button class="drill ghost" data-ti="${ti}" title="Drill just this topic">Drill</button>
+        </div>
+        <div class="catcards" id="catcards${ti}">${cardRows}</div>
+      </div>`;
+  }).join("");
+
+  consoleEl.innerHTML = `
+    <div class="center">
+      <h1 class="brand"><span class="gt">&gt;_</span> ${SUBJECT} Crammer</h1>
+      <p class="tagline">Learn &rarr; copy &rarr; recall, until every card sticks.</p>
+    </div>
+    <div class="statrow">
+      <div class="stat"><div class="v">${DECK.length}</div><div class="k">cards</div></div>
+      <div class="stat"><div class="v">${TOPICS.length}</div><div class="k">topics</div></div>
+      <div class="stat"><div class="v" style="color:${masteredTotal ? 'var(--ok)' : 'var(--dim)'}">${masteredTotal}<span class="small">/${DECK.length}</span></div><div class="k">mastered</div></div>
+    </div>
+    <div class="label">Contents; click a topic to see its cards</div>
+    <div class="toc">${topicRows}</div>
+    <div class="legend">
+      <span><span class="cdot clean"></span>recalled first try</span>
+      <span><span class="cdot retry"></span>needed retries</span>
+      <span><span class="cdot"></span>not drilled yet</span>
+    </div>
+    <div class="row center" style="justify-content:center; margin-top:24px">
+      <button class="primary" id="startBtn">Start the full deck &nbsp;&crarr;</button>
+    </div>
+    <details class="how"${anyProgress ? "" : " open"}>
+      <summary>How a session works</summary>
+      <ol>
+        <li><b>Learn</b>: you see what a card does and its exact syntax.</li>
+        <li><b>Copy</b>: type it once while looking, to wire in the keystrokes.</li>
+        <li><b>Recall</b>: type it from memory.</li>
+      </ol>
+      <div style="margin-top:8px">Miss a recall and the card resurfaces later in the session until it sticks. ${modeWord} <kbd>${MULTILINE ? "Ctrl+Enter" : "Enter"}</kbd> checks your answer.</div>
+    </details>
+    ${anyProgress ? `<div class="resetline"><button id="resetBtn">reset saved progress</button></div>` : ""}
+  `;
+
+  consoleEl.querySelectorAll('.catmain').forEach(btn => {
+    btn.onclick = () => {
+      const cat = document.getElementById('cat' + btn.dataset.ti);
+      const open = cat.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? "true" : "false");
+    };
+  });
+  consoleEl.querySelectorAll('.drill').forEach(btn => {
+    btn.onclick = () => startSession(TOPICS[btn.dataset.ti].name);
+  });
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) resetBtn.onclick = () => {
+    if (resetBtn.dataset.armed) { try { localStorage.removeItem(PKEY); } catch (e) {} renderStart(); }
+    else { resetBtn.dataset.armed = "1"; resetBtn.textContent = "sure? click again to wipe it"; }
+  };
+  const startBtn = document.getElementById('startBtn');
+  startBtn.onclick = () => startSession(null);
+  startBtn.focus({ preventScroll: true });
+  onGlobalEnter(() => startSession(null));
+}
+
+/* ---- session ---- */
+function startSession(topicName) {
+  onGlobalEnter(null);
+  scopeTopic = topicName;
+  queue = topicName === null
+    ? DECK.map((_, i) => i)
+    : (TOPICS.find(t => t.name === topicName) || { idxs: [] }).idxs.slice();
+  if (!queue.length) { renderStart(); return; }
+  sessionTotal = queue.length;
+  learnedSet = new Set(); attempts = 0; hits = 0; missCount = {};
+  stripwrap.style.visibility = "visible";
+  tbHome.classList.remove('hide');
+  nextCard();
+}
+function nextCard() {
+  if (queue.length === 0) { renderSummary(); return; }
+  card = { ...DECK[queue[0]], _idx: queue[0] };
+  stage = "learn"; renderCard(); updateStrip();
+}
+function updateStrip() {
+  const learned = learnedSet.size;
+  stripfill.style.width = (learned / sessionTotal * 100) + "%";
+  stripleft.textContent = (scopeTopic === null ? "full deck" : scopeTopic) + " · queue: " + queue.length;
+  stripright.textContent = learned + " / " + sessionTotal + " learned";
+}
+function topicPill() {
+  return card.cat ? ` <span class="pill topic">${escapeHtml(card.cat)}</span>` : "";
+}
+function renderCard() {
+  if (stage === "learn") return renderLearn();
+  return renderType(stage === "copy" ? "copy" : "recall");
+}
+function renderLearn() {
+  consoleEl.innerHTML = `
+    <div class="eyebrow">Learn <span class="pill">${escapeHtml(card.cmd)}</span>${topicPill()}</div>
+    <p class="desc">${card.desc}</p>
+    <div class="label" style="margin-top:18px">Syntax</div>
+    <div class="syntaxbox">${escapeHtml(card.syntax)}</div>
+    <p class="note">${card.note}</p>
+    <div class="row">
+      <button class="primary" id="go">I've read it; let me type it &rarr;</button>
+      <div class="spacer"></div>
+      <button class="ghost" id="skip">Skip card</button>
+    </div>`;
+  const go = document.getElementById('go');
+  go.onclick = () => { stage = "copy"; renderCard(); };
+  document.getElementById('skip').onclick = () => { dropCard(); nextCard(); };
+  go.focus({ preventScroll: true });
+  onGlobalEnter(() => go.click());
+}
+function renderType(mode) {
+  onGlobalEnter(null);
+  const isCopy = mode === "copy";
+  const field = MULTILINE
+    ? `<textarea id="entry" rows="${Math.min(10, card.syntax.split("\n").length + 1)}" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>`
+    : `<input id="entry" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" />`;
+  consoleEl.innerHTML = `
+    <div class="eyebrow">${isCopy ? "Copy" : "Recall"} <span class="pill">${escapeHtml(card.cmd)}</span>${topicPill()}</div>
+    <p class="desc">${card.desc}</p>
+    ${isCopy ? `<div class="label" style="margin-top:16px">Type this exactly</div><div class="target" id="target">${escapeHtml(card.syntax)}</div>`
+             : `<p class="note" style="margin-top:8px">From memory.</p>`}
+    <div class="promptline">
+      <div class="ps ${MULTILINE ? 'multiline' : ''}" id="psline">
+        <span class="sigil"></span>
+        ${field}
+      </div>
+      <div class="feedback" id="fb"></div>
+    </div>
+    <div class="row">
+      <button class="primary" id="check">Check &nbsp;&crarr;</button>
+      ${isCopy ? "" : `<button class="ghost" id="reveal">Show answer</button>`}
+      <div class="spacer"></div>
+      <span class="small">${isCopy ? "Live-matched against the target." : (MATCH_MODE === "strict" ? "Strict match." : "Forgiving match.")}</span>
+    </div>`;
+  const entry = document.getElementById('entry');
+  const psline = document.getElementById('psline');
+  const fb = document.getElementById('fb');
+  const targetEl = document.getElementById('target');
+  entry.focus();
+  if (isCopy && targetEl) entry.addEventListener('input', () => paintTarget(targetEl, card.syntax, entry.value));
+
+  function attempt() {
+    if (isMatch(entry.value, card.syntax)) {
+      psline.classList.remove('wrong'); psline.classList.add('correct');
+      fb.className = "feedback ok";
+      fb.textContent = isCopy ? "Matched. Now the real test." : "Correct. Locked in.";
+      if (!isCopy) { hits++; attempts++; recordResult(card.cmd, !missCount[card.cmd]); }
+      setTimeout(() => {
+        if (isCopy) { stage = "recall"; renderCard(); }
+        else { learnedSet.add(card.cmd); dropCard(); nextCard(); }
+      }, 480);
+    } else {
+      psline.classList.remove('correct'); psline.classList.add('wrong');
+      fb.className = "feedback bad";
+      if (isCopy) {
+        fb.textContent = "Not quite, the highlight shows where it differs.";
+        if (targetEl) paintTarget(targetEl, card.syntax, entry.value);
+      } else {
+        attempts++; missCount[card.cmd] = (missCount[card.cmd] || 0) + 1;
+        fb.innerHTML = "Missed. This card will come back. Try again, or reveal.";
+        requeueCurrent();
+        entry.select();
+      }
+    }
+  }
+  document.getElementById('check').onclick = attempt;
+  entry.addEventListener('keydown', (e) => {
+    if (e.key === "Enter" && (!MULTILINE || e.ctrlKey || e.metaKey)) { e.preventDefault(); attempt(); }
+  });
+  if (!isCopy) document.getElementById('reveal').onclick = () => {
+    fb.className = "feedback bad";
+    fb.innerHTML = "Answer: <b>" + escapeHtml(card.syntax) + "</b> &nbsp;(card requeued)";
+    missCount[card.cmd] = (missCount[card.cmd] || 0) + 1; requeueCurrent();
+    entry.value = ""; entry.focus();
+  };
+}
+function requeueCurrent() {
+  const idx = queue.shift();
+  const insertAt = Math.min(queue.length, 3 + Math.floor(Math.random() * 3));
+  queue.splice(insertAt, 0, idx); updateStrip();
+}
+function dropCard() { queue.shift(); updateStrip(); }
+function paintTarget(el, target, typed) {
+  let html = "", diverged = false;
+  for (let i = 0; i < target.length; i++) {
+    const ch = escapeHtml(target[i]);
+    if (!diverged && i < typed.length && typed[i] === target[i]) html += "<span class='hit'>" + ch + "</span>";
+    else if (!diverged && i < typed.length && typed[i] !== target[i]) { html += "<span class='miss'>" + ch + "</span>"; diverged = true; }
+    else html += ch;
+  }
+  el.innerHTML = html;
+}
+function renderSummary() {
+  stripwrap.style.visibility = "hidden";
+  tbHome.classList.add('hide');
+  const accuracy = attempts ? Math.round(hits / attempts * 100) : 0;
+  const tough = Object.entries(missCount).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const scopeWord = scopeTopic === null ? "deck" : `<b>${escapeHtml(scopeTopic)}</b> topic`;
+  consoleEl.innerHTML = `
+    <div class="center">
+      <h1 class="brand"><span class="gt">&gt;_</span> ${scopeTopic === null ? "Deck" : "Topic"} cleared</h1>
+      <p class="tagline">${learnedSet.size} of ${sessionTotal} ${scopeWord} cards recalled from memory.</p>
+      <div class="summary-grid">
+        <div><div class="v" style="color:var(--ok)">${learnedSet.size}</div><div class="k">learned</div></div>
+        <div><div class="v">${attempts}</div><div class="k">recall attempts</div></div>
+        <div><div class="v" style="color:${accuracy >= 80 ? 'var(--ok)' : 'var(--caret)'}">${accuracy}%</div><div class="k">first-try rate</div></div>
+      </div>
+      ${tough.length ? `<div class="label" style="margin-top:18px">Worth another look</div>
+        <div class="toughlist">${tough.map(([c, n]) => `<div class="ti"><code>${escapeHtml(c)}</code> ; missed ${n} time${n > 1 ? 's' : ''}</div>`).join("")}</div>`
+        : `<p class="note center" style="margin-top:16px">Clean run, nothing tripped you up.</p>`}
+    </div>
+    <div class="row center" style="justify-content:center; margin-top:24px">
+      <button class="primary" id="again">Run it again</button>
+      <button class="ghost" id="toughonly" ${tough.length ? '' : 'disabled'}>Drill just the missed ones</button>
+      <button class="ghost" id="home">Contents</button>
+    </div>`;
+  document.getElementById('again').onclick = () => startSession(scopeTopic);
+  document.getElementById('home').onclick = renderStart;
+  document.getElementById('toughonly').onclick = () => {
+    const t = new Set(tough.map(x => x[0]));
+    queue = DECK.map((_, i) => i).filter(i => t.has(DECK[i].cmd));
+    if (!queue.length) { startSession(scopeTopic); return; }
+    sessionTotal = queue.length;
+    learnedSet = new Set(); attempts = 0; hits = 0; missCount = {};
+    stripwrap.style.visibility = "visible"; tbHome.classList.remove('hide');
+    nextCard();
+  };
+  document.getElementById('again').focus({ preventScroll: true });
+}
+function escapeHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+/* favicon: subject initial on the theme accent, so browser tabs are tellable apart */
+(function () {
+  const css = getComputedStyle(document.documentElement);
+  const accent = css.getPropertyValue('--accent').trim() || "#888";
+  const deep = css.getPropertyValue('--bg-deep').trim() || "#000";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="13" fill="${accent}"/><text x="32" y="45" font-size="38" font-family="monospace" font-weight="bold" text-anchor="middle" fill="${deep}">${escapeHtml(SUBJECT[0] || "?")}</text></svg>`;
+  const link = document.createElement('link');
+  link.rel = "icon";
+  link.href = "data:image/svg+xml," + encodeURIComponent(svg);
+  document.head.appendChild(link);
+})();
+
+renderStart();
+</script>
+</body>
+</html>

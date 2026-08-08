@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagrams you write instead of draw &middot; NT World Ink</title>
+<meta name="description" content="An interactive walkthrough of Mermaid; the small text language that renders as a diagram. Type the syntax, watch it draw, and learn when a diagram should be written rather than drawn.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* THEME: ntworldink dark. Baskerville on black, one amber accent, restrained. */
+    --page: #000000; --panel: #0a0a0a; --panel-2: #101010;
+    --accent: #e0983c; --accent-bright: #f2ab52; --accent-dim: #8a6a3a;
+    --ink-head: #f4f4f2; --ink-body: #d5d8d9; --ink-muted: #9a9d9e; --ink-dim: #6a6d6e;
+    --hairline: rgba(240,240,235,.12); --hairline-strong: rgba(240,240,235,.22);
+    --glow: rgba(240,235,225,.12);
+    --ok: #7bb37b;
+    --display: "Libre Baskerville", Baskerville, "Times New Roman", serif;
+    --serif: "Libre Baskerville", Baskerville, Georgia, serif;
+    --mono: Consolas, "SF Mono", ui-monospace, "Liberation Mono", monospace;
+    --radius: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { background: var(--page); color: var(--ink-head); font-family: var(--serif); overflow: hidden; }
+  #stage { height: 100vh; display: flex; flex-direction: column; }
+
+  header {
+    display: flex; justify-content: space-between; align-items: center; gap: 28px; flex-wrap: wrap;
+    flex-shrink: 0; padding: 18px 36px; border-bottom: 1px solid var(--hairline);
+  }
+  header .brand { font-size: 14px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-head); }
+  header .crumb { color: var(--accent-dim); font-size: 13px; }
+  header .modtag { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent-dim); }
+  footer { flex-shrink: 0; display: flex; justify-content: center; align-items: center; gap: 10px; padding: 18px; border-top: 1px solid var(--hairline); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); transition: background .3s, box-shadow .3s; }
+  .dot.on { background: var(--accent); box-shadow: 0 0 8px var(--glow); }
+  main { flex: 1; display: flex; padding: 16px 60px; overflow: auto; }
+  .beat { display: none; max-width: 1080px; width: 100%; margin: auto; animation: rise .45s ease; }
+  .beat.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .navhint { position: fixed; right: 28px; bottom: 16px; color: var(--ink-dim); font-size: 12px; letter-spacing: .5px; }
+
+  .eyebrow { color: var(--ink-muted); font-size: 13px; letter-spacing: .26em; text-transform: uppercase; margin-bottom: 14px; }
+  h1 { font-family: var(--display); font-weight: 700; font-size: 42px; line-height: 1.16; color: var(--ink-head); letter-spacing: .01em; }
+  h2 { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1.22; margin-bottom: 22px; color: var(--ink-head); }
+  .lede { font-size: 20px; line-height: 1.62; color: var(--ink-body); margin-top: 18px; max-width: 800px; }
+  .myth { display: inline-block; margin-top: 24px; padding: 9px 20px; border: 1px solid var(--accent); border-radius: 24px; color: var(--accent-bright); font-size: 16px; }
+  .callout { border-left: 3px solid var(--accent); background: var(--panel); padding: 24px 30px; border-radius: 0 var(--radius) var(--radius) 0; font-size: 22px; line-height: 1.5; max-width: 900px; color: var(--ink-body); }
+  .callout strong { font-weight: 400; color: var(--ink-head); text-shadow: 0 0 14px rgba(244,244,242,.2); }
+  .callout .mono { font-family: var(--mono); font-size: .82em; color: var(--accent-bright); }
+  .caption { color: var(--ink-muted); font-size: 15px; margin-top: 20px; max-width: 900px; line-height: 1.6; }
+  .cite { color: var(--ink-dim); font-size: 13px; margin-top: 14px; line-height: 1.7; max-width: 920px; }
+  .cite a { color: var(--ink-muted); }
+  .qline { margin-top: 30px; font-size: 20px; color: var(--ink-muted); }
+  .btn { display: inline-block; margin-top: 26px; padding: 11px 26px; background: var(--accent); color: #140d03; border: 1px solid var(--accent); border-radius: var(--radius); font-size: 15px; font-family: var(--display); font-weight: 700; cursor: pointer; }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--hairline-strong); font-weight: 400; }
+  .btn.ghost:hover { color: var(--accent-bright); border-color: var(--accent); }
+  .btn:focus-visible, .menu-item:focus-visible, .insp-card:focus-visible, .chipbtn:focus-visible, .exbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .menu-item {
+    display: flex; align-items: baseline; gap: 24px; width: 100%; background: var(--panel);
+    border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 26px; margin-bottom: 12px; cursor: pointer;
+    text-align: left; color: var(--ink-head); font-family: var(--serif); transition: border-color .2s, box-shadow .25s;
+  }
+  .menu-item:hover { border-color: var(--accent); box-shadow: 0 0 26px -10px var(--glow); }
+  .menu-item .num { color: var(--accent-dim); font-size: 13px; letter-spacing: .22em; }
+  .menu-item .name { font-size: 22px; flex: 1; }
+  .menu-item .state { color: var(--accent-dim); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
+
+  /* Staggered list */
+  .tl-item {
+    display: grid; grid-template-columns: 210px 1fr; gap: 24px; padding: 15px 0;
+    border-bottom: 1px solid var(--hairline);
+    opacity: 0; transform: translateY(8px); transition: opacity .5s, transform .5s;
+  }
+  .tl-item.shown { opacity: 1; transform: none; }
+  .tl-item .year { font-size: 17px; color: var(--accent-bright); }
+  .tl-item .ttext { font-size: 17px; line-height: 1.6; color: var(--ink-body); }
+
+  /* Clickable inspector */
+  .insp-row { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+  .insp-card {
+    width: 190px; min-height: 120px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px;
+    background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: var(--radius);
+    padding: 16px 18px; cursor: pointer; font-family: var(--serif); color: inherit; text-align: left;
+  }
+  .insp-card:hover { border-color: var(--accent); }
+  .insp-card.on { border-color: var(--accent); box-shadow: 0 0 22px -8px var(--glow); }
+  .insp-card .ic { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-dim); }
+  .insp-card .it { font-size: 21px; color: var(--ink-head); line-height: 1.2; }
+  .insp-card .isub { font-size: 13px; color: var(--ink-muted); line-height: 1.45; }
+  .insp-note { margin-top: 22px; font-size: 18px; line-height: 1.62; color: var(--ink-body); max-width: 820px; min-height: 96px; }
+  .insp-note .t { color: var(--accent-bright); }
+
+  /* Chip-driven builder */
+  .chiprow-select { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 4px; }
+  .chipbtn { font-family: var(--mono); font-size: 14px; padding: 9px 15px; cursor: pointer; background: var(--panel); color: var(--ink-muted); border: 1px solid var(--hairline); border-radius: 6px; }
+  .chipbtn:hover { color: var(--ink-head); border-color: var(--accent-dim); }
+  .chipbtn.on { color: var(--accent-bright); border-color: var(--accent); box-shadow: 0 0 16px -8px var(--glow); }
+  .buildstage { margin-top: 24px; display: flex; gap: 36px; align-items: flex-start; flex-wrap: wrap; }
+  .shapebox { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 18px 22px; min-width: 300px; min-height: 130px; display: flex; align-items: center; justify-content: center; }
+  .build-note { flex: 1; min-width: 300px; font-size: 17px; line-height: 1.65; color: var(--ink-body); }
+  .build-note .pt { color: var(--accent-bright); font-family: var(--mono); font-size: .92em; }
+
+  /* Live editor */
+  .editwrap { display: flex; gap: 22px; margin-top: 8px; flex-wrap: wrap; align-items: flex-start; }
+  .editcol { flex: 1 1 320px; min-width: 290px; }
+  .editcol.wide { flex: 1.5 1 420px; }
+  .editcol .lbl { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 8px; }
+  textarea#src {
+    width: 100%; height: 240px; background: var(--panel-2); color: var(--ink-body);
+    border: 1px solid var(--hairline-strong); border-radius: var(--radius); padding: 14px 16px;
+    font-family: var(--mono); font-size: 14px; line-height: 1.65; resize: vertical;
+  }
+  textarea#src:focus { outline: none; border-color: var(--accent); }
+  .canvasbox { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 14px; min-height: 240px; max-height: 56vh; overflow: auto; display: flex; align-items: center; justify-content: center; }
+  .canvasbox svg { max-width: 100%; max-height: 46vh; width: auto; height: auto; }
+  .shapebox svg { max-width: 100%; height: auto; }
+  .parsemsg { font-size: 14px; color: var(--ink-muted); margin-top: 10px; min-height: 22px; }
+  .parsemsg.bad { color: var(--accent-bright); }
+  .exrow { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .exbtn { font-family: var(--serif); font-size: 13px; padding: 6px 13px; cursor: pointer; background: transparent; color: var(--ink-muted); border: 1px solid var(--hairline); border-radius: 20px; }
+  .exbtn:hover { color: var(--accent-bright); border-color: var(--accent-dim); }
+
+  /* Quiz */
+  .quizcard { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 26px; margin-bottom: 13px; }
+  .quizcard .setup { font-size: 16px; color: var(--ink-muted); line-height: 1.6; margin-bottom: 10px; }
+  .quizcard .word { font-family: var(--mono); font-size: 15px; color: var(--ink-head); line-height: 1.7; white-space: pre; overflow-x: auto; }
+  .quizcard .ans { display: none; margin-top: 12px; font-size: 18px; line-height: 1.55; }
+  .quizcard .ans .note { display: block; font-size: 14px; color: var(--ink-muted); margin-top: 6px; }
+  .quizcard.answered .ans { display: block; animation: rise .4s ease; }
+  .quizcard .btn { margin-top: 12px; padding: 7px 18px; font-size: 13px; }
+  .quizcard.answered .btn { display: none; }
+
+  /* Comparison rows */
+  .cmp { margin-top: 6px; }
+  .cmp-row { display: grid; grid-template-columns: 200px 1fr 1fr; gap: 18px; padding: 13px 0; border-bottom: 1px solid var(--hairline); opacity: 0; transform: translateY(8px); transition: opacity .45s, transform .45s; }
+  .cmp-row.shown { opacity: 1; transform: none; }
+  .cmp-row .k { font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-dim); }
+  .cmp-row .v { font-size: 16px; line-height: 1.55; color: var(--ink-body); }
+  .cmp-head { display: grid; grid-template-columns: 200px 1fr 1fr; gap: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--hairline-strong); }
+  .cmp-head span { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-head); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beat, .quizcard.answered .ans { animation: none; }
+    .tl-item, .cmp-row { transition: none; }
+  }
+  @media (max-width: 900px) {
+    h1 { font-size: 32px; } h2 { font-size: 24px; }
+    main { padding: 12px 22px; }
+    .tl-item { grid-template-columns: 1fr; gap: 5px; }
+    .cmp-row, .cmp-head { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <header>
+    <span class="brand">NT World Ink <span class="crumb">&middot; Presentations</span></span>
+    <span class="modtag" id="hdrRight">Press M for menu</span>
+  </header>
+  <main id="main">
+
+    <!-- ============ MENU ============ -->
+    <section class="beat" data-scene="menu">
+      <div class="eyebrow">An interactive walkthrough</div>
+      <h1>Diagrams you write instead of draw</h1>
+      <p class="lede">Most diagrams are drawn, which is why most diagrams are wrong. There is another way: describe the diagram in a few lines of text and let software draw it, so keeping it current is an edit rather than a job. This walks you through Mermaid, the small language that does it, with a working editor you can type into. About fifteen minutes, and you need nothing installed.</p>
+      <div style="margin-top:36px">
+        <button class="menu-item" onclick="goModule(1)"><span class="num">01</span><span class="name">Why drawn diagrams go stale</span><span class="state">Start</span></button>
+        <button class="menu-item" onclick="goModule(2)"><span class="num">02</span><span class="name">Ten minutes of syntax</span><span class="state">Start</span></button>
+        <button class="menu-item" onclick="goModule(3)"><span class="num">03</span><span class="name">Where it renders, and who writes it</span><span class="state">Start</span></button>
+        <button class="menu-item" onclick="goModule(4)"><span class="num">04</span><span class="name">Write it, or draw it</span><span class="state">Start</span></button>
+      </div>
+      <a class="btn ghost" href="../" style="margin-top:20px; text-decoration:none">&larr; Back to presentations</a>
+    </section>
+
+    <!-- ============ MODULE 1 ============ -->
+
+    <section class="beat" data-scene="m1">
+      <div class="eyebrow">Module 01</div>
+      <h1>Why drawn diagrams go stale</h1>
+      <div class="myth">Myth we'll unpick: "a diagram is a picture you draw"</div>
+      <p class="lede">Some are. But the ones that describe a living system are better thought of as a view onto something else, and that changes what you should make them out of.</p>
+    </section>
+
+    <section class="beat" data-scene="m1">
+      <h2>Everyone has met this diagram</h2>
+      <div class="callout">There is a process map in a shared folder somewhere with a filename ending <span class="mono">_FINAL_v3.vsdx</span>. Somebody spent a good afternoon on it. It was accurate for about five weeks. Nobody has updated it since, because updating it means finding whoever has the licence, opening the file, moving fourteen boxes and re-exporting the image that got pasted into the induction pack. So it sits there, <strong>quietly wrong</strong>, being shown to new starters.</div>
+      <p class="caption">The problem is not that the diagram was drawn badly. It is that the cost of a small correction was too high, so small corrections never happened.</p>
+    </section>
+
+    <section class="beat" data-scene="m1" data-onenter="resetDecay">
+      <h2>The life of a drawn diagram</h2>
+      <div id="tl">
+        <div class="tl-item"><span class="year">Week one</span><span class="ttext">Accurate, admired, pinned to the wall. Somebody says "we should keep this updated".</span></div>
+        <div class="tl-item"><span class="year">Month two</span><span class="ttext">A step changes. Updating it is a twenty-minute job in an application only two people have. It goes on a list.</span></div>
+        <div class="tl-item"><span class="year">Month six</span><span class="ttext">Three more changes. The exported PNG in the handbook is now the version people actually see, and it is two revisions behind the source file.</span></div>
+        <div class="tl-item"><span class="year">Year two</span><span class="ttext">Nobody trusts it. Somebody starts a new one from scratch, and the cycle begins again.</span></div>
+      </div>
+      <p class="qline">The failure is in the format, not the effort. So change the format.</p>
+    </section>
+
+    <section class="beat" data-scene="m1">
+      <h2>What if the diagram were text?</h2>
+      <div class="callout">If the source of a diagram is a few lines of plain text, then correcting it is editing a line. It can live in the same file as the documentation it belongs to, travel through the same version history as the code it describes, and be reviewed the way any other change is reviewed. <strong>You stop maintaining a picture and start maintaining a description.</strong></div>
+      <p class="caption">This is what Mermaid does. It is a small text language; other software reads it and draws the picture.</p>
+    </section>
+
+    <!-- ============ MODULE 2 ============ -->
+
+    <section class="beat" data-scene="m2">
+      <div class="eyebrow">Module 02</div>
+      <h1>Ten minutes of syntax</h1>
+      <p class="lede">There is much more to Mermaid than this, but the flowchart subset below covers most of what anyone actually draws at work. Two ideas: nodes have shapes, and arrows join them.</p>
+    </section>
+
+    <section class="beat" data-scene="m2" data-onenter="resetBuilder">
+      <h2>The shape is in the brackets</h2>
+      <div class="eyebrow">Pick a syntax to see what it draws</div>
+      <div class="chiprow-select" id="chipRow"></div>
+      <div class="buildstage">
+        <div class="shapebox" id="shapeBox"></div>
+        <div class="build-note" id="buildNote"></div>
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m2">
+      <h2>Arrows, and what goes on them</h2>
+      <div class="callout">An arrow is <span class="mono">--&gt;</span> and a plain line is <span class="mono">---</span>. To put a word on the arrow, wrap it in pipes: <span class="mono">C --&gt;|Yes| D</span>. And once a node has been given its label, you can refer to it by its short name alone for the rest of the diagram, which is why <strong>a loop back is just one more line</strong>.</div>
+      <p class="caption">The first line of the diagram sets the direction. <span class="mono">flowchart TD</span> runs top down; <span class="mono">flowchart LR</span> runs left to right. That single word is often the difference between a diagram that fits on the page and one that does not.</p>
+    </section>
+
+    <section class="beat" data-scene="m2" data-onenter="resetEditor">
+      <h2>Type something and watch it draw</h2>
+      <div class="exrow">
+        <button class="exbtn" onclick="loadExample(0)">A service request</button>
+        <button class="exbtn" onclick="loadExample(1)">A small network</button>
+        <button class="exbtn" onclick="loadExample(2)">A site map</button>
+        <button class="exbtn" onclick="loadExample(3)">Empty, start your own</button>
+      </div>
+      <div class="editwrap">
+        <div class="editcol">
+          <div class="lbl">You write this</div>
+          <textarea id="src" spellcheck="false" aria-label="Mermaid source"></textarea>
+          <div class="parsemsg" id="msg"></div>
+        </div>
+        <div class="editcol wide">
+          <div class="lbl">Software draws this</div>
+          <div class="canvasbox" id="canvas"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m2">
+      <h2>An honest note about that editor</h2>
+      <div class="callout">The renderer on the previous beat is a <strong>small one written for this walkthrough</strong>, handling the flowchart subset taught here so the page stays self-contained and works offline. Real Mermaid does a great deal more: sequence diagrams, entity relationships, Gantt charts, state machines, mind maps, and much better layout than this. Treat what you just used as the training wheels.</div>
+      <p class="caption">The next module covers where the real one lives.</p>
+    </section>
+
+    <!-- ============ MODULE 3 ============ -->
+
+    <section class="beat" data-scene="m3">
+      <div class="eyebrow">Module 03</div>
+      <h1>Where it renders, and who writes it</h1>
+      <p class="lede">Mermaid is not an application you install. It is text that other tools already know how to draw, which is the whole point of it.</p>
+    </section>
+
+    <section class="beat" data-scene="m3" data-onenter="resetPlaces">
+      <h2>Four places it already works</h2>
+      <div class="insp-row" id="placeRow">
+        <button class="insp-card" onclick="placePick(0)"><span class="ic">Try it</span><span class="it">Live editor</span><span class="isub">draws as you type</span></button>
+        <button class="insp-card" onclick="placePick(1)"><span class="ic">Repositories</span><span class="it">GitHub</span><span class="isub">inside a Markdown file</span></button>
+        <button class="insp-card" onclick="placePick(2)"><span class="ic">Notes</span><span class="it">Obsidian, Notion</span><span class="isub">in a code block</span></button>
+        <button class="insp-card" onclick="placePick(3)"><span class="ic">Editors</span><span class="it">VS Code</span><span class="isub">in the preview pane</span></button>
+      </div>
+      <div class="insp-note" id="placeNote"></div>
+    </section>
+
+    <section class="beat" data-scene="m3">
+      <h2>You do not have to write it yourself</h2>
+      <div class="callout">Mermaid is text, so an assistant can produce it. Paste your process into Copilot, or any other assistant, and ask for <strong>a Mermaid flowchart of these steps</strong>; you will get something close, which you then correct. This is the practical reason to learn the syntax even if you never write one from scratch: you need to be able to read what comes back.</div>
+      <p class="caption">Two cautions. Assistants sometimes emit syntax from a different version and it will simply refuse to render; paste it into the live editor and it will name the offending line. And they invent plausible-sounding steps, so check the diagram against the actual process rather than against how tidy it looks.</p>
+    </section>
+
+    <section class="beat" data-scene="m3" data-onenter="resetQuiz">
+      <h2>Now you read it</h2>
+      <div class="quizcard" id="qz1">
+        <p class="setup">Everything you need is in the two modules you have just done. What does this draw?</p>
+        <div class="word">flowchart LR
+  A[Form submitted] --&gt; B{Spam check}
+  B --&gt;|Clean| C[(Store)]
+  B --&gt;|Suspect| D[Quarantine]</div>
+        <div class="ans">A left-to-right chart: a rectangle, an arrow into a diamond, and two labelled arrows out of it; one to a cylinder, one to a rectangle.<span class="note">The cylinder is the giveaway that Store is a database rather than a step. Shape carries meaning; that is why choosing brackets carelessly makes a diagram lie.</span></div>
+        <button class="btn ghost" onclick="quizReveal('qz1')">Reveal</button>
+      </div>
+      <div class="quizcard" id="qz2">
+        <p class="setup">This one has a mistake in it. The author wanted the rejected path to go back to the check.</p>
+        <div class="word">flowchart TD
+  A[Draft] --&gt; B{Approved?}
+  B --&gt;|Yes| C([Published])
+  B --&gt;|No| D[Revise]</div>
+        <div class="ans">There is no line back. Add <span style="font-family:var(--mono)">D --&gt; B</span> and the loop closes.<span class="note">Missing return paths are the most common error in a hand-written flowchart, in any tool. Reading the text makes it obvious in a way that staring at the picture does not.</span></div>
+        <button class="btn ghost" onclick="quizReveal('qz2')">Reveal</button>
+      </div>
+    </section>
+
+    <!-- ============ MODULE 4 ============ -->
+
+    <section class="beat" data-scene="m4">
+      <div class="eyebrow">Module 04</div>
+      <h1>Write it, or draw it</h1>
+      <p class="lede">This is not an argument that Mermaid replaces a drawing tool. They answer different questions, and knowing which is which is the skill worth taking away.</p>
+    </section>
+
+    <section class="beat" data-scene="m4" data-onenter="resetCompare">
+      <h2>Six honest differences</h2>
+      <div class="cmp-head"><span></span><span>Drawing tool</span><span>Written diagram</span></div>
+      <div class="cmp" id="cmp">
+        <div class="cmp-row"><span class="k">Layout control</span><span class="v">Complete. Every shape exactly where you want it.</span><span class="v">None. The software decides, and sometimes decides badly.</span></div>
+        <div class="cmp-row"><span class="k">Cost of a change</span><span class="v">Open the file, move things, re-export.</span><span class="v">Edit a line.</span></div>
+        <div class="cmp-row"><span class="k">Who can edit it</span><span class="v">Whoever holds a licence.</span><span class="v">Anyone with a text editor.</span></div>
+        <div class="cmp-row"><span class="k">Version history</span><span class="v">A binary file; you can see that it changed, not what changed.</span><span class="v">A readable difference, line by line.</span></div>
+        <div class="cmp-row"><span class="k">Where it lives</span><span class="v">A separate file beside the document.</span><span class="v">Inside the document, the notes, or the repository.</span></div>
+        <div class="cmp-row"><span class="k">How it looks</span><span class="v">As polished as you are willing to make it.</span><span class="v">Consistent, plain, and not yours to fuss over.</span></div>
+      </div>
+      <p class="qline">Notice that the drawing tool wins on presentation and the written diagram wins on maintenance.</p>
+    </section>
+
+    <section class="beat" data-scene="m4">
+      <h2>Why this matters</h2>
+      <div class="callout">Reach for a <strong>drawing tool</strong> when the diagram is the deliverable: a tender, a report, a client hand-over, anything where the layout is part of the argument. Reach for a <strong>written diagram</strong> when the picture describes something that changes and needs to stay true. The second kind is far more common than the first, and it is the kind almost everybody has been making the wrong way.</div>
+      <p class="caption">One more thing worth noticing. Generating a diagram from a table in a drawing tool, and generating one from text in an editor, are the same idea: the source is what you maintain, and the picture is an output. That is the difference between a diagram you own and a diagram that owns you.</p>
+      <p class="cite">Sources used. Mermaid documentation and syntax reference, <a href="https://mermaid.js.org/" target="_blank" rel="noopener">mermaid.js.org</a>, version 11.16.0 as displayed 4 August 2026; no page date shown. Mermaid Live Editor, <a href="https://mermaid.live/" target="_blank" rel="noopener">mermaid.live</a>, checked 4 August 2026. GitHub Docs, "Creating diagrams", <a href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams" target="_blank" rel="noopener">docs.github.com</a>, checked 4 August 2026; no publication date shown. The renderer used in module 02 was written for this page and handles a subset of the flowchart syntax only.</p>
+      <button class="btn ghost" style="margin-top:28px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+  </main>
+  <footer id="dots"></footer>
+</div>
+<div class="navhint">&larr; &rarr; or space &nbsp;|&nbsp; M menu</div>
+
+<script>
+  'use strict';
+
+  /* ================= Deck scaffold ================= */
+  const beats = Array.from(document.querySelectorAll('.beat'));
+  let idx = 0;
+  const sceneTitles = {
+    m1: 'Module 01 &middot; Why drawn diagrams go stale',
+    m2: 'Module 02 &middot; Ten minutes of syntax',
+    m3: 'Module 03 &middot; Where it renders',
+    m4: 'Module 04 &middot; Write it, or draw it'
+  };
+
+  function show(i) {
+    idx = Math.max(0, Math.min(i, beats.length - 1));
+    beats.forEach((b, n) => b.classList.toggle('active', n === idx));
+    const scene = beats[idx].dataset.scene;
+    document.getElementById('hdrRight').innerHTML =
+      scene === 'menu' ? 'Press M for menu' : sceneTitles[scene];
+    const dots = document.getElementById('dots');
+    dots.innerHTML = '';
+    if (scene !== 'menu') {
+      const moduleBeats = beats.filter(b => b.dataset.scene === scene);
+      const pos = moduleBeats.indexOf(beats[idx]);
+      moduleBeats.forEach((_, n) => {
+        const d = document.createElement('div');
+        d.className = 'dot' + (n === pos ? ' on' : '');
+        dots.appendChild(d);
+      });
+    }
+    const hook = beats[idx].dataset.onenter;
+    if (hook && onEnterHooks[hook]) onEnterHooks[hook]();
+  }
+  function goMenu() { show(0); }
+  function goModule(n) {
+    const i = beats.findIndex(b => b.dataset.scene === 'm' + n);
+    if (i > -1) show(i);
+  }
+  function next() { if (idx < beats.length - 1) show(idx + 1); }
+  function prev() { if (idx > 0) show(idx - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') prev();
+    else if (e.key === 'm' || e.key === 'M') goMenu();
+    else if (e.key >= '1' && e.key <= '4') goModule(Number(e.key));
+  });
+  document.getElementById('main').addEventListener('click', e => {
+    if (e.target.closest('button, a, input, textarea, .quizcard, .insp-card, .chipbtn, .editwrap, .canvasbox, .shapebox')) return;
+    next();
+  });
+
+  function staggerShow(els, delay) {
+    els.forEach((el, i) => {
+      el.classList.remove('shown');
+      setTimeout(() => el.classList.add('shown'), 150 + i * delay);
+    });
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  /* ================= A small Mermaid flowchart renderer =================
+     Handles the subset taught in module 02: flowchart TD / LR,
+     node shapes [] () ([]) {} [()], arrows --> and ---, and |labels|.
+     Deliberately small; the real Mermaid does far more.
+     ==================================================================== */
+
+  function parseNodePart(raw) {
+    if (!raw) return null;
+    const pairs = [
+      ['([', '])', 'stadium'],
+      ['[(', ')]', 'cyl'],
+      ['[', ']', 'rect'],
+      ['(', ')', 'round'],
+      ['{', '}', 'diamond']
+    ];
+    for (const [open, close, shape] of pairs) {
+      if (raw.startsWith(open) && raw.endsWith(close) && raw.length >= open.length + close.length) {
+        return { shape: shape, label: raw.slice(open.length, raw.length - close.length).trim() };
+      }
+    }
+    return null;
+  }
+
+  function splitNodeSpec(chunk) {
+    const s = chunk.trim();
+    const m = s.match(/^([A-Za-z0-9_]+)([\s\S]*)$/);
+    if (!m) return null;
+    const id = m[1];
+    const part = parseNodePart(m[2].trim());
+    return { id: id, part: part };
+  }
+
+  function parseFlow(text) {
+    const out = { dir: 'TD', nodes: new Map(), edges: [], errors: [] };
+    const lines = text.split(/\n/);
+    lines.forEach((rawLine, ln) => {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('%%')) return;
+      const head = line.match(/^(?:flowchart|graph)\s+(TD|TB|LR|RL|BT)\b/i);
+      if (head) { out.dir = head[1].toUpperCase(); return; }
+
+      const arrowMatch = line.match(/(-->|---)/);
+      if (!arrowMatch) {
+        const solo = splitNodeSpec(line);
+        if (solo && solo.part) { touch(out, solo); }
+        else if (solo && !out.nodes.has(solo.id)) { touch(out, solo); }
+        else out.errors.push('Line ' + (ln + 1) + ': not understood.');
+        return;
+      }
+      const at = line.indexOf(arrowMatch[1]);
+      const left = line.slice(0, at);
+      let right = line.slice(at + arrowMatch[1].length).trim();
+      let label = '';
+      if (right.startsWith('|')) {
+        const close = right.indexOf('|', 1);
+        if (close === -1) { out.errors.push('Line ' + (ln + 1) + ': unclosed | label.'); return; }
+        label = right.slice(1, close).trim();
+        right = right.slice(close + 1).trim();
+      }
+      const a = splitNodeSpec(left);
+      const b = splitNodeSpec(right);
+      if (!a || !b) { out.errors.push('Line ' + (ln + 1) + ': could not read both ends of the arrow.'); return; }
+      touch(out, a); touch(out, b);
+      out.edges.push({ from: a.id, to: b.id, label: label, arrow: arrowMatch[1] === '-->' });
+    });
+    return out;
+  }
+
+  function touch(g, spec) {
+    if (!g.nodes.has(spec.id)) {
+      g.nodes.set(spec.id, {
+        id: spec.id,
+        label: spec.part ? spec.part.label : spec.id,
+        shape: spec.part ? spec.part.shape : 'rect',
+        order: g.nodes.size
+      });
+    } else if (spec.part) {
+      const n = g.nodes.get(spec.id);
+      n.label = spec.part.label;
+      n.shape = spec.part.shape;
+    }
+  }
+
+  /* Find back edges with a depth-first walk, so cycles do not break layering. */
+  function findBackEdges(g) {
+    const adj = new Map();
+    g.nodes.forEach((_, id) => adj.set(id, []));
+    g.edges.forEach((e, i) => adj.get(e.from).push({ to: e.to, i: i }));
+    const colour = new Map();
+    const back = new Set();
+    g.nodes.forEach((_, id) => colour.set(id, 0));
+    function walk(id) {
+      colour.set(id, 1);
+      adj.get(id).forEach(function (link) {
+        if (colour.get(link.to) === 1) back.add(link.i);
+        else if (colour.get(link.to) === 0) walk(link.to);
+      });
+      colour.set(id, 2);
+    }
+    g.nodes.forEach((_, id) => { if (colour.get(id) === 0) walk(id); });
+    return back;
+  }
+
+  function layout(g) {
+    const back = findBackEdges(g);
+    const layer = new Map();
+    g.nodes.forEach((_, id) => layer.set(id, 0));
+    const fwd = g.edges.filter((_, i) => !back.has(i));
+    for (let pass = 0; pass < g.nodes.size + 1; pass++) {
+      let moved = false;
+      fwd.forEach(function (e) {
+        if (layer.get(e.to) < layer.get(e.from) + 1) {
+          layer.set(e.to, layer.get(e.from) + 1);
+          moved = true;
+        }
+      });
+      if (!moved) break;
+    }
+    const rows = [];
+    Array.from(g.nodes.values()).sort((a, b) => a.order - b.order).forEach(function (n) {
+      const L = layer.get(n.id);
+      if (!rows[L]) rows[L] = [];
+      rows[L].push(n);
+    });
+    return { rows: rows, back: back, layer: layer };
+  }
+
+  function renderFlow(text) {
+    const g = parseFlow(text);
+    if (!g.nodes.size) return { svg: '', msg: g.errors.length ? g.errors[0] : 'Nothing to draw yet.', bad: g.errors.length > 0 };
+
+    const lay = layout(g);
+    const horizontal = (g.dir === 'LR' || g.dir === 'RL');
+    const GAPMAIN = horizontal ? 110 : 96;   // between layers
+    const GAPCROSS = horizontal ? 46 : 30;   // between siblings
+    const H = 40, DH = 54;
+
+    // size each node
+    g.nodes.forEach(function (n) {
+      n.w = Math.max(96, Math.min(210, n.label.length * 8.2 + 30));
+      n.h = n.shape === 'diamond' ? DH : H;
+    });
+
+    // place
+    let mainPos = 40;
+    let crossExtent = 0;
+    lay.rows.forEach(function (row) {
+      let cross = 0;
+      row.forEach(function (n) {
+        if (horizontal) { n.x = mainPos; n.y = cross; cross += n.h + GAPCROSS; }
+        else { n.y = mainPos; n.x = cross; cross += n.w + GAPCROSS; }
+      });
+      crossExtent = Math.max(crossExtent, cross - GAPCROSS);
+      mainPos += (horizontal ? Math.max.apply(null, row.map(n => n.w)) : Math.max.apply(null, row.map(n => n.h))) + GAPMAIN;
+    });
+    // centre each row across the cross axis
+    lay.rows.forEach(function (row) {
+      const used = row.reduce((s, n) => s + (horizontal ? n.h : n.w), 0) + GAPCROSS * (row.length - 1);
+      const off = (crossExtent - used) / 2;
+      row.forEach(function (n) { if (horizontal) n.y += off; else n.x += off; });
+    });
+
+    const padL = 56, padT = 30;
+    g.nodes.forEach(function (n) { n.x += padL; n.y += padT; });
+    const W = (horizontal ? mainPos : crossExtent + padL * 2) + 20;
+    const HT = (horizontal ? crossExtent + padT * 2 : mainPos) + 20;
+
+    // draw
+    let edgeSvg = '', labelSvg = '';
+    g.edges.forEach(function (e, i) {
+      const a = g.nodes.get(e.from), b = g.nodes.get(e.to);
+      let d, lx, ly;
+      if (lay.back.has(i)) {
+        const outX = padL - 34;
+        const outY = padT - 22;
+        if (horizontal) {
+          d = 'M ' + (a.x + a.w / 2) + ' ' + a.y + ' L ' + (a.x + a.w / 2) + ' ' + outY +
+              ' L ' + (b.x + b.w / 2) + ' ' + outY + ' L ' + (b.x + b.w / 2) + ' ' + b.y;
+          lx = (a.x + b.x) / 2 + 20; ly = outY - 6;
+        } else {
+          const drop = a.y + a.h + 22;
+          d = 'M ' + (a.x + a.w / 2) + ' ' + (a.y + a.h) + ' L ' + (a.x + a.w / 2) + ' ' + drop +
+              ' L ' + outX + ' ' + drop +
+              ' L ' + outX + ' ' + (b.y + b.h / 2) + ' L ' + b.x + ' ' + (b.y + b.h / 2);
+          lx = outX + 8; ly = (a.y + b.y) / 2;
+        }
+      } else if (horizontal) {
+        const x1 = a.x + a.w, y1 = a.y + a.h / 2, x2 = b.x, y2 = b.y + b.h / 2;
+        const mid = (x1 + x2) / 2;
+        d = 'M ' + x1 + ' ' + y1 + ' L ' + mid + ' ' + y1 + ' L ' + mid + ' ' + y2 + ' L ' + x2 + ' ' + y2;
+        lx = mid + 6; ly = (y1 + y2) / 2 - 6;
+      } else {
+        const x1 = a.x + a.w / 2, y1 = a.y + a.h, x2 = b.x + b.w / 2, y2 = b.y;
+        const mid = (y1 + y2) / 2;
+        d = 'M ' + x1 + ' ' + y1 + ' L ' + x1 + ' ' + mid + ' L ' + x2 + ' ' + mid + ' L ' + x2 + ' ' + y2;
+        lx = (x1 + x2) / 2 + 7; ly = mid - 6;
+      }
+      edgeSvg += '<path d="' + d + '" fill="none" stroke="#9a9d9e" stroke-width="1.3"' +
+                 (e.arrow ? ' marker-end="url(#mm-arrow)"' : '') + '/>';
+      if (e.label) {
+        labelSvg += '<text x="' + lx + '" y="' + ly + '" font-family="Consolas, monospace" font-size="11" fill="#f2ab52">' + esc(e.label) + '</text>';
+      }
+    });
+
+    let nodeSvg = '';
+    g.nodes.forEach(function (n) {
+      const fill = '#101010', stroke = '#e0983c';
+      if (n.shape === 'diamond') {
+        const cx = n.x + n.w / 2, cy = n.y + n.h / 2;
+        nodeSvg += '<path d="M ' + cx + ' ' + n.y + ' L ' + (n.x + n.w) + ' ' + cy +
+                   ' L ' + cx + ' ' + (n.y + n.h) + ' L ' + n.x + ' ' + cy + ' z" fill="' + fill + '" stroke="' + stroke + '" stroke-width="1.2"/>';
+      } else if (n.shape === 'cyl') {
+        nodeSvg += '<rect x="' + n.x + '" y="' + n.y + '" width="' + n.w + '" height="' + n.h + '" rx="6" fill="' + fill + '" stroke="' + stroke + '" stroke-width="1.2"/>' +
+                   '<ellipse cx="' + (n.x + n.w / 2) + '" cy="' + (n.y + 7) + '" rx="' + (n.w / 2 - 1) + '" ry="6" fill="none" stroke="' + stroke + '" stroke-width="1.2"/>';
+      } else {
+        const rx = n.shape === 'stadium' ? n.h / 2 : (n.shape === 'round' ? 12 : 3);
+        nodeSvg += '<rect x="' + n.x + '" y="' + n.y + '" width="' + n.w + '" height="' + n.h + '" rx="' + rx + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="1.2"/>';
+      }
+      nodeSvg += '<text x="' + (n.x + n.w / 2) + '" y="' + (n.y + n.h / 2 + 4) + '" text-anchor="middle" ' +
+                 'font-family="Georgia, serif" font-size="12.5" fill="#f4f4f2">' + esc(n.label) + '</text>';
+    });
+
+    const svg = '<svg viewBox="0 0 ' + Math.round(W) + ' ' + Math.round(HT) + '" width="' + Math.round(W) + '" height="' + Math.round(HT) + '" role="img" aria-label="Rendered diagram" xmlns="http://www.w3.org/2000/svg">' +
+      '<defs><marker id="mm-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">' +
+      '<path d="M 0 0 L 10 5 L 0 10 z" fill="#9a9d9e"/></marker></defs>' +
+      edgeSvg + nodeSvg + labelSvg + '</svg>';
+
+    const msg = g.errors.length
+      ? g.errors[0]
+      : g.nodes.size + ' node' + (g.nodes.size === 1 ? '' : 's') + ', ' + g.edges.length + ' connection' + (g.edges.length === 1 ? '' : 's') + '. Direction ' + g.dir + '.';
+    return { svg: svg, msg: msg, bad: g.errors.length > 0 };
+  }
+
+  /* ================= Widgets ================= */
+
+  /* Staggered decay list */
+  function resetDecayState() {
+    staggerShow(Array.from(document.querySelectorAll('#tl .tl-item')), 550);
+  }
+
+  /* Shape builder */
+  const SHAPES = [
+    { chip: 'A[Check the form]', src: 'flowchart TD\n  A[Check the form]',
+      note: '<span class="pt">Square brackets</span> draw a rectangle. This is the default and the right choice for an ordinary step; something happens here.' },
+    { chip: 'A(Check the form)', src: 'flowchart TD\n  A(Check the form)',
+      note: '<span class="pt">Round brackets</span> soften the corners. Used loosely for a note or a softer step; no strong convention attaches to it.' },
+    { chip: 'A([Start])', src: 'flowchart TD\n  A([Start])',
+      note: '<span class="pt">Round brackets inside square ones</span> draw a stadium, the pill shape. Conventionally the beginning and the end of a process, so a reader can find both at a glance.' },
+    { chip: 'A{Approved?}', src: 'flowchart TD\n  A{Approved?}',
+      note: '<span class="pt">Curly brackets</span> draw a diamond, which means a decision. If a shape has two arrows leaving it, it should almost always be this one.' },
+    { chip: 'A[(Records)]', src: 'flowchart TD\n  A[(Records)]',
+      note: '<span class="pt">Round brackets inside square ones, the other way round,</span> draw a cylinder: a database or a store. Not a step, a place things sit.' }
+  ];
+  let shapeActive = 0;
+  function shapeRender(n) {
+    shapeActive = n;
+    document.querySelectorAll('#chipRow .chipbtn').forEach((c, i) => c.classList.toggle('on', i === n));
+    document.getElementById('shapeBox').innerHTML = renderFlow(SHAPES[n].src).svg;
+    document.getElementById('buildNote').innerHTML = SHAPES[n].note;
+  }
+  function resetBuilderState() {
+    const wrap = document.getElementById('chipRow');
+    if (!wrap.childElementCount) {
+      SHAPES.forEach(function (s, i) {
+        const btn = document.createElement('button');
+        btn.className = 'chipbtn';
+        btn.textContent = s.chip;
+        btn.onclick = function () { shapeRender(i); };
+        wrap.appendChild(btn);
+      });
+    }
+    shapeRender(0);
+  }
+
+  /* Live editor */
+  const EXAMPLES = [
+    'flowchart TD\n  A([Request received]) --> B[Check request details]\n  B --> C{Details complete?}\n  C -->|Yes| D[Assign to team]\n  C -->|No| E[Return to requester]\n  E --> B\n  D --> F([Request closed])',
+    'flowchart LR\n  A([Internet]) --> B[Firewall]\n  B --> C[Switch]\n  C --> D[Desktops]\n  C --> E[Printer]\n  C --> F[Access point]',
+    'flowchart TD\n  H[Home] --> A[About]\n  H --> S[Services]\n  H --> C[Contact]\n  S --> S1[Training]\n  S --> S2[Consulting]\n  C --> F{Enquiry form}\n  F --> D[(Enquiries)]',
+    'flowchart TD\n  A[Start here] --> B[Then this]'
+  ];
+  function drawFromSource() {
+    const src = document.getElementById('src').value;
+    const r = renderFlow(src);
+    document.getElementById('canvas').innerHTML = r.svg || '<span style="color:#6a6d6e;font-size:14px">Nothing to draw yet.</span>';
+    const m = document.getElementById('msg');
+    m.textContent = r.msg;
+    m.classList.toggle('bad', !!r.bad);
+  }
+  function loadExample(n) {
+    document.getElementById('src').value = EXAMPLES[n];
+    drawFromSource();
+  }
+  let editorWired = false;
+  function resetEditorState() {
+    if (!editorWired) {
+      document.getElementById('src').addEventListener('input', drawFromSource);
+      editorWired = true;
+    }
+    loadExample(0);
+  }
+
+  /* Places inspector */
+  const PLACES = [
+    { note: '<span class="t">The live editor at mermaid.live.</span> A page with the text on the left and the diagram on the right, redrawing as you type, with export to an image or a link. The quickest way to try anything, and the fastest way to find out which line of a broken diagram is at fault.' },
+    { note: '<span class="t">GitHub, and GitLab.</span> Put Mermaid inside a fenced code block in any Markdown file and it renders in the browser. This is the one that changes habits: a diagram in the repository sits in the same review and the same history as the code it describes.' },
+    { note: '<span class="t">Obsidian, Notion and several other note applications.</span> Same idea, in a code block. Worth knowing because it means an architecture sketch can live inside the note about the project rather than as an image file beside it.' },
+    { note: '<span class="t">Visual Studio Code.</span> Renders in the Markdown preview once an extension is installed. Useful when the documentation is written in the same editor as everything else.' }
+  ];
+  let placeActive = null;
+  function placePick(n) {
+    placeActive = n === placeActive ? null : n;
+    document.querySelectorAll('#placeRow .insp-card')
+      .forEach((c, i) => c.classList.toggle('on', i === placeActive));
+    document.getElementById('placeNote').innerHTML = placeActive === null
+      ? 'Click one to see what it means in practice.'
+      : PLACES[placeActive].note;
+  }
+  function resetPlacesState() { placeActive = null; placePick(null); }
+
+  /* Quiz */
+  function quizReveal(id) { document.getElementById(id).classList.add('answered'); }
+  function resetQuizState() {
+    ['qz1', 'qz2'].forEach(id => document.getElementById(id).classList.remove('answered'));
+  }
+
+  /* Comparison rows */
+  function resetCompareState() {
+    staggerShow(Array.from(document.querySelectorAll('#cmp .cmp-row')), 260);
+  }
+
+  const onEnterHooks = {
+    resetDecay: resetDecayState,
+    resetBuilder: resetBuilderState,
+    resetEditor: resetEditorState,
+    resetPlaces: resetPlacesState,
+    resetQuiz: resetQuizState,
+    resetCompare: resetCompareState
+  };
+
+  show(0);
+</script>
+</body>
+</html>
