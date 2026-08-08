@@ -217,21 +217,21 @@ header.site {
   justify-content: center;
 }
 
+/* Two squares, one rotated 45 degrees, forming an eight-pointed star.
+   The inset has to leave room for the rotated square's diagonal: at inset 4px
+   the square is 24px across, so it needs 33.9px of box and only has 32px, and
+   the star's north and south points were being cut off. inset 5px gives a 22px
+   square, 31.1px on the diagonal, which fits. */
 .brand-mark::before,
 .brand-mark::after {
   content: '';
   position: absolute;
+  inset: 5px;
   border: 1.5px solid var(--accent);
-  border-radius: 4px;
-}
-
-.brand-mark::before {
-  inset: 4px;
-  border-color: var(--accent);
+  border-radius: 3px;
 }
 
 .brand-mark::after {
-  inset: 4px;
   transform: rotate(45deg);
   border-color: var(--accent-2);
   opacity: 0.5;
