@@ -46,7 +46,7 @@ SD authors in CSV, because that is what NotebookLM, Excel and Anki produce. The 
 
 `convert.js` normalises US spellings and em-dashes to the site's Australian English rule. Extend its `SPELLING` table as more turn up; it is the cheapest place to catch them. Capitalised `-ization` forms are deliberately absent from that table: the ISM's own proper nouns, "International Organization for Standardization" and "Route Origin Authorization", must be reproduced as published.
 
-`ready: false` keeps a set in the manifest but out of the catalogue, so a set can be planned before its data exists. Three are waiting that way: `tech-words`, `excel-words` and `networking`.
+`ready: false` keeps a set in the manifest but out of the catalogue, so a set can be planned before its data exists. One is waiting that way: `networking`, which needs a content decision from SD about which terms belong. The `tech-words` and `excel-words` sets were dropped from the manifest on 8 August 2026 at SD's decision; the two plain-English glossary pages they would have drawn on stay as they are.
 
 ## Set metadata
 
@@ -64,6 +64,7 @@ Deliberately simple; there is no spaced repetition, which would need accounts.
 - **Again** does not clear the card. It splices it back roughly three live positions ahead, so it returns before the round ends, and records it in `lapses`.
 - `again` is the live "to repeat" count and clears when the card is finally got. `lapses` is cumulative and never clears, and drives the end-of-round summary. They must stay separate; with one array the summary could never report a fumbled round, because finishing means everything is in `got`.
 - SD's decision, 8 August 2026: no round splitting. Each set is one deck however long it is, and progress is kept, so a long set can be left and resumed.
+- Both answers move to the next card, so the hint under the card changes after the flip to "Pick one to go to the next card", and the buttons read "Again later" and "Got it", each with a forward arrow. SD tested the first wording and could not tell how to advance; do not quietly revert it to a bare "Again".
 
 Progress lives in `localStorage` under the single key `ntwi.flashcards`, as `{slug: {got, lapses, n}}`. `n` is the card count at the time it was saved; if a set is re-converted and the count changes, the stored indices no longer mean anything and the progress is discarded rather than misapplied.
 

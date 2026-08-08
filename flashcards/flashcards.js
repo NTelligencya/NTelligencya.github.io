@@ -236,14 +236,22 @@
         : (reversed ? 'Definition' : 'Question');
       elFaceText.textContent = text;
       elFaceText.className = 'fc-face-text ' + faceSize(text);
-      elHint.hidden = flipped;
+
+      // Both answers move to the next card, so once the card is flipped the
+      // hint says so; without it people look for a separate Next button.
+      elHint.hidden = false;
+      elHint.textContent = flipped
+        ? 'Pick one to go to the next card'
+        : 'Click, or press space, to reveal';
 
       if (flipped) {
-        var againBtn = el('button', 'btn btn-ghost btn-answer', 'Again');
+        var againBtn = el('button', 'btn btn-ghost btn-answer', 'Again later');
         againBtn.type = 'button';
+        againBtn.appendChild(arrowSVG());
         againBtn.addEventListener('click', function (e) { e.stopPropagation(); markAgain(); });
         var gotBtn = el('button', 'btn btn-primary btn-answer', 'Got it');
         gotBtn.type = 'button';
+        gotBtn.appendChild(arrowSVG());
         gotBtn.addEventListener('click', function (e) { e.stopPropagation(); markGot(); });
         elAnswers.appendChild(againBtn);
         elAnswers.appendChild(gotBtn);

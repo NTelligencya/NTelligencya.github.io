@@ -182,7 +182,7 @@ ${header}
   <div class="fc-answers" id="fc-answers"></div>
   <div class="fc-keys fc-label" id="fc-keys">
     <span>space &middot; flip</span>
-    <span>1 &middot; again</span>
+    <span>1 &middot; again later</span>
     <span>2 &middot; got it</span>
     <span>r &middot; restart</span>
   </div>
