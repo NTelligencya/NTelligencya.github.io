@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workplace surveillance laws by jurisdiction, and the public sector difference · Shadow AI Blue Team Manual</title>
+<meta name="description" content="Workplace surveillance statutes against surveillance devices statutes, the New South Wales scheme in detail, the one jurisdiction that reaches a private employer using monitoring software, and the interception question.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-5/29-workplace-surveillance-law.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Workplace surveillance laws by jurisdiction</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Five &middot; Governance, law and proportionate response</div>
+  <h1>Workplace surveillance laws by jurisdiction, and the public sector difference</h1>
+  <p class="subtitle">A missing notice does not produce a technical non-compliance in New South Wales; a definition converts the monitoring into covert surveillance, which is an offence.</p>
+  <div class="reading-meta">
+    <span>Part Five</span>
+    <span>About 24 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+
+    <div class="scene">
+      <p>An organisation with staff in Darwin, Sydney and Melbourne decides to switch on endpoint monitoring. One configuration profile, one policy object, one deployment ring, one Monday morning.</p>
+      <p>In Melbourne there is no statute that speaks to it directly. In Darwin there is none either. In Sydney it is an offence, unless a written notice went out fourteen days ago, and a computer surveillance policy exists, and staff were told about that policy in a way that makes it reasonable to assume they understand it. Not a technical non-compliance. An offence, carrying fifty penalty units, because of a definition that turns a missing notice into something other than a missing notice.</p>
+      <p>Chapter 28 established which privacy regime an organisation is in. This chapter is about a separate body of law that most security teams do not know exists, because it is not privacy law, it is not in any product's documentation, and it does not appear in any vendor's compliance matrix. It regulates the act of watching rather than the handling of what is seen, and a control that satisfies every privacy principle can still be prohibited by it.</p>
+    </div>
+
+    <h2>Two bodies of law, not one</h2>
+    <p>There are two kinds of statute in play and confusing them is the most common error.</p>
+    <p>Workplace surveillance statutes regulate an employer watching employees. Their mechanism is notice and policy: the surveillance is permitted, provided the employer has told people about it in a prescribed way beforehand. Only New South Wales and the Australian Capital Territory have one of these covering computer surveillance.</p>
+    <p>Surveillance devices statutes regulate anyone using a defined class of device. Their mechanism is prohibition plus consent: using the device is an offence unless a party consents or an exception applies. Every jurisdiction has one. The question that decides whether monitoring software is caught is whether that jurisdiction's Act regulates a device that watches a computer, and the answers differ.</p>
+    <p>Sitting over both is the Commonwealth interception statute, which regulates a third thing again: reading a communication while it is in transit.</p>
+
+    <h2>The New South Wales Act as the working model</h2>
+    <p>The Workplace Surveillance Act 2005 (NSW) is the most developed scheme in the country and it is worth learning in detail, both because it applies to a large share of the Australian workforce and because it is the sensible national floor for reasons set out below.</p>
+    <p>Section 3 defines <a class="term" href="../glossary.html">computer surveillance</a> as surveillance by means of software or other equipment that monitors or records the information input or output, or other use, of a computer <span class="conf">(high)</span>. There is no argument to be had about scope. An endpoint agent is caught. A browser extension that reports policy matches is caught. A data loss prevention policy that logs paste events is caught. So is a proxy log, if it monitors the use of a computer, which it does.</p>
+    <p>Section 10 sets the notice requirement. Surveillance must not commence without prior notice in writing to the employee, given at least fourteen days before it starts, though an employee may agree to a lesser period <span class="conf">(high)</span>. Section 10(4) prescribes what the notice must state: the kind of surveillance, being camera, computer or tracking; how it will be carried out; when it will start; whether it is continuous or intermittent; and whether it is for a specified limited period or ongoing <span class="conf">(high)</span>. Notice by email is notice in writing. Where an employee starts work after surveillance has commenced, or within the fourteen days, notice must be given before they start.</p>
+    <p>Section 12 adds two conditions that apply to computer surveillance specifically, and it is short enough to state in full in substance. Computer surveillance must not be carried out unless it is carried out in accordance with a policy of the employer on computer surveillance of employees at work, and the employee has been notified in advance of that policy in such a way that it is reasonable to assume the employee is aware of and understands it <span class="conf">(high)</span>.</p>
+    <p>Read those two requirements as a design constraint rather than as paperwork. A policy has to exist, in writing, describing the surveillance. Staff have to have been told about it in a way that would survive someone asking whether they actually understood. An intranet page nobody has visited does not obviously meet the second limb; an induction module, a log-on notice or a targeted email might.</p>
+
+    <h2>The trick in the definitions</h2>
+    <p>Here is the part that changes how a defender should think about compliance, and it is not obvious from reading ss 10 and 12.</p>
+    <p>Neither s 10 nor s 12 carries a penalty. Look for one and there is none. That is not because breach is costless. It is because s 3 defines <a class="term" href="../glossary.html">covert surveillance</a> as surveillance of an employee while at work for an employer, carried out or caused to be carried out by the employer, and not carried out in compliance with the requirements of Part 2 <span class="conf">(high)</span>.</p>
+    <p>Sections 10 and 12 are in Part 2. So monitoring that does not comply with them is not non-compliant monitoring; it is covert surveillance, by definition. And s 19 makes covert surveillance of an employee at work an offence unless authorised by a covert surveillance authority, with a maximum penalty of fifty penalty units <span class="conf">(high)</span>. A covert surveillance authority is issued by a Magistrate under Part 4, on application by the employer under s 23, on grounds relating to suspected unlawful activity by named employees, and s 25 requires the Magistrate to be satisfied there are reasonable grounds to justify it. Section 29 limits the authority to thirty days <span class="conf">(high)</span>.</p>
+    <p>The practical consequence is worth stating plainly. An organisation that deploys endpoint data loss prevention across a New South Wales workforce without a published computer surveillance policy has not committed an administrative oversight. It has, on the face of the Act, committed the offence of covert surveillance, and the remedy for covert surveillance is a warrant from a Magistrate, which it will not get for routine monitoring, because routine monitoring is not investigation of suspected unlawful activity by named individuals.</p>
+    <p>At $110 per penalty unit under s 17 of the Crimes (Sentencing Procedure) Act 1999 (NSW), fifty penalty units is $5,500 <span class="conf">(high)</span>. The number is not the point. The characterisation is.</p>
+
+    <h2>The rest of the New South Wales scheme</h2>
+    <p>Four more provisions matter for this manual.</p>
+    <p>Section 15 prohibits surveillance of an employee in any change room, toilet facility, or shower or other bathing facility, at fifty penalty units <span class="conf">(high)</span>. It is not directly relevant to AI monitoring and it is the provision most people have heard of, which is worth knowing when the Act comes up in a meeting.</p>
+    <p>Section 16 prohibits surveillance of an employee using a work surveillance device when the employee is not at work, with an express carve-out: the prohibition does not apply to computer surveillance of the employee's use of equipment or resources provided by or at the expense of the employer <span class="conf">(high)</span>. That carve-out is what permits monitoring a corporate laptop used at home on a Sunday, provided Part 2 has been complied with. It does not extend to a personal device.</p>
+    <p>Section 18 restricts use and disclosure of <a class="term" href="../glossary.html">surveillance records</a> made through notified surveillance. The permitted purposes are a legitimate purpose related to employment or the employer's legitimate business activities, disclosure to law enforcement for the detection, investigation or prosecution of an offence, purposes related to civil or criminal proceedings, and averting an imminent threat of serious violence or substantial damage to property. Maximum penalty twenty penalty units <span class="conf">(high)</span>. This is the provision that governs whether telemetry gathered for security may be handed to a disciplinary process, and Chapter 33 returns to it.</p>
+    <p>And section 17, which is the one that matters most for shadow AI, gets its own treatment below.</p>
+
+    <h2>The Australian Capital Territory</h2>
+    <p>The Workplace Privacy Act 2011 (ACT) covers similar ground with different drafting, and one detail of that drafting is worth borrowing.</p>
+    <p>Section 11 defines a <a class="term" href="../glossary.html">data surveillance device</a> as a device <strong>or program</strong> capable of being used to record or monitor the input of information into, or the output of information from, a computer <span class="conf">(high)</span>. The word 'program' means monitoring software is named rather than inferred, which removes the argument that a piece of software is not a device. Listening devices are excluded and sit under separate territory legislation.</p>
+    <p>Section 13 requires written notice at least fourteen days before surveillance starts, or a shorter agreed period, and prescribes the notice contents including the permitted uses of surveillance records <span class="conf">(high on the period; medium on the full content list)</span>. Section 16 adds the policy requirement for data surveillance specifically, and requires the policy to address permitted use of computer resources, access to logged information and monitoring methods, with 'computer resources' defined to include internet access and electronic communication applications <span class="conf">(high)</span>. Sections 41 and 42 prohibit surveillance of private areas and of workers who are not at work.</p>
+    <p>The shape is the same as New South Wales: notice, policy, prohibited places, use limits, and a covert surveillance process for investigations.</p>
+
+    <h2>Everywhere else</h2>
+    <p>No other Australian jurisdiction has a dedicated workplace computer surveillance statute as at August 2026 <span class="conf">(high)</span>.</p>
+    <p>Victoria has workplace-specific provisions in Part 2A of the Surveillance Devices Act 1999 (Vic), inserted in 2006, but they apply only to the use of surveillance devices in workplace toilets, washrooms, change rooms and lactation rooms <span class="conf">(high)</span>. There is no Victorian notice requirement and no computer surveillance policy requirement.</p>
+    <p>Victoria is nevertheless the jurisdiction to watch. A Legislative Assembly committee inquiry into workplace surveillance was referred in May 2024 and reported in May 2025 with twenty-nine findings and eighteen recommendations. The government supported fifteen of the eighteen in principle, with three still under consideration <span class="conf">(high on the inquiry and report; medium-high on the government response, which rests on a single commentary source)</span>. No Bill had been introduced as at August 2026, and the government had not settled whether reform would amend existing legislation or create a standalone Act.</p>
+    <p>Queensland has no workplace surveillance statute and no general surveillance devices Act. The Queensland Law Reform Commission recommended in 2020 that the Invasion of Privacy Act 1971 be replaced with a Surveillance Devices Act covering listening, optical, tracking and data surveillance devices. A government consultation closed in May 2023. Nothing had been enacted as at August 2026 <span class="conf">(medium, being a negative finding from targeted searching)</span>.</p>
+
+    <h2>The data surveillance question, jurisdiction by jurisdiction</h2>
+    <p>This is the part most often missed, and it has one answer that matters.</p>
+    <p>Victoria's Surveillance Devices Act 1999 defines a data surveillance device in s 3 and then, in s 9, restricts the prohibition to law enforcement officers. A private employer is outside it <span class="conf">(high on the restriction to law enforcement; medium-high on the s 3 wording)</span>. The Northern Territory's Surveillance Devices Act 2007 does the same thing: s 4 defines a data surveillance device as a device capable of being used to monitor or record information being put onto or retrieved from a computer, and s 14 prohibits its installation, use and maintenance by a law enforcement officer <span class="conf">(high)</span>. Neither Act reaches an employer.</p>
+    <p>Western Australia, Tasmania and Queensland do not regulate data surveillance at all. The Western Australian Act covers listening, optical and tracking devices; the Tasmanian and Queensland Acts cover listening devices only <span class="conf">(high)</span>.</p>
+    <p>South Australia is the exception, and it is the practically important finding of this section. The Surveillance Devices Act 2016 (SA) defines a surveillance device in s 3 to include a data surveillance device, and defines that as a program or device capable of being used to access, track, monitor or record the input of information into, or the output of information from, a computer <span class="conf">(high)</span>. Section 8 then prohibits a person knowingly installing, using or maintaining a data surveillance device to do any of those things without the express or implied consent of the owner or the person with lawful control of the computer. The penalty is $15,000 or three years imprisonment for a natural person, and $75,000 for a body corporate <span class="conf">(high)</span>.</p>
+    <p>Note that this prohibition is not limited to law enforcement and not limited to employers. It applies to everyone. Where the employer owns the device, the consent element is generally satisfied because the employer is the owner or the person with lawful control. Where the device belongs to the employee, under a bring-your-own-device arrangement, it is not, and a monitoring agent installed on that device is on the face of the section within the prohibition. No case applying s 8 to workplace monitoring was found, so treat this as a live risk rather than settled law, and treat it as a reason to get advice rather than a reason to guess <span class="conf">(medium on the analysis; high on the statutory text)</span>.</p>
+
+    <h2>The interception Act, and the public sector difference</h2>
+    <p>Section 7(1) of the Telecommunications (Interception and Access) Act 1979 (Cth) prohibits a person from intercepting a communication passing over a telecommunications system, except as authorised by the Act <span class="conf">(medium, verified only against secondary sources during this build)</span>.</p>
+    <p>The definition of <a class="term" href="../glossary.html">interception</a> in s 6(1) has two elements a defender should hold onto, because both are doing work.</p>
+    <p>The interception must occur while the communication is passing over the system. Reading content after it has arrived, or before it is sent, is not interception in passage; access to stored communications is dealt with separately. This is a large part of why the whole industry instruments at the user agent rather than in the network. A browser extension that inspects a prompt before the request is composed is not intercepting anything in transit; a proxy that decrypts and reads the request body is doing something much closer to it.</p>
+    <p>And the interception must be without the knowledge of the person making the communication. Notice defeats that element, at least as to the employee who is the sender. This is one of the places where the notice requirements of Chapter 29 and the interception question converge: the notice is not only a workplace surveillance obligation, it is also the thing that removes one of the two elements of the Commonwealth offence.</p>
+    <p>Then the public sector difference, which appears in a definition rather than in an operative section. Section 5 defines <a class="term" href="../glossary.html">network protection duties</a> in relation to a computer network as duties relating to the operation, protection or maintenance of the network, or, where the network is operated by or on behalf of a Commonwealth agency, security authority or eligible authority of a State, ensuring that the network is appropriately used by employees, office holders or contractors <span class="conf">(high)</span>.</p>
+    <p>Read the two limbs against each other. Everyone gets operation, protection and maintenance. Only government networks get 'ensuring appropriate use by employees'. A private employer monitoring staff to check whether they are using AI tools appropriately is not performing network protection duties as the Act defines them. A government agency doing the same thing is. That is a genuine and under-discussed asymmetry, and it runs in the opposite direction to the privacy position in Chapter 28, where the public sector body was the one without the exemption.</p>
+    <p>The provisions that use those definitions sit in Part 2-6 as ss 63C, 63D and 63E, dealing respectively with information for network protection purposes, information for disciplinary purposes, and communication of information to an agency <span class="conf">(high on the section numbers and headings)</span>. Note what they are: rules about what may be done with intercepted information, not authorisations to intercept it. Finding a dealing provision that permits something is not the same as finding an interception exception.</p>
+
+    <h2>Consultation</h2>
+    <p>One more obligation, from a different Act again.</p>
+    <p>Section 205 of the Fair Work Act 2009 (Cth) requires an enterprise agreement to include a <a class="term" href="../glossary.html">consultation term</a> that requires the employer to consult employees about major workplace changes likely to have a significant effect on them, and allows for their representation in that consultation <span class="conf">(high)</span>. Where an agreement does not contain a compliant term, the model term prescribed by reg 2.09 and set out in Schedule 2.3 of the Fair Work Regulations 2009 is taken to be a term of the agreement <span class="conf">(high)</span>. The model term requires notification of a definite decision, the opportunity to appoint a representative, discussion of the change and its effects and of measures to mitigate adverse effects, written information, and genuine consideration of matters raised.</p>
+    <p>Whether introducing endpoint monitoring is a major change with a significant effect is a question of fact. The model term's definition of major change is framed around changes in production, program, organisation, structure or technology, which is broad enough to reach it. That is analysis rather than statutory text, and it is the analysis most higher education <a class="term" href="../glossary.html">enterprise agreements</a> proceed on in practice. Many such agreements also contain their own surveillance and monitoring clauses, which can be more restrictive than any statute, and which are the first document to read rather than the last.</p>
+
+    <h2>The shadow AI lens</h2>
+    <p><strong>Blocking an AI site is itself regulated conduct in New South Wales.</strong> This is the finding that most surprises security teams, and it applies directly to the manual's standard first intervention.</p>
+    <p>Section 17 of the Workplace Surveillance Act provides that an employer must not prevent delivery of an email or access to a website unless the employer is acting in accordance with a policy on email and internet access that has been notified in advance in a way that it is reasonable to assume the employee is aware of and understands, and gives a prevented delivery notice as soon as practicable. Maximum penalty fifty penalty units <span class="conf">(high)</span>. Section 17(2) provides exceptions where the email was blocked as spam or as containing malicious content, or where the email or website would be regarded by reasonable persons as menacing, harassing or offensive. Section 17(4) prohibits a policy that permits blocking merely because content concerns an industrial organisation of employees or an industrial matter <span class="conf">(high)</span>.</p>
+    <p>Now apply it. Tagging a consumer AI service as unsanctioned so that the endpoint product pushes a block indicator prevents access to a website. A consumer AI service is not spam, is not malicious content, and is not menacing, harassing or offensive. So the s 17(2) exceptions do not obviously apply, and the block requires a notified internet access policy and a mechanism for issuing a notice to the affected employee. Nothing in any vendor's block workflow produces that notice. That is analysis rather than case law, and it follows directly from the text.</p>
+    <p><strong>The multi-jurisdiction organisation.</strong> Run the three-city example to a conclusion. The conclusion is not that the organisation maintains three configurations. Jurisdictional carve-outs in a technical control are a maintenance liability, they fail silently when someone relocates, and they require the platform team to know where every staff member works, which it does not. The conclusion is that the organisation runs one configuration to the strictest applicable standard, because a policy and a notice cost nothing to extend to people who did not strictly need them.</p>
+    <p><strong>What the floor requires, operationally.</strong> Four artefacts and one design constraint. A published computer surveillance policy describing what is monitored, by what means, and for what purpose. A written notice issued at least fourteen days before anything starts, containing the five matters in s 10(4). A separate policy covering blocking of websites, with a means of issuing a notice when a block is applied. Written use and disclosure limits, implemented as access control over who can query the telemetry and for what, not merely as a paragraph in a document. And the design constraint: no covert component, because the covert path requires a Magistrate and is available only for investigating suspected unlawful activity by identified individuals.</p>
+    <p><strong>Bring your own device.</strong> Two provisions converge on the same answer from different directions. Section 16 of the New South Wales Act permits out-of-hours computer surveillance only of employer-provided equipment. Section 8 of the South Australian Act prohibits a data surveillance program without the consent of the person with lawful control of the computer. Both point at the same conclusion the technical chapters reached independently: monitoring software on a personal device is a different proposition from monitoring software on a corporate one, and the difference is not only technical.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>Territorial reach is unresolved. The New South Wales Act contains no express extraterritoriality provision, and whether it binds a New South Wales employer in respect of an employee who works entirely in another state was not resolved by any source found. The definitions borrow from the state's industrial relations legislation, which suggests the connection that matters is the employment and the place of work rather than the employer's registered office, but that is inference and should not be stated as settled <span class="conf">(low)</span>.</p>
+      <p>Whether a private organisation's internal network is a 'telecommunications system' for interception purposes is unresolved, and no authority was found either way. The consequence is not that the risk is low; it is that the risk is unquantified, which is a worse position for a governance paper to be in.</p>
+      <p>The exceptions in s 7(2) of the interception Act were not verified at paragraph level during this build, so a specific paragraph should not be cited without checking, and the provision that authorises interception for network protection, as distinct from the provisions that permit dealing with the results, was not located.</p>
+      <p>Enterprise agreement clauses vary and were not reviewed. In the higher education sector they routinely address surveillance directly, and several are more restrictive than the statutes described here.</p>
+      <p>Reform is pending in Victoria and recommended in Queensland. A jurisdictional map drawn in August 2026 has a short useful life, and the Victorian government response makes change there likely rather than speculative.</p>
+      <p>And the underlying limit of the whole chapter: these statutes regulate what an employer may do. They say nothing at all about what a staff member may do on their own device with their own account, which remains, as it has been since Chapter 3, the part of the problem that no instrument reaches.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A colleague says the fourteen-day notice was missed but it is only a technical breach and can be fixed by issuing it now. Correct them in two sentences, naming what the monitoring became in the meantime.</li>
+        <li>State which of the jurisdictions your organisation operates in has a surveillance devices Act that reaches a private employer using monitoring software, and what the consent element requires.</li>
+        <li>Explain why notice matters to the Commonwealth interception question and not only to the workplace surveillance question.</li>
+        <li>Identify the provision that regulates blocking a website in New South Wales, and state the two things an employer must have in place before applying a block.</li>
+        <li>Explain the difference between what a private employer and a Commonwealth agency may treat as network protection, and say which of the two your employer is.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">computer surveillance &middot; consultation term &middot; covert surveillance &middot; data surveillance device &middot; device onboarding &middot; endpoint DLP &middot; enterprise agreement &middot; interception &middot; Microsoft Compliance Extension &middot; network protection duties &middot; penalty unit &middot; prevented delivery notice &middot; surveillance record &middot; unsanctioned application &middot; workplace surveillance</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>Legislation was checked against the jurisdictional legislation services and, for New South Wales, against the Bill as passed by both Houses and the New South Wales Judicial Commission Bench Book, on 9 August 2026. Two preferred primary hosts were unreachable during the build, which is why the New South Wales sourcing takes the form it does.</p>
+      <ol class="sources-list">
+        <li>Workplace Surveillance Act 2005 (NSW), Act No 47 of 2005. Text verified against the Bill as passed by both Houses. <a href="https://www.parliament.nsw.gov.au/bill/files/742/Passed%20by%20both%20Houses.pdf" target="_blank" rel="noopener">parliament.nsw.gov.au</a> The source for the s 3 definitions of surveillance, computer surveillance and covert surveillance, and for ss 10, 12, 15, 16, 17, 18, 19, 23, 25 and 29. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Judicial Commission of New South Wales, Local Court Bench Book, 'Workplace Surveillance Act 2005'. <a href="https://www.judcom.nsw.gov.au/publications/benchbks/local/act-2005-47.html" target="_blank" rel="noopener">judcom.nsw.gov.au</a> Currency as amended to the Industrial Relations Amendment Act 2023, commenced 1 July 2024. Used as an independent cross-check on section numbers and penalties, and the source for the fifty and twenty penalty unit maxima. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Judicial Commission of New South Wales, Sentencing Bench Book, 'Fines'. <a href="https://www.judcom.nsw.gov.au/publications/benchbks/sentencing/fines.html" target="_blank" rel="noopener">judcom.nsw.gov.au</a> The source for the New South Wales penalty unit value of $110 under s 17 of the Crimes (Sentencing Procedure) Act 1999 (NSW). Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Workplace Privacy Act 2011 (ACT), republication R6. <a href="https://www.legislation.act.gov.au/DownloadFile/a/2011-4/current/PDF/2011-4.PDF" target="_blank" rel="noopener">legislation.act.gov.au</a> The source for the s 11 definition of a data surveillance device including a program, the s 13 notice period, the s 16 policy requirement, and ss 41 and 42. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Surveillance Devices Act 2016 (SA), authorised version. <a href="https://www.legislation.sa.gov.au/__legislation/lz/c/a/surveillance%20devices%20act%202016/current/2016.2.auth.pdf" target="_blank" rel="noopener">legislation.sa.gov.au</a> The source for the s 3 definition of a data surveillance device as including a program, and the s 8 prohibition and penalties. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Surveillance Devices Act 1999 (Vic), and Surveillance Devices Act 2007 (NT). <a href="https://www.legislation.vic.gov.au/in-force/acts/surveillance-devices-act-1999/048" target="_blank" rel="noopener">legislation.vic.gov.au</a> and <a href="https://legislation.nt.gov.au/api/sitecore/Bill/APDF?id=17237" target="_blank" rel="noopener">legislation.nt.gov.au</a> The source for the restriction of the data surveillance device prohibitions to law enforcement officers in s 9 and s 14 respectively, and for the Victorian Part 2A workplace privacy provisions covering toilets, washrooms, change rooms and lactation rooms. Last checked 9 August 2026; <span class="conf">(medium-high)</span>.</li>
+        <li>Australian Law Reform Commission, <em>Serious Invasions of Privacy in the Digital Era</em>, Report 123, chapter 14, 'Surveillance Devices'. <a href="https://www.alrc.gov.au/wp-content/uploads/2019/08/fr123_14._surveillance_devices.pdf" target="_blank" rel="noopener">alrc.gov.au</a> Published 2014. Used for the cross-jurisdictional comparison of surveillance devices legislation. Note that it predates the South Australian Act of 2016 and is out of date for that jurisdiction. Last checked 9 August 2026; <span class="conf">(medium)</span>.</li>
+        <li>Telecommunications (Interception and Access) Act 1979 (Cth), Federal Register of Legislation, compilation current at 4 June 2026. <a href="https://www.legislation.gov.au/C2004A02124/latest/text" target="_blank" rel="noopener">legislation.gov.au</a> The source for the s 5 definitions of network protection duties and responsible person for a computer network, and for the location of ss 63C, 63D and 63E in Part 2-6. The wording of ss 6(1) and 7(1) is reported here from secondary sources and should be verified against the compilation before quotation. Last checked 9 August 2026; <span class="conf">(medium)</span>.</li>
+        <li>Fair Work Commission, 'Consultation term', and Fair Work Regulations 2009 (Cth) reg 2.09 and Schedule 2.3. <a href="https://fwc.gov.au/consultation-term" target="_blank" rel="noopener">fwc.gov.au</a> The source for s 205 of the Fair Work Act 2009 (Cth) and the contents of the model consultation term. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Parliament of Victoria, Legislative Assembly Economy and Infrastructure Committee, Inquiry into Workplace Surveillance, and the Office of the Victorian Information Commissioner news item of 11 June 2025. <a href="https://www.parliament.vic.gov.au/inquiryintoworkplacesurveillance" target="_blank" rel="noopener">parliament.vic.gov.au</a> and <a href="https://ovic.vic.gov.au/newsitem/final-report-on-the-inquiry-into-workplace-surveillance/" target="_blank" rel="noopener">ovic.vic.gov.au</a> The source for the referral in May 2024, the final report in May 2025, and its twenty-nine findings and eighteen recommendations. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Queensland Law Reform Commission, Report 77, and the Queensland Department of Justice civil surveillance reforms consultation page. <a href="https://www.qlrc.qld.gov.au/__data/assets/pdf_file/0003/653322/QLRC-Report-77-online.pdf" target="_blank" rel="noopener">qlrc.qld.gov.au</a> and <a href="https://www.justice.qld.gov.au/community-engagement/community-consultation/past/civil-surveillance-reforms-consultation" target="_blank" rel="noopener">justice.qld.gov.au</a> The source for the 2020 recommendation of a Queensland Surveillance Devices Act and the consultation that closed in May 2023. Last checked 9 August 2026; <span class="conf">(medium)</span>.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>Whether the Workplace Surveillance Act 2005 (NSW) binds a New South Wales employer in respect of employees working entirely outside the state is unresolved. No primary source or case law was found <span class="conf">(low)</span>.</p>
+      <p>Whether a private organisation's internal network is a telecommunications system for the purposes of the Telecommunications (Interception and Access) Act 1979 (Cth) is unresolved, and no authority was found either way <span class="conf">(low)</span>.</p>
+      <p>The paragraph lettering of the exceptions in s 7(2) of the interception Act, and the location of the interception-side network protection exception as distinct from the dealing provisions in Part 2-6, were not confirmed <span class="conf">(low)</span>.</p>
+      <p>The amendment history of the Workplace Surveillance Act between 2020 and August 2026 was verified against the as-passed Bill and the New South Wales Judicial Commission Bench Book rather than against the consolidated Act's historical notes. One consequential amendment was identified, commencing 1 July 2024. Confirm there is nothing further before relying on the section numbers in a document that matters <span class="conf">(medium)</span>.</p>
+      <p>Whether Queensland has enacted a surveillance devices Act since the 2023 consultation is a negative finding based on absence of search results rather than an authoritative statement <span class="conf">(medium)</span>.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="28-australian-privacy-landscape.html">&larr; The Australian privacy landscape</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="30-notice-consent-proportionality.html">Notice, consent and proportionality &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

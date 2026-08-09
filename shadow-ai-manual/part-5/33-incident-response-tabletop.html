@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incident response when shadow AI goes wrong: a tabletop in five acts · Shadow AI Blue Team Manual</title>
+<meta name="description" content="Two real Australian cases run through a data breach response: the report, containment when deletion is unavailable, the statutory assessment, notification and the regulator, and the review that looks past the individual.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-5/33-incident-response-tabletop.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Incident response when shadow AI goes wrong</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Five &middot; Governance, law and proportionate response</div>
+  <h1>Incident response when shadow AI goes wrong: a tabletop in five acts</h1>
+  <p class="subtitle">Containment assumes the organisation can reach the data. A prompt cannot be recalled, so containment here means four other things, and one of them is writing down what is not achievable.</p>
+  <div class="reading-meta">
+    <span>Part Five</span>
+    <span>About 19 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+
+    <div class="scene">
+      <p>Two Australian cases are on the public record and neither needs dramatising.</p>
+      <p>In Victoria, a child protection worker used a consumer AI service to draft a protection application report for the Children's Court, entering names, risk assessment material and case detail. The generated text mischaracterised evidence in a way that materially understated risk to a child: a doll that had been reported as used by the father for sexual purposes appeared in the draft as evidence of age-appropriate toys. A legal representative reading the document noticed the deficiencies. The regulator's investigation found the department had contravened the data quality and data security principles, issued a compliance notice requiring technical blocking of fifteen named platforms and ongoing reporting through to September 2026, and established that roughly a hundred further cases in the same unit showed potential indicators of the same practice, against a background of nearly nine hundred departmental staff accessing the service in a six-month window <span class="conf">(high)</span>.</p>
+      <p>In New South Wales, a former contractor to a state agency uploaded a spreadsheet of more than twelve thousand rows of applicant information, including health information, to a consumer AI service over a four-day period in March 2025. Up to three thousand individuals may be affected. The agency disclosed it in October 2025 <span class="conf">(high)</span>.</p>
+      <p>Everything in this manual so far has been about prevention, visibility and governance design. This chapter starts after the thing has happened, which is where competence is actually tested and where the gaps left by the previous thirty-two chapters become concrete rather than theoretical. Run an incident of this shape through five acts and see what each one demands.</p>
+    </div>
+
+    <h2>What a plan is, and why the generic one does not fit</h2>
+    <p>An incident response plan is a set of decisions made in advance, when nobody is under pressure: who does what, what thresholds trigger what, who communicates with whom, and what evidence is preserved and how. The national guidance sets out the structure, including a readiness checklist, situation report and incident log templates, and post-incident review guidance <span class="conf">(high)</span>.</p>
+    <p>The reason a generic plan does not fit this incident type is that its first step assumes something that is not true here. Containment, in the ordinary sense, assumes the organisation can reach the data. Isolate the host, revoke the credential, pull the network cable, restore from backup. None of that applies to text that has been typed into somebody else's service.</p>
+    <p>The regulator's own framing of a data breach response has four steps: contain, assess, notify, review <span class="conf">(high)</span>. The acts below follow that structure, with the containment step doing something other than what it usually does.</p>
+
+    <h2>The statutory clock, and where it starts</h2>
+    <p>Under the Commonwealth scheme, an <a class="term" href="../glossary.html">eligible data breach</a> arises under s 26WE(2) where there is unauthorised access to, or unauthorised disclosure of, personal information, or a loss of personal information, and a reasonable person would conclude that it would be likely to result in <a class="term" href="../glossary.html">serious harm</a> to any of the individuals to whom the information relates <span class="conf">(high)</span>.</p>
+    <p>Where an entity is aware of reasonable grounds to <strong>suspect</strong> an eligible data breach but does not yet have reasonable grounds to <strong>believe</strong> one has occurred, s 26WH(2) requires it to carry out a reasonable and expeditious assessment and to take all reasonable steps to complete it within thirty calendar days of becoming aware of the grounds <span class="conf">(high)</span>.</p>
+    <p>Once there are reasonable grounds to believe, s 26WK requires a statement to the Commissioner as soon as practicable, containing the entity's identity and contact details, a description of the breach, the kinds of information concerned, and recommendations about the steps individuals should take. Section 26WL(2) then offers three notification routes: notify each individual to whom the information relates, notify each individual at risk, or, where neither is practicable, publish the statement and take reasonable steps to publicise it <span class="conf">(high on the section numbers; medium on verbatim wording)</span>.</p>
+    <p>Then the correction that most of this manual's readers need. If the organisation is a state public sector body, the scheme that applies is the state one and the regulator is the state one. New South Wales has had a mandatory notification scheme in Part 6A of its privacy Act since 28 November 2023, Queensland since 1 July 2025, and Western Australia's serious data breach obligations begin on 1 January 2027. Elsewhere, check the current Act rather than assuming a scheme exists. Chapter 28 has the map.</p>
+
+    <h2>Why this is a disclosure</h2>
+    <p>Name the event correctly, because the name determines which limb of the definition applies and how the harm assessment reads.</p>
+    <p>Pasting content into a third-party service is an unauthorised <strong>disclosure</strong> of personal information to an external recipient. It is not unauthorised access, because nobody broke in. It is not a loss, because nothing went missing. It is the organisation's own staff member sending information outside the organisation to a recipient with whom the organisation has no agreement, in circumstances not authorised by any policy.</p>
+    <p>That framing has a consequence for the assessment in act three. The question of who could obtain the information becomes a question about a commercial service's data handling under terms the organisation is not party to, rather than a question about an attacker's capability. It is a harder question and a different one.</p>
+
+    <h2>Act one, the report</h2>
+    <p>How the organisation learns is itself a finding, and it is worth logging before anything else.</p>
+    <p>In the Victorian case it was a legal representative reading a court document. Not a data loss prevention alert, not a discovery dashboard, not a manager. A person outside the organisation noticed that the writing was wrong. Any post-incident review that does not ask why the detection came from there has skipped the most useful question available.</p>
+    <p>The triage questions, in order, and the order matters because two of them decide almost everything downstream. What was entered. By whom. When. Into which service. From which device. Under which account. And is it still there.</p>
+    <p>The last two are the ones that split the incident. A work account on a managed device produces one incident: there may be endpoint telemetry, there may be a browser policy match, there is possibly a contract with the service, and there is a chance of establishing what was sent. A personal account on a personal device produces a different incident with identical facts: no telemetry, no contract, no log, and the organisation's only source of information about what happened is the staff member's own account of it.</p>
+
+    <h2>Act two, containment when deletion is not available</h2>
+    <p>State the hard part first. A prompt cannot be recalled. There is no equivalent of pulling an email back, and there is no equivalent of wiping a device. The information has been disclosed to a third party and it is not coming back.</p>
+    <p>So <a class="term" href="../glossary.html">containment</a> here means four different things, none of which is the usual one.</p>
+    <p>Stop the ongoing behaviour. That may mean a targeted block on the specific service, a direction to the specific team, or both. Note that this is the moment where Chapter 31's argument and Chapter 29's constraint meet: a targeted block following a specific incident is proportionate and expected, and in New South Wales it still requires a notified internet access policy and a notice under s 17.</p>
+    <p>Preserve what evidence exists before it ages out. Endpoint telemetry has a retention period. Browser history is user-clearable. The unified audit log has its own window. Whatever the organisation is going to know about this incident, it will know from data that is already expiring.</p>
+    <p>Establish the exposure by reconstructing what was sent, not what was intended. These differ. A staff member who says they entered a summary may have pasted a document. Where the original artefact still exists on a file share, comparing it to what the person describes is the closest thing to evidence available.</p>
+    <p>And determine whether the service's terms give any deletion or retention control at all. For an enterprise agreement, there may be a data processing addendum, a retention setting and a deletion right. For a free consumer tier accessed under a personal account, there is generally none, and the organisation has no standing to ask, because it is not the customer.</p>
+    <p>Where the account was personal, the honest containment step is to record that the organisation cannot establish the exposure and cannot cause the data to be deleted. Writing that down is not a failure of the response. It is the response, and an incident log that pretends otherwise will not survive review.</p>
+
+    <h2>Act three, the assessment</h2>
+    <p>Work the statutory test rather than the vibe.</p>
+    <p>Was there unauthorised disclosure of personal information. Yes, for the reasons above.</p>
+    <p>Is serious harm likely, judged by a reasonable person in the entity's position. The Act lists the matters relevant to that assessment: the kind of information, its sensitivity, whether it is protected by a security measure and the likelihood of that measure being overcome, who has obtained or could obtain it, and the nature of the harm <span class="conf">(medium, on the list of factors)</span>. Apply them to the New South Wales case as a worked example: applicant information including health information, unprotected once submitted, submitted to a commercial service under consumer terms, with potential harms including identity-related harm and the distress of health information being handled outside a controlled environment.</p>
+    <p>Two features of this incident type make the assessment harder than usual. The recipient is not an adversary, which means the ordinary reasoning about attacker capability does not apply and is replaced by reasoning about a vendor's data handling, retention and training practices under terms the organisation has not read. And the information may have been used to train or inform a system, which is a form of persistence that the drafters of the scheme were not contemplating and that the factors do not squarely address.</p>
+    <p>Record when the clock started, in writing, on the day. Not the day of the incident: the day the organisation became aware of grounds to suspect. That is the date a regulator will ask about, and reconstructing it three weeks later from memory is a bad position to be in.</p>
+
+    <h2>Act four, notification</h2>
+    <p>Identify the regulator correctly. For a state university this is not the Australian Information Commissioner, and a notification sent to the wrong regulator is not a notification.</p>
+    <p>Prepare the statement with the required contents. Then choose a route: everyone whose information was involved, everyone at risk, or publication where neither is practicable. In the New South Wales case the agency contacted affected individuals directly and published a media release and a dedicated page, which is the belt-and-braces version and is usually right where the population is identifiable.</p>
+    <p>Then the part that is not in the statute, and it is the part this manual cares about most.</p>
+    <p>There is an internal communication as well as an external one, and its tone determines whether the organisation ever hears about the next incident. A notification and an internal message that read as though a staff member was reckless will teach everybody else to conceal. That is precisely the dynamic Chapter 31 described, arriving through a different door: the organisation will have converted a visible problem into an invisible one, at the moment of maximum attention, using its own communications.</p>
+    <p>The alternative is not to excuse the conduct. It is to describe the event, describe what the organisation is changing, and say plainly that reporting early is what the organisation wants. A staff member who pastes something they should not have and tells someone within the hour has done the organisation an enormous service relative to one who does not.</p>
+
+    <h2>Act five, the review</h2>
+    <p>What a <a class="term" href="../glossary.html">post-incident review</a> should examine, in a widening circle.</p>
+    <p>Not only what the individual did. That question is the one everybody asks first and it produces the least useful answers.</p>
+    <p>Whether a sanctioned alternative existed, and whether it was reachable and adequate for the task the person was doing. In the Victorian case the task was drafting a long structured document under time pressure, and the question of what the department had provided for that is more interesting than the question of what the worker used instead.</p>
+    <p>Whether training had named the data class involved. Most AI training names tools. Almost none of it names the specific categories of information that must not leave, in the language of the work.</p>
+    <p>What the discovery data had been showing before the incident, and whether anyone read it. This is the question that stings, because in most organisations the answer is that the data existed and nobody had a standing reason to look at it.</p>
+    <p>And the population question, which the Victorian case makes unavoidable. The investigation did not find one worker. It found roughly a hundred further cases in the same unit with potential indicators, and nearly nine hundred staff across the department who had reached the service in six months. The incident named one person and revealed a workforce practice. A review that concludes with an individual performance conversation has closed a file and left the practice in place.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The evidence problem. The endpoint may hold nothing useful, the browser history may be cleared, and the service holds everything and will not give it to the employer. Reconstruction is often from the staff member's own account of what they entered. That is a poor evidentiary basis for a disciplinary process and an adequate one for a harm assessment, and confusing the two standards is a common error in both directions.</p>
+      <p>The personal account case, where there is no log, no contract and no reach. The organisation's honest position is that it cannot establish the exposure, and that position has to be written into the assessment rather than papered over with an estimate.</p>
+      <p>Use and disclosure limits on the telemetry. Section 18 of the New South Wales Workplace Surveillance Act restricts use of surveillance records to enumerated purposes, and the Commonwealth interception Act separately regulates dealing with intercepted information for disciplinary purposes at s 63D <span class="conf">(medium)</span>. A defender should not assume that telemetry gathered under a security notice can be handed to a disciplinary process without checking what the notice said and what the statute permits.</p>
+      <p>No Australian university incident of this kind is publicly reported. The sector-specific evidence base is the two public sector cases above and inference from them. That is worth stating rather than implying otherwise <span class="conf">(high, as a negative finding)</span>.</p>
+      <p>The incident will surface the monitoring programme's own compliance position. If notice was never issued, or the computer surveillance policy was never published, or the proportionality analysis was never written down, that becomes visible during the response, to the regulator, at the worst possible moment. Chapters 29 and 30 are, among other things, incident preparation.</p>
+      <p>And the most common failure of all: post-incident reviews that produce only a training action. Training is the cheapest recommendation, it is the easiest to close, and it is rarely the thing that would have prevented the incident. If the review's single output is a module, the review has not finished.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>State the moment the thirty-day assessment clock starts, and name the person in your organisation who would notice it starting.</li>
+        <li>A staff member pasted client information into a consumer service from a personal account on a personal laptop. Describe your containment step in two sentences, including the part you would write down as not achievable.</li>
+        <li>Name the regulator you would notify, and the instrument that says so.</li>
+        <li>Write the sentence in the internal communication that avoids teaching the rest of the organisation to conceal the next incident.</li>
+        <li>Identify the finding a post-incident review of this kind should look for beyond the individual case, and say where in your existing data you would look for it.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">cloud discovery &middot; computer surveillance &middot; containment &middot; eligible data breach &middot; notifiable data breach &middot; personal information &middot; post-incident review &middot; sanctioned alternative &middot; sensitive information &middot; serious harm &middot; situation report &middot; surveillance record &middot; tabletop exercise &middot; unified audit log</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>Office of the Victorian Information Commissioner, <em>Investigation into the use of ChatGPT by a Child Protection worker</em>, report dated 24 September 2024. <a href="https://ovic.vic.gov.au/wp-content/uploads/2024/11/DFFH-ChatGPT-investigation-report-20240924-Re-upload.pdf" target="_blank" rel="noopener">ovic.vic.gov.au</a> The source for the facts of the Victorian case, the findings of contravention of IPP 3.1 and IPP 4.1, the compliance notice requirements including blocking of fifteen named platforms and reporting through to September 2026, and the figures of approximately one hundred further cases in the unit and nearly nine hundred departmental staff accessing the service between July and December 2023. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>NSW Reconstruction Authority, 'Northern Rivers Resilient Homes Program data breach', media release, 6 October 2025. <a href="https://www.nsw.gov.au/departments-and-agencies/nsw-reconstruction-authority/media-releases/northern-rivers-resilient-homes-program-data-breach" target="_blank" rel="noopener">nsw.gov.au</a> The source for the second case: a former contractor uploading a spreadsheet of ten columns and over twelve thousand rows between 12 and 15 March 2025, up to three thousand individuals potentially affected, and the response including notification of the Privacy Commissioner under the state scheme. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Information and Privacy Commission NSW, 'Statement relating to the NSW Reconstruction Authority data breach'. <a href="https://www.ipc.nsw.gov.au/news-events/statements/statement-relating-nsw-reconstruction-authority-data-breach" target="_blank" rel="noopener">ipc.nsw.gov.au</a> The regulator's statement on the second case, including the Privacy Commissioner's position that such information must never be entered into public platforms. Date not shown on the page. Last checked 9 August 2026; <span class="conf">(medium)</span>.</li>
+        <li>Office of the Australian Information Commissioner, 'Quick reference guide for responding to data breaches', 29 June 2026. <a href="https://www.oaic.gov.au/privacy/notifiable-data-breaches/quick-reference-guide-for-responding-to-data-breaches" target="_blank" rel="noopener">oaic.gov.au</a> The source for the four steps of contain, assess, notify and review, and for the requirement to take all reasonable steps to complete the assessment within thirty calendar days after becoming aware of the grounds. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Office of the Australian Information Commissioner, 'Data breach preparation and response', Part 4, the Notifiable Data Breach scheme, last updated February 2025. <a href="https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies/preventing-preparing-for-and-responding-to-data-breaches/data-breach-preparation-and-response/part-4-notifiable-data-breach-ndb-scheme" target="_blank" rel="noopener">oaic.gov.au</a> The source for ss 26WE(2), 26WH(2), 26WK and 26WL of the Privacy Act 1988 (Cth) as described here, and for the matters relevant to the serious harm assessment. Last checked 9 August 2026; <span class="conf">(high on section numbers; medium on verbatim wording)</span>.</li>
+        <li>Australian Signals Directorate's Australian Cyber Security Centre, <em>Cyber security incident response planning: Practitioner guidance</em>, December 2024. <a href="https://www.cyber.gov.au/business-government/detecting-responding-to-threats/cyber-security-incident-response/cyber-security-incident-response-planning-practitioner-guidance" target="_blank" rel="noopener">cyber.gov.au</a> The source for the structure of an incident response plan referred to here, including the readiness checklist, situation report and incident log templates and post-incident review guidance. Last checked 9 August 2026; <span class="conf">(high on the document; low on the page's own last-updated date, which could not be read)</span>.</li>
+        <li>Australian Signals Directorate's Australian Cyber Security Centre and international partners, <em>Engaging with Artificial Intelligence</em>, first published 24 January 2024. <a href="https://www.cyber.gov.au/business-government/secure-design/artificial-intelligence/engaging-with-artificial-intelligence" target="_blank" rel="noopener">cyber.gov.au</a> Supports the advice that organisations should be cautious about what information their personnel provide to generative AI systems, given that information may be incorporated into training data and inform outputs to other users. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Office of the Australian Information Commissioner, 'GenAI tools in the workplace: balancing protection of personal information and business efficiency', 4 December 2025. <a href="https://www.oaic.gov.au/news/blog/GenAI-tools-in-the-workplace-balancing-protection-of-personal-information-and-business-efficiency" target="_blank" rel="noopener">oaic.gov.au</a> The source for the regulator's observation that once personal information has been input into generative AI systems it is difficult to track or control how it is used, and potentially impossible to remove. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Workplace Surveillance Act 2005 (NSW) s 18, and Telecommunications (Interception and Access) Act 1979 (Cth) s 63D. Cited and sourced in full in Chapter 29. The basis for the use-limitation caution in the breakdown section. <span class="conf">(medium)</span>.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The list of matters relevant to the likelihood of serious harm under the Commonwealth scheme is reported here from the regulator's guidance rather than read from the current compilation. Verify the subsection reference before quoting it <span class="conf">(medium)</span>.</p>
+      <p>The interaction between a workplace surveillance record use limitation and a disciplinary process following a shadow AI incident was not resolved by any source found. The statutory provisions are identified; how they apply to a particular fact pattern is a question for legal advice <span class="conf">(low)</span>.</p>
+      <p>No Australian university incident involving staff entering confidential information into a consumer AI tool is publicly reported. Whether that reflects an absence of incidents or an absence of reporting is not knowable from public sources <span class="conf">(medium)</span>.</p>
+      <p>Whether personal information used to inform or train a commercial model constitutes ongoing disclosure for the purposes of an eligible data breach assessment is not addressed in the guidance consulted. I don't know <span class="conf">(low)</span>.</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Closing Part Five and the manual</h2>
+      <p>Part Five set out to cover the constraints that are not technical, and the six chapters have moved from what the law requires to what an organisation should actually build.</p>
+      <p>The constraint in this part is authority rather than capability. Privacy law decides which regime applies, which principles govern the handling, and who hears the complaint. Surveillance law decides what may be watched, on what notice, and what a missing notice converts the watching into. Proportionality decides what should be watched among the things that lawfully may be, and supplies a test that produces a written argument rather than a score. Effectiveness decides whether watching achieves anything, and is the question a dashboard cannot answer about itself. The architecture is what is left standing after all four have been applied, and the decision record is the part of it that most organisations never write.</p>
+      <p>Which returns the manual to where it started. The question on the first page was why an employer can see that a staff member reached a chatbot, but not what they typed into it.</p>
+      <p>The answer has now been given five times, from five directions, and it has been the same answer each time. Part One: the content is encrypted in transit, and the metadata is not. Part Two: the tenant sees the authentications it brokers, and a personal account does not ask it. Part Three: the device reports what the organisation is permitted to install an agent to report, and on a device it does not own it is permitted nothing. Part Four: the cloud reflects what the organisation has a contract to be told, and there is no contract. Part Five: what remains technically possible is bounded again by what is lawful, proportionate and effective, and those three do not always agree with each other.</p>
+      <p>Underneath all five is one proposition. An organisation can see what crosses something it controls. Everything else is inference, contract, or nothing.</p>
+      <p>That is not a comfortable place to end, and it is the accurate one. The competence this manual has been building is not the ability to close the gap, because the gap does not close. It is the ability to say, in a meeting, without a product name, which of those three is in play, how far the instrument reaches, what the number on the screen is a measurement of, and what the organisation has decided to accept. A defender who can do that is doing the job.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="32-reference-architecture.html">&larr; A reference architecture for shadow AI governance</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <span class="cn-next" style="color:var(--text-3);font-family:'JetBrains Mono',monospace;font-size:12px;">End of the manual</span>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

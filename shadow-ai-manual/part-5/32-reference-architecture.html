@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A reference architecture for shadow AI governance · Shadow AI Blue Team Manual</title>
+<meta name="description" content="A shadow AI governance architecture assembled from the whole manual: legal, visibility, identity, data, endpoint and browser, enablement and review, with the residual risk written down.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-5/32-reference-architecture.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>A reference architecture for shadow AI governance</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Five &middot; Governance, law and proportionate response</div>
+  <h1>A reference architecture for shadow AI governance</h1>
+  <p class="subtitle">Seven layers, each stated with what it depends on and what it cannot see, and a decision record naming what the organisation has chosen not to do.</p>
+  <div class="reading-meta">
+    <span>Part Five</span>
+    <span>About 14 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+
+    <div class="scene">
+      <p>A committee asks for one page. What is the organisation going to do about staff use of AI tools.</p>
+      <p>The temptation is to answer with a list of products, because a product list is easy to write, easy to cost and easy to approve. Everything in this manual argues against it. A product list conceals the dependencies that decide whether any of it works, and a governance body that approves a product list has approved a set of assumptions it was never shown.</p>
+      <p>What the committee needs instead is a <a class="term" href="../glossary.html">reference architecture</a> expressed as a set of layers, each of which states what it depends on and what it cannot see, and a final section naming what the organisation has decided to accept as <a class="term" href="../glossary.html">residual risk</a>. That last section is the one that is almost always missing, and its absence is what turns an architecture into a checklist.</p>
+      <p>Thirty-one chapters have produced constraints. This one assembles them. The discipline throughout is that no layer is described without its limit.</p>
+    </div>
+
+    <h2>Layers, not phases</h2>
+    <p>State the organising principle before the layers, because the shape of the thing is doing work.</p>
+    <p>These are layers, not steps. They are set out in an order that makes the argument legible, and a real organisation will work on several at once, at different speeds, owned by different people. Only the first has a genuine ordering claim over the others, and its claim is not that it must be finished first but that it constrains what may lawfully be built. An organisation that deploys the endpoint layer before the legal layer has not moved faster; it has created a compliance position it will have to unwind.</p>
+    <p>Each layer below has three parts: what it is, what it depends on, and what it cannot do.</p>
+
+    <h2>The legal and consultative layer</h2>
+    <p>What it is. Establish which privacy regime applies and name the regulator, using Chapter 28. Establish whether a workplace surveillance statute applies to any part of the workforce, using Chapter 29, and if it applies to any part, treat its requirements as the standard for all of it. Publish a computer surveillance policy. Issue written notice at least fourteen days before anything starts. Publish a collection notice. Consult through the enterprise agreement mechanism and with the relevant unions. Record the proportionality analysis in writing before deployment, using the six questions in Chapter 30, whether or not a formal assessment is mandatory in your jurisdiction.</p>
+    <p>What it depends on. Nothing, which is why it goes first. It requires no licence, no agent and no procurement.</p>
+    <p>What it cannot do. It authorises nothing technically and produces no visibility. It is the layer that makes the others lawful and it detects nothing at all.</p>
+
+    <h2>The visibility layer</h2>
+    <p>What it is. Cloud application discovery fed by endpoint telemetry from onboarded devices, filtered to the generative AI category, with a log collector for network egress that is not natively integrated. The output is an inventory: which applications, how many users, what volume, at what risk classification.</p>
+    <p>What it depends on. Device onboarding, or a network chokepoint that the traffic actually crosses. In practice, mostly the former.</p>
+    <p>What it cannot do. Chapter 24 established the shape of the error. Discovery infers use from traffic, so it errs low, and it errs low in a knowable direction: roughly by the proportion of the estate that is unmanaged and off the network. It sees nothing at all on a device that is not in the fleet and not on a network the organisation controls. Report the number with the coverage denominator attached, every time, or Chapter 27's error is reintroduced at the source.</p>
+
+    <h2>The identity layer</h2>
+    <p>What it is. Conditional access binding any procured enterprise AI tenant to compliant devices and corporate identities, and refusing personal-account sign-in to the corporate tenant. Application consent governance over third-party AI applications that request delegated access to tenant data, which is the problem Chapter 13 set out: an AI product that never touches the network can still read the mailbox, if somebody clicked accept.</p>
+    <p>What it depends on. The service federating to the identity provider. No federation, no control.</p>
+    <p>What it cannot do. A personal account signing in to a consumer service never touches the tenant. The authentication is brokered by a provider the organisation has no relationship with, so conditional access cannot evaluate it, log it or block it. This is the layer that produces the most confident wrong answers in governance discussions, because 'we have conditional access' sounds like coverage and describes a boundary the activity in question never crosses.</p>
+
+    <h2>The data layer</h2>
+    <p>What it is. Sensitivity labelling and encryption that travels with the file, so that protection is a property of the content rather than of the location or the device.</p>
+    <p>What it depends on. The content being labelled, which is a classification problem, which is a people problem. Automatic labelling based on sensitive information types reduces but does not remove the dependency.</p>
+    <p>What it cannot do. It protects the file. It does not protect the paragraph a staff member reads off the screen and retypes into a chat window, and no data-centric control ever will.</p>
+    <p>And its unique property, which is the reason it belongs in the architecture at all: it is the only layer that continues to operate on a device the organisation does not manage. An encrypted document that will not open without a work identity is still doing its job on a personal laptop at midnight. Nothing else in this list can say that.</p>
+
+    <h2>The endpoint and browser layer</h2>
+    <p>What it is. Inline protection in the managed browser under a work profile, which Chapter 27 identified as the one capability in the set that reaches unmanaged devices, because the control lives in the browser rather than on the device. The compliance extension on other browsers, which does not reach unmanaged devices, because it requires an onboarded Windows machine. Endpoint data loss prevention for paste and upload events. Adaptive enforcement introduced in audit, moved to warn, and moved to block only for elevated risk, with the automated-decision caveat from Chapter 30 attached.</p>
+    <p>What it depends on. Browser management or device management, and which of the two differs by capability. This is the layer where the dependency map is most granular and most worth getting right, because two capabilities that appear adjacent in a product console have completely different reach.</p>
+    <p>What it cannot do. It is browser-centred. Desktop AI clients and development environment plugins sit outside it, visible to the endpoint agent as processes and network connections but not as content. On an unmanaged device without the managed browser, the whole layer is absent.</p>
+
+    <h2>The enablement layer</h2>
+    <p>What it is. The sanctioned alternative, promoted and easy to reach, with enterprise data protection. A procurement path with a named owner and a known timeframe for the workflow that genuinely needs a different tool. Training that teaches the data classes that must not leave, rather than the tool names, because the tool names change every quarter and the data classes do not.</p>
+    <p>What it depends on. The alternative being good enough at the task. This is the architecture's largest single dependency and it sits outside the security team's control.</p>
+    <p>What it cannot do. It is a substitution effect, not an enforcement mechanism. It will shift the default behaviour of most people and it will not reach the person who has decided. Chapter 31 made the case for it and was honest about the limit.</p>
+
+    <h2>The review layer</h2>
+    <p>What it is. An alert on newly discovered generative AI applications. A scheduled review of the block list, the policy set and the notices, with the date each notice was last issued recorded somewhere a person can find. A re-run of the proportionality analysis when a vendor changes a default, which they will, without asking.</p>
+    <p>What it depends on. Somebody owning it, with time allocated.</p>
+    <p>What it cannot do. Review catches drift. It does not catch novelty that nobody thought to look for, and the category has produced a good deal of that.</p>
+
+    <h2>The shadow AI lens</h2>
+    <p><strong>What the assembled architecture covers.</strong> Express it as a coverage statement rather than as a claim, by walking the device and account states from Chapter 20 against the seven layers.</p>
+    <p>The onboarded corporate device with a work account gets all seven. Discovery sees it, conditional access governs its enterprise sign-ins, labels protect its content, the browser and endpoint controls apply, the sanctioned tool is installed, and the whole thing is covered by the notice.</p>
+    <p>The unmanaged device using the managed browser under a work profile gets the legal layer, the enablement layer, the data layer, and the part of the endpoint and browser layer that lives in the browser. It does not get discovery, because there is no agent reporting. That is a meaningful amount of coverage on a device the organisation does not own, and it is the single most useful architectural fact in Part Four.</p>
+    <p>The unmanaged device with a personal account, off the network, gets the legal layer, the enablement layer, and the data layer only to the extent that content was labelled and encrypted before it left. Discovery: nothing. Identity: nothing. Endpoint and browser: nothing.</p>
+    <p>That last row is the residue the whole manual has been circling. The architecture does not remove it. What the architecture does is make it explicit, which is a different and achievable goal.</p>
+    <p><strong>The decision record.</strong> This <a class="term" href="../glossary.html">decision record</a> is the artefact this chapter is really arguing for, and it has three sections.</p>
+    <p>What the organisation has decided to do, layer by layer, with the dependency and the limit stated for each.</p>
+    <p>What it has decided <strong>not</strong> to do, and why. Prompt content capture for consumer services is the worked example, and the reasoning from Chapter 30 attaches directly: it collects third-party personal information the organisation has no basis to hold, the network-layer means of doing it manufactures a target and captures traffic irrelevant to the question, and for free consumer tiers it does not work anyway.</p>
+    <p>And what the organisation therefore accepts as residual risk, written in a sentence somebody would be willing to have read back to them in an inquiry. Something of the form: staff using consumer AI services on personal devices with personal accounts are outside all technical controls, and the organisation manages that exposure through data-centric protection, training, and the availability of a governed alternative, accepting that it cannot measure it.</p>
+    <p>The second and third sections are the ones that are always missing. Their absence is what allows a governance body to believe that the first section describes the whole problem.</p>
+    <p><strong>Where the architecture is Microsoft-shaped, and what that means.</strong> It is shaped that way because the estate is, and this manual has been open about that since Chapter 1. Restate the generalisation clearly, because it is what makes the chapter portable. Every layer above names a function, not a product. Discovery, identity binding, data-centric protection, user-agent instrumentation, enablement and review exist in every other stack under different names. A defender who understands what the layer is for can evaluate any vendor's version of it, including vendors that do not exist yet, by asking the two questions this manual has been building toward: what does it depend on, and what can it not see.</p>
+    <p><strong>Reporting from the architecture.</strong> What a governance committee should receive quarterly, in five items.</p>
+    <p>Which AI applications are in use, by category and scale. What proportion of the estate that measurement covers. What changed in the block list and why. Which notices are current and when they were last issued. And what remains accepted, restated from the decision record.</p>
+    <p>The second item is the one that keeps the other four honest. Without it, the first item is a selection effect presented as a finding, and Chapter 27 exists to prevent exactly that.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>Reference architectures are read as checklists. A checklist without the limits attached is worse than no architecture, because it produces the belief that the problem has been handled, and that belief is harder to dislodge than ignorance.</p>
+      <p>The licensing position for several capabilities across the endpoint, browser and posture layers is billed separately rather than included in an enterprise or academic entitlement, and the guidance shifted more than once during 2025. Australian education pricing is not published. Do not put a figure in the paper without checking the tenant's own billing position <span class="conf">(low)</span>. This has now been the manual's most repeated open question across four parts, which is itself a finding: it would be worth one organisation resolving centrally rather than each team guessing.</p>
+      <p>The architecture degrades to two layers on an unmanaged personal device. An organisation with a substantial bring-your-own-device population should size its programme to that reality rather than reporting fleet coverage as estate coverage.</p>
+      <p>Layer six depends on a judgement about product quality that the organisation does not control and cannot fix by procurement alone.</p>
+      <p>Every layer has an owner problem. The legal layer belongs to a privacy officer, the visibility and endpoint layers to a platform team, the enablement layer to a communications or learning function, and the review layer to nobody in particular. Nothing in most organisational structures makes those people meet, and the architecture fails at the seams rather than in the layers.</p>
+      <p>And the architecture assumes a single organisation with a single regime. Joint ventures, research partnerships and controlled entities can sit under different privacy law, as Chapter 28 set out, and a shared research environment can put two institutions with different obligations on the same tenant.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Name the only layer that continues to operate on a device the organisation does not manage, and state what it requires in order to work.</li>
+        <li>Write the residual risk sentence for an organisation of a thousand staff with a substantial bring-your-own-device population, in one sentence you would be willing to have read back to you.</li>
+        <li>A committee asks why the architecture does not include prompt content capture. Give the two-sentence answer.</li>
+        <li>Identify which layer your own organisation is weakest at, and say who would have to own the fix.</li>
+        <li>State which of the five quarterly report items keeps the other four honest, and explain why in one sentence.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">adaptive protection &middot; cloud discovery &middot; conditional access &middot; decision record &middot; device onboarding &middot; endpoint DLP &middot; enterprise data protection &middot; inline DLP &middot; log collector &middot; Microsoft Compliance Extension &middot; posture management &middot; reference architecture &middot; residual risk &middot; sensitivity label &middot; unsanctioned application</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>This is an assembly chapter and it cites the manual more than it cites documentation, which is deliberate. Where a fact was established and sourced in an earlier chapter, the cross-reference is to that chapter rather than a re-citation of the underlying page.</p>
+      <ol class="sources-list">
+        <li>Chapters 13, 20, 24, 25, 26 and 27 of this manual, for the dependencies restated in the layer descriptions: application consent and delegated access, the device and account state ladder, the direction of discovery error, the endpoint and browser control map, the correlation and retention layer, and the aggregation surface that adds no sensors.</li>
+        <li>Chapters 28, 29, 30 and 31 of this manual, for the legal and consultative layer, the notice and policy requirements, the proportionality test, and the case for the enablement layer.</li>
+        <li><em>Telemetry and Control Options for Shadow AI in an Australian University</em> (this project's internal source report), section 7, for the sequence and the maturity model on which the layer ordering is loosely based, restructured here as layers with stated dependencies rather than as stages to be climbed.</li>
+        <li><em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em> (this project's internal source report), for the coverage walk across device and account states used in the shadow AI lens section.</li>
+        <li>Microsoft Learn, 'Considerations for DSPM for AI to manage data security and compliance protections for AI interactions'. <a href="https://learn.microsoft.com/en-us/purview/dspm-for-ai-considerations" target="_blank" rel="noopener">learn.microsoft.com</a> The policy-to-prerequisite mapping underlying the endpoint and browser layer's dependency statements, established and cited in full in Chapter 27. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Enterprise data protection in Microsoft 365 Copilot and Microsoft 365 Copilot Chat'. <a href="https://learn.microsoft.com/en-us/copilot/microsoft-365/enterprise-data-protection" target="_blank" rel="noopener">learn.microsoft.com</a> The basis for the enablement layer's description of the sanctioned alternative, including Microsoft acting as data processor and prompts and responses not being used to train foundation models. Verified against the Microsoft Learn documentation service on 9 August 2026; <span class="conf">(high)</span>.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The billing position for several capabilities across the endpoint, browser and posture layers is not resolvable from vendor documentation, and Australian education pricing is not published. This has been flagged in chapters 19, 20, 22, 27 and now 32. It is the manual's single most repeated unresolved question and is worth resolving once, centrally, against a tenant billing portal <span class="conf">(low)</span>.</p>
+      <p>Whether a shared research tenant spanning two institutions in different Australian privacy jurisdictions creates joint obligations, and how those are apportioned, is outside the sources consulted for this manual. I don't know <span class="conf">(low)</span>.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="31-driving-usage-underground.html">&larr; The risk of driving usage underground</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="33-incident-response-tabletop.html">Incident response when shadow AI goes wrong &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

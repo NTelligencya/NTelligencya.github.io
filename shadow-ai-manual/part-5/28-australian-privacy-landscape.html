@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Australian privacy landscape: the Privacy Act, state and territory regimes · Shadow AI Blue Team Manual</title>
+<meta name="description" content="Which of the nine Australian privacy regimes an organisation is actually in, why a State-established university is neither an agency nor an organisation, and why a monitoring programme is itself an act of collection.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-5/28-australian-privacy-landscape.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>The Australian privacy landscape</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Five &middot; Governance, law and proportionate response</div>
+  <h1>The Australian privacy landscape: the Privacy Act, state and territory regimes</h1>
+  <p class="subtitle">For most Australian universities the Privacy Act does not apply at all, which means the principles are elsewhere, the regulator is somebody else, and the exemption everyone reaches for is unavailable.</p>
+  <div class="reading-meta">
+    <span>Part Five</span>
+    <span>About 22 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+
+    <div class="scene">
+      <p>A privacy officer is asked a narrow question. The security team wants to log which staff visit chatgpt.com, attributed to the individual, retained for ninety days. Does the Privacy Act permit it?</p>
+      <p>For most Australian universities the honest first answer is that the Privacy Act does not apply to the organisation at all.</p>
+      <p>That is not the relief it sounds like. It means the principles that govern the decision are in a different statute, the regulator who would hear a complaint is a different regulator, the exemption that private sector employers reach for in exactly this situation is unavailable, and the answer may differ for a colleague in another state. It also means that a security design document citing the Australian Privacy Principles, which is what most of them cite, is citing the wrong instrument.</p>
+      <p>Chapter 27 closed Part Four by naming the residue that no technical layer resolves, and observing that the interesting question stops being what can be built and becomes what should be. This is the first constraint on that question. It is dull, it is jurisdictional, and getting it wrong invalidates everything downstream. The method for this chapter is to establish what privacy law regulates, establish what personal information is, and then work the coverage map until the organisation lands in exactly one regime.</p>
+    </div>
+
+    <h2>What privacy law regulates</h2>
+    <p>Australian privacy law does not protect secrets. It regulates the handling of information about people, across a lifecycle: collection, notification, use, disclosure, quality, security, access and correction.</p>
+    <p>Every Australian regime expresses that lifecycle as a set of numbered principles. The Commonwealth has thirteen <a class="term" href="../glossary.html">Australian Privacy Principles</a>, the Northern Territory has ten <a class="term" href="../glossary.html">Information Privacy Principles</a>, New South Wales has twelve Information Protection Principles, Queensland has a set of Queensland Privacy Principles numbered on the Commonwealth pattern, and so on. The naming differs, the numbering differs, and the substance converges. Learn the pattern once and any of them can be read.</p>
+    <p>The pattern is worth stating because it predicts what a defender will be asked. Collect only what is reasonably necessary. Tell people at the time you collect. Use it for the purpose you collected it for, and not another one, unless an exception applies. Keep it accurate. Keep it secure. Destroy it when it is no longer needed. Let people see it and correct it.</p>
+    <p>Notice what that list implies about a monitoring programme. Switching on user-attributed telemetry is not a passive act of observation. It generates records about identifiable people that did not previously exist, which is a collection, and the whole lifecycle attaches to it. Chapter 30 does the work of deciding whether a particular collection is justified. This chapter establishes that the question is live.</p>
+
+    <h2>Personal information, and the two limbs that matter</h2>
+    <p>Section 6(1) of the Privacy Act 1988 (Cth) defines <a class="term" href="../glossary.html">personal information</a> as information or an opinion about an identified individual, or an individual who is reasonably identifiable, whether the information or opinion is true or not, and whether it is recorded in a material form or not <span class="conf">(high)</span>. Every state and territory definition is a close variant.</p>
+    <p>Two limbs of that definition do real work here.</p>
+    <p>'Reasonably identifiable' means the definition reaches records that do not contain a name. A log line recording that user account jsmith reached a domain at a timestamp is personal information, because the account resolves to a person through a directory the organisation controls. So is a device identifier, a risk score, and a row in a discovery dashboard filtered to one user. There is no threshold of sensitivity to cross. The information is personal because the person is identifiable, not because the content is embarrassing.</p>
+    <p>'Whether true or not' is the limb that catches generative AI, and it catches it on both sides of the interaction. A prompt containing information about a person is personal information. So is the model's response. A fabricated statement about a named individual, produced by a system that had no basis for it, is personal information the organisation now holds, and the accuracy principle applies to it in the ordinary way. The regulator has said this directly in its guidance on commercially available AI products <span class="conf">(high)</span>.</p>
+    <p><a class="term" href="../glossary.html">Sensitive information</a> is a narrower enumerated category in the same subsection: racial or ethnic origin, political opinions and associations, religious beliefs, philosophical beliefs, professional or trade association membership, trade union membership, sexual orientation or practices, criminal record, health information, genetic information, and biometric information and templates <span class="conf">(high)</span>. It attracts a higher collection threshold, generally requiring consent. Health information usually also sits under a separate statute with a separate regulator, which matters in an institution with a clinic, a psychology programme or a health faculty.</p>
+
+    <h2>The coverage map: who the Commonwealth Act binds</h2>
+    <p>The Privacy Act binds <a class="term" href="../glossary.html">APP entities</a>, and an APP entity is an agency or an organisation. Both terms are defined, and the definitions are where the university problem arises.</p>
+    <p>'Agency' in s 6(1) captures Commonwealth departments and, at paragraph (c), a body established or appointed for a public purpose by or under a Commonwealth law <span class="conf">(high)</span>. The Australian National University, established under Commonwealth legislation, is an agency and is bound by the Act; it says so on its own privacy page <span class="conf">(high)</span>.</p>
+    <p>'Organisation' in s 6C(1) captures individuals, bodies corporate, partnerships, unincorporated associations and trusts, and then excludes several categories: small business operators, registered political parties, agencies, State or Territory authorities, and prescribed State or Territory instrumentalities <span class="conf">(high)</span>. Section 6C(3) defines State or Territory authority, and paragraph (c) is the relevant one: a body, whether incorporated or not, established or appointed for a public purpose by or under a law of a State or Territory <span class="conf">(high)</span>.</p>
+    <p>Put those together. A university established under a State or Territory Act is established for a public purpose under a State or Territory law. It is therefore a State or Territory authority, therefore not an organisation, and it was never an agency because its constituting Act is not a Commonwealth one. It is neither, so it is not an APP entity, so the Australian Privacy Principles do not bind it <span class="conf">(medium, because the conclusion depends on each institution's own constituting Act)</span>.</p>
+    <p>Two qualifications keep this from being a clean rule. The exclusion in s 6C(3)(c)(i) does not extend to an incorporated company, so a university's controlled entities structured as companies under the Corporations Act can be organisations in their own right, and are APP entities unless they are small business operators. And s 6F allows a State or Territory authority to be prescribed by regulation so that the Act applies to it as if it were an organisation <span class="conf">(high)</span>. Whether any Australian university has been prescribed in this way is not something I could confirm.</p>
+
+    <h2>The exemption that is not available</h2>
+    <p>The employee records exemption is the provision every private sector employer reaches for when monitoring is proposed, and it is worth understanding precisely, because it is misdescribed more often than it is applied.</p>
+    <p>Section 7B(3) exempts an act done, or practice engaged in, by an organisation that is or was an employer of an individual, where the act or practice is directly related to a current or former employment relationship and to an <a class="term" href="../glossary.html">employee record</a> held by the organisation and relating to that individual <span class="conf">(high, on substance)</span>. 'Employee record' is defined in s 6(1) as a record of personal information relating to the employment of the employee, with an inclusive list covering health information, engagement and training, discipline, terms and conditions, contact details, performance and conduct, hours, salary, union membership, leave and taxation and banking affairs <span class="conf">(high)</span>.</p>
+    <p>Three limits, in descending order of importance for this manual.</p>
+    <p>It is available to organisations only. Section 7B is headed 'Exempt acts and practices of organisations', and no agency or State authority can use it. A public sector employer that has been told the employee records exemption covers its staff monitoring has been told something that is not available to it.</p>
+    <p>It attaches to the employee record. The exemption covers handling of a record about the employee. It does not cover information about people who are not the employee, and Chapter 30 will return to this, because it is the strongest single argument against capturing the content of prompts.</p>
+    <p>And it may not last. The Privacy Act Review proposed narrowing or removing it. The Privacy and Other Legislation Amendment Act 2024 did not touch s 7B, and no further reform tranche had been enacted as at August 2026 <span class="conf">(high)</span>. A programme designed around the exemption should be designed to survive its removal.</p>
+
+    <h2>The patchwork</h2>
+    <p>If the Commonwealth Act does not apply, something else does, and it depends on the jurisdiction. What follows is the map as at August 2026. Read it as a directory rather than as a summary of nine statutes; the point is to know which door to open.</p>
+    <p><strong>Northern Territory.</strong> The Information Act 2002 (NT) combines freedom of information, privacy and records management. Section 65 specifies the ten Information Privacy Principles in Schedule 2 as the principles for collecting and handling personal information by public sector organisations <span class="conf">(high)</span>. 'Public sector organisation' is defined in s 5 and includes a body established by or under an Act, which is how a university established under Territory legislation is captured <span class="conf">(medium-high)</span>. The regulator is the Northern Territory Information Commissioner. IPP 1.3 is the collection notice provision and lists six matters: the organisation's identity and contact details, the fact that the individual can access the information, the purpose of collection, the usual disclosure recipients, any law requiring the collection, and the consequences of not providing the information <span class="conf">(high)</span>.</p>
+    <p><strong>New South Wales.</strong> The Privacy and Personal Information Protection Act 1998 (NSW) contains twelve Information Protection Principles at ss 8 to 19, applied to public sector agencies by s 20 <span class="conf">(high)</span>. Health information sits in the Health Records and Information Privacy Act 2002 (NSW), with fifteen Health Privacy Principles in Schedule 1 applied by s 11(2) <span class="conf">(medium-high)</span>. Universities are covered as public sector agencies through the s 3 definition, and the regulator confirms that universities are among the bound bodies <span class="conf">(high)</span>. A mandatory notification of data breach scheme was inserted as Part 6A and commenced on 28 November 2023 <span class="conf">(high)</span>.</p>
+    <p><strong>Victoria.</strong> The Privacy and Data Protection Act 2014 (Vic) contains ten Information Privacy Principles in Schedule 1, applied by s 20 <span class="conf">(high)</span>. Victorian universities are covered; the Victorian regulator has formally investigated a Victorian university's compliance with the IPPs, which settles the point in practice <span class="conf">(high)</span>. Health information sits under the Health Records Act 2001 (Vic) with a different regulator.</p>
+    <p><strong>Queensland.</strong> The Information Privacy Act 2009 (Qld) was substantially rewritten by amending legislation in 2023. Since 1 July 2025 the former Information Privacy Principles and National Privacy Principles have been replaced by a single set of Queensland Privacy Principles in Schedule 3, specified by s 26 and imposed by s 27 <span class="conf">(high)</span>. A mandatory notification scheme sits in Chapter 3A, commencing for State agencies on 1 July 2025 <span class="conf">(medium-high)</span>. Queensland universities are covered as public authorities under s 21 <span class="conf">(high)</span>.</p>
+    <p><strong>Western Australia.</strong> The Privacy and Responsible Information Sharing Act 2024 (WA) received assent in December 2024 and commenced in stages. The substantive privacy provisions, including eleven Information Privacy Principles in Schedule 1 applied by s 20, commenced on 1 July 2026, and serious data breach reporting obligations begin on 1 January 2027 <span class="conf">(high on the commencement dates; medium on the section and schedule references, which come from the regulator's summary rather than from a post-commencement consolidation)</span>. Public universities are within scope <span class="conf">(medium-high)</span>. Before July 2026 Western Australia had no general public sector privacy statute, so any Western Australian material written before then describes a regime that no longer exists.</p>
+    <p><strong>South Australia.</strong> No privacy statute as at August 2026. The public sector regime is an administrative instruction, Premier and Cabinet Circular PC012, most recently reissued in May 2020, administered by the Privacy Committee of South Australia <span class="conf">(high)</span>. It binds public sector agencies administratively and is not enforceable in a court in the way a statute is. Whether it reaches South Australian universities is not addressed by any source I could find. I don't know.</p>
+    <p><strong>Tasmania.</strong> The Personal Information Protection Act 2004 (Tas) contains ten Personal Information Protection Principles in Schedule 1, specified by s 16, and binds personal information custodians, a category that the Tasmanian Ombudsman confirms includes the University of Tasmania <span class="conf">(high)</span>.</p>
+    <p><strong>Australian Capital Territory.</strong> The Information Privacy Act 2014 (ACT) contains Territory Privacy Principles in Schedule 1, applied by s 20 <span class="conf">(high)</span>. Note the numbering: the principles run to thirteen on the Commonwealth pattern, but there is no TPP 7 and no TPP 9, so eleven are operative <span class="conf">(medium-high)</span>. The regulator changed on 1 July 2024, when an independent ACT Privacy Commissioner was appointed within the ACT Human Rights Commission, replacing the arrangement under which the Australian Information Commissioner performed the role <span class="conf">(high)</span>. Any document describing the OAIC as the ACT's privacy regulator is out of date.</p>
+
+    <h2>Breach notification, by regime</h2>
+    <p>The Commonwealth scheme is in Part IIIC. An eligible data breach under s 26WE(2) is unauthorised access to, or unauthorised disclosure of, personal information, or a loss of personal information, where a reasonable person would conclude that it would be likely to result in serious harm to any of the individuals concerned <span class="conf">(high)</span>. Where an entity has reasonable grounds to suspect but not to believe, s 26WH(2) requires it to take all reasonable steps to complete an assessment within thirty calendar days <span class="conf">(high)</span>. A statement to the Commissioner is required by s 26WK, with contents specified in s 26WK(3), and s 26WL(2) sets out three notification routes: notify everyone whose information was involved, notify everyone at risk, or publish where neither is practicable <span class="conf">(high on the section numbers; medium on verbatim wording)</span>.</p>
+    <p>The state position is uneven. New South Wales has had a scheme since 28 November 2023, Queensland since 1 July 2025, and Western Australia will from 1 January 2027. Elsewhere, check the current Act rather than assuming a scheme exists <span class="conf">(medium)</span>. Chapter 33 runs an incident through the whole sequence.</p>
+
+    <h2>The tort, which binds everyone</h2>
+    <p>The most consequential recent change for this manual's purposes is not in the principles at all.</p>
+    <p>The Privacy and Other Legislation Amendment Act 2024 inserted a new Schedule 2 into the Privacy Act creating a <a class="term" href="../glossary.html">statutory tort of serious invasion of privacy</a>, which commenced on 10 June 2025 <span class="conf">(high)</span>. It has two limbs, intrusion upon seclusion and misuse of information relating to the plaintiff. It requires that the plaintiff had a reasonable expectation of privacy in the circumstances, and that the public interest in privacy outweighs any countervailing public interest. Remedies include damages and injunctions. The Commissioner does not administer it; it is litigated <span class="conf">(high)</span>.</p>
+    <p>The reason it matters here is structural. The Australian Privacy Principles bind APP entities. The tort binds defendants. A State university that sits outside the Commonwealth principles is not outside the tort, and neither is any other employer. Intrusion upon seclusion is precisely the framing a disproportionate monitoring programme would attract. No case applying the tort to workplace monitoring had been found as at August 2026, which is unsurprising given how recently it commenced, and the absence of authority is not the same as the absence of risk.</p>
+
+    <h2>The shadow AI lens</h2>
+    <p>Three consequences follow for a shadow AI programme, and they are the reason this chapter exists.</p>
+    <p><strong>The monitoring is itself a collection.</strong> Every principle set opens with a collection limit expressed as necessity. The Commonwealth wording is 'reasonably necessary'; the Northern Territory's IPP 1.1 says 'necessary for one or more of its functions or activities'. Turning on user-attributed AI usage telemetry is a collection of personal information about staff and has to clear that threshold, before any question about how the data is later used. Chapter 30 supplies the test.</p>
+    <p><strong>The prompt contains other people.</strong> This is the point that changes designs. A prompt written by a staff member routinely contains personal information about someone who is not that staff member: a student, a patient, an applicant, a colleague, a member of the public. When an organisation captures prompt content, it collects information about all of them. No employee records exemption could reach that information even in a jurisdiction where the exemption is available, because the information is not about the employee and is not in an employee record. The Victorian child protection case is the clearest illustration on the public record: the material entered into the service concerned a child and a family, not the worker.</p>
+    <p><strong>The output is personal information too.</strong> Because the definition covers information whether true or not, a generated statement about an identifiable person is personal information held by the organisation from the moment it is produced and retained. Work the Victorian case through the definitions rather than through the headline. The generated text mischaracterised evidence about a named child. That is personal information, it was inaccurate, and it went into a document filed with a court. The regulator's findings were contraventions of the data quality and data security principles <span class="conf">(high)</span>. Most people expect an AI incident to be a confidentiality finding. This one was substantially an accuracy finding, and accuracy obligations are the ones an organisation is least likely to have thought about when it wrote its AI policy.</p>
+    <p><strong>Which regulator, in one paragraph.</strong> Run the worked case for a Northern Territory university. It answers to the Northern Territory Information Commissioner under the Information Act 2002. It applies the ten Information Privacy Principles in Schedule 2. It cannot rely on s 7B(3), because that provision is available to organisations and the university is not one. It is nevertheless a potential defendant to the Commonwealth statutory tort, because the tort does not depend on being an APP entity. Four sentences, and a defender who can say them is ahead of most of the room.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>Coverage turns on the constituting Act, and one institution can sit in two regimes at once. A university that is a State authority for its own operations may control a company that is an APP entity in its own right, with a different regulator and a different notification obligation on the same day.</p>
+      <p>Health information usually has its own statute and its own regulator, which cuts across the map above. An organisation with a clinical function should assume two regimes rather than one.</p>
+      <p>South Australia's arrangement is administratively binding and not court enforceable, and its application to universities is unresolved. This is a real gap and it should be treated as one rather than filled by analogy.</p>
+      <p>Reform is in flight and the dates are known. The automated decision-making transparency clauses at APP 1.7 and 1.8 commence on 10 December 2026, and the Children's Online Privacy Code must be registered by the same date <span class="conf">(high)</span>. Neither binds a State university directly, and both indicate where expectations are moving. A second reform tranche has been proposed and not enacted.</p>
+      <p>And the largest limit of all: privacy law is not the only constraint. A control can satisfy every principle in the applicable set and still be an offence, because a separate body of statute regulates the act of watching rather than the handling of what is seen. That is Chapter 29.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>State which privacy regime applies to your own employer, and give the section of the relevant Act that puts it there.</li>
+        <li>Explain in two sentences why the employee records exemption does not assist a public sector employer, without using the word 'exemption' more than once.</li>
+        <li>A colleague proposes capturing prompt content and says staff have consented in their employment contract. Identify the person whose personal information is captured who has not consented to anything.</li>
+        <li>Explain why an AI-generated statement about a named individual is personal information even when it is false, and name the principle that then applies to it.</li>
+        <li>Name the regulator you would notify if your organisation suffered an eligible data breach tomorrow, and the instrument that says so.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">APP entity &middot; Australian Privacy Principles &middot; employee record &middot; employee records exemption &middot; Information Privacy Principles &middot; notifiable data breach &middot; personal information &middot; sensitive information &middot; sensitivity label &middot; statutory tort of serious invasion of privacy &middot; tenant</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>Commonwealth legislation was checked against the Federal Register of Legislation compilation current at 4 June 2026, and regulator guidance against the pages as published on 9 August 2026.</p>
+      <ol class="sources-list">
+        <li>Privacy Act 1988 (Cth), Federal Register of Legislation, compilation C2026C00227 (compilation date 4 June 2026). <a href="https://www.legislation.gov.au/C2004A03712/latest" target="_blank" rel="noopener">legislation.gov.au</a> The source for ss 6(1), 6C, 6F, 7B, Part IIIC and Schedule 1. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Privacy and Other Legislation Amendment Act 2024 (Cth), No 128 of 2024, as made. <a href="https://www.legislation.gov.au/C2024A00128/asmade/details" target="_blank" rel="noopener">legislation.gov.au</a> Royal assent 10 December 2024. The source for the commencement table used here: Schedule 2, the statutory tort, commenced 10 June 2025; Schedule 1 Part 15, the automated decision-making clauses, commences 10 December 2026. Also confirms that s 7B was not amended. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Office of the Australian Information Commissioner, 'Statutory tort for serious invasions of privacy'. <a href="https://www.oaic.gov.au/privacy/your-privacy-rights/more-privacy-rights/statutory-tort-for-serious-invasions-of-privacy" target="_blank" rel="noopener">oaic.gov.au</a> Published 19 June 2025, last updated 4 July 2025. Supports the two limbs, the reasonable expectation and public interest elements, and the point that the Commissioner does not administer the tort. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Office of the Australian Information Commissioner, 'Australian Privacy Principles guidelines', chapters 3, 5, 6 and 11. <a href="https://www.oaic.gov.au/privacy/australian-privacy-principles/australian-privacy-principles-guidelines" target="_blank" rel="noopener">oaic.gov.au</a> Chapter 3 version 1.2, updated 13 May 2026. The source for the collection, notification, use and disclosure, and security principles as described here. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Office of the Australian Information Commissioner, 'Guidance on privacy and the use of commercially available AI products'. <a href="https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies/guidance-on-privacy-and-the-use-of-commercially-available-ai-products" target="_blank" rel="noopener">oaic.gov.au</a> Published 21 October 2024, last updated 17 January 2025. Supports the treatment of AI output as personal information including where it is inaccurate, and the recommendation that organisations do not enter personal information into publicly available generative AI tools. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Office of the Australian Information Commissioner, 'State and territory privacy legislation'. <a href="https://www.oaic.gov.au/privacy/privacy-legislation/state-and-territory-privacy-legislation" target="_blank" rel="noopener">oaic.gov.au</a> Last updated 1 December 2025. The index used to assemble the jurisdictional map, and the source for the change of ACT regulator on 1 July 2024. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Information Act 2002 (NT), authorised consolidation in force at 1 June 2026, and the Northern Territory Information Commissioner's published text of the Information Privacy Principles. <a href="https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=11860" target="_blank" rel="noopener">legislation.nt.gov.au</a> and <a href="https://infocomm.nt.gov.au/privacy/information-privacy-principles" target="_blank" rel="noopener">infocomm.nt.gov.au</a> The source for s 5, s 65 and the six elements of the IPP 1.3 collection notice. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Privacy and Personal Information Protection Act 1998 (NSW), and Information and Privacy Commission NSW guidance. <a href="https://legislation.nsw.gov.au/view/whole/html/inforce/current/act-1998-133" target="_blank" rel="noopener">legislation.nsw.gov.au</a> and <a href="https://www.ipc.nsw.gov.au/privacy/nsw-privacy-laws/ppip" target="_blank" rel="noopener">ipc.nsw.gov.au</a> The source for the twelve Information Protection Principles, s 20, university coverage, and Part 6A commencing 28 November 2023. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Privacy and Data Protection Act 2014 (Vic), and Office of the Victorian Information Commissioner guidance. <a href="https://www.legislation.vic.gov.au/in-force/acts/privacy-and-data-protection-act-2014" target="_blank" rel="noopener">legislation.vic.gov.au</a> and <a href="https://ovic.vic.gov.au/privacy/resources-for-organisations/privacy-officer-toolkit/the-pdp-act-a-deep-dive/" target="_blank" rel="noopener">ovic.vic.gov.au</a> The source for the ten Information Privacy Principles in Schedule 1 and s 20. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Information Privacy Act 2009 (Qld), current as at 1 July 2026, and Office of the Information Commissioner Queensland, 'Basic guide to the IP Act changes'. <a href="https://www.legislation.qld.gov.au/view/whole/html/inforce/current/act-2009-014" target="_blank" rel="noopener">legislation.qld.gov.au</a> and <a href="https://www.oic.qld.gov.au/guidelines/for-government/guidelines-privacy-principles/basic-guide-to-the-ip-act-changes" target="_blank" rel="noopener">oic.qld.gov.au</a> The source for ss 21, 26 and 27, the replacement of the IPPs and NPPs by the Queensland Privacy Principles from 1 July 2025, and Chapter 3A. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Privacy and Responsible Information Sharing Act 2024 (WA), and the Western Australian Office of the Information Commissioner. <a href="https://www.legislation.wa.gov.au/legislation/statutes.nsf/law_a147470.html" target="_blank" rel="noopener">legislation.wa.gov.au</a> and <a href="https://www.wa.gov.au/government/privacy-and-responsible-information-sharing" target="_blank" rel="noopener">wa.gov.au</a> The source for the staged commencement, the 1 July 2026 start for the substantive privacy provisions, the 1 January 2027 start for breach reporting, and the statement that public universities are covered. Last checked 9 August 2026; <span class="conf">(medium)</span>.</li>
+        <li>Premier and Cabinet Circular PC012, Information Privacy Principles Instruction (SA), reissued 4 May 2020, and State Records of South Australia. <a href="https://www.dpc.sa.gov.au/resources-and-publications/premier-and-cabinet-circulars/DPC-Circular-Information-Privacy-Principles-IPPS-Instruction.pdf" target="_blank" rel="noopener">dpc.sa.gov.au</a> and <a href="https://www.archives.sa.gov.au/managing-information/privacy-in-south-australia/information-privacy-principles-instruction" target="_blank" rel="noopener">archives.sa.gov.au</a> The source for the position that South Australia has no privacy statute. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Personal Information Protection Act 2004 (Tas), and Ombudsman Tasmania. <a href="https://www.legislation.tas.gov.au/view/whole/html/inforce/current/act-2004-046" target="_blank" rel="noopener">legislation.tas.gov.au</a> and <a href="https://www.ombudsman.tas.gov.au/personal-information-protection/pipp-for-public-authorities" target="_blank" rel="noopener">ombudsman.tas.gov.au</a> The source for the ten principles in Schedule 1, s 16, and the confirmation that the University of Tasmania is a personal information custodian. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Information Privacy Act 2014 (ACT), republication R13 effective 16 December 2025. <a href="https://www.legislation.act.gov.au/a/2014-24/" target="_blank" rel="noopener">legislation.act.gov.au</a> The source for s 20, the Territory Privacy Principles in Schedule 1, and the absence of TPP 7 and TPP 9. Last checked 9 August 2026; <span class="conf">(medium-high)</span>.</li>
+        <li>Office of the Victorian Information Commissioner, <em>Investigation into the use of ChatGPT by a Child Protection worker</em>, report dated 24 September 2024. <a href="https://ovic.vic.gov.au/wp-content/uploads/2024/11/DFFH-ChatGPT-investigation-report-20240924-Re-upload.pdf" target="_blank" rel="noopener">ovic.vic.gov.au</a> The source for the worked example: the facts of the case, the findings of contravention of IPP 3.1 and IPP 4.1, and the compliance notice requirements. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Australian National University, privacy page, last modified 10 June 2025. <a href="https://www.anu.edu.au/privacy" target="_blank" rel="noopener">anu.edu.au</a> Supports the statement that the ANU is regulated as an agency under the Commonwealth Act. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>Whether South Australia's Information Privacy Principles Instruction reaches South Australian public universities is not addressed by any source I could find. I don't know, and an organisation in that position should ask its own legal office rather than reason by analogy from other states <span class="conf">(low)</span>.</p>
+      <p>The exact section and schedule references for the Western Australian regime rest on the regulator's summary page rather than on a consolidation published after the substantive provisions commenced on 1 July 2026. Verify against a current consolidation before citing s 20 or Schedule 1 in a document that matters <span class="conf">(medium)</span>.</p>
+      <p>Whether any Australian State or Territory university has been prescribed under s 6F of the Privacy Act, so that the Commonwealth Act applies to it as if it were an organisation, could not be confirmed <span class="conf">(low)</span>.</p>
+      <p>Whether a second tranche of Commonwealth privacy reform has been introduced into Parliament, as distinct from enacted, could not be confirmed. Nothing further has been enacted as at August 2026 <span class="conf">(medium)</span>.</p>
+      <p>The verbatim current text of ss 7B(3), 26WE, 26WK and 26WL was not read directly from the current compilation during this build; the section numbers and substance are confirmed from the regulator's guidance and the amending Act. Quote from the compilation, not from this chapter <span class="conf">(medium)</span>.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="../part-4/27-dspm-for-ai.html">&larr; DSPM for AI as a category</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="29-workplace-surveillance-law.html">Workplace surveillance laws by jurisdiction &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
