@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DNS: how names become addresses, and what a DNS block actually blocks · Shadow AI Blue Team Manual</title>
+<meta name="description" content="How the Domain Name System resolves a name to an address, why DNS is a cheap first place to block an AI service, what a DNS block does not stop, and how encrypted DNS routes around it.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-1/03-dns.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>DNS</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part One &middot; How the network actually works</div>
+  <h1>DNS: how names become addresses, and what a DNS block actually blocks</h1>
+  <p class="subtitle">The lookup that happens before every connection, why it is the cheapest place to block a site, and why the block is easy to defeat.</p>
+  <div class="reading-meta">
+    <span>Part One</span>
+    <span>About 14 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>An organisation decides to stop staff reaching a particular AI service. The quickest control to deploy, and often the first proposed, is a block in the Domain Name System: configure the internal resolver to refuse the name, and the site stops loading for anyone using that resolver. It can be in place in minutes and it needs no change to any device. Within a week, some staff still reach the service. Nothing was misconfigured. The block works exactly as designed; its design has limits, and this chapter is about where they are.</p>
+      <p>The previous chapters established that the network reads only names and addresses, and that a name is resolved before any connection. This chapter examines that resolution step, which is the earliest point at which an organisation can see intent and the earliest point it can intervene.</p>
+    </div>
+
+    <h2>How a name becomes an address</h2>
+    <p>The <a class="term" href="../glossary.html">DNS</a> is a distributed directory that turns a name such as chat.openai.com into an <a class="term" href="../glossary.html">IP address</a>. No single machine holds the whole directory. It is split across a hierarchy, and a lookup walks down that hierarchy until it finds the answer.</p>
+
+    <p>When a browser needs an address, it asks a <a class="term" href="../glossary.html">recursive resolver</a>: a server whose job is to do the walking and return a final answer. On a corporate network the resolver is usually one the organisation runs, handed to the device by DHCP. The resolver, if it does not already know the answer, asks the root of the hierarchy which servers are responsible for .com, asks those which servers are responsible for openai.com, and asks those for the address of chat.openai.com. The servers that hold the definitive records for a domain are its <a class="term" href="../glossary.html">authoritative name servers</a>. The recursive resolver collects the answer and returns it to the browser.</p>
+
+    <p>Answers are cached at each step, for a period set by the record's <a class="term" href="../glossary.html">TTL</a>, its time to live. A resolver that looked up a name a minute ago answers the next request from memory rather than repeating the walk. Caching makes DNS fast and reduces load, and it also means a change, including a block, does not always take effect immediately, because cached answers persist until their TTL expires. The main record types a defender meets are the address records, A for IPv4 and AAAA for IPv6, and CNAME, which points one name at another and is common in front of content delivery networks.</p>
+
+    <h2>Why DNS is the cheapest control point</h2>
+    <p>DNS resolution has two properties that make it attractive for control. First, it happens before the connection, so a block prevents the connection from ever starting; the device never obtains an address to connect to. Second, it is centralised on a resolver the organisation already runs, so a policy is applied in one place and covers every device using that resolver, with no software to install.</p>
+
+    <p>A DNS block is implemented by making the resolver answer differently for chosen names: return no address, return an error, or return the address of a controlled page that explains the block. The common mechanism is a response policy applied at the resolver, sometimes called a response policy zone. A managed, filtering resolver used for this purpose is often described as <a class="term" href="../glossary.html">Protective DNS</a>. The same resolver logs are a source of visibility as well as control: a DNS query log records that a device asked for chat.openai.com, which is a statement of intent captured before any content is exchanged, and is one of the cheapest detection signals an organisation has. <span class="conf">(high)</span></p>
+
+    <h2>What a DNS block does not stop</h2>
+    <p>The block acts on name resolution through the organisation's resolver. It follows that it does nothing about three things.</p>
+
+    <p>It does not stop a device that does not ask the organisation's resolver. If the device resolves the name somewhere else, the policy is never consulted. This is the central weakness, and encrypted DNS below makes it easy to trigger.</p>
+
+    <p>It does not stop a connection made without a name. If a client already holds the address, from a cache, from a configuration, or from a person typing an address literal, no lookup happens and there is nothing to block. Address blocking would be needed to stop that, with the imprecision the previous chapter described.</p>
+
+    <p>It does not stop resolution of names the block does not list. Large services use many names and front ends, and a name not on the list resolves normally. Blocklists are therefore a maintenance task, not a one-off setting.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The largest gap is encrypted DNS. <a class="term" href="../glossary.html">DoH</a>, DNS over HTTPS, and <a class="term" href="../glossary.html">DoT</a>, DNS over TLS, send lookups to a resolver of the client's choice inside an encrypted connection, so the organisation neither sees nor controls them. Modern browsers can enable DoH on their own, to a public resolver, independent of the operating system's configured resolver. When that happens, the corporate resolver is bypassed and the DNS block silently stops applying to that browser. Blocking encrypted DNS to known public resolvers, or disabling browser DoH by policy on managed devices, is the usual response, and neither reaches an unmanaged device.</p>
+      <p>Hardcoded public resolvers, such as well-known addresses run by large providers, are a related path: a device or application configured to use them ignores the corporate resolver entirely. Caching and TTL add a timing gap, so a newly added block can lag. And the standing limit holds: a personal device on a home network uses its own resolver, over which the organisation has no control at all. A DNS block is a useful, cheap reduction in casual access on managed, on-network devices; it is not a boundary.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A manager asks why staff can still reach an AI service the day after you blocked it at the resolver. Give the two most likely explanations, and how you would confirm each.</li>
+        <li>Explain the difference between using DNS logs to detect intent and using a DNS block to prevent access. Which survives a browser turning on its own encrypted DNS, and why?</li>
+        <li>Your blocklist names one address record for an AI service, but usage continues. List two reasons a single blocked name may not cover the service.</li>
+        <li>You want to stop managed devices from bypassing the corporate resolver. Name two settings you would change, and state which devices remain out of reach afterwards.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">
+        <a href="../glossary.html">DNS</a> ·
+        <a href="../glossary.html">recursive resolver</a> ·
+        <a href="../glossary.html">authoritative name server</a> ·
+        <a href="../glossary.html">TTL</a> ·
+        <a href="../glossary.html">Protective DNS</a> ·
+        <a href="../glossary.html">DoH</a> ·
+        <a href="../glossary.html">DoT</a> ·
+        <a href="../glossary.html">IP address</a>
+      </p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>RFC 1034, <em>Domain Names, Concepts and Facilities</em>. IETF, November 1987. <a href="https://www.rfc-editor.org/rfc/rfc1034" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc1034</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 1035, <em>Domain Names, Implementation and Specification</em>. IETF, November 1987. <a href="https://www.rfc-editor.org/rfc/rfc1035" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc1035</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 8484, <em>DNS Queries over HTTPS (DoH)</em>. IETF, October 2018. <a href="https://www.rfc-editor.org/rfc/rfc8484" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc8484</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 7858, <em>Specification for DNS over Transport Layer Security (TLS)</em>. IETF, May 2016. <a href="https://www.rfc-editor.org/rfc/rfc7858" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc7858</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9076, <em>DNS Privacy Considerations</em>. IETF, July 2021. <a href="https://www.rfc-editor.org/rfc/rfc9076" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9076</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Australian Signals Directorate, ACSC guidance on Protective DNS. Publisher: ASD ACSC, cyber.gov.au. Cited for the Australian framing of Protective DNS; confirm the current page and title before quoting. Checked 9 August 2026. <span class="conf">(medium)</span></li>
+      </ol>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="02-ip-addressing.html">&larr; IP addressing, subnets and NAT</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="04-tcp-udp-quic.html">TCP, UDP and QUIC &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

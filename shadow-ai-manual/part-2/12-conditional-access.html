@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conditional access, device state and risk-based authentication · Shadow AI Blue Team Manual</title>
+<meta name="description" content="The policy engine that sits between authentication and authorisation, the signals it evaluates, the one grant control that most affects shadow AI, and the boundary it cannot cross.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-2/12-conditional-access.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Conditional access and device state</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Two &middot; Identity, OAuth and the modern enterprise</div>
+  <h1>Conditional access, device state and risk-based authentication</h1>
+  <p class="subtitle">The engine where shadow AI policy is most often written, and where it most often fails to bite the case an organisation assumed it would.</p>
+  <div class="reading-meta">
+    <span>Part Two</span>
+    <span>About 16 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A sign-in arrives at Entra at 10:42am on a Tuesday. The user is a finance analyst; the application is claude.ai; the device is a personally owned MacBook on the office guest Wi-Fi; the corporate session is still valid from forty minutes ago. From the analyst's view, a small Microsoft window appears for half a second and Claude is signed in. Beneath that click, a policy engine evaluated more than a dozen signals: who the user is, what role they hold, which application is the target, what kind of device this is, whether it is compliant, whether the IP is a named location, whether the sign-in or user risk score has changed, whether MFA is satisfied. The decision here was 'allow', and the analyst has no idea anything was decided.</p>
+      <p>This chapter is about that engine. Conditional Access pulls the threads of chapters 8 to 11 together into the place shadow AI controls are most often written, and most often fail to reach the cases an organisation thought they would. It is the canonical implementation in Australian enterprise environments; the patterns transfer to the equivalents at Okta, Google and Auth0.</p>
+    </div>
+
+    <h2>What Conditional Access is</h2>
+    <p><a class="term" href="../glossary.html">Conditional Access</a> is a policy engine that sits between authentication and authorisation. Authentication has produced a successful credential check; authorisation is the resource server's later decision about what the user may do; Conditional Access lives in the gap, evaluating signals about a sign-in and deciding whether to allow it, allow it under conditions, or block it. Other IdPs offer the same idea under other names: Okta's Adaptive Authentication, Google's Context-Aware Access, Auth0's Adaptive MFA. Authentication itself is left untouched: a user who authenticates with a valid password and MFA can still be blocked on the basis that the device is non-compliant or the risk is too high, while a user who fails the password check never reaches the engine at all.</p>
+
+    <h2>The structure of a policy</h2>
+    <p>A policy has two parts: assignments and access controls. Assignments describe who and what it applies to. The user assignment selects users by identity, group, role or 'all users' with exclusions. The cloud apps assignment selects applications by individual app, by category (Microsoft maintains thousands of pre-categorised SaaS, including a generative AI category), or by 'all cloud apps'. The conditions assignment narrows by sign-in risk, user risk, device platform, location, client app type, device state or authentication context.</p>
+
+    <p>Access controls describe what happens when assignments match. Grant controls operate at sign-in: block access, require MFA, require authentication strength, require a <a class="term" href="../glossary.html">compliant device</a>, require a hybrid-joined device, require an approved client app, require an app protection policy, and others, combined with a Boolean for whether all or any are needed. Session controls operate during the session: sign-in frequency, persistent browser session, app-enforced restrictions, and Conditional Access App Control, which routes the session through Defender for Cloud Apps. The combination logic matters: every policy whose assignments match is evaluated, and a sign-in must satisfy the grant controls of every matching policy. This is what makes a tenant with thirty policies hard to reason about, and it is also the source of the engine's reach.</p>
+
+    <h2>The signals</h2>
+    <p>User identity is who is signing in, with group and role membership; most tenants target privileged groups specifically. Cloud app is what they are signing in to, and the generative AI category is the natural target for shadow AI controls. <span class="conf">(medium; the category name and membership move with vendor releases)</span> Device platform names the operating system. Location combines source IP with named locations: a trusted location is a corporate range, and common policies require extra MFA from outside trusted locations, with the caveat that travelling staff and personal-VPN users appear to come from anywhere. Client app type distinguishes modern authentication from legacy authentication (older mail protocols) that cannot carry an MFA challenge, so any MFA requirement is bypassed wherever legacy authentication is still allowed; tenants that have not finished retiring it cannot enforce MFA universally.</p>
+
+    <p>Device state bridges to Part Three. 'Compliant' means the device has reported to Intune within its policy window and is passing compliance; 'hybrid joined' is a Windows device joined to on-premises Active Directory and registered in Entra. The device-state signal is what lets a policy say 'compliant device only', the most leveraged single grant control for shadow AI at the device boundary. <a class="term" href="../glossary.html">Sign-in risk</a> and user risk come from Entra ID Protection: sign-in risk is a real-time score (impossible travel, anonymous IP, atypical patterns), and user risk is cumulative (leaked credentials, prior risky sign-ins). ID Protection requires Entra ID P2, included in Microsoft 365 E5 and A5 but not E3 or A3. <span class="conf">(medium; the licensing boundary has moved before)</span> Authentication context is a custom signal a sensitive resource can require, so a finance application can demand stronger authentication on specific operations without the whole tenant carrying the friction.</p>
+
+    <h2>Risk-based authentication and continuous evaluation</h2>
+    <p>Risk-based authentication uses the ID Protection signals to drive decisions in real time, on the basis that risk is dynamic. <a class="term" href="../glossary.html">Continuous Access Evaluation</a> (CAE) is what makes near-real-time response possible after authentication: without it, an access token issued at 9am stays valid until it expires regardless of what happens to the user's risk; with it, when risk rises or an admin revokes sessions, supporting Microsoft 365 services re-evaluate and can revoke within a minute or two. CAE coverage is uneven: major Microsoft 365 services support it, many third-party SaaS do not, and a policy that depends on rapid revocation only gets it against services that support the protocol. <span class="conf">(medium; the coverage list changes as services adopt it)</span></p>
+
+    <p>Authentication strength sits on top of the older 'require MFA' control. 'MFA' historically meant any second factor, including SMS and authenticator-app push. Authentication strength lets a policy require a specific class, such as <a class="term" href="../glossary.html">phishing-resistant MFA</a> (passkey or FIDO2 only). This matters for adversary-in-the-middle phishing: a password and an authenticator push can both be relayed by an AiTM page, but a passkey cannot, because it is bound to the legitimate origin and refuses to authenticate against an attacker-controlled domain.</p>
+
+    <h2>The shadow AI lens</h2>
+    <p>The natural place to write shadow AI policy is at the IdP, against the generative AI category. A single policy that says 'require compliant device to access generative AI tools' covers the AI estate federated to the corporate IdP and scales as new tools appear in the category. Combined with a tenant-wide 'block legacy authentication' policy and an 'all cloud apps require MFA' baseline, the corporate sign-in path to AI tools is closed to anything not coming from a managed device.</p>
+
+    <p>The personal-account boundary, restated mechanically: Conditional Access only evaluates authentications that reach the corporate Entra tenant. A personal Microsoft account, a personal Google account, an email-and-password sign-up against an AI tool, none of these reach Entra, so the engine is silent on them. This is why 'we have Conditional Access blocking AI tools, so we are fine' is incomplete. The 'require compliant device' grant control is the most leveraged single control at the device boundary, because even with valid corporate credentials and MFA, sign-in is denied unless the device is enrolled and passing compliance, which closes the path of using corporate credentials from a personal phone or a contractor's laptop, and produces a visible 'this device is not compliant' message rather than a silent allow. It does not, by itself, address the personal-account path: the same staff member can still sign in with a personal Gmail address, which the engine never sees.</p>
+
+    <p>Adversary-in-the-middle phishing is the contemporary attack, and phishing-resistant authentication strength is the response that stops the AiTM page relaying the authentication. For shadow AI, tokens stolen from a user's session against an AI tool can read corporate data through whatever scopes the tool was consented to until the token is revoked; CAE shortens the revocation window, and phishing-resistant strength prevents the theft in the first place, both implemented through Conditional Access. The most common failure in organisations that have invested in the product is the belief that the problem is solved by owning it. The architectural question is not 'do we have Conditional Access' but 'what does it reach, and what does it not', which the next chapter takes into the specific case of 'sign in with Microsoft' on consumer AI tools.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>Policy drift is the everyday problem: policies accumulate exceptions over years and the behaviour drifts from anyone's mental model, so the 'what-if' simulation tool becomes the tool of last resort and periodic reviews are mandatory and usually not done. Exclusion creep is structural: break-glass accounts and 'just for now' executive exclusions aggregate into a back door no single person designed. Legacy authentication that was supposed to be disabled is the silent gap, because any MFA requirement fails wherever legacy is still allowed. Block-without-grant misconfigurations produce hard blocks with no recovery path, and the audit log does not show whether that was intended. The complexity tax is the deepest failure: the behaviour at any sign-in is the union of every matching policy's grant controls, and fewer, broader, well-named policies are easier to operate than many narrow ones. Compliance-policy drift is a related slow failure: 'require compliant device' is only as strong as the underlying Intune compliance policy, and the two are written by different teams and do not always align. CAE gaps limit rapid revocation to supporting services. ID Protection false positives are an operational tax that needs a timely, audited unblock workflow. And the IdP-as-single-point-of-failure pattern is felt sharply, because if the IdP is unavailable, so is policy evaluation.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Write, in plain English, a policy requiring a compliant device to sign in to any generative AI application. State the user-visible behaviour when a staff member tries from a personal phone with corporate credentials, and when the same person uses their personal Gmail account on the same tool.</li>
+        <li>Distinguish, in two sentences each, sign-in risk and user risk. Which Entra tier is required, and what is the practical consequence for tenants on the lower tier?</li>
+        <li>Your CISO says Conditional Access blocking generative AI means the problem is solved. Write a four-sentence reply on the boundary of its reach and the categories of shadow AI activity outside it.</li>
+        <li>How is 'require phishing-resistant authentication strength' stronger than 'require MFA', and what class of attack does it defeat that the weaker control does not?</li>
+        <li>An Intune compliance policy does not require disk encryption, while Conditional Access requires a compliant device for AI tools. Describe a realistic scenario where the controls fail because of the gap between these two policies.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">app protection policy · authentication strength · compliant device · Conditional Access · Continuous Access Evaluation (CAE) · grant controls · hybrid Microsoft Entra joined · ID Protection · Intune · named location · phishing-resistant MFA · session controls · sign-in risk · trusted location · user risk</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>Microsoft Learn, <em>What is Conditional Access in Microsoft Entra ID?</em> <a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Conditional Access: grant controls</em> and <em>session controls</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-grant" target="_blank" rel="noopener">learn.microsoft.com</a>. Grant-controls URL last checked 9 August 2026; the session-controls page is not separately verified. <span class="conf">(medium)</span></li>
+        <li>Microsoft Learn, <em>What is Microsoft Entra ID Protection?</em> <a href="https://learn.microsoft.com/en-us/entra/id-protection/overview-identity-protection" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Continuous access evaluation in Microsoft Entra</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-continuous-access-evaluation" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Microsoft Entra authentication strengths</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-strengths" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>NIST, <em>SP 800-63B: Digital Identity Guidelines</em>. <a href="https://pages.nist.gov/800-63-3/sp800-63b.html" target="_blank" rel="noopener">pages.nist.gov/800-63-3/sp800-63b.html</a>. Relevant for AAL3 (phishing-resistant) authentication. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>Australian Signals Directorate (ACSC), <em>Implementing Multi-Factor Authentication</em>. <a href="https://www.cyber.gov.au/resources-business-and-government/maintaining-devices-and-systems/system-hardening-and-administration/system-hardening/implementing-multi-factor-authentication" target="_blank" rel="noopener">cyber.gov.au</a>. Australian guidance on phishing-resistant MFA. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The Entra ID P1 versus P2 licensing boundary has shifted at least twice since 2022; verify that ID Protection (sign-in and user risk) is in P2 against current licensing pages before designing an architecture that depends on it. <span class="conf">(medium)</span> CAE support across Microsoft 365 and third-party SaaS is broad but not universal; test per service in scope. <span class="conf">(medium)</span> The generative AI category name and membership move periodically; test any category-based policy against the current catalogue. <span class="conf">(medium)</span> ID Protection false-positive rates are environment-dependent and not published in detail. <span class="conf">(low)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="11-saml.html">&larr; SAML</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="13-tenant-app-registrations.html">Sign in with Microsoft / Google &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

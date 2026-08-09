@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>macOS for defenders: launchd, TCC, MDM and the unified log · Shadow AI Blue Team Manual</title>
+<meta name="description" content="How privileged software runs on a Mac, why there is no registry and no Group Policy, and how TCC and the Endpoint Security framework limit what even a root-privileged agent may see. The macOS counterpart to the Windows chapter, read for shadow AI control.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-3/16-macos-for-defenders.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>macOS for defenders</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Three &middot; Browsers, operating systems and the device</div>
+  <h1>macOS for defenders: launchd, TCC, MDM and the unified log</h1>
+  <p class="subtitle">On a Mac, installing a privileged agent is necessary and no longer sufficient, because Apple has built a second set of fences inside the privileged side of the device.</p>
+  <div class="reading-meta">
+    <span>Part Three</span>
+    <span>About 17 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A university buys a licence for an endpoint security agent and rolls it out across its fleet. One of the machines is a Mac belonging to a researcher. The Mac is enrolled in the management system, the agent is deployed, and the console shows both as it should: device managed, agent running, last check-in a few minutes ago. Everything is green.</p>
+      <p>Some weeks later the researcher pastes a confidential dataset into a consumer AI tool. The agent records nothing. The security team is puzzled, because the same agent on a Windows laptop would have caught the activity, and here it is installed, running and reporting healthy. Nothing is broken. The agent is doing exactly what it is permitted to do, which on this Mac is less than the team assumed, because macOS did not grant the agent permission to observe what it needed to observe. A privileged agent on a Mac does not automatically get to watch the screen, read the contents of the user's Documents folder, or hook into another application. Each of those is gated behind a consent system that can be granted and can also be refused.</p>
+      <p>Chapter 15 worked through Windows, where placing a privileged agent on the machine buys broad latitude to watch what happens. This chapter works through macOS, where it does not. The <a class="term" href="../glossary.html">privilege boundary</a> from Chapter 14 is just as real on a Mac, but Apple has built a second set of fences inside the privileged side, so that 'we installed the agent' is necessary and no longer sufficient. The Mac population in Australian government and university estates is real, and it is concentrated among exactly the staff most likely to reach for capable AI tools: researchers, developers, designers, senior people with discretion over their own equipment. A defender needs to know whether the device-state report's recurring 'on macOS, however' qualifications are incidental or structural. They are structural, and the structure is what this chapter explains. A reader who finishes it can predict which macOS controls will work, which will silently see nothing, and which do not exist on the Mac at all.</p>
+    </div>
+
+    <h2>How privileged software runs on macOS: launchd and daemons</h2>
+    <p>Start where Chapter 15 started, with the question of how privileged software comes to be running at all. On Windows the answer was the service. On macOS it is <a class="term" href="../glossary.html">launchd</a> and the programs it supervises.</p>
+
+    <p>launchd is the first user-space <a class="term" href="../glossary.html">process</a> the system starts at boot, and it is the ancestor of everything else that runs. Its job is to start and supervise background programs, restarting them if they fail and starting them on demand. Those background programs come in two kinds, and the distinction is worth holding lightly. A <a class="term" href="../glossary.html">daemon</a> runs system-wide, started before and independently of any user logging in, under a system account rather than a person's. A launch agent runs inside a particular user's logged-in session. A security agent on a Mac is a daemon: it runs for the whole machine, before and after any user is at the keyboard, which is the macOS form of what Chapter 15 called running as LocalSystem.</p>
+
+    <p>The point that carries across all three operating-system chapters holds here too. A daemon belonging to the organisation's security tooling gets onto the Mac only through an administrative install on a managed machine. The personal Mac on a researcher's kitchen table runs no such daemon, because nobody with the organisation's authority installed one, which is the <a class="term" href="../glossary.html">bring-your-own-device</a> blind spot once more, now in macOS clothing.</p>
+
+    <h2>No registry: configuration profiles and the defaults system</h2>
+    <p>Here the platforms diverge in a way that trips up Windows-trained defenders, so it is worth stating flatly: macOS has no registry. There is no single hierarchical database of machine-wide settings with a protected hive an administrator writes into. macOS keeps configuration as preferences, a system of property-list files usually manipulated through a tool called 'defaults', and for organisational control it uses <a class="term" href="../glossary.html">configuration profiles</a>.</p>
+
+    <p>A configuration profile is a signed document that expresses policy: settings, restrictions, certificates, and the permissions discussed later in this chapter. A profile can be installed by hand, but in an organisation it is delivered by the management system. The conceptual equivalence to draw for the reader is this. On Windows the organisation enforces a setting by writing a value into a protected registry hive the user cannot reach. On macOS the organisation enforces a setting by installing a managed configuration profile, and a profile delivered by the management system the device is enrolled in is the one the user cannot casually remove. The browser policies that matter for shadow AI, forcing the Edge for Business work profile, constraining other browsers, force-installing or locking an extension, arrive on a Mac as profile payloads, not as registry keys, but they do the same job by the same logic of an enforced setting the user does not own.</p>
+
+    <h2>MDM is the only substrate: there is no Group Policy</h2>
+    <p>The next divergence is larger. macOS has no domain join, no Group Policy, and no Active Directory mechanism that reaches into the operating system the way Group Policy reaches into Windows. The single supported way an organisation manages a Mac is the <a class="term" href="../glossary.html">MDM</a> protocol, the mobile-device-management framework Apple itself defines, which products such as Microsoft Intune and Jamf Pro speak on the organisation's behalf.</p>
+
+    <p>This is exactly why the device-state report, every time it touches macOS, says onboarding happens 'via Intune, JAMF or another MDM' and never via Group Policy or a domain. There is no other road. Microsoft's own documentation makes the dependency explicit: to bring a Mac into Purview's data-loss tooling the device must already be managed through Intune, Jamf Pro or another MDM, with the Defender for Endpoint agent deployed first. <span class="conf">(high)</span> Management on a Mac is MDM or it is nothing.</p>
+
+    <p>The consequence for the device-state ladder from Chapter 14 is that the Mac's rungs are coarser than Windows'. The rich middle that Windows offers, where the Edge work profile can carry policy onto a device that is not fully enrolled, is thinner on the Mac. Apple also ties its strongest management to <a class="term" href="../glossary.html">supervision</a>, the state of a device enrolled through Apple Business Manager and automated device enrolment, which is the macOS analogue of the distinction between a corporate-owned and a personally-owned device. Supervision is what lets an organisation pre-grant the permissions the next section describes, and a bring-your-own Mac will not have it. The full join-state taxonomy is Chapter 20's subject; what matters here is that on a Mac the meaningful line is between unenrolled and MDM-enrolled, and the strongest controls sit behind supervised enrolment specifically.</p>
+
+    <h2>TCC and the Endpoint Security framework: Apple's fences inside the privileged side</h2>
+    <p>Now the heart of the chapter, and the part with no clean Windows parallel. On Windows, an agent running with system privilege can broadly watch what the machine does. On macOS, privilege and permission are two different things, and Apple keeps them apart deliberately.</p>
+
+    <p>The mechanism is <a class="term" href="../glossary.html">TCC</a>, for Transparency, Consent and Control. TCC gates access to a list of sensitive resources behind explicit consent: the camera, the microphone, screen recording, the contents of the Documents, Desktop and Downloads folders, the sweeping permission called Full Disk Access, and the ability to automate or observe other applications. The feature that surprises Windows-trained defenders is that TCC applies even to software running with root privilege. An agent can be a daemon, running with the highest privilege the system offers, and still be unable to read a protected folder or watch the screen until it has been granted that specific permission through TCC. That is precisely what happened to the agent in the opening scene. It was running; it had not been granted what it needed to see.</p>
+
+    <p>The way an organisation removes that surprise is to pre-grant the agent its permissions through the management system, using a profile payload that declares, in advance, which TCC permissions the agent is allowed, so that the user is never prompted and cannot refuse. This pre-grant is reliable only on a supervised, MDM-enrolled device. On a personal Mac the permissions fall back to the user, who can decline them and revoke them later. So on the Mac the consent system does not merely add a step; it hands the user a veto that on Windows they would not have.</p>
+
+    <p>Underneath TCC sits a deeper architectural shift. Apple has deprecated the <a class="term" href="../glossary.html">kernel</a> extension, the old way a security vendor inserted code into the macOS kernel to watch the system. macOS Catalina was the last release to fully support legacy kernel extensions, and Apple has since moved security vendors into user-space <a class="term" href="../glossary.html">system extensions</a>, observing the system through Apple-defined frameworks rather than from inside the kernel. <span class="conf">(high)</span> The relevant framework for an endpoint agent is the <a class="term" href="../glossary.html">Endpoint Security framework</a>, through which an agent subscribes to a curated stream of process, file and, by way of the related Network Extension framework, network events. On recent Apple silicon Macs, loading a third-party kernel extension at all requires the user to approve it, restart, and reduce the machine's secure-boot posture, which is a deliberate disincentive. <span class="conf">(high)</span></p>
+
+    <p>Tie this back to Chapter 14. There, the model said a control sitting in or near the kernel can observe the <a class="term" href="../glossary.html">system calls</a> a process makes, and therefore see what the process actually does. macOS now answers: not by reading syscalls from the kernel, you do not. You observe the event stream Apple chooses to expose, from user space, limited to the event types the Endpoint Security framework defines, and only with the entitlements and TCC grants Apple's framework requires. The privileged side of the boundary still exists, but Apple has narrowed what standing on it lets you see. The <a class="term" href="../glossary.html">unified log</a>, the system-wide structured logging facility on macOS, is where much of this activity surfaces and is a useful detection and forensic source, but it too shows what the system records, not whatever an agent might wish to capture.</p>
+
+    <h2>Reading shadow AI controls down the macOS stack</h2>
+    <p>With the mechanisms in hand, walk the same path down the stack as Chapter 15, and let the divergences carry the section.</p>
+
+    <p>The outermost control blocks the AI site from the device. <a class="term" href="../glossary.html">Defender for Endpoint</a> runs on managed Macs, deployed by MDM, and its network protection feeds Cloud Discovery so that traffic to AI services can be both seen and blocked on a managed Mac. <span class="conf">(high; source reports)</span> The honest qualification is that network protection on macOS rides on a Network Extension, an Apple-mediated user-space mechanism, not a kernel filter, so its behaviour and coverage are not identical to Windows and should not be assumed to be. The lesson of the chapter is to expect macOS parity to be partial until tested.</p>
+
+    <p>The control that reads the paste or the prompt before encryption is where macOS quietly does less, and this explains the device-state report's most-quoted macOS caveat. Endpoint <a class="term" href="../glossary.html">data-loss prevention</a> does exist on a managed Mac, but with a smaller set of conditions than on Windows. Content scanning is more limited, several activities are not yet supported, and copy-to-clipboard enforcement carries caveats, so the specific exfiltration paths an organisation cares about, paste, drag and upload into an AI tool, have to be tested rather than assumed. <span class="conf">(medium)</span> The reason is now legible: the agent has no Windows-style latitude, it works through the Endpoint Security framework and through TCC-gated access, so what it can see is bounded by what Apple's framework surfaces and what permission has been granted. There is a second, sharper instance of the same point. The Microsoft Purview browser extension for Chrome and Firefox, which on Windows is force-installed to catch sensitive data going into AI sites, is not used on macOS at all; Endpoint DLP on the Mac relies on Defender hooks in supported browsers instead. <span class="conf">(high)</span> The clean Windows approach of pushing a compliance extension into Chrome simply does not transfer.</p>
+
+    <p>Then there is a control that is absent rather than merely reduced. There is no Intune App Protection, no <a class="term" href="../glossary.html">mobile-application-management</a> path, for macOS desktop applications. <span class="conf">(high)</span> The story that exists on iOS and Android, where copy-and-paste from Outlook into a consumer AI app can be blocked without managing the whole device, has no macOS-desktop equivalent. Microsoft's substitute on the Mac is the same one it offers on unmanaged Windows: the Edge for Business work profile and its inline data-loss prevention, which works on macOS in the work profile and needs no device onboarding. <span class="conf">(high)</span> The consequence is stark. On a personal Mac, the only surviving prompt-level control is Edge for Business inline DLP inside the work profile, and the user steps around it by opening Safari, Chrome, or Edge's personal profile, just as on Windows but with even fewer controls standing behind it.</p>
+
+    <p>The innermost control stops the local AI client, and here macOS has no AppLocker and no App Control for Business. Its own mechanisms are <a class="term" href="../glossary.html">Gatekeeper</a>, which checks that software is signed and notarised by Apple before it is first allowed to run, and, for managed fleets, MDM-delivered restrictions on which applications may be installed or opened, within the broader posture of a supervised, locked-down device. Gatekeeper is a baseline integrity check, not an enterprise allowlist, so the crisp Windows answer, that App Control in enforced mode refuses the launch, has only a softer macOS analogue. The locally-run-model problem from Chapter 15 returns with more force. A researcher running a model under a tool like Ollama on a personal Mac is reachable by essentially nothing the organisation owns: no network connection for network protection to block, no browser session to inspect, no cloud sign-in to police, and no enterprise application control to refuse the launch.</p>
+
+    <p>The payoff mirrors Chapter 15 with one added clause. Every macOS shadow AI control still reduces to placing something on the privileged side of the device through MDM. But Apple has interposed TCC and the Endpoint Security framework so that standing on the privileged side grants less than it does on Windows. The macOS column of the device-state matrix is not Windows with footnotes. It is a platform where the vendor has deliberately narrowed what any agent, including the organisation's own, is permitted to see.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The user is still the administrator of their own Mac, Chapter 14's hard limit, and on macOS they hold more than that. They can decline the TCC permissions an agent needs and revoke them afterwards, and they can remove a configuration profile that was not locked down by supervised enrolment. An unmanaged Mac is, if anything, a harder blind spot than an unmanaged Windows machine, because even an agent that somehow gets installed can be starved by a withheld consent.</p>
+      <p>Feature parity lags and shifts. macOS endpoint DLP and the inline Edge support were catching up through 2025, and the supported macOS versions and the exact capability set drift with each release; the device-state report flags both as items to verify per tenant. <span class="conf">(medium)</span> The instruction to the reader is to test the paths they intend to control, not to trust a matrix as though it were fixed.</p>
+      <p>Pre-granting an agent its TCC permissions, so the user is never asked, depends on supervised enrolment, which a bring-your-own Mac will not have. User-enrolled Macs leave more to the user's discretion, which is the right design for a personal device and a real limit for the organisation. Chapter 20 takes up where supervision sits in the join-state taxonomy.</p>
+      <p>Finally, Apple's direction of travel is itself a control surface that shifts under everyone's feet. Kernel extensions are gone, system extensions are the present, and Apple keeps tightening what runs and what an extension may observe. A control that works on today's macOS can be narrowed by the next release, on Apple's schedule rather than the security team's. This is the macOS instance of a theme the manual returns to: the platform vendor, not the security vendor, sets the ceiling on what a control can see, and on the Mac that ceiling descends more readily than defenders expect. <span class="conf">(medium; by its nature)</span></p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A security agent is deployed and running on a managed Mac, but it is logging nothing about file activity. Name the most likely macOS-specific cause, and the artefact that would resolve it.</li>
+        <li>A colleague proposes force-installing the Purview compliance extension in Chrome on staff Macs, exactly as the team does on Windows. Explain why this will not achieve the same thing on macOS.</li>
+        <li>The organisation wants to enforce a browser setting the user cannot change. Name the mechanism that does that job on Windows and the one that does it on macOS, and say what state each device has to be in for the setting to stick.</li>
+        <li>Explain to a manager, in two sentences, why the organisation can do less to a fully managed Mac than to an otherwise-equivalent managed Windows laptop, without blaming the IT team.</li>
+        <li>A staff member runs a model locally on a personal MacBook. List the controls from this chapter that could reach it, and account for the length of your list.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">BYOD &middot; configuration profile &middot; daemon &middot; DLP &middot; Endpoint Security framework &middot; Gatekeeper &middot; kernel &middot; launchd &middot; MAM &middot; MDE &middot; MDM &middot; privilege boundary &middot; process &middot; supervision &middot; system call &middot; system extension &middot; TCC &middot; unified log</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>The macOS architecture in the foundations section is documented by Apple's own platform-security and developer material. The references below anchor that and support the specific shadow AI claims.</p>
+      <ol class="sources-list">
+        <li>Apple, <em>Apple Platform Security</em>, sections on system and kernel extensions and on the privacy protections of macOS. <a href="https://support.apple.com/guide/security/kernel-extensions-sec8e454101b/web" target="_blank" rel="noopener">support.apple.com</a> and <a href="https://support.apple.com/guide/deployment/system-and-kernel-extensions-in-macos-depa5fb8376f/web" target="_blank" rel="noopener">support.apple.com</a>. Supports the deprecation of kernel extensions, the shift to user-space system extensions, and the Apple-silicon approval friction for any remaining kernel extensions. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Apple Developer, <em>Deprecated Kernel Extensions and System Extension Alternatives</em>. <a href="https://developer.apple.com/support/kernel-extensions/" target="_blank" rel="noopener">developer.apple.com</a>. Supports the claim that endpoint security agents should use the EndpointSecurity, NetworkExtension and DriverKit frameworks instead of kernel extensions. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Apple Developer, <em>Endpoint Security framework documentation</em>. <a href="https://developer.apple.com/documentation/endpointsecurity" target="_blank" rel="noopener">developer.apple.com</a>. Supports the description of an agent subscribing to a curated, Apple-defined stream of process, file and network events from user space. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Apple, <em>Apple Platform Security</em> guide and macOS user guidance on privacy controls (Transparency, Consent and Control). Supports the description of TCC gating sensitive resources behind explicit consent, including for software running with root privilege, and the role of Full Disk Access. Verify the current guide section URL before publication. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Onboard macOS devices into Microsoft 365 overview</em>. <a href="https://learn.microsoft.com/en-us/purview/device-onboarding-macos-overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the claim that macOS devices must already be managed through Intune, Jamf Pro or another MDM, with Defender for Endpoint deployed, before Purview endpoint DLP applies, and that the macOS condition set begins with 'Content Contains'. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li><em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em>, this project's internal source report. Section 4 (the Purview browser extension is not used on macOS), section 5 (Edge for Business inline DLP on macOS in the work profile, no onboarding required), section 7 (no MAM for macOS desktop apps), the macOS rows of the device-state matrix, and points 3 and 5 of 'Things to flag as uncertain or evolving' (inline Edge support and macOS endpoint-DLP feature parity). The spine of the shadow AI section.</li>
+        <li><em>Telemetry and control options for shadow AI in an Australian university</em>, this project's internal source report. Supports the point that Defender for Endpoint telemetry from onboarded macOS devices, with network protection enabled, feeds Cloud Discovery directly.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The claim that macOS endpoint DLP supports a narrower set of conditions than Windows, and that inline Edge support and supported macOS versions were still settling through 2025, is carried from the device-state report and should be re-verified against current Microsoft documentation and tested in the target environment before being quoted. <span class="conf">(medium)</span></p>
+      <p>The assertion that Apple will continue to narrow what system extensions may observe is directional rather than specific, and is labelled accordingly. <span class="conf">(medium; by its nature)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="15-windows-for-defenders.html">&larr; Windows for defenders</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="17-linux-and-the-substrate.html">Linux's role &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux's role: the servers and containers behind the SaaS · Shadow AI Blue Team Manual</title>
+<meta name="description" content="Linux matters to a shadow AI defender in two ways: as the substrate every AI service runs on, and as the endpoint of the people who call model APIs from notebooks and containers. Covers the Linux privilege model, containers, API keys and the point at which device-side control ends.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-3/17-linux-and-the-substrate.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Linux and the substrate</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Three &middot; Browsers, operating systems and the device</div>
+  <h1>Linux's role: the servers and containers behind the SaaS</h1>
+  <p class="subtitle">The AI service runs on Linux machines the organisation will never manage, and its most capable users work against APIs rather than in a browser, which is where device-side control runs out.</p>
+  <div class="reading-meta">
+    <span>Part Three</span>
+    <span>About 17 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A data scientist in a population-health unit opens a Jupyter notebook. The notebook is running on a Linux workstation, or inside a Linux container on their managed laptop; for the moment it does not matter which. They load a dataset into a dataframe. It is de-identified, but it is small-n, the kind of remote-community data where a handful of rows can still point at a person. In three lines of Python they send a few hundred of those rows to a frontier model's <a class="term" href="../glossary.html">API</a> and ask it to suggest cohort definitions.</p>
+      <p>No browser tab was opened to an AI site. No consumer application was installed. Nobody clicked 'Continue with Microsoft', because the API call authenticates with a personal API key the scientist generated on the vendor's dashboard and pasted into an environment variable weeks ago. The <a class="term" href="../glossary.html">DNS</a> lookup went to the vendor's API endpoint, the payload was wrapped in <a class="term" href="../glossary.html">TLS</a>, and the request left the machine as ordinary <a class="term" href="../glossary.html">HTTPS</a> to a host on port 443.</p>
+      <p>Walk through which controls from the previous sixteen chapters could have caught this. A network-layer block could refuse the API hostname, but only if that specific endpoint is on the blocklist and the device is on a filtered network. An endpoint agent could, in principle, see the Python process open an outbound socket to that host, if the workstation is managed and onboarded. Everything browser-resident sees nothing, because there is no browser. The identity layer sees nothing, because no corporate identity was used; the key is the scientist's own. The honest tally is that the most consequential AI use in a research organisation, the one with the widest data access and the most technical sophistication, may never touch any of the surfaces the manual has spent sixteen chapters teaching you to watch.</p>
+      <p>That is what this chapter is about. The running example of the manual has been a staff member pasting into a website, and that example has carried us a long way. It is now about to break, because the highest-capability users do not work in a browser. They work in terminals, notebooks, IDEs and containers, against APIs, on Linux or on Linux running inside their Mac or Windows machine. To reason about them, and to understand why device-side control has a ceiling, you have to understand Linux: both the substrate the AI services run on and the endpoint the organisation's most capable people sit at.</p>
+    </div>
+
+    <h2>Linux is the same privilege model, different furniture</h2>
+    <p>The reassuring news first. Everything Chapter 14 taught applies to Linux unchanged at the level that matters. Linux has the <a class="term" href="../glossary.html">kernel</a> and <a class="term" href="../glossary.html">userland</a> split, enforced by the same hardware <a class="term" href="../glossary.html">privilege boundary</a>. It has <a class="term" href="../glossary.html">processes</a> with isolated address spaces. It reaches privileged operations through <a class="term" href="../glossary.html">system calls</a>. Its privileged account, the one with no restrictions, is the superuser, conventionally called <a class="term" href="../glossary.html">root</a>. A defender who understood the bones of Chapter 14 already understands the bones of Linux.</p>
+
+    <p>What differs is the furniture. There is no registry; configuration lives in plain-text files, most of them under a directory called '/etc', and in environment variables held by each process. Background programs, the Linux counterpart of Windows services and macOS daemons, are started and supervised by an init system, which on most modern distributions is <a class="term" href="../glossary.html">systemd</a>. And there is no single assumed management product the way Windows assumes Group Policy or Intune and macOS assumes MDM. A Linux machine is managed by whatever the organisation chooses to build: an image it bakes, a configuration-management tool it runs, an agent it installs. Where Windows and macOS hand the organisation a management substrate, Linux hands it a blank page. That difference turns out to matter, because control on Linux depends far more on whether the organisation built the machine than on whether it can push something to a fleet.</p>
+
+    <p>The chapter spends little time here on purpose. The interesting part of Linux for a shadow AI defender is not how its privilege model resembles the others. It is what Linux is for.</p>
+
+    <h2>Linux is the substrate, not usually the seat</h2>
+    <p>Here is the pivot. The overwhelming majority of Linux instances your organisation depends on are not staff desktops. They are servers, and increasingly containers: the web servers, API back ends, databases and model-serving infrastructure that every <a class="term" href="../glossary.html">SaaS</a> product and every AI vendor runs on. The proportion of office workers who use Linux as their daily desktop is small. The proportion of the software they touch that runs on Linux somewhere is close to all of it.</p>
+
+    <p>When a staff member sends a prompt to ChatGPT, that prompt is received, queued and processed on Linux machines inside OpenAI's infrastructure. When they call Claude or Gemini, the same is true on Anthropic's and Google's infrastructure. Those machines are operated by the vendor, in the vendor's data centres, and the organisation has no access to them, no agent on them, and never will. This is not a deficiency anyone can remedy. It is the architecture of using someone else's service.</p>
+
+    <p>State the consequence plainly, because it is the hinge of the chapter. Device-side control, the entire subject of Chapters 14 to 16, stops at the boundary of devices the organisation can place software on. The servers running the AI service are permanently on the far side of that boundary. Once a prompt has left the staff member's device, the only parties who can see it are the staff member, the network path while it remains observable, and the vendor. The organisation's reach ends at its own edge. This is precisely why a manual about controlling shadow AI cannot stay on the device forever. At some point the question stops being 'what can I install on the endpoint' and becomes 'what does my contract with the vendor say, and what does the shared-responsibility model give me', which is where Part Four takes the argument, beginning with cloud service models in Chapter 21 and the API economy in Chapter 22.</p>
+
+    <h2>Containers: why one Linux machine is now many disposable ones</h2>
+    <p>Modern Linux software, including AI tooling, rarely runs as a program installed directly on the operating system. It runs in a <a class="term" href="../glossary.html">container</a>. The concept is worth building from the privilege model rather than from the branding.</p>
+
+    <p>A container is a process, or a small group of processes, running on the host's shared Linux kernel but given its own isolated view of the system: its own filesystem, its own network interfaces, its own process tree, so that from the inside it looks like a separate machine. That isolation is built from two kernel features. <a class="term" href="../glossary.html">Namespaces</a> partition what a process can see, so that processes in one container cannot see the files or processes of another or of the host. <a class="term" href="../glossary.html">Control groups</a>, usually written cgroups, limit and account for what a process can use, such as memory and processor time. Namespaces are, in the words of the Linux manual pages, the mechanism used to implement containers. <span class="conf">(high)</span> A container differs from a <a class="term" href="../glossary.html">virtual machine</a> in that the virtual machine runs its own complete operating system with its own kernel, while a container shares the host's kernel and only isolates the userland around it. The container is lighter and starts in moments; the virtual machine is heavier and more thoroughly separated.</p>
+
+    <p>Two consequences follow, and a defender should hold both. The first is that containers are how the cloud back end is built, so the same idea explains the substrate face of the previous section: the AI vendor's service is a fleet of containers on Linux hosts you cannot reach. The second is the one that matters for the endpoint. Because a container brings its own filesystem and runs its workload inside a runtime, running an AI tool can be as quick as issuing a single command to pull and run an image, and the resulting workload leaves less of a trace in the places an endpoint agent habitually looks. An application-allowlisting control tuned to recognise and block named executables, the kind Chapter 15 described, may not catch a model that runs as a process inside a container runtime, because the thing that launched is the runtime, not the named client the policy was written against. Containers, in other words, quietly blunt several device controls at once.</p>
+
+    <h2>The API and the key: shadow AI with no app and no browser</h2>
+    <p>The second pivot is the one that matters most to a research audience. Every major model is reachable not only through a web app but through an API, and an enormous amount of serious AI work happens that way, from scripts, notebooks and IDEs.</p>
+
+    <p>An API call is not authenticated by a federated sign-in. It is authenticated, in the common case, by an <a class="term" href="../glossary.html">API key</a>: a long secret string the user generates in the vendor's dashboard and places into their code, an environment variable or a configuration file. The request carries the key and the service honours it. In the terms of Part Two, this is bearer-token authentication, with all of that pattern's properties and none of its identity-layer visibility. The key is the user's own. The organisation's <a class="term" href="../glossary.html">identity provider</a> is not in the loop, never sees the authentication, and has nothing to log or to block. The enterprise-application audit of Chapter 13, which can surface and revoke a federated grant, has no equivalent grip on a personal API key.</p>
+
+    <p>Beyond the plain API call sits a faster-moving development. Models are increasingly wired into <a class="term" href="../glossary.html">agents</a>: software that lets a model call tools and reach data sources on the user's behalf, so that the model is no longer a chat box but an automated actor issuing its own API calls. The <a class="term" href="../glossary.html">Model Context Protocol</a>, an open standard introduced in late 2024 for connecting models to external tools and data, is the most prominent expression of this, and it has spread quickly. <span class="conf">(high)</span> For a defender the significance is that the device-side controls have even less to grip on agentic use than on a manual API call, and the network sees only more HTTPS to more API endpoints. The one place this surfaces in the source material for this manual is that Microsoft's <a class="term" href="../glossary.html">Defender for Cloud Apps</a> catalogue has begun categorising AI model providers and MCP servers as discoverable application types, which is discovery and not control, and is lightly documented at that. <span class="conf">(medium)</span></p>
+
+    <h2>Reading shadow AI controls against the two faces of Linux</h2>
+    <p>Bring the two faces together against the controls, honestly.</p>
+
+    <p>The substrate face is where control structurally ends. The AI vendor's Linux servers are out of reach by construction, so the only controls that touch a consumer AI interaction are the ones that act before the data leaves the organisation's own boundary, and those are the network, endpoint, browser and identity controls already covered. There is nothing on the far side for the organisation to deploy. The practical effect is that the centre of gravity for governing the data, once it is in use against a cloud AI service, shifts away from controlling the device and toward controlling the data and the contract: classification, the terms the vendor agrees to, the shared-responsibility split that Part Four develops, and the proportionate-monitoring questions that Part Five develops. The chapter's job is to let the reader feel where the boundary falls, not to pretend it can be pushed back.</p>
+
+    <p>The power-user-endpoint face is where the controls still reach, but more weakly than for a browser. Return to the opening scene on a managed machine. An endpoint agent, whose mechanics belong to Chapter 23, can in principle observe that a Python process opened an outbound connection to a model API. That is process-and-network telemetry: it establishes that something talked to an AI endpoint, not what was said. Network protection can block the API hostname if it is on the blocklist and the device is on a filtered path, subject to the same edge cases Chapter 15 set out. Endpoint <a class="term" href="../glossary.html">data loss prevention</a> could inspect a file the dataset was read from, but a few hundred rows assembled in memory in a notebook and streamed to an API may never touch a watched file or the <a class="term" href="../glossary.html">clipboard</a>, so the paths DLP relies on can be sidestepped with no intent to evade at all. The controls degrade in a clear order: from reading the prompt, which only the browser-resident controls do, to seeing that a process spoke to an API, which a managed endpoint agent can do, to nothing, which is what an unmanaged or off-network machine yields. For API-shaped use, even the best case sits lower on that ladder than it does for browser-shaped use.</p>
+
+    <p>The self-hosted model is the case nothing reaches, and it completes a thread that ran through Chapters 15 and 16. A model run locally, especially inside a container, with the data never leaving the machine, is reachable only by application control, and on Linux there is no AppLocker or App Control for Business assumed by default. Whether the organisation can constrain it depends entirely on whether it owns the build of the machine and the container pipeline. On an organisation-built, managed Linux workstation, it can limit which images run and what the machine may pull. On a developer's self-administered Linux box, or inside the Windows Subsystem for Linux that Chapter 15 flagged, it cannot. The privacy paradox deserves to be stated without flinching: the local model is at once the most privacy-preserving option for the data, because nothing leaves the machine, and the least governable, because nothing is visible. A defender should sit with the implication, which is that pushing too hard against sanctioned cloud AI can rationally drive a capable user toward a local model the organisation can see even less of. Part Five returns to this under the heading of driving usage underground.</p>
+
+    <p>None of this is a digression for a population-health audience. The staff who work in notebooks and against APIs, often with the most sensitive small-n data, on Linux or Linux inside a virtual machine because that is where the data-science tooling lives, are the same staff with the widest data access and the greatest technical means. Widest access and greatest means is exactly the combination a shadow AI programme most needs to account for, which is why Linux earns a chapter rather than a footnote.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>'We have an endpoint agent, so Linux is covered' is often false in practice. Linux coverage is real but uneven. A server fleet may be onboarded while individual researcher workstations are not, and a self-administered personal Linux machine is the classic unmanaged endpoint that no agent reaches. Coverage on Windows tells you nothing about coverage on the Linux boxes in the same building.</p>
+      <p>The API key is a credential the organisation usually never sees and cannot easily revoke. A federated grant can be found and removed in the tenant, as Chapter 13 showed. A personal API key lives in the vendor's account and the user's environment, and it may sit in a script, a notebook, an environment variable or a configuration file long after the person who created it has gone. Offboarding the staff member at the identity provider does not touch it. Revoking it means finding it, or persuading the vendor's account to rotate it, neither of which the organisation controls.</p>
+      <p>Containers blunt several device controls at once: allowlisting written against executables, data loss prevention watching host paths, and in some configurations endpoint visibility itself. The remedy is governance of the image and the pipeline rather than agents pushed to endpoints, which is a different organisational muscle and one many security teams have not built.</p>
+      <p>Agentic and Model Context Protocol use is moving faster than either the controls or the documentation. The discovery categories exist; the control story is immature; and anything specific written here will date quickly. The honest position is to flag the direction and decline to over-claim a maturity that is not there. <span class="conf">(medium, and in places low)</span></p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A data scientist sends a confidential dataset to a model's API from a Jupyter notebook on a managed laptop. Which controls in this manual could have seen the destination, which could have seen the content, and which saw nothing, and why?</li>
+        <li>A colleague says 'block the AI websites at the firewall and we are covered'. Give the API-shaped counter-example, and explain why the website block does not address it.</li>
+        <li>Explain to a manager why a researcher running a model locally is, at the same moment, the best outcome for the confidentiality of the data and the worst outcome for the organisation's visibility of it.</li>
+        <li>A staff member leaves, and their federated ChatGPT grant is revoked at offboarding. Why might their access to a model API survive that offboarding, and what would actually be required to revoke it?</li>
+        <li>A researcher pulls and runs a model-serving image on a managed Linux workstation. Explain why an allowlisting rule written against executable names may not stop it, and name what the organisation would have to govern instead.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">agent (AI) &middot; API &middot; API key &middot; bearer token &middot; clipboard &middot; container &middot; control groups (cgroups) &middot; DLP &middot; DNS &middot; HTTPS &middot; IdP &middot; kernel &middot; MDCA &middot; Model Context Protocol (MCP) &middot; namespaces &middot; privilege boundary &middot; process &middot; root (superuser) &middot; SaaS &middot; system call &middot; systemd &middot; TLS &middot; userland &middot; virtual machine &middot; Windows Subsystem for Linux</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>The Linux privilege model, init system and container primitives are documented in standard systems references and in the Linux manual pages. The references below anchor that and support the specific shadow AI claims.</p>
+      <ol class="sources-list">
+        <li>Michael Kerrisk, <em>The Linux Programming Interface</em>, No Starch Press, 2010. Chapters on processes, system calls and the user and kernel boundary, and on process credentials and the superuser. Standard reference for Linux systems behaviour. <span class="conf">(high)</span></li>
+        <li>Linux manual pages, <em>namespaces(7)</em>. <a href="https://man7.org/linux/man-pages/man7/namespaces.7.html" target="_blank" rel="noopener">man7.org</a>. Supports the claim that namespaces are the kernel mechanism used to implement containers, partitioning what a process can see. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Linux manual pages, <em>cgroups(7)</em>. <a href="https://man7.org/linux/man-pages/man7/cgroups.7.html" target="_blank" rel="noopener">man7.org</a>. Supports the description of control groups as the mechanism that limits and accounts for a process's resource use. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Model Context Protocol, <em>Specification</em>. <a href="https://modelcontextprotocol.io/specification/2025-11-25" target="_blank" rel="noopener">modelcontextprotocol.io</a>. Supports the description of MCP as an open protocol for connecting models to external tools and data sources, and its emergence in late 2024. Last checked 22 May 2026. <span class="conf">(high for the definition)</span></li>
+        <li>OpenAI and Anthropic API documentation, <em>developer platform pages on authentication with API keys</em>. Cited as illustration of the API-key bearer-credential pattern common to major model providers; the mechanism is described in original prose rather than reproduced. Verify the current dashboard wording before publication. Last checked 9 August 2026. <span class="conf">(high for the mechanism)</span></li>
+        <li><em>Telemetry and control options for shadow AI in an Australian university</em>, this project's internal source report. The passage describing the Defender for Cloud Apps catalogue categories 'AI - Model Providers' and 'AI - MCP Servers', which supports the discovery point in the API section. Carries the report's own label and its note that this is discovery, not control, and is lightly documented. <span class="conf">(medium)</span></li>
+        <li><em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em>, this project's internal source report. The application-control material, section 12 and the corporate SOE scenario, supports the point that blocking a local AI client is a managed-device control that depends on owning the build, reused from Chapters 15 and 16.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The control and governance story for agentic and Model Context Protocol use is immature and changing quickly. The claims here are deliberately general <span class="conf">(medium)</span>, with the catalogue-discovery point taken from the source report <span class="conf">(medium)</span> and the broader maturity assessment lower still <span class="conf">(low)</span>. Re-verify the state of agentic AI controls before quoting specifics.</p>
+      <p>The breadth of Linux endpoint-agent coverage in a given organisation is an empirical question to be checked per environment rather than assumed from the Windows posture. <span class="conf">(medium)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="16-macos-for-defenders.html">&larr; macOS for defenders</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="18-browsers-as-operating-systems.html">Browsers as operating systems &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

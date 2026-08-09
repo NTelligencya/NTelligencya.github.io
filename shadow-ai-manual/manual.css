@@ -1,0 +1,253 @@
+/* ============================================================
+   Shadow AI Blue Team Manual, section stylesheet
+   manual.css  ·  built on the shared styles.css design tokens
+   ============================================================
+
+   Deliberate exception to the "no page-level style overrides" house
+   rule, in the same spirit as /references/ and /flashcards/: this is
+   one shared stylesheet for a multi-page reading section, not an
+   inline block repeated per page. It only styles prose, callouts and
+   chapter chrome; it defines no new colours, pulling --accent, --bg-2,
+   --rule and the rest from styles.css.
+   ============================================================ */
+
+/* Readable column, a little wider than the 760px content default,
+   so long code-free prose does not run short. */
+.container-manual {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Breadcrumb, matched to the course-page pattern. */
+.breadcrumb {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  margin: 28px 0 8px;
+}
+.breadcrumb a { color: var(--text-2); text-decoration: none; }
+.breadcrumb a:hover { color: var(--accent-2); }
+.breadcrumb .sep { margin: 0 8px; color: var(--rule-2); }
+
+/* Chapter and page masthead. */
+.manual-masthead { margin: 20px 0 40px; }
+.part-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+.manual-masthead h1 { margin-bottom: 18px; }
+.manual-masthead .subtitle {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(19px, 2.4vw, 24px);
+  line-height: 1.35;
+  color: var(--text-2);
+  font-style: italic;
+  max-width: 40em;
+}
+.reading-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-top: 22px;
+}
+.reading-meta span:not(:last-child)::after { content: "  ·  "; color: var(--rule-2); }
+
+/* Prose body. Slightly larger and looser than the site default,
+   because these are long reading chapters. */
+.manual-prose { font-size: 17px; line-height: 1.72; }
+.manual-prose p { color: var(--text-2); margin-bottom: 1.35em; }
+.manual-prose h2 {
+  font-size: clamp(24px, 3vw, 34px);
+  margin: 52px 0 18px;
+}
+.manual-prose h3 {
+  font-size: clamp(19px, 2vw, 23px);
+  margin: 36px 0 12px;
+  color: var(--text);
+}
+.manual-prose strong { color: var(--text); }
+
+/* A term on first use. Bold plus a hair of accent, linking to the
+   glossary. Kept subtle so the prose still reads as prose. */
+.term {
+  color: var(--text);
+  font-weight: 600;
+  border-bottom: 1px dotted var(--accent-deep);
+  text-decoration: none;
+}
+.term:hover { border-bottom-color: var(--accent); color: var(--accent-2); }
+
+/* The opening scene sits in a slightly raised block. */
+.scene {
+  background: var(--bg-2);
+  border: 1px solid var(--rule-2);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  padding: 24px 28px;
+  margin: 8px 0 36px;
+}
+.scene p:last-child { margin-bottom: 0; }
+
+/* Callouts. Two named variants used by every chapter, plus a plain note. */
+.callout {
+  background: var(--bg-2);
+  border: 1px solid var(--rule-2);
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin: 32px 0;
+}
+.callout .callout-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.callout.breaks { border-left: 3px solid #d98a2b; }
+.callout.breaks .callout-label { color: #e2a24d; }
+.callout.check { border-left: 3px solid var(--accent); }
+.callout.check ol { margin: 6px 0 0; padding-left: 22px; }
+.callout.check li { margin-bottom: 12px; color: var(--text-2); }
+.callout.check li:last-child { margin-bottom: 0; }
+
+/* Confidence labels rendered inline in the prose. */
+.conf {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+
+/* Sources and glossary-terms lists at the foot of a chapter. */
+.chapter-foot { margin: 56px 0 0; }
+.chapter-foot h2 { font-size: 24px; margin-bottom: 14px; }
+.sources-list { list-style: none; padding: 0; margin: 0; counter-reset: src; }
+.sources-list li {
+  position: relative;
+  padding: 12px 0 12px 34px;
+  border-bottom: 1px dotted var(--rule);
+  color: var(--text-2);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.sources-list li:last-child { border-bottom: none; }
+.sources-list li::before {
+  counter-increment: src;
+  content: counter(src);
+  position: absolute;
+  left: 0;
+  top: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--accent);
+}
+.sources-list a { color: var(--accent-2); word-break: break-word; }
+
+.terms-used {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.9;
+}
+.terms-used a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--rule-2); }
+.terms-used a:hover { color: var(--accent-2); }
+
+/* Chapter navigation: previous, contents, next. */
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 48px 0 8px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.chapter-nav a {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+  text-decoration: none;
+}
+.chapter-nav a:hover { color: var(--accent-2); }
+.chapter-nav .cn-contents { color: var(--text-3); }
+
+.last-updated {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin: 44px 0 40px;
+}
+
+/* ---- Landing page: the parts and their chapter lists ---- */
+.part-block { margin: 40px 0; }
+.part-block > .part-label { margin-bottom: 6px; }
+.part-block .part-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(24px, 3vw, 32px);
+  margin-bottom: 8px;
+}
+.part-block .part-blurb { color: var(--text-2); margin-bottom: 18px; max-width: 44em; }
+.chapter-list { list-style: none; padding: 0; margin: 0; }
+.chapter-list li {
+  padding: 12px 0;
+  border-bottom: 1px dotted var(--rule);
+}
+.chapter-list li:last-child { border-bottom: none; }
+.chapter-list a { color: var(--text); text-decoration: none; }
+.chapter-list a:hover { color: var(--accent-2); }
+.chapter-list .ch-soon { color: var(--text-3); }
+.chapter-list .ch-note {
+  display: block;
+  color: var(--text-3);
+  font-size: 14px;
+  margin-top: 3px;
+}
+
+/* ---- Glossary page ---- */
+.glossary-entry {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.glossary-entry:last-child { border-bottom: none; }
+.glossary-entry dt {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.glossary-entry dt .expand {
+  font-family: 'Manrope', sans-serif;
+  font-size: 13px;
+  color: var(--text-3);
+  margin-left: 10px;
+}
+.glossary-entry dd { color: var(--text-2); margin: 0; max-width: 46em; }
+.glossary-letter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin: 32px 0 4px;
+}
+
+@media (max-width: 720px) {
+  .container-manual { padding: 0 20px; }
+  .scene, .callout { padding: 20px; }
+  .manual-prose { font-size: 16px; }
+}

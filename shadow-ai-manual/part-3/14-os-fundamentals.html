@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operating systems: kernel, userland, processes, syscalls · Shadow AI Blue Team Manual</title>
+<meta name="description" content="The privilege boundary a processor enforces in silicon, and why it decides whether a shadow AI control can read a prompt before TLS encrypts it. Kernel, userland, processes, syscalls and the clipboard, for defenders.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-3/14-os-fundamentals.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Operating systems</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Three &middot; Browsers, operating systems and the device</div>
+  <h1>Operating systems: kernel, userland, processes, syscalls</h1>
+  <p class="subtitle">One line, drawn by the operating system and enforced by the processor, decides what any control on a device can possibly see.</p>
+  <div class="reading-meta">
+    <span>Part Three</span>
+    <span>About 17 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A staff member types a paragraph of confidential patient data into chat.openai.com and presses Enter. By the time those characters cross the network they are opaque. TLS turned them into encrypted bytes before they left the machine, as Chapter 5 described, so the corporate firewall sees only that someone reached a Cloudflare address on port 443. The identity provider saw nothing either, because the staff member signed in to ChatGPT with a personal Google account, and Chapter 13 established that an authentication the tenant IdP never brokered is an authentication the tenant cannot police.</p>
+      <p>And yet some organisations can tell you, after the fact, exactly what was pasted. They can show the text in a dashboard, attribute it to a user, and configure the system to block the same paste next time. If the network could not read it and the identity layer never saw it, where did that capability come from?</p>
+      <p>It came from a piece of software running on the same machine as the browser, with enough privilege to read the text out of the browser, or off the clipboard, before the browser handed it to TLS. That is the whole trick. There is no magic in it, and there is no way around the constraint that makes it work: to read a prompt before it is encrypted, your software has to be running on the device, on the right side of a line the operating system draws and the hardware enforces.</p>
+      <p>This chapter is about that line. Every control discussed in the rest of Part Three is defined by which side of it the control sits on. A reader who finishes this chapter should be able to look at any endpoint security product and ask the one question that determines whether it can do what its datasheet claims: where, on the device, does this software run, and what does the operating system therefore let it see?</p>
+    </div>
+
+    <h2>What an operating system is for</h2>
+    <p>A computer is a pile of hardware: a processor, some memory, a disk, a network card, a screen. Left to itself it does nothing useful. The operating system is the program that sits between that hardware and every other program, managing the hardware on their behalf and arbitrating between programs that would otherwise fight over it.</p>
+
+    <p>It exists for two reasons, and the second is the one that matters here. The first is sharing. A laptop runs dozens of programs at once, and only has one set of hardware to go around, so something has to decide which program gets the processor this millisecond and which has to wait. The second reason is isolation. Programs should not be able to reach into each other. A spreadsheet should not be able to read the memory of a password manager running in the next window, and a crashing music player should not be able to take the whole machine down with it. The operating system enforces walls between programs, and between every program and the hardware. Those walls are the security substance of the operating system, and the rest of this chapter is about how they are built.</p>
+
+    <h2>Kernel and userland: the privilege boundary</h2>
+    <p>Modern processors have a built-in notion of privilege. The hardware itself supports at least two modes of operation, and it will not let code running in the less privileged mode do certain things at all. On the processors that run laptops and servers these modes are called rings, and although the chip defines four of them, operating systems in practice use two: ring 0, the most privileged, and ring 3, the least.</p>
+
+    <p>Code running in ring 0 can do anything. It can read and write any byte of memory, talk to any device, and interfere with any running program. This is where the core of the operating system lives, and that core is called the <a class="term" href="../glossary.html">kernel</a>. The kernel is the part of the system that runs privileged, because its whole job is to manage the hardware and police everything else, and it cannot do that job from behind a wall.</p>
+
+    <p>Everything else runs in ring 3, unprivileged. This is <a class="term" href="../glossary.html">userland</a>: the territory where ordinary programs live. The browser is a userland program. So is Word, the desktop ChatGPT app if one is installed, the staff member's music player, and the photo viewer. A userland program cannot touch the hardware directly and cannot read another program's memory. When it wants to do anything beyond shuffling bytes around inside its own allotted space, it has to ask the kernel.</p>
+
+    <p>The line between ring 0 and ring 3, between the kernel and userland, is the <a class="term" href="../glossary.html">privilege boundary</a>. It is worth being precise about what kind of line it is, because the precision is the point. It is not a policy, a setting or a convention that software agrees to honour. It is enforced by the processor in silicon. A userland program that tries to execute a privileged instruction does not get a stern warning; the hardware refuses, and hands control back to the kernel to deal with the offending program. You cannot talk a processor out of this the way you can talk a misconfigured firewall out of a rule. The boundary holds because the transistors hold it.</p>
+
+    <p>This single line is the most important fact about a device for a defender. A security control that runs in userland has the powers of any other userland program, no more. A control that runs in the kernel can see and touch everything. Where a vendor's software sits relative to this boundary determines, before any feature is configured, the ceiling on what that software can possibly do.</p>
+
+    <h2>Processes, memory and the clipboard</h2>
+    <p>When the kernel runs a program, it runs it as a <a class="term" href="../glossary.html">process</a>. A process is a program in execution, and the kernel gives each one its own private view of memory, called its address space. The guarantee the kernel makes, and enforces with help from the processor's memory-management hardware, is that one userland process cannot read or write the memory of another. The browser's memory is the browser's alone. The password manager's secrets sit in the password manager's address space, invisible to the spreadsheet next door.</p>
+
+    <p>This isolation is why a single web page crashing should not crash the others, and why a curious program cannot simply reach into the browser and read what someone is typing. If reading another process's memory were free, there would be no security on a shared machine at all. The wall between address spaces is the same kind of wall as the privilege boundary: built into the hardware, enforced by the kernel, not negotiable from userland.</p>
+
+    <p>Programs do need to exchange data sometimes, and the kernel provides controlled ways for them to do it. The one that matters most for shadow AI is the <a class="term" href="../glossary.html">clipboard</a>. The clipboard is a shared buffer the operating system maintains, that any process can write to and any process can read from. When a staff member selects a paragraph in Outlook and presses copy, Outlook writes that text into the clipboard the operating system manages. When they switch to the browser and press paste, the browser reads it back out. The data has crossed from one process to another, and it did so by passing through a buffer the operating system controls.</p>
+
+    <p>That detail is the reason 'block copy and paste into AI tools' is a coherent control rather than a vague aspiration. The clipboard is a real place, managed by the operating system, that a sufficiently privileged piece of software can watch. A control that can observe the clipboard can see the patient data the moment it is copied, before it ever reaches a browser, a network or TLS. Hold that thought; it returns shortly.</p>
+
+    <h2>Syscalls: the only door through the boundary</h2>
+    <p>A userland process cannot open a file, send a network packet, draw on the screen or read the clipboard on its own, because all of those things mean touching hardware or resources the kernel manages, and userland is walled off from both. So how does the browser ever send your prompt to OpenAI?</p>
+
+    <p>It asks. The mechanism by which a userland process requests a privileged operation from the kernel is the <a class="term" href="../glossary.html">system call</a>, or syscall. A syscall is the single controlled doorway from userland into the kernel. The process places its request and arguments where the kernel expects them, executes a special instruction that transfers control across the privilege boundary, and the kernel takes over, checks that the request is allowed, does the work, and hands control back. Opening a file is a syscall. Sending bytes to a network socket is a syscall. Reading the clipboard is a syscall. Allocating more memory is a syscall.</p>
+
+    <p>Almost everything a program does that has any effect on the world outside its own address space happens through a syscall, which makes the syscall interface a chokepoint. A program's syscalls are a near-complete record of what it touched: every file it read, every network connection it opened, every time it reached for the clipboard. Software positioned to observe syscalls can therefore see what a process is actually doing, not what it claims to be doing. This is the architectural basis of endpoint detection, and Chapter 23 develops it properly. For now the point is narrower: the kernel sees every syscall by definition, because the syscall is a request made to the kernel, so a control that lives in or just below the kernel inherits that visibility, and a control stuck in userland does not.</p>
+
+    <h2>Where a control has to sit to read a prompt</h2>
+    <p>Now the model earns its keep. Return to the staff member pasting patient data into ChatGPT. We want to read that text before TLS encrypts it. The privilege model tells us there are exactly three places a control can be, and each has a fixed ceiling on what it can see.</p>
+
+    <p>The first place is inside the browser's own process. A browser extension runs here, and so does the browser's own built-in policy machinery. Code in this position has the browser's own view of the world: it can see the page, the contents of the form field, the characters as they are typed, because it is part of the process that holds them. It does not need to defeat memory isolation or hook the kernel, because it is already on the inside of the wall that matters. This is what the Microsoft Purview browser extension is, and it is what the inline data loss prevention built into Edge for Business is: software running with the browser's access to the page. <span class="conf">(high)</span> It explains a fact from the device-state report that otherwise looks surprising. Microsoft states plainly that Edge for Business inline DLP needs no device onboarding to work. <span class="conf">(high)</span> The reason is structural. The control lives in the browser, signed in to a work profile, not in a privileged agent below it, so it does not need anyone to have installed anything on the privileged side of the device. The browser is doing the watching, and the browser is already there.</p>
+
+    <p>The second place is below the browser, in or near the kernel. This is where an endpoint agent lives: <a class="term" href="../glossary.html">endpoint detection and response</a>, endpoint <a class="term" href="../glossary.html">DLP</a>, the privileged security software an organisation installs on a managed machine. Running privileged, it can observe syscalls, watch the clipboard, see which files are written and which network sockets open. It can read the pasted prompt, but only by a route that gets to the text before TLS does: by watching the clipboard as the paste happens, by hooking into the browser, or by relying on the in-browser extension to hand the data down to it. The agent's power is real, and it is also why endpoint DLP requires the device to be onboarded. <span class="conf">(high)</span> Installing a privileged agent is not something that happens by signing in to a website. It is an administrative act performed on a machine the organisation controls, which is to say it happens on a managed device and nowhere else.</p>
+
+    <p>The third place is off the device entirely, on the network, which is the whole of Part One. From out there a control sees encrypted bytes leaving for a Cloudflare address and learns nothing about their content, unless <a class="term" href="../glossary.html">TLS inspection</a> is in play, with all the cost and breakage Chapter 5 set out.</p>
+
+    <p>Seen this way, the blind spot of the personal laptop stops being mysterious. The prompt is unreadable on the wire because TLS encrypts it, and it is unreadable at the identity layer because a personal account never reaches the tenant IdP, so the only remaining place to read it is on the device, before encryption. On a personal laptop nobody with the organisation's authority has been allowed to install anything on the privileged side of the boundary. The one option that survives, the in-browser control, works only inside a signed-in work profile, and a staff member on their own machine can simply open a different browser, or the same browser without the work profile, and the control is not there.</p>
+
+    <p>This is also the deep structure of the six device states in the report. Underneath the Microsoft product names, the states are a ladder measured in exactly one quantity: how much the organisation has been permitted to place on the privileged side of this device's boundary. At the bottom, browser-only sign-in, the organisation has placed nothing on the device and can rely only on what the browser itself will enforce. At the top, the corporate <a class="term" href="../glossary.html">standard operating environment</a>, the organisation owns the privileged side outright and can run a full agent with kernel-level visibility. Every state in between is a point on that single axis, and Chapter 20 sets the ladder out rung by rung.</p>
+
+    <p>One more case follows directly. A desktop ChatGPT application, or a model run locally with a tool such as Ollama or LM Studio, is itself just a userland process. Whether it can be installed at all is a question of application allowlisting, the subject of the next chapter, and allowlisting is a control on the kernel side: it works by the privileged part of the system refusing to launch programs that are not approved. Like every other privileged control, it exists on a managed device and is absent on a personal one.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The model is clean, but the reality around its edges is not, and a defender should know where it frays. A control that runs in userland is weaker than its features suggest, because any other userland program with the same privileges can interfere with it, starve it of resources, or close it. A control in the kernel is stronger, but asking to install one is a larger request than it sounds: it needs rights on the device the organisation may not have, and a privileged agent that misbehaves can destabilise the whole machine, which is a real operational and reputational cost.</p>
+      <p>The browser is increasingly an operating system in its own right, with its own internal process isolation and its own profile and extension model. 'Inside the browser process' is therefore subdividing into finer compartments, and Chapter 18 takes that apart. For now it is enough to notice that the neat three-place model has a fourth complication growing inside its first place.</p>
+      <p>Where exactly a vendor is allowed to sit on the privileged side differs by operating system and is changing under everyone's feet. macOS confines what even privileged software can reach through a consent system called <a class="term" href="../glossary.html">TCC</a>, and both Windows and macOS have been pushing security vendors out of the kernel proper and into more constrained, supported interfaces. <span class="conf">(medium; the platforms are actively tightening this, and the detail is the subject of Chapters 15 and 16)</span></p>
+      <p>The hardest limit is the simplest. On a personal device the staff member is the administrator. They are on the privileged side of their own machine, and anything the organisation did not have consent to install, the user can remove. No amount of clever positioning changes that, and the rest of Part Three keeps running into it.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A vendor says their data loss product 'reads the prompt before it is encrypted'. In one sentence, what must be true about where their software runs for that claim to hold, and what does it imply about which devices the product can protect?</li>
+        <li>A colleague proposes blocking copy and paste into AI tools. At what level of the system does that control have to operate, and why does it not work on an unmanaged personal laptop?</li>
+        <li>Explain to a non-technical manager why the organisation can read prompts typed on a corporate laptop but not on a staff member's home computer, without using the word 'agent'.</li>
+        <li>A teammate is comparing a browser extension and a kernel-level endpoint agent for the same task. Name one thing the extension can do that the agent finds awkward, and one thing the agent can do that the extension cannot.</li>
+        <li>Trace a single paste from Outlook into a browser prompt box as a sequence of operating system events, and mark the two points at which a control could observe the text.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">BYOD &middot; clipboard &middot; DLP &middot; EDR &middot; kernel &middot; privilege boundary &middot; process &middot; SOE &middot; system call &middot; TCC &middot; TLS &middot; TLS inspection &middot; userland</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>The kernel, userland, process and system call model in the foundations section is standard operating systems material, not in dispute, and is set out in any undergraduate text. The references below anchor it and support the specific factual claims in the shadow AI section.</p>
+      <ol class="sources-list">
+        <li>Andrew S. Tanenbaum and Herbert Bos, <em>Modern Operating Systems</em>, 4th edition, Pearson, 2015. Chapters 1 and 2 cover the kernel and userland split, processes and address spaces, and the system call interface. Standard reference. <span class="conf">(high)</span></li>
+        <li>Abraham Silberschatz, Peter B. Galvin and Greg Gagne, <em>Operating System Concepts</em>, 10th edition, Wiley, 2018. Chapter 1 covers dual-mode operation and the privileged and unprivileged distinction; Chapter 2 covers system calls. Standard reference. <span class="conf">(high)</span></li>
+        <li>Intel, <em>Intel 64 and IA-32 Architectures Software Developer's Manual, Volume 3A: System Programming Guide</em>, section on privilege levels. Supports the claim that the privilege boundary is enforced in silicon rather than by convention. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Learn about Data Loss Prevention for Cloud Apps in Edge for Business</em>. <a href="https://learn.microsoft.com/en-us/purview/dlp-browser-dlp-learn" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the claim that Purview DLP is built into the Edge for Business browser and that the device does not need to be onboarded into Microsoft Purview for it to apply. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Get started with Endpoint data loss prevention</em>. <a href="https://learn.microsoft.com/en-us/purview/endpoint-dlp-getting-started" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the claim that device monitoring must be enabled and endpoints onboarded before Endpoint DLP can monitor or protect items on a device. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Onboard Windows devices into Microsoft 365 overview</em>. <a href="https://learn.microsoft.com/en-us/purview/device-onboarding-overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the claim that device onboarding is shared across Microsoft 365 and Microsoft Defender for Endpoint, so onboarding to one onboards to the other. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li><em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em>, this project's internal source report. The spine of the shadow AI section: the mapping of each Microsoft control to a required device state, and the framing of the six device states as a ladder of how much the organisation may place on the privileged side of the device.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The claim that Windows and macOS are moving security vendors out of kernel-mode code and into constrained supported interfaces is directionally well established, but the specifics are vendor and version dependent and are treated in Chapters 15 and 16. <span class="conf">(medium)</span> Verify the current state of macOS system extension and Endpoint Security framework support, and the Windows position on kernel-mode drivers for security agents, against current platform documentation before quoting particulars.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="../part-2/13-tenant-app-registrations.html">&larr; Sign in with Microsoft or Google</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="15-windows-for-defenders.html">Windows for defenders &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSPM for AI as a category: what it is beneath the marketing · Shadow AI Blue Team Manual</title>
+<meta name="description" content="Posture management against detection, the lineage from CSPM, the policy-to-prerequisite map that is Part Four in condensed form, and what population a dashboard percentage actually describes.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-4/27-dspm-for-ai.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>DSPM for AI as a category</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Four &middot; Cloud, telemetry and the enterprise data plane</div>
+  <h1>DSPM for AI as a category: what it is beneath the marketing</h1>
+  <p class="subtitle">An aggregation surface adds no sensors, so its coverage is exactly the coverage of the controls beneath it, and its blind spots are theirs unchanged.</p>
+  <div class="reading-meta">
+    <span>Part Four</span>
+    <span>About 13 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A dashboard reports that a small percentage of staff are sharing sensitive data with AI applications. There is a trend line, it is flat, and there is a list of recommendations underneath. Read at face value, it is reassuring: a manageable problem, under observation, with next steps.</p>
+      <p>Six chapters of Part Four have equipped a reader to ask the question that matters, and it is not about the percentage. On which devices was that measured? If the answer is the onboarded fleet, and if the AI activity of most concern is happening on machines that are not in it, then the trend line is a measurement of the population that was already the most governed, and it is flat for the same reason.</p>
+      <p>This is the category a defender will be asked to buy, justify or report from, and the marketing around it is at its thickest. The method for cutting through it is the one the whole of Part Four has been building: work out what kind of thing the surface is, then work out what it is standing on.</p>
+    </div>
+
+    <h2>Posture is not detection</h2>
+    <p>Two security activities are conflated constantly and are quite different.</p>
+    <p>Detection asks what is happening now. It consumes events, applies logic and produces alerts. Chapter 26 is about detection.</p>
+    <p>Posture management asks whether the configuration matches what was intended. It consumes configuration, compares it against a template of good practice, and produces findings and recommendations. Its output is a list of things to change, not a list of things that happened.</p>
+    <p>Both are useful and they answer different questions. A posture finding of the form 'this control exists in your licence and is not switched on' is often more valuable than an alert, because most organisations are not attacked through a novel technique; they are exposed through a capability they own and never enabled.</p>
+
+    <h2>The lineage</h2>
+    <p>The category arrived in three steps and the sequence explains its shape.</p>
+    <p><a class="term" href="../glossary.html">Cloud security posture management</a> came first, to answer 'is our cloud infrastructure configured the way we think it is', because misconfiguration rather than intrusion had become the dominant cause of cloud data exposure. It works by reading configuration continuously and comparing it to a baseline.</p>
+    <p><a class="term" href="../glossary.html">Data security posture management</a> moved the same idea from infrastructure to data. Where is sensitive data, who can reach it, is it labelled, is it protected. The questions are older than the category; the contribution was continuous automated assessment rather than a periodic audit.</p>
+    <p>The AI variant applies that method to a new object. Which AI applications are in use, what data is reaching them, and are the controls that ought to be in place actually in place.</p>
+    <p>Naming in this area is unstable, and a reader should expect that rather than be surprised by it. Microsoft's own instance was introduced under one name, renamed, and has since been superseded by a broader <a class="term" href="../glossary.html">posture management</a> solution, with the AI-specific surface now documented as the classic version and the newer one covering AI applications and agents with wider reach <span class="conf">(high, checked 9 August 2026)</span>. The concept is stable; the product names are not.</p>
+
+    <h2>An aggregation and orchestration surface</h2>
+    <p>Here is the structural claim of the chapter, and it should be stated carefully because everything else follows from it.</p>
+    <p>A surface of this kind does three things. It reads from the controls beneath it. It presents the result in one place. And it offers one-click deployment of policies that those underlying controls will enforce.</p>
+    <p>It observes nothing directly. It has no sensor of its own. Therefore its coverage is exactly the union of the coverage of its inputs, and its blind spots are their blind spots, unchanged and inherited.</p>
+    <p>That is not a criticism. It is the definition of the category, and it is what makes the category evaluable. It also gives a defender a single question to put to any product in this space, including ones that do not exist yet: which sensor produces this number, and on which devices does that sensor run?</p>
+
+    <h2>The recommendation engine</h2>
+    <p>The other half of the product is a set of recommendations, each a comparison between an observed configuration and a template of good practice.</p>
+    <p>This is genuinely valuable, and the reason is unflattering to all of us: most organisations do not have an accurate inventory of what they have not switched on. Entitlements are broad, feature releases are frequent, and nobody reads every release note. A surface that says 'this exists, you own it, it is off' does real work.</p>
+    <p>It should also be read for what it is. The template was written by a vendor, and it reflects that vendor's product set. A recommendation is, in effect, 'here is a control we sell that you have not enabled'. That is frequently exactly the right advice. It is still worth recognising, because the template will not recommend a competitor's control, and it will not recommend the non-technical interventions that Part Five argues are among the most effective options available.</p>
+
+    <h2>The shadow AI lens: the policy-to-prerequisite map</h2>
+    <p>The most useful thing this category offers a student of the subject is that its policy list is a directory of the mechanisms in Chapters 22 to 26. Read the map and Part Four reappears in condensed form.</p>
+    <p>Detecting visits to AI sites uses insider risk browser signals, and requires the device to be onboarded and the compliance browser extension deployed, which is Windows only. Detecting sensitive information pasted or uploaded to AI sites uses endpoint data loss prevention, and requires an onboarded device plus either native integration in Microsoft's browser or the extension in Chrome and Firefox. Blocking elevated-risk users from pasting or uploading uses endpoint data loss prevention with adaptive protection, and requires an onboarded device. Blocking sensitive information from being sent to AI applications in Edge is inline browser protection, and requires no device onboarding at all, because the control lives in the browser. Detecting sensitive information shared with AI over the network requires a secure access service edge or security service edge integration, which is neither a device nor a browser dependency but a network one. Capturing interactions for Copilot experiences requires nothing device-side, because it is service-side capture. And the enterprise AI application integrations are server to server and independent of device state entirely <span class="conf">(high)</span>.</p>
+    <p>Every one of those is a mechanism the reader has already met. The surface has not added a capability; it has arranged existing capabilities so that they can be seen together, which is a real service and a different one.</p>
+    <p><strong>What the dashboard therefore measures.</strong> Work it through for a realistic Australian institution. Coverage of Microsoft's own AI is strong, because it is service-side and needs no device. Coverage of consumer AI in Microsoft's browser under a work profile is good, and reaches unmanaged devices, which is the one capability in the set that escapes the enrolment ladder. Coverage on the onboarded fleet is comprehensive. Coverage of the unmanaged device with a personal account is nil.</p>
+    <p>So the percentage on the screen is a measurement of the governed population. Presenting it without that qualifier presents a selection effect as a finding, and it is the specific error this chapter exists to prevent. The correct sentence for a governance paper names the denominator: of activity we can observe, this proportion involved sensitive information, and here is what proportion of the estate we can observe.</p>
+    <p><strong>Prompt content, one final time, because this is where the question gets asked.</strong> Retention of prompts and responses through this surface is supported for enterprise AI applications connected through the identity layer or through the named enterprise integrations, and for a restricted set of consumer services in Microsoft's browser where a <a class="term" href="../glossary.html">collection policy</a> has been configured to capture content <span class="conf">(high)</span>. Sensitivity labels and encryption are not supported for those third-party AI interactions at all <span class="conf">(high)</span>. If the executive question is 'can we see what staff typed into free consumer ChatGPT on an unmanaged laptop', the answer is no, and no dashboard changes it.</p>
+    <p><strong>What the category is actually good for.</strong> Stated positively, because this chapter should not read as dismissal. It collapses a scattered configuration question into one place. It surfaces controls the organisation already owns and has not enabled, which is usually the largest available improvement and the cheapest. It produces reporting a governance committee can read without a translator. It turns an unreviewable set of individual policies into a reviewable posture, with a history.</p>
+    <p>Those are real benefits. None of them is a sensor.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>Dashboards inherit blind spots and present them as completeness. The most dangerous number in a shadow AI programme is a reassuring one drawn from the governed subset, because it is both true and misleading, and it is very hard to argue with in a meeting.</p>
+      <p>The category is young and its names are unstable. Microsoft's instance has been renamed at least twice and the AI-specific surface is now documented as the classic version alongside a newer, broader one <span class="conf">(high)</span>. Documentation, screenshots and internal runbooks written a year ago will not match the product.</p>
+      <p>Several capabilities in and around the category are billed as pay-as-you-go rather than included in an enterprise or academic entitlement, and the guidance shifted more than once during 2025. Do not quote a cost without checking the tenant's own billing position <span class="conf">(low)</span>.</p>
+      <p>Buying the surface does not add coverage. When the recommendation reads 'onboard more devices', the work is the onboarding, and the dashboard is the invoice for noticing. That is worth saying to a budget holder before rather than after procurement.</p>
+      <p>Recommendation templates are vendor-shaped. They will not recommend a competitor's control, and they will not recommend consulting the union, publishing a surveillance notice, or making the sanctioned alternative easier to find than the unsanctioned one.</p>
+      <p>The supported application list is maintained by the vendor and changes, so the posture is measured against a moving definition of what counts as an AI application. A percentage that improves between quarters may reflect a change in the denominator.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Define posture management against detection in two sentences, and give one example of a finding that only posture management would produce.</li>
+        <li>Take any named AI policy from this chapter and state the sensor it depends on and the device state it requires.</li>
+        <li>An executive reads a dashboard percentage aloud in a meeting. Write the one sentence you add.</li>
+        <li>Look at a typical recommendation list and identify which item represents real work rather than a configuration change, and say who would have to do it.</li>
+        <li>State what would need to be true before a number on this dashboard could honestly be described as an estate-wide measurement.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">activity explorer &middot; adaptive protection &middot; browser data security &middot; collection policy &middot; CSPM &middot; Defined from earlier chapters and reused here &middot; device onboarding &middot; DSPM &middot; DSPM for AI &middot; endpoint DLP &middot; inline DLP &middot; Insider Risk Management &middot; Microsoft Compliance Extension &middot; one-click policy &middot; posture management &middot; Purview &middot; recommendation &middot; SASE &middot; SSE</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>Every Microsoft Learn page below was verified against the Microsoft Learn documentation service on 9 August 2026.</p>
+      <ol class="sources-list">
+        <li>Microsoft Learn, 'Microsoft Purview data security and compliance protections for generative AI apps'. <a href="https://learn.microsoft.com/en-us/purview/ai-microsoft-purview" target="_blank" rel="noopener">learn.microsoft.com</a> The reference for the category structure used in this chapter: Copilot experiences and agents, enterprise AI applications, and other AI applications detected through browser activity and categorised as generative AI in the cloud application catalogue. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Considerations for DSPM for AI to manage data security and compliance protections for AI interactions'. <a href="https://learn.microsoft.com/en-us/purview/dspm-for-ai-considerations" target="_blank" rel="noopener">learn.microsoft.com</a> The source of the policy-to-prerequisite map in this chapter, including that device onboarding and the browser extension are required for third-party AI site monitoring, that an Edge configuration policy activates browser integration, and the full list of one-click policies with their sources. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Learn about Data Security Posture Management for AI (classic)'. <a href="https://learn.microsoft.com/en-us/purview/dspm-for-ai" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the description of the surface as a central management location offering insights, ready-to-use policies, data risk assessments and compliance controls, and carries the notice that this version is now the classic one, superseded by a broader posture management solution. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Use Microsoft Purview to manage data security and compliance for other AI apps'. <a href="https://learn.microsoft.com/en-us/purview/ai-other-apps" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the capability table used here, including that sensitivity labels and encryption are not supported for third-party AI interactions, that most capabilities require the browser extension and onboarded devices, and that retention and eDiscovery are restricted to the Edge browser and a named set of services. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Use Microsoft Purview to manage data security and compliance for ChatGPT Enterprise'. <a href="https://learn.microsoft.com/en-us/purview/ai-chatgpt-enterprise" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the claim that enterprise AI application integration is server to server and independent of device state. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Use Microsoft Purview to manage data security and compliance for Entra-registered AI apps'. <a href="https://learn.microsoft.com/en-us/purview/ai-entra-registered" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the treatment of identity-registered AI applications as a distinct category with their own integration path. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Collection policies solution overview'. <a href="https://learn.microsoft.com/en-us/purview/collection-policies-solution-overview" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the dependency of prompt and response content on a collection policy configured to capture content. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li><em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em> (this project's internal source report), section 8 and the concluding list of uncertain and evolving points. The source of the policy-to-device-state mapping this chapter renders as prose, and of the pay-as-you-go and renaming caveats.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>Microsoft's posture management surface for AI is documented as a classic version alongside a newer, broader posture management solution, and capability differences between them are still being described. Verify which version a tenant is using before mapping policies to prerequisites <span class="conf">(medium)</span>.</p>
+      <p>The pay-as-you-go position for several capabilities in and around this category shifted more than once during 2025, and Australian education pricing is not published on Microsoft Learn. Check the tenant billing portal before quoting any figure <span class="conf">(low)</span>.</p>
+      <p>The list of AI applications supported for each capability differs by capability, and several entries carry footnotes and preview status. Read the supported-sites page rather than assuming uniform coverage <span class="conf">(medium)</span>.</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Closing Part Four</h2>
+      <p>Part Four set out to demystify the systems defenders actually work with, and the seven chapters have travelled outward from the device to the contract. The cloud service model decides which layers an organisation can instrument. The tenant decides where an audit trail can exist. The endpoint agent sees the connection and not the conversation. Discovery infers use from traffic and errs low in a knowable direction. Data loss prevention is a classification problem wearing an enforcement problem's clothes. The platform reflects the blind spots of its connectors. And the posture surface arranges all of it in one place without adding a sensor.</p>
+      <p>Where Part Three's constraint was the privilege boundary, Part Four's is the contract boundary. Every instrument in this part is either an inference drawn from traffic the organisation can still see, or a report from a service it has an agreement with. Where there is neither, there is nothing, and no product in the category alters that.</p>
+      <p>Which leaves the residue the manual has now approached from four directions. The staff member on their own device, with their own account, on their own network, typing into a service the organisation has no relationship with. Part One could not see it because of TLS. Part Two could not see it because the tenant never brokered the authentication. Part Three could not see it because nobody was permitted to install anything. Part Four cannot see it because there is no contract. Four layers, one answer, and it is not going to change.</p>
+      <p>At that point the interesting question stops being what can be built and becomes what should be. Under which Australian law, with what notice, at what level of invasiveness, after what consultation, and with what sanctioned alternative on offer. That is Part Five.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="26-siem-xdr-data-lake.html">&larr; SIEM, XDR and the data lake</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <span class="cn-next" style="color:var(--text-3);font-family:'JetBrains Mono',monospace;font-size:12px;">Part Five in preparation</span>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

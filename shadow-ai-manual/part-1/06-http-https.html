@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTTP and HTTPS: requests, responses, and what a proxy can see · Shadow AI Blue Team Manual</title>
+<meta name="description" content="What an HTTP request to an AI service actually contains, and exactly how much of it a proxy can read depending on whether it terminates and decrypts the TLS connection.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-1/06-http-https.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>HTTP and HTTPS</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part One &middot; How the network actually works</div>
+  <h1>HTTP and HTTPS: requests, responses, and what a proxy can see</h1>
+  <p class="subtitle">What is in a request to an AI service, and why a proxy's view of it is all-or-nothing depending on decryption.</p>
+  <div class="reading-meta">
+    <span>Part One</span>
+    <span>About 14 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>Two organisations both run a proxy, and both route staff traffic through it. In the first, the security team can produce the exact text a staff member submitted to an AI service. In the second, the team can produce only the name of the service and the times of the connections. Neither proxy is misconfigured. The difference is a single decision about whether the proxy decrypts, and this chapter shows precisely what that decision includes and excludes.</p>
+      <p>The previous chapter covered how TLS is decrypted. This chapter covers what is inside once it is, and what remains hidden when it is not, by looking at the structure of an HTTP request.</p>
+    </div>
+
+    <h2>The shape of an HTTP exchange</h2>
+    <p><a class="term" href="../glossary.html">HTTP</a> is a request-and-response protocol. A client sends a request naming a method, such as GET to retrieve or POST to submit; a target, expressed as a <a class="term" href="../glossary.html">URL</a>; a set of headers carrying metadata such as the host, the type of content and authentication tokens; and, for methods like POST, a body carrying the actual payload. The server replies with a status code, its own headers, and a response body. HTTP is stateless in itself, so applications track a logged-in session using a <a class="term" href="../glossary.html">cookie</a> or a token carried in a header on each request.</p>
+
+    <p>When a staff member submits a prompt through a chat interface or an application, the prompt travels in the body of a POST request to the service's endpoint, and the model's reply comes back in the response body. The destination name is in the host header and matches the <a class="term" href="../glossary.html">SNI</a> seen during the handshake. The full path and query are in the URL. The prompt itself is in the request body, and the answer is in the response body.</p>
+
+    <p>The version of HTTP affects the framing but not this structure. <a class="term" href="../glossary.html">HTTP/2</a> multiplexes several requests over one connection; HTTP/3 does the same over QUIC. Both carry the same requests, responses, headers and bodies as HTTP/1.1, so the question of what is visible reduces to whether an observer can read inside the encryption.</p>
+
+    <h2>HTTPS is HTTP inside TLS</h2>
+    <p><a class="term" href="../glossary.html">HTTPS</a> is not a separate protocol; it is HTTP carried inside a TLS connection. Everything above, the method, URL, headers, body and response, sits inside the encrypted channel. On the wire, none of it is visible; an observer sees an encrypted stream to an address, plus the destination name in the handshake, as covered earlier. This is the whole reason the proxy's decision matters.</p>
+
+    <h2>What a proxy sees, in two postures</h2>
+    <p>A <a class="term" href="../glossary.html">proxy</a> is a server that traffic passes through. Its view of an HTTPS request depends entirely on whether it terminates and decrypts the TLS connection.</p>
+
+    <p>In the pass-through posture, the proxy does not decrypt. A client asks the proxy to connect it to a destination using the <a class="term" href="../glossary.html">CONNECT method</a>, and the proxy then relays an opaque encrypted tunnel between the client and the server. The proxy can see the destination name in the CONNECT request and in the SNI, the address, the timing, and the rough volume of traffic. It cannot see the method, the full URL path, the headers, the request body or the response. In this posture, a prompt is not visible; the proxy log shows that a device reached the service and roughly how much data passed.</p>
+
+    <p>In the inspecting posture, the proxy performs the TLS inspection described in the previous chapter: it terminates the client's TLS connection, decrypts, and opens its own connection onward. Now it sees the complete request and response: the method, the full URL, every header, the request body containing the prompt, and the response body containing the answer. Everything the application sent is available to logging and policy. This posture is what allows content-based data loss policy to act on the text of a prompt. Its preconditions are exactly those of TLS inspection: a managed device that trusts the organisation's authority, and traffic that actually passes through the proxy. <span class="conf">(high)</span></p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The two postures are the boundary. Without decryption, the request body is never visible, so no amount of proxy logging yields the prompt; the organisation has destination and volume only. With decryption, the prompt is visible, but only for traffic that meets the inspection preconditions, and only for the browsers and applications whose traffic is routed through the proxy and do not pin their certificates.</p>
+      <p>Some patterns complicate even the inspecting posture. Streaming responses, where a model returns its answer token by token over a held-open connection, arrive as a long response body rather than a single message, which a naive logger may capture partially. Multiplexing in HTTP/2 and HTTP/3 interleaves several requests on one connection, so parsing has to separate them. And a prompt submitted through a service's own application programming interface, rather than a browser, is still a POST body and is visible under inspection, but may travel from a tool the proxy does not cover. The rule holds across all of these: destination without decryption, content with it, and only where the traffic and the device allow inspection at all.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Two teams both route traffic through a proxy; one can retrieve prompt text and one cannot. Name the single difference and explain, in terms of the request body, why it produces that result.</li>
+        <li>In the pass-through posture, list what the proxy log can and cannot contain for a connection to an AI service.</li>
+        <li>Where in an HTTP request does a submitted prompt travel, and where does the model's answer travel? Why does that placement matter for logging?</li>
+        <li>A prompt is sent through an AI service's API from a desktop tool rather than a browser. Under what conditions is it still visible to the organisation, and under what conditions is it not?</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">
+        <a href="../glossary.html">HTTP</a> ·
+        <a href="../glossary.html">HTTPS</a> ·
+        <a href="../glossary.html">URL</a> ·
+        <a href="../glossary.html">cookie</a> ·
+        <a href="../glossary.html">HTTP/2</a> ·
+        <a href="../glossary.html">SNI</a> ·
+        <a href="../glossary.html">proxy</a> ·
+        <a href="../glossary.html">CONNECT method</a>
+      </p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>RFC 9110, <em>HTTP Semantics</em>. IETF, June 2022. <a href="https://www.rfc-editor.org/rfc/rfc9110" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9110</a>. Defines methods, headers, status codes and the CONNECT method. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9112, <em>HTTP/1.1</em>. IETF, June 2022. <a href="https://www.rfc-editor.org/rfc/rfc9112" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9112</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9113, <em>HTTP/2</em>. IETF, June 2022. <a href="https://www.rfc-editor.org/rfc/rfc9113" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9113</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9114, <em>HTTP/3</em>. IETF, June 2022. <a href="https://www.rfc-editor.org/rfc/rfc9114" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9114</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 6265, <em>HTTP State Management Mechanism</em>. IETF, April 2011. <a href="https://www.rfc-editor.org/rfc/rfc6265" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc6265</a>. Defines cookies. Checked 9 August 2026. <span class="conf">(high)</span></li>
+      </ol>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="05-tls.html">&larr; TLS</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="07-proxies-swg-sase.html">Proxies, SWG and SASE &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

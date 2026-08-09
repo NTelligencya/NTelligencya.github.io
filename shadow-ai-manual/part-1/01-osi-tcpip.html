@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The OSI and TCP/IP models, and why we keep two of them · Shadow AI Blue Team Manual</title>
+<meta name="description" content="Build the layered model of a network from the bottom up, then use it to answer a real question: why an employer can see that a staff member reached a chatbot, but not what they typed into it.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-1/01-osi-tcpip.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>The OSI and TCP/IP models</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part One &middot; How the network actually works</div>
+  <h1>The OSI and TCP/IP models, and why we keep two of them</h1>
+  <p class="subtitle">A layered model of a network, from the wire up, and the question it lets you answer.</p>
+  <div class="reading-meta">
+    <span>Part One</span>
+    <span>About 15 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A staff member on a corporate laptop opens a browser tab, types chat.openai.com, and pastes three paragraphs of a confidential draft into the prompt box, with an instruction to shorten and rewrite it. The draft names a supplier and a figure that is not yet public. Two separate things happen. First, the page has to load, which requires the browser to reach the service. Second, when the user submits the prompt, the pasted text is sent to that service.</p>
+      <p>This chapter answers one question about that sequence: if the security team is later asked what the organisation could see, what is the accurate answer? In most configurations, the organisation can see that the device connected to chat.openai.com, but cannot, from the network alone, read the text that was pasted. Both facts follow from the same cause. A network is built in layers, and each layer can read only its own part of the traffic. Once you know the layers, you can work out, for any proposed control, what it will detect and what it will not.</p>
+    </div>
+
+    <h2>Why a network is described in layers</h2>
+    <p>Moving data from a laptop to a server in another country involves several separate mechanisms: the physical signal on copper, fibre or radio; the local office network; routing across the internet; reliable delivery of the data in order; encryption; and the rules a browser and a web server use to exchange messages. These parts are designed and built independently. The standard way to manage that complexity is to divide the work into layers, each with one job. A layer relies on the layer below it and provides a service to the layer above, and it does not need to know how the lower layers work internally.</p>
+
+    <p>The common naming scheme for those layers is the <a class="term" href="../glossary.html">OSI model</a>, short for Open Systems Interconnection, a seven-layer reference model published by the international standards bodies in the 1980s. The internet is not built exactly to this shape, but the model is worth learning because it gives everyone a shared vocabulary. When an engineer refers to a problem "at layer 3" or a product that works "at layer 7", they mean a specific layer in this model. From the bottom up, the layers are as follows.</p>
+
+    <p>The <strong>physical layer</strong> is the actual signal: voltage on a wire, light in a fibre, radio in Wi-Fi. The <strong>data link layer</strong> organises those signals into <a class="term" href="../glossary.html">frames</a> and moves them between devices on the same local network, using hardware addresses assigned to each network interface. The <strong>network layer</strong> is where data becomes a <a class="term" href="../glossary.html">packet</a> and gains an <a class="term" href="../glossary.html">IP address</a>, a numeric address that lets the packet be routed across many networks to a machine anywhere in the world. The <strong>transport layer</strong> gets a stream of data to the right program on that machine, in order and without gaps where required; this is where <a class="term" href="../glossary.html">TCP</a> and <a class="term" href="../glossary.html">UDP</a> operate, and where the <a class="term" href="../glossary.html">port</a> numbers identify which program the data is for. The top three layers, <strong>session</strong>, <strong>presentation</strong> and <strong>application</strong>, deal with keeping a conversation going, the format of the data, and the protocols programs actually speak, such as the web's <a class="term" href="../glossary.html">HTTP</a>. "Layer 7" usually refers to this top layer, which carries the meaning of the traffic.</p>
+
+    <p>One term recurs throughout Part One: <a class="term" href="../glossary.html">protocol</a>. A protocol is an agreed set of rules for a conversation: which messages are allowed, in what order, and what to do on error. Each layer has its own protocols, and each protocol exposes a different amount of information to anyone watching the traffic. That point is central, and the chapter returns to it.</p>
+
+    <h2>How a message travels down the stack</h2>
+    <p>The mechanism that connects the layers is <strong>encapsulation</strong>. As the data goes down the stack, each layer adds its own header describing what it is carrying. By the time the data leaves the laptop, the original prompt is wrapped in a series of headers: an application-protocol header, then a transport header naming the port, then a network header naming the source and destination IP addresses, then a link header for the next hop. Each layer adds only the header it is responsible for. At the receiving end the process runs in reverse: each layer reads and removes its own header and passes the rest up, until the server's application receives the prompt as sent.</p>
+
+    <p>This is what determines visibility. A device in the middle of the network can usually read only the outer headers. A router needs the network-layer header to forward the packet, so it can read the IP addresses; it does not read the inner headers or the payload, and often cannot. A firewall may also read the transport header, so it can read the port. Whether anything in the middle can read the payload, which is the prompt itself, depends on whether that payload is encrypted.</p>
+
+    <h2>The other model, and why we keep both</h2>
+    <p>The OSI model is a reference and a teaching tool. The internet itself was built to a simpler design that predates OSI's final form: the <a class="term" href="../glossary.html">TCP/IP model</a>, named after its two central protocols. It has four layers rather than seven. Its <strong>link</strong> layer combines OSI's physical and data link; its <strong>internet</strong> layer corresponds to the network layer and is where IP operates; its <strong>transport</strong> layer matches OSI's; and a single broad <strong>application</strong> layer absorbs OSI's session, presentation and application. This is the model the internet actually follows, set out in the early Internet standards for how a host should behave.</p>
+
+    <p>Both models are kept because they serve different purposes. TCP/IP describes what happens on the wire; where the two disagree about where something belongs, the wire follows TCP/IP. OSI, with its finer divisions and numbered layers, is the common vocabulary for explaining and comparing products; a vendor describes "layer 7 filtering" because the term is widely understood. A defender needs both: OSI for communication, TCP/IP for accuracy. The mismatch is worth knowing. OSI's session and presentation layers do not correspond to any distinct layer the internet implements, which shows that the seven-layer diagram is a simplification, not a build specification.</p>
+
+    <p>One more point before the worked example. A packet's IP address gets it to the right machine; the port number in the transport header gets it to the right program on that machine. Web servers listen on well-known ports, 443 for encrypted web traffic. But the user did not type an address or a port; they typed a name. Turning that name into an address is the job of the <a class="term" href="../glossary.html">DNS</a>, the Domain Name System, and it happens before any connection is made. The fact that the name is looked up first, and separately, matters for what follows.</p>
+
+    <h2>The worked example, layer by layer</h2>
+    <p>We can now answer the opening question by following the prompt down the stack and asking, at each layer, what an observer at that layer can read.</p>
+
+    <p>First, the name. Before the browser can connect, it asks DNS to turn chat.openai.com into an IP address. That request goes to whichever resolver the laptop or network is configured to use. Anyone operating that resolver, or watching the request, sees the name being looked up. A block at the DNS layer is a common first control: the organisation configures its resolver to refuse to answer for chat.openai.com, or to answer with a dead address, and the page does not load. Note the limit of what this sees. A DNS control sees that a request was made for a particular name. It does not see any of the prompt, because at this point nothing has been sent to the service.</p>
+
+    <p>Second, the connection. With an address in hand, the browser opens a TCP connection to that IP on port 443. A firewall or router in the path reads the network and transport headers, so it sees the source address (the laptop, or the shared office address after <a class="term" href="../glossary.html">NAT</a>), the destination IP, and the port. It can allow or refuse the connection on those grounds. An IP address is imprecise: large services share addresses behind content delivery networks, so blocking by address can catch unrelated sites or miss the target when its address changes. No content is visible at this layer.</p>
+
+    <p>Third, the encryption. Before any prompt is sent, the browser and the server carry out a <a class="term" href="../glossary.html">TLS</a> handshake to set up an encrypted channel. Historically, one field in that handshake is sent in clear text: the <a class="term" href="../glossary.html">SNI</a>, or Server Name Indication, which tells the server which site the client wants, so that one address can host many. A network device watching the handshake can read that field. This is why the organisation can accurately state that the device connected to chat.openai.com: the destination name is exposed in the handshake, even though the rest of the session is encrypted.</p>
+
+    <p>Fourth, the prompt. Once TLS is established, the user submits the three paragraphs as an <a class="term" href="../glossary.html">HTTPS</a> request inside the encrypted channel. On the wire, that request is encrypted; a device in the middle sees an unreadable stream. The prompt exists in unencrypted form in only two places: in the browser on the user's device, before it is encrypted, and on the service's servers, after it is decrypted. It is not readable anywhere in between.</p>
+
+    <p>This is the central principle of the manual, and the rest of it follows from this point. <strong>The layer at which a control operates determines what it can read.</strong> A control on the network can read names, addresses and ports; it cannot read a prompt encrypted by TLS. To read the prompt, a control must operate where the prompt is unencrypted: at the application layer, on the endpoint itself. That means the browser, an agent running on the device, an extension inside the browser, or an inspection point that has been given the keys. Later chapters cover endpoint data loss prevention, the browser compliance extension, and inspecting proxies installed on managed machines. Each is a response to the same constraint: the prompt is readable only at the endpoints, so a control that needs to read it must operate at an endpoint.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The layered model is a simplification, and three limitations matter here. First, the model hides some awkward joins. TLS does not sit on a single OSI layer; and <a class="term" href="../glossary.html">QUIC</a>, the transport now under much web traffic, combines transport and encryption over UDP, so a tool that expects ordinary TCP on port 443 can miss the connection. Second, the destination name, the one thing the network could reliably read, is becoming unavailable. Encrypted Client Hello (<a class="term" href="../glossary.html">ECH</a>) encrypts the SNI as well, so where it is in use the assumption that the network can at least see the destination no longer holds. <span class="conf">(medium; ECH is partly deployed and still changing, so its reach varies by browser, network and server)</span> Third, DNS is easy to route around: <a class="term" href="../glossary.html">DoH</a>, DNS over HTTPS, sends lookups inside ordinary web traffic, so a DNS-layer block stops working for anyone whose browser performs its own encrypted lookups.</p>
+      <p>The largest limitation is scope. This entire account assumes the traffic crosses a network the organisation controls. If the same task were done on a personal laptop on home Wi-Fi, none of these network controls would be in the path. Blocking chat.openai.com at the office firewall does nothing to the same person at home. The only controls that apply off the corporate network are those bound to the work identity and those running on the device itself, which Parts Two and Three cover. This asymmetry is where most shadow AI activity goes unseen.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A colleague proposes blocking chat.openai.com at the firewall and calls the problem solved. In two sentences a non-technical manager could follow, explain why this is incomplete.</li>
+        <li>Your logs show that a laptop connected to a known AI service, but not what was sent. Which layers gave you the first fact, and why can you not have the second from the same source?</li>
+        <li>A vendor claims its network appliance can read and block sensitive prompts to ChatGPT. What must be true about the traffic, or about the appliance's place in it, for that claim to hold, and why should you be sceptical by default?</li>
+        <li>Explain, to someone who has just learned the seven OSI layers, why the internet is usually described with only four.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">
+        <a href="../glossary.html">OSI model</a> ·
+        <a href="../glossary.html">TCP/IP model</a> ·
+        <a href="../glossary.html">protocol</a> ·
+        <a href="../glossary.html">packet</a> ·
+        <a href="../glossary.html">IP address</a> ·
+        <a href="../glossary.html">TCP</a> ·
+        <a href="../glossary.html">UDP</a> ·
+        <a href="../glossary.html">DNS</a> ·
+        <a href="../glossary.html">DoH</a> ·
+        <a href="../glossary.html">NAT</a> ·
+        <a href="../glossary.html">TLS</a> ·
+        <a href="../glossary.html">SNI</a> ·
+        <a href="../glossary.html">ECH</a> ·
+        <a href="../glossary.html">HTTP and HTTPS</a> ·
+        <a href="../glossary.html">QUIC</a>
+      </p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>ISO/IEC 7498-1:1994, <em>Information technology, Open Systems Interconnection, Basic Reference Model: The Basic Model</em>. ISO/IEC. The standard behind the seven-layer OSI model. Available for purchase from ISO; the model itself is widely reproduced. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 1122, <em>Requirements for Internet Hosts, Communication Layers</em>. IETF, October 1989. <a href="https://www.rfc-editor.org/rfc/rfc1122" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc1122</a>. Sets out the four-layer TCP/IP host model. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 8446, <em>The Transport Layer Security (TLS) Protocol Version 1.3</em>. IETF, August 2018. <a href="https://www.rfc-editor.org/rfc/rfc8446" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc8446</a>. The current TLS specification. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 6066, <em>Transport Layer Security (TLS) Extensions: Extension Definitions</em>. IETF, January 2011. <a href="https://www.rfc-editor.org/rfc/rfc6066" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc6066</a>. Defines Server Name Indication (SNI). Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9000, <em>QUIC: A UDP-Based Multiplexed and Secure Transport</em>. IETF, May 2021. <a href="https://www.rfc-editor.org/rfc/rfc9000" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9000</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 8484, <em>DNS Queries over HTTPS (DoH)</em>. IETF, October 2018. <a href="https://www.rfc-editor.org/rfc/rfc8484" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc8484</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>TLS Encrypted Client Hello, IETF TLS Working Group draft (draft-ietf-tls-esni), work in progress. <a href="https://datatracker.ietf.org/doc/draft-ietf-tls-esni/" target="_blank" rel="noopener">datatracker.ietf.org/doc/draft-ietf-tls-esni</a>. Status and deployment are still changing; treat details as provisional. Checked 9 August 2026. <span class="conf">(medium)</span></li>
+      </ol>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="../">&larr; Contents</a>
+      <a class="cn-contents" href="../glossary.html">Glossary</a>
+      <a class="cn-next" href="02-ip-addressing.html">IP addressing, subnets and NAT &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

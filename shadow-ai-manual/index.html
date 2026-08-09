@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Shadow AI Blue Team Manual · NTell World Ink</title>
+<meta name="description" content="A written manual that teaches the network, identity, device, cloud and governance fundamentals a defender needs to understand, monitor and control the use of generative AI tools inside an Australian organisation.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../#about">About</a>
+      <a href="../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../">Home</a>
+    <span class="sep">/</span>
+    <a href="../#library">Library</a>
+    <span class="sep">/</span>
+    <span>Shadow AI Blue Team Manual</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Blue Team Manual</div>
+  <h1>The Shadow AI Blue Team Manual</h1>
+  <p class="subtitle">The computer science a defender needs, taught through one question: why can an employer see that a staff member reached a chatbot, but not what they typed into it?</p>
+  <div class="reading-meta">
+    <span>Written manual</span>
+    <span>Five parts</span>
+    <span>For early-career defenders</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <p>Australian cybersecurity courses usually teach networking, identity, operating systems, cloud and governance as separate units, often through overseas textbooks and case studies. Students come out able to recite the OSI layers but unable to answer a question a manager might ask in a meeting. This manual teaches the same fundamentals through one current problem: staff using consumer AI tools such as ChatGPT, Claude and Gemini at work, and what an organisation can and cannot see, log or block when they do.</p>
+
+    <p>The problem spans almost every layer of the stack at once: how names resolve to addresses, how traffic is encrypted, how a browser isolates a tab, how a work account signs in to a third-party app, how a device reports that it is managed, and how the law constrains monitoring in an Australian workplace. Understanding the shadow AI control problem covers a large part of modern defensive security.</p>
+
+    <p>The manual is institution-agnostic. Microsoft 365 appears often, because it is the dominant enterprise stack in Australian higher education and government, but the grounding generalises, and where a non-Microsoft tool illustrates a concept more clearly it is used instead. This is not a product tour, and it is not a substitute for legal advice; the governance part teaches the legal landscape so a defender can hold a competent conversation with a privacy officer, not replace one.</p>
+
+    <h2>Who it is for</h2>
+    <p>Entry-level trainees and career-transitioning students: readers who will work through a chapter but are not yet fluent in the terminology. Each chapter assumes no prior exposure and defines its terms as it goes. Read the parts in order, or start with the one that matches your current gap.</p>
+
+    <h2>How the manual is organised</h2>
+    <p>There are five parts. Each chapter explains one concept, then shows how it determines what a control can and cannot do. A single <a class="term" href="glossary.html">glossary</a> covers the whole manual; a term is set in bold on first use in a chapter and defined there.</p>
+  </section>
+
+  <section class="container-manual">
+
+    <div class="part-block">
+      <div class="part-label">Part One</div>
+      <div class="part-title">How the network actually works</div>
+      <p class="part-blurb">The network stack from the physical layer to the application layer, using shadow AI as the running example, up to describing what happens on the wire when a prompt leaves a device.</p>
+      <ul class="chapter-list">
+        <li><a href="part-1/01-osi-tcpip.html">The OSI and TCP/IP models, and why we keep two of them</a></li>
+        <li><a href="part-1/02-ip-addressing.html">IP addressing, subnets, NAT, and what corporate networks really look like</a></li>
+        <li><a href="part-1/03-dns.html">DNS: how names become addresses, and what a DNS block actually blocks</a></li>
+        <li><a href="part-1/04-tcp-udp-quic.html">TCP, UDP and QUIC: connections, sessions and the modern web</a></li>
+        <li><a href="part-1/05-tls.html">TLS: encryption, certificates, SNI, and why inspection is contentious</a></li>
+        <li><a href="part-1/06-http-https.html">HTTP and HTTPS: requests, responses, and what a proxy can see</a></li>
+        <li><a href="part-1/07-proxies-swg-sase.html">Web proxies, secure web gateways and SASE: where inspection happens</a></li>
+      </ul>
+    </div>
+
+    <div class="part-block">
+      <div class="part-label">Part Two</div>
+      <div class="part-title">Identity, OAuth and the modern enterprise</div>
+      <p class="part-blurb">Authentication and authorisation, the basis of enterprise security, up to the point where a third-party AI tool becomes a tenant's problem through a single sign-in.</p>
+      <ul class="chapter-list">
+        <li><a href="part-2/08-authn-authz.html">Authentication versus authorisation: the conceptual split</a></li>
+        <li><a href="part-2/09-federated-identity.html">Federated identity, SSO and the role of the identity provider</a></li>
+        <li><a href="part-2/10-oauth-oidc.html">OAuth 2.0 and OpenID Connect: the flows, the tokens, the trust model</a></li>
+        <li><a href="part-2/11-saml.html">SAML, and why it is still around</a></li>
+        <li><a href="part-2/12-conditional-access.html">Conditional access, device state and risk-based authentication</a></li>
+        <li><a href="part-2/13-tenant-app-registrations.html">Sign in with Microsoft or Google: when an AI tool becomes a tenant problem</a></li>
+      </ul>
+    </div>
+
+    <div class="part-block">
+      <div class="part-label">Part Three</div>
+      <div class="part-title">Browsers, operating systems and the device</div>
+      <p class="part-blurb">The device is an operating system with processes, identities and management agents, with the browser running inside it. Shadow AI controls depend on these distinctions.</p>
+      <ul class="chapter-list">
+        <li><a href="part-3/14-os-fundamentals.html">Operating systems: kernel, userland, processes, syscalls</a></li>
+        <li><a href="part-3/15-windows-for-defenders.html">Windows for defenders: services, the registry, Group Policy, AppLocker, WDAC</a></li>
+        <li><a href="part-3/16-macos-for-defenders.html">macOS for defenders: launchd, TCC, MDM and the unified log</a></li>
+        <li><a href="part-3/17-linux-and-the-substrate.html">Linux's role: the servers and containers behind the SaaS</a></li>
+        <li><a href="part-3/18-browsers-as-operating-systems.html">Browsers as operating systems: process isolation, profiles, extensions</a></li>
+        <li><a href="part-3/19-edge-for-business.html">Edge for Business, Chrome work profiles and the compliance extension</a></li>
+        <li><a href="part-3/20-device-join-states.html">Device join states: unmanaged, registered, joined, hybrid, managed, onboarded</a></li>
+      </ul>
+    </div>
+
+    <div class="part-block">
+      <div class="part-label">Part Four</div>
+      <div class="part-title">Cloud, telemetry and the enterprise data plane</div>
+      <p class="part-blurb">The SaaS and telemetry systems defenders work with. CASB, EDR, DLP, SIEM, XDR and DSPM for AI explained as architectural patterns rather than product names.</p>
+      <ul class="chapter-list">
+        <li><a href="part-4/21-cloud-service-models.html">Cloud service models and shared responsibility</a></li>
+        <li><a href="part-4/22-saas-api-economy.html">SaaS and the API economy: tenants, scopes, audit trails</a></li>
+        <li><a href="part-4/23-edr-telemetry-pipelines.html">EDR: agents, telemetry pipelines and what an endpoint really reports</a></li>
+        <li><a href="part-4/24-casb-discovery.html">CASB and the discovery problem: how a vendor learns what apps you use</a></li>
+        <li><a href="part-4/25-dlp-three-problems.html">DLP at rest, in motion and at the endpoint: three different problems</a></li>
+        <li><a href="part-4/26-siem-xdr-data-lake.html">SIEM, XDR and the data lake: correlation, retention and cost</a></li>
+        <li><a href="part-4/27-dspm-for-ai.html">DSPM for AI as a category: what it is beneath the marketing</a></li>
+      </ul>
+    </div>
+
+    <div class="part-block">
+      <div class="part-label">Part Five</div>
+      <div class="part-title">Governance, law and proportionate response</div>
+      <p class="part-blurb">The legal and organisational constraints on monitoring in Australian workplaces, and the design of proportionate, defensible programs.</p>
+      <ul class="chapter-list">
+        <li class="ch-soon">The Australian privacy landscape: the Privacy Act, state and territory regimes</li>
+        <li class="ch-soon">Workplace surveillance laws by jurisdiction, and the public sector difference</li>
+        <li class="ch-soon">Notice, consent and proportionality in monitoring program design</li>
+        <li class="ch-soon">The risk of driving usage underground, and the case for sanctioned alternatives</li>
+        <li class="ch-soon">A reference architecture for shadow AI governance</li>
+        <li class="ch-soon">Incident response when shadow AI goes wrong: a tabletop in five acts</li>
+      </ul>
+    </div>
+
+  </section>
+
+  <section class="container-manual">
+    <div class="callout check">
+      <div class="callout-label">Start here</div>
+      <p>Parts One to Four are written: twenty-seven chapters, from <a href="part-1/01-osi-tcpip.html">the OSI and TCP/IP models</a> through to <a href="part-4/27-dspm-for-ai.html">DSPM for AI as a category</a>. The first chapter sets out the method used throughout. The <a href="glossary.html">glossary</a> defines every term in plain language. Part Five is in preparation.</p>
+    </div>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+  </section>
+
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// library</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Shadow AI Blue Team Manual</a></li>
+          <li><a href="/powerbi-siem/">Power BI for Cyber Security</a></li>
+          <li><a href="/#library">All courses</a></li>
+          <li><a href="/resources/">Resources</a></li>
+          <li><a href="/flashcards/">Flashcards</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#about">About this site</a></li>
+          <li><a href="/simulations/">Simulation tools</a></li>
+          <li><a href="mailto:hello@ntworldink.com">Get in touch</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

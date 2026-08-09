@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IP addressing, subnets, NAT, and what corporate networks really look like · Shadow AI Blue Team Manual</title>
+<meta name="description" content="How addresses, subnets and Network Address Translation shape what a corporate network can attribute to a person when a staff member reaches an AI service, and why a shared public address is a weak form of proof.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-1/02-ip-addressing.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>IP addressing, subnets and NAT</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part One &middot; How the network actually works</div>
+  <h1>IP addressing, subnets, NAT, and what corporate networks really look like</h1>
+  <p class="subtitle">Addresses, address translation, and why a shared public IP is a weak way to prove who did something.</p>
+  <div class="reading-meta">
+    <span>Part One</span>
+    <span>About 15 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>The security team pulls the outbound proxy log for yesterday and finds the office's single public address made just over four hundred connections to chat.openai.com. The obvious next question is who. The address in the log belongs to the organisation, not to a person, and by itself it does not narrow four hundred connections down to one desk. Whether the team can get from that address to a named staff member depends on how the network is built, and on which records the organisation kept.</p>
+      <p>This chapter builds the addressing model that decides the answer. The previous chapter established that a network control reads only its own layer. This chapter is about what the network layer actually contains, how addresses are assigned inside an organisation, and why the address a remote service records is almost never the address that identifies the person.</p>
+    </div>
+
+    <h2>What an IP address encodes</h2>
+    <p>An <a class="term" href="../glossary.html">IP address</a> identifies an interface on a network. The version still dominant in most internal networks is IPv4, a 32-bit number written as four decimal parts, such as 192.168.10.24. An address has two components: a network part, shared by every device on the same local network, and a host part, unique to the device. The split between them is not fixed by the address alone; it is set by a <strong>subnet mask</strong>, which marks how many leading bits are the network part.</p>
+
+    <p>The newer version, <a class="term" href="../glossary.html">IPv6</a>, uses 128-bit addresses to solve IPv4 exhaustion. Its addressing changes several assumptions in this chapter, and the differences are noted where they matter. Most internal enterprise traffic a defender examines today is still IPv4, so the body of the chapter uses it. <span class="conf">(high)</span></p>
+
+    <h2>Subnets and CIDR</h2>
+    <p>A <a class="term" href="../glossary.html">subnet</a> is a contiguous block of addresses treated as one local network. The modern notation is <a class="term" href="../glossary.html">CIDR</a>, Classless Inter-Domain Routing, which writes the network part as a slash and a number: 192.168.10.0/24 means the first 24 bits are the network, leaving 8 bits, or 254 usable addresses, for hosts. A /16 is larger, a /28 smaller. The number after the slash is the mask.</p>
+
+    <p>Organisations divide their address space into subnets for two reasons that matter to a defender. The first is routing: traffic between subnets passes through a router or firewall, which is a place a control can be applied. The second is segmentation: putting staff laptops, servers, printers, guest devices and building systems on separate subnets limits what can reach what, and gives each segment its own policy. A device does not decide its own subnet; it is placed on one by the switch port or wireless network it joins, and given an address from that subnet's range.</p>
+
+    <h2>Private address space and NAT</h2>
+    <p>Most devices inside an organisation do not hold a public, internet-routable address. They hold an address from the <a class="term" href="../glossary.html">private address space</a> reserved for internal use: 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16. These ranges are not routed on the public internet. A packet with a private source address cannot, on its own, reach an external service and get a reply.</p>
+
+    <p>The mechanism that bridges the gap is <a class="term" href="../glossary.html">NAT</a>, Network Address Translation, run by the router or firewall at the network edge. When an internal device connects out, the NAT device rewrites the private source address to the organisation's public address, records the mapping, and rewrites the reply on the way back. In practice this is almost always port-based translation: many internal devices share one public address, distinguished by port number in the translation table. From outside, the entire organisation appears as one address, or a small pool of them.</p>
+
+    <p>This is the core fact behind the opening scene. The remote service, and its logs, see the organisation's public address. They do not see 192.168.10.24. The information that maps the public address and port back to an internal device exists only inside the organisation, in the NAT device's translation table, and only for as long as that table or its logs are retained.</p>
+
+    <h2>What a corporate network really looks like</h2>
+    <p>A real corporate network is not one flat space. A device joining it is typically assigned its address automatically by <a class="term" href="../glossary.html">DHCP</a>, the Dynamic Host Configuration Protocol, which leases an address from the subnet's pool for a set time and records the lease. The device is told a <a class="term" href="../glossary.html">default gateway</a>, the router it sends outbound traffic to, and an internal DNS resolver, which is the resolver referenced in the previous chapter.</p>
+
+    <p>The address space is usually carved into separate segments, often as <a class="term" href="../glossary.html">VLANs</a>, virtual LANs: a segment for staff devices, a separate one for guest Wi-Fi, others for servers, printers, voice handsets and building systems. Public-facing services may sit in a <a class="term" href="../glossary.html">DMZ</a>, a segment exposed to the internet but walled off from the internal network. Outbound traffic leaves through a firewall, and often a proxy or secure web gateway, which is where egress filtering and logging happen. Remote staff are pulled back onto this structure through a <a class="term" href="../glossary.html">VPN</a>, or routed through a cloud security service. The important pattern for a defender is that identity and logging are strong on some segments and weak on others, and the guest segment is usually the weakest.</p>
+
+    <h2>The attribution problem</h2>
+    <p>Return to the four hundred connections. There are two separate attribution problems, and they have different answers.</p>
+
+    <p>The external problem is the remote service's view. The AI service recorded the organisation's public address, shared through NAT by every device on that egress. From the service's side, the organisation is one entity. If the organisation later wanted the service to confirm which staff member sent a particular prompt, the service's connection logs cannot provide it; they resolve only to the shared address. Any attribution has to come from the organisation's own records, not the vendor's.</p>
+
+    <p>The internal problem is the organisation's own view, and here the answer depends on records and on which segment the device was on. On the staff segment, the proxy or firewall logs the internal source address and the destination. To turn the internal address into a device, the team needs the DHCP lease that was active at that time, because addresses are reassigned. To turn the device into a person, the team needs an identity signal: a proxy that authenticated the user, or a sign-in correlated by time. With all three retained, proxy log, DHCP lease and identity, the four hundred connections can be attributed. With any one missing, the chain breaks.</p>
+
+    <p>On the guest Wi-Fi segment, the chain usually breaks by design. Guest networks commonly apply NAT with little or no user authentication, so the record is an internal address that changes with each lease, reaching an AI service at a time, with no link to a named person. This is the same limitation the enterprise sees when it relies on network logs alone: the evidence supports "a device on our network used this service" and rarely "this person used this service". <span class="conf">(medium; depends entirely on local proxy, DHCP and identity logging)</span></p>
+
+    <p>Addressing also explains why blocking an AI service by IP address is unreliable. Large services sit behind content delivery networks and shared front ends, so a single address may serve many unrelated sites, and the service's addresses change without notice. An address block is therefore both over-broad and easily outdated, which is why name-based and identity-based controls, covered in later chapters, are preferred. Segmentation is a stronger structural control than address blocking: isolating a class of device on a restricted segment limits what it can reach internally. It does not, on its own, stop a staff laptop on guest Wi-Fi from reaching a public AI service, because guest egress still goes to the internet.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>Attribution through NAT assumes the organisation keeps the translation and lease records and can correlate them by time. At volume, many organisations do not retain NAT tables, so a public-address hit often cannot be resolved to a device after the fact. <a class="term" href="../glossary.html">CGNAT</a>, carrier-grade NAT, extends the same problem to home connections: an internet provider shares one public address across many customers, so even the public address seen from a home network is weak evidence about any one household.</p>
+      <p>IPv6 inverts part of the picture. With IPv6 there is frequently no NAT, and a device can hold a globally routable address of its own, which can make external attribution easier while complicating address-based blocklists and privacy. Dual-stack networks, running IPv4 and IPv6 together, produce two paths with different visibility, and a control applied to one may not apply to the other. <span class="conf">(medium; IPv6 deployment and address-privacy behaviour vary by network and operating system)</span></p>
+      <p>Two operational gaps recur. DHCP churn means an internal address maps to different devices over time, so without the lease log the address is ambiguous. Split-tunnel VPNs send only some traffic through the corporate egress, so a remote device may reach an AI service directly while appearing, for other traffic, to be on the corporate network. And the largest limit is unchanged from the previous chapter: a personal device on a home network sits behind the household's own NAT, entirely outside the organisation's addressing, records and controls.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Your proxy log shows your organisation's public address connecting to an AI service four hundred times. List the records you would need, and the order you would join them in, to attribute one of those connections to a named staff member.</li>
+        <li>Explain to a manager why the AI vendor's own logs cannot tell you which of your staff used the service.</li>
+        <li>A colleague wants to block an AI service by adding its IP address to the firewall. Give two reasons this will be both over-broad and short-lived.</li>
+        <li>Guest Wi-Fi and the staff network both use NAT. Why is attribution usually possible on one and not the other, and what single addition would most improve the guest case?</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">
+        <a href="../glossary.html">IP address</a> ·
+        <a href="../glossary.html">subnet</a> ·
+        <a href="../glossary.html">CIDR</a> ·
+        <a href="../glossary.html">private address space</a> ·
+        <a href="../glossary.html">NAT</a> ·
+        <a href="../glossary.html">CGNAT</a> ·
+        <a href="../glossary.html">DHCP</a> ·
+        <a href="../glossary.html">default gateway</a> ·
+        <a href="../glossary.html">VLAN</a> ·
+        <a href="../glossary.html">DMZ</a> ·
+        <a href="../glossary.html">IPv6</a> ·
+        <a href="../glossary.html">VPN</a>
+      </p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>RFC 1918, <em>Address Allocation for Private Internets</em>. IETF, February 1996. <a href="https://www.rfc-editor.org/rfc/rfc1918" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc1918</a>. Defines the private IPv4 ranges. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 4632, <em>Classless Inter-Domain Routing (CIDR): The Internet Address Assignment and Aggregation Plan</em>. IETF, August 2006. <a href="https://www.rfc-editor.org/rfc/rfc4632" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc4632</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 2663, <em>IP Network Address Translator (NAT) Terminology and Considerations</em>. IETF, August 1999. <a href="https://www.rfc-editor.org/rfc/rfc2663" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc2663</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 6598, <em>IANA-Reserved IPv4 Prefix for Shared Address Space</em>. IETF, April 2012. <a href="https://www.rfc-editor.org/rfc/rfc6598" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc6598</a>. Defines the shared range used for carrier-grade NAT. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 2131, <em>Dynamic Host Configuration Protocol</em>. IETF, March 1997. <a href="https://www.rfc-editor.org/rfc/rfc2131" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc2131</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 8200, <em>Internet Protocol, Version 6 (IPv6) Specification</em>. IETF, July 2017. <a href="https://www.rfc-editor.org/rfc/rfc8200" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc8200</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+      </ol>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="01-osi-tcpip.html">&larr; The OSI and TCP/IP models</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="03-dns.html">DNS &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

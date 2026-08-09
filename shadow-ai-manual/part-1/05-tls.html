@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TLS: encryption, certificates, SNI, and why inspection is contentious · Shadow AI Blue Team Manual</title>
+<meta name="description" content="How TLS encrypts a connection and proves a server's identity, how an organisation can decrypt it on managed devices to read prompts, and why that interception is limited and contested.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-1/05-tls.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>TLS</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part One &middot; How the network actually works</div>
+  <h1>TLS: encryption, certificates, SNI, and why inspection is contentious</h1>
+  <p class="subtitle">What TLS hides, the one field it historically leaves visible, and what an organisation must do, and own, to read inside it.</p>
+  <div class="reading-meta">
+    <span>Part One</span>
+    <span>About 16 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A security architect is asked to make prompts to AI services readable, so that data loss policy can act on them. The answer is that it is possible, on the organisation's own managed devices, by having the organisation sit in the middle of every encrypted connection and decrypt it. It is not possible on a personal device, and doing it at all carries costs that reach beyond the network team. Understanding why requires understanding what TLS actually guarantees, and to whom.</p>
+      <p>Chapter one established that a prompt sealed by TLS is unreadable on the wire, and readable only at the endpoints. This chapter is about how that seal is made, the single field it has historically left exposed, and what it takes to break the seal deliberately.</p>
+    </div>
+
+    <h2>What TLS provides</h2>
+    <p><a class="term" href="../glossary.html">TLS</a>, Transport Layer Security, gives a connection three things: confidentiality, so a third party cannot read the contents; integrity, so tampering is detected; and server authentication, so the client can confirm it is talking to the real server and not an impostor. Its predecessor was SSL, and the term is still used loosely. Modern deployments use TLS 1.3.</p>
+
+    <p>The connection begins with a handshake. The client and server use asymmetric cryptography, in which a public and a private key are mathematically paired, to agree on a fresh set of symmetric keys that only the two of them hold. The rest of the session is encrypted with those symmetric keys, which are faster. Because a new set of keys is generated for each session, a party who later obtains the server's long-term private key still cannot decrypt past sessions; this property is <a class="term" href="../glossary.html">forward secrecy</a>, and it is standard in TLS 1.3.</p>
+
+    <h2>Certificates and trust</h2>
+    <p>Server authentication rests on a <a class="term" href="../glossary.html">certificate</a>: a signed document that binds a server's name to its public key. The signature comes from a <a class="term" href="../glossary.html">Certificate Authority</a>, an organisation the client already trusts. The client trusts a set of authorities whose own certificates are installed in its trust store, placed there by the operating system or browser vendor. When a server presents its certificate, the client checks that the name matches the site it intended to reach, that the certificate chains to an authority in its trust store, and that it has not expired or been revoked. This system of authorities, certificates and trust stores is the <a class="term" href="../glossary.html">PKI</a>, the public key infrastructure. Its load-bearing assumption for this chapter is simple: the client will only trust a certificate signed by an authority already in its trust store.</p>
+
+    <h2>The one field left in the open</h2>
+    <p>Historically, the client's first handshake message carries the name of the site it wants, the <a class="term" href="../glossary.html">SNI</a>, in clear text, so that a server hosting many sites at one address knows which certificate to present. A device watching the handshake can read the SNI, even though everything after the handshake is encrypted. This is why an organisation can filter or record by destination name without decrypting anything: it reads the SNI. TLS 1.3 encrypted more of the handshake than earlier versions, including the server's certificate, but the SNI remained visible until the separate Encrypted Client Hello effort, covered below, began to close it.</p>
+
+    <h2>Reading inside: TLS inspection</h2>
+    <p>To read the content of a TLS session, an organisation must become one of the two endpoints. This is <a class="term" href="../glossary.html">TLS inspection</a>, sometimes called break-and-inspect. An inspection point, usually a proxy or gateway, intercepts the connection, presents its own certificate to the client, and makes its own separate connection onward to the real server. It decrypts the traffic in the middle, inspects or logs it, then re-encrypts it. With inspection in place, the organisation can read the full request, including a prompt, and apply policy to it.</p>
+
+    <p>Inspection works only because of the trust rule above. The proxy presents a certificate signed by an internal authority, and the client accepts it only if that authority is in the client's trust store. An organisation can install its own authority in the trust store of a device it manages. It cannot do so on a device it does not manage. This single requirement is the reason TLS inspection is a managed-device control: on a personal laptop, the browser does not trust the organisation's authority, so the interception is detected and the connection fails or warns. The device-state limits from the earlier chapters reappear here as a hard boundary.</p>
+
+    <h2>Why inspection is contested</h2>
+    <p>TLS inspection is the strongest network-side way to read AI prompts, and it is contentious for several reasons at once. It removes the confidentiality TLS is meant to provide, on every inspected site, not only the ones of interest, so it concentrates a large amount of sensitive traffic at one decryption point. It can weaken security if the inspection product validates upstream certificates less rigorously than a modern browser would. It breaks applications that use <a class="term" href="../glossary.html">certificate pinning</a>, where a client is built to accept only a specific certificate and refuses any substitute, including the organisation's. And it raises proportionality and privacy questions, because it exposes staff banking, health and personal activity to the employer along with work traffic. These legal and proportionality questions belong to Part Five; the technical point here is that inspection is powerful, bounded to managed devices, and not free of cost. <span class="conf">(high)</span></p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The destination name is becoming unavailable even for filtering. Encrypted Client Hello (<a class="term" href="../glossary.html">ECH</a>) encrypts the SNI, so where it is in use, name-based filtering and logging that relied on reading the SNI no longer work, and the organisation is pushed toward either full inspection or coarser address-based controls. <span class="conf">(medium; ECH deployment is partial and changing)</span></p>
+      <p>Certificate pinning defeats inspection for the applications that use it, which increasingly includes some native apps and updaters, so an inspection deployment usually needs a list of exceptions that are passed through undecrypted, and those exceptions are blind spots. On unmanaged devices, inspection cannot be applied at all, because the organisation's authority is not trusted. And inspection only sees traffic that traverses the inspection point, so a device on QUIC that was not forced back to TCP, or a device off the corporate network, is not inspected regardless of trust. Reading a prompt on the network requires trust, a decryption point, and a path through it, together.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Explain, to a manager, why the organisation can read prompts on its own laptops but not on a staff member's personal laptop, in terms of certificates and trust.</li>
+        <li>A colleague says TLS inspection lets the organisation "see everything". Give two categories of traffic it will not see, and one category it exposes that raises a privacy concern.</li>
+        <li>Filtering that relied on reading the SNI has started to fail for some sites. What change is the likely cause, and what are the organisation's two remaining options?</li>
+        <li>Why does certificate pinning force an inspection deployment to maintain a list of pass-through exceptions, and why is each exception a blind spot?</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">
+        <a href="../glossary.html">TLS</a> ·
+        <a href="../glossary.html">forward secrecy</a> ·
+        <a href="../glossary.html">certificate</a> ·
+        <a href="../glossary.html">Certificate Authority</a> ·
+        <a href="../glossary.html">PKI</a> ·
+        <a href="../glossary.html">SNI</a> ·
+        <a href="../glossary.html">TLS inspection</a> ·
+        <a href="../glossary.html">certificate pinning</a> ·
+        <a href="../glossary.html">ECH</a>
+      </p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>RFC 8446, <em>The Transport Layer Security (TLS) Protocol Version 1.3</em>. IETF, August 2018. <a href="https://www.rfc-editor.org/rfc/rfc8446" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc8446</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 6066, <em>Transport Layer Security (TLS) Extensions: Extension Definitions</em>. IETF, January 2011. <a href="https://www.rfc-editor.org/rfc/rfc6066" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc6066</a>. Defines SNI. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 5280, <em>Internet X.509 Public Key Infrastructure Certificate and CRL Profile</em>. IETF, May 2008. <a href="https://www.rfc-editor.org/rfc/rfc5280" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc5280</a>. The certificate and trust-chain model. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9162, <em>Certificate Transparency Version 2.0</em>. IETF, December 2021. <a href="https://www.rfc-editor.org/rfc/rfc9162" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9162</a>. Context on how mis-issued certificates are detected. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>TLS Encrypted Client Hello, IETF TLS Working Group draft (draft-ietf-tls-esni), work in progress. <a href="https://datatracker.ietf.org/doc/draft-ietf-tls-esni/" target="_blank" rel="noopener">datatracker.ietf.org/doc/draft-ietf-tls-esni</a>. Deployment is still changing. Checked 9 August 2026. <span class="conf">(medium)</span></li>
+      </ol>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="04-tcp-udp-quic.html">&larr; TCP, UDP and QUIC</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="06-http-https.html">HTTP and HTTPS &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

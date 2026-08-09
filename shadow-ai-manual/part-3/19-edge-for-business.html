@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edge for Business, Chrome work profiles and the Microsoft Compliance Extension · Shadow AI Blue Team Manual</title>
+<meta name="description" content="How to keep the three Edge for Business data-loss-prevention features apart, and why the Microsoft Compliance Extension for Chrome and Firefox needs an onboarded device when the Edge built-in control does not. What applies on a personal laptop, and how a staff member steps around it.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-3/19-edge-for-business.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Edge for Business</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Three &middot; Browsers, operating systems and the device</div>
+  <h1>Edge for Business, Chrome work profiles and the Microsoft Compliance Extension</h1>
+  <p class="subtitle">Three Microsoft features are routinely described as one, and telling them apart is what lets a defender say precisely what can be stopped on a staff member's own laptop.</p>
+  <div class="reading-meta">
+    <span>Part Three</span>
+    <span>About 17 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A security architect is asked a direct question by the privacy officer. 'If a staff member uses their own laptop, can we stop them pasting patient data into ChatGPT? Yes or no.' It is a fair question and it deserves a clean answer, and the architect finds they cannot give one. The honest reply is neither yes nor no. It is 'it depends on which browser they use, which profile they are in, and what we have licensed', and the architect realises, uncomfortably, that they have been carrying half a dozen product names around as if they were one thing. Inline DLP in Edge. Browser DLP for unmanaged devices. The Compliance Extension. Edge for Business. The work profile. They blur together in conversation, and because they blur, the architect cannot assemble the sentence the privacy officer actually needs.</p>
+      <p>This chapter takes the one device-side control that reaches an unmanaged personal device, the browser-resident control that Part Three has been circling since Chapter 14, and pulls its parts far enough apart that the question can be answered precisely. Chapter 18 built the generic architecture: the browser as an operating system, the renderer where the page's plaintext lives, the profile that policy attaches to, the extension whose content script can read a page. This chapter instantiates that architecture in the products a Microsoft-shop defender actually administers, and resolves the three distinct Edge for Business features that practitioners most often collapse into one. By the end the reader should be able to say, for a staff member's exact situation, which feature applies, what it sees, what it blocks, and how the staff member could step around it.</p>
+    </div>
+
+    <h2>What Edge for Business and a work profile actually are</h2>
+    <p>Start by deflating a piece of jargon. '<a class="term" href="../glossary.html">Edge for Business</a>' is not a separate browser you download instead of Edge. It is Microsoft Edge running under a <a class="term" href="../glossary.html">work profile</a>: the profile that is signed in with the organisation's <a class="term" href="../glossary.html">Entra identity</a> and that carries the organisation's policy and managed extensions. The same installed Edge holds the user's personal profile alongside it, and the two share nothing, exactly as Chapter 18 described for browser profiles in general. A work profile is the product instantiation of that generic profile. Google Chrome has the equivalent under Chrome Enterprise, where a managed work profile carries the organisation's policy separately from the user's personal Chrome.</p>
+
+    <p>The property that carries over from Chapter 18 is the one that matters: policy attaches to the profile, not to the human being. The organisation does not configure the person; it configures a profile, and its controls exist when, and only when, the AI site is loaded in that profile. So the instruction that will recur throughout this chapter, 'sign into the work profile', is not housekeeping. It is the precondition for every control described here. A staff member who is not in the work profile is, as far as these controls are concerned, not being watched at all.</p>
+
+    <h2>Inline AI prompt protection: the control that needs no onboarding</h2>
+    <p>The first feature is the one that reaches a personal device, and it is worth quoting Microsoft precisely, because the precision is the point. Microsoft's documentation states that Purview <a class="term" href="../glossary.html">data-loss-prevention</a> monitoring and protection are built into the Microsoft Edge for Business browser, without needing to onboard the device into Microsoft Purview <span class="conf">(high)</span>.</p>
+
+    <p>Chapter 18 already explained why this is possible, and the explanation is worth restating now that the product has a name. The protection is the browser's own built-in data-loss prevention, running inside Edge's trusted view of the page, in the renderer where the prompt text lives. It reads the typed prompt before <a class="term" href="../glossary.html">TLS</a> encrypts anything for the network, and it does so without any privileged agent sitting below the browser in the operating system. Because nothing has to be installed on the privileged side of the device, nothing has to be onboarded. The browser is doing the watching, and on a personal device the user has put the browser there themselves by signing into the work profile.</p>
+
+    <p>What it does, concretely, is audit or block a typed prompt that contains sensitive information types when the user submits it to a defined set of consumer AI sites. Microsoft names ChatGPT, Google Gemini and DeepSeek among the targets, and the capability reached general availability across the middle and later part of 2025 <span class="conf">(high; the supported-site list and rollout dates are product specifics that drift, so treat the exact list as something to confirm against current documentation)</span>. The dependency is light: the policy flows to the browser through the Microsoft Edge management service and is activated by the user being signed into the work profile. It does not require the device to be enrolled in Intune, and it does not require <a class="term" href="../glossary.html">mobile-application-management</a> enrolment. Sign into the work profile and the control is live.</p>
+
+    <h2>Browser DLP for managed apps on unmanaged devices, and why it is a different feature</h2>
+    <p>The second feature is the one most often mistaken for the first, and keeping them apart is the single most useful thing this chapter can give a defender. Microsoft's documentation is again exact: Edge for Business applies data-loss-prevention policies for unmanaged devices only to the work profile, and these policies do not apply when the user chooses a personal or InPrivate profile; to target managed apps on unmanaged devices, the work profile must be enforced <span class="conf">(high)</span>.</p>
+
+    <p>This is a broader capability than the inline-prompt feature. Where inline AI prompt protection is specifically about reading the text submitted to consumer AI sites, the managed-apps browser DLP governs the wider range of actions a user takes against organisation-managed cloud apps reached through the browser: uploads, downloads, copying and the like. It is also the feature with the licensing wrinkle, and the wrinkle is real enough that a defender who ignores it will make a promise they cannot keep. Inline AI prompt blocking to consumer AI sites is included in the standard Microsoft 365 E5 entitlement. The broader data-security controls for managed apps on unmanaged Windows and macOS devices are structured as a pay-as-you-go Purview capability, sitting on top of the standard entitlement that already covers managed devices <span class="conf">(medium; Microsoft has moved this licensing more than once during 2025, the specific Australian and A5 position is not always clear in the documentation, and it should be verified against current licensing guidance and the tenant billing portal before anything is promised)</span>.</p>
+
+    <p>The practical instruction is to ask, of any specific capability someone claims Edge for Business provides on a personal device, a single disambiguating question: is this the inline AI prompt feature that is included in E5, or the broader managed-apps-on-unmanaged-devices feature that is pay-as-you-go? The two get described in the same breath and they are not the same thing, and the difference shows up on an invoice.</p>
+
+    <p>One detail from the documentation deserves a defender's attention because it explains why the control is harder to circumvent than the architecture alone would suggest. When an administrator saves the first policy targeting unmanaged apps in Edge for Business, the Microsoft Edge management service automatically creates the Edge configuration policies and the supporting Intune policies needed to activate the policy in the browser and to prevent its circumvention <span class="conf">(high)</span>. The point is that Microsoft has done some of the work of pinning the user into the work profile on the organisation's behalf, rather than leaving it entirely to be assembled by hand.</p>
+
+    <h2>The Microsoft Compliance Extension: the control that does need onboarding</h2>
+    <p>The third feature is the contrast that makes the whole posture make sense, and it concerns the other browsers. The Microsoft Purview browser extension, commonly called the <a class="term" href="../glossary.html">Microsoft Compliance Extension</a>, brings data-loss-prevention visibility and enforcement into Google Chrome and Mozilla Firefox: sensitive-information detection on uploads and pastes, and the <a class="term" href="../glossary.html">Insider Risk Management</a> browser signals that feed Microsoft's risk engine. In the Edge story the protection is built into the browser; in the Chrome and Firefox story it is bolted on as an extension.</p>
+
+    <p>And here is the decisive difference, again in Microsoft's own words: to use the Microsoft Purview extension for Chrome, the device must be onboarded into Endpoint data-loss prevention <span class="conf">(high)</span>. The reason is architectural, and Chapter 18 set it up. The extension is a content-script-based front end, running in the page like any extension, but its detection engine is the local Endpoint DLP service, which lives below the browser in the operating system and exists only on an onboarded device. The extension is the eyes; the brain is the onboarded endpoint. So even if a user on a personal device installs the Compliance Extension by hand from the web store, it does nothing useful, because the device has no Purview device identity and no DLP engine for the extension to report to. The extension is also Windows-only, supported on Windows 10 and 11, and is not used on macOS at all, which is the fact Chapter 16 stated from the Mac's side and can now be explained from this one: on macOS the Endpoint DLP path uses Defender hooks in supported browsers rather than this extension.</p>
+
+    <p>This is the asymmetry that drives Microsoft's recommended posture for personal devices. The Edge built-in inline control needs no onboarding; the Chrome and Firefox extension does. On a managed device both paths are available, because the device is onboarded. On an unmanaged personal device only the Edge path survives, because there is nothing onboarded for the extension's engine to live in. That single asymmetry is why 'route AI access through Edge for Business' is the answer Microsoft gives for <a class="term" href="../glossary.html">bring-your-own-device</a>, and why a defender who understands it stops treating the four feature names as interchangeable.</p>
+
+    <h2>Answering the privacy officer</h2>
+    <p>Now the opening question can be answered in the sentence the architect could not assemble. Take the staff member on a personal laptop and walk it across their choices.</p>
+
+    <p>In an Edge for Business work profile, inline AI prompt protection applies, and a policy targeting the relevant information types can block the patient-data paste into ChatGPT at the moment of submission <span class="conf">(high)</span>. In Edge's personal profile, or an InPrivate window, it does not apply, because the policy is bound to the work profile <span class="conf">(high)</span>. In Chrome, Firefox or Safari on that same personal laptop, nothing applies: the Compliance Extension needs an onboarding the personal device does not have, and the Edge built-in control is, by definition, Edge's <span class="conf">(high)</span>. So the precise answer to 'can we stop them' is this: yes, if and only if they submit from an Edge for Business work profile, for a supported AI site, under a policy that targets the information types in question; otherwise no. That is the sentence the privacy officer can act on, and assembling it required keeping the three features distinct.</p>
+
+    <p>Everything turns on the user being in the work profile, which is Chapter 18's profile-is-the-linchpin point in Microsoft dress. The control is real exactly to the extent the organisation can ensure the AI site is reached in the work profile and nowhere else, and Microsoft's documentation is candid that a user can defeat it by switching to a personal profile, an InPrivate window, or another browser. Its recommended reinforcement is <a class="term" href="../glossary.html">Conditional Access</a>: a policy that blocks other browsers from reaching Microsoft 365 unless the user is in an Edge work profile. It is worth being honest about what that buys, because Chapter 12 already established the limit. Conditional Access governs authentication to the organisation's own services. It can require the work profile as a condition of reaching corporate resources, which raises the bar and makes the work profile the path of least resistance for someone who needs those resources anyway. It does not stop a determined user opening Chrome and going to ChatGPT outside any work session, because free browsing to a consumer site is not an authentication to the organisation that Conditional Access can intercept. The reinforcement shifts the bar; it does not close the gap.</p>
+
+    <p>On a corporate <a class="term" href="../glossary.html">standard operating environment</a> the picture inverts, and it inverts in a way worth naming precisely. There, every surface stacks: Edge <a class="term" href="../glossary.html">inline DLP</a>, the broader Edge browser DLP, the Compliance Extension in Chrome and Firefox because the device is now onboarded, Endpoint DLP, and the sensitivity-label and upload controls. The native Edge integration is the strongest single surface, but the deeper point is that onboarding unlocks the Chrome and Firefox path that the personal device could never have. A managed device is not 'a personal device plus a little more'. It is a categorically wider control surface, and the line between the two is the enrolment ladder that Chapter 20 sets out in full.</p>
+
+    <p>One layer remains to be placed, so that a reader does not mistake it for a prerequisite. Windows App Protection Policy targeting Edge, the Windows form of mobile-application management, is a separate and additional Intune feature. It adds controls such as <a class="term" href="../glossary.html">clipboard</a> restriction across the work profile, watermarking, conditional launch and threat-level checks, and on Windows it targets only Microsoft Edge; there is no Windows app-protection policy for the Outlook, Word or Teams desktop applications <span class="conf">(high)</span>. It is a hardening layer on top of the work-profile control, not a condition of it. The inline DLP described above works without it. A defender should keep the two separate, so as not to believe the BYOD control requires an enrolment it does not.</p>
+
+    <p>The reason Edge for Business is the linchpin, then, is the architecture of Chapter 18 plus one product decision. Architecturally, a control built into the browser sees the prompt before TLS without needing the privileged operating-system layer that only a managed device grants. Microsoft's decision was to ship that built-in inline control with no onboarding gate, while leaving the Chrome and Firefox extension dependent on the onboarded Endpoint DLP engine. The first half is why any browser-resident control can reach a personal device. The second half is why, in a Microsoft shop specifically, the surviving personal-device control is Edge.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The user chooses the browser and the profile. This is Chapter 14's hard limit, now fully concrete: a personal profile, an InPrivate window, or Chrome, Firefox or Safari all escape the control, and Conditional Access raises but does not close the gap, because it governs access to corporate services rather than the user's free browsing. There is no configuration that removes this, only configurations that make the work profile the easier path.</p>
+      <p>The control is site-aware, and a list of sites is only ever as current as its last update. Inline AI prompt protection applies to a defined set of consumer AI sites; a new AI tool, a self-hosted model, or an <a class="term" href="../glossary.html">API</a> call of the kind Chapter 17 described is not on the list and is not covered. The defender should treat the supported-site list as a moving target to be checked, not a guarantee of completeness <span class="conf">(medium)</span>.</p>
+      <p>The licensing is genuinely confusing and it changes. The split between standard-E5 inline AI prompt blocking and the pay-as-you-go managed-apps-on-unmanaged-devices capability shifted through 2025, and the specific position for Australian A5 customers is not always legible in the documentation. Verify against current licensing guidance and the tenant billing portal before promising a capability to anyone <span class="conf">(medium)</span>.</p>
+      <p>'Edge for Business' is itself a moving product. The inline AI support, the supported sites, the minimum Edge versions and the macOS coverage have all been catching up through 2025. Confirm the versions in the standard operating environment and, where it matters, on staff personal devices, rather than assuming a static feature set <span class="conf">(medium)</span>.</p>
+      <p>Finally, even at its best the Edge control is plaintext at the page in one browser. It sees the prompt typed into Edge's work profile. It is not coverage of the device, and it is one surface among the several this part of the manual has laid out. The predictable error is to sell it, internally, as more than that.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A staff member on a personal laptop pastes patient data into ChatGPT. State the one condition under which Edge for Business inline DLP blocks it, and three ways the staff member could ensure it does not.</li>
+        <li>A colleague wants to deploy the Microsoft Compliance Extension to staff personal devices to cover Chrome. Explain in two sentences why this will not work, naming the dependency.</li>
+        <li>Distinguish, for a manager, 'inline AI prompt protection in Edge' from 'browser DLP for managed apps on unmanaged devices', in terms of what each covers and how each is licensed.</li>
+        <li>Conditional Access has been set to require the Edge work profile for Microsoft 365 on unmanaged devices. Does this stop a determined user reaching ChatGPT in Chrome? Explain your answer.</li>
+        <li>A project team argues that the bring-your-own-device rollout cannot start until Windows App Protection Policy for Edge is deployed, because otherwise the inline DLP will not apply. Say whether that is correct, and what the app-protection policy actually adds.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">API &middot; BYOD &middot; CA &middot; clipboard &middot; DLP &middot; Edge for Business &middot; Entra ID &middot; inline DLP &middot; IRM &middot; MAM &middot; Microsoft Compliance Extension &middot; SOE &middot; TLS &middot; work profile</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>The feature behaviours in this chapter are documented on Microsoft Learn and in Microsoft product announcements. The architectural reasoning is carried from Chapter 18.</p>
+      <ol class="sources-list">
+        <li>Microsoft, <em>Learn about Data Loss Prevention for Cloud Apps in Edge for Business</em>, Microsoft Learn. <a href="https://learn.microsoft.com/en-us/purview/dlp-browser-dlp-learn" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports that Purview DLP is built into the Edge for Business browser with no device onboarding required, that DLP policies for unmanaged devices apply only to the work profile and not to a personal or InPrivate profile, and that targeting managed apps on unmanaged devices requires enforcing the work profile. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft, <em>Help prevent sharing via Microsoft Edge for Business to unmanaged AI apps from managed devices</em>, Microsoft Learn. <a href="https://learn.microsoft.com/en-us/purview/dlp-create-policy-block-to-ai-via-edge" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports that admins can block sharing of sensitive information to consumer generative-AI tools including ChatGPT, DeepSeek and Gemini through Edge for Business. Last checked 22 May 2026. <span class="conf">(high for the capability; the named-site list is a product specific that drifts)</span></li>
+        <li>Microsoft, <em>Get started with the Microsoft Purview extension for Chrome</em>, Microsoft Learn. <a href="https://learn.microsoft.com/en-us/purview/dlp-chrome-get-started" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports that the device must be onboarded into Endpoint DLP to use the extension, and that deployment is via Intune or Group Policy on Windows 10/11. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft, <em>Get started with the Microsoft Purview extension for Firefox</em>, Microsoft Learn. <a href="https://learn.microsoft.com/en-us/purview/dlp-firefox-extension-get-started" target="_blank" rel="noopener">learn.microsoft.com</a>. Corroborates the same onboarding requirement for the Firefox extension. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft, <em>Activate your DLP policy in Microsoft Edge</em>, Microsoft Learn. <a href="https://learn.microsoft.com/en-us/deployedge/microsoft-edge-dlp-purview-configuration" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the work-profile sign-in requirement and that the Edge management service creates the configuration and Intune policies needed to activate the policy and prevent circumvention. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Edge team, <em>New advanced data protection for BYOD and AI in Edge for Business</em>, Microsoft Edge blog, March 2025, and message-centre reference MC1046161. Cited as dated product announcements for the inline AI prompt protection general availability and supported consumer AI sites. Last checked 9 August 2026. <span class="conf">(high for existence; medium for current feature specifics, which should be re-verified)</span></li>
+        <li><em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em>, this project's internal source report, sections 4 (the Compliance Extension and its onboarding dependency, Windows-only support, macOS exclusion) and 5 (Edge for Business inline DLP, the three distinct features, the work-profile requirement, the pay-as-you-go caveat, and the Windows-MAM-targets-only-Edge point). The organising spine of this chapter, carrying its quotes and confidence labels.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The supported list of consumer AI sites for Edge inline DLP, the minimum Edge versions, and macOS inline support were all settling through 2025 <span class="conf">(medium)</span>; confirm against current Microsoft documentation.</p>
+      <p>The licensing split between standard E5 and pay-as-you-go for managed-apps-on-unmanaged-devices DLP has moved more than once and the Australian A5 position is not fully documented; treat any specific claim as <span class="conf">(medium)</span> and verify in the tenant billing portal before relying on it.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="18-browsers-as-operating-systems.html">&larr; Browsers as operating systems</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="20-device-join-states.html">Device join states &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

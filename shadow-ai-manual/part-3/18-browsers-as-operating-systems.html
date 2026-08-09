@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browsers as operating systems: process isolation, profiles, extensions · Shadow AI Blue Team Manual</title>
+<meta name="description" content="A modern browser is a small operating system built to run untrusted code safely, with its own privilege boundary, its own identity in profiles, and third-party programs as extensions. That architecture is what lets a browser-resident control read a prompt, and what bounds it.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-3/18-browsers-as-operating-systems.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Browsers as operating systems</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Three &middot; Browsers, operating systems and the device</div>
+  <h1>Browsers as operating systems: process isolation, profiles, extensions</h1>
+  <p class="subtitle">The browser rebuilt itself as an operating system in order to run strangers' code safely, and that architecture decides exactly what a control inside it can read.</p>
+  <div class="reading-meta">
+    <span>Part Three</span>
+    <span>About 18 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>Open the operating system's task manager on a laptop with half a dozen tabs open, one of them ChatGPT, and look for the browser. You will not find it. You will find fourteen of it. There is one entry with the browser's name and a substantial memory footprint, and then a crowd of others with the same name and smaller footprints, one of which is quietly ticking over as the assistant streams its answer into the tab. Open the browser's own task manager, the one buried in its menus, and the crowd resolves into labels: a process for each site, a process for the graphics work, a process for each installed extension.</p>
+      <p>This is odd, on the face of it. A browser draws one window. Why does it run as a fleet?</p>
+      <p>The answer is that the browser has spent about fifteen years solving a problem it shares with the operating system underneath it. Every website a user visits is a program written by a stranger, downloaded without ceremony, and executed on the user's machine within milliseconds of a click. Doing that safely, thousands of times a day, is the same problem Chapter 14 described the operating system solving for ordinary applications, and the browser has arrived at the same answer: isolation and least privilege, enforced by walls the untrusted code cannot argue with.</p>
+      <p>The consequence for a defender is direct. Chapter 14 established that a control which reads a prompt before TLS encrypts it has to be in one of three places, and that the first of those places is 'inside the browser'. That description was deliberately coarse. This chapter gives it an address. Once the browser's internal structure is visible, it becomes possible to say exactly where the browser-resident control stands, why it can read the prompt without anybody installing anything privileged on the machine, and where its view stops.</p>
+    </div>
+
+    <h2>Why a browser looks like an operating system</h2>
+    <p>Start with the problem, because the architecture follows from it. A web page is not a document. It is a program: markup, styles and, in any page a staff member is likely to be typing into, a substantial body of JavaScript that runs on the user's processor. The browser fetches that program from a server it has never met, on the strength of nothing more than a name resolving and a certificate validating, and runs it immediately.</p>
+
+    <p>An operating system that ran every program a user encountered, from any source, without asking, would be considered indefensible. The browser does exactly that, deliberately, as its core function, and the web works because of it. What makes the arrangement survivable is that the browser gives that untrusted program almost nothing. The page's code cannot open a file on the disk. It cannot read another site's data. It cannot make an arbitrary network connection. Everything it is allowed to do, it does through a narrow set of interfaces the browser defines, and everything it is not allowed to do is prevented rather than discouraged.</p>
+
+    <p>That should sound familiar. It is the shape of Chapter 14's <a class="term" href="../glossary.html">privilege boundary</a>, recreated one level up. The browser has its own <a class="term" href="../glossary.html">kernel</a>, in the sense of a trusted core that holds the real capabilities, and its own <a class="term" href="../glossary.html">userland</a>, in the sense of a restricted territory where untrusted code is allowed to run and ask for things. The rest of this section is the anatomy of that split.</p>
+
+    <h2>The browser process, the renderer and the sandbox</h2>
+    <p>A modern browser divides its work across several kinds of operating system <a class="term" href="../glossary.html">process</a>. The one that matters most is the split between the browser process and the renderers.</p>
+
+    <p>The <a class="term" href="../glossary.html">browser process</a> is the trusted core. It is the part with real privileges, in the ordinary sense of Chapter 14: it is the process that talks to the network stack, reads and writes files on disk, draws the window frame and the address bar, holds the cookie store and the password store, and mediates every request the rest of the fleet makes. If you think of the browser as an operating system for web pages, the browser process is its kernel.</p>
+
+    <p>A <a class="term" href="../glossary.html">renderer process</a> is where a web page actually runs. It parses the HTML, applies the styles, executes the JavaScript, and works out what the page should look like. It holds the page's content in its memory: the text of the document, the values in every form field, the response streaming back from the server. It is, in other words, the process that holds the plaintext of a prompt. And it is the process the browser trusts least, because everything in it came from a stranger.</p>
+
+    <p>So the renderer runs inside a <a class="term" href="../glossary.html">sandbox</a>. A sandbox is a deliberately impoverished execution context: the operating system is asked to strip the process of capabilities it would ordinarily have, so that even if the code inside it is entirely hostile, there is very little for it to reach. A sandboxed renderer typically cannot open files, cannot make network connections of its own, and cannot see other processes. When a page needs any of those things, its renderer asks the browser process, over a defined channel, and the browser process decides whether to comply.</p>
+
+    <p>Chapter 14's vocabulary maps onto this without strain. The renderer is userland; the browser process is the kernel; the request channel between them is the <a class="term" href="../glossary.html">system call</a> interface. The reasoning behind the design is the same too. Browsers have bugs, and a page that finds one may be able to run code of its own choosing inside the renderer. The sandbox is the answer to 'and then what?' A compromised renderer is a program with almost no capabilities, sitting in a box, having to ask permission for anything interesting. Containing the damage is more achievable than preventing every bug.</p>
+
+    <h2>Site isolation, and why there are so many processes</h2>
+    <p>That accounts for two kinds of process, not fourteen. The rest of the count comes from <a class="term" href="../glossary.html">site isolation</a>: the practice of putting content from different sites into different renderer processes, so that one site's data is never resident in a process that another site's code is running in.</p>
+
+    <p>For a long time this was not the case. Browsers grouped pages into renderers loosely, by tab or by memory pressure, and relied on in-page rules to keep one site's script from reading another site's data. Those rules were enforced by the browser's own logic rather than by the hardware, and in early 2018 the Spectre class of processor vulnerabilities demonstrated that logic of that kind could be undermined. The vulnerabilities allowed carefully written code to infer the contents of memory it was not supposed to be able to read, within its own process, by observing timing side effects of the processor's speculative execution. The browsers' response was structural rather than corrective: if a site's data is never in the same process as another site's code, then reading across the boundary requires escaping the process, not just outwitting a check inside it. Site isolation was accelerated and turned on broadly for that reason. <span class="conf">(high; Chromium's own security documentation states the Spectre motivation directly)</span></p>
+
+    <p>Two of the crowd's remaining members are worth naming. The graphics process handles the actual drawing, kept separate because graphics drivers are a historically rich source of vulnerabilities. And each installed extension generally gets a process of its own, which brings us to the two features that decide whether the organisation has any presence inside the browser at all.</p>
+
+    <h2>Profiles: the browser's notion of identity</h2>
+    <p>A <a class="term" href="../glossary.html">browser profile</a> is the unit of state and identity inside a browser. One profile holds one set of <a class="term" href="../glossary.html">cookie</a> jars, one set of active <a class="term" href="../glossary.html">session</a>s, one history, one set of saved sign-ins and passwords, one set of settings, and one set of installed extensions. A second profile in the same installed browser holds a completely different set of all of those, and the two do not share. Signing in to a service in one profile does not sign you in in the other. An extension installed in one is not present in the other.</p>
+
+    <p>Framed against Chapter 14, a profile is the browser's equivalent of a user account on the operating system. It is the container that answers 'who is this, and what is configured for them'. One human being routinely runs two or three, and the browser encourages it: a personal profile and a work profile, switched between with a click on an avatar in the corner of the window.</p>
+
+    <p>For a defender this is the concept everything else in Part Three hangs from, so it is worth stating without hedging. Organisational browser policy does not attach to a person, and it does not attach to a browser installation. It attaches to a profile. The registry values Chapter 15 described, and the configuration profiles Chapter 16 described, are the operating system's mechanism for delivering settings; what those settings configure is a profile. An extension that an administrator force-installs is force-installed into a managed profile. A policy that says 'audit prompts sent to consumer AI sites' applies while the page is loaded in a profile that carries the policy.</p>
+
+    <p>Which makes 'which profile is this page open in' the question a defender has to be able to answer for any given control, and Chapter 19 is largely about the specific mechanics by which Microsoft and Google implement work and personal profiles in Edge and Chrome.</p>
+
+    <h2>Extensions and content scripts</h2>
+    <p>A <a class="term" href="../glossary.html">browser extension</a> is a third-party program installed into a browser profile, which the browser runs with a set of permissions declared up front and approved at install time. The permission model is explicit and reasonably legible: an extension declares which sites it wants access to and which browser capabilities it needs, the browser surfaces that as a list at installation, and it is granted or not. An extension that never asked to read page content cannot read page content.</p>
+
+    <p>The part of an extension that matters here is the <a class="term" href="../glossary.html">content script</a>. A content script is a piece of the extension's code that the browser injects into the renderer process running a page, so that it executes in the context of that page and can read and change the document the page has built. It runs in a separate execution context from the page's own JavaScript, so the two cannot interfere with each other's variables, but it sees the same document. It can read the text content of any element, watch a form field change, observe a submission, and modify what is on screen.</p>
+
+    <p>That is the whole mechanism. An extension with permission for a given site places a content script inside the renderer for that site, and from there it can see what the page holds. Nothing about it is exotic; it is the ordinary way ad blockers, password managers, grammar checkers and translation tools have always worked.</p>
+
+    <h2>The shadow AI lens: what a browser-resident control can read, and where it stops</h2>
+    <p>Now the architecture pays. Chapter 14 asserted, and Chapters 15 and 16 kept returning to, a fact that has been left unexplained until now: an in-browser data loss control can read a prompt without the device being onboarded into anything, which no other device-side control can do. The reason is a matter of position.</p>
+
+    <p>The prompt exists as plaintext in exactly one place on the device long enough for anything to read it: the renderer process for the AI site, between the moment the user types or pastes it and the moment the page hands it to the browser process to send. A content script injected into that renderer, or the browser's own inline <a class="term" href="../glossary.html">DLP</a> machinery which is built into the browser and needs no injection, is inside that process. It reads the text from the document, as the document, before any of it is serialised for the network and long before TLS encrypts anything.</p>
+
+    <p>Compare that with the alternatives and the asymmetry is clear. A network control sees ciphertext, because TLS has already been applied by the time the bytes leave. A kernel-side agent could in principle observe the data, but only by watching the <a class="term" href="../glossary.html">clipboard</a> as a paste happens, or by attaching itself to the browser, and getting a privileged agent onto the machine requires an administrative act on a device the organisation controls. The in-browser control needs neither. It needs a profile.</p>
+
+    <p>So the profile is the whole dependency, and it is worth being precise about what that means in practice. When a staff member opens an AI site in a managed work profile, the page loads in a renderer into which the organisation's extension has injected a content script, or in a browser whose inline policy is active because the profile carries it. When the same staff member opens the same site in their personal profile in the same browser, the page loads in a renderer with none of the organisation's code in it. Not a weakened version of the control; none of it. The organisation is not present in that process, and there is nothing to bypass because there is nothing there.</p>
+
+    <p>This is the profile model working exactly as designed. Profile isolation exists so that a work extension cannot read a personal banking session, which is a property users and privacy regulators both want. The same property means the work extension cannot read a personal ChatGPT session either. A defender should treat the two as one fact rather than as a feature and a flaw.</p>
+
+    <p>Site isolation cuts the same way, one level finer. Because each site runs in its own renderer, a content script is naturally scoped: an extension granted access to a list of AI sites is present in the renderers for those sites and absent from the rest. That is useful, because it makes a proportionate control possible; an organisation can monitor prompts sent to consumer AI services without its extension being resident in the renderer holding an employee's superannuation portal. It is also a bound. Nothing about being 'in the browser' gives an observer a view across the browser. It gives a view of the pages it is permitted to be in.</p>
+
+    <p>All of which yields a usable test for vendor claims. When a product says its extension 'sees everything in the browser', the accurate restatement is that it sees the content of pages, in profiles, where it is installed and permitted, while it remains installed. Every word of that is doing work. Ask which profiles it is deployed to, whether the user can remove it, and which sites its permissions cover, and a broad claim becomes a specific and checkable one.</p>
+
+    <p>There is a second consequence of the extension model that receives less attention than it deserves. The same mechanism that hosts the organisation's control hosts whatever the user installs. A page-summarising extension, a writing assistant, a 'chat with this page' tool: each of these is an in-browser program with a content script, reading page content and sending it to a third party the organisation never assessed. The staff member did not visit an AI website, so nothing in the network telemetry looks like AI usage, and yet the contents of every page they open, including the ones behind corporate authentication, may be leaving. On a managed profile, extension allowlisting addresses this and is a control worth having. On an unmanaged profile it is unaddressed, and it is a genuine gap in most organisations' picture of their exposure.</p>
+
+    <p>The summary a defender can carry into a design review is that the browser-resident control is strong and weak for the same architectural reason. The browser, having rebuilt itself as an operating system to run strangers' code safely, contains a place where the page's plaintext is visible before the network exists. That is why the control works on a device the organisation does not manage. That place is bounded by the browser's own isolation and permission model and belongs to a profile the user may choose not to be in. That is why the control is never a guarantee.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>On an unmanaged device the choice of browser and profile belongs to the user. The control hangs off the work profile, and the staff member on their own laptop can decline to use it, in a way that requires no technical skill and does not look like evasion. This is Chapter 14's hard limit restated at the browser layer, and it is why the in-browser control is necessary without being sufficient. Chapter 20 sets out what enrolment actually buys in tying a profile down.</p>
+      <p>Extensions can be removed, disabled, or never installed. On a managed profile an administrator can force-install an extension and prevent its removal, and that dependency is worth stating plainly in any design document, because the control's existence is conditional on a configuration that has to be delivered and maintained.</p>
+      <p>Browsers are not equally controllable and the market is not static. Edge and Chrome have mature enterprise policy surfaces; Safari and Firefox differ in what they expose to administrators; and browsers built around AI features, or shipping their own assistants, are entering the market. A control strategy pinned to the capabilities of one browser is brittle by construction. <span class="conf">(medium; this surface is changing)</span></p>
+      <p>The browser's own AI features blur the boundary the chapter has drawn. When the browser itself ships a sidebar assistant or a page-summarising feature that sends page content to a model, the shadow AI risk has moved inside the software the organisation was relying on to host its control. Enterprise policy for these features exists in varying degrees of maturity and is changing quickly, and the honest position for now is that this is an open governance question rather than a solved one. <span class="conf">(medium)</span></p>
+      <p>In-browser observation is plaintext at the page, not coverage. It does not see a desktop AI application, a script calling a model's API as in Chapter 17, a different browser, or another profile. Treating the browser-resident control as total coverage is the predictable error, and the whole structure of Part Three is an argument against making it.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A colleague says 'our DLP browser extension reads everything in the browser, so we are covered'. Rewrite that claim accurately in two sentences, naming the two architectural facts that bound it.</li>
+        <li>Explain, in terms of processes and the sandbox, why a browser-resident control can read a prompt that the corporate firewall cannot.</li>
+        <li>A user reaches an AI site in the same browser the organisation manages, and the inline DLP did not fire. Give the most likely profile-related explanation, and one way to confirm it.</li>
+        <li>Why do user-installed browser extensions constitute a shadow AI risk in their own right, distinct from staff visiting AI websites? What telemetry would you expect to miss it?</li>
+        <li>Site isolation was hardened in response to a processor vulnerability, not a browser bug. Explain that reasoning to someone who is not sure why a hardware flaw should change how software is structured.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">browser extension &middot; browser process &middot; browser profile &middot; clipboard &middot; content script &middot; cookie &middot; DLP &middot; kernel &middot; privilege boundary &middot; process &middot; renderer process &middot; sandbox &middot; session &middot; site isolation &middot; system call &middot; TLS &middot; userland</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>The Chromium Projects, <em>Multi-process Architecture</em>. <a href="https://www.chromium.org/developers/design-documents/multi-process-architecture/" target="_blank" rel="noopener">chromium.org</a>. The primary reference for the browser process and renderer process split and the reasoning behind it. Page undated; last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>The Chromium Projects, <em>Site Isolation</em>. <a href="https://www.chromium.org/Home/chromium-security/site-isolation/" target="_blank" rel="noopener">chromium.org</a>. Supports the description of one renderer per site and the sandbox's role in containing a compromised renderer. Page undated; last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Google Online Security Blog, <em>Mitigating Spectre with Site Isolation in Chrome</em>, 11 July 2018. <a href="https://security.googleblog.com/2018/07/mitigating-spectre-with-site-isolation.html" target="_blank" rel="noopener">security.googleblog.com</a>. Supports the causal claim that the Spectre class of processor vulnerabilities drove the broad rollout of site isolation. <span class="conf">(high)</span></li>
+        <li>Chrome for Developers, <em>Content scripts</em>. <a href="https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts" target="_blank" rel="noopener">developer.chrome.com</a>. Supports the description of a content script executing in the context of a page, in a separate execution context from the page's own scripts, with access to the document. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>MDN Web Docs, <em>Content scripts</em> (WebExtensions). <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_scripts" target="_blank" rel="noopener">developer.mozilla.org</a>. The cross-browser equivalent, used to confirm that the content script model is not specific to Chromium. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Mozilla, <em>Introducing Firefox's new Site Isolation Security Architecture</em>, Mozilla Hacks, 18 May 2021. <a href="https://hacks.mozilla.org/2021/05/introducing-firefox-new-site-isolation-security-architecture/" target="_blank" rel="noopener">hacks.mozilla.org</a>. Supports the claim that site isolation is an industry-wide architectural response rather than one vendor's choice. <span class="conf">(high)</span></li>
+        <li>Chapters 14, 15 and 16 of this manual, and <em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em>, this project's internal source report, for the browser-resident control facts reused here: that Edge inline DLP requires no device onboarding, and that the Purview extension and inline policy depend on the work profile. Those claims are sourced in Chapters 14 and 19 rather than re-derived here.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The number and kind of processes a browser runs varies by browser, by version and by available memory, and browsers consolidate processes under memory pressure. The opening scene's count is illustrative rather than a specification. <span class="conf">(high, as an illustration; the specific number is not a claim)</span></p>
+      <p>Enterprise policy coverage for browsers' own built-in AI features is uneven and changing, and I have not established what a defender can reliably switch off across the major browsers as at August 2026. Verify against current administrative templates before relying on any particular setting. <span class="conf">(low)</span></p>
+      <p>Safari and Firefox enterprise management differ from Edge and Chrome in ways this chapter does not detail, because the manual's case-study material is Microsoft-centred. An organisation with a substantial Safari or Firefox population needs that gap closed with vendor documentation. <span class="conf">(medium)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="17-linux-and-the-substrate.html">&larr; Linux's role</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="19-edge-for-business.html">Edge for Business &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

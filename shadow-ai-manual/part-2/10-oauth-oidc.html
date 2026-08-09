@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OAuth 2.0 and OpenID Connect: the flows, the tokens, the trust model · Shadow AI Blue Team Manual</title>
+<meta name="description" content="The authorisation code flow taken apart request by request, what each of the three tokens carries, and why the consent screen is the most leveraged shadow AI control an organisation has.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-2/10-oauth-oidc.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>OAuth 2.0 and OpenID Connect</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Two &middot; Identity, OAuth and the modern enterprise</div>
+  <h1>OAuth 2.0 and OpenID Connect: the flows, the tokens, the trust model</h1>
+  <p class="subtitle">Read a sign-in as a sequence of requests, and the difference between an access token and an ID token stops being abstract.</p>
+  <div class="reading-meta">
+    <span>Part Two</span>
+    <span>About 17 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A defender opens the network log for a corporate laptop. A user has clicked 'Continue with Microsoft' on claude.ai, and the log shows eleven HTTPS requests in quick succession across three domains: claude.ai, login.microsoftonline.com and graph.microsoft.com. Something coherent is happening across the eleven requests, but the defender cannot yet name what each one does.</p>
+      <p>This chapter takes that sequence apart, one request at a time. By the end you should be able to read a similar log and recognise which request is the authorisation request, which redirect carries the authorisation code, which is the back-channel token exchange, and which is the call to Microsoft Graph using the access token. OAuth 2.0, defined in RFC 6749 in 2012, and OpenID Connect, published in 2014, together carry virtually every 'sign in with' interaction on the modern web, including every consumer AI tool a defender will meet.</p>
+    </div>
+
+    <h2>Why OAuth exists</h2>
+    <p>Before OAuth, third-party access to a user's data on another service often meant handing over the password. A photo-printing site that wanted your cloud photos asked for your storage password and logged in as you. This was bad in several ways: the third party had full account access with no scoping; it could be revoked only by a password change, which broke the user's own access everywhere; it trained users to type passwords into anything that asked; and a breach of the third party exposed a working credential to the original service. OAuth 2.0 was designed to let a user authorise a third party to access specific resources on their behalf, without sharing the password, with explicit scoping, and with revocation that does not require a password change.</p>
+
+    <h2>The four roles</h2>
+    <p>OAuth names four roles. The resource owner is the person whose data the protocol is about; in this manual, the user. The resource server is the API that holds the data; Microsoft Graph when the data is in Microsoft 365. The <a class="term" href="../glossary.html">client</a> is the application that wants access, in the OAuth sense rather than the HTTP sense: it is the third-party application asking permission, not the browser. Claude is the client when a user signs into claude.ai. The authorisation server is the IdP that authenticates the user and issues tokens; Microsoft Entra for 'Continue with Microsoft'. The resource server and authorisation server are often the same vendor, but the protocol does not require it, and that is what lets one IdP serve many resource servers.</p>
+
+    <h2>The two channels</h2>
+    <p>The protocol uses two channels with different security properties. The <a class="term" href="../glossary.html">front channel</a> is the path through the user's browser via HTTP redirects; anything on it is visible to anyone who can see the URL bar, the browser history, or the network in between, so it cannot carry secrets. The <a class="term" href="../glossary.html">back channel</a> is server-to-server, between the client and the authorisation server over HTTPS, confidential to the two endpoints, and can carry a client secret or a token. The design follows from this: long-lived credentials and bearer tokens travel on the back channel; short-lived identifiers travel on the front channel. The authorisation code flow is structured so that the only thing on the front channel is a one-time identifier that grants nothing until exchanged on the back channel for tokens.</p>
+
+    <h2>The authorisation code flow</h2>
+    <p>The dominant flow in 2026 is the <a class="term" href="../glossary.html">authorisation code flow</a>, and almost every AI tool uses it. It has seven steps.</p>
+
+    <p>First, the user clicks 'Continue with Microsoft' on claude.ai. The client builds a URL on the authorisation server and redirects the browser to it, carrying the client identifier, the requested scopes, the redirect URI, a random state parameter, and a PKCE code challenge. This is on the front channel. Second, the user authenticates at the authorisation server; from the protocol's point of view this is a black box, and it is where the IdP's factors and Conditional Access apply. Third, the authorisation server shows a consent screen listing the requested scopes, and the user clicks 'Allow' or 'Cancel'. Fourth, on consent, the authorisation server redirects the browser back to the client's registered redirect URI carrying an authorisation code and the state parameter; this is on the front channel, and the code is short-lived and one-time-use. Fifth, the client's server makes a back-channel POST to the token endpoint, presenting the authorisation code, its client identifier, its client secret if it is a confidential client, and the PKCE verifier; the browser is no longer involved. Sixth, the authorisation server validates all of this and returns an access token, optionally a refresh token, and, if OIDC was requested, an ID token. Seventh, the client calls the resource server with the access token, repeating for as long as the token is valid and using the refresh token to get a new one when it expires. The state parameter, sent in step one and returned in step four, lets the client confirm the redirect belongs to a flow it started, defending against cross-site request forgery.</p>
+
+    <h2>PKCE: closing the gap for clients without a secret</h2>
+    <p>The flow above assumes the client can keep a secret. A server-side web application can; a mobile app or a single-page application running in the browser cannot, because anyone with the binary or the JavaScript can extract it. These are public clients, and if the only thing protecting the token exchange is the authorisation code, an attacker who intercepts the redirect can present the code and receive the tokens. <a class="term" href="../glossary.html">PKCE</a>, Proof Key for Code Exchange, fixes this: the client generates a random verifier, sends a hash of it as the code challenge with the authorisation request, and presents the verifier at the token exchange. An attacker with the code but not the verifier cannot complete the exchange. PKCE began as mobile-app guidance and the OAuth 2.1 consolidation makes it mandatory for all clients. In 2026 it is the default everywhere it can be, and an AI tool not using it should be assumed to carry other security debt.</p>
+
+    <h2>The other flows, briefly</h2>
+    <p>The client credentials flow is machine-to-machine: no user, the client authenticates itself and receives a token bound to the client, used by service accounts and back-end automations. The device code flow is for input-constrained devices, where a code and URL are shown and the user completes sign-in on a phone; it is used by command-line tools and some AI coding assistants. The implicit flow is deprecated: it returned access tokens in the URL fragment, which leak through history, referer headers and proxy logs. The resource owner password credentials flow is the password antipattern in OAuth clothing and is a red flag wherever found. The hybrid flow is OIDC-specific; for shadow AI reasoning, the authorisation code flow with PKCE covers almost every consumer AI tool.</p>
+
+    <h2>The tokens: what each carries</h2>
+    <p>Conflating the three tokens is one of the most common errors in shadow AI policy documents. The <a class="term" href="../glossary.html">access token</a> is the bearer credential the client presents to the resource server on every API call, often a JWT carrying the subject, the audience, the granted scopes and the expiry. It is short-lived, typically an hour. The <a class="term" href="../glossary.html">refresh token</a> is a long-lived credential the client holds to obtain new access tokens without the user; it is typically opaque, so the client cannot read it, and its value to an attacker equals the value of the consented scopes for as long as it remains valid. The <a class="term" href="../glossary.html">ID token</a> is OIDC-specific and answers a different question, who is this user, as a signed JWT with standard claims (sub, iss, aud, iat, exp, auth_time, nonce and others). The client reads the ID token to learn the user's identity. The ID token is not a credential for the resource server; the access token is. Conflating these is the source of more than one identity-layer bug.</p>
+
+    <h2>OpenID Connect on top of OAuth</h2>
+    <p>OIDC adds three things. The ID token, above. The UserInfo endpoint, a standardised resource server at the IdP from which the client can fetch user attributes using the access token. And discovery: every OIDC provider exposes a well-known URL that returns a document listing its endpoints and the location where it publishes its signing keys, so a client that knows the issuer URL can configure itself. OIDC also standardises scopes: 'openid' triggers ID token issuance and marks a flow as OIDC; 'profile', 'email' and others add attributes. Beyond these, every IdP layers its own; Microsoft Graph scopes such as Mail.Read and Files.Read.All are issued by Entra on top of the OIDC scopes, and the <a class="term" href="../glossary.html">scope</a> namespace is what the consent screen shows the user.</p>
+
+    <h2>The shadow AI lens</h2>
+    <p>The defender looking at eleven requests can now read them. The first is the front-channel authorisation request to login.microsoftonline.com, carrying claude.ai's client identifier, the requested scopes, the redirect URI, the state and the PKCE challenge. The second through fifth are the user authenticating: a password prompt, an MFA challenge, a Conditional Access evaluation, the consent screen. The sixth is the redirect back to claude.ai's callback with the authorisation code and state. The seventh is the back-channel POST to the token endpoint. The eighth is the response with the access, refresh and ID tokens. The ninth through eleventh are claude.ai calling Microsoft Graph for whatever the consented scopes allow.</p>
+
+    <p>The <a class="term" href="../glossary.html">consent screen</a> is the most underappreciated control in the flow. It is the point at which the user authorises the AI vendor to receive specific capabilities against the corporate tenant. A user who clicks 'Allow' without reading has consented to the listed scopes; a user trained to read consent screens is the most leveraged shadow AI control an organisation can deploy at zero technology cost. Admin consent settings move the decision off the user for high-risk scopes, but the consent screen is where the question is asked.</p>
+
+    <p>Scope creep is the slow failure. A tool that initially requests 'openid profile email' can, in a later release, ask for 'Mail.Read' or 'Files.Read.All'. The blast radius of a granted token is what its scopes say, regardless of how the vendor markets the integration. Token theft is the contemporary attack: an access token is a bearer token, so whoever holds it can use it while it is valid, and the resource server cannot tell the user from a thief. Adversary-in-the-middle phishing kits defeat MFA by harvesting tokens after authentication rather than credentials before it; token binding, introduced in Chapter 9, is the IdP-side response. Refresh tokens and offboarding deserve the mechanical detail this chapter can now give: disabling the user's account does not invalidate a refresh token already at the AI vendor. Entra's 'revoke sessions' action revokes refresh tokens for a user, but propagation depends on whether the vendor's token validation checks back with the IdP on each refresh or accepts the refresh token until it expires, and coverage is uneven. <span class="conf">(medium; behaviour varies by relying party and is not always documented)</span> What a defender can audit is the front of the flow: the sign-in event, the consent grant, the OAuth grant. What the vendor then does with the tokens is invisible to the corporate stack unless the AI service supports tenant-side audit pulls, which most consumer-grade services do not for free-tier accounts.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The audience claim is what a resource server should validate; servers that do not are open to confused-deputy attacks, where a token meant for one audience is used to call another. The redirect URI is part of the trust boundary, and wildcard redirect URIs or open redirects on the client domain let an attacker steer authorisation codes to a callback they control. A client registered with a secret but deployed as a public client leaks that secret to anyone with the binary. Token-signing bugs have a long history: the 'alg: none' family accepted unsigned tokens because the header said none was required, and RS256-versus-HS256 confusion let attackers sign tokens with the public key; modern libraries are mostly fixed, legacy code is not. Implicit-flow clients are still around, leaking access tokens through URL fragments and unable to use PKCE; treat any AI tool still using implicit flow as an indicator of broader security debt.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A user clicks 'Continue with Microsoft'. Trace the authorisation code flow with PKCE. For each step, say whether it is front channel or back channel. Where is the authorisation code? Where is the access token?</li>
+        <li>In two sentences each, distinguish an access token, a refresh token and an ID token. What is the consequence of each being stolen, and from whom?</li>
+        <li>An offboarded user's account was just disabled in Entra. Before leaving, they granted Mail.Read to an AI tool. Can the tool still read their mail one hour later? One week later? What determines the answer?</li>
+        <li>An AI tool requests 'openid profile email Mail.Read Files.Read' at sign-up. Write three sentences for a tenant admin explaining what these give the tool and which to be cautious about.</li>
+        <li>A defender sees a successful sign-in to login.microsoftonline.com from a corporate device, then no calls to graph.microsoft.com from that client for an hour. What can they conclude, and what can they not?</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">access token · authorisation code · authorisation code flow · authorisation server · back channel · client (OAuth) · client credentials flow · code challenge · code verifier · confidential client · consent screen · device code flow · discovery endpoint · front channel · hybrid flow · ID token · implicit flow (deprecated) · JWKS · nonce · PKCE · public client · redirect URI · resource owner · resource server · ROPC (deprecated) · scope · state parameter · UserInfo endpoint</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>IETF, <em>RFC 6749: The OAuth 2.0 Authorization Framework</em>, 2012. <a href="https://datatracker.ietf.org/doc/html/rfc6749" target="_blank" rel="noopener">datatracker.ietf.org/doc/html/rfc6749</a>. Base specification. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>IETF, <em>RFC 6750: OAuth 2.0 Bearer Token Usage</em>, 2012. <a href="https://datatracker.ietf.org/doc/html/rfc6750" target="_blank" rel="noopener">datatracker.ietf.org/doc/html/rfc6750</a>. Bearer token usage in HTTP. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>IETF, <em>RFC 7636: Proof Key for Code Exchange (PKCE)</em>, 2015. <a href="https://datatracker.ietf.org/doc/html/rfc7636" target="_blank" rel="noopener">datatracker.ietf.org/doc/html/rfc7636</a>. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>IETF, <em>RFC 8252: OAuth 2.0 for Native Apps</em>, 2017. <a href="https://datatracker.ietf.org/doc/html/rfc8252" target="_blank" rel="noopener">datatracker.ietf.org/doc/html/rfc8252</a>. Established PKCE as the default for public clients. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>IETF, <em>RFC 8628: OAuth 2.0 Device Authorization Grant</em>, 2019. <a href="https://datatracker.ietf.org/doc/html/rfc8628" target="_blank" rel="noopener">datatracker.ietf.org/doc/html/rfc8628</a>. The device code flow. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>OpenID Foundation, <em>OpenID Connect Core 1.0 incorporating errata set 2</em>, 2023. <a href="https://openid.net/specs/openid-connect-core-1_0.html" target="_blank" rel="noopener">openid.net/specs/openid-connect-core-1_0.html</a>. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>OpenID Foundation, <em>OpenID Connect Discovery 1.0</em>, 2014 (with errata). <a href="https://openid.net/specs/openid-connect-discovery-1_0.html" target="_blank" rel="noopener">openid.net/specs/openid-connect-discovery-1_0.html</a>. The well-known configuration endpoint. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Microsoft identity platform and OAuth 2.0 authorization code flow</em>. <a href="https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Permissions and consent in the Microsoft identity platform</em>. <a href="https://learn.microsoft.com/en-us/entra/identity-platform/permissions-consent-overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The OAuth 2.1 consolidation has been in IETF draft for several years; whether it has been published as a numbered RFC by the time this is read should be verified and the citation updated. <span class="conf">(medium)</span> The RFC number for the OAuth 2.0 Security Best Current Practice (historically the security-topics draft, cited elsewhere as RFC 9700) should be verified at publication. <span class="conf">(medium)</span> Default access-token and refresh-token lifetimes in Entra are configurable and move with releases; consult the live documentation rather than assume the figures here. <span class="conf">(medium)</span> Refresh-token revocation propagation from Entra to specific relying parties is not always documented and varies by the relying party's validation logic. <span class="conf">(medium)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="09-federated-identity.html">&larr; Federated identity and SSO</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="11-saml.html">SAML &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Authentication versus authorisation: the conceptual split · Shadow AI Blue Team Manual</title>
+<meta name="description" content="Why proving who a user is and deciding what they may do are two separate decisions, why the distinction is central to enterprise security, and why a control good at one is often blind to the other.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-2/08-authn-authz.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Authentication versus authorisation</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Two &middot; Identity, OAuth and the modern enterprise</div>
+  <h1>Authentication versus authorisation: the conceptual split</h1>
+  <p class="subtitle">Two decisions happen in one click, and treating them as one is why controls miss what they miss.</p>
+  <div class="reading-meta">
+    <span>Part Two</span>
+    <span>About 15 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A staff member opens claude.ai on a corporate-managed laptop and clicks 'Continue with Google'. A Google sign-in window appears, recognises that they are already signed into their corporate Google Workspace account in another tab, and completes in a single click. Claude greets them by name. Their manager hears about it later and asks the IT team whether the sign-in went through the organisation's security controls. The accurate answer is "partly, depending on what you mean by controls".</p>
+      <p>Two things happened in that click. The corporate identity provider confirmed the user is who they claim to be. A separate decision authorised Claude to receive an assertion about that user, and depending on the integration, some access to the user's Google account. The first is <strong>authentication</strong>: are you who you say you are? The second is <strong>authorisation</strong>: given that we know who you are, what should you, and this third party acting for you, be allowed to do? Treating the two as one thing is a common reason defenders are surprised by what their controls do not catch.</p>
+    </div>
+
+    <h2>Authentication: a question about identity</h2>
+    <p><a class="term" href="../glossary.html">Authentication</a> proves that the person making a request is the person the account claims. The classical model has three factor types: something you know (a password or PIN), something you have (a phone with an authenticator app, a hardware key), and something you are (a fingerprint or face). Single-factor uses one. <a class="term" href="../glossary.html">Multi-factor authentication</a> requires two from different categories, on the reasoning that an attacker who stole the password is unlikely to also hold the phone.</p>
+
+    <p>Passwordless authentication, despite the name, is not a fourth factor. A passkey is a private key (something you have) unlocked by a biometric (something you are). The cryptography is fresher and the sign-in shorter, but the categories are unchanged.</p>
+
+    <p>Authenticating a user costs key presses and attention, so applications cannot ask on every request. They cache the answer in a <a class="term" href="../glossary.html">session</a>: a successful authentication produces a session, the session lives for minutes or hours, and during that window the application treats the user as authenticated without asking again. This is what users feel as 'staying logged in'. It is also where the long tail of post-authentication risk sits, because once a session exists, compromising it no longer requires the password.</p>
+
+    <p>Most organisations do not run authentication inside each application. They delegate the question to one trusted system, the <a class="term" href="../glossary.html">identity provider</a> (IdP), and let every application defer to it. Microsoft Entra ID, Google Workspace, Okta and Auth0 dominate Australian corporate environments in 2026. The IdP is where the password lives, or where the passkey is registered; where MFA is enforced; and where sign-in events are logged. In a federated world, authentication is a property of the IdP, not of the application.</p>
+
+    <h2>Authorisation: a question about policy</h2>
+    <p><a class="term" href="../glossary.html">Authorisation</a> is the separate decision about what an authenticated user may do. Its inputs typically include who the user is, what action they are attempting, what role or permission set they hold, and the context: device, location, time, risk score. Its output is a yes or no.</p>
+
+    <p>Three models dominate enterprise authorisation. Role-based access control (<a class="term" href="../glossary.html">RBAC</a>) assigns roles to users and permissions to roles. Attribute-based access control (ABAC) evaluates rules over user, resource and environment attributes. Policy-based access control, of which Microsoft Conditional Access is the canonical example, layers a rules engine on top of either to decide per sign-in. A modern environment uses all three, often without anyone tracking which decision lives where.</p>
+
+    <p>The property of authorisation that matters most for shadow AI is that it can outlive authentication. A user authenticates once at 9am. The system issues an <a class="term" href="../glossary.html">access token</a> valid until 5pm and a <a class="term" href="../glossary.html">refresh token</a> valid for weeks. The user is now authorised, by holding those tokens, to call a long list of APIs without re-authenticating. If the account is disabled at 11am, the access token still works until it expires or until each application checks back with the IdP, and the refresh token still works until something revokes it. Authorisation that outlives authentication is the design point that makes web applications usable, and it is where almost every interesting identity-layer attack sits.</p>
+
+    <h2>How they connect: assertions, tokens, claims</h2>
+    <p>The mechanism that links the two is the bearer token, seen in Chapter 6 in its HTTP-header form. When a user authenticates to an IdP and requests access to an application, three artefacts are commonly produced. An identity assertion describes what the IdP knows about the user; in SAML this is a SAML assertion, in OpenID Connect an <a class="term" href="../glossary.html">ID token</a>. An access token authorises the holder to call the application's APIs on the user's behalf, limited to a set of permissions. A refresh token, where issued, lets the application obtain new access tokens silently.</p>
+
+    <p>Each token carries claims: key-value statements such as 'sub' for the user identifier, 'aud' for the intended audience, 'iat' for issue time, 'exp' for expiry, and application-specific claims about roles, groups and consented scopes. JSON Web Tokens, the format carrying most of these, are base64-encoded and readable to anyone who can decode them, so the corporate proxy of Chapter 7, when it inspects traffic, can read the user identity, the issuing tenant and the granted <a class="term" href="../glossary.html">scopes</a> without the signing key. Whether it is permitted to is a Part Five question.</p>
+
+    <p>The pattern is delegation. A user signs in to their IdP; the IdP issues tokens to the application; the application calls the user's APIs using those tokens; the user's password never touches the application. The IdP vouches for the user, and the application trusts the IdP. OAuth 2.0 is the dominant standard for the delegation step, and OpenID Connect adds the identity-assertion semantics on top. Chapter 10 covers both mechanically. The point here is that these protocols separate the act of proving identity from the act of granting capabilities, and that separation is what lets an organisation govern the two independently: the IdP owns authentication, the application owns authorisation for its own resources, and a policy engine such as Conditional Access can deny a sign-in the IdP would otherwise allow.</p>
+
+    <h2>The shadow AI lens</h2>
+    <p>The 'sign in with Google' or 'Continue with Microsoft' button on every consumer AI service is where the split arrives in operational form. When a corporate user clicks the corporate option, the IdP authenticates them with whatever factors policy requires; issues an ID token asserting their identity to the AI vendor; and often the AI vendor also requests OAuth scopes, asking to read profile information at least, sometimes more. The user clicks 'Allow', and the AI vendor receives an access token and a refresh token. Until that refresh token is revoked, the AI vendor can call certain APIs in the user's tenant on the user's behalf.</p>
+
+    <p>This is a federated sign-in working as designed, and it is where a defender starts losing visibility. The sign-in event is in Entra. The OAuth grant is in Entra, under 'Enterprise applications'. What the AI vendor does with the tokens afterwards is in the AI vendor's own logs, which the organisation can read only if it pays for an enterprise tenant in that AI service.</p>
+
+    <p>The deeper problem is that the same staff member has another identity available. Almost every consumer AI tool also accepts a personal account: a personal Gmail address, a personal Microsoft account, a free email-and-password sign-up. A user can sign into Claude with their corporate or their personal identity, on the same managed device, sometimes in the same browser session. From the network's view, both are a TLS connection to claude.ai. From the IdP's view, only the corporate sign-in exists at all. The personal sign-in does not touch Entra, does not appear in its sign-in logs, and does not invoke Conditional Access. This two-identity problem is the heart of the shadow AI gap at the identity layer, and most controls written for the corporate IdP have nothing to say about it.</p>
+
+    <p>Conditional Access shows the trade-off. As an authorisation layer over authentication, it has reach: a defender can require a compliant device, an MFA prompt or a particular risk threshold before allowing a sign-in to a named application, and the Entra catalogue lists thousands of pre-categorised SaaS so that AI tools can be targeted specifically. Conditional Access can deny corporate sign-in to chat.openai.com from a non-compliant device with one rule. It cannot prevent the same user signing in with a personal account, because the personal account never authenticates against Entra. The rule operates on what it can see, which is the corporate authentication path. The way forward is not a stronger authorisation rule; it is to recognise that authentication-layer controls cover one half of the problem, and the other half needs the network, endpoint and governance controls the rest of the manual covers.</p>
+
+    <p>A second consequence appears in app registrations and <a class="term" href="../glossary.html">consent</a>. When a user clicks 'Continue with Microsoft', the AI vendor's application becomes a registered enterprise application in the tenant, with its own identity, permissions and sign-in events. The consent framework decides whether the user can grant the requested scopes themselves, or whether an administrator must approve. Microsoft has tightened the defaults over time, but tenants configured years ago can still permit user consent to scopes an administrator would refuse if asked one at a time. <span class="conf">(medium; default behaviour depends on tenant age and licensing)</span> Entra exposes the enterprise-application list and the consents granted; Defender for Cloud Apps adds tenant-wide risk scoring. Not every organisation looks, and a tenant audit at the start of a control programme routinely surfaces a hundred or more consented OAuth applications no one remembered approving, including a long tail of AI tools. <span class="conf">(medium; the figure varies by sector and tenant size, but the pattern is consistent)</span></p>
+
+    <p>What a defender can see at this layer, when the controls work, is a clean record of corporate identity meeting AI tool: the sign-in, the Conditional Access decision, the OAuth grant, the consented scopes. What they cannot see, ever, is a personal-account interaction with the same AI tool from the same device. Identity-layer telemetry is sharp where it bites and silent where it does not.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>Several patterns escape identity controls, and a defender should know each by name. Local accounts inside applications: some AI services still allow email-and-password sign-up with no IdP at all, invisible to the corporate identity stack. Email-and-password fallback: even tools that prefer federated sign-in usually offer a backup, so a user blocked by Conditional Access can often switch to email signup and proceed. Refresh-token persistence after offboarding: disabling a corporate account does not, by itself, revoke a refresh token already held by an AI vendor, which keeps working until it expires or the grant is swept. Stale Conditional Access: policies that name specific AI applications drift out of date as new tools appear, so category-based rules are more durable than name-based ones. And conflation in policy documents: 'we have MFA' is an authentication claim; 'we control access to AI tools' is a separate authorisation claim, and many organisations write the first and assume the second.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Your security team announces that multi-factor authentication is now enforced for all corporate sign-ins. In two sentences, explain why this, alone, does not address shadow AI use of personal accounts on consumer AI tools.</li>
+        <li>A user clicks 'Continue with Microsoft' on a third-party AI tool. List, in order, the events the tenant just experienced, and which of them a defender can audit later, and where.</li>
+        <li>A staff member's corporate account is disabled at 5pm Friday. The day before, they signed into an AI tool with 'Continue with Microsoft' and consented to scopes against Microsoft Graph. Can the tool still call those APIs at 6pm Friday? What determines the answer?</li>
+        <li>In two sentences each, distinguish authentication, authorisation and consent.</li>
+        <li>Conditional Access blocks corporate sign-in to chat.openai.com from non-compliant devices. Describe a realistic way a staff member uses ChatGPT on a non-compliant device without breaking any Conditional Access rule.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">ABAC · app registration · authentication · authorisation · bearer token · claim · Conditional Access · consent · Entra ID · federated identity · identity provider (IdP) · MFA · OAuth · OIDC · RBAC · refresh token · scope · SAML · session · access token · ID token</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>NIST, <em>SP 800-63B: Digital Identity Guidelines, Authentication and Lifecycle Management</em>, 2017 (errata through 2023). <a href="https://pages.nist.gov/800-63-3/sp800-63b.html" target="_blank" rel="noopener">pages.nist.gov/800-63-3/sp800-63b.html</a>. The reference for the factor categorisation and the authentication assurance levels. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>IETF, <em>RFC 6749: The OAuth 2.0 Authorization Framework</em>, 2012. <a href="https://datatracker.ietf.org/doc/html/rfc6749" target="_blank" rel="noopener">datatracker.ietf.org/doc/html/rfc6749</a>. Defines the delegation model, grant types and refresh-token semantics. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>IETF, <em>RFC 7519: JSON Web Token (JWT)</em>, 2015. <a href="https://datatracker.ietf.org/doc/html/rfc7519" target="_blank" rel="noopener">datatracker.ietf.org/doc/html/rfc7519</a>. Defines the claims structure used in ID tokens and many access tokens. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>OpenID Foundation, <em>OpenID Connect Core 1.0 incorporating errata set 2</em>, 2023. <a href="https://openid.net/specs/openid-connect-core-1_0.html" target="_blank" rel="noopener">openid.net/specs/openid-connect-core-1_0.html</a>. Defines the ID token, standard claims and the authentication request. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>What is Conditional Access in Microsoft Entra ID?</em> <a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/overview" target="_blank" rel="noopener">learn.microsoft.com/en-us/entra/identity/conditional-access/overview</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Configure how users consent to applications</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-user-consent" target="_blank" rel="noopener">learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-user-consent</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Office of the Australian Information Commissioner, <em>Australian Privacy Principles guidelines, Chapter 11, Security of personal information</em>. <a href="https://www.oaic.gov.au/privacy/australian-privacy-principles/australian-privacy-principles-guidelines/chapter-11-app-11-security-of-personal-information" target="_blank" rel="noopener">oaic.gov.au</a>. Relevant to the proportionality framing Part Five develops. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The licensing boundary between Entra ID P1 and P2 for Conditional Access features has shifted several times since 2023; verify against current Microsoft licensing pages before quoting any feature as included or extra. <span class="conf">(medium)</span> Default user-consent behaviour varies with a tenant's age and prior configuration; a specific tenant's posture should be inspected, not assumed. <span class="conf">(medium)</span> The exact OAuth scopes that AI vendors request from Google and Microsoft change over time and should be re-validated against the live consent screens at deployment. <span class="conf">(medium)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="../part-1/07-proxies-swg-sase.html">&larr; Proxies, SWG and SASE</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="09-federated-identity.html">Federated identity and SSO &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

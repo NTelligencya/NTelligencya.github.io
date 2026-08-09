@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Windows for defenders: services, the registry, Group Policy, AppLocker, WDAC · Shadow AI Blue Team Manual</title>
+<meta name="description" content="The four pieces of Windows machinery an organisation uses to impose its will on a device: privileged services, the registry, Group Policy and Intune, and application control. Why each one works on a corporate build and is simply absent on a personal laptop.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-3/15-windows-for-defenders.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Windows for defenders</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Three &middot; Browsers, operating systems and the device</div>
+  <h1>Windows for defenders: services, the registry, Group Policy, AppLocker, WDAC</h1>
+  <p class="subtitle">Every shadow AI control on Windows reduces to a privileged act performed on a device that has joined a management authority.</p>
+  <div class="reading-meta">
+    <span>Part Three</span>
+    <span>About 16 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>Two Windows 11 laptops sit on a desk. One was issued by an Australian health department. The other a staff member bought from a retailer on the weekend. From two metres away they are the same machine: the same operating system, the same lock screen, the same blue Edge icon in the taskbar. A staff member could open ChatGPT on either, sign in, and paste the same patient record into the prompt box.</p>
+      <p>On the first laptop the organisation can block that paste before it leaves the machine, write a record of the attempt, refuse to launch a downloaded desktop AI client, and tighten every one of those controls automatically when the user's behaviour starts to look risky. On the second it can do none of these things. It cannot see the paste, cannot log it, cannot stop the desktop client installing, and has no idea the laptop exists.</p>
+      <p>The hardware is identical and the operating system is identical, so the difference is not in Windows the product. It is in what has been done to this particular installation of Windows: which privileged software has been placed on it, and which switches have been set, by whom, and with what authority. Chapter 14 established the general principle that the capable controls live on the privileged side of a boundary the hardware enforces, and that putting them there is an administrative act that happens only on a managed device. This chapter makes that concrete for Windows, which is the platform on most corporate laptops in Australian government and higher education. The gap between the two laptops on the desk is not magic and it is not licensing. It is four nameable pieces of Windows machinery, each sitting at a known privilege level, and a defender who can name them can predict which shadow AI controls a given device will honour and which it will quietly ignore.</p>
+    </div>
+
+    <h2>How privileged software runs on Windows: services</h2>
+    <p>Start with the question Chapter 14 left implicit. A security agent has to run with privilege to be useful, but how does it come to be running at all, before anyone has logged in, and how does it keep running regardless of who is at the keyboard?</p>
+
+    <p>The answer on Windows is the <a class="term" href="../glossary.html">service</a>. A service is a program that runs in the background, started and managed by the operating system itself rather than launched by a user opening it. Services start as the machine boots, often before any human has signed in, and they keep running across logins and logouts. Most of them run not as the logged-in person but as a dedicated high-privilege system account, the most powerful of which is <a class="term" href="../glossary.html">LocalSystem</a>. A service running as LocalSystem has the run of the machine.</p>
+
+    <p>This is the shape every endpoint agent takes. The Microsoft Defender sensor is a service. The Intune management component is a service. A third-party <a class="term" href="../glossary.html">data loss prevention</a> agent is a service. When the device-state report and Chapter 14 talk about 'onboarding a device', the concrete meaning on Windows is this: a privileged service belonging to the security tooling has been installed and is running as a system account. That is what places the organisation on the privileged side of the boundary. Everything the agent can later do, reading the <a class="term" href="../glossary.html">clipboard</a>, watching <a class="term" href="../glossary.html">syscalls</a>, blocking a network connection, follows from its being a service running with system privilege.</p>
+
+    <p>The personal laptop on the desk has none of these services. Nobody installed them, because installing a system-level service is something you do to a machine you administer, and the staff member administers their own. The entire <a class="term" href="../glossary.html">bring-your-own-device</a> blind spot, restated in Windows terms, is the absence of these services. There is no agent because no agent was ever placed there.</p>
+
+    <h2>The registry: the machine's settings, and who is allowed to change them</h2>
+    <p>A service is software the organisation runs. The next mechanism is about settings the organisation imposes, and on Windows almost every setting of consequence lives in the <a class="term" href="../glossary.html">registry</a>.</p>
+
+    <p>The registry is a single hierarchical database of key/value pairs that the operating system and applications read their configuration from. It is divided into top-level sections called hives, and for a defender the division that matters is between two of them. HKEY_LOCAL_MACHINE, universally abbreviated HKLM, holds machine-wide settings and can be written only by an administrator. HKEY_CURRENT_USER, HKCU, holds settings for the person currently signed in, and that person can write to it freely.</p>
+
+    <p>That asymmetry is the whole point. A setting placed in HKLM is one an ordinary user cannot change. A setting in HKCU is one the user owns. So when an organisation wants to enforce something a user must not be able to undo, it writes a value into HKLM, where the user lacks the privilege to touch it. This is why so many enforced controls reduce, underneath, to 'set a particular value under HKLM'. The browser controls that matter most for shadow AI are exactly this kind of setting: forcing the user into the Edge for Business work profile, constraining or blocking other browsers, controlling which extensions are installed and which cannot be removed. These are registry values written under HKLM, and on a managed device the user cannot reach them.</p>
+
+    <p>Recall Chapter 14's hard limit: on a personal machine the user is the administrator. That sentence now has teeth. An administrator can write anywhere in the registry, HKLM included. Every machine-wide control an organisation might wish for is, on a personal device, a value the device's owner can simply set back. The control is not weak on the personal laptop; it is absent, and even if it were somehow present the owner could remove it.</p>
+
+    <h2>Group Policy and Intune: settings at scale</h2>
+    <p>An organisation does not have hundreds of staff, walk to each laptop, and edit the registry by hand. It defines policy once, centrally, and the machines apply it. The two mechanisms for this are worth naming because a defender will hear both constantly.</p>
+
+    <p><a class="term" href="../glossary.html">Group Policy</a> is the older mechanism, tied to on-premises Active Directory. An administrator defines policy objects on a domain controller, and domain-joined machines pull and apply them, mostly by writing the corresponding values into the registry. The acronym <a class="term" href="../glossary.html">GPO</a>, for Group Policy Object, is the unit of that configuration. <a class="term" href="../glossary.html">Intune</a> is the cloud-era equivalent, introduced in Part Two's Conditional Access material and threaded through the device-state report. For devices joined to <a class="term" href="../glossary.html">Microsoft Entra</a> and enrolled in Intune, policy is defined in the cloud and the device pulls and applies it through its management agent.</p>
+
+    <p>The detail of Active Directory versus Intune is Chapter 20's subject, and the full taxonomy of join and enrolment states belongs there. The conceptual content here is narrower and more important: central enforcement works only because the device has joined a management authority and agreed to obey it. A laptop applies the organisation's Group Policy because it is domain-joined. It applies Intune policy because it is Entra-joined and enrolled. Joining is itself the act of placing the organisation on the privileged side of the device, the same act in a different costume. The retail laptop on the desk has joined nothing, so there is no authority whose policy it would pull, and the central machinery has no purchase on it at all.</p>
+
+    <h2>Application control: AppLocker and App Control for Business</h2>
+    <p>The last mechanism decides not what runs in the background or what settings hold, but which programs the machine will agree to launch in the first place. Chapter 14 framed launching a program as the operating system being asked, through the system-call interface, to start a new <a class="term" href="../glossary.html">process</a>. Application control is the privileged gatekeeper that can answer no.</p>
+
+    <p>Windows has two such gatekeepers, and the difference between them is the kind of thing a defender is expected to know. <a class="term" href="../glossary.html">AppLocker</a> is the older one. It works from rules an administrator writes: allow programs from this publisher, in this path, with this file hash, and block the rest. It is enforced by a service, and it is bypassable in ways that are publicly documented. AppLocker still receives security fixes but no new features, and Microsoft now steers organisations toward the newer technology where they can use it. <span class="conf">(high)</span> It remains the better fit in some cases, notably mixed estates that still include older Windows versions, or shared machines that need different policies for different users. <span class="conf">(high)</span></p>
+
+    <p>The newer technology is <a class="term" href="../glossary.html">App Control for Business</a>, which is the current name for what was for years called Windows Defender Application Control, or <a class="term" href="../glossary.html">WDAC</a>, and before that was part of a feature called Device Guard. The branding has changed more than once, and Microsoft's own documentation still uses both 'App Control for Business' and 'WDAC', so a defender reading around the topic should treat the two as the same thing. <span class="conf">(high)</span> The substance is that App Control policies are a stronger form of allowlisting: they can be enforced close to the <a class="term" href="../glossary.html">kernel</a> and anchored to a hardware root of trust, which makes them far harder to step around than AppLocker rules. If AppLocker is a fence a determined person can sometimes climb, App Control in enforced mode is closer to a wall.</p>
+
+    <p>Both are controls of the <a class="term" href="../glossary.html">standard operating environment</a> and nowhere else. <span class="conf">(high; device-state report section 12)</span> They are configured centrally and applied to managed, joined machines. Their relevance to a manual about shadow AI is direct, and it is the bridge to the next section: these are the mechanisms that decide whether a desktop AI client, or a model run locally on the machine, is allowed to execute at all.</p>
+
+    <h2>Reading shadow AI controls down the Windows stack</h2>
+    <p>With the four mechanisms in hand, the Windows shadow AI controls stop being a list of product features and become a walk down from the network into the operating system, reusing the three places from Chapter 14.</p>
+
+    <p>The outermost control blocks the consumer AI site from the device itself. <a class="term" href="../glossary.html">Microsoft Defender for Endpoint</a>'s network protection and custom indicators run as part of the privileged Defender service and can refuse a connection to chat.openai.com whether the laptop is on the corporate network or at home. <span class="conf">(high; device-state report section 1)</span> This is the strongest-sounding control, and a manual owes the reader its real texture rather than the brochure version. Full URL-path blocking works only in Microsoft's own browsers, Edge and Internet Explorer; for a third-party browser the agent can block the <a class="term" href="../glossary.html">fully qualified domain name</a> but not specific paths within it. <span class="conf">(high)</span> There can be up to two hours of latency between setting a block and the endpoint enforcing it. <span class="conf">(medium)</span> And Chrome's use of the <a class="term" href="../glossary.html">QUIC</a> protocol can intermittently slip past the block unless QUIC is disabled, a point that rests on independent testing rather than Microsoft documentation. <span class="conf">(medium)</span> So 'we block AI sites at the endpoint' is true, and also leakier than it sounds, and the leaks are predictable from the protocols Part One described.</p>
+
+    <p>The next control forces the user onto the inspectable path. The browser-resident controls from Chapter 14, Edge for Business inline DLP and the Purview extension, only bite when the user is actually inside the Edge work profile or a managed browser. The Windows machinery that herds them there is exactly the registry-backed browser policy of the earlier sections: force the work profile, constrain or block other browsers, force-install the extension and forbid its removal. On the standard operating environment these are values under HKLM, written by Group Policy or Intune, that the user cannot reach. The reader who absorbed the foundations now sees this for what it is, a policy value in a protected hive, rather than a proprietary Microsoft trick.</p>
+
+    <p>The innermost control stops the local AI client, and this is where application control earns its place in a shadow AI manual. A desktop ChatGPT application, or a tool like Ollama or LM Studio that runs a model on the machine itself, is in Chapter 14's terms just another <a class="term" href="../glossary.html">userland</a> process asking the operating system to launch it. App Control for Business in enforced mode can refuse that launch, and the refusal is a genuine block; AppLocker can refuse it less reliably; on the personal laptop neither exists. <span class="conf">(high; device-state report section 12)</span></p>
+
+    <p>The locally run model deserves its own sentence because it inverts everything else in the manual so far. When the model runs on the machine, the prompt never leaves it. There is no network connection for network protection to block, no browser session for inline DLP to inspect, no cloud service for the identity layer to police. Every control discussed up to this point is irrelevant by construction, and application control is the only lever left. Application control is a standard-operating-environment control, which means the one lever that works against a local model is absent on exactly the unmanaged personal device where a privacy-minded or determined staff member is most likely to run one. That is not a gap a vendor can close with a feature; it is a consequence of where the boundary falls.</p>
+
+    <p>Step back and the Windows picture reduces to something a defender can hold in one sentence. Every shadow AI control on Windows is one of three privileged acts performed on a managed device: run a privileged service, which is the agent; write a machine-wide registry value the user cannot change, which is the browser and DLP policy; or interpose application control at the moment a program tries to launch. All three depend on the device having joined a management authority. That dependency is the Windows-specific restatement of Chapter 14's thesis. The controls live on the privileged side of the boundary, and on a personal device nobody put them there.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The local administrator on a personal machine undoes all of it. They can stop the services, edit HKLM, and there was never an application-control policy to remove. This is Chapter 14's hard limit wearing Windows clothes, and no arrangement of the four mechanisms changes it.</p>
+      <p>Even on a managed device, application control is not a button you press once. AppLocker has known bypasses. App Control is stronger but demands continuous curation of which programs are allowed, and a policy tightened too far breaks legitimate work, so organisations frequently run it in audit mode, logging what would have been blocked rather than blocking it. The honest position is that application control is a real control whose strength is entirely a function of how rigorously it is run, which is also the spirit of the Essential Eight, where application control is a mitigation strategy with maturity levels rather than a yes-or-no checkbox. <span class="conf">(high)</span></p>
+      <p>'Managed' is not one state but several, and conflating them is a common and costly error. A device can be Entra-registered without being Intune-enrolled, and enrolled without being onboarded to Defender for Endpoint. Each of the four mechanisms in this chapter needs a different rung of that ladder: browser policy can ride on enrolment, while network protection needs the Defender sensor onboarded. A control that assumes the wrong rung will be specified for devices that cannot honour it. Chapter 20 sets out the full taxonomy; the warning here is just not to say 'managed' as though it were one thing.</p>
+      <p>Finally, the <a class="term" href="../glossary.html">Windows Subsystem for Linux</a> is worth flagging and not resolving. It gives a user a genuine Linux environment running on the Windows box, with its own way of launching programs, where someone could run a model or a client under a control surface that the Windows-native mechanisms do not fully cover. It is an edge case and a forward pointer to Chapter 17, which takes Linux seriously in its own right.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A colleague says 'we will just push a Group Policy to stop staff installing the ChatGPT desktop app'. On a corporate standard operating environment, which of this chapter's mechanisms actually enforces that, and why does the same approach do nothing on a staff member's home PC?</li>
+        <li>Explain the difference between AppLocker and App Control for Business to a manager deciding which to fund, in terms of how hard each is for a determined user to get around.</li>
+        <li>A device is Entra-registered but not Intune-enrolled. Can the organisation force the Edge work profile on it through a machine-wide policy? Say why or why not, in terms of what 'enrolled' buys that 'registered' does not.</li>
+        <li>The security team reports that ChatGPT is 'blocked at the endpoint', yet a user reached it in Chrome this morning. Give two technical reasons from this chapter that could account for the gap.</li>
+        <li>A staff member downloads Ollama onto a corporate laptop and runs a model locally. Which of the four mechanisms is the only one that could have prevented it, and what would each of the other three have seen?</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">App Control for Business &middot; AppLocker &middot; BYOD &middot; clipboard &middot; DLP &middot; Entra ID &middot; FQDN &middot; GPO &middot; Group Policy &middot; Intune &middot; kernel &middot; LocalSystem &middot; MDE &middot; process &middot; QUIC &middot; registry &middot; SOE &middot; system call &middot; userland &middot; WDAC &middot; Windows service &middot; Windows Subsystem for Linux</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>The Windows service model, the registry and its hives, the user-versus-system privilege split, and the mechanics of Group Policy are standard Windows-internals material. The references below anchor that and support the specific shadow AI claims.</p>
+      <ol class="sources-list">
+        <li>Mark E. Russinovich, Andrea Allievi, Alex Ionescu and David A. Solomon, <em>Windows Internals</em>, 7th edition, Microsoft Press. Parts on services and the service control manager, the registry, and processes and security. Standard reference. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>App Control and AppLocker Overview</em>. <a href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol-and-applocker-overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the relationship between the two technologies, that App Control for Business is the current name for WDAC, and the guidance to prefer App Control where it can be used. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>AppLocker</em>. <a href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/applocker-overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the claim that AppLocker continues to receive security fixes but no new features, and the cases where it remains the appropriate choice. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Application Control for Windows</em>. <a href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/appcontrol" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the description of App Control for Business as kernel-enforced allowlisting anchored to a hardware root of trust, and its lineage from Device Guard. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li>Australian Signals Directorate, <em>Essential Eight Maturity Model</em>. <a href="https://www.cyber.gov.au/business-government/asds-cyber-security-frameworks/essential-eight/essential-eight-maturity-model" target="_blank" rel="noopener">cyber.gov.au</a>. Supports the framing of application control as an Australian government baseline expressed in maturity levels, with central logging of allowed and blocked events. Last checked 22 May 2026. <span class="conf">(high)</span></li>
+        <li><em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em>, this project's internal source report, section 1 (Defender for Endpoint network protection, web content filtering, the SmartScreen generative AI category) and section 12 (application allowlisting as a standard-operating-environment control). The spine of the shadow AI section.</li>
+        <li><em>Telemetry and control options for shadow AI in an Australian university</em>, this project's internal source report. Supports the enforcement texture: full URL-path blocking in Edge and Internet Explorer versus FQDN-only blocking in third-party browsers, the up-to-two-hours enforcement latency, and the QUIC bypass. The report's own citations to Microsoft Learn and to independent testing are the primary sources behind those points.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The claim that Chrome's QUIC can intermittently bypass Defender for Endpoint network-protection blocks rests on independent testing rather than Microsoft documentation. <span class="conf">(medium)</span> Verify against current behaviour, since both Chrome's QUIC handling and Defender's network protection change over time.</p>
+      <p>The up-to-two-hours enforcement latency for network-protection indicators is documented by Microsoft as a maximum, with 'usually less' as the stated norm, and should be re-checked against current documentation before being quoted as a firm figure. <span class="conf">(medium)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="14-os-fundamentals.html">&larr; Operating systems</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="16-macos-for-defenders.html">macOS for defenders &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

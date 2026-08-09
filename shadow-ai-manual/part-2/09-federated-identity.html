@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Federated identity, SSO and the role of the identity provider · Shadow AI Blue Team Manual</title>
+<meta name="description" content="What an identity provider actually does, why every application defers authentication to it, and which categories of shadow AI activity federation reaches and which it cannot.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-2/09-federated-identity.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Federated identity and SSO</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Two &middot; Identity, OAuth and the modern enterprise</div>
+  <h1>Federated identity, SSO and the role of the identity provider</h1>
+  <p class="subtitle">One system answers "is this the right person?" for every application, and that is where AI policy is written, and where it stops.</p>
+  <div class="reading-meta">
+    <span>Part Two</span>
+    <span>About 15 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>An architecture diagram on an office wall has a box in the centre labelled 'Entra ID'. Arrows fan out to Microsoft 365, ServiceNow, Workday, Atlassian, Salesforce, the intranet, the HR portal, and a long tail of SaaS. What is that box doing? It is the place every application in the organisation has agreed to ask one question: is this person who they say they are? Each application has handed off authentication, because no one wants to maintain a password store, and because doing so would be a security liability. In return, each application accepts assertions issued by Entra and trusts what they say. The arrows are not just connections; they are trust relationships expressed in protocol metadata, set up once and exercised on every sign-in.</p>
+      <p>This is federation. Single sign-on is what users feel when it works; the identity provider is the system that makes it work; the relying parties are the applications that defer to it. This chapter covers all three, and what each looks like when shadow AI tools push into the picture.</p>
+    </div>
+
+    <h2>The federation pattern</h2>
+    <p>Federation has three actors. The user is the human or service account trying to reach an application. The <a class="term" href="../glossary.html">relying party</a> (RP), called the <a class="term" href="../glossary.html">service provider</a> (SP) in SAML's older language, is the application. The <a class="term" href="../glossary.html">identity provider</a> (IdP) is the system the RP has agreed to trust for authentication.</p>
+
+    <p>The trust is asymmetric. The RP trusts the IdP to vouch for users; the IdP does not, in general, need to trust the RP beyond returning an assertion to a registered callback. The RP holds the IdP's public key, or the metadata that names it, and uses that key to verify that any assertion presented to it was actually signed by the IdP.</p>
+
+    <p>The handoff is the same shape everywhere. A user lands at the RP with no valid session. The RP redirects the browser to the IdP. The user authenticates there, which may be a password, an MFA prompt, a passkey, or recognition of an existing IdP session. The IdP issues a signed assertion describing the user. The browser carries it back to the RP. The RP validates the signature, reads the claims, creates a local session, and the user is in. Whether the assertion is dressed in SAML XML or OIDC JSON, the choreography is identical: redirect to the IdP, prove identity, return with an assertion. Chapters 10 and 11 take the two protocols apart.</p>
+
+    <p>The motivations are economic, security and administrative. No one wants to issue and revoke a hundred passwords per employee. If each application enforced MFA separately, it would be enforced weakly and inconsistently; with federation, MFA is enforced once at the IdP and every RP inherits the result. And when a staff member is offboarded, disabling the IdP account stops new sign-ins everywhere at once.</p>
+
+    <h2>Single sign-on and the IdP session</h2>
+    <p><a class="term" href="../glossary.html">Single sign-on</a> is what users feel when federation works: they sign in once and click into Outlook, Teams, ServiceNow and the intranet without being asked again. SSO is not a protocol; it is the result of layering federation over a session at the IdP. The IdP session is a state that says "this user has authenticated; treat new requests from this browser as authenticated". When the user reaches a new federated application and is redirected to the IdP, the IdP recognises the session and issues a fresh assertion without prompting.</p>
+
+    <p>The IdP session lifetime is a usability and security trade-off. Longer sessions mean fewer prompts; shorter sessions limit the dwell time of a stolen session cookie. Most enterprise IdPs default to a few hours of idle timeout and a longer absolute lifetime, but defaults vary by IdP and tenant. <span class="conf">(medium; tenant defaults move with vendor releases)</span> A subtlety worth surfacing: the IdP session and the per-application session are different. Signing out of an application usually ends only that application's session; the IdP session persists, and the next sign-in still gets through silently. Single sign-out, the protocol-defined way to end every RP's session at once, is supported unevenly and is the source of more than one offboarding surprise.</p>
+
+    <h2>The identity provider as a system</h2>
+    <p>An IdP does five things, to varying depth. It stores user identities, or syncs them; in Australian enterprises the dominant pattern is syncing from on-premises Active Directory into Entra using Entra Connect, though some organisations are now cloud-first. It authenticates the user, which is where passwords, MFA factors and passkeys live. It issues identity assertions to relying parties in the protocols they speak, and modern IdPs speak both SAML and OIDC. It maintains the IdP session and runs the policy engine that decides whether to issue an assertion, Conditional Access being the canonical example. And it logs every sign-in. The IdP sign-in log is one of the highest-value telemetry streams a defender has, because it captures every federated authentication attempt and the policy decision attached to it.</p>
+
+    <p>The dominant IdPs in Australian enterprise environments in 2026 are Microsoft Entra ID, by a wide margin because of M365 E5 economics in higher education and government, then Google Workspace identity, Okta, and Auth0. Each speaks the same federation protocols; the differences are in the policy engine, the audit-log shape, and the integrations with the rest of the stack.</p>
+
+    <h2>The relying party</h2>
+    <p>An application becomes a relying party by being federated. On the IdP side, the application is registered with a name, an identifier, a callback URL and the signing key it will use to validate assertions. On the RP side, the IdP's federation metadata is loaded. Either side can revoke the relationship by removing the registration.</p>
+
+    <p>Federation can start from either end. SP-initiated sign-in is what users get when they navigate to the application directly and are redirected to the IdP. IdP-initiated sign-in is what they get when they start at the IdP's 'My Apps' portal and click a tile. When an organisation federates to multiple IdPs, home realm discovery asks "which IdP do you belong to?" and routes accordingly, usually by email domain. Just-in-time provisioning lets an RP create a user record from the assertion on first sign-in. The <a class="term" href="../glossary.html">SCIM</a> protocol takes this further, letting the IdP push create, update and deactivate events to the RP automatically, so an offboarded user is removed without manual cleanup. SCIM support is uneven: enterprise-grade applications support it, many consumer-grade tools do not.</p>
+
+    <h2>The shadow AI lens</h2>
+    <p>Federation pulls every identity decision into one place, which is also the place to write policy about which AI tools staff may use under their corporate identity. An organisation that has fully federated its SaaS estate has one place to enforce identity policy; one that has not, has many.</p>
+
+    <p>Conditional Access lives at the IdP and bites at the federation handoff. When a user is redirected from the AI tool to Entra, Conditional Access evaluates the request and either issues an assertion or denies the sign-in. It can refuse specific applications, whole categories, specific devices, specific networks, or sessions above a risk threshold, and the Entra catalogue recognises generative AI as a category, so a defender can target AI tools with one policy rather than a maintained list of names. <span class="conf">(medium; the category name and membership are revised periodically)</span></p>
+
+    <p>What federation reaches and what it does not is the shape of the problem. Federation reaches any sign-in to a federated AI tool using the corporate identity, and the IdP's policy engine and audit log apply. It does not reach four things: sign-ins to the same AI tools using personal accounts, which authenticate against a different IdP; AI tools that were never federated and use local accounts only; 'Continue with email' fallback flows that bypass federation by design; and SaaS the organisation has not yet federated, where users hold local accounts.</p>
+
+    <p>The 'sign in with Microsoft' button deserves a second look here. From Chapter 8, clicking it triggers an OAuth grant and creates an enterprise app registration. From the federation view, the same click establishes a federation trust relationship the administrator did not pre-approve; the user has federated a third-party application to the corporate IdP on the organisation's behalf. This is why a tenant audit so often surfaces dozens of unfamiliar enterprise applications, each the residue of a federation initiated from outside, one click at a time. The mitigations are the consent settings of Chapter 8, plus periodic review of the enterprise-applications list.</p>
+
+    <p>Offboarding shows the seams. When a staff member leaves, the IdP disables the account. Applications that check the IdP on every sign-in stop letting them in immediately. Applications holding long-lived sessions keep them in until the session expires. Applications holding refresh tokens keep getting new access tokens until something revokes them at the IdP or the AI vendor's token lifecycle ends. A 'sign in with Microsoft' relationship to an AI tool can outlive the corporate account by days or weeks unless OAuth grants are explicitly revoked, and most offboarding playbooks, written before the shadow AI era, do not include this step. Cross-tenant guest access through Entra B2B adds a further wrinkle: a guest using AI tools under their guest identity is partly under the resource tenant's governance and partly under their home tenant's, and the boundaries are not always crisp.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The IdP is a single point of failure: when Entra has an outage, every federated application stops accepting new sign-ins, while users with valid sessions continue until their session lapses. This has happened more than once. <span class="conf">(high)</span> The IdP is also a high-value compromise target: if its signing key is stolen or forged, every relying party accepts assertions an attacker mints for any user, which is the class of attack seen in the 2020 SolarWinds compromise. <span class="conf">(high)</span> Token theft is the contemporary version: a stolen IdP session cookie is an assertion-issuing key for the duration of the session, which is why token-binding features such as Token Protection are emerging, with partial adoption. <span class="conf">(medium)</span> The federation that was never done is the simplest gap: applications still using local accounts bypass everything Conditional Access does and produce no IdP audit trail. And refresh tokens that survive offboarding, from Chapter 8, are a federation-era problem specifically, because federation pulls authentication into one place while pushing authorisation into long-lived tokens at the relying party.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A user had to sign in to Salesforce, Workday and Atlassian separately this morning; a colleague signed in once and reached all three. Why might that be, in terms of the federation pattern?</li>
+        <li>Your CIO asks what would happen to applications during an eight-hour Entra outage at 9am Monday. Write a four-sentence reply distinguishing applications that rely on the IdP for new sign-in from those relying on it for session refresh.</li>
+        <li>A staff member 'signed in with Microsoft' to an AI tool eight months ago and left last week. Conditional Access now blocks all generative AI categories. Can the vendor still reach Microsoft Graph on their behalf today, and what determines the answer?</li>
+        <li>Distinguish, in two sentences each, an IdP, an RP and an SP. Why do you meet both 'RP' and 'SP' for the same role?</li>
+        <li>Your tenant admin sees fifty enterprise-application entries for AI tools no one centrally approved. Where did they come from, and what does each represent?</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">B2B (cross-tenant) · Conditional Access · Entra ID · federated identity · federation metadata · home realm discovery · identity provider · JIT provisioning · OAuth · OIDC · refresh token · relying party (RP) · SAML · SCIM · service provider (SP) · single sign-on (SSO) · single sign-out · token protection</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>NIST, <em>SP 800-63C: Digital Identity Guidelines, Federation and Assertions</em>, 2017 (errata through 2023). <a href="https://pages.nist.gov/800-63-3/sp800-63c.html" target="_blank" rel="noopener">pages.nist.gov/800-63-3/sp800-63c.html</a>. Federation terminology, the assertion model and federation assurance levels. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>IETF, <em>RFC 7644: System for Cross-domain Identity Management (SCIM): Protocol</em>, 2015. <a href="https://datatracker.ietf.org/doc/html/rfc7644" target="_blank" rel="noopener">datatracker.ietf.org/doc/html/rfc7644</a>. IdP-driven user lifecycle synchronisation to relying parties. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>What is single sign-on in Microsoft Entra ID?</em> <a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/what-is-single-sign-on" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>What is Microsoft Entra B2B collaboration?</em> <a href="https://learn.microsoft.com/en-us/entra/external-id/what-is-b2b" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Australian Signals Directorate (ACSC), <em>Implementing Multi-Factor Authentication</em>. <a href="https://www.cyber.gov.au/resources-business-and-government/maintaining-devices-and-systems/system-hardening-and-administration/system-hardening/implementing-multi-factor-authentication" target="_blank" rel="noopener">cyber.gov.au</a>. Background to the IdP-as-MFA-enforcement picture. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>CISA, <em>Mitigating Attacks on a Federated Identity System: Lessons from the SolarWinds Compromise</em>. <a href="https://www.cisa.gov/news-events/cybersecurity-advisories" target="_blank" rel="noopener">cisa.gov</a>. Reference case for IdP key forgery. Last checked 2 May 2026; verify the specific advisory URL. <span class="conf">(medium)</span></li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The name and membership of Microsoft's Conditional Access category for generative AI tools move with vendor releases; verify the current category name and scope at publication. <span class="conf">(medium)</span> B2B governance boundaries between home and resource tenants for OAuth grants and AI consents are implementation-dependent; inspect the tenant settings rather than infer. <span class="conf">(medium)</span> IdP-resilience features across Entra, Google, Okta and Auth0 are evolving, so the chapter mentions resilience without quoting specific guarantees. <span class="conf">(low)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="08-authn-authz.html">&larr; Authentication versus authorisation</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="10-oauth-oidc.html">OAuth 2.0 and OpenID Connect &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

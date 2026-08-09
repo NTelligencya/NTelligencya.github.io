@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCP, UDP and QUIC: connections, sessions and the modern web · Shadow AI Blue Team Manual</title>
+<meta name="description" content="How the transport layer sets up connections, what a firewall can track about them, and why QUIC changes what network inspection can see when a browser talks to an AI service.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-1/04-tcp-udp-quic.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>TCP, UDP and QUIC</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part One &middot; How the network actually works</div>
+  <h1>TCP, UDP and QUIC: connections, sessions and the modern web</h1>
+  <p class="subtitle">What the transport layer exposes to a control, and why QUIC quietly removed some of it.</p>
+  <div class="reading-meta">
+    <span>Part One</span>
+    <span>About 15 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A network team turns on a new inspection appliance and finds that a large share of traffic to major services, including some AI front ends, is not being inspected. The appliance understands connections built on TCP. Much of the traffic is using QUIC, carried over UDP, which the appliance does not parse. The team has a choice: block QUIC and force the traffic back onto TCP where the appliance works, or let it pass uninspected. This chapter explains why that choice exists.</p>
+      <p>The transport layer is where a stream of data is directed to the right program on a machine, and where the idea of a connection lives. What a firewall or proxy can track about traffic, before any decryption, is largely decided here.</p>
+    </div>
+
+    <h2>Ports and the transport layer</h2>
+    <p>The network layer gets a packet to a machine; the transport layer gets it to the right program, identified by a <a class="term" href="../glossary.html">port</a> number. A web server listens on a known port, 443 for encrypted web traffic, and the client uses a temporary port of its own. Any observer, and any firewall, can identify a flow by five values together: the source address and port, the destination address and port, and the protocol. This set of five is the basic unit a firewall uses to permit, deny and track traffic, and it is visible without reading any content.</p>
+
+    <h2>TCP: connections with state</h2>
+    <p><a class="term" href="../glossary.html">TCP</a> provides a reliable, ordered stream between two programs. It begins with a defined setup, the three-step handshake, in which the client and server exchange opening packets to agree they are both present and ready. From then on, each side numbers the data it sends so that loss can be detected and retransmitted, and order restored. The connection is explicit: it is opened, used, and closed.</p>
+
+    <p>That explicit state is useful to a defender. A firewall can hold a table of active connections and allow return traffic only for connections that were properly opened from inside. It can see a connection start, to a given address and port, and end. Traditional network inspection assumes this TCP structure: a connection it can see beginning, follow, and hand to a proxy.</p>
+
+    <h2>UDP: no connection, by design</h2>
+    <p><a class="term" href="../glossary.html">UDP</a> sends individual packets with no setup, no ordering and no delivery guarantee. It is used where speed matters more than reliability, and where the application handles any recovery itself. For a firewall, UDP has no connection to track in the TCP sense; it sees packets to and from a port, and applies rules to those. UDP has always carried real-time media and DNS. It now also carries QUIC, which changes the picture.</p>
+
+    <h2>QUIC: a connection built inside UDP</h2>
+    <p><a class="term" href="../glossary.html">QUIC</a> is a modern transport that runs over UDP and rebuilds the reliability and ordering of TCP inside itself, while integrating encryption from the start. It underlies <a class="term" href="../glossary.html">HTTP/3</a>, the current version of the web's application protocol, and now carries a large share of traffic to major services. Two of its design choices matter for inspection.</p>
+
+    <p>First, QUIC encrypts almost everything, including most of its own transport information, from the first packet. Where a TCP connection exposes its setup and much of its control data in clear text, a QUIC connection exposes very little beyond the addresses and ports. A device that only knew how to read TCP control data sees almost nothing useful in QUIC.</p>
+
+    <p>Second, a QUIC connection is identified by a connection identifier carried inside it, not by the address and port pair. This lets a connection survive a change of network, for example a laptop moving from Wi-Fi to a mobile hotspot, without breaking. The connection continues under the same identifier from a new address. Any tool that tracked the session by its address and port loses it at that point.</p>
+
+    <h2>What this means for controlling AI traffic</h2>
+    <p>Before any decryption, a control at the transport layer can see the same small facts for AI traffic as for anything else: which internal device connected to which external address and port, and when. That is enough to enforce address and port rules, and enough to record that a connection happened, subject to the attribution limits of the previous chapters. It is not enough to see a prompt.</p>
+
+    <p>QUIC narrows even this. An inspection point that terminates TCP connections, the standard design for a proxy, does not receive QUIC connections at all, because they are not TCP. If the organisation does nothing, browsers that prefer QUIC can reach services over UDP and bypass a TCP-based proxy entirely. The common response is to block UDP on port 443 at the firewall. Browsers treat QUIC as optional and fall back to TCP with TLS when UDP is blocked, which returns the traffic to the path where the existing proxy and its inspection work. Blocking QUIC is therefore not about stopping access; it is about forcing traffic onto the path the organisation can inspect. <span class="conf">(high)</span></p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>If QUIC is not blocked and the inspection point only handles TCP, AI traffic over HTTP/3 passes without inspection while appearing, in summary, as ordinary encrypted traffic to a known address. Connection migration means a session cannot be reliably followed by address and port, so tools built on that assumption undercount or lose sessions. QUIC's early-data feature lets a client send application data in its first packet to a server it has spoken to before, which reduces the setup an observer can see.</p>
+      <p>Blocking UDP 443 to force fallback is effective only where the organisation controls the egress, so it does nothing for a device off the corporate network. And forcing fallback to TCP still only yields inspectable content if the organisation also decrypts TLS, which is the subject of the next two chapters. Transport choices decide what can be tracked; they do not, by themselves, reveal content.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>List the values that identify a single flow to a firewall, and state which of them, if any, reveal the content of a prompt.</li>
+        <li>Explain why blocking UDP on port 443 can improve an organisation's visibility of AI usage rather than reduce it.</li>
+        <li>A monitoring tool reports fewer sessions to an AI service than help-desk reports suggest are happening. Give two properties of QUIC that could explain the undercount.</li>
+        <li>Your proxy inspects TCP but not QUIC, and QUIC is not blocked. Describe the path a browser can take to reach an AI service without passing through the proxy.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">
+        <a href="../glossary.html">port</a> ·
+        <a href="../glossary.html">TCP</a> ·
+        <a href="../glossary.html">UDP</a> ·
+        <a href="../glossary.html">QUIC</a> ·
+        <a href="../glossary.html">HTTP/3</a>
+      </p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>RFC 9293, <em>Transmission Control Protocol (TCP)</em>. IETF, August 2022. <a href="https://www.rfc-editor.org/rfc/rfc9293" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9293</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 768, <em>User Datagram Protocol</em>. IETF, August 1980. <a href="https://www.rfc-editor.org/rfc/rfc768" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc768</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9000, <em>QUIC: A UDP-Based Multiplexed and Secure Transport</em>. IETF, May 2021. <a href="https://www.rfc-editor.org/rfc/rfc9000" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9000</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9001, <em>Using TLS to Secure QUIC</em>. IETF, May 2021. <a href="https://www.rfc-editor.org/rfc/rfc9001" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9001</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9114, <em>HTTP/3</em>. IETF, June 2022. <a href="https://www.rfc-editor.org/rfc/rfc9114" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9114</a>. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>RFC 9312, <em>Manageability of the QUIC Transport Protocol</em>. IETF, September 2022. <a href="https://www.rfc-editor.org/rfc/rfc9312" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9312</a>. Discusses what QUIC exposes to on-path devices. Checked 9 August 2026. <span class="conf">(high)</span></li>
+      </ol>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="03-dns.html">&larr; DNS</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="05-tls.html">TLS &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

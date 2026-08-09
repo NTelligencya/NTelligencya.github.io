@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web proxies, secure web gateways and SASE: where inspection happens · Shadow AI Blue Team Manual</title>
+<meta name="description" content="Where an organisation actually inspects web traffic, from an on-premises proxy to a cloud secure web gateway and SASE, and why every option that reaches a roaming device depends on a managed endpoint.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-1/07-proxies-swg-sase.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Proxies, SWG and SASE</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part One &middot; How the network actually works</div>
+  <h1>Web proxies, secure web gateways and SASE: where inspection happens</h1>
+  <p class="subtitle">Where the inspection point physically sits, how it reaches a laptop at home, and why that reach still depends on a managed device.</p>
+  <div class="reading-meta">
+    <span>Part One</span>
+    <span>About 15 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>An organisation buys a cloud service that promises to inspect web traffic and enforce AI policy wherever staff work, on or off the corporate network. It is deployed, and coverage is good for staff on managed laptops. It is zero for staff using personal devices at home. The vendor did not overstate the product. The gap is structural, and it is the same gap that has appeared at the end of every chapter in this part. This chapter names the architectures that decide where inspection happens, and shows why the roaming case always returns to the device.</p>
+      <p>This is the synthesis chapter for Part One. It puts the address, transport, TLS and HTTP mechanisms together into the question a defender actually asks: where, physically, does the organisation get to look, and what has to be true for the look to happen.</p>
+    </div>
+
+    <h2>Proxies: forward and reverse</h2>
+    <p>A <a class="term" href="../glossary.html">forward proxy</a> sits in front of clients and mediates their outbound connections to the internet; it is the kind relevant to controlling staff use of AI services. A <a class="term" href="../glossary.html">reverse proxy</a> sits in front of servers and mediates inbound connections to them, and is a different tool for a different job. When this manual says proxy without qualification, it means a forward proxy.</p>
+
+    <p>A forward proxy can be explicit, meaning devices are configured to send traffic to it, often through a <a class="term" href="../glossary.html">PAC file</a> that tells the browser which proxy to use for which destinations; or transparent, meaning the network silently redirects traffic to it without device configuration. Either way, the proxy is only useful for traffic that reaches it, and, as the previous two chapters established, it reads content only when it performs TLS inspection on a device that trusts its authority.</p>
+
+    <h2>The secure web gateway</h2>
+    <p>A <a class="term" href="../glossary.html">SWG</a>, secure web gateway, is a forward proxy with security functions built around it: URL and category filtering, malware scanning, TLS inspection, and data loss inspection of what passes through. It is the product an organisation typically points to when it says it controls web access. A SWG can run as an appliance on the corporate network, or as a cloud service. The distinction decides its reach.</p>
+
+    <p>An on-premises SWG inspects traffic that crosses the corporate network. It covers devices in the office, and remote devices only when their traffic is carried back to the corporate network through a <a class="term" href="../glossary.html">VPN</a>. A staff member working from home without that tunnel does not pass through it, so it does not see their traffic at all.</p>
+
+    <h2>Cloud SWG and SASE</h2>
+    <p>A cloud SWG moves the inspection point to the provider's network, reached over the internet. To send a device's traffic to it, the organisation installs a small forwarding agent on the device, or configures the device to tunnel to the provider. The agent follows the device wherever it goes, so a managed laptop at home is inspected the same way it is in the office. This is the model that delivers the roaming coverage the on-premises appliance cannot.</p>
+
+    <p><a class="term" href="../glossary.html">SASE</a>, secure access service edge, is the broader architecture that combines a cloud SWG, a <a class="term" href="../glossary.html">CASB</a>, zero trust network access and cloud firewalling into one cloud-delivered service; its security functions on their own are often labelled <a class="term" href="../glossary.html">SSE</a>, security service edge. The relevant part for AI control is the same cloud SWG function: it inspects a device's web traffic from the cloud, including prompts, when TLS inspection is configured. Zero trust network access, <a class="term" href="../glossary.html">ZTNA</a>, is a related idea that replaces broad VPN access with per-application access decisions; it governs reaching internal applications more than reaching public AI services, but it belongs to the same architecture. The term SASE was defined by an industry analyst firm in 2019 and is used loosely by vendors, so confirm what a given product actually does rather than relying on the label. <span class="conf">(medium; the term is a market category, not a standard)</span></p>
+
+    <h2>The pattern that runs through all of it</h2>
+    <p>Every architecture that inspects a roaming device's traffic does so by getting that traffic to an inspection point and decrypting it there. Getting the traffic there, off the corporate network, requires software on the device: an agent or an enforced tunnel. Decrypting it requires the device to trust the organisation's inspection authority. Both are properties of a managed device. It follows that the strongest network-layer control over AI prompts, a cloud SWG or SASE with TLS inspection, reaches exactly as far as device management reaches, and no further. On an unmanaged personal device off the corporate network, there is no agent to forward the traffic and no trusted authority to decrypt it, so none of these products apply. This is the same boundary seen at the DNS, transport, TLS and HTTP layers, now stated at the level of architecture. <span class="conf">(high)</span></p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The roaming agent is a managed-device feature, so the entire cloud-SWG and SASE approach is absent on personal devices. Even on a managed device, the same evasions from earlier chapters persist: QUIC that was not forced back to TCP can bypass a proxy that only handles TCP; a personal browser or profile that is not covered by the agent's forwarding is not inspected; certificate pinning forces pass-through exceptions that are blind spots; and split-tunnel configurations send some traffic around the inspection point.</p>
+      <p>There is also a governance cost that this part flags and Part Five develops: routing all of a person's traffic through an employer-controlled cloud inspection service, and decrypting it, gathers a large amount of personal activity into one place, which raises proportionality and privacy questions independent of whether the technology works. The architecture answers where inspection can happen. Whether it should, and within what limits, is a separate decision.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>An on-premises SWG covers the office well but misses staff working from home. Explain why, and name the two ways their traffic could be brought back into coverage.</li>
+        <li>A cloud SWG reaches managed laptops anywhere but not personal devices. Identify the two device properties that create that boundary.</li>
+        <li>A vendor sells a "SASE platform". List three questions you would ask to establish what it actually inspects for AI usage.</li>
+        <li>State the single sentence that summarises how far a cloud SWG with TLS inspection can see, and why.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">
+        <a href="../glossary.html">forward proxy</a> ·
+        <a href="../glossary.html">reverse proxy</a> ·
+        <a href="../glossary.html">PAC file</a> ·
+        <a href="../glossary.html">SWG</a> ·
+        <a href="../glossary.html">VPN</a> ·
+        <a href="../glossary.html">SASE</a> ·
+        <a href="../glossary.html">SSE</a> ·
+        <a href="../glossary.html">CASB</a> ·
+        <a href="../glossary.html">ZTNA</a>
+      </p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>RFC 9110, <em>HTTP Semantics</em>. IETF, June 2022. <a href="https://www.rfc-editor.org/rfc/rfc9110" target="_blank" rel="noopener">rfc-editor.org/rfc/rfc9110</a>. Defines proxy behaviour and the CONNECT method used by forward proxies. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>NIST Special Publication 800-207, <em>Zero Trust Architecture</em>. NIST, August 2020. <a href="https://csrc.nist.gov/pubs/sp/800/207/final" target="_blank" rel="noopener">csrc.nist.gov/pubs/sp/800/207/final</a>. Underpins the ZTNA concept. Checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Gartner, origin of the term "secure access service edge" (SASE), 2019. Publisher: Gartner. Cited as the source of the market category; the defining report is not freely available, so treat vendor use of the term with care. Checked 9 August 2026. <span class="conf">(medium)</span></li>
+      </ol>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="06-http-https.html">&larr; HTTP and HTTPS</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="../part-2/08-authn-authz.html">Authentication versus authorisation &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

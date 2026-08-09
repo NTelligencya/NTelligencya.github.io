@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Device join states: unmanaged, registered, joined, hybrid, managed, onboarded · Shadow AI Blue Team Manual</title>
+<meta name="description" content="What 'a managed device' actually means, and why registration, enrolment, onboarding and compliance are four separate facts about a device. The ladder that decides which shadow AI controls exist on any given laptop.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-3/20-device-join-states.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Device join states</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Three &middot; Browsers, operating systems and the device</div>
+  <h1>Device join states: unmanaged, registered, joined, hybrid, managed, onboarded</h1>
+  <p class="subtitle">'It is a managed device' is four separate claims wearing one coat, and only one of them decides whether a control exists on the machine.</p>
+  <div class="reading-meta">
+    <span>Part Three</span>
+    <span>About 18 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A working group is reviewing a proposed control. The proposal is to detect and block staff pasting classified material into consumer AI tools, and the paper says the control will apply to managed devices. Someone asks what proportion of the fleet that covers, and the room produces four different answers within a minute.</p>
+      <p>The identity administrator says almost everything, because nearly every device that touches the tenant has a record in the directory. The Intune administrator says about two thirds, because that is how many are enrolled and receiving configuration. The security operations lead says just under half, because that is how many appear in the Defender console reporting telemetry. The privacy officer, who has not spoken yet, asks whether 'managed' means the organisation can see what is on the screen, because that determines whether the proposal needs to go to a privacy impact assessment.</p>
+      <p>Everyone is answering honestly. They are answering different questions. 'Managed' is not one property of a device; it is at least four, they are set by different systems at different times, and the one that decides whether the proposed control can exist at all is the one nobody in the room named.</p>
+      <p>Chapter 14 described the device states as a ladder measured in a single quantity: how much the organisation has been permitted to place on the privileged side of the device's boundary. That framing is right, and this chapter builds the ladder rung by rung, in the vocabulary a defender will meet in a Microsoft tenant. It closes Part Three by giving a name to every state the previous six chapters have been gesturing at, and by making the sharpest point in the whole part explicit: the difference between two of these rungs is a cliff, not a step.</p>
+    </div>
+
+    <h2>Four questions, not one</h2>
+    <p>Before any product names, separate the questions. A device that a staff member uses for work can be interrogated on four independent axes, and although in a well-run corporate fleet all four move together, in a real estate containing personal laptops and half-finished migrations they come apart constantly.</p>
+
+    <p>The first question is whether the directory knows the device exists. This is the identity axis. A device with a record in <a class="term" href="../glossary.html">Entra ID</a> has a device identity: an object in the directory, a device certificate, and, once a user has signed in on it, a <a class="term" href="../glossary.html">primary refresh token</a> tying that user's sessions to that machine. Answering yes here means the identity layer can recognise the device when it turns up in an authentication.</p>
+
+    <p>The second is whether anything pushes configuration to the device. This is the management axis, and its answer is a mobile device management system: <a class="term" href="../glossary.html">Intune</a> in a Microsoft estate, or a third-party equivalent. Answering yes means the organisation can set policies on the machine, deploy software, and, as Chapters 15 and 16 described, write settings into the registry or install a configuration profile.</p>
+
+    <p>The third is whether a particular security service has a sensor reporting from the device. This is the onboarding axis, and it is the one the room in the opening scene did not name. Microsoft uses two distinct words here and means two distinct things by them. Enrolment is management of the whole device. Onboarding configures a device to work with a specific set of capabilities, which in practice means switching on the Defender sensor and connecting it to the service. <span class="conf">(high)</span> Enrolling a device in Intune does not by itself onboard it; onboarding is an additional action, usually delivered through Intune but capable of being delivered by Configuration Manager, Group Policy or a local script.</p>
+
+    <p>The fourth is whether the organisation currently considers the device acceptable. This is compliance, and it is not a state the device is put into so much as a verdict computed about it. Intune evaluates an enrolled device against a compliance policy, decides pass or fail, and reports the result to Entra, where <a class="term" href="../glossary.html">Conditional Access</a> can act on it. <span class="conf">(high)</span> Compliance is downstream of enrolment and can flip from one hour to the next without anything about the device's join state changing.</p>
+
+    <p>Hold those four apart and the rest of the chapter is bookkeeping. Collapse them, which is what the phrase 'managed device' does, and every conversation about shadow AI control coverage will produce the confusion in the opening scene.</p>
+
+    <h2>The rungs</h2>
+    <p>Now the named states, from the bottom.</p>
+
+    <p><strong>Unregistered.</strong> The organisation has no record of the device. A staff member signs in to Outlook on the web from a home computer, and the identity layer sees the authentication but not the machine. Entra records the sign-in, the IP address and the user agent string, all of which are assertions rather than attestations. There is no device object, no certificate, and nothing on the machine belonging to the organisation. Chapter 14's description of this rung is exact: nothing has been placed on the privileged side, so nothing device-side exists.</p>
+
+    <p><a class="term" href="../glossary.html">Microsoft Entra registered</a>, also called workplace join. The user has added their work account to the device, typically through Windows Settings under Access work or school, or through a sign-in flow in Edge or the Authenticator app. A device object is created in the directory and the device gets an identity footprint. The device is not managed by Intune, not onboarded to Defender, and not subject to configuration policy. Registration is the state Microsoft describes as the normal one for personal devices in a bring-your-own model, and it is deliberately light. <span class="conf">(high)</span></p>
+
+    <p><a class="term" href="../glossary.html">Microsoft Entra joined</a>. The device is joined to the directory itself rather than merely registered with it, which means the organisation owns it and users sign in to the machine with a work account. This is the cloud-native corporate laptop, provisioned through Autopilot or the out-of-box experience, and joining ordinarily enrols the device in Intune automatically as part of the same process. It is worth noting that Entra join is no longer a Windows-only state; current Microsoft documentation lists macOS 13 and later and several Linux distributions as capable of it. <span class="conf">(medium; the supported platform list changes, so verify against current documentation rather than quoting this sentence)</span></p>
+
+    <p><a class="term" href="../glossary.html">Microsoft Entra hybrid joined</a>. The device is joined to an on-premises Active Directory domain in the traditional way and also registered with Entra, so it holds both identities. This is the state most large Australian institutions with a long Windows history are actually in, because it lets a fleet built around Group Policy and domain controllers participate in cloud Conditional Access without being rebuilt. It carries the on-premises constraint with it: a hybrid joined device needs a line of sight to a domain controller for initial sign-in and for password changes, so a fully remote workforce is a poor fit. <span class="conf">(high)</span></p>
+
+    <p><strong>Intune enrolled.</strong> The device is under management. Configuration profiles, compliance policy, application deployment and Windows or macOS settings policy all apply. This is the rung at which the organisation can actually change the machine, and it is the prerequisite for the rung above it being delivered at scale.</p>
+
+    <p><strong>Onboarded.</strong> The Defender for Endpoint sensor has been activated on the device and is reporting. Endpoint detection and response telemetry, custom indicators, network protection and web content filtering exist from here up and nowhere below. The same act onboards the device for Microsoft Purview: Microsoft's documentation states that device onboarding is shared across Microsoft 365 and Defender for Endpoint, so onboarding to one onboards to the other. <span class="conf">(high)</span> That shared onboarding is what makes Endpoint DLP, the Purview browser extension and Insider Risk Management endpoint signals available, and it is the rung the working group in the opening scene needed to be counting.</p>
+
+    <p>Compliance sits alongside rather than above. A device must be registered in Entra before it can be marked compliant at all, and the compliant marking itself requires Intune enrolment and a passing compliance policy. <span class="conf">(high)</span> Registration on its own never produces compliance, which is a distinction worth committing to memory, because a great deal of Conditional Access design goes wrong on exactly this point.</p>
+
+    <h2>The shadow AI lens: where the cliff is</h2>
+    <p>Take the same action across the ladder and watch what appears. The action is the one this manual has used since Chapter 5: a staff member pastes confidential material into a consumer AI tool in a browser.</p>
+
+    <p>On an unregistered personal device with a personal account on the AI service, the organisation sees nothing about the AI interaction. Not a degraded view; nothing. The <a class="term" href="../glossary.html">IdP</a> never brokered the authentication, the traffic never crossed a logged egress point, and no software of the organisation's is on the machine. <span class="conf">(high)</span> Chapter 13 named this the central blind spot and Chapter 14 explained why it is structural rather than a gap in the product line.</p>
+
+    <p>Registering the device changes what the identity layer knows and changes nothing about what the device can be made to do. Conditional Access can now tell a registered device from an unknown one and vary policy accordingly, which is a real capability and worth having. The technical shadow AI controls, though, remain exactly what they were: no Defender for Endpoint, no Endpoint DLP, no Purview browser extension, no application control, no network protection. <span class="conf">(high)</span> A tenant can watch its registered device count climb for a year and gain no additional ability to see a prompt.</p>
+
+    <p>Two things do work below the onboarding line, and it is worth being precise about them because they carry a disproportionate share of any realistic BYOD posture. The first is Conditional Access itself, which operates at the identity layer and needs no device state at all to function, although it can demand one as a grant control. The second is the browser-resident control of Chapters 18 and 19: Edge for Business inline DLP applies in the work profile without the device being onboarded into anything, because, as Chapter 14 established and Chapter 18 explained architecturally, the control lives inside the browser rather than below it. <span class="conf">(high)</span></p>
+
+    <p>Everything else waits for onboarding. Defender for Endpoint telemetry and custom indicators, network protection and web content filtering including the generative AI category, Cloud Discovery attributed to a named user and device, Endpoint DLP watching the clipboard and the upload, the Purview extension in Chrome and Firefox, application control refusing to launch a desktop AI client or a locally run model: every one of these requires the sensor, and the sensor requires an administrative act on a machine the organisation controls. <span class="conf">(high)</span></p>
+
+    <p>Which is why the ladder is misleading if read as a gentle slope. Between unregistered and enrolled the organisation gains identity signal and configuration reach, both useful, neither of which lets anyone read a prompt. Between enrolled and onboarded, in one step, the entire device-side control set switches on. A defender presenting coverage figures to a governance committee should present the onboarded count, and should resist the temptation to present the registered count, which is always larger and always answers a different question.</p>
+
+    <p>Conditional Access is the mechanism that converts these states into decisions, and its grant controls are worth distinguishing because they are routinely conflated. Requiring a compliant device demands enrolment and a passing policy, and will therefore block a personal laptop outright. Requiring Entra hybrid joined demands the corporate domain fleet. Requiring an app protection policy is the softer control that a personal Windows device can actually satisfy, and on Windows it means Edge and only Edge, which is the constraint Chapter 19 examined in detail. <span class="conf">(high)</span> Choosing between them is a policy decision about how much friction the organisation will impose on personal devices, not a technical one, and it is usually the point at which a shadow AI programme meets its first serious internal resistance.</p>
+
+    <p>One narrower detail is worth carrying to a design review because it is exactly the sort of thing that surfaces after deployment. Microsoft treats Edge in InPrivate mode on Windows as a non-compliant device for Conditional Access purposes. <span class="conf">(high)</span> A private window is therefore not a quiet way around a compliance grant; it is a way to be refused. Whether staff know that before or after they try it is a communications question.</p>
+
+    <p>The honest summary of the whole ladder is the one the device-state report reaches. There is exactly one configuration in which an organisation has end-to-end visibility of shadow AI activity on a device, and it is the fully joined, enrolled and onboarded corporate machine. Every other state is partial, and the partiality is not a licensing gap that money closes. It is the shape of the privilege boundary from Chapter 14, expressed in a product catalogue.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>Registration is not compliance, and the two are confused constantly. A device that appears in the Entra device list looks managed in a report and is not. Any coverage figure quoted to a committee should say which axis it counts, and a defender who inherits a coverage claim should ask before repeating it.</p>
+      <p>Whether adding a work account to Windows automatically registers the device depends on tenant settings, on the mobility scope configured in Entra, and on which button the user pressed on the prompt asking whether the organisation may manage their device. Microsoft's behaviour here changed across 2024 and 2025 and there is an administrative property affecting the sign-in experience. Test the actual outcome in a pilot rather than inferring it. <span class="conf">(medium)</span></p>
+      <p>Compliance is a self-report from software the organisation installed, evaluated by a service the organisation runs, on a device someone else may control. That chain is reasonable for most purposes and it is not an attestation of the machine's state in the way a hardware root of trust would be. It is worth knowing which of your compliance signals are hardware-backed and which are a management agent's word.</p>
+      <p>'Managed' means materially less on a Mac than on a Windows laptop, for the reasons Chapter 16 set out, and Endpoint DLP on macOS supports a narrower set of conditions than on Windows. A join state matrix that treats the two platforms as equivalent will overstate coverage on the Mac population, which in a university tends to be concentrated among exactly the staff with the widest data access. <span class="conf">(medium; test the specific paste, drag and upload paths you intend to control)</span></p>
+      <p>Device inventories drift. Onboarded devices continue to appear in the Purview device list for 180 days after they go offline, which is sensible for investigation and unhelpful for counting. <span class="conf">(high)</span> Hybrid joined devices can also carry a duplicate registered record, producing two rows for one machine and, occasionally, non-deterministic Conditional Access evaluation. <span class="conf">(high)</span></p>
+      <p>The hardest limit is the one the whole of Part Three keeps arriving at. No join state governs an authentication the tenant never sees. A staff member on a fully onboarded corporate laptop who opens a consumer AI tool with a personal account is still outside the identity layer's reach, and only the device-side controls catch them. A staff member on a personal laptop with a personal account is outside both. Device state raises the ceiling on what is possible; it does not close the gap that opens when the work identity is left out of the transaction altogether.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>A colleague reports that 94 per cent of the fleet is 'managed'. What three follow-up questions establish what that figure actually measures, and which single number would you want instead before signing off a control that relies on Endpoint DLP?</li>
+        <li>Explain, without using product names, why registering a personal laptop with the directory gives the organisation a useful signal and no new ability to see a prompt.</li>
+        <li>A proposal requires a compliant device for access to all cloud applications. Describe what happens to a staff member working from a personal laptop, and name the softer grant control that would admit them, along with what it does and does not cover on Windows.</li>
+        <li>Your organisation wants to block a desktop AI client and a locally run model. Which rung of the ladder does that control need, and why can it not be delivered by Conditional Access?</li>
+        <li>Write two sentences for a governance paper distinguishing enrolment from onboarding, in language a non-technical committee member can act on.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">BYOD &middot; CA (Conditional Access) &middot; clipboard &middot; compliant device &middot; device enrolment &middot; device onboarding &middot; DLP &middot; EDR &middot; Entra ID &middot; IdP &middot; Intune &middot; MDCA &middot; MDE &middot; MDM &middot; Microsoft Entra hybrid joined &middot; Microsoft Entra joined &middot; Microsoft Entra registered &middot; privilege boundary &middot; PRT &middot; SOE &middot; WDAC</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>Microsoft Learn, <em>What is a device identity in Microsoft Entra ID?</em> <a href="https://learn.microsoft.com/en-us/entra/identity/devices/overview" target="_blank" rel="noopener">learn.microsoft.com</a>. The reference for the registered, joined and hybrid joined distinction and for what a device identity is. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Microsoft Entra registered devices</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/devices/concept-device-registration" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the description of registration as the light-touch state intended for personal devices. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Microsoft Entra joined devices</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/devices/concept-directory-join" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the description of Entra join as an organisation-owned state, the provisioning methods, and the current supported operating system list including macOS and several Linux distributions. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Microsoft Entra hybrid joined devices</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/devices/concept-hybrid-join" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the hybrid join description and the line-of-sight requirement to an on-premises domain controller. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Manage devices with Intune overview</em>, section 'Enrolling devices vs. onboarding devices'. <a href="https://learn.microsoft.com/en-us/security/zero-trust/manage-devices-with-intune-overview" target="_blank" rel="noopener">learn.microsoft.com</a>. The source for the enrolment and onboarding distinction that structures this chapter, in Microsoft's own words: enrolment applies to managing devices, while onboarding configures a device to work with a specific set of capabilities. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Onboard Windows devices into Microsoft 365 overview</em>. <a href="https://learn.microsoft.com/en-us/purview/device-onboarding-overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the claims that device monitoring must be enabled and endpoints onboarded before Endpoint DLP applies, that onboarding is shared across Microsoft 365 and Defender for Endpoint, and that onboarded devices continue to appear for 180 days after going offline. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Onboarding overview</em> (Microsoft Defender for Endpoint). <a href="https://learn.microsoft.com/en-us/defender-endpoint/onboarding" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the claim that onboarding is a separate act delivered through Intune, Configuration Manager, Group Policy or a local script, and is not a consequence of directory registration. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Conditional Access: Grant</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-grant" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the grant control descriptions, the statement that devices must be registered in Entra before they can be marked compliant, and the treatment of Edge in InPrivate mode on Windows as a non-compliant device. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Use compliance policies to set rules for devices you manage with Intune</em>. <a href="https://learn.microsoft.com/en-us/intune/device-security/compliance/overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the description of compliance as a verdict computed by Intune and reported to Entra for Conditional Access to act on. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Microsoft Entra device management FAQ</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/devices/faq" target="_blank" rel="noopener">learn.microsoft.com</a>. Supports the duplicate registered record on hybrid joined devices and the non-deterministic evaluation it can cause. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li><em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em>, this project's internal source report. The source of the device-state matrix behind the shadow AI section, the worked scenarios, and the macOS Endpoint DLP parity caveat.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>Whether adding a work account to Windows automatically registers the device, and whether Windows app protection is applied at the same time, depends on tenant mobility scope, on an administrative property affecting the Edge sign-in experience, and on the user's answer to the management prompt. Microsoft's behaviour has changed at least once. Verify in a pilot rather than from documentation. <span class="conf">(medium)</span></p>
+      <p>The supported operating system list for Entra join, and for the compliant device grant control, has broadened to include macOS and specific Linux distributions and continues to change. Check the current list before designing policy around it. <span class="conf">(medium)</span></p>
+      <p>macOS Endpoint DLP supports a narrower set of conditions than Windows, and the exact set has been moving. The specific paste, drag and upload paths an organisation intends to control need testing on the Mac build actually deployed. <span class="conf">(medium)</span></p>
+      <p>Several capabilities named across Part Three are billed as pay-as-you-go rather than included in an E5 or A5 entitlement, and the licensing guidance shifted more than once during 2025. I have not established the current Australian education pricing position, and it is not published on Microsoft Learn. Check the tenant billing portal before quoting a cost. <span class="conf">(low)</span></p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Closing Part Three</h2>
+      <p>Part Three set out to establish that the device is not a black box, and the seven chapters have taken it apart in one direction: down to the privilege boundary, across the three operating systems that draw that boundary differently, into the browser that has rebuilt itself as an operating system inside them, and back out to the enrolment ladder that decides how much of any of it the organisation may touch. The recurring finding is a single one. Every capable device-side control depends on an administrative act performed on a machine the organisation controls, and the one control that escapes that dependency, the browser-resident one, escapes it by living inside a profile the user can decline to use.</p>
+      <p>That leaves a large and specific gap, and Part Four is about the systems built to work in it. Cloud service models, the API economy, endpoint telemetry pipelines, the discovery problem, data loss prevention as three distinct problems rather than one, correlation and retention at scale, and the product category currently marketed as data security posture management for AI. The device layer is where control is strongest and reach is narrowest. The cloud layer is the reverse, and the trade between them is the subject of the next seven chapters.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="19-edge-for-business.html">&larr; Edge for Business</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="../part-4/21-cloud-service-models.html">Cloud service models &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

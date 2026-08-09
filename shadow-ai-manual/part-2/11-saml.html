@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAML, and why it is still around · Shadow AI Blue Team Manual</title>
+<meta name="description" content="What SAML is mechanically, why an Australian defender will keep meeting it, and why a dual-protocol identity estate governs enterprise-tier AI tools while leaving consumer-tier personal-account use untouched.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-2/11-saml.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>SAML</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Two &middot; Identity, OAuth and the modern enterprise</div>
+  <h1>SAML, and why it is still around</h1>
+  <p class="subtitle">The enterprise estate runs two SSO protocols at once, and shadow AI controls land at one and not the other.</p>
+  <div class="reading-meta">
+    <span>Part Two</span>
+    <span>About 15 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>Two security engineers at a large Australian university are looking at yesterday's SSO logs on a meeting-room screen. Two columns dominate. The left is a long list of 'SAML SP-initiated sign-in to Workday' events. The right is a smaller but growing list of 'OIDC authorisation request from claude.ai' events. Why does the organisation run two SSO protocols at once, and is one on the way out?</p>
+      <p>The answer is that the university has two of everything because the SaaS estate does. Workday speaks SAML. Anthropic speaks OIDC. Microsoft 365 speaks both. The student information system speaks SAML and was last upgraded in 2017. Most new SaaS speaks OIDC. The Australian Access Federation, which lets researchers sign in across institutions, is a SAML federation and remains one. The two protocols are not on a clean replacement path. SAML is the federated SSO protocol of the enterprise era, still here because the SaaS that uses it is still here. This chapter is about what SAML is, mechanically, and about the seams between the SAML estate and the OIDC estate where shadow AI controls land at one and not the other.</p>
+    </div>
+
+    <h2>Origins and the OASIS standard</h2>
+    <p><a class="term" href="../glossary.html">SAML</a> 1.0 was published by OASIS in 2002, and SAML 2.0, the version everyone operates today, was ratified in 2005. That places it several years before OAuth and most of a decade before OpenID Connect. It was designed when XML was the common language of inter-system communication, so expressing identity assertions as signed XML documents was conventional at the time. That vocabulary is the source of SAML's present reputation for being awkward: every assertion is an XML document, every signature is an XML Digital Signature with its namespace and canonicalisation complexity, and every binding base64-encodes XML inside HTTP. The mechanism works at scale; it does not feel modern.</p>
+
+    <h2>The roles</h2>
+    <p>SAML uses its own names for the federation roles of Chapter 9, and a defender needs both vocabularies because the same architecture diagram uses both. The identity provider (IdP) is the same role: it authenticates the user and issues assertions. The <a class="term" href="../glossary.html">service provider</a> (SP) is what OIDC calls the relying party: the application that defers authentication and accepts assertions. Workday, ServiceNow and the student information system are SPs, and dozens per organisation are common. The subject is the user, in SAML's vocabulary. The trust shape is the same as in OIDC: the SP holds the IdP's metadata and validates assertions against the IdP's signing key.</p>
+
+    <h2>The SAML assertion</h2>
+    <p>The artefact that does the work is the <a class="term" href="../glossary.html">SAML assertion</a>, an XML document containing statements about the subject. The three statement types are the authentication statement, the attribute statement, and the rarely used authorisation decision statement. The authentication statement says when and by what method the subject authenticated, carrying the AuthnContext that describes the assurance level, so an SP that cares about MFA can require an AuthnContext asserting MFA was used. The attribute statement carries claims: name, email, group memberships, employee number, department. Australian universities commonly pass affiliation (staff, student, alumni), department and a stable identifier.</p>
+
+    <p>The assertion is signed by the IdP using XML Digital Signature, conceptually similar to a JWT signature but operating over XML elements. The SP validates it against the IdP's public key from the federation metadata. Two elements deserve mention: the Conditions element carries NotBefore and NotOnOrAfter timestamps defining the validity window, and an SP that does not check them is open to replay; the audience inside Conditions names the intended SP, and an SP that does not validate audience is open to a token meant for a different SP.</p>
+
+    <h2>Bindings and the Web Browser SSO profile</h2>
+    <p>SAML defines several bindings for how messages move. The three seen in practice are HTTP-Redirect, which encodes a message in URL parameters and is used for small outbound requests; HTTP-POST, which delivers a message in an auto-submitting HTML form and is used for inbound assertions too large for a URL; and HTTP-Artifact, an indirect binding where the SP fetches the assertion from the IdP over a back channel. HTTP-POST is dominant for the response.</p>
+
+    <p>The profile a defender meets day to day is Web Browser SSO. The user reaches an SP with no session. The SP generates an AuthnRequest and redirects the browser to the IdP, or, if the user started at the IdP portal, the request is implicit. The IdP authenticates the user; as in OIDC, the protocol treats this step as a black box, and Conditional Access applies here when Entra is the IdP because the policy engine evaluates every sign-in regardless of protocol. The IdP creates a signed response containing the assertion and returns it to the browser by HTTP-POST to the SP's Assertion Consumer Service URL. The SP validates the signatures, checks the validity window, validates the audience, parses the statements, and creates a session. The IdP-initiated variant has the user start at the portal and click a tile; the IdP posts the assertion with no inbound request, so the SP relies entirely on the assertion's audience and validity window for protection.</p>
+
+    <h2>Metadata and NameID</h2>
+    <p>Federation metadata in SAML is an XML document describing one end of a federation to the other: the entity ID, the bindings and endpoints, the certificates, and the supported NameID formats. Each side loads the other's at setup. SAML metadata is long-lived in a way OIDC metadata is not; certificates inside it can be valid for years, and rotation requires a coordinated change at both ends. Federations break, often, when a certificate quietly expires and no one was monitoring expiry dates. That is the single most common SAML outage.</p>
+
+    <p>The NameID identifies the subject inside the assertion. A persistent NameID is a stable opaque identifier reused across sessions, the basis of cross-session correlation. A transient NameID is a one-time identifier, so each session is uncorrelated from the SP's view. An email NameID is the address. The choice has privacy and joinability implications, and it matters for shadow AI when correlating SAML sign-in events to other telemetry: if the log shows a transient NameID and the correlation needs a persistent identifier, the join has to happen on a different attribute.</p>
+
+    <h2>The shadow AI lens</h2>
+    <p>Most consumer AI tools speak OIDC, not SAML, because AI vendors target the developer mass market: easy to integrate, JSON-based, JavaScript-friendly. The 'sign in with Google', 'sign in with Microsoft' and 'sign in with Apple' buttons on consumer AI tools are OIDC. Where SAML shows up in AI tooling is at the enterprise tier: ChatGPT Enterprise, Claude for Work, Microsoft Copilot, Google Gemini Enterprise usually support SAML, sometimes only SAML, because large customers require it, and Australian government procurement has historically required SAML support for whole-of-government arrangements. <span class="conf">(medium; documented in some procurement rulebooks, not all, and practice varies by agency)</span></p>
+
+    <p>The control problem is therefore stratified by tier. A SAML-federated enterprise-tier AI tool is governable through the same federation that governs Workday and ServiceNow. An OIDC consumer-tier tool used under personal accounts is invisible at the corporate identity layer regardless of protocol. An OIDC consumer-tier tool signed into with 'Continue with Microsoft' is governable through the OIDC half of the estate, because Entra speaks both. That dual-protocol capability is what makes the workable picture work: Entra and Google Workspace both speak SAML and OIDC at once, and the same Conditional Access policies apply to both, so an organisation can federate Workday over SAML and claude.ai over OIDC to one tenant and target 'generative AI tools as a category' with one policy that bites both.</p>
+
+    <p>For Australian universities specifically, the SAML estate is not optional. The <strong>Australian Access Federation</strong>, operated by AARNet since 2009, lets researchers and students sign in to research services with their home-institution credentials, and underpins access to the Australian Research Data Commons, the National Computational Infrastructure, eResearch services and library and journal aggregators. <span class="conf">(high)</span> For a defender at a university, the SAML estate carries a large fraction of daily SSO traffic, and shadow AI controls written only for OIDC will leave it uncovered. The IdP-initiated flow is a specific surface worth flagging: whether enterprise-tier AI tools appear as tiles in the 'My Apps' portal is a policy choice many organisations have not consciously made, because the tile appeared when the SaaS was federated, not because someone decided it should be visible. And Entra's sign-in log records a Protocol field distinguishing SAML from OIDC, so detection rules for shadow AI activity need to be written protocol-agnostically or run as two parallel rules; mixing this up is a recurring source of incomplete detection.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>XML signature wrapping is the vulnerability class that has bitten SAML more than any other: an attacker wraps a legitimately signed assertion inside an outer structure carrying additional unsigned elements, and a naive parser reads the attacker's elements while verifying the signature on the untouched inner assertion. The defence is 'verify, then read', a strict parser ordering; major libraries are patched, older custom integrations are not always. <span class="conf">(medium)</span> Certificate expiry at either end is the everyday failure, mitigated only by calendar-based monitoring. NameID format mismatch silently duplicates users. Replay protection fails wherever an SP does not validate NotOnOrAfter and audience. Single Logout is the SAML instance of the offboarding problem: the protocol defines it, but deployment is uneven, so a user who logs out of one SP may keep other SAML sessions. <span class="conf">(medium)</span> The XML attack surface itself (external entity, entity-expansion denial of service) applies wherever a SAML library is used, and hardened parsing is the default in mature libraries. The deepest failure is the complexity tax: SAML has many optional features, bindings and profiles, implementations vary, and edge-case behaviour differs between SP and IdP, which is the main reason the industry pivoted to OIDC for new builds.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Your organisation runs both SAML and OIDC federations and the CIO asks why you do not just pick one. Write a four-sentence reply on what each does today, why the SaaS estate drove the dual-protocol design, and the cost of consolidation.</li>
+        <li>A SAML AuthnRequest is sent by HTTP-Redirect. The IdP returns a response. By what binding, and why is it different from the request binding?</li>
+        <li>An attacker replays a captured SAML assertion three minutes later, audience-matched and within its NotOnOrAfter window. What two protections does a correct SP apply, and what is the residual risk?</li>
+        <li>Distinguish, in two sentences each, an SP, an RP, an IdP and a subject. Why does SAML use 'SP' and OIDC 'RP' for the same role?</li>
+        <li>Your university federates 50 SaaS over SAML and 30 over OIDC. Does that make the SAML applications weaker for shadow AI control? Explain in three sentences, and say what would actually weaken controls regardless of protocol.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">AAF (Australian Access Federation) · Assertion Consumer Service (ACS) · AuthnContext · AuthnRequest · attribute statement · authentication statement · binding (SAML) · federation metadata · HTTP-Artifact · HTTP-POST · HTTP-Redirect · NameID · SAML · SAML assertion · SAML response · Single Logout (SLO) · SP-initiated / IdP-initiated · subject (SAML) · Web Browser SSO profile · XML Digital Signature · XML signature wrapping (XSW)</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>OASIS, <em>SAML v2.0 Technical Overview</em>, 2008. <a href="https://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html" target="_blank" rel="noopener">docs.oasis-open.org</a>. The accessible introduction to SAML 2.0. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>OASIS, <em>Assertions and Protocols for SAML V2.0</em>, 2005. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf" target="_blank" rel="noopener">docs.oasis-open.org</a>. The core specification. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>OASIS, <em>Bindings for SAML V2.0</em>, 2005. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf" target="_blank" rel="noopener">docs.oasis-open.org</a>. Defines HTTP-Redirect, HTTP-POST and HTTP-Artifact. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>OASIS, <em>Profiles for SAML V2.0</em>, 2005. <a href="https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf" target="_blank" rel="noopener">docs.oasis-open.org</a>. Defines Web Browser SSO and Single Logout. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>W3C, <em>XML Signature Syntax and Processing Version 1.1</em>, 2013. <a href="https://www.w3.org/TR/xmldsig-core/" target="_blank" rel="noopener">w3.org/TR/xmldsig-core</a>. The signature standard SAML uses. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>How SAML 2.0 authentication works in Microsoft Entra ID</em>. <a href="https://learn.microsoft.com/en-us/entra/identity-platform/single-sign-on-saml-protocol" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Australian Access Federation, <em>About AAF</em>. <a href="https://aaf.edu.au/about/" target="_blank" rel="noopener">aaf.edu.au/about</a>. The SAML federation serving Australian higher education. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+        <li>Somorovsky et al., <em>On Breaking SAML: Be Whoever You Want to Be</em>, USENIX Security, 2012. <a href="https://www.usenix.org/conference/usenixsecurity12/technical-sessions/presentation/somorovsky" target="_blank" rel="noopener">usenix.org</a>. The reference paper on XML signature wrapping. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The set of consumer-tier AI tools that offer SAML at their enterprise tier changes year on year; verify ChatGPT Enterprise, Claude for Work, Microsoft Copilot and Google Gemini Enterprise against current vendor documentation, including the scopes their SAML attributes carry. <span class="conf">(medium)</span> Australian government SAML procurement requirements vary across Commonwealth, state and local government; the chapter says 'historically required', and the current state of whole-of-government arrangements should be checked. <span class="conf">(medium)</span> Single Logout deployment in major Australian SaaS is uneven; test it per SP rather than trust a 'supported' label. The AAF member list changes over time and specific figures should be sourced from the AAF site at publication. <span class="conf">(high; AAF publishes a member list)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="10-oauth-oidc.html">&larr; OAuth 2.0 and OpenID Connect</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="12-conditional-access.html">Conditional access and device state &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

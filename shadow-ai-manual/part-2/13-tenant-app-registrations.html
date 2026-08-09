@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in with Microsoft / Google: when a third party AI tool becomes a tenant problem · Shadow AI Blue Team Manual</title>
+<meta name="description" content="What a consumer AI tool leaves behind in a corporate tenant when staff click Continue with Microsoft, how to audit the enterprise-application list, and why a consent outlives the user who granted it.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-2/13-tenant-app-registrations.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Sign in with Microsoft / Google</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Two &middot; Identity, OAuth and the modern enterprise</div>
+  <h1>Sign in with Microsoft / Google: when a third party AI tool becomes a tenant problem</h1>
+  <p class="subtitle">The residue of a thousand consent clicks, and how to audit it, revoke it, and stop it accumulating.</p>
+  <div class="reading-meta">
+    <span>Part Two</span>
+    <span>About 16 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A new IT security manager joins an Australian higher-education provider and asks how many third-party applications have been granted access to the corporate Entra tenant. The administrator opens the Entra portal, navigates to Enterprise applications, and applies the filter 'application type: enterprise applications'. The list returns 847 entries. Filtered by name on 'gpt', 'claude', 'gemini', 'copilot' and a few other strings, 64 remain.</p>
+      <p>This is a normal tenant. The 64 AI-tool entries are the residue of staff clicking 'Continue with Microsoft' on consumer AI services since around 2022. None was approved by a procurement committee; most were created with user consent, automatically, the moment a staff member completed a sign-in. Some are dormant, some are still pulling tokens. The manager's question becomes: what does each entry represent, and what should be done about it? This chapter answers that, and closes Part Two by taking authentication, federation, OAuth, the consent screen, Conditional Access and the audit log into the specific case of a consumer AI tool becoming a registered enterprise application.</p>
+    </div>
+
+    <h2>What an enterprise application is</h2>
+    <p>An <a class="term" href="../glossary.html">enterprise application</a> in Entra is an object representing a third-party application granted some access to the tenant. It carries the consents granted, the assigned permissions, the assigned users, and the sign-in audit history. The same construct exists in Google Workspace and Okta, with minor interface differences. Two related objects matter. The 'application' object is the global registration owned by whoever published the application, shared across every tenant it has been used in. The <a class="term" href="../glossary.html">service principal</a> is the per-tenant instance, created when a user in this tenant first signs in or when an admin registers it, and it carries the per-tenant consents and audit data. A defender doing a tenant audit is looking at service principals.</p>
+
+    <p>A service principal is created automatically when a user first signs in and grants user consent, or by an administrator when admin consent is granted. Once it exists, it persists until something deletes it. Disabling the consenting user does not remove it; removing the user from the tenant does not remove it. A service principal is tenant-level state on a tenant-level lifecycle, not a user lifecycle, which is one of the central points of this chapter.</p>
+
+    <h2>The two consent paths</h2>
+    <p><a class="term" href="../glossary.html">User consent</a> is the path most consumer AI tools use: an individual signs in, sees the consent screen of Chapter 10, and clicks 'Allow' to grant the requested scopes for themselves only. <a class="term" href="../glossary.html">Admin consent</a> is required for applications that need to act for many users without each consenting, or that request scopes classified as too sensitive for user consent; an administrator grants it on behalf of the tenant, and for delegated permissions every user can then use the application without a consent screen. Tenants created since around 2020 restrict user consent to low-risk scopes, with an admin-consent request workflow for higher-risk ones; without that workflow configured, the user gets a hard block. Tenants created earlier can have more permissive settings, so the first step of any OAuth audit is to check the current consent settings, because the past behaviour the audit uncovers depends on what the settings have been. <span class="conf">(medium; defaults have changed across Microsoft updates, and a tenant's posture depends on when it was created and what has changed since)</span></p>
+
+    <h2>Delegated and application permissions</h2>
+    <p><a class="term" href="../glossary.html">Delegated permissions</a> let the application act as the signed-in user: the token carries the user's identity, and the resource server enforces what that user may do. 'Mail.Read' as a delegated permission reads the signed-in user's mail only, and stops working when the user is offboarded. <a class="term" href="../glossary.html">Application permissions</a> let the application act as itself, with no user: 'Mail.Read' as an application permission reads every user's mail in the tenant. Application permissions always require admin consent, because the impact is tenant-wide, and they are common for back-end automations. For shadow AI the dominant pattern is delegated permissions, where a staff member clicks 'Continue with Microsoft' and the AI vendor calls <a class="term" href="../glossary.html">Microsoft Graph</a> as that user, with a blast radius limited to one user's data. Application-permission AI tools are the less common but more dangerous case: an admin has approved a tool with tenant-wide read access, the integration acts independently of any user, and offboarding an individual does not affect it. Only revoking the admin consent or deleting the service principal stops it, so a tenant audit needs to flag application-permission grants specifically.</p>
+
+    <h2>What AI tools commonly ask for</h2>
+    <p>The minimum for federated sign-in is the OIDC set: 'openid', 'profile', 'email' and 'offline_access', the last triggering the refresh token. These are benign on their own. The escalation begins with Microsoft Graph scopes on top: 'User.Read', 'Mail.Read', 'Calendars.Read', 'Files.Read.All', 'Sites.Read.All', 'Chat.Read.All', each expanding the vendor's reach into corporate data. <span class="conf">(medium; the exact scope set drifts as products evolve, and any list should be re-validated against the live consent screen at deployment)</span> Google Workspace works the same way with different names, such as 'gmail.readonly' and 'drive.readonly'.</p>
+
+    <h2>What the enterprise-applications view shows</h2>
+    <p>The Entra portal exposes the audit surface Part Two has been pointing at since Chapter 8, at Identity, Applications, Enterprise applications, with 'application type: enterprise applications' applied to filter out Microsoft's own internal service principals. Per application it shows the name and application ID, the sign-in events, the assigned users, the permissions consented to (split into admin-consented and user-consented), and the owners, which is often empty for user-consented apps. The Permissions tab is the most important page for audit work, because it shows exactly what was granted and by whom. The sign-in logs filtered for the application are the operational telemetry, with timestamp, user, device, IP, Conditional Access decision and result; an application with a service principal but no recent sign-ins is dormant and a candidate for revocation.</p>
+
+    <p>Microsoft Defender for Cloud Apps has an <strong>app governance</strong> capability, sold as an add-on, that scores OAuth applications for risk using scope sensitivity, publisher verification, application age, anomalous usage and cross-customer reputation. It is the closest thing to a purpose-built tool for OAuth-app risk in a Microsoft tenant. <span class="conf">(medium; licensing has shifted, verify before quoting)</span> The Google Workspace equivalent is under Security, API controls, App access control, where admins can block app access to Workspace data by default and allow only approved apps, with scope-based restrictions.</p>
+
+    <h2>The shadow AI lens: the tenant audit</h2>
+    <p>The activity that should happen at least annually, ideally quarterly, is a tenant audit. For each enterprise application the questions are: what is this application; who consented and when; what scopes are granted; when was it last used and by whom; is the publisher verified; does it appear in any threat-intelligence feed for risky OAuth apps. The disposition is one of three: keep (legitimate, in scope), restrict (legitimate but over-scoped, narrow the consent), or revoke (no longer needed, or never should have been there). The audit routinely surfaces AI tools no one centrally approved, apps from vendors no longer trading with the organisation whose refresh tokens are still alive, one-time test integrations never cleaned up, browser extensions that registered themselves as enterprise apps, and personal-account sign-ins that authenticated against the corporate tenant by accident.</p>
+
+    <p>Revoking a consent is a specific act: in the Entra portal, open the application, open the Permissions tab, remove the consent, and the <strong>OAuth grant</strong> is deleted. Existing access tokens may keep working until they expire, typically within the hour; the next refresh-token use returns an error and the vendor stops calling Graph, faster where CAE is supported. The user sees a re-consent prompt the next time they sign in, which is usually when they discover the revocation, so communicating revocations in advance avoids help-desk tickets. Tenant-side preventive controls are the other half: restrict user consent to verified publishers and low-risk scopes; configure the admin-consent request workflow so users have a path to ask; block specific high-risk scopes from user consent at the tenant level; and create app-specific Conditional Access policies for the highest-risk applications. The category-based approach from Chapter 12 closes the loop: Conditional Access against the generative AI category catches sign-ins, and app governance against the same category catches grants and scope changes, both governable when the user authenticates against the corporate tenant and invisible when they do not.</p>
+
+    <p>Offboarding and the residual grant is the failure that keeps surfacing across Part Two. Disabling the account prevents new sign-ins from that user but does not delete enterprise-application entries or invalidate a refresh token already held by a vendor. The missing step in many playbooks is the explicit sweep: identify the user's OAuth grants, revoke their sessions across vendors, and audit for tokens that survived. Entra's 'revoke sessions' action revokes refresh tokens for a user, with propagation at the relying party depending on whether the vendor supports CAE-like semantics, which most consumer-grade vendors do not. When the AI vendor acts for nobody, the failure is more serious: a delegated-permission tool stops on the next refresh once the user is gone, but an application-permission tool keeps working on the original admin consent until that consent is revoked, so application-permission AI tools need explicit governance, owners, and periodic reconfirmation of business need.</p>
+
+    <h2>Closing Part Two</h2>
+    <p>A reader who has worked through chapters 8 to 13 has the identity-layer apparatus a defender needs: the authentication and authorisation split, the federation pattern, the OAuth and OIDC mechanics, SAML in the enterprise long tail, the Conditional Access engine that bites at the IdP, and the residual third-party app registration that consented users leave behind. They also understand the boundary the identity layer cannot cross: the personal account, the local SaaS account, the device the corporate IdP cannot see. Part Three begins there. The device is not a black box; it is an operating system with processes, identities, certificate stores and management agents, and the browser sits inside it. Several of the gaps named in Part Two can be closed, or named more precisely, at the device layer.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The audit is never done because no one owns it: app governance falls between the identity team, the SOC and vendor management, so the first step in any control programme is to assign ownership. Verified publisher does not equal trustworthy: the programme confirms a publisher controls a domain and has a Partner Network ID, not that the application is benign. Scope creep through silent consent is a subtle pattern where an application can sometimes add scopes to an existing grant depending on current platform semantics, which Microsoft has tightened over time; verify current behaviour before assuming an application cannot grow its access without notice. <span class="conf">(medium)</span> The 'sign in with' button on a site you do not control is the user-experience problem at the heart of shadow AI: one click, a consent screen, 'Allow' without reading, persistent consequences, which is why reading consent screens is a teachable practice every training programme should include. Cross-tenant guests consenting in a host tenant record the consent in the host, not the guest's home tenant, which cannot revoke it. And the 'enterprise applications' filter is the one to apply first, or the view is dominated by Microsoft's own internal service principals and the audit becomes overwhelming.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>You filter the enterprise-applications view and find 64 AI-tool entries. Outline the audit you would run. For each entry, what do you need to answer to make a keep, restrict or revoke decision?</li>
+        <li>In two sentences each, distinguish user consent, admin consent, delegated permissions and application permissions. Which combination is the dominant shadow AI pattern, and which is the more dangerous one?</li>
+        <li>A staff member 'signed in with Microsoft' to an AI tool last year, granting Mail.Read, and has now left with their account disabled. Walk through what is required to fully revoke the tool's continuing access, and what each step does and does not do.</li>
+        <li>The CIO asks why you do not just block all OAuth consent at the tenant level. Write a four-sentence reply on what that would and would not achieve, and what would break.</li>
+        <li>An AI tool requests 'openid profile email Mail.Read Files.Read.All' at sign-up, then three months later requests an additional 'Calendars.Read'. Describe what happens to the existing grant, what the user sees, and how a defender finds out.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">admin consent · admin consent workflow · app governance · application permission · delegated permission · enterprise application · Microsoft Graph · OAuth grant · restricted scope · service principal · user consent · verified publisher</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <ol class="sources-list">
+        <li>Microsoft Learn, <em>Application and service principal objects in Microsoft Entra ID</em>. <a href="https://learn.microsoft.com/en-us/entra/identity-platform/app-objects-and-service-principals" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Permissions and consent in the Microsoft identity platform</em>. <a href="https://learn.microsoft.com/en-us/entra/identity-platform/permissions-consent-overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Configure how users consent to applications</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-user-consent" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Configure the admin consent workflow</em>. <a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>App governance overview</em> (Defender for Cloud Apps add-on). <a href="https://learn.microsoft.com/en-us/defender-cloud-apps/app-governance-manage-app-governance" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Microsoft Learn, <em>Verified publisher in the Microsoft identity platform</em>. <a href="https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview" target="_blank" rel="noopener">learn.microsoft.com</a>. Last checked 9 August 2026. <span class="conf">(high)</span></li>
+        <li>Google Workspace Admin Help, <em>Control which third-party and internal apps access Google Workspace data</em>. <a href="https://support.google.com/a/answer/7281227" target="_blank" rel="noopener">support.google.com/a/answer/7281227</a>. Last checked 2 May 2026; verify current URL. <span class="conf">(medium)</span></li>
+        <li>Office of the Australian Information Commissioner, <em>Australian Privacy Principles guidelines, Chapter 8, Cross-border disclosure of personal information</em>. <a href="https://www.oaic.gov.au/privacy/australian-privacy-principles/australian-privacy-principles-guidelines/chapter-8-app-8-cross-border-disclosure-of-personal-information" target="_blank" rel="noopener">oaic.gov.au</a>. Relevant because grants to overseas-hosted AI vendors involve cross-border disclosure. Last checked 2 May 2026. <span class="conf">(high)</span></li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>Default user-consent settings vary by tenant vintage; inspect a tenant's actual settings rather than infer from its age. <span class="conf">(medium)</span> Microsoft's verified-publisher criteria have evolved; verify what the badge confirms before repeating this chapter's framing to an administrator. <span class="conf">(medium)</span> The scope set requested by major AI tools drifts as products evolve, so re-validate any list against the live consent screens at deployment. <span class="conf">(medium)</span> Defender for Cloud Apps app-governance licensing has changed at least once; verify the current model and SKU before recommending it. <span class="conf">(medium)</span></p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="12-conditional-access.html">&larr; Conditional access and device state</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="../part-3/14-os-fundamentals.html">Operating systems &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 · 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
