@@ -1480,3 +1480,509 @@ footer.site {
   }
   .site-search-result-title { font-size: 18px; }
 }
+
+
+/* ============================================================
+   25. ARTWORK PLATES
+   The illustrated plates in /assets/artwork/, applied as a system.
+   Six treatments, from design_handoff_site_artwork/ (10 August 2026).
+
+   Rules the treatments exist to enforce:
+   - A plate is a finished composition with its own frame running to all
+     four edges. Cropping one destroys the frame, so the band, the footer
+     and the inset never crop, and the masthead and card slots crop only
+     where a lost frame does not matter.
+   - Type never lands on the plate's own lettering: every zone carrying
+     page copy has a scrim fading the plate to the ground colour.
+   - One wordmark plate per page, and two or three plates per page at most.
+   - Body text sits on flat --bg. Artwork belongs in heroes, dividers,
+     thumbnails, footers and list markers.
+
+   Every gradient, opacity and ratio below is lifted from the handoff.
+   ============================================================ */
+
+:root {
+  /* Teal washes and lines, the only tints the site uses */
+  --accent-wash-2:  rgba(26, 201, 201, 0.02);
+  --accent-wash-4:  rgba(26, 201, 201, 0.04);
+  --accent-wash-6:  rgba(26, 201, 201, 0.06);
+  --accent-wash-8:  rgba(26, 201, 201, 0.08);
+  --accent-wash-12: rgba(26, 201, 201, 0.12);
+  --accent-line-25: rgba(26, 201, 201, 0.25);
+  --accent-line-35: rgba(26, 201, 201, 0.35);
+  --accent-line-40: rgba(26, 201, 201, 0.4);
+
+  /* Families, as named in the design system */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  /* Corners */
+  --radius-xs:   3px;
+  --radius-sm:   5px;
+  --radius-md:   6px;
+  --radius-lg:   8px;
+  --radius-xl:   10px;
+  --radius-2xl:  12px;
+  --radius-3xl:  14px;
+  --radius-pill: 100px;
+
+  /* The five scrims, written once so no page re-types them */
+  --scrim-hero-vertical: linear-gradient(to bottom, rgba(10,10,12,0.72) 0%, rgba(10,10,12,0.5) 34%, rgba(10,10,12,0.78) 72%, var(--bg) 100%);
+  --scrim-hero-right:    linear-gradient(to left, var(--bg) 0%, rgba(10,10,12,0.86) 34%, rgba(10,10,12,0) 100%);
+  --scrim-masthead:      linear-gradient(to right, var(--bg) 0%, rgba(10,10,12,0.95) 32%, rgba(10,10,12,0.6) 68%, rgba(10,10,12,0.8) 100%);
+  --scrim-band:          linear-gradient(to right, var(--bg) 0%, rgba(10,10,12,0.92) 18%, rgba(10,10,12,0.3) 40%, rgba(10,10,12,0.55) 100%);
+  --scrim-band-right:    linear-gradient(to left, var(--bg) 0%, rgba(10,10,12,0.92) 18%, rgba(10,10,12,0.3) 40%, rgba(10,10,12,0.55) 100%);
+  --scrim-card:          linear-gradient(to bottom, rgba(10,10,12,0.1), rgba(10,10,12,0.72));
+  --scrim-inset:         linear-gradient(160deg, rgba(10,10,12,0), rgba(10,10,12,0.55));
+}
+
+
+/* --- 25.1 Plate ratios -------------------------------------
+   Read off the files, never guessed. The band, the divider and the
+   footer show a plate whole, so the element has to carry the plate's
+   own ratio; a wrong value silently reintroduces the crop these
+   treatments exist to avoid. Add a class here when a plate is added.
+   ---------------------------------------------------------- */
+
+.r-banner-laptop-monogram           { aspect-ratio: 1688 / 506;  }
+.r-banner-laptop-spreadsheet        { aspect-ratio: 2032 / 860;  }
+.r-banner-mouse-lightbulb-keyboard  { aspect-ratio: 1984 / 382;  }
+.r-banner-wordmark-keyboard         { aspect-ratio: 3232 / 490;  }
+.r-banner-wordmark-usb              { aspect-ratio: 2040 / 330;  }
+.r-footer-data-table-monogram       { aspect-ratio: 1426 / 386;  }
+.r-footer-keyboard-data-monogram    { aspect-ratio: 3412 / 390;  }
+.r-footer-monogram-chip             { aspect-ratio: 858 / 318;   }
+.r-footer-mouse-lightbulb-monogram  { aspect-ratio: 1858 / 324;  }
+.r-footer-wordmark-url              { aspect-ratio: 3386 / 504;  }
+.r-hero-keyboard-closeup            { aspect-ratio: 1720 / 838;  }
+.r-hero-motherboard-chip            { aspect-ratio: 1907 / 926;  }
+.r-hero-motherboard-chip1           { aspect-ratio: 1254 / 472;  }
+.r-hero-padlock-circuit             { aspect-ratio: 1734 / 907;  }
+.r-hero-padlock-wordmark            { aspect-ratio: 1717 / 916;  }
+.r-hero-portrait-chip-wordmark      { aspect-ratio: 852 / 1658;  }
+.r-hero-portrait-keyboard           { aspect-ratio: 848 / 1240;  }
+.r-hero-square-laptop-spreadsheet   { aspect-ratio: 1254 / 1254; }
+.r-hero-square-padlock              { aspect-ratio: 1254 / 1254; }
+.r-hero-square-padlock-mouse        { aspect-ratio: 690 / 690;   }
+.r-hero-wordmark-keyboard-usb       { aspect-ratio: 1738 / 905;  }
+
+
+/* --- 25.2 Plate band hero ----------------------------------
+   The workhorse, and the safe hero for a wordmark plate: the plate runs
+   at its own ratio, uncropped, with the headline on flat ground beneath
+   it. Needs a ratio class from 25.1. Depth caps at 420px, above which a
+   6:1 band starts to read as a hero image and competes with the headline.
+   ---------------------------------------------------------- */
+
+.plate-band {
+  position: relative;
+  width: 100%;
+  max-height: 420px;
+  aspect-ratio: 3232 / 490;
+  line-height: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.plate-band picture { display: block; height: 100%; }
+
+.plate-band img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* Fades the band's foot into the page ground. */
+.plate-band-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+/* Depth caps for pages that want a shallower band than the 420px default. */
+.plate-band-sm { max-height: 240px; }
+.plate-band-md { max-height: 300px; }
+.plate-band-lg { max-height: 360px; }
+
+/* Headline and standfirst, set on flat ground below the band. */
+.plate-band-text { padding: 44px 0 0; }
+
+
+/* --- 25.3 Plate strip --------------------------------------
+   A band with no type on it, used as a ruled divider between two
+   sections. Same uncropped plate, screened slightly.
+   ---------------------------------------------------------- */
+
+.plate-strip {
+  position: relative;
+  width: 100%;
+  max-height: 150px;
+  line-height: 0;
+  overflow: hidden;
+  background: var(--bg);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.plate-strip picture { display: block; height: 100%; }
+
+.plate-strip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.8;
+  display: block;
+}
+
+
+/* --- 25.4 Plate divider ------------------------------------
+   A thin plate strip dividing two sections, carrying a mono label and a
+   serif heading over its left end. The scrim is not decoration: without
+   it the heading collides with the plate's own CTRL / ALT / DEL block.
+   One per page; two in one scroll reads as a pattern rather than a
+   division. Needs a ratio class from 25.1.
+   ---------------------------------------------------------- */
+
+.plate-divider {
+  position: relative;
+  width: 100%;
+  max-height: 220px;
+  overflow: hidden;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.plate-divider picture { display: block; height: 100%; }
+
+.plate-divider img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 62% 50%;
+  opacity: 0.55;
+  display: block;
+}
+
+.plate-divider::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-band);
+}
+
+.plate-divider-text {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+
+.plate-divider-text .container { width: 100%; }
+
+.plate-divider-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.plate-divider-text h2 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(28px, 3.4vw, 40px);
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Mirrored: scrim heaviest at the right, type ranged right. */
+.plate-divider-right::after { background: var(--scrim-band-right); }
+.plate-divider-right .plate-divider-text { text-align: right; }
+
+
+/* --- 25.5 Plate masthead -----------------------------------
+   The existing .page-masthead with a plate layer behind it, cropped and
+   screened to 0.42 under a left-to-right scrim. 0.42 is doing real work:
+   above about 0.55 the plate competes with the headline, and below 0.3
+   it is not worth loading the image.
+
+   Wrap the breadcrumb and the masthead in .masthead-plate; the plate goes
+   in .masthead-art as the first child.
+   ---------------------------------------------------------- */
+
+.masthead-plate {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+}
+
+.masthead-art {
+  position: absolute;
+  inset: 0;
+}
+
+.masthead-art picture { display: block; height: 100%; }
+
+.masthead-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 78% 50%;
+  opacity: 0.42;
+  display: block;
+}
+
+/* For a plate whose interesting middle sits above centre. */
+.masthead-art-high img { object-position: 78% 42%; }
+
+.masthead-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-masthead);
+}
+
+.masthead-plate > *:not(.masthead-art) {
+  position: relative;
+  z-index: 2;
+}
+
+/* The wrapper carries the rule, so the masthead inside it does not. */
+.masthead-plate .page-masthead { border-bottom: none; }
+
+
+/* --- 25.6 Artwork card -------------------------------------
+   .app-card with a plate across the top: a fixed 2:1 thumbnail slot,
+   ruled off from the body, with a bottom scrim so the mono category line
+   never lands on busy artwork.
+
+   The slot is a fixed ratio on purpose. A fixed pixel height made the
+   crop shift with the window, so no export size could ever fit it.
+
+   Feed it the pre-cut plates in assets/artwork/cards/, which are already
+   2:1. Square, portrait and very wide plates use .fit instead, which
+   shows the plate whole and letterboxed on --bg, reading as a mounted
+   plate; card heights are unchanged either way.
+   ---------------------------------------------------------- */
+
+a.app-card,
+a.app-card-plate {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.app-card-plate { padding: 0; overflow: hidden; }
+
+.app-card-art {
+  position: relative;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+}
+
+.app-card-art picture { display: block; height: 100%; }
+
+.app-card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.app-card-art.fit { background: var(--bg); }
+.app-card-art.fit img { object-fit: contain; }
+
+.app-card-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-card);
+}
+
+.app-card-body { padding: 20px 24px 24px; }
+
+/* The card body keeps the .app-card type scale. */
+.app-card-body h3 { margin-top: 0; }
+.app-card-body p:last-child { margin-bottom: 0; }
+
+
+/* --- 25.7 Plate foot band ----------------------------------
+   The footer plate, shown whole at its own intrinsic ratio: no crop, no
+   fixed height, so a 8.75:1 plate becomes a thin band and a 2.7:1 one a
+   deeper band, and neither is sliced. The 230px cap stops the deepest
+   plates dominating a short page.
+
+   Footer plates want to be 3.5:1 or wider; footer-monogram-chip at 2.7:1
+   exceeds the cap at full width and letterboxes with bars either side.
+
+   Put .plate-foot as the first child of footer.site and add .footer-plate
+   to the footer, which drops the footer's own top rule and padding.
+   ---------------------------------------------------------- */
+
+.plate-foot {
+  position: relative;
+  line-height: 0;
+  border-top: 1px solid var(--rule);
+  background: var(--bg);
+}
+
+.plate-foot picture { display: block; }
+
+.plate-foot img {
+  width: 100%;
+  height: auto;
+  max-height: 230px;
+  object-fit: contain;
+  opacity: 0.9;
+  display: block;
+}
+
+footer.site.footer-plate { border-top: none; padding-top: 0; }
+footer.site.footer-plate > .container { padding-top: 52px; }
+
+
+/* --- 25.8 Plate inset --------------------------------------
+   A small square plate crop marking a list row: flashcard sets, resource
+   rows, session lists. The most forgiving use of the artwork. At 96px the
+   slot needs about 192px of source at double density, so even the
+   smallest plate has three times the pixels it needs, and a 1:1 crop
+   lands on the interesting middle of the composition.
+
+   Use the full-size plate, not the 2:1 card cut; this slot is 1:1, so a
+   pre-cropped file would be cropped twice.
+   ---------------------------------------------------------- */
+
+.plate-inset {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  position: relative;
+  flex: none;
+}
+
+.plate-inset picture { display: block; height: 100%; }
+
+.plate-inset img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+  display: block;
+}
+
+.plate-inset::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-inset);
+}
+
+/* Row built around an inset marker. */
+.plate-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+
+/* --- 25.9 Plate hero ---------------------------------------
+   Full-bleed cover crop with a vertical scrim and a faded right edge.
+   Available, not required: no page uses it, because the uncropped band
+   was preferred on the home page. Only wordmark-free, wide plates belong
+   here; hero-motherboard-chip and hero-keyboard-closeup carry the ornate
+   wordmark at an edge and get sliced.
+   ---------------------------------------------------------- */
+
+.plate-hero {
+  position: relative;
+  width: 100%;
+  height: clamp(620px, 52vw, 760px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.plate-hero-art { position: absolute; inset: 0; overflow: hidden; }
+.plate-hero-art picture { display: block; height: 100%; }
+
+.plate-hero-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left 46%;
+  display: block;
+}
+
+/* The plate carries its tagline and its DATA / IDEAS / STORIES / STRATEGY
+   list hard against the right edge; below about 1400px the cover crop
+   lands mid-word, so the edge is faded rather than sliced. */
+.plate-hero-art::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 22%;
+  z-index: 1;
+  background: var(--scrim-hero-right);
+}
+
+@media (min-width: 1400px) {
+  .plate-hero-art::before { display: none; }
+}
+
+.plate-hero-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--scrim-hero-vertical);
+}
+
+.plate-hero-inner {
+  position: relative;
+  z-index: 3;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 0 84px;
+}
+
+
+/* --- 25.10 Artwork, small screens --------------------------
+   The plates all use object-fit, so they degrade without extra rules.
+   These only shorten the deepest treatments and collapse the inset row.
+   ---------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .plate-band     { max-height: 260px; }
+  .plate-band-sm,
+  .plate-band-md,
+  .plate-band-lg  { max-height: 200px; }
+  .plate-band-text { padding: 32px 0 0; }
+  .plate-divider  { max-height: 150px; }
+  .plate-strip    { max-height: 100px; }
+  .plate-foot img { max-height: 150px; }
+  .plate-hero     { height: clamp(460px, 90vw, 620px); }
+  footer.site.footer-plate > .container { padding-top: 40px; }
+}
+
+@media (max-width: 540px) {
+  .plate-row { grid-template-columns: 72px 1fr; gap: 14px; }
+  .plate-inset { width: 72px; height: 72px; }
+}

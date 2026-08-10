@@ -76,16 +76,30 @@
         sets.filter(function (s) {
           return current === 'All sets' || s.subject === current;
         }).forEach(function (s) {
-          var card = el('div', 'fc-set');
+          var card = el('div', 'fc-set' + (s.plate ? '' : ' fc-set-noplate'));
+
+          // Artwork marker. A 1:1 crop of the full-size plate, not the 2:1 card
+          // cut, which this slot would crop a second time. At 96px even the
+          // smallest plate in the library has more pixels than it needs.
+          if (s.plate) {
+            var inset = el('div', 'plate-inset');
+            inset.innerHTML = '<picture><source srcset="/assets/artwork/' + s.plate
+              + '.webp" type="image/webp"><img src="/assets/artwork/' + s.plate
+              + '.jpg" alt="" loading="lazy"></picture>';
+            card.appendChild(inset);
+          }
+
+          var body = el('div', 'fc-set-body');
+          card.appendChild(body);
 
           var title = el('h2', 'fc-set-name', s.title);
-          card.appendChild(title);
+          body.appendChild(title);
 
           var meta = el('div', 'fc-set-meta fc-label');
           meta.appendChild(el('span', 'fc-count', s.count + (s.count === 1 ? ' card' : ' cards')));
           meta.appendChild(el('span', 'fc-divider'));
           meta.appendChild(el('span', 'fc-level', s.level));
-          card.appendChild(meta);
+          body.appendChild(meta);
 
           var actions = el('div', 'fc-set-actions');
 
@@ -98,7 +112,7 @@
           list.href = '/flashcards/' + s.slug + '/list/';
           actions.appendChild(list);
 
-          card.appendChild(actions);
+          body.appendChild(actions);
           grid.appendChild(card);
         });
       }

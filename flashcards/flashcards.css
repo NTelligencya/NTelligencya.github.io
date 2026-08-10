@@ -84,15 +84,28 @@
   gap: 16px;
 }
 
+/* A set row: artwork marker, then the set. The marker is .plate-inset from
+   styles.css section 25. */
 .fc-set {
   background: var(--bg-2);
   border: 1px solid var(--rule-2);
   border-radius: 12px;
-  padding: 26px 28px;
+  padding: 20px 22px;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  transition: border-color 0.2s ease;
+}
+
+.fc-set-noplate { grid-template-columns: minmax(0, 1fr); }
+
+.fc-set-body {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  transition: border-color 0.2s ease;
+  gap: 16px;
+  min-width: 0;
+  height: 100%;
 }
 
 .fc-set:hover { border-color: rgba(26, 201, 201, 0.25); }

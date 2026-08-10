@@ -41,8 +41,7 @@ const CARD = '/assets/brand/ntwi-social-card.png';
 const CARD_ALT = 'ntworld.ink. Learning materials in cybersecurity, AI literacy, ' +
   'Microsoft Office and workplace digital skills.';
 const DEFAULT_DESCRIPTION = 'Practical learning materials in cybersecurity, AI literacy, ' +
-  'Microsoft Office and workplace digital skills. Real datasets; real exercises; ' +
-  'everything downloadable and yours to keep.';
+  'Microsoft Office and workplace digital skills.';
 
 // Kept in step with tools/build-index.js, so the same pages are covered.
 const SKIP_DIRS = new Set([

@@ -243,3 +243,83 @@ Published dates come from each file's first commit. Do not add `--follow` back t
 The slide decks under `/workshops/`, `/presentations/` and `/simulations/` carry no search field. They run their own full-screen chrome with no site nav, so there is nowhere to put one. `tools/add-search.js` skips them by design, which is why its report shows a large "no site header" count.
 
 Directories named `assets` are skipped by both tools, along with `_to_delete/`, `digitalliteracy/`, `*-original.html` and the two redirect stubs under `/resources/`. The lists are at the top of each script.
+
+
+## Artwork plates (10 August 2026)
+
+The illustrated plates now run across the site as a system, from the
+`design_handoff_site_artwork/` bundle SD brought back from the design work. Before
+this the artwork was one banner image on the home page and every other page was flat
+black, so all pages looked alike.
+
+Full notes are in `assets/artwork/README.md`; the short version for anyone building a
+page follows.
+
+**Where the pieces live.** The treatments are `styles.css` section 25, six of them:
+`.plate-band` (a banner plate uncropped at its own ratio, with the headline on flat
+ground beneath), `.masthead-plate` (a plate behind the page masthead at 0.42 opacity
+under a scrim), `.plate-divider` (a section divider carrying a mono label and a serif
+heading), `.plate-strip` (the same with no type on it), `.app-card-plate` with
+`.app-card-art` (a fixed 2:1 thumbnail slot on a card), `.plate-foot` (the footer
+plate, shown whole), and `.plate-inset` (a 96px 1:1 marker for a list row). A seventh,
+`.plate-hero`, is a full-bleed cover crop; it is available but no page uses it.
+
+**The rollout is scripted.** `tools/add-artwork.js` puts a plate behind every page
+masthead, or an uncropped band above it, and a plate across the top of every footer.
+The plate per section comes from the `PLATES` table at the top of the script. It is
+idempotent, takes `--dry-run`, and skips `/simulations/` outright, which SD asked to
+leave exactly as it was. Run it after adding a page, the same way `add-search.js` and
+`add-meta.js` are run.
+
+**Three rules the treatments exist to enforce.** Each plate is a finished composition
+whose frame runs to all four edges, so cropping one destroys it; type never lands on
+the plate's own lettering, which is what the scrims are for; and long reading sits on
+flat `--bg`, with artwork kept to heroes, dividers, thumbnails, footers and list
+markers. Two or three plates per page is the ceiling, and one wordmark plate per page.
+
+**Hand-authored exceptions**, which the script does not touch: the home page band and
+library divider, the workshop card thumbnails, the Presentations card grid, the Excel
+strip and divider, and the resource cards. The flashcards catalogue draws its markers
+from a new `plate` field per set in `flashcards/sets/sets.json`.
+
+**Image weight.** Every plate was re-sized to its display slot and written as WebP
+with a JPEG fallback in a `<picture>`; the originals stay in
+`assets/artwork/_originals/`, which Jekyll leaves unpublished. The 37MB of source
+plates serve as about 2MB of WebP.
+
+### Copy and colour changes made at the same time
+
+The handoff asked for marketing register to be taken out site-wide. Removed: the
+"No paywall; no email harvesting; no nonsense" footer line (26 pages), "Free, no
+sign-ups" and "nothing is listed that hasn't been vetted" on the Resources page,
+"Nothing to install and nothing to sign up for" on Flashcards, "nothing to install"
+on two course pages, "they stay out of search engines, but not out of your own index"
+on `/index/`, and "Real datasets; real exercises; everything downloadable and yours to
+keep" from the shared social description in `tools/add-meta.js` (44 pages). Kept, as
+factual entry requirements rather than pitches: "no experience needed" and "works
+offline" on the Excel meta row.
+
+The retired tagline "connect, create, leave a mark" came off the social card, which
+was re-rendered from `tools/social-card/social-card.html`. "Intelligence inked,
+legacies written" is still drawn into several artwork plates; that is part of the
+illustration and stays.
+
+The three legacy deck inks were replaced across the ten slide decks under
+`/workshops/` and `/presentations/`: ochre `#E08A3C` to steel blue `#4B85A9`, red
+`#E05B4A` to pale mint `#BEEBD5`, green `#4CC98A` to sage `#8DB091`, with their
+washes and their ink-on-fill text colours moved to match. None of the three reads as
+a warning, which is a known and accepted limitation; the words carry the meaning.
+`/simulations/handwriting-and-voice/` still carries the old three, because
+`/simulations/` was left alone.
+
+### Still open
+
+- `/workshops/` has seven subfolders and no `index.html`, so the workshops index
+  screen in the mock is a new page rather than a restyle. Not built; flagged for SD.
+- The Presentations page moved from an accordion to a card grid, which drops the
+  duration, level and "covers" list each deck used to carry. SD's call, 10 August 2026.
+- The Excel jump nav was kept. The mock replaced it with the ruled plate strip; the
+  strip was added above it instead, so the page keeps its in-page navigation.
+- Several plates are below 1600px and will go soft used full-bleed on a large display:
+  `banner-wordmark-usb`, `footer-monogram-chip` and `footer-mouse-lightbulb-monogram`
+  are the weakest. SD intends to supply higher-resolution re-exports.

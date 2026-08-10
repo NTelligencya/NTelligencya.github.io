@@ -58,7 +58,7 @@ const footer = `<!-- =============== FOOTER =============== -->
           <div class="brand-mark"></div>
           <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
         </a>
-        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills. No paywall; no email harvesting; no nonsense.</p>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
       </div>
       <div class="footer-col">
         <h4>// library</h4>
@@ -97,7 +97,7 @@ const lastUpdated = `    <div class="last-updated">Last updated: ${UPDATED}</div
 /* --- Catalogue ---------------------------------------------- */
 
 const catalogue = `${head('Flashcards · NT World Ink',
-  'Glossaries and technical terminology you can drill as flashcards or read as a searchable glossary. Cyber security, digital literacy and Microsoft Office terms, free and in the browser.')}
+  'Glossaries and technical terminology you can drill as flashcards or read as a searchable glossary. Cyber security, digital literacy and Microsoft Office terms, in the browser.')}
 <body data-fc="catalogue">
 ${header}
 
@@ -115,7 +115,7 @@ ${header}
   <div class="page-masthead">
     <div class="series-label">Library · Terminology</div>
     <h1>Glossaries and technical terminology</h1>
-    <p class="fc-standfirst">Terminology you can drill in five minutes, or read straight through as a glossary. Nothing to install and nothing to sign up for; each set runs in the browser and remembers where you left off.</p>
+    <p class="fc-standfirst">Terminology you can drill in five minutes, or read straight through as a glossary. Each set runs in the browser and remembers where you left off.</p>
   </div>
 </div>
 
