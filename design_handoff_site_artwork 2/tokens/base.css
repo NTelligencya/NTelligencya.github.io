@@ -1,0 +1,21 @@
+/* Element defaults. Kept minimal: the system styles by class, not by tag. */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-weight:400;font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{max-width:100%;display:block}
+a{color:var(--link);text-decoration:none}
+a:hover{color:var(--link-hover)}
+h1,h2,h3,h4,h5{font-family:var(--font-display);line-height:var(--lh-display)}
+h1{font-weight:var(--fw-light);font-size:var(--fs-h1);letter-spacing:var(--ls-display)}
+h2{font-weight:var(--fw-light);font-size:var(--fs-h2);letter-spacing:var(--ls-display)}
+h3{font-weight:var(--fw-regular);font-size:var(--fs-h3);letter-spacing:var(--ls-display)}
+h4{font-family:var(--font-body);font-weight:var(--fw-semibold);font-size:var(--fs-h4);letter-spacing:var(--ls-label);text-transform:uppercase;color:var(--text-2)}
+p{color:var(--text-2)}
+strong{color:var(--text);font-weight:var(--fw-semibold)}
+code,pre{font-family:var(--font-mono);font-size:var(--fs-meta);background:var(--bg-2);border:1px solid var(--rule-2);border-radius:var(--radius-md);color:var(--accent-2)}
+code{padding:2px 6px}
+pre{padding:20px 24px;overflow-x:auto;line-height:1.7}
+
+/* Grain overlay. Drop <div class="noise-overlay"></div> as the first child of
+   body on any full page; it is the one texture the brand uses. */
+.noise-overlay{position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px 200px;opacity:var(--noise-opacity);pointer-events:none;z-index:9999}

@@ -217,6 +217,59 @@ h2 .hlw { background: linear-gradient(transparent 64%, var(--warm-wash) 64%); co
 .foot .brand-name .dot { color: var(--accent); }
 .foot .brand small { font: 500 15px var(--font-mono); color: var(--text-3); margin-left: 16px; letter-spacing: .08em; }
 
+/* Real data column chart */
+.colchart { display: flex; align-items: flex-end; gap: 13px; height: 330px; }
+.colw { flex: 1; display: flex; flex-direction: column; height: 100%; }
+.colw .cstack { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.colw .cval { font: 500 21px var(--font-mono); color: var(--text); margin-bottom: 9px; letter-spacing: -.01em; }
+.colw .cbar { width: 100%; background: var(--accent); opacity: .88; border-radius: 5px 5px 0 0; }
+.colw .cbar.warm { background: var(--warm); }
+.colw .cbar.dim { background: var(--text-3); opacity: .7; }
+.colw .cname { font: 700 16px/1.22 var(--font-body); color: var(--text-2); text-align: center; margin-top: 14px; }
+.colw .cname small { display: block; font: 500 12.5px var(--font-mono); color: var(--text-3); letter-spacing: .05em; margin-top: 4px; text-transform: uppercase; font-weight: 500; }
+.colw.dimmed .cval { color: var(--text-3); }
+
+/* Screenshot of a source */
+.shotframe { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; line-height: 0; }
+.shotframe img { display: block; width: 100%; height: auto; }
+.shotnote { display: flex; gap: 18px; align-items: flex-start; margin-top: 20px; }
+.shotnote .pin { flex: 0 0 46px; height: 46px; border-radius: 50%; background: var(--accent); color: #04211F;
+  display: flex; align-items: center; justify-content: center; font: 500 20px var(--font-mono); }
+.shotnote .pin.warm { background: var(--warm); color: #06202B; }
+.shotnote p { font: 400 24px/1.42 var(--font-body); color: var(--text-2); }
+.shotnote p b { font-weight: 700; color: var(--text); }
+
+/* Two-value comparison */
+.vsrow { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: end; }
+.vsbar .vtop { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; }
+.vsbar .vnum { font: 600 68px/1 var(--font-display); color: var(--accent); }
+.vsbar.warm .vnum { color: var(--warm); }
+.vsbar .vwho { font: 500 22px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--text-3); }
+.vsbar .vtrack { height: 34px; background: var(--card-2); border-radius: 6px; overflow: hidden; }
+.vsbar .vfill { height: 100%; background: var(--accent); opacity: .85; border-radius: 0 5px 5px 0; }
+.vsbar.warm .vfill { background: var(--warm); }
+.vsbar .vsub { font: 400 21px/1.45 var(--font-body); color: var(--text-2); margin-top: 14px; }
+
+/* Doubling ladder */
+.ladder { display: flex; align-items: flex-end; gap: 16px; height: 300px; }
+.rung { flex: 1; display: flex; flex-direction: column; height: 100%; }
+.rung .rstack { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+.rung .rbar { background: var(--accent); opacity: .3; border-radius: 5px 5px 0 0; transition: none; }
+.rung.now .rbar { opacity: .95; }
+.rung.future .rbar { background: var(--warm); opacity: .45; }
+.rung .rval { font: 500 20px var(--font-mono); color: var(--text-2); margin-bottom: 8px; text-align: center; }
+.rung.now .rval { color: var(--text); }
+.rung .rdate { font: 500 14px var(--font-mono); color: var(--text-3); text-align: center; margin-top: 12px; letter-spacing: .04em; }
+
+/* Slope */
+.slope { display: grid; grid-template-columns: 1fr auto 1fr; gap: 34px; align-items: center; }
+.slopeend { text-align: center; }
+.slopeend .snum { font: 600 104px/1 var(--font-display); color: var(--accent); }
+.slopeend.warm .snum { color: var(--warm); }
+.slopeend .swhen { font: 500 19px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); margin-top: 10px; }
+.slopeend .swhat { font: 400 21px/1.45 var(--font-body); color: var(--text-2); margin-top: 16px; }
+.slopearrow { font: 400 40px var(--font-body); color: var(--text-3); }
+
 /* Illustrative bench chart (slide 2) */
 .bc-row { display: flex; align-items: center; gap: 20px; margin-bottom: 13px; }
 .bc-label { width: 250px; font: 600 23px var(--font-body); color: var(--text); text-align: right; line-height: 1.15; }
@@ -260,34 +313,54 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             <p class="lede reveal r3" style="margin-top:36px;font-size:34px;font-style:italic;font-family:var(--font-display)">Every AI launch comes with a wall of charts. This hour is about learning to read them: what the tests measure, when a score means something, and when it's marketing.</p>
             <p class="lede muted reveal r4" style="margin-top:24px;font-size:23px">Scores quoted in this deck were current in July 2026; the whole point of the session is that they won't stay current.</p>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">01 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">01 / 24</span></div>
     </section>
 
 
-    <!-- ===== SLIDE 2 : THE CONTENDERS ===== -->
+    <!-- ===== SLIDE 2 : THE CONTENDERS, REAL SCORES ===== -->
     <section class="slide" aria-label="The contenders">
         <div class="topbar"><span class="chip">START HERE</span><span class="crumb">the view from the couch</span><span class="sect">The contenders</span></div>
         <div class="body">
             <div class="kicker reveal r1">Before any jargon: the picture most people never see</div>
-            <h2 class="reveal r2" style="font-size:66px">There isn't one AI; there are several, and they're <span class="hl">neck and neck</span></h2>
-            <div class="grid2" style="margin-top:36px;align-items:start;grid-template-columns:1.15fr 1fr">
-                <div class="reveal r3">
-                    <div class="bc-row"><div class="bc-label">Claude<small>ANTHROPIC</small></div><div class="bc-track"><div class="bc-bar" style="width:99%"></div></div></div>
-                    <div class="bc-row"><div class="bc-label">ChatGPT<small>OPENAI</small></div><div class="bc-track"><div class="bc-bar" style="width:98%"></div></div></div>
-                    <div class="bc-row"><div class="bc-label">Gemini<small>GOOGLE</small></div><div class="bc-track"><div class="bc-bar" style="width:97.5%"></div></div></div>
-                    <div class="bc-row"><div class="bc-label">Grok<small>XAI</small></div><div class="bc-track"><div class="bc-bar" style="width:96.5%"></div></div></div>
-                    <div class="bc-row"><div class="bc-label">DeepSeek<small>DEEPSEEK</small></div><div class="bc-track"><div class="bc-bar" style="width:96%"></div></div></div>
-                    <div class="bc-row"><div class="bc-label">Kimi<small>MOONSHOT AI</small></div><div class="bc-track"><div class="bc-bar" style="width:95.5%"></div></div></div>
-                    <div class="bc-row"><div class="bc-label">Copilot<small>MICROSOFT</small></div><div class="bc-track"><div class="bc-bar warm" style="width:97%"></div></div></div>
-                    <p class="cite" style="margin-top:16px">Illustrative, not to scale; Copilot (orange) is an interface that runs OpenAI's models under the hood. For real closeness: the entire top ten on the Arena leaderboard sat within about 22 rating points, roughly 1.5%, on 28 July 2026 (arena.ai).</p>
+            <h2 class="reveal r2" style="font-size:60px">There isn't one AI. There are about ten labs at the front, and <span class="hl">they are not tied</span></h2>
+            <div class="reveal r3" style="margin-top:26px">
+                <div class="colchart">
+                        <div class="colw"><div class="cstack"><div class="cval">55.5</div><div class="cbar " style="height:100.0%"></div></div><div class="cname">Claude Fable 5<small>Anthropic</small></div></div>
+                        <div class="colw"><div class="cstack"><div class="cval">49.5</div><div class="cbar " style="height:89.2%"></div></div><div class="cname">GPT-5.6 Sol<small>OpenAI</small></div></div>
+                        <div class="colw"><div class="cstack"><div class="cval">47.9</div><div class="cbar " style="height:86.3%"></div></div><div class="cname">Gemini 3.7 Flash<small>Google</small></div></div>
+                        <div class="colw"><div class="cstack"><div class="cval">46.9</div><div class="cbar " style="height:84.5%"></div></div><div class="cname">Kimi K3<small>Moonshot AI</small></div></div>
+                        <div class="colw"><div class="cstack"><div class="cval">45.5</div><div class="cbar " style="height:82.0%"></div></div><div class="cname">Muse Spark 1.2<small>Meta</small></div></div>
+                        <div class="colw"><div class="cstack"><div class="cval">43.0</div><div class="cbar " style="height:77.5%"></div></div><div class="cname">Qwen3.8 Max<small>Alibaba</small></div></div>
+                        <div class="colw"><div class="cstack"><div class="cval">42.9</div><div class="cbar " style="height:77.3%"></div></div><div class="cname">Grok 4.6<small>xAI</small></div></div>
+                        <div class="colw"><div class="cstack"><div class="cval">41.1</div><div class="cbar " style="height:74.1%"></div></div><div class="cname">GLM-5.2<small>Z.ai</small></div></div>
+                        <div class="colw"><div class="cstack"><div class="cval">41.0</div><div class="cbar " style="height:73.9%"></div></div><div class="cname">DeepSeek V4 Pro<small>DeepSeek</small></div></div>
+                        <div class="colw"><div class="cstack"><div class="cval">39.0</div><div class="cbar " style="height:70.3%"></div></div><div class="cname">MiniMax-M3<small>MiniMax</small></div></div>
+                        <div class="colw dimmed"><div class="cstack"><div class="cval">10.4</div><div class="cbar dim" style="height:18.7%"></div></div><div class="cname">Claude 4.5 Haiku<small>Anthropic, budget</small></div></div>
                 </div>
-                <div class="dcard reveal r4"><div class="ctag">The report card</div><h3>What they're graded on</h3><p>Public tests score each model on the same handful of subjects:</p>
-                    <div class="chips"><span class="chip-m">CODING</span><span class="chip-m">WRITING</span><span class="chip-m">REASONING</span><span class="chip-m">IMAGE GENERATION</span><span class="chip-m">SEEING &amp; HEARING</span><span class="chip-m">CYBER SECURITY</span><span class="chip-m">MEMORY (CONTEXT)</span></div>
-                    <p style="margin-top:18px">Every model has stronger and weaker subjects; none tops the class in all of them.</p></div>
             </div>
-            <div class="strip teal reveal r5" style="margin-top:30px"><b>The takeaway:</b> for everyday writing, questions and admin, you would struggle to pick these apart in a blind test. Real differences only show up when you push hard on one subject; which is exactly what benchmarks are for.</div>
+            <p class="cite reveal r4" style="margin-top:18px">Humanity's Last Exam, percentage correct; best-scoring configuration per lab, plus one budget model for contrast. Independently benchmarked by Artificial Analysis, <a href="https://artificialanalysis.ai/evaluations/humanitys-last-exam" target="_blank" rel="noopener">artificialanalysis.ai/evaluations/humanitys-last-exam</a>, accessed 14 August 2026.</p>
+            <div class="strip teal reveal r5" style="margin-top:26px"><b>Two things at once.</b> On everyday writing, questions and admin you would struggle to pick the leaders apart in a blind test; the top ten on the Arena leaderboard sat within about 22 rating points, roughly 1.5%, on 28 July 2026. Push them onto the hardest exam anyone has written and a 16-point spread opens up. <b>Both facts are true, and the gap between them is what this hour is about.</b></div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">02 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">02 / 24</span></div>
+    </section>
+
+
+    <!-- ===== SLIDE 3 : READING THE SOURCE ===== -->
+    <section class="slide" aria-label="Reading the source">
+        <div class="topbar"><span class="chip">SOURCE</span><span class="crumb">where that chart came from</span><span class="sect">Read it yourself</span></div>
+        <div class="body" style="justify-content:flex-start;padding-top:4px">
+            <div class="kicker reveal r1" style="margin-bottom:14px">The whole skill in one screen: go and look at the actual leaderboard</div>
+            <div class="shotframe reveal r2" style="max-width:1400px;margin:0 auto">
+                <img src="../assets/hle-artificial-analysis.png" alt="Screenshot of the Artificial Analysis leaderboard for Humanity's Last Exam, showing a bar chart of scores for thirty models from 55.5 percent down to 10.4 percent">
+            </div>
+            <div class="grid3 reveal r3" style="margin-top:22px">
+                <div class="shotnote"><span class="pin">1</span><p><b>30 of 567 models.</b> You are looking at a filtered view. Change the filter and the picture changes.</p></div>
+                <div class="shotnote"><span class="pin">2</span><p><b>(max), (high), (medium).</b> Same model, different thinking budget. Claude Opus 5 scores 54.9 on max and 51.3 on medium.</p></div>
+                <div class="shotnote"><span class="pin warm">3</span><p><b>55.5% and 10.4% are the same lab.</b> The gap inside one company is larger than the gap between companies.</p></div>
+            </div>
+            <p class="cite reveal r4" style="margin-top:16px">Screenshot taken 14 August 2026 from <a href="https://artificialanalysis.ai/evaluations/humanitys-last-exam" target="_blank" rel="noopener">artificialanalysis.ai/evaluations/humanitys-last-exam</a>. The lightbulb marks a reasoning model. Scores on this page will have moved by the time you read this; that is the point.</p>
+        </div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">03 / 24</span></div>
     </section>
 
 
@@ -304,7 +377,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <div class="strip warn reveal r6" style="margin-top:44px"><b>Why people don't know this:</b> unless you follow the industry, none of these updates reach you. The rest of this hour is the catch-up: how the scoreboard works, and how to read it for yourself.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">03 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">04 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 4 : THE QUESTION ===== -->
@@ -319,7 +392,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <div class="strip teal reveal r5" style="margin-top:44px"><b>Where the answers live:</b> public benchmarks; standardised tests that every major model sits. They're imperfect, gameable and short-lived, and they're still the best evidence we have.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">04 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">05 / 24</span></div>
     </section>
 
 
@@ -336,7 +409,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             <div class="strip teal reveal r5" style="margin-top:36px"><b>Why it retired:</b> passing as human rewards deception, not capability; "it's all about trying to deceive the jury", as AI researcher Fran&ccedil;ois Chollet put it. So scientists went looking for better tests, and there is "no Rubicon, no one line" to replace it; just the many scoreboards in the rest of this hour.</div>
             <p class="cite reveal r6" style="margin-top:22px">Source: Celeste Biever, <a href="https://www.nature.com/articles/d41586-023-02361-7" target="_blank" rel="noopener">"ChatGPT broke the Turing test; the race is on for new ways to assess AI"</a>, Nature, vol 619, 27 July 2023.</p>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">05 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">06 / 24</span></div>
     </section>
 
 
@@ -346,18 +419,18 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
         <div class="body">
             <div class="kicker reveal r1">Six terms that make sense of everything that follows</div>
             <h2 class="reveal r2" style="font-size:62px">Speak scoreboard: <span class="hl">the jargon, translated</span></h2>
-            <div class="grid3" style="margin-top:34px">
+            <div class="grid3" style="margin-top:28px">
                 <div class="dcard reveal r3"><div class="ctag">AGI</div><h3>Artificial General Intelligence</h3><p>AI as broadly capable as a person across most kinds of work. The definition is <b>hotly contested</b> and there's no agreed way to measure it; when someone says AGI is near (or here), ask which definition they're using.</p></div>
                 <div class="dcard reveal r4"><div class="ctag">Elo</div><h3>The head-to-head rating</h3><p>The rating system borrowed from chess: win a matchup, your number rises. Despite the capitals you often see, <b>it's not an acronym</b>; it's named after its inventor, physicist Arpad Elo. It's how Arena turns millions of blind votes into a ranking.</p></div>
                 <div class="dcard reveal r5"><div class="ctag">HLE</div><h3>Humanity's Last Exam</h3><p>2,500 questions written by subject experts across roughly 100 fields; built in 2025 to be the hardest knowledge exam an AI can sit, and named for the hope that we won't need another.</p></div>
             </div>
-            <div class="grid3" style="margin-top:30px">
+            <div class="grid3" style="margin-top:24px">
                 <div class="dcard reveal r6"><div class="ctag">Spatial reasoning</div><h3>Thinking in shapes and space</h3><p>Judging positions, rotations and layouts; reading a map, a diagram or a clock face. One of AI's famously jagged spots: gold-medal mathematics alongside 50.1% at reading an analogue clock.</p></div>
                 <div class="dcard reveal r6"><div class="ctag">Chain of thought</div><h3>Showing the working</h3><p>When a model writes out step-by-step reasoning before giving its answer; the "thinking" mode on modern chatbots. It lifts performance on hard problems, at the cost of being slower and dearer.</p></div>
                 <div class="dcard reveal r6"><div class="ctag">Context window</div><h3>The model's working memory</h3><p>How much text a model can hold in mind in one sitting, measured in tokens (word-pieces). Bigger windows are heavily advertised; benchmarks like RULER test how much of the window actually works.</p></div>
             </div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">06 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">07 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 7 : WHAT A BENCHMARK IS ===== -->
@@ -373,23 +446,42 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <p class="lede reveal r6" style="margin-top:40px">The industry is shifting its attention from the first kind to the third: from <b>what models know</b> to <b>what they can do</b>.</p>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">07 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">08 / 24</span></div>
     </section>
 
-    <!-- ===== SLIDE 8 : JAGGED CAPABILITY ===== -->
+    <!-- ===== JAGGED CAPABILITY ===== -->
     <section class="slide" aria-label="Jagged capability">
         <div class="topbar"><span class="chip warm">KEY IDEA 1</span><span class="crumb">brilliant and clumsy at once</span><span class="sect">Jagged capability</span></div>
         <div class="body">
             <div class="kicker warm reveal r1">Key idea one</div>
-            <h2 class="reveal r2">Capability is <span class="hlw">jagged</span>: brilliant and clumsy in the same model</h2>
-            <div class="stats" style="margin-top:44px">
-                <div class="stat reveal r3"><div class="big">Gold</div><div class="lbl"><b>International Mathematical Olympiad, July 2025:</b> Gemini Deep Think earned a certified gold-medal score (35/42), verified by the independent MathArena project.</div></div>
-                <div class="stat reveal r4"><div class="big">12 / 12</div><div class="lbl"><b>ICPC World Finals, September 2025:</b> an OpenAI system solved all twelve problems, above the best human team in the world's top programming contest.</div></div>
-                <div class="stat reveal r5"><div class="big">50.1%</div><div class="lbl"><b>Reading an analogue clock:</b> the same generation of frontier models, versus <b>90.1% for humans</b> (Stanford AI Index 2026).</div></div>
+            <h2 class="reveal r2" style="font-size:62px">Capability is <span class="hlw">jagged</span>: brilliant and clumsy in the same model</h2>
+            <div class="grid2" style="margin-top:26px;align-items:start;grid-template-columns:1fr 1.15fr;gap:36px">
+                <div class="reveal r3">
+                    <div class="stat" style="margin-bottom:18px;padding:28px 32px"><div class="big" style="font-size:66px;margin-bottom:10px">Gold</div><div class="lbl"><b>International Mathematical Olympiad, July 2025:</b> Gemini Deep Think earned a certified gold-medal score (35/42), verified by the independent MathArena project.</div></div>
+                    <div class="stat" style="padding:28px 32px"><div class="big" style="font-size:66px;margin-bottom:10px">12 / 12</div><div class="lbl"><b>ICPC World Finals, September 2025:</b> an OpenAI system solved all twelve problems, above the best human team in the world's top programming contest.</div></div>
+                </div>
+                <div class="reveal r4">
+                    <div class="dcard bad" style="padding:28px 34px">
+                        <div class="ctag">The same generation of models</div>
+                        <h3 style="margin-bottom:20px">Reading an analogue clock</h3>
+                        <div class="vsrow" style="grid-template-columns:1fr;gap:20px">
+                            <div class="vsbar warm">
+                                <div class="vtop"><span class="vnum">50.1%</span><span class="vwho">Frontier AI</span></div>
+                                <div class="vtrack"><div class="vfill" style="width:50.1%"></div></div>
+                            </div>
+                            <div class="vsbar">
+                                <div class="vtop"><span class="vnum">90.1%</span><span class="vwho">People</span></div>
+                                <div class="vtrack"><div class="vfill" style="width:90.1%"></div></div>
+                                <p class="vsub">Gold-medal mathematics, and a coin flip on the clock in your nan's kitchen.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="cite" style="margin-top:12px">Source: Stanford AI Index Report 2026, published April 2026.</p>
+                </div>
             </div>
-            <div class="strip warn reveal r6" style="margin-top:44px"><b>So "best" is task-shaped.</b> A model can out-reason the world's mathematicians and still fumble something your ten-year-old finds easy. Never assume skill in one area transfers to another; check the benchmark closest to <b>your</b> task.</div>
+            <div class="strip warn reveal r6" style="margin-top:20px;font-size:24px"><b>So "best" is task-shaped.</b> A model can out-reason the world's mathematicians and still fumble something your ten-year-old finds easy. Never assume skill in one area transfers to another; check the benchmark closest to <b>your</b> task.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">08 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">09 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 9 : SATURATION ===== -->
@@ -405,7 +497,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <div class="strip teal reveal r6" style="margin-top:40px"><b>Why it matters to you:</b> a benchmark only carries information while models still fail it. Once everyone scores 95%+, quoting it is nostalgia; Epoch AI's May 2026 analysis ("Are AI benchmarks doomed?") found most now saturate within months of release.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">09 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">10 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 10 : THE CODING ARC ===== -->
@@ -422,23 +514,42 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <div class="strip warn reveal r7" style="margin-top:36px"><b>The pattern:</b> each exam is "impossible" for about two years, then trivial. When someone quotes a coding score, your first question is: <b>which generation of exam?</b></div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">10 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">11 / 24</span></div>
     </section>
 
-    <!-- ===== SLIDE 11 : BROWSECOMP, SPEED RUN ===== -->
+    <!-- ===== BROWSECOMP, SPEED RUN ===== -->
     <section class="slide" aria-label="BrowseComp speed run">
         <div class="topbar"><span class="chip">CASE STUDY</span><span class="crumb">the fastest saturation on record</span><span class="sect">Speed run</span></div>
         <div class="body">
             <div class="kicker reveal r1">How fast is "months, not years"? This fast.</div>
-            <h2 class="reveal r2">BrowseComp: <span class="hl">0.6% to ~90%</span> in fifteen months</h2>
-            <div class="stats" style="margin-top:44px">
-                <div class="stat reveal r3"><div class="big">0.6%</div><div class="lbl"><b>April 2025, at launch.</b> 1,266 web-research questions built by OpenAI to be genuinely hard for browsing agents: obscure facts needing long, creative search trails.</div></div>
-                <div class="stat reveal r4"><div class="big">~90%</div><div class="lbl"><b>July 2026.</b> Frontier agents now clear it almost routinely; a 150-fold improvement in fifteen months, one of the fastest capability arcs ever recorded.</div></div>
-                <div class="stat reveal r5"><div class="big">Next</div><div class="lbl"><b>BrowseComp-Plus</b> (2026) restores the difficulty; the field's answer to every saturated test is a harder sequel.</div></div>
+            <h2 class="reveal r2">BrowseComp: <span class="hl">0.6% to about 90%</span> in fifteen months</h2>
+            <div class="reveal r3" style="margin-top:40px">
+                <div class="slope">
+                    <div class="slopeend warm">
+                        <div class="snum">0.6%</div>
+                        <div class="swhen">April 2025, at launch</div>
+                        <div class="swhat">1,266 web-research questions built by OpenAI to be genuinely hard for browsing agents: obscure facts needing long, creative search trails.</div>
+                    </div>
+                    <div class="slopearrow" aria-hidden="true">
+                        <svg width="240" height="150" viewBox="0 0 240 150" role="img" aria-label="A line rising steeply from bottom left to top right">
+                            <line x1="10" y1="140" x2="230" y2="140" stroke="#26262F" stroke-width="1"/>
+                            <line x1="10" y1="140" x2="10" y2="10" stroke="#26262F" stroke-width="1"/>
+                            <path d="M 14 138 C 90 136, 150 120, 226 18" fill="none" stroke="#1AC9C9" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="14" cy="138" r="6" fill="#4B85A9"/>
+                            <circle cx="226" cy="18" r="6" fill="#1AC9C9"/>
+                            <text x="120" y="132" text-anchor="middle" fill="#7C796F" font-family="'JetBrains Mono',monospace" font-size="14">15 months</text>
+                        </svg>
+                    </div>
+                    <div class="slopeend">
+                        <div class="snum">~90%</div>
+                        <div class="swhen">July 2026</div>
+                        <div class="swhat">Frontier agents now clear it almost routinely; a 150-fold improvement, one of the fastest capability arcs ever recorded. BrowseComp-Plus (2026) restores the difficulty.</div>
+                    </div>
+                </div>
             </div>
             <div class="strip teal reveal r6" style="margin-top:44px"><b>Practical lesson:</b> any AI capability claim, positive or negative, needs a date attached. "AI can't do deep web research" was true in April 2025 and false a year later.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">11 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">12 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 12 : VENDOR VS INDEPENDENT ===== -->
@@ -454,7 +565,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <div class="strip bad reveal r6" style="margin-top:38px"><b>The habit:</b> before trusting a score, ask <b>who ran the evaluation</b>. A number from the lab that built the model is a claim; a number from an independent leaderboard is evidence.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">12 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">13 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 13 : STORY, FRONTIERMATH ===== -->
@@ -465,7 +576,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             <p class="story reveal r2">FrontierMath was the hardest maths benchmark ever built: research-level problems, written in secret by professional mathematicians. Then it emerged that <b>OpenAI had funded its creation</b>, with access to the problems, under an agreement the contributing mathematicians <b>were never told about</b>.</p>
             <p class="story-close reveal r3">Nobody proved cheating; the model performed impressively anyway. But the episode, disclosed in January 2025, changed the field: Epoch AI now keeps a <b>50-problem holdout set no lab ever sees</b>, and "who funded the benchmark?" became a standard question. Even the scoreboard needs auditing. A June 2026 audit then found errors in roughly a third of the original problems, now corrected in version 2; even the hardest exam ever written needed marking twice.</p>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">13 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">14 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 14 : ARENA & THE LEADERBOARD ILLUSION ===== -->
@@ -480,7 +591,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <div class="strip warn reveal r5" style="margin-top:44px"><b>Also remember:</b> arena votes reward answers people <b>like</b>; confident, agreeable, nicely formatted. That is not the same as answers that are <b>right</b>. Use Arena for vibes, exams for correctness, simulations for competence.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">14 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">15 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 15 : STORY, VENDING-BENCH ===== -->
@@ -491,23 +602,32 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             <p class="story reveal r2">Researchers at Andon Labs gave AI models <b>$500 and a simulated vending machine business</b> to run for a year: find suppliers, set prices, pay the daily fees, restock. The score is simply how much money is left at the end.</p>
             <p class="story-close reveal r3">It measures what no exam can: staying coherent over thousands of small decisions. Models have spiralled into ordering nothing for months or hallucinating suppliers; the best run on the July 2026 leaderboard turned $500 into <b>$10,937</b>. And in the multi-agent version, competing AI shopkeepers spontaneously <b>formed a price-fixing cartel</b>; benchmarks find behaviours nobody thought to test for.</p>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">15 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">16 / 24</span></div>
     </section>
 
-    <!-- ===== SLIDE 16 : METR TIME HORIZONS ===== -->
+    <!-- ===== METR TIME HORIZONS ===== -->
     <section class="slide" aria-label="METR time horizons">
         <div class="topbar"><span class="chip">THE TREND</span><span class="crumb">how fast is this moving?</span><span class="sect">Time horizons</span></div>
         <div class="body">
             <div class="kicker reveal r1">The one chart that shows the speed</div>
             <h2 class="reveal r2">Task length doubles about <span class="hl">every three months</span></h2>
-            <div class="stats" style="margin-top:44px">
-                <div class="stat reveal r3"><div class="big">50%</div><div class="lbl">The research group METR measures the <b>longest task a model completes at 50% reliability</b>, expressed as how long the same work takes a skilled human.</div></div>
-                <div class="stat reveal r4"><div class="big">~320 min</div><div class="lbl">The frontier's horizon in METR's January 2026 update: models now handle tasks that take a person <b>around five hours</b>.</div></div>
-                <div class="stat reveal r5"><div class="big">~89 days</div><div class="lbl">The doubling time of that horizon since 2024. Minutes became hours in two years; if the trend holds, hours become days.</div></div>
+            <p class="lede reveal r3" style="margin-top:20px;font-size:26px">The research group METR measures the longest task a model finishes at 50% reliability, expressed as how long the same work takes a skilled human. Each step below is one doubling.</p>
+            <div class="reveal r4" style="margin-top:26px">
+                <div class="ladder">
+                        <div class="rung "><div class="rstack"><div class="rval">5 min</div><div class="rbar" style="height:12.5%"></div></div><div class="rdate">Jul 2024</div></div>
+                        <div class="rung "><div class="rstack"><div class="rval">10 min</div><div class="rbar" style="height:25%"></div></div><div class="rdate">Oct 2024</div></div>
+                        <div class="rung "><div class="rstack"><div class="rval">20 min</div><div class="rbar" style="height:37.5%"></div></div><div class="rdate">Jan 2025</div></div>
+                        <div class="rung "><div class="rstack"><div class="rval">40 min</div><div class="rbar" style="height:50%"></div></div><div class="rdate">Apr 2025</div></div>
+                        <div class="rung "><div class="rstack"><div class="rval">1h 20</div><div class="rbar" style="height:62.5%"></div></div><div class="rdate">Jul 2025</div></div>
+                        <div class="rung "><div class="rstack"><div class="rval">2h 40</div><div class="rbar" style="height:75%"></div></div><div class="rdate">Oct 2025</div></div>
+                        <div class="rung now"><div class="rstack"><div class="rval">5h 20</div><div class="rbar" style="height:87.5%"></div></div><div class="rdate">Jan 2026</div></div>
+                        <div class="rung future"><div class="rstack"><div class="rval">10h 40</div><div class="rbar" style="height:100%"></div></div><div class="rdate">Apr 2026</div></div>
+                </div>
             </div>
-            <div class="strip teal reveal r6" style="margin-top:44px"><b>Why this one matters:</b> single-benchmark scores expire, but this is a trend line across many tasks; the best single picture of how fast AI agents are improving, and the one to show anyone planning more than a year ahead.</div>
+            <p class="cite reveal r5" style="margin-top:16px">Drawn from METR's published figures: a frontier horizon of about 320 minutes in the Time Horizon 1.1 update, 29 January 2026, and a doubling time of about 89 days since 2024. The earlier and later steps are that doubling rate carried backwards and forwards, not separately measured points. Methodology: <a href="https://arxiv.org/abs/2503.14499" target="_blank" rel="noopener">arxiv.org/abs/2503.14499</a>. Teal is measured territory; ochre is the trend continued one step past it.</p>
+            <div class="strip teal reveal r6" style="margin-top:22px"><b>Why this one matters:</b> single-benchmark scores expire, but this is a trend line across many tasks; the best single picture of how fast AI agents are improving, and the one to show anyone planning more than a year ahead.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">16 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">17 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 17 : CHOOSING BY TASK ===== -->
@@ -527,7 +647,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
                 <div class="dcard reveal r6"><div class="ctag">Long documents</div><h3>RULER, MRCR</h3><p>Whether the advertised million-token context window actually works, which is routinely less than claimed.</p></div>
             </div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">17 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">18 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 18 : WRAPPER APPS ===== -->
@@ -543,7 +663,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <div class="strip bad reveal r6" style="margin-top:38px"><b>Rule of thumb:</b> if a product's marketing quotes no independent numbers, assume you could get the same capability, cheaper, by going straight to the model it's wrapping.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">18 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">19 / 24</span></div>
     </section>
 
 
@@ -552,16 +672,16 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
         <div class="topbar"><span class="chip bad">CASE STUDY</span><span class="crumb">when the top result is bought</span><span class="sect">The fake ChatGPT</span></div>
         <div class="body">
             <div class="kicker bad reveal r1">Wrappers in the wild: a true story from May 2026</div>
-            <h2 class="reveal r2">The "ChatGPT" at the top of Google <span class="hlw">wasn't ChatGPT</span></h2>
-            <div class="rows" style="margin-top:34px;max-width:1660px;font-size:25px">
+            <h2 class="reveal r2" style="font-size:64px">The "ChatGPT" at the top of Google <span class="hlw">wasn't ChatGPT</span></h2>
+            <div class="rows" style="margin-top:26px;max-width:1660px;font-size:23px">
                 <div class="row reveal r3"><span class="n bad">&middot;</span><span>YouTuber Christophe investigated after his friend googled "ChatGPT 4o", clicked the top result and paid for "premium"; weeks later he had <b>no ChatGPT subscription at all</b>. The top result was a paid ad for a lookalike site with a near-identical logo and interface.</span></div>
                 <div class="row reveal r4"><span class="n bad">&middot;</span><span><b>The top spot is bought at auction:</b> advertisers bid on search phrases, weighted by a relevance "quality score". Two decades of design changes have made sponsored results look almost identical to real ones.</span></div>
                 <div class="row reveal r5"><span class="n bad">&middot;</span><span>The company behind it ran ad variations mimicking OpenAI's and DeepSeek's logos, and dozens of other AI apps. Customers reported paying US$20 to $60 for limits they thought they'd removed, and models <b>"not even as capable as the free version of ChatGPT"</b>.</span></div>
                 <div class="row reveal r6"><span class="n bad">&middot;</span><span>Google confirmed the two reported ads broke its misleading-ads policies and removed them; but it's whack-a-mole: in 2024 Google blocked or removed <b>half a billion ads</b> over trademark issues and about <b>147 million</b> for misrepresentation.</span></div>
             </div>
-            <div class="strip bad reveal r7" style="margin-top:32px"><b>The defence is boring and it works:</b> slow down. Type the address or use a bookmark, skip the "Sponsored" results, and check which model you're actually paying for. We'll watch Christophe's full breakdown at the end of the session.</div>
+            <div class="strip bad reveal r7" style="margin-top:22px;font-size:23px"><b>The defence is boring and it works:</b> slow down. Type the address or use a bookmark, skip the "Sponsored" results, and check which model you're actually paying for. We'll watch Christophe's full breakdown at the end of the session.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">19 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">20 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 20 : THE FIVE HABITS ===== -->
@@ -578,7 +698,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
                 <div class="row reveal r7"><span class="n">&middot;</span><span><b>One number, or several?</b> No single figure captures a model; triangulate an exam, an arena and a simulation.</span></div>
             </div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">20 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">21 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 21 : KEEP WATCHING ===== -->
@@ -593,7 +713,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <div class="strip teal reveal r5" style="margin-top:42px"><b>The one-line summary of this hour:</b> there is no best AI; there is a best AI <b>for a task, on a date, according to somebody</b>. Always find out what, when and who.</div>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">21 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">22 / 24</span></div>
     </section>
 
     <!-- ===== SLIDE 22 : SOURCES ===== -->
@@ -614,7 +734,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <p class="lede muted reveal r4" style="margin-top:30px;font-size:22px">Prepared July 2026 for the NT World Ink AI Special Topic Workshops. Scores age quickly; check the linked leaderboards for the current picture.</p>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">22 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">23 / 24</span></div>
     </section>
 
 
@@ -631,7 +751,7 @@ body.editing [contenteditable="true"] { outline: 2px dashed rgba(26,201,201,.5);
             </div>
             <p class="cite reveal r3" style="margin-top:18px;text-align:center">Christophe (YouTube), May 2026 investigation into lookalike AI apps in sponsored search results &middot; youtube.com/watch?v=uuNCPmd6yU0</p>
         </div>
-        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">23 / 23</span></div>
+        <div class="foot"><span class="brand"><span class="brand-mark"></span><span class="brand-name">ntworld<span class="dot">.</span>ink</span><small>Workshops</small></span><span class="pg">24 / 24</span></div>
     </section>
 
 </main>
@@ -700,7 +820,7 @@ class SlidePresentation {
 class InlineEditor {
     constructor() {
         this.isActive = false;
-        this.storeKey = 'which-ai-is-best-deck-edits-v2';
+        this.storeKey = 'which-ai-is-best-deck-edits-v3';
         this.toggleBtn = document.getElementById('editToggle');
         this.hotzone = document.getElementById('editHotzone');
         this.restore(); this.wire();

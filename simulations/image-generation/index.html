@@ -66,13 +66,7 @@
   h1 { font-weight: 400; font-size: 54px; line-height: 1.1; letter-spacing: 0.04em; }
   h2 { font-weight: 400; font-size: 38px; line-height: 1.15; margin-bottom: 22px; letter-spacing: 0.04em; }
   .lede { font-size: 22px; color: var(--grey); margin-top: 16px; max-width: 820px; line-height: 1.5; }
-  .lede strong, .callout strong { font-weight: 400; color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
-  .myth {
-    display: inline-block; margin-top: 26px; padding: 9px 20px;
-    border: 1px solid var(--white); border-radius: 24px;
-    color: var(--white); font-size: 18px;
-    box-shadow: 0 0 16px -4px var(--glow);
-  }
+  .lede strong, .callout strong, .qbox strong, .figure figcaption strong { font-weight: 400; color: var(--white); text-shadow: 0 0 14px rgba(255,255,255,0.35); }
   .callout {
     border-left: 1px solid var(--white); background: var(--panel);
     padding: 22px 30px; border-radius: 0 10px 10px 0;
@@ -81,7 +75,7 @@
     margin-top: 26px;
   }
   .caption { color: var(--grey-dim); font-size: 15px; margin-top: 18px; line-height: 1.6; }
-  .caption a, .cite a { color: var(--grey); }
+  .caption a, .cite a, figcaption a { color: var(--grey); }
   .btn {
     display: inline-block; margin-top: 26px; padding: 13px 32px;
     background: var(--white); color: var(--ink); border: none; border-radius: 7px;
@@ -91,7 +85,7 @@
   .btn:hover { box-shadow: 0 0 20px -2px var(--glow); }
   .btn.ghost { background: transparent; color: var(--grey); border: 1px solid var(--line); }
   .btn.ghost:hover { color: var(--white); border-color: var(--grey-dim); }
-  .btn:focus-visible, .cellbtn:focus-visible, input[type=range]:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
+  .btn:focus-visible, .cellbtn:focus-visible, input[type=range]:focus-visible, .wordchip:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
   .navhint { position: fixed; right: 30px; bottom: 20px; color: var(--grey-dim); font-size: 13px; letter-spacing: 1px; }
 
   .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 14px; }
@@ -100,7 +94,34 @@
   .card p { font-size: 19px; line-height: 1.5; color: var(--body); }
   .mono { font-family: Consolas, monospace; }
 
-  /* Step 1 · ping */
+  /* ---------- Pictures and screenshots ---------- */
+  .figure { margin-top: 18px; }
+  .figure img {
+    display: block; width: 100%; height: auto; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--panel);
+  }
+  .figure figcaption { color: var(--grey-dim); font-size: 14.5px; line-height: 1.65; margin-top: 12px; }
+  .figure.shot img { box-shadow: 0 10px 40px -18px rgba(0,0,0,1); }
+  .figure.cap img { max-height: 50vh; object-fit: cover; object-position: center; }
+  .figure.shot.cap { max-width: 880px; }
+  .figure.shot.cap img { max-height: none; object-fit: fill; }
+  .split { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); gap: 30px; align-items: start; margin-top: 12px; }
+  .split.even { grid-template-columns: 1fr 1fr; }
+
+  /* Opening and closing question */
+  .qbox {
+    border: 1px solid var(--grey-dim); border-radius: 10px; background: var(--panel);
+    padding: 24px 30px; margin-top: 24px; font-size: 24px; line-height: 1.5; color: var(--body);
+    box-shadow: 0 0 34px -14px var(--glow);
+  }
+  .qbox .qtag { display: block; font-family: Consolas, monospace; font-size: 13px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--grey-dim); margin-bottom: 12px; }
+  .tellrow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+  .tell { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; }
+  .tell .tk { font-family: Consolas, monospace; font-size: 12.5px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--grey-dim); }
+  .tell p { font-size: 17.5px; line-height: 1.5; color: var(--body); margin-top: 8px; }
+
+  /* Step · ping */
   .pingwrap { display: flex; gap: 40px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
   .cellbtn { cursor: pointer; }
   .cellbtn circle.body { fill: var(--panel); stroke: var(--line); stroke-width: 2; transition: fill .3s, stroke .3s, filter .3s; }
@@ -116,7 +137,7 @@
   #sumline { font-size: 21px; color: var(--grey); margin-top: 16px; }
   #sumline b { font-weight: 400; color: var(--white); }
 
-  /* Step 2 · ladder of layers */
+  /* Step · ladder of layers */
   .layerstack { display: flex; flex-direction: column-reverse; gap: 12px; margin-top: 14px; max-width: 880px; }
   .layer {
     display: grid; grid-template-columns: 240px 1fr; gap: 22px; align-items: center;
@@ -130,7 +151,7 @@
   .layer svg .g0 { opacity: .25; transition: opacity .5s; }
   .layer.lit svg .g0 { opacity: 1; }
 
-  /* Step 3 · training */
+  /* Step · training */
   .train-grid { display: grid; grid-template-columns: 300px 1fr; gap: 26px; margin-top: 12px; align-items: start; }
   .photocard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; text-align: center; }
   .photocard .plabel { font-family: Consolas, monospace; letter-spacing: 3px; font-size: 15px; color: var(--white); margin-top: 12px; }
@@ -141,13 +162,7 @@
   .err-fill.good { background: linear-gradient(90deg, var(--grey), var(--white)); box-shadow: 0 0 14px var(--glow); }
   .step-count { font-family: Consolas, monospace; color: var(--grey-dim); font-size: 15px; margin-top: 14px; }
 
-  /* Step 4 · dataset grid */
-  .cifar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 14px; max-width: 880px; }
-  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 10px 10px; text-align: center; }
-  .tile .tlabel { font-family: Consolas, monospace; font-size: 12.5px; letter-spacing: 2px; color: var(--grey); margin-top: 8px; text-transform: uppercase; }
-  .tile svg { width: 100%; max-width: 86px; height: auto; }
-
-  /* Step 5 · croc vs alligator */
+  /* Step · croc vs alligator */
   .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 12px; max-width: 900px; }
   .cmp .card { text-align: center; }
   .cmp .cname { font-size: 22px; margin-top: 10px; }
@@ -158,7 +173,36 @@
   #featNote b { font-weight: 400; color: var(--white); }
   .hl-snout .snout, .hl-teeth .teeth, .hl-colour .hide { stroke: var(--white) !important; stroke-width: 3 !important; filter: drop-shadow(0 0 6px rgba(230,235,238,0.8)); }
 
-  /* Step 6 · denoise */
+  /* Step · shared space of ideas (CLIP) */
+  .spacebox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  .spacebox svg { display: block; width: 100%; height: auto; }
+  .sp-dot { fill: #2a2d2f; stroke: var(--line); stroke-width: 1.5; transition: fill .35s, stroke .35s, filter .35s; }
+  .sp-dot.near { fill: #3c4143; stroke: var(--white); filter: drop-shadow(0 0 9px rgba(230,235,238,0.7)); }
+  .sp-lbl { fill: var(--grey-dim); font-size: 11.5px; font-family: Consolas, monospace; letter-spacing: .6px; transition: fill .35s; }
+  .sp-lbl.near { fill: var(--white); }
+  #spMarker { opacity: 0; transition: opacity .35s, transform .6s cubic-bezier(.4,0,.2,1); }
+  #spMarker.on { opacity: 1; }
+  #spLink { stroke: var(--white); stroke-width: 1.4; stroke-dasharray: 4 4; opacity: 0; transition: opacity .35s; }
+  #spLink.on { opacity: .85; }
+  .wordchips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+  .wordchip {
+    font-family: inherit; font-size: 17px; color: var(--grey); cursor: pointer;
+    background: transparent; border: 1px solid var(--line); border-radius: 22px; padding: 9px 20px;
+    transition: color .25s, border-color .25s, box-shadow .25s; min-height: 44px;
+  }
+  .wordchip:hover { color: var(--white); border-color: var(--grey-dim); }
+  .wordchip.sel { color: var(--white); border-color: var(--white); box-shadow: 0 0 16px -4px var(--glow); }
+  #spNote { font-size: 19.5px; color: var(--body); line-height: 1.55; margin-top: 18px; min-height: 108px; }
+  #spNote b { font-weight: 400; color: var(--white); }
+  .sumline-math { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 16px; }
+  .mathcard { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; text-align: center; width: 128px; }
+  .mathcard svg { display: block; width: 100%; height: auto; }
+  .mathcard .mlbl { font-family: Consolas, monospace; font-size: 11px; letter-spacing: 1.6px; color: var(--grey-dim); margin-top: 8px; text-transform: uppercase; }
+  .mathop { font-size: 30px; color: var(--grey-dim); }
+  .mathout { font-size: 22px; color: var(--white); }
+  .mathout small { display: block; font-family: Consolas, monospace; font-size: 12px; color: var(--grey-dim); letter-spacing: 1.5px; margin-top: 6px; }
+
+  /* Step · denoise */
   .denoise-wrap { display: grid; grid-template-columns: minmax(0, 640px) 1fr; gap: 30px; margin-top: 12px; align-items: start; }
   .scenebox { position: relative; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #000; }
   .scenebox img { display: block; width: 100%; height: auto; transition: filter .5s, opacity .5s; }
@@ -178,19 +222,43 @@
   #denoiseCap { font-size: 20px; color: var(--body); line-height: 1.55; min-height: 96px; }
   #denoiseCap b { font-weight: 400; color: var(--white); }
 
-  /* Step 7 · generate again */
+  /* Step · steering */
+  .steerbox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  .steerbox svg { display: block; width: 100%; height: auto; border-radius: 6px; }
+  #alphaRead { font-family: Consolas, monospace; font-size: 15px; letter-spacing: 2px; color: var(--grey-dim); margin-top: 12px; }
+  #alphaRead b { font-weight: 400; color: var(--white); }
+  #steerNote { font-size: 19.5px; color: var(--body); line-height: 1.55; min-height: 132px; }
+  #steerNote b { font-weight: 400; color: var(--white); }
+  .treepart { transition: opacity .5s, transform .6s cubic-bezier(.4,0,.2,1); transform-origin: 300px 250px; }
+
+  /* Step · generate again */
   .runsrow { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
   .runcard { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; width: 300px; animation: rise .5s ease; }
   .runcard img { display: block; width: 100%; height: auto; border-radius: 6px; }
   .runcard .runlbl { font-family: Consolas, monospace; font-size: 12.5px; letter-spacing: 2px; color: var(--grey-dim); margin: 10px 2px 2px; }
 
-  /* Step 8 · payoff */
+  /* Step · payoff */
   .prompt-chip {
     display: inline-block; margin-top: 20px; padding: 14px 26px;
     background: var(--panel); border: 1px solid var(--grey-dim); border-radius: 10px;
     font-size: 24px; color: var(--white); box-shadow: 0 0 22px -6px var(--glow);
   }
   .cite { color: var(--grey-dim); font-size: 14px; margin-top: 16px; line-height: 1.7; }
+  .srclist { color: var(--grey-dim); font-size: 15px; line-height: 1.85; margin-top: 16px; list-style: none; max-width: 960px; }
+  .srclist li { padding-left: 20px; text-indent: -20px; margin-bottom: 6px; }
+  .srclist a { color: var(--grey); }
+
+  /* Video */
+  .video-wrap { position: relative; margin-top: 20px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #000; max-width: 900px; }
+  .video-wrap iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; }
+  .yt-facade { display: block; width: 100%; aspect-ratio: 16 / 9; padding: 0; border: 0; background: #000; cursor: pointer; position: relative; }
+  .yt-facade img { width: 100%; height: 100%; object-fit: cover; opacity: .72; border: 0; border-radius: 0; }
+  .yt-facade .playbtn {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 88px; height: 62px; background: rgba(8,8,10,.85); border: 1px solid var(--white);
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  }
+  .yt-facade .playbtn::after { content: ''; border-style: solid; border-width: 14px 0 14px 24px; border-color: transparent transparent transparent var(--white); }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.15s !important; }
@@ -200,13 +268,13 @@
     h1 { font-size: 34px; }
     h2 { font-size: 27px; }
     .lede { font-size: 18px; }
-    .callout { font-size: 19px; padding: 18px 22px; }
-    .pair, .train-grid, .cmp, .denoise-wrap { grid-template-columns: 1fr; }
-    .cifar { grid-template-columns: repeat(3, 1fr); }
+    .callout, .qbox { font-size: 19px; padding: 18px 22px; }
+    .pair, .train-grid, .cmp, .denoise-wrap, .split, .split.even, .tellrow { grid-template-columns: 1fr; }
     .layer { grid-template-columns: 1fr; }
     .layer svg { justify-self: start; }
     .navhint { display: none; }
     header { padding: 14px 20px; }
+    .mathcard { width: 104px; }
   }
 </style>
 </head>
@@ -218,18 +286,24 @@
 </header>
 <main id="main">
 
-  <!-- 0 · Title -->
+  <!-- Title and the opening question -->
   <section class="beat active" data-title="">
     <p class="eyebrow">A companion to How AI Predicts the Next Word</p>
     <h1>How Image Generation Works</h1>
-    <p class="lede">You ask for a picture of a crocodile driving a Hilux, and thirty seconds later there it is. Where did it come from? Not from a folder. Not from the internet. This is the story of how a machine paints something <strong>nobody has ever seen</strong>.</p>
-    <div class="myth">Myth to retire: "it finds a picture and hands it over"</div>
-    <p class="caption">Eight short steps. Click anywhere, tap, or use the arrow keys to move through.</p>
+    <figure class="figure cap">
+      <img src="image_gen_assets/croc_alligator.jpg" alt="An AI-generated picture of an alligator on the left and a crocodile on the right, facing each other across a muddy creek lined with mangroves">
+      <figcaption>Generated by Nano Banana, Google DeepMind's image model, officially Gemini 2.5 Flash Image, released 26 August 2025. Nobody took this photograph. There is no creek, no mangroves, and no animals.</figcaption>
+    </figure>
+    <div class="qbox">
+      <span class="qtag">Hold this question</span>
+      Alligator on the left; broad rounded snout, dark hide, teeth tucked away. Crocodile on the right; narrower tapering snout, lighter olive hide, teeth showing along the closed jaw. Those are the real tells, and the machine got them right. <strong>How does a machine that has never been near a billabong know the difference?</strong>
+    </div>
+    <p class="caption">We will answer it properly at the end. Click anywhere, tap, or use the arrow keys to move through.</p>
     <button class="btn" onclick="next()">Begin</button>
   </section>
 
-  <!-- 1 · Ping -->
-  <section class="beat" data-title="Step 1 · A cell that goes ping" data-onenter="resetPing">
+  <!-- Ping -->
+  <section class="beat" data-title="A cell that goes ping" data-onenter="resetPing">
     <h2>Start small: a cell that goes ping</h2>
     <p class="lede">A brain cell, or the artificial kind in this machine, mostly just sits there. Sometimes it <strong>goes ping</strong>. It decides to ping based on how many pings are arriving from the cells connected to it, and how strong each connection is. That is the whole component. Everything else is just lots of them.</p>
     <div class="pingwrap">
@@ -259,8 +333,8 @@
     <div class="callout">A cell never sees the whole picture. It only ever asks one tiny question: <strong>are my neighbours pinging hard enough?</strong></div>
   </section>
 
-  <!-- 2 · Edges, beak, bird -->
-  <section class="beat" data-title="Step 2 · Edges, beak, bird" data-onenter="resetLayers">
+  <!-- Edges, beak, bird -->
+  <section class="beat" data-title="Edges, beak, bird" data-onenter="resetLayers">
     <h2>Stack them up: edges, then beak, then bird</h2>
     <p class="lede">How do you recognise a bird? You do not write rules for "bird". You build upward, layer by layer, each layer pinging when the layer below gives it something to ping about.</p>
     <div class="layerstack">
@@ -305,8 +379,8 @@
     <button class="btn" id="layerBtn" onclick="layerStep()">Light the bottom layer</button>
   </section>
 
-  <!-- 3 · Training -->
-  <section class="beat" data-title="Step 3 · Nudged, not programmed" data-onenter="resetTrain">
+  <!-- Training -->
+  <section class="beat" data-title="Nudged, not programmed" data-onenter="resetTrain">
     <h2>Nobody sets those connections by hand</h2>
     <p class="lede">The connection strengths start out <strong>random</strong>. You show the machine a labelled picture and ask: bird or not? Then you nudge every connection a tiny bit in whichever direction makes the guess <strong>less wrong</strong>, and you do that across millions of labelled pictures, millions of times. That nudging is the learning. That is all "training" is.</p>
     <div class="train-grid">
@@ -334,25 +408,32 @@
     <div class="callout">No rules were typed in. The idea of "beak" was never programmed. It <strong>grew</strong>, because having a beak detector made the guesses less wrong.</div>
   </section>
 
-  <!-- 4 · Labelled data -->
-  <section class="beat" data-title="Step 4 · Millions of labelled pictures">
-    <h2>What "labelled pictures" actually look like</h2>
-    <p class="lede">This is not a mystery ingredient. A labelled dataset is just pictures with a word attached to each one. A famous one, CIFAR-10, holds 60,000 tiny photos in ten classes: cat, dog, bird, automobile, truck and so on. Sixty thousand tiny flash cards.</p>
-    <div class="cifar">
-      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><circle cx="43" cy="36" r="17" fill="#9a9c9b"/><path d="M 30 26 L 26 8 L 40 20 Z" fill="#9a9c9b"/><path d="M 56 26 L 60 8 L 46 20 Z" fill="#9a9c9b"/><circle cx="37" cy="33" r="2.5" fill="#0a0a0a"/><circle cx="49" cy="33" r="2.5" fill="#0a0a0a"/><path d="M 39 42 Q 43 46 47 42" fill="none" stroke="#0a0a0a" stroke-width="1.6"/></svg><div class="tlabel">cat</div></div>
-      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><circle cx="43" cy="34" r="16" fill="#8b8e8c"/><path d="M 28 24 Q 20 32 26 44 L 32 34 Z" fill="#8b8e8c"/><path d="M 58 24 Q 66 32 60 44 L 54 34 Z" fill="#8b8e8c"/><circle cx="37" cy="31" r="2.5" fill="#0a0a0a"/><circle cx="49" cy="31" r="2.5" fill="#0a0a0a"/><ellipse cx="43" cy="40" rx="4" ry="3" fill="#0a0a0a"/></svg><div class="tlabel">dog</div></div>
-      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><ellipse cx="40" cy="38" rx="18" ry="10" fill="#9a9c9b"/><circle cx="58" cy="28" r="7" fill="#9a9c9b"/><path d="M 64 26 L 76 28 L 64 31 Z" fill="#c9cbc9"/><circle cx="60" cy="26" r="1.8" fill="#0a0a0a"/><path d="M 32 36 Q 40 26 50 33" fill="none" stroke="#c9cbc9" stroke-width="2.5"/></svg><div class="tlabel">bird</div></div>
-      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><rect x="14" y="30" width="58" height="14" rx="4" fill="#9a9c9b"/><path d="M 26 30 Q 30 18 42 18 L 54 18 Q 62 20 64 30 Z" fill="#9a9c9b"/><rect x="34" y="21" width="16" height="9" rx="2" fill="#232527"/><circle cx="28" cy="46" r="7" fill="#232527"/><circle cx="60" cy="46" r="7" fill="#232527"/></svg><div class="tlabel">automobile</div></div>
-      <div class="tile"><svg width="86" height="64" viewBox="0 0 86 64"><rect width="86" height="64" fill="#101213"/><rect x="10" y="22" width="38" height="22" fill="#9a9c9b"/><rect x="48" y="28" width="26" height="16" rx="2" fill="#8b8e8c"/><rect x="52" y="31" width="10" height="8" fill="#232527"/><circle cx="24" cy="48" r="6.5" fill="#232527"/><circle cx="62" cy="48" r="6.5" fill="#232527"/></svg><div class="tlabel">truck</div></div>
-    </div>
-    <p class="caption">The real thing, browsable online: the CIFAR-10 dataset at <a href="https://huggingface.co/datasets/uoft-cs/cifar10">huggingface.co/datasets/uoft-cs/cifar10</a>. The truck and automobile classes are our stand-in for the Hilux.</p>
-    <div class="callout">Teach a machine cat versus dog from labelled examples and you can teach it <strong>any</strong> difference the same way. You just need the flash cards.</div>
+  <!-- Labelled data, real catalogue -->
+  <section class="beat" data-title="What labelled pictures look like">
+    <h2>This is not a mystery ingredient</h2>
+    <p class="lede">A labelled dataset is just pictures with a word attached to each one. You can browse them. Here is a real one, open in the TensorFlow Datasets catalogue: a file path, a thumbnail, and a label that says <strong>0 (cat)</strong> or <strong>1 (dog)</strong>. That is the whole format. About 23,000 photos in this one.</p>
+    <figure class="figure shot cap">
+      <img src="image_gen_assets/tfds_cats_vs_dogs.png" alt="Screenshot of the TensorFlow Datasets catalogue page for cats_vs_dogs, showing a table with columns for image, filename and label; rows show dog and cat photographs labelled 1 (dog) or 0 (cat)">
+      <figcaption>Screenshot: the <b>cats_vs_dogs</b> dataset in the TensorFlow Datasets catalogue, 23,262 photographs, accessed 14 August 2026. Browse it yourself at <a href="https://www.tensorflow.org/datasets/catalog/cats_vs_dogs" target="_blank" rel="noopener">tensorflow.org/datasets/catalog/cats_vs_dogs</a>.</figcaption>
+    </figure>
+    <div class="callout">Every "magical" thing later in this page is built on a table that looks like the one above. Pictures, and a word for each.</div>
   </section>
 
-  <!-- 5 · Croc vs alligator -->
-  <section class="beat" data-title="Step 5 · Crocodile or alligator" data-onenter="resetFeat">
-    <h2>Fine differences, learnt the same way</h2>
-    <p class="lede">Here in the Territory we know the difference at a glance. A machine could learn it too, from enough labelled photos, even though nobody would ever type the rules in. Click each feature to see what the layers would quietly discover.</p>
+  <!-- Fine-grained labels -->
+  <section class="beat" data-title="The label can be as fine as you like">
+    <h2>The label does not have to be "car"</h2>
+    <p class="lede">Cat or dog is a coarse difference. But there is nothing special about coarse. Here is <strong>cars196</strong>, another catalogue dataset: 16,185 photographs sorted into <strong>196 classes</strong>, and the class is the make, the model and the year.</p>
+    <figure class="figure shot cap">
+      <img src="image_gen_assets/tfds_cars196.png" alt="Screenshot of the TensorFlow Datasets catalogue page for cars196, showing sample photographs labelled with specific makes, models and years such as Volvo XC90 SUV 2007 and Hyundai Santa Fe SUV 2012">
+      <figcaption>Screenshot: the <b>cars196</b> dataset in the TensorFlow Datasets catalogue, 16,185 images across 196 classes, accessed 14 August 2026. Labels read "Volvo XC90 SUV 2007", "Hyundai Santa Fe SUV 2012", "Bentley Arnage Sedan 2009". Original dataset: Krause, Stark, Deng and Fei-Fei, Stanford, 2013. Catalogue page: <a href="https://www.tensorflow.org/datasets/catalog/cars196" target="_blank" rel="noopener">tensorflow.org/datasets/catalog/cars196</a>.</figcaption>
+    </figure>
+    <div class="callout">Nobody wrote a rule for what makes a 2007 Volvo XC90 different from a 2012 Hyundai Santa Fe. The machine found the differences itself, because finding them made its guesses less wrong. <strong>Fine differences are learnt exactly the same way as coarse ones.</strong> Hold on to that; it is half the answer to our opening question.</div>
+  </section>
+
+  <!-- Croc vs alligator -->
+  <section class="beat" data-title="Crocodile or alligator" data-onenter="resetFeat">
+    <h2>So: crocodile or alligator</h2>
+    <p class="lede">Here in the Territory we know the difference at a glance. Give a machine enough labelled photographs and it would find the same tells, without anyone typing a rule. Click each feature.</p>
     <div class="cmp">
       <div class="card">
         <svg id="crocSvg" width="300" height="120" viewBox="0 0 300 120" role="img" aria-label="Stylised crocodile head, long narrow snout, teeth showing">
@@ -383,18 +464,76 @@
       <button class="btn ghost" onclick="showFeat('colour')">The colour</button>
     </div>
     <p id="featNote">Three tells, all learnable from examples.</p>
-    <div class="callout">There is no famous crocodile-versus-alligator dataset. But you can picture building one: a few thousand labelled photos of each, and the machine would find the snout, the teeth and the colour <strong>on its own</strong>. That is worth sitting with.</div>
+    <div class="callout">Look back at the opening picture and you will see all three tells rendered correctly. But knowing the difference is only half of it. Something still has to connect <strong>the word you typed</strong> to <strong>the picture that comes out</strong>. That is next.</div>
   </section>
 
-  <!-- 6 · Denoise -->
-  <section class="beat" data-title="Step 6 · Painting from static" data-onenter="resetDenoise">
+  <!-- CLIP: shared space -->
+  <section class="beat" data-title="How words find pictures" data-onenter="resetSpace">
+    <h2>Words and pictures, filed in the same place</h2>
+    <p class="lede">In February 2021 a team at OpenAI trained two models at once: one that reads text, one that looks at pictures. Both produce a list of 512 numbers, which you can think of as an <strong>address</strong>. They were trained on 400 million picture-and-caption pairs so that a picture and its own caption land at nearly the same address, and mismatched pairs land far apart. The model is called CLIP.</p>
+    <div class="split">
+      <div class="spacebox">
+        <svg viewBox="0 0 520 340" role="img" aria-label="A flattened map of the shared space of ideas, with dots for pictures and a moving marker for the selected word">
+          <line x1="40" y1="300" x2="490" y2="300" stroke="#35383a" stroke-width="1"/>
+          <line x1="40" y1="300" x2="40" y2="24" stroke="#35383a" stroke-width="1"/>
+          <line id="spLink" x1="0" y1="0" x2="0" y2="0"/>
+          <g class="sp-dot-g">
+            <circle class="sp-dot" id="d_croc" cx="150" cy="96" r="13"/>
+            <text class="sp-lbl" id="l_croc" x="150" y="72" text-anchor="middle">photo: croc on a bank</text>
+            <circle class="sp-dot" id="d_gator" cx="243" cy="129" r="13"/>
+            <text class="sp-lbl" id="l_gator" x="243" y="160" text-anchor="middle">photo: gator in a swamp</text>
+            <circle class="sp-dot" id="d_ute" cx="404" cy="238" r="13"/>
+            <text class="sp-lbl" id="l_ute" x="404" y="266" text-anchor="middle">photo: white Hilux</text>
+            <circle class="sp-dot" id="d_mangrove" cx="106" cy="238" r="13"/>
+            <text class="sp-lbl" id="l_mangrove" x="106" y="266" text-anchor="middle">photo: mangrove creek</text>
+            <circle class="sp-dot" id="d_lizard" cx="316" cy="72" r="13"/>
+            <text class="sp-lbl" id="l_lizard" x="316" y="48" text-anchor="middle">photo: goanna on sand</text>
+          </g>
+          <g id="spMarker">
+            <circle cx="0" cy="0" r="9" fill="#f4f4f2"/>
+            <circle cx="0" cy="0" r="17" fill="none" stroke="#f4f4f2" stroke-width="1" opacity=".55"/>
+          </g>
+        </svg>
+        <p class="caption" style="margin-top:10px">The real space has 512 dimensions. This is a flat sketch of it, so you can see the idea: nearness means "these mean the same sort of thing".</p>
+      </div>
+      <div>
+        <div class="wordchips" id="wordChips">
+          <button class="wordchip" onclick="pickWord('crocodile')">crocodile</button>
+          <button class="wordchip" onclick="pickWord('alligator')">alligator</button>
+          <button class="wordchip" onclick="pickWord('ute')">ute</button>
+          <button class="wordchip" onclick="pickWord('mangroves')">mangroves</button>
+          <button class="wordchip" onclick="pickWord('reptile')">reptile</button>
+        </div>
+        <p id="spNote">Pick a word. It gets an address in the same space the pictures live in, and the nearest picture lights up.</p>
+      </div>
+    </div>
+    <p class="lede" style="margin-top:22px">The addresses behave like arithmetic on ideas. In the video linked at the end, the presenter takes a photo of himself in a hat, subtracts a photo of himself without one, and searches for the word closest to what is left over.</p>
+    <div class="sumline-math">
+      <div class="mathcard">
+        <svg viewBox="0 0 90 76" role="img" aria-label="Sketch of a person wearing a hat"><rect width="90" height="76" fill="#101213"/><path d="M 22 30 L 68 30 L 60 20 Q 45 12 30 20 Z" fill="#c9cbc9"/><rect x="18" y="30" width="54" height="4" fill="#c9cbc9"/><circle cx="45" cy="46" r="13" fill="#8b8e8c"/><path d="M 26 76 Q 30 60 45 60 Q 60 60 64 76 Z" fill="#55585a"/></svg>
+        <div class="mlbl">with hat</div>
+      </div>
+      <span class="mathop">&minus;</span>
+      <div class="mathcard">
+        <svg viewBox="0 0 90 76" role="img" aria-label="Sketch of the same person without a hat"><rect width="90" height="76" fill="#101213"/><circle cx="45" cy="40" r="14" fill="#8b8e8c"/><path d="M 26 76 Q 30 58 45 58 Q 60 58 64 76 Z" fill="#55585a"/></svg>
+        <div class="mlbl">without hat</div>
+      </div>
+      <span class="mathop">=</span>
+      <div class="mathout">the word "hat"<small>then cap, then helmet</small></div>
+    </div>
+    <div class="callout">The machine is not storing pictures of hats. It has learnt a space in which <strong>the idea of a hat is a direction you can travel in</strong>. Type "crocodile" and you get an address; type "alligator" and you get a different one, close by but genuinely distinct, because in 400 million captions people used those two words about different animals.</div>
+    <p class="caption">Source: Radford et al., "Learning Transferable Visual Models From Natural Language Supervision", OpenAI, 26 February 2021, <a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">arxiv.org/abs/2103.00020</a>. The hat demonstration is from the Welch Labs video linked at the end, at 6:24.</p>
+  </section>
+
+  <!-- Denoise -->
+  <section class="beat" data-title="Painting from static" data-onenter="resetDenoise">
     <h2>Now run the whole thing in reverse</h2>
-    <p class="lede">After all that training, the machine holds a rich sense of what things look like: the ridged back of a crocodile, the metal shine of a car door. Generation uses that sense backwards. Start with a square of <strong>pure random static</strong>, like an old TV between channels. Then ask: if this static were slowly becoming "a crocodile driving a Hilux", which speckles should change, and which way? Nudge them. Look again. Nudge again.</p>
+    <p class="lede">CLIP only goes one way; it turns pictures and words into addresses, and cannot turn an address back into a picture. Something else does that. Start with a square of <strong>pure random static</strong>, like an old TV between channels. Then ask, over and over: if this static were slowly becoming "a crocodile driving a Hilux", which speckles should change, and which way?</p>
     <div class="denoise-wrap">
       <div>
         <div class="scenebox" id="sceneBox"></div>
         <div class="sliderrow">
-          <label for="denoiseSlider">Drag from static to picture, one nudge at a time</label>
+          <label for="denoiseSlider">Drag from static to picture, one pass at a time</label>
           <input type="range" id="denoiseSlider" min="0" max="4" step="1" value="0" oninput="setDenoise(+this.value)">
         </div>
         <button class="btn ghost" onclick="freshStatic()">Start over with fresh static</button>
@@ -404,10 +543,51 @@
         <div class="callout" style="margin-top:22px; font-size:20px;">Honest version of the fancy word: the machine is <strong>removing noise a little at a time</strong> until a picture that matches your words is left standing.</div>
       </div>
     </div>
+    <div class="callout">Two details that surprise people. It is not trained to tidy up one small step at a time; it is trained to predict <strong>all</strong> the noise at once, and then take a small step in that direction. And during generation it <strong>adds a little fresh randomness back in</strong> at each pass. Take that randomness out and the pictures come back blurry, because the machine settles on the average of everything it has seen, and averages look like mush.</div>
+    <p class="caption">Source: Ho, Jain and Abbeel, "Denoising Diffusion Probabilistic Models", UC Berkeley, 19 June 2020, <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">arxiv.org/abs/2006.11239</a>. The blurry-tree demonstration is in the Welch Labs video at 10:23.</p>
   </section>
 
-  <!-- 7 · Same words, new picture -->
-  <section class="beat" data-title="Step 7 · Same words, new picture" data-onenter="resetGen">
+  <!-- Steering -->
+  <section class="beat" data-title="Steering it with your words" data-onenter="resetSteer">
+    <h2>Asking is not the same as getting</h2>
+    <p class="lede">Handing the machine your words is called <strong>conditioning</strong>, and on its own it is disappointingly weak. Researchers asked a well known model for a tree in the desert and got a desert, and a shadow where a tree should be, and no tree. The fix is to compare two runs: one that was told your words, and one that was told nothing. The difference between them points towards <strong>what your words actually added</strong>, and you can turn that up.</p>
+    <div class="split">
+      <div class="steerbox">
+        <svg viewBox="0 0 600 320" role="img" aria-label="A desert scene in which a tree grows larger and more detailed as the guidance strength is increased">
+          <rect width="600" height="320" fill="#141110"/>
+          <rect y="250" width="600" height="70" fill="#2b2420"/>
+          <circle cx="500" cy="66" r="30" fill="#3d3630"/>
+          <path d="M 0 250 Q 120 232 250 250 Q 400 268 600 246 L 600 260 L 0 260 Z" fill="#332b26"/>
+          <ellipse id="treeShadow" cx="300" cy="256" rx="46" ry="8" fill="#171310" opacity=".9"/>
+          <g id="treeGroup" class="treepart">
+            <rect x="294" y="196" width="12" height="56" fill="#4a3f36"/>
+            <ellipse cx="300" cy="188" rx="46" ry="30" fill="#3f4a3a"/>
+            <ellipse cx="272" cy="198" rx="26" ry="17" fill="#39432f"/>
+            <ellipse cx="328" cy="198" rx="26" ry="17" fill="#39432f"/>
+          </g>
+          <g id="treeDetail" class="treepart">
+            <path d="M 300 240 L 284 214 M 300 232 L 318 208" stroke="#4a3f36" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <ellipse cx="300" cy="170" rx="24" ry="15" fill="#4a563f"/>
+            <ellipse cx="258" cy="184" rx="15" ry="10" fill="#4a563f"/>
+            <ellipse cx="342" cy="184" rx="15" ry="10" fill="#4a563f"/>
+          </g>
+        </svg>
+        <div class="sliderrow">
+          <label for="alphaSlider">Guidance strength</label>
+          <input type="range" id="alphaSlider" min="0" max="4" step="1" value="0" oninput="setAlpha(+this.value)">
+        </div>
+        <p id="alphaRead">guidance scale: <b>0</b> · conditioning only</p>
+      </div>
+      <div>
+        <p id="steerNote"></p>
+        <div class="callout" style="font-size:19px">This trick is called <strong>classifier-free guidance</strong>, and it is in nearly every image and video model you can use today. When you notice a picture obeying your prompt almost too literally, this is the dial responsible.</div>
+      </div>
+    </div>
+    <p class="caption">Illustration of a published result; the actual generated images are in the Welch Labs video at 33:08. Method: Ho and Salimans, "Classifier-Free Diffusion Guidance", <a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">arxiv.org/abs/2207.12598</a>, NeurIPS workshop December 2021. The tree-in-the-desert runs used Stable Diffusion; Rombach et al., "High-Resolution Image Synthesis with Latent Diffusion Models", Heidelberg, 20 December 2021, <a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">arxiv.org/abs/2112.10752</a>.</p>
+  </section>
+
+  <!-- Same words, new picture -->
+  <section class="beat" data-title="Same words, new picture" data-onenter="resetGen">
     <h2>Why everyone's crocodile is different</h2>
     <p class="lede">The static it starts from is fresh and random <strong>every single time</strong>. Different static means the nudges land differently, so the same words end somewhere new. Same prompt, three runs:</p>
     <button class="btn" id="genBtn" onclick="genStep()">Generate: a crocodile driving a Hilux</button>
@@ -415,8 +595,29 @@
     <div class="callout" id="genMoral" style="opacity:0; transition:opacity .6s;">Generative AI is not looking anything up. It is <strong>imagining, from noise, guided by your words</strong>. That is why no two are alike.</div>
   </section>
 
-  <!-- 8 · Over to you -->
-  <section class="beat" data-title="Step 8 · Over to you">
+  <!-- The answer -->
+  <section class="beat" data-title="The answer">
+    <h2>Back to the two animals</h2>
+    <div class="split">
+      <figure class="figure" style="margin-top:0">
+        <img src="image_gen_assets/croc_alligator.jpg" alt="The same AI-generated picture of an alligator and a crocodile facing each other across a muddy creek">
+        <figcaption>The picture we started with. Still nobody's photograph.</figcaption>
+      </figure>
+      <div>
+        <p class="lede" style="margin-top:0">Nothing mystical happened. Four ordinary things stacked up.</p>
+        <div class="tellrow" style="grid-template-columns:1fr">
+          <div class="tell"><div class="tk">One</div><p>Millions of captioned photographs on the internet, in which people writing about crocodiles and people writing about alligators were describing different animals.</p></div>
+          <div class="tell"><div class="tk">Two</div><p>A text model and a picture model trained together until those two words landed at <b>different addresses</b>, and each address sat near the pictures that matched it.</p></div>
+          <div class="tell"><div class="tk">Three</div><p>A generator that starts from static and repeatedly asks which speckles to change, using those addresses as the instruction.</p></div>
+          <div class="tell"><div class="tk">Four</div><p>Guidance, amplifying whatever the words added, which is why you got a broad snout on one side of the creek and a narrow one on the other rather than two generic lizards.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">The honest caveat: the machine has learnt <strong>how the words are used</strong>, not what the animals are. It has no idea that a saltie can kill you. Where the captions were wrong, it will be confidently wrong too, and it will not tell you which parts those are. That is the whole reason a person still checks the output.</div>
+  </section>
+
+  <!-- Over to you -->
+  <section class="beat" data-title="Over to you">
     <h2>Now prove it with the room</h2>
     <p class="lede">Everyone, at the same time, give your AI tool the exact same prompt:</p>
     <div class="prompt-chip">Show me a picture of a crocodile driving a Hilux.</div>
@@ -424,14 +625,40 @@
     <div class="pair" style="margin-top:30px;">
       <div class="card">
         <h3>The one idea to keep</h3>
-        <p>The machine learnt what things look like from millions of labelled pictures, feature by feature. To make a new picture, it runs that understanding in reverse, starting from random static. Fresh static every time is why the same words never paint the same picture twice.</p>
+        <p>The machine learnt what things look like from millions of captioned pictures, feature by feature, and learnt to file words and pictures at the same addresses. To make a new picture it starts from random static and nudges it towards the address your words point to. Fresh static every time is why the same words never paint the same picture twice.</p>
       </div>
       <div class="card">
         <h3>Where this connects</h3>
-        <p>This deck's sibling, <a href="../next-word-prediction/" style="color:var(--white)">How AI Predicts the Next Word</a>, tells the same story for text: weighted dice instead of nudged static, and the same lesson at the end. The machine predicts; it does not look up.</p>
+        <p>This page's sibling, <a href="../next-word-prediction/" style="color:var(--white)">How AI Predicts the Next Word</a>, tells the same story for text: weighted dice instead of nudged static, and the same lesson at the end. The machine predicts; it does not look up.</p>
       </div>
     </div>
-    <p class="cite">Dataset shown in Step 4: CIFAR-10 (Krizhevsky), via huggingface.co/datasets/uoft-cs/cifar10.</p>
+  </section>
+
+  <!-- Watch and sources -->
+  <section class="beat" data-title="Watch it properly">
+    <h2>Thirty-seven minutes, and worth every one</h2>
+    <p class="lede">Everything on this page is the plain-language version of one exceptional explainer. If you want the mathematics underneath, with the animations that make it click, watch this.</p>
+    <div class="video-wrap">
+      <button class="yt-facade" onclick="ytPlay(this,'iv-5mZ_9CPY')" aria-label="Play: But how do AI images and videos actually work, by Welch Labs">
+        <img src="https://i.ytimg.com/vi/iv-5mZ_9CPY/hqdefault.jpg" alt="Video thumbnail: But how do AI images and videos actually work" onerror="this.style.display='none'">
+        <span class="playbtn"></span>
+      </button>
+    </div>
+    <p class="cite">Stephen Welch (Welch Labs), "But how do AI images and videos actually work?", guest video on 3Blue1Brown, 25 July 2025, 37:20. <a href="https://www.youtube.com/watch?v=iv-5mZ_9CPY" target="_blank" rel="noopener">youtube.com/watch?v=iv-5mZ_9CPY</a>. Chapters: CLIP at 3:37, shared embedding space at 6:25, diffusion and DDPM at 8:16, vector fields at 11:44, DDIM at 22:00, DALL&middot;E 2 at 25:25, conditioning at 26:37, guidance at 30:02.</p>
+    <h3 style="font-weight:400; font-size:24px; margin-top:30px; letter-spacing:.03em">Sources used</h3>
+    <ul class="srclist">
+      <li>Radford et al., "Learning Transferable Visual Models From Natural Language Supervision" (CLIP), OpenAI, 26 February 2021. <a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">arxiv.org/abs/2103.00020</a></li>
+      <li>Ho, Jain and Abbeel, "Denoising Diffusion Probabilistic Models" (DDPM), UC Berkeley, 19 June 2020. <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">arxiv.org/abs/2006.11239</a></li>
+      <li>Song, Meng and Ermon, "Denoising Diffusion Implicit Models" (DDIM), Stanford, 6 October 2020. <a href="https://arxiv.org/abs/2010.02502" target="_blank" rel="noopener">arxiv.org/abs/2010.02502</a></li>
+      <li>Ho and Salimans, "Classifier-Free Diffusion Guidance", NeurIPS workshop, December 2021. <a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">arxiv.org/abs/2207.12598</a></li>
+      <li>Ramesh et al., "Hierarchical Text-Conditional Image Generation with CLIP Latents" (unCLIP, released as DALL&middot;E 2), OpenAI, 13 April 2022. <a href="https://arxiv.org/abs/2204.06125" target="_blank" rel="noopener">arxiv.org/abs/2204.06125</a></li>
+      <li>Rombach et al., "High-Resolution Image Synthesis with Latent Diffusion Models" (Stable Diffusion), Heidelberg, 20 December 2021. <a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">arxiv.org/abs/2112.10752</a></li>
+      <li>TensorFlow Datasets catalogue, <b>cats_vs_dogs</b> and <b>cars196</b>, accessed 14 August 2026. <a href="https://www.tensorflow.org/datasets/catalog/cats_vs_dogs" target="_blank" rel="noopener">cats_vs_dogs</a> &middot; <a href="https://www.tensorflow.org/datasets/catalog/cars196" target="_blank" rel="noopener">cars196</a></li>
+      <li>Krause, Stark, Deng and Fei-Fei, "3D Object Representations for Fine-Grained Categorization" (the Stanford Cars dataset behind cars196), 2013. <a href="https://www.tensorflow.org/datasets/catalog/cars196" target="_blank" rel="noopener">catalogue entry</a></li>
+      <li>Nano Banana, officially Gemini 2.5 Flash Image, Google DeepMind, released 26 August 2025. <a href="https://blog.google/products/gemini/updated-image-editing-model/" target="_blank" rel="noopener">blog.google</a></li>
+      <li>Stephen Welch (Welch Labs), "But how do AI images and videos actually work?", 3Blue1Brown, 25 July 2025. <a href="https://www.3blue1brown.com/lessons/diffusion-models/" target="_blank" rel="noopener">3blue1brown.com/lessons/diffusion-models</a></li>
+    </ul>
+    <p class="cite">Opening and closing image generated with Nano Banana. The crocodile-driving-a-Hilux images were generated for this page. The two screenshots are of public documentation pages, reproduced for teaching.</p>
   </section>
 
 </main>
@@ -469,11 +696,11 @@
     else if (e.key === 'm' || e.key === 'M') show(0);
   });
   document.getElementById('main').addEventListener('click', e => {
-    if (e.target.closest('button, svg, a, input, [role=button]')) return;
+    if (e.target.closest('button, svg, a, input, [role=button], img')) return;
     next();
   });
 
-  // ---------- step 1: ping ----------
+  // ---------- ping ----------
   const pingOn = [false, false, false];
   const pingWeight = [2, 1, 1];
   function wirePing() {
@@ -507,7 +734,7 @@
   };
   wirePing();
 
-  // ---------- step 2: layers ----------
+  // ---------- layers ----------
   const layerLabels = [
     'Light the bottom layer',
     'Now find the edges',
@@ -529,7 +756,7 @@
     document.getElementById('layerBtn').textContent = layerLabels[0];
   };
 
-  // ---------- step 3: training ----------
+  // ---------- training ----------
   const trainStates = [
     { pct: '50% bird', note: ', which is a coin flip. It has no idea.', w: 50, good: false, count: 'labelled pictures seen: 0 · connections: random' },
     { pct: '61% bird', note: '. A little less wrong; every connection got its tiny nudge.', w: 61, good: false, count: 'labelled pictures seen: 1,000' },
@@ -553,6 +780,80 @@
   function trainStep() { if (trainIdx < trainStates.length - 1) { trainIdx++; renderTrain(); } }
   onEnterHooks.resetTrain = () => { trainIdx = 0; renderTrain(); };
 
+  // ---------- features ----------
+  const featData = {
+    snout: 'The <b>snout</b>: a crocodile’s tapers to a narrow point; an alligator’s is broad and rounded, like a shovel. To the machine this is just edge detectors voting, the same cells that found the beak.',
+    teeth: 'The <b>teeth</b>: with its mouth shut, a crocodile still shows teeth along the jaw; an alligator hides them. A "visible tooth" detector would grow in training without anyone asking for it.',
+    colour: 'The <b>colour</b>: crocodiles run lighter and greener; alligators darker, nearly black. Colour is the easiest feature of all, it lives right down in the pixel layer.'
+  };
+  function showFeat(k) {
+    ['crocSvg', 'gatorSvg'].forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.remove('hl-snout', 'hl-teeth', 'hl-colour');
+      el.classList.add('hl-' + k);
+    });
+    document.getElementById('featNote').innerHTML = featData[k];
+  }
+  onEnterHooks.resetFeat = () => {
+    ['crocSvg', 'gatorSvg'].forEach(id =>
+      document.getElementById(id).classList.remove('hl-snout', 'hl-teeth', 'hl-colour'));
+    document.getElementById('featNote').textContent = 'Three tells, all learnable from examples.';
+  };
+
+  // ---------- shared space of ideas ----------
+  const spacePoints = {
+    croc:     { x: 150, y: 96 },
+    gator:    { x: 243, y: 129 },
+    ute:      { x: 404, y: 238 },
+    mangrove: { x: 106, y: 238 },
+    lizard:   { x: 316, y: 72 }
+  };
+  const wordData = {
+    crocodile: { x: 168, y: 108, near: 'croc',
+      note: '"Crocodile" lands right beside the crocodile photographs. Nothing was looked up; the address came out of the text model, and it happens to sit where those pictures sit.' },
+    alligator: { x: 231, y: 141, near: 'gator',
+      note: 'Move one word and the address moves. "Alligator" sits <b>near</b> the crocodile, because the two are related, but not <b>on</b> it. That gap is the whole reason the machine can draw two different animals.' },
+    ute: { x: 392, y: 226, near: 'ute',
+      note: 'Nowhere near the reptiles. The space is not sorted alphabetically or by file name; it is sorted by meaning, learnt from how captions were written.' },
+    mangroves: { x: 118, y: 226, near: 'mangrove',
+      note: 'Background and setting get addresses too. This is why adding "in a mangrove creek" to a prompt changes the whole scene rather than pasting in a tree.' },
+    reptile: { x: 236, y: 96, near: 'croc',
+      note: 'A general word lands in the middle of the specific ones. Vague prompt, vague address, and the picture you get is whatever the machine averages out of that neighbourhood.' }
+  };
+  let spTimer = null;
+  function pickWord(w) {
+    const d = wordData[w];
+    document.querySelectorAll('#wordChips .wordchip').forEach(b =>
+      b.classList.toggle('sel', b.textContent.trim() === w));
+    document.querySelectorAll('.sp-dot').forEach(e => e.classList.remove('near'));
+    document.querySelectorAll('.sp-lbl').forEach(e => e.classList.remove('near'));
+    const m = document.getElementById('spMarker');
+    m.classList.add('on');
+    m.style.transform = 'translate(' + d.x + 'px,' + d.y + 'px)';
+    const p = spacePoints[d.near];
+    const link = document.getElementById('spLink');
+    link.setAttribute('x1', d.x); link.setAttribute('y1', d.y);
+    link.setAttribute('x2', p.x); link.setAttribute('y2', p.y);
+    clearTimeout(spTimer);
+    link.classList.remove('on');
+    spTimer = setTimeout(() => {
+      link.classList.add('on');
+      document.getElementById('d_' + d.near).classList.add('near');
+      document.getElementById('l_' + d.near).classList.add('near');
+    }, 420);
+    document.getElementById('spNote').innerHTML = d.note;
+  }
+  onEnterHooks.resetSpace = () => {
+    clearTimeout(spTimer);
+    document.querySelectorAll('#wordChips .wordchip').forEach(b => b.classList.remove('sel'));
+    document.querySelectorAll('.sp-dot').forEach(e => e.classList.remove('near'));
+    document.querySelectorAll('.sp-lbl').forEach(e => e.classList.remove('near'));
+    document.getElementById('spMarker').classList.remove('on');
+    document.getElementById('spLink').classList.remove('on');
+    document.getElementById('spNote').textContent =
+      'Pick a word. It gets an address in the same space the pictures live in, and the nearest picture lights up.';
+  };
+
   // ---------- crocodile-in-Hilux pictures (AI-generated, local assets) ----------
   const crocPics = [
     'image_gen_assets/Croc_hilux1.png',
@@ -563,11 +864,11 @@
     return '<img src="' + crocPics[n] + '" alt="An AI-generated picture of a crocodile driving a Hilux ute">';
   }
 
-  // ---------- step 6: denoise ----------
+  // ---------- denoise ----------
   const denoiseStages = [
     { noise: 1,    blur: 16, op: 0,   cap: '<b>Pure random static.</b> No picture is hiding in here. This square is different every time you start.' },
     { noise: 0.75, blur: 13, op: 0.6, cap: 'First pass. The machine asks: which speckles should get a little more <b>crocodile</b>, which a little more <b>ute</b>, which a little more <b>windscreen</b>? And it nudges them.' },
-    { noise: 0.45, blur: 7,  op: 0.85,cap: 'Look again, nudge again. Shapes the machine learnt from all those labelled pictures are starting to win the argument.' },
+    { noise: 0.45, blur: 7,  op: 0.85,cap: 'Look again, nudge again. Shapes the machine learnt from all those captioned pictures are starting to win the argument.' },
     { noise: 0.18, blur: 2.5,op: 1,   cap: 'Almost there. Each pass removes a little more noise and agrees a little more with the words you typed.' },
     { noise: 0,    blur: 0,  op: 1,   cap: '<b>A picture nobody has ever seen before.</b> Not found. Not fetched. Painted out of static, guided by nine words.' }
   ];
@@ -605,7 +906,36 @@
     freshStatic();
   };
 
-  // ---------- step 7: generate ----------
+  // ---------- steering ----------
+  const alphaStates = [
+    { label: '0 · conditioning only', tree: 0, detail: 0, shadow: .9,
+      note: 'You asked for a tree in the desert. You have a desert, and a shadow on the sand where a tree should be, and <b>no tree</b>. The words went in, and almost nothing came of them.' },
+    { label: '2 · guidance on', tree: .28, detail: 0, shadow: .75,
+      note: 'Turn the dial to about two and a tiny tree appears. Nothing was retrained; the machine is simply being pushed harder in the direction your words added.' },
+    { label: '4', tree: .55, detail: .35, shadow: .6,
+      note: 'Higher again. The tree grows, and picks up branches. The picture is agreeing with the prompt more and drifting from the average less.' },
+    { label: '7', tree: .82, detail: .8, shadow: .5,
+      note: 'Most tools ship with the dial sitting somewhere around here. It is why a modern image model obeys your prompt so much better than one from a few years ago.' },
+    { label: '10 · pushed hard', tree: 1, detail: 1, shadow: .45,
+      note: 'Push it too far and pictures go garish and over-saturated; the machine is now caring more about your words than about looking like a photograph. There is a sweet spot, and it is a setting, not a mystery.' }
+  ];
+  function setAlpha(n) {
+    const s = alphaStates[n];
+    const g = document.getElementById('treeGroup');
+    const d = document.getElementById('treeDetail');
+    g.style.opacity = s.tree > 0 ? 1 : 0;
+    g.style.transform = 'scale(' + (0.001 + s.tree) + ')';
+    d.style.opacity = s.detail;
+    document.getElementById('treeShadow').setAttribute('opacity', s.shadow);
+    document.getElementById('alphaRead').innerHTML = 'guidance scale: <b>' + s.label + '</b>';
+    document.getElementById('steerNote').innerHTML = s.note;
+  }
+  onEnterHooks.resetSteer = () => {
+    document.getElementById('alphaSlider').value = 0;
+    setAlpha(0);
+  };
+
+  // ---------- generate ----------
   const genLabels = [
     'Generate: a crocodile driving a Hilux',
     'Same words. Generate again',
@@ -631,25 +961,14 @@
     document.getElementById('genMoral').style.opacity = 0;
   };
 
-  // ---------- step 5: features ----------
-  const featData = {
-    snout: 'The <b>snout</b>: a crocodile’s tapers to a narrow point; an alligator’s is broad and rounded, like a shovel. To the machine this is just edge detectors voting, the same cells that found the beak.',
-    teeth: 'The <b>teeth</b>: with its mouth shut, a crocodile still shows teeth along the jaw; an alligator hides them. A "visible tooth" detector would grow in training without anyone asking for it.',
-    colour: 'The <b>colour</b>: crocodiles run lighter and greener; alligators darker, nearly black. Colour is the easiest feature of all, it lives right down in the pixel layer.'
-  };
-  function showFeat(k) {
-    ['crocSvg', 'gatorSvg'].forEach(id => {
-      const el = document.getElementById(id);
-      el.classList.remove('hl-snout', 'hl-teeth', 'hl-colour');
-      el.classList.add('hl-' + k);
-    });
-    document.getElementById('featNote').innerHTML = featData[k];
+  // ---------- video ----------
+  function ytPlay(btn, id) {
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0';
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    btn.parentNode.replaceChild(f, btn);
   }
-  onEnterHooks.resetFeat = () => {
-    ['crocSvg', 'gatorSvg'].forEach(id =>
-      document.getElementById(id).classList.remove('hl-snout', 'hl-teeth', 'hl-colour'));
-    document.getElementById('featNote').textContent = 'Three tells, all learnable from examples.';
-  };
 
   show(0);
 </script>
