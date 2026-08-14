@@ -68,6 +68,7 @@ const PLATES = {
   'word':             { type: 'masthead', plate: 'hero-keyboard-closeup',        foot: 'footer-data-table-monogram' },
   'powerpoint':       { type: 'masthead', plate: 'hero-square-laptop-spreadsheet', foot: 'footer-data-table-monogram' },
   'visio':            { type: 'masthead', plate: 'hero-motherboard-chip',        foot: 'footer-keyboard-data-monogram' },
+  'agentic-web-dev':  { type: 'masthead', plate: 'hero-padlock-wordmark',         foot: 'footer-data-table-monogram' },
   'cdu-ai-staff':     { type: 'masthead', plate: 'hero-motherboard-chip',        foot: 'footer-wordmark-url' },
 
   // The manual runs its own .manual-masthead, so it takes the footer plate only.

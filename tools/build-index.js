@@ -156,6 +156,8 @@ const RULES = [
     hub: { section: 'Course library', type: 'Course' } },
   { prefix: '/ai-for-research/',  section: 'AI for Research',        type: 'Lesson', topic: 'Research practice & ethics',
     hub: { section: 'Course library', type: 'Course' } },
+  { prefix: '/agentic-web-dev/', section: 'Agentic AI Web Dev',      type: 'Lesson', topic: 'Diagrams & websites',
+    hub: { section: 'Course library', type: 'Course' } },
 
   // Standalone sections.
   { prefix: '/index/',         section: 'Site index',    type: 'Resource',     topic: 'AI basics & literacy' },
@@ -184,6 +186,7 @@ const TITLE_SUFFIXES = [
   'AI Literacy', 'AI for Research', 'Course library',
   'CDU AI Staff Training', 'CDU AI Staff', 'Roper Gulf', 'Roper Gulf Regional Council',
   'Alice Springs ARN', 'Power BI SIEM', 'Visio', 'Power Query',
+  'Agentic AI Web Dev',
 ];
 
 /* ===========================================================================

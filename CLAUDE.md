@@ -323,3 +323,72 @@ a warning, which is a known and accepted limitation; the words carry the meaning
 - Several plates are below 1600px and will go soft used full-bleed on a large display:
   `banner-wordmark-usb`, `footer-monogram-chip` and `footer-mouse-lightbulb-monogram`
   are the weakest. SD intends to supply higher-resolution re-exports.
+
+## Agentic AI Web Dev course (14 August 2026)
+
+Built from SD's five plan files in `~/Desktop/Web dev course plan/` plus the
+`SEO-GEO-Research.md` brief she added the same day. Three new pages.
+
+`/agentic-web-dev/index.html` is the course, "Agentic AI Web Dev 2026: From
+Design Security to Discoverable Deployment", added to the library accordion as
+course 11 and to the front-page footer library column. Single-page course in the
+Visio and Power BI SIEM shape: positioning, prerequisites, two foundation
+phases, then the two core streams (access gates; machine-readable sites),
+a capstone, the optional marketing adaptation, and a currency section listing
+what to re-verify before delivery. Phases are named, not numbered, so they can
+be reordered.
+
+Two interactive walkthrough decks under `/presentations/`, both built to the
+`interactive-walkthrough-deck` skill with the refresh SD asked for in plan file
+04: myth chips only where a module genuinely corrects a false belief, no
+obligatory taglines, varied module openers (plain question, claim to test, flat
+statement). Both match the publishing-a-website deck's palette and faces
+exactly, and both carry a `<noscript>` block that degrades the deck to a
+scrolling document.
+
+- `/presentations/why-the-frontend-gate-fails/` (4 modules, 18 beats). Flagship
+  is the break-the-gate widget: a simulated frontend passcode gate, an "open
+  developer tools" control that reveals the passcode in the downloaded source,
+  and an "edit the check" control that bypasses it entirely. Closed simulation
+  throughout; no working passcode logic, no signing code, nothing that functions
+  against a live site. No prices anywhere in the card by design; the dated
+  figures stay in the access-gates resource.
+- `/presentations/from-ranking-to-being-cited/` (4 modules, 17 beats). Flagship
+  is the place-it-on-the-spectrum widget: five techniques, five bands from
+  genuine standard to actively backfires. llms.txt lands in "proposed
+  convention, contested" and keyword stuffing in "actively backfires".
+
+CONTENT RULE FOLLOWED: every fact comes from the five plan files and the
+research brief. Nothing was invented and no citation was fabricated; where the
+reach report hedges, the deck hedges. Research-benchmark figures are framed as
+benchmark results, not outcomes.
+
+TITLE NOTE: SD's title says "Agentic AI" and "Design Security"; the plan covers
+neither as its own content. Her decision, 14 August 2026, was to keep the title
+and the plan as they are. If an agentic-AI phase is ever wanted, the natural
+place is a foundation phase on building with AI coding agents, feeding straight
+into the broken-gate demonstration.
+
+SIDE EFFECTS of running the four maintenance scripts, all documented behaviour
+rather than anything this build asked for. `build-index.js` found 37 pages that
+had never been indexed (the whole `shadow-ai-manual`, several presentations,
+`design_handoff_site_artwork/site-mock.html`) and added them, taking
+`search-index.json` from 165 to 202 entries. `add-search.js` then added the
+search script tag to 29 of those pages, and `add-meta.js` added social tags to
+them. `tools/social-card/social-card.html` was restored by hand afterwards,
+because it has no `<title>` and `add-meta.js` writes its path into the og:title
+when that happens; worth fixing in the script if it keeps recurring.
+
+`tools/build-index.js` gained a RULES entry and a title suffix for the new
+course; `tools/add-artwork.js` gained a PLATES entry
+(`hero-padlock-wordmark` masthead, `footer-data-table-monogram` footer).
+Published dates for the three new pages were hand-set in `index-meta.json`,
+since an uncommitted page has no git date.
+
+Verified before delivery: both decks driven headlessly through every beat at
+three viewport sizes, every widget control clicked, every interactive beat left
+and re-entered to confirm the `data-onenter` reset, console clean, and
+screenshots checked of the menus, both flagship widgets mid-interaction and the
+densest beats. At 1280x720 a few beats scroll rather than fitting; the
+publishing-a-website deck does the same at that height, so this matches house
+behaviour.
