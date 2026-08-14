@@ -392,3 +392,34 @@ screenshots checked of the menus, both flagship widgets mid-interaction and the
 densest beats. At 1280x720 a few beats scroll rather than fitting; the
 publishing-a-website deck does the same at that height, so this matches house
 behaviour.
+
+### Course page rewritten, 14 August 2026 (same day)
+
+SD read the first version and called it overly academic: abstract openers,
+metaphors, and headings that did not say what a section contained. Rewritten
+from scratch in the tech-strategist register. What changed:
+
+- Headings now name their contents. "The honest baseline" became "How to check
+  a claim before you act on it"; "The layered model of machine readability"
+  became "What machines read, ranked by how settled it is". You can read any
+  heading and know what is in the section.
+- Every phase opens with a one-line summary of what it is, then a scannable
+  `// covers` bullet list, then the point to take away. No "this phase exists
+  because" framing.
+- Metaphors removed throughout (hinges, spines, wristbands, security theatre as
+  a standing frame). Where a comparison earns its place it is stated plainly.
+- Facts moved out of prose into three reference tables: the three
+  access-control options, the four machine-readability layers, and the GEO
+  tactic results.
+- Confidence labels added inline as `<span class="conf">(high)</span>` etc, per
+  SD's standing preference. On this page they also fit the subject, since the
+  course is about separating verified from hyped.
+- A "Sources used" section added at the base with a per-source confidence label
+  and an explicit "not verified" list.
+
+New page-scoped classes: `.summary`, `.covers-label`, `ul.covers`, `.conf`,
+`ul.sources`. Everything else is unchanged from the first build. Verified:
+all TOC anchors resolve, no horizontal overflow at 1440px, no page errors.
+The two decks were NOT rewritten; their register is the walkthrough-deck
+register, which is a different job. Worth checking with SD whether they need
+the same treatment.
