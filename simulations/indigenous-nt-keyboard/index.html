@@ -83,6 +83,7 @@
   .key.hasralt .big { color: var(--accent-bright); }
   .key.sel { border-color: var(--accent); box-shadow: 0 0 14px -3px var(--glow); }
   .key.fire { background: var(--accent); }
+  .key.miss { border-color: var(--bad); }
   .key .big { font-size: 19px; line-height: 1; }
   .key .lab { font-size: 9px; color: var(--ink-dim); letter-spacing: .04em; }
   .key.empty .big { color: var(--ink-dim); }
@@ -103,6 +104,7 @@
   .gloss { color: var(--ink-muted); font-size: 15px; margin-top: 8px; min-height: 20px; }
   .dz { margin-top: 20px; position: relative; border: 1px solid var(--hairline-strong); background: var(--panel-deep); min-height: 76px; padding: 18px 22px; font-size: 30px; color: var(--ink-head); cursor: text; }
   .dz:focus { outline: none; border-color: var(--accent); }
+  .dz.miss { border-color: var(--bad); }
   .dz .cursor { display: inline-block; width: 2px; height: 30px; background: var(--accent-bright); vertical-align: middle; animation: blink 1s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
   .dz .prompt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ink-dim); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; background: var(--panel-deep); }
@@ -515,7 +517,11 @@ const dz = document.getElementById('dropZone');
 dz.addEventListener('focus', () => dz.classList.add('focused'));
 dz.addEventListener('blur', () => dz.classList.remove('focused'));
 dz.addEventListener('keydown', e => {
-  if (e.metaKey || e.ctrlKey) return;
+  // Alt Gr on Windows arrives as Ctrl+Alt held together (and often AltGraph too);
+  // only bail out for a genuine Ctrl shortcut (copy/paste/etc.), not for Alt Gr, and let Cmd through untouched.
+  const altGr = (e.getModifierState && e.getModifierState('AltGraph')) || (e.ctrlKey && e.altKey);
+  if (e.metaKey) return;
+  if (e.ctrlKey && !altGr) return;
   e.preventDefault();
   if (!startTime) { startTime = Date.now(); timerId = setInterval(tick, 250); }
 
@@ -530,20 +536,25 @@ dz.addEventListener('keydown', e => {
   const km = KEYMAP[e.code];
   if (!km) return;
   let ch = null;
-  const altActive = e.altKey || (e.getModifierState && e.getModifierState('AltGraph'));
+  const altActive = altGr || e.altKey;
   if (altActive && km.ralt) {
     ch = e.shiftKey && km.shiftRalt ? km.shiftRalt : km.ralt;
-    flashKey(e.code);
   } else if (!altActive) {
     ch = e.shiftKey && km.shift ? km.shift : km.base;
   }
   if (ch === null) return;
 
   totalKeystrokes++;
-  buffer = (buffer + ch).normalize('NFC');
   const target = SETS[currentSet].lines[lineIdx].target.normalize('NFC');
-  if (target.startsWith(buffer)) {
-    totalCorrectChars = Array.from(buffer).length;
+  const testBuffer = (buffer + ch).normalize('NFC');
+
+  if (target.startsWith(testBuffer)) {
+    buffer = testBuffer;
+    totalCorrectChars++;
+    if (altActive) flashKey(e.code, false);
+  } else {
+    flashKey(e.code, true);
+    flashMiss();
   }
   document.getElementById('statAcc').textContent = totalKeystrokes ? Math.round((totalCorrectChars / totalKeystrokes) * 100) + '%' : '—';
   renderTarget();
@@ -557,11 +568,15 @@ dz.addEventListener('keydown', e => {
     }, 380);
   }
 });
-function flashKey(code) {
+function flashKey(code, miss) {
   const el = document.querySelector('.key[data-code="' + code + '"]');
   if (!el) return;
-  el.classList.add('fire');
-  setTimeout(() => el.classList.remove('fire'), 160);
+  el.classList.add(miss ? 'miss' : 'fire');
+  setTimeout(() => el.classList.remove(miss ? 'miss' : 'fire'), miss ? 260 : 160);
+}
+function flashMiss() {
+  dz.classList.add('miss');
+  setTimeout(() => dz.classList.remove('miss'), 260);
 }
 
 /* ===================== Init ===================== */
