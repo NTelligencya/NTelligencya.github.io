@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaaS and the API economy: tenants, scopes, audit trails · Shadow AI Blue Team Manual</title>
+<meta name="description" content="Service principals, delegated and application permissions, the standing grant, and why an audit log can be correctly configured, correctly billed and still empty.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-4/22-saas-api-economy.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>SaaS and the API economy</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Four &middot; Cloud, telemetry and the enterprise data plane</div>
+  <h1>SaaS and the API economy: tenants, scopes, audit trails</h1>
+  <p class="subtitle">The AI tool that reads the organisation&#x27;s data without a packet leaving the network, and the two places in the tenant where it is visible.</p>
+  <div class="reading-meta">
+    <span>Part Four</span>
+    <span>About 14 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A meeting-notes assistant joins a Teams call. It announces itself, it transcribes, and afterwards it emails a summary to the participants. Nobody on the call installed anything. No laptop in the room is doing the recording. Some weeks earlier one participant clicked through a consent screen while trying the product, and since then the application has held a standing authorisation against the organisation's tenant, reading calendars and joining meetings from the vendor's own servers.</p>
+      <p>Run the diagnostic. Which control described in this manual so far would have seen that happen? The firewall saw nothing, because no traffic left the organisation's network; the vendor's servers talk to Microsoft's servers, and neither is on campus. The endpoint agent saw nothing, because no process ran on any managed machine. The browser-resident control saw nothing, because no browser was involved after the initial consent click. The secure web gateway has no record because there was no web session to record.</p>
+      <p>This is the application programming interface economy working exactly as designed, and it is the most under-watched path to shadow AI in a modern estate. The event exists in exactly two places, both inside the tenant. Getting to the point where a defender can say that sentence with confidence, and know what to do about it, is what this chapter is for.</p>
+    </div>
+
+    <h2>The tenant is three boundaries at once</h2>
+    <p>Chapter 21 established the tenant as the customer's compartment in a shared service. It is worth separating the three things that compartment simultaneously is, because in practice they are administered together and reasoned about separately.</p>
+    <p>It is an identity boundary: the population of accounts the organisation is authoritative for, which Part Two developed at length. It is a data boundary: the records that belong to the organisation rather than to some other customer of the same service. And it is a telemetry boundary: the audit trail of what was done, by whom, to what, inside that compartment.</p>
+    <p>The three coincide, and the same administrative role governs all of them, which is why 'who administers this tenant' is the first question to ask about any software as a service product and 'is there a tenant at all' is the question that precedes it.</p>
+
+    <h2>The interface is the product</h2>
+    <p>Modern software as a service exposes its function twice. Once as a user interface for humans, and once as an application programming interface for programs. The second is generally the more capable of the two, because the interface is how the vendor's own components talk to each other and how integrations are built. Anything the web interface can do, the interface can usually do, without a browser, without a person and without a device.</p>
+    <p>To use an interface, a program needs an identity. In a Microsoft tenant that identity is a <strong>service principal</strong>: the local representation, inside one tenant, of an application that may be used across many. The application itself is described once by an <a class="term" href="../glossary.html">application object</a> in its home tenant, and a <a class="term" href="../glossary.html">service principal</a> is created in each tenant where it is used, carrying that tenant's own record of what the application has been permitted to do <span class="conf">(high)</span>.</p>
+    <p>Two kinds of permission exist, and the difference between them carries the rest of this chapter.</p>
+    <p>A <strong>delegated permission</strong> lets the application act on behalf of a signed-in user. Its reach is the intersection of what the application was granted and what that user can personally access. An application granted permission to read all files, acting for a staff member with access to three sites, can read three sites' worth of files <span class="conf">(high)</span>.</p>
+    <p>An <strong>application permission</strong> lets the application act as itself, with no user present. Its reach is whatever the permission covers, across the whole tenant. An application granted the equivalent read-all-files permission at application level can read any file in the organisation. Only an administrator can consent to permissions of this kind <span class="conf">(high)</span>.</p>
+    <p>Both are ordinary and both are necessary. The point is that they answer different questions, and a security conversation that does not distinguish them is not about anything.</p>
+
+    <h2>Consent, and the standing grant</h2>
+    <p>A <strong>scope</strong> names a class of access. Consent is the act of binding <a class="term" href="../glossary.html">scopes</a> to an application inside a tenant, and it comes in two forms. User consent covers one person, and is possible only where the tenant permits it and only for permissions that do not require an administrator. Admin consent covers the organisation, and is granted once for everyone <span class="conf">(high)</span>.</p>
+    <p>The property that matters is durability. Consent is not a login. It is a recorded authorisation, and the artefacts it produces, refresh tokens and client credentials, let the application return without the user, indefinitely, until somebody revokes the grant. The staff member who clicked the consent screen for the meeting-notes assistant has not logged in to it since. It does not need them to.</p>
+    <p>Tenants can be configured to disable <a class="term" href="../glossary.html">user consent</a> entirely, to allow it under conditions, or to route it through an administrative consent workflow where the user submits a justification and a reviewer approves or denies <span class="conf">(high)</span>. The choice among those is the single most consequential setting discussed in this chapter, and Chapter 13 has already described what it looks like from the user's side of the screen.</p>
+    <p>The framing worth carrying into a governance meeting: a tenant with unrestricted user consent has delegated software procurement to every member of staff, silently, with no purchase order and no review. That is sometimes a reasonable trade for a research institution that values speed. It should be a decision rather than a default.</p>
+
+    <h2>Audit trails are manufactured</h2>
+    <p>Chapter 21 made the general claim that in software as a service telemetry is a product feature. Here is the specific form of it.</p>
+    <p>An audit trail exists because somebody wrote code to emit each event. That person decided which fields the record carries, the product decided how long it is kept, and the commercial team decided what it costs. Three questions follow for any audit surface: what is recorded, for how long, and can it be exported. Then a fourth, which is the one people forget to ask: is content included, or only metadata?</p>
+    <p>The worked example is instructive because the answer is not intuitive. Interactions with Microsoft 365 Copilot are captured in the <a class="term" href="../glossary.html">unified audit log</a>, and the record contains metadata: who, when, in which application, which resources were referenced, and the sensitivity labels on them. The text of the prompt and the response is not in that audit record. Content is reachable, through the posture management surface and through eDiscovery, subject to the retention policy that applies, and prompts and responses for AI applications are stored in the user's mailbox, which is why eDiscovery can reach them at all <span class="conf">(high)</span>.</p>
+    <p>So 'is it audited' has three possible answers rather than two: no; yes, as metadata; yes, with content, under a policy somebody had to configure. Confusing the second with the third is the most common error in this area, and it goes in both directions. Defenders assume content is captured when it is not, and privacy officers assume content is captured when it is not, and both design around a fact that is false.</p>
+
+    <h2>The shadow AI lens: the path that leaves no traffic</h2>
+    <p>Draw the meeting-notes assistant end to end. A staff member authorises an AI product against the tenant, granting it delegated access to their calendar and mail, or an administrator grants it application-level access to something broader. From then on the vendor's servers read the organisation's data directly, over an interface, from the vendor's own infrastructure.</p>
+    <p>No packet crosses the campus network. No process starts on a managed device. No browser renders a page. Every control in Part One and Part Three is structurally blind, not because it is configured wrongly but because there is nothing in its field of view. The activity is visible in the identity layer, as a sign-in and a consent record, and in the tenant audit log, as the operations the application performed. That is the complete list.</p>
+    <p><strong>Tenant-side control is therefore the whole of the response.</strong> Restricting user consent so that new applications require review. Running the consent request workflow so that the restriction produces a queue rather than a dead end. Reviewing the grants that already exist, which in an established tenant is usually a larger set than anyone expects. Using application governance in the cloud access security broker to detect and act on applications with risky permission profiles or anomalous behaviour. All of this is real and all of it works. It is also worth being honest that it is a governance queue rather than a sensor: it functions to the extent that somebody works the queue, and it decays the moment nobody does.</p>
+    <p><strong>The agent case is the same case.</strong> Autonomous agents, and servers offering tools to them under the <a class="term" href="../glossary.html">Model Context Protocol</a>, are applications holding scopes. The vocabulary is new and moving quickly. The control surface is the one described above, and a defender who understands consent and permission types already understands the shape of the problem. Microsoft's compliance stack has begun treating agents as inheriting the capabilities of the AI application they belong to, which is a reasonable model and one worth checking rather than assuming <span class="conf">(medium; the coverage differs by parent application and is changing)</span>.</p>
+    <p><strong>The audit trail has a price tag, and can be correctly configured and empty.</strong> Records of interactions with non-Microsoft AI applications are not included in the standard enterprise audit entitlement. They are billed on a pay-as-you-go basis, logged under their own record types, and retained for 180 days once that billing is enabled <span class="conf">(high)</span>. Two things follow. The first is budgetary. The second is more interesting: these records are populated from the same upstream paths described in Chapters 23 to 26, so enabling the billing does not by itself produce data. If no browser-resident control, no onboarded endpoint and no network integration is generating the signal, the organisation has bought a table that stays empty. It is the clearest illustration in the manual of the difference between a place where a fact would be recorded and a mechanism that records it.</p>
+    <p><strong>The interface is also how visibility is regained.</strong> The positive case has the same shape. Where an enterprise AI service is procured, an integration reads its interaction records into the tenant's compliance stack server to server, independent of any device, and prompts and responses become reachable through audit, eDiscovery, communication compliance and lifecycle management <span class="conf">(high)</span>. The mechanism that creates the shadow AI blind spot and the mechanism that closes it for sanctioned services are the same mechanism, pointed in opposite directions.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>Consent review scales badly. A tenant with several thousand staff and permissive settings accumulates grants faster than anyone reviews them, and by the time somebody looks, revocation breaks workflows that people have come to depend on. The remediation cost rises with the delay, which argues for tightening the setting before the backlog exists rather than after.</p>
+      <p>Delegated permissions inherit the user's access, so the same scope is modest on a modest account and expansive on a privileged one. A permission profile read without reference to who consented is only half the assessment.</p>
+      <p>Audit coverage is uneven across a single vendor's own products, and the lag between an action and its appearance in the log is real and varies by workload. Investigations run in the first hour are working with an incomplete record and should say so.</p>
+      <p>Retention defaults are usually shorter than the interval at which this class of incident is discovered, and extending them is a billing decision made long before the incident. Chapter 26 returns to this.</p>
+      <p>Personal-account use sits outside everything in this chapter. A staff member uploading a document to an AI service with their own account has not granted anything against the tenant, and no consent control touches it. The tenant boundary governs what is inside it, which is the point of a boundary and also its limit.</p>
+      <p>Then the case that is hardest to see: an AI feature appearing inside a product the organisation already sanctioned. The grant was given to a document tool, and the document tool grew a summariser. Nothing new was consented to, no new application appeared, and the catalogue-based discovery of Chapter 24 has no new destination to notice. This is currently the least well handled problem in the category, and a defender should expect it to be handled by the vendor relationship rather than by a control.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Distinguish delegated from application permission in two sentences a non-technical manager can act on, and say which one you would want an approval gate in front of.</li>
+        <li>Trace the meeting-notes assistant through every control layer this manual has covered, and name the two places the event is visible.</li>
+        <li>Explain how an audit log can be correctly enabled, correctly billed and still contain nothing about the activity you are investigating.</li>
+        <li>Name the tenant setting most responsible for uncontrolled growth in AI application grants, and describe the operational cost of changing it in an institution that values researcher autonomy.</li>
+        <li>The same staff member authorises the same AI product with a personal account instead. State what the organisation can now see, and what it can now control.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">admin consent &middot; app governance &middot; application object &middot; application permission &middot; connector &middot; consent request workflow &middot; Defined from earlier chapters and reused here &middot; delegated permission &middot; DSPM for AI &middot; eDiscovery &middot; Entra ID &middot; identity provider &middot; MCP &middot; OAuth &middot; refresh token &middot; scope &middot; service principal &middot; tenant &middot; unified audit log &middot; user consent</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>Every Microsoft Learn page below was verified against the Microsoft Learn documentation service on 9 August 2026.</p>
+      <ol class="sources-list">
+        <li>Microsoft Learn, 'Application and service principal objects in Microsoft Entra ID'. <a href="https://learn.microsoft.com/en-us/entra/identity-platform/app-objects-and-service-principals" target="_blank" rel="noopener">learn.microsoft.com</a> The reference for the application object and service principal distinction, and for the creation of a service principal in each tenant where an application is used or consented to. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Overview of permissions and consent in the Microsoft identity platform'. <a href="https://learn.microsoft.com/en-us/entra/identity-platform/permissions-consent-overview" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the delegated versus application permission comparison, including that a delegated permission cannot exceed the signed-in user's own access and that only an administrator can consent to application permissions. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Overview of user and admin consent'. <a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/user-admin-consent-overview" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the description of user consent settings, including the option to disable user consent entirely, and of the administrative consent workflow. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Overview of admin consent workflow'. <a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/admin-consent-workflow-overview" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the description of the request and approval queue that replaces a blocked consent prompt. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Audit logs for Copilot and AI applications'. <a href="https://learn.microsoft.com/en-us/purview/audit-copilot" target="_blank" rel="noopener">learn.microsoft.com</a> The source for the pay-as-you-go billing of audit records for non-Microsoft AI applications, their 180-day retention, and the record types and workload they are logged under. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Use Microsoft Purview to manage data security and compliance for other AI apps'. <a href="https://learn.microsoft.com/en-us/purview/ai-other-apps" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the statement that prompts and responses for AI applications are stored in the user's mailbox and are therefore reachable by eDiscovery, and that capturing content requires a collection policy configured to do so. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Use Microsoft Purview to manage data security and compliance for ChatGPT Enterprise'. <a href="https://learn.microsoft.com/en-us/purview/ai-chatgpt-enterprise" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the server-to-server integration of an enterprise AI service into audit, eDiscovery, communication compliance and lifecycle management, independent of device state. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Use Microsoft Purview to manage data security and compliance for AI agents'. <a href="https://learn.microsoft.com/en-us/purview/ai-agents" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the claim that agents inherit the capabilities of their parent AI application, with per-application differences. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Govern discovered apps using Microsoft Defender for Endpoint'. <a href="https://learn.microsoft.com/en-us/defender-cloud-apps/mde-govern" target="_blank" rel="noopener">learn.microsoft.com</a> Cited here for application governance as the surface on which risky application grants are reviewed and acted on. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li><em>Telemetry and Control Options for Shadow AI in an Australian University</em> and <em>Shadow AI Controls in Microsoft 365 E5, Behaviour by Windows Device State</em> (this project's internal source reports). The source of the framing that identity-layer control is the highest-leverage lever available for non-Microsoft AI, and of the audit billing position.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>Latency between an action in a Microsoft 365 workload and its appearance in the unified audit log is documented as variable but is not given as a single figure that covers every workload. Measure it in your own tenant rather than quoting a number <span class="conf">(medium)</span>.</p>
+      <p>Whether the pay-as-you-go audit records for non-Microsoft AI applications are worth enabling in a given tenant depends on whether any upstream signal exists to populate them, and on Australian education pricing that is not published on Microsoft Learn. Check the tenant billing portal before committing <span class="conf">(low)</span>.</p>
+      <p>Purview's treatment of agents as inheriting their parent AI application's capabilities is documented, but the supported capability set differs by parent and several entries carry footnotes. Verify per application before designing policy around it <span class="conf">(medium)</span>.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="21-cloud-service-models.html">&larr; Cloud service models</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="23-edr-telemetry-pipelines.html">EDR and telemetry pipelines &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

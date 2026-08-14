@@ -159,6 +159,9 @@ const RULES = [
   { prefix: '/agentic-web-dev/', section: 'Agentic AI Web Dev',      type: 'Lesson', topic: 'Diagrams & websites',
     hub: { section: 'Course library', type: 'Course' } },
 
+  { prefix: '/shadow-ai-manual/', section: 'Shadow AI Manual',   type: 'Lesson', topic: 'Cyber security',
+    hub: { section: 'Course library', type: 'Course' } },
+
   // Standalone sections.
   { prefix: '/index/',         section: 'Site index',    type: 'Resource',     topic: 'AI basics & literacy' },
   { prefix: '/workshops/',     section: 'Workshops',     type: 'Workshop',     topic: 'AI policy, law & economics' },
@@ -184,6 +187,7 @@ const TITLE_SUFFIXES = [
   'Workshops', 'Presentations', 'Resources', 'References',
   'Excel Fundamentals', 'Digital Literacy', 'Cyber Security Awareness',
   'AI Literacy', 'AI for Research', 'Course library',
+  'Shadow AI Blue Team Manual',
   'CDU AI Staff Training', 'CDU AI Staff', 'Roper Gulf', 'Roper Gulf Regional Council',
   'Alice Springs ARN', 'Power BI SIEM', 'Visio', 'Power Query',
   'Agentic AI Web Dev',

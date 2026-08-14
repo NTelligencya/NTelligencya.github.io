@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud service models and shared responsibility · Shadow AI Blue Team Manual</title>
+<meta name="description" content="What the shared responsibility model actually divides, why telemetry in SaaS is a product feature rather than a property of the system, and why free consumer AI sits outside the model entirely.">
+<link rel="canonical" href="https://ntworldink.com/shadow-ai-manual/part-4/21-cloud-service-models.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../manual.css">
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="../../">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav">
+      <a href="../../#library">Library</a>
+      <a href="/index/">Index</a>
+      <a href="../../#about">About</a>
+      <a href="../../#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container-manual">
+  <nav class="breadcrumb">
+    <a href="../../">Home</a>
+    <span class="sep">/</span>
+    <a href="../">Shadow AI Blue Team Manual</a>
+    <span class="sep">/</span>
+    <span>Cloud service models</span>
+  </nav>
+</div>
+
+<section class="container-manual manual-masthead">
+  <div class="part-label">Part Four &middot; Cloud, telemetry and the enterprise data plane</div>
+  <h1>Cloud service models and shared responsibility</h1>
+  <p class="subtitle">Moving up the service models buys away obligation, and buys away visibility with it; where there is no contract there is no boundary at all.</p>
+  <div class="reading-meta">
+    <span>Part Four</span>
+    <span>About 14 minutes</span>
+  </div>
+</section>
+
+<main class="content-body manual-prose">
+
+  <section class="container-manual">
+    <div class="scene">
+      <p>A university signs a contract for a software service, and some months later the security team needs the logs. Not exotic logs; sign-in records, administrative actions, exports of data. The vendor supplies part of it, through a portal, at a retention period the vendor chose, in a format the vendor defined. The team then asks for the host telemetry underneath, because they would like to know whether the machine holding the data was patched and whether anything else was running on it. The vendor declines, and is right to. It is not the customer's machine.</p>
+      <p>Nobody has behaved badly in that exchange. What has happened is that a boundary drawn at contract signature has become visible under pressure, and the security team has discovered where it sits by walking into it. The boundary has a name and a well-developed vocabulary, and the useful thing about learning that vocabulary properly is that it stops being a surprise. Drawn accurately, the boundary predicts every visibility gap in Part Four, including the one that matters most here.</p>
+      <p>That largest gap is not a gap in the model at all. When a staff member opens a consumer AI service and signs in with a personal account, the organisation is not a party to anything. There is no contract, no <a class="term" href="../glossary.html">tenant</a>, no administrator and no boundary, because a boundary requires two sides and the organisation is not on either of them. Chapter 20 closed by observing that the cloud layer reaches everywhere and controls almost nothing directly. This chapter explains the shape of that trade, and the rest of Part Four is a study of the instruments built to work inside it.</p>
+    </div>
+
+    <h2>The stack, and who runs which part of it</h2>
+    <p>Start with the stack. Any running application sits on top of a tower of things that have to work: a building with power and cooling, physical machines, the network between them, a hypervisor that carves those machines into virtual ones, an operating system in each, a runtime and the middleware around it, the application itself, the configuration that tunes the application, the identities of the people allowed to use it, and the data it holds.</p>
+    <p>On-premises, the organisation runs all of it. Every <a class="term" href="../glossary.html">cloud service model</a> is a horizontal cut through that tower. Below the cut, the provider operates. Above the cut, the customer does. That is the entire concept; the familiar three-letter names are just conventional places to put the cut.</p>
+    <p><strong>Infrastructure as a service</strong> cuts below the operating system. The provider runs the building, the hardware, the network and the hypervisor, and hands over a virtual machine. The customer patches the operating system, installs what they like and carries the consequences.</p>
+    <p><strong>Platform as a service</strong> cuts above the runtime. The customer brings application code and data, and the provider runs everything the code sits on. Nobody patches an operating system, because the customer never sees one.</p>
+    <p><strong>Software as a service</strong> cuts just below the application. The provider runs the whole thing. What is left to the customer is configuration, identity and data, which sounds thin until you notice that most publicly reported cloud data exposure has come from precisely those three.</p>
+    <p>The clean lines are pedagogical. Real services sit between the models, and one product often spans several. The value of the model is not taxonomic precision, it is that it makes the question 'which layers do we still operate' askable in a form that has an answer.</p>
+
+    <h2>Shared responsibility is a division of visibility</h2>
+    <p>The standard treatment of <a class="term" href="../glossary.html">shared responsibility</a> stops at obligation. Whose job is it to patch, whose job is it to configure, whose job is it to encrypt. Microsoft's own published matrix is of exactly this kind, and it is correct: physical datacentre, physical network and physical hosts are always the provider's; data, configuration and identities are always the customer's; the layers in between move with the service model <span class="conf">(high)</span>.</p>
+    <p>The step that matters for a defender is the one after that. Responsibility and visibility move together, because you cannot instrument a layer you do not operate. As an organisation moves up the models its security obligations shrink, which is the selling point, and its capacity to observe shrinks with them. In <a class="term" href="../glossary.html">infrastructure as a service</a> you can install an agent in the operating system and watch processes, because the operating system is yours. In <a class="term" href="../glossary.html">platform as a service</a> you cannot, because there is no operating system you are permitted to touch. In <a class="term" href="../glossary.html">software as a service</a> you have nothing to instrument at all.</p>
+    <p>What replaces instrumentation in software as a service is whatever the provider chooses to expose: an administrative console, an audit log, an application programming interface, a report. Which yields the sentence the rest of Part Four rests on. In software as a service, telemetry is a product feature. It is not a property of the system that a determined engineer can go and extract. Somebody at the vendor decided which events to emit, which fields to include, how long to keep them and what to charge. If they did not build it, it does not exist, and no amount of contractual insistence will conjure it.</p>
+
+    <h2>Tenancy, and what a tenant boundary is</h2>
+    <p>One more piece of vocabulary, because Part Four uses it constantly. Multi-tenancy means one running system serving many customers at once, with separation enforced logically by the provider's code rather than physically by separate hardware. The <strong>tenant</strong> is the customer's compartment inside that shared system.</p>
+    <p>Part Two introduced the tenant as an identity boundary: the population of accounts an identity provider is authoritative for. In software as a service it is also the data boundary and the audit boundary. The tenant is the unit of administration, and everything the organisation can see or control inside a service, it sees and controls because somebody in it holds an administrative role over that tenant.</p>
+    <p>Hold that clearly, because the corollary does the work. Where there is no tenant, there is no administrator. Where there is no administrator, there is no console, no audit log and no export. Not a degraded view; no view.</p>
+
+    <h2>The shadow AI lens: which side of the contract is the activity on</h2>
+    <p>Now apply it. Split staff use of generative AI into two cases, because they are not variations on a theme, they are different problems that happen to look alike from the outside.</p>
+    <p><strong>Sanctioned enterprise AI is an ordinary software as a service problem.</strong> The organisation has a contract, a tenant and an administrator. The questions are the familiar ones: what does the provider log, for how long, exportable how, and is prompt content included or only metadata. Because a tenant exists, integration is possible, and Microsoft's compliance stack now treats several enterprise AI services this way, with ChatGPT Enterprise and Anthropic Claude Enterprise both appearing as connected enterprise AI applications alongside AI applications registered through the tenant's identity platform <span class="conf">(high)</span>. Prompt and response retention through that route is supported for those enterprise services and not for the free consumer tiers, which is a distinction of contract rather than of technology <span class="conf">(high)</span>.</p>
+    <p><strong>Free consumer AI is not a shared responsibility problem, because the organisation is not in the relationship.</strong> The staff member accepted the terms. The staff member is the customer. There is no organisational tenant, so there is no administrator, no audit interface and no contractual right to anything at all. This is worth stating flatly because it disposes of a conversation that recurs in procurement forums: the organisation cannot require the AI vendor to hand over its staff members' prompts, or to log anything, or to attest to anything, because it has no agreement with that vendor and is not the counterparty to the one that exists.</p>
+    <p>Everything the organisation can nonetheless learn about that activity therefore comes from the layers it still operates. The network its staff are sitting on, which is Part One and which stops working the moment they go home. The device the browser is running on, which is Part Three and which requires an administrative act the organisation may not have been permitted to perform. That is the whole inventory. Seen from here, a cloud access security broker is not a window into the AI provider at all. It is an instrument on the organisation's own side of the wire, inferring from traffic what a service it has no relationship with is being asked to do. Chapter 24 takes that apart.</p>
+    <p><strong>The sanctioned alternative works by moving activity across the boundary.</strong> Microsoft 365 Copilot Chat, available at no additional cost to a user signed in with a work account, carries what Microsoft calls <a class="term" href="../glossary.html">enterprise data protection</a>: prompts and responses are covered by the same contractual terms and commitments as Exchange and SharePoint content, Microsoft acts as a data processor under the Data Protection Addendum and Product Terms, and prompts and responses are not used to train foundation models <span class="conf">(high)</span>. The interface shows a green shield to indicate that the protection is applied <span class="conf">(high)</span>.</p>
+    <p>Notice what kind of control that is. Nothing about it makes the organisation better at inspecting what staff type. It changes the legal relationship, the data-handling commitment and the existence of an administrative surface, and it does so by moving the activity from a service the organisation has no relationship with to one where it is the tenant. That is the general form of the strongest intervention available at this layer, and Part Five returns to it as the argument for sanctioned alternatives.</p>
+    <p><strong>Residency and sub-processing are shaped by the model and settled by the contract.</strong> Where data is processed, and by which parties on the provider's behalf, is not something the service model determines; it determines only that the answer is the provider's to give. It is also not uniform within a single product. Copilot Chat's calls to the model are routed to nearby datacentres and can be sent to other regions at high utilisation, with European Union traffic held inside the European Union Data Boundary and worldwide traffic able to be processed elsewhere <span class="conf">(high)</span>. A defender reading a residency commitment should ask which components of the service it covers, because the answer is rarely 'all of them'.</p>
+
+    <div class="callout breaks">
+      <div class="callout-label">Where this breaks down</div>
+      <p>The published shared responsibility diagram is a marketing artefact as much as an architecture. It is drawn to reassure, the boundary sits differently in different products from the same vendor, it sometimes differs between tiers of one product, and it moves over time without anyone redrawing the picture. Treat it as a starting point for questions rather than as a specification.</p>
+      <p>Serverless and managed AI services blur the cuts to the point where the model strains. The customer supplies configuration, data and prompts and operates nothing, which pushes almost all the failure surface into configuration error. Microsoft has published a separate shared responsibility model for AI workloads for this reason, adding responsibilities that the original three models do not describe well, including prompt security and prompt injection <span class="conf">(high)</span>.</p>
+      <p>The boundary is recursive. The provider uses sub-processors, and those sub-processors have their own boundaries. The organisation's counterparty is not necessarily the operator of the thing holding its data, and the chain is only as visible as the contract makes it.</p>
+      <p>A tenant boundary is enforced by the provider's own code. It is strong in practice and it is not a wall the customer can inspect, test or verify independently. Trust in it is trust in an engineering organisation and its assurance reporting, which is a reasonable thing to extend and a different thing from verification.</p>
+      <p>The hardest limit is the one the model does not address, because it lies outside its scope. An individual using a consumer service, with their own account, on their own device, is not in a shared responsibility relationship with their employer's supplier. Mistaking that for a gap in the model leads to procurement conversations that cannot arrive anywhere, and to security requirements written against a vendor who has never heard of the organisation writing them.</p>
+    </div>
+
+    <div class="callout check">
+      <div class="callout-label">Check your understanding</div>
+      <ol>
+        <li>Take a service your organisation uses and place the cut. Which layers can you instrument, which can you only ask about, and which do you have no standing to ask about at all?</li>
+        <li>A procurement officer proposes a clause requiring the vendor to provide host-level logs for the servers holding the university's data. Explain in two sentences why that requirement cannot be met for a software as a service product, and what to ask for instead.</li>
+        <li>Staff move from consumer ChatGPT to Copilot Chat with a work account. State what changes technically and what changes contractually, and be precise about which of the two is doing most of the work.</li>
+        <li>A staff member uses a consumer AI service with a personal account on a personal laptop at home. List everything the organisation can observe about that activity, and name the layer each observation comes from.</li>
+        <li>Write the two questions you would put to any AI vendor about telemetry before signing, and say what a bad answer to each would tell you.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Glossary terms used in this chapter</h2>
+      <p class="terms-used">API &middot; audit log &middot; cloud service model &middot; control plane &middot; data plane &middot; Defined from earlier chapters and reused here &middot; enterprise data protection &middot; identity provider &middot; infrastructure as a service &middot; multi-tenancy &middot; platform as a service &middot; sensitivity label &middot; shared responsibility model &middot; software as a service &middot; tenant &middot; TLS</p>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Sources</h2>
+      <p>Every Microsoft Learn page below was verified against the Microsoft Learn documentation service on 9 August 2026.</p>
+      <ol class="sources-list">
+        <li>Peter Mell and Timothy Grance, <em>The NIST Definition of Cloud Computing</em>, NIST Special Publication 800-145, National Institute of Standards and Technology, September 2011. <a href="https://csrc.nist.gov/publications/detail/sp/800-145/final" target="_blank" rel="noopener">csrc.nist.gov</a> The origin of the infrastructure, platform and software as a service vocabulary, and still the definition auditors cite. <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Shared responsibility in the cloud'. <a href="https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility" target="_blank" rel="noopener">learn.microsoft.com</a> The source for the responsibility matrix used in this chapter, including the statement that customer data, configuration and identities remain the customer's responsibility in every model, and that physical datacentre, physical network and physical hosts are always the provider's. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Artificial intelligence (AI) shared responsibility model'. <a href="https://learn.microsoft.com/en-us/azure/security/fundamentals/shared-responsibility-ai" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the claim that AI workloads introduce responsibilities the original three models describe poorly, including prompt security and prompt injection. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Enterprise data protection in Microsoft 365 Copilot and Microsoft 365 Copilot Chat'. <a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/enterprise-data-protection" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the processor position under the Data Protection Addendum and Product Terms, the commitment that prompts and responses are not used to train foundation models, and that access controls, sensitivity labels, retention and audit apply. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Privacy and protections' (Microsoft 365 Copilot Chat). <a href="https://learn.microsoft.com/en-us/copilot/privacy-and-protections" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the green shield indicator, the no-extra-cost availability of enterprise data protection in Copilot Chat, and the logging of prompts and responses in Exchange for audit and eDiscovery. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Considerations for Microsoft 365 Copilot Chat admins'. <a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-chat-considerations" target="_blank" rel="noopener">learn.microsoft.com</a> Supports the description of model call routing, including that European Union traffic stays within the European Union Data Boundary while worldwide traffic can be processed in other regions. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li>Microsoft Learn, 'Microsoft Purview data security and compliance protections for generative AI apps'. <a href="https://learn.microsoft.com/en-us/purview/ai-microsoft-purview" target="_blank" rel="noopener">learn.microsoft.com</a> The source for the three-way split between Copilot experiences, enterprise AI applications and other AI applications, and for the presence of ChatGPT Enterprise and Anthropic Claude Enterprise in the enterprise category. Last checked 9 August 2026; <span class="conf">(high)</span>.</li>
+        <li><em>Telemetry and Control Options for Shadow AI in an Australian University</em> (this project's internal source report, <code>Shadow Telemtery options.md</code>). The source of the free-versus-enterprise distinction as it applies to prompt retention, and of the observation that promoting a sanctioned alternative is a control in its own right.</li>
+      </ol>
+    </div>
+
+    <div class="chapter-foot">
+      <h2>Open questions</h2>
+      <p>The published shared responsibility matrices differ in detail between Microsoft's Azure security fundamentals guidance, its industry guidance and its AI-specific model, and the AI model is the newest and least settled of the three. Treat the AI matrix as directionally useful and re-read it before quoting particulars <span class="conf">(medium)</span>.</p>
+      <p>Whether a given Australian institution's contract with an enterprise AI vendor gives it rights to prompt content, and on what terms, is a contract question rather than a product question. I have not reviewed any such contract and cannot generalise about them <span class="conf">(low)</span>.</p>
+      <p>The set of enterprise AI applications that Microsoft Purview treats as connected enterprise applications has grown during 2025 and 2026 and continues to change. Verify the current list before designing around it <span class="conf">(medium)</span>.</p>
+    </div>
+
+    <nav class="chapter-nav">
+      <a class="cn-prev" href="../part-3/20-device-join-states.html">&larr; Device join states</a>
+      <a class="cn-contents" href="../">Contents</a>
+      <a class="cn-next" href="22-saas-api-economy.html">SaaS and the API economy &rarr;</a>
+    </nav>
+
+    <p class="last-updated">Last updated 9 August 2026</p>
+
+  </section>
+</main>
+
+<footer class="site" id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/">
+          <div class="brand-mark"></div>
+          <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+        </a>
+        <p>Practical learning materials in cybersecurity, AI literacy, Microsoft Office, and workplace digital skills.</p>
+      </div>
+      <div class="footer-col">
+        <h4>// this manual</h4>
+        <ul>
+          <li><a href="/shadow-ai-manual/">Contents</a></li>
+          <li><a href="/shadow-ai-manual/glossary.html">Glossary</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>// elsewhere</h4>
+        <ul>
+          <li><a href="/#library">Course library</a></li>
+          <li><a href="/resources/">Resources</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
+      Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a></span>
+      <span style="font-family: 'JetBrains Mono', monospace;">v1.0 &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
