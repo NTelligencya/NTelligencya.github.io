@@ -51,8 +51,8 @@ const SKIP_DIRS = new Set([
      pos     'high' shifts a masthead crop to 78% 42%.
      foot    the footer plate, shown whole.                                */
 const PLATES = {
-  'presentations':    { type: 'masthead', plate: 'hero-motherboard-chip',        foot: 'banner-mouse-lightbulb-keyboard' },
-  'flashcards':       { type: 'masthead', plate: 'hero-keyboard-closeup', pos: 'high', foot: 'footer-keyboard-data-monogram' },
+  'presentations':    { type: 'masthead', plate: 'hero-envelope-mouse-wordmark', foot: 'banner-mouse-lightbulb-keyboard' },
+  'flashcards':       { type: 'masthead', plate: 'hero-qr-mouse-wordmark',       foot: 'footer-keyboard-data-monogram' },
   'resources':        { type: 'band', plate: 'banner-mouse-lightbulb-keyboard', band: 'md', foot: 'footer-mouse-lightbulb-monogram' },
   'references':       { type: 'masthead', plate: 'hero-motherboard-chip1',       foot: 'footer-data-table-monogram' },
   'index':            { type: 'band', plate: 'banner-wordmark-usb', band: 'sm',   foot: 'footer-data-table-monogram' },
@@ -61,15 +61,15 @@ const PLATES = {
   'powerbi-siem':     { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'lg', foot: 'footer-keyboard-data-monogram' },
   'pandanus-reach':   { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'lg', foot: 'footer-keyboard-data-monogram' },
 
-  'cybersecurity':    { type: 'masthead', plate: 'hero-padlock-circuit', session: 'hero-padlock-wordmark', foot: 'footer-data-table-monogram' },
-  'ai-literacy':      { type: 'masthead', plate: 'hero-motherboard-chip1',       foot: 'footer-mouse-lightbulb-monogram' },
+  'cybersecurity':    { type: 'masthead', plate: 'hero-envelope-connect', session: 'hero-padlock-wordmark', foot: 'footer-data-table-monogram' },
+  'ai-literacy':      { type: 'masthead', plate: 'hero-cloud-monogram',          foot: 'footer-envelope-mouse-wordmark' },
   'ai-for-research':  { type: 'masthead', plate: 'hero-portrait-chip-wordmark',  foot: 'footer-mouse-lightbulb-monogram' },
   'digital-literacy': { type: 'masthead', plate: 'hero-wordmark-keyboard-usb',   foot: 'footer-mouse-lightbulb-monogram' },
   'word':             { type: 'masthead', plate: 'hero-keyboard-closeup',        foot: 'footer-data-table-monogram' },
-  'powerpoint':       { type: 'masthead', plate: 'hero-square-laptop-spreadsheet', foot: 'footer-data-table-monogram' },
+  'powerpoint':       { type: 'masthead', plate: 'hero-padlock-circuit',        foot: 'footer-data-table-monogram' },
   'visio':            { type: 'masthead', plate: 'hero-motherboard-chip',        foot: 'footer-keyboard-data-monogram' },
-  'agentic-web-dev':  { type: 'masthead', plate: 'hero-padlock-wordmark',         foot: 'footer-data-table-monogram' },
-  'cdu-ai-staff':     { type: 'masthead', plate: 'hero-motherboard-chip',        foot: 'footer-wordmark-url' },
+  'agentic-web-dev':  { type: 'masthead', plate: 'hero-envelope-wordmark',       foot: 'footer-data-table-monogram' },
+  'cdu-ai-staff':     { type: 'masthead', plate: 'hero-cloud-monogram',          foot: 'footer-wordmark-url' },
 
   // The manual runs its own .manual-masthead, so it takes the footer plate only.
   'shadow-ai-manual': { type: 'none', foot: 'footer-wordmark-url' },
@@ -77,8 +77,8 @@ const PLATES = {
   // Client areas. Artwork deliberately minimal: a plate behind the masthead
   // and a footer plate, nothing else. A page carrying an Acknowledgement of
   // Country should not have artwork competing with it.
-  'roper-gulf':       { type: 'masthead', plate: 'hero-portrait-keyboard',       foot: 'footer-mouse-lightbulb-monogram' },
-  'alice-springs-arn':{ type: 'masthead', plate: 'hero-portrait-keyboard',       foot: 'footer-mouse-lightbulb-monogram' },
+  'roper-gulf':       { type: 'masthead', plate: 'hero-portrait-keyboard',       foot: 'footer-envelope-mouse-wordmark' },
+  'alice-springs-arn':{ type: 'masthead', plate: 'hero-qr-mouse',                foot: 'footer-mouse-lightbulb-monogram' },
 
   // Home. The band and the divider are hand-authored in index.html, since the
   // page has no masthead; the script only maintains its footer plate.
@@ -98,6 +98,13 @@ const ALT = {
   'footer-data-table-monogram':      'A data table beside the NT monogram',
   'footer-wordmark-url':             'The Ntell World Ink wordmark with the site address',
   'footer-monogram-chip':            'The NT monogram beside a processor chip',
+  'footer-envelope-mouse-wordmark':  'The Ntell World Ink wordmark, an envelope on a hook and a mouse holding a lit bulb',
+  'hero-envelope-connect':           'An envelope hanging from a hook, with the Ntell World Ink wordmark and a connect link',
+  'hero-envelope-mouse-wordmark':    'An envelope on a hook and a mouse holding a lit bulb, under the Ntell World Ink wordmark',
+  'hero-envelope-wordmark':          'An envelope hanging from a hook beside the Ntell World Ink wordmark',
+  'hero-qr-mouse-wordmark':          'A QR code built from metal tiles, scanned by a mouse holding a tablet',
+  'hero-qr-mouse':                   'A QR code built from metal tiles, scanned by a mouse holding a tablet',
+  'hero-cloud-monogram':             'A glass cloud above a circuit board, with the NT monogram',
 };
 
 const OPEN = '<!-- artwork: generated by tools/add-artwork.js; edit the script, not this -->';
