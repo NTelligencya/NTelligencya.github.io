@@ -188,6 +188,36 @@
   .genstat .sv { font-family: var(--mono); font-size: 24px; color: var(--ink-head); }
   .genstat .sl { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-dim); }
 
+  /* Law text explorer */
+  .lawbox { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 26px 30px; max-width: 960px; font-size: 17.5px; line-height: 1.9; color: var(--ink-body); }
+  .lawbox .lawhead { font-family: var(--mono); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 14px; }
+  .lawseg { display: inline; background: rgba(26,201,201,.09); border: none; border-bottom: 1px dashed var(--accent-dim); border-radius: 2px; color: var(--ink-head); font: inherit; line-height: inherit; padding: 1px 0; cursor: pointer; text-align: left; }
+  .lawseg:hover { background: rgba(26,201,201,.16); }
+  .lawseg.on { background: rgba(26,201,201,.22); border-bottom: 1px solid var(--accent); box-shadow: 0 0 14px -6px var(--glow); }
+  .lawnote { margin-top: 20px; font-size: 17px; line-height: 1.6; color: var(--ink-body); max-width: 920px; min-height: 92px; }
+  .lawnote .t { color: var(--accent-bright); }
+
+  /* Figures and screenshots */
+  .figrow { display: flex; gap: 30px; margin-top: 10px; align-items: flex-start; }
+  .figrow .figside { flex: 1; min-width: 300px; }
+  .shot { display: block; max-width: 100%; border: 1px solid var(--hairline-strong); border-radius: var(--radius); }
+  .shotframe { flex: 0 0 330px; max-width: 330px; }
+  .shotscroll { max-height: 54vh; overflow-y: auto; border: 1px solid var(--hairline-strong); border-radius: var(--radius); }
+  .shotscroll img { display: block; width: 100%; }
+  .figfull { margin-top: 10px; max-width: 1000px; }
+  .figfull img { width: auto; max-width: 100%; max-height: 54vh; border: 1px solid var(--hairline-strong); border-radius: var(--radius); }
+  .figlabel { color: var(--ink-dim); font-size: 12.5px; margin-top: 8px; letter-spacing: .04em; }
+  .figside .fp { font-size: 16.5px; line-height: 1.65; color: var(--ink-body); margin-bottom: 14px; }
+  .figside .fp strong { font-weight: 400; color: var(--ink-head); text-shadow: 0 0 14px rgba(244,244,242,.2); }
+  .figside .fp .mono { font-family: var(--mono); font-size: .85em; color: var(--accent-bright); }
+
+  /* Cycle diagram */
+  .cyc { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 8px; max-width: 960px; }
+  .cycnode { background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: 24px; padding: 10px 18px; font-size: 14.5px; color: var(--ink-body); }
+  .cycnode.hotn { border-color: var(--accent); color: var(--accent-bright); }
+  .cycarrow { color: var(--accent-dim); font-family: var(--mono); font-size: 17px; }
+  .cycback { width: 100%; color: var(--accent-dim); font-family: var(--mono); font-size: 13px; letter-spacing: .08em; margin-top: 4px; }
+
   .linkrow { display: flex; gap: 14px; margin-top: 26px; flex-wrap: wrap; }
   .linkrow a { flex: 1; min-width: 220px; padding: 16px 20px; border: 1px solid var(--hairline); border-radius: var(--radius); display: flex; flex-direction: column; gap: 6px; color: inherit; text-decoration: none; transition: border-color .2s; }
   .linkrow a:hover { border-color: var(--accent); }
@@ -201,7 +231,8 @@
   @media (max-width: 900px) {
     h1 { font-size: 40px; } h2 { font-size: 29px; }
     main { padding: 0 20px; }
-    .insp-row, .panels { flex-direction: column; }
+    .insp-row, .panels, .figrow { flex-direction: column; }
+    .shotframe { flex-basis: auto; max-width: 100%; }
     .stp { grid-template-columns: 1fr; gap: 4px; }
   }
 </style>
@@ -245,9 +276,25 @@
       <p class="caption">Dates from the European Commission's Digital Strategy site and Anthropic's own Help Center article "How Claude marks AI-generated content," both accessed 14 August 2026; corroborated by TechCrunch, The Register and Euronews, all published 11 August 2026.</p>
     </section>
 
+    <section class="beat" data-scene="m1" data-onenter="resetLaw">
+      <h2>What Article 50 actually requires</h2>
+      <div class="lawbox no-advance">
+        <div class="lawhead">EU AI Act &middot; Article 50(2) &middot; full text</div>
+        Providers of AI systems, including general-purpose AI systems, generating synthetic audio, image, video or text content, shall ensure that the outputs of the AI system are <button class="lawseg" data-law onclick="lawPick(0)">marked in a machine-readable format and detectable as artificially generated or manipulated</button>. Providers shall ensure their technical solutions are <button class="lawseg" data-law onclick="lawPick(1)">effective, interoperable, robust and reliable as far as this is technically feasible</button>, taking into account the specificities and limitations of various types of content, the costs of implementation and the generally acknowledged state of the art, as may be reflected in relevant technical standards. <button class="lawseg" data-law onclick="lawPick(2)">This obligation shall not apply to the extent the AI systems perform an assistive function for standard editing or do not substantially alter the input data provided by the deployer or the semantics thereof</button>, or <button class="lawseg" data-law onclick="lawPick(3)">where authorised by law to detect, prevent, investigate or prosecute criminal offences</button>.
+      </div>
+      <div class="lawnote" id="lawNote">The whole obligation is three sentences. Click any highlighted phrase to unpack it.</div>
+      <p class="caption">Article 50(2) of Regulation (EU) 2024/1689 (the EU AI Act), applying from 2 August 2026; text as published in the AI Act Explorer at artificialintelligenceact.eu, accessed 17 August 2026. The related recital, 133, discusses watermarks, metadata and cryptographic provenance as acceptable marking techniques.</p>
+    </section>
+
     <section class="beat" data-scene="m1">
-      <h2>Why not just switch it on for Europe?</h2>
-      <div class="callout">Running two versions of the same model, one marked and one not, roughly doubles the engineering cost and complicates every API integration a business has built. <strong>It is cheaper to build one pipeline than two</strong>, so the EU's rule became the practical floor for the entire internet. There is no region where an unmarked Claude response is the default any more.</div>
+      <h2>The carve-out everyone will argue about</h2>
+      <div class="callout">Read that third sentence again. If the AI performs "an assistive function for standard editing", or does not substantially alter what you gave it or what it means, the marking duty does not apply to that extent. <strong>The law itself distinguishes AI that writes from AI that tidies.</strong> Where tidying ends and writing begins, the Article does not say; that boundary is exactly where the arguments will happen.</div>
+      <p class="qline">Keep that carve-out in mind for Module 04, where a spell-checked essay comes back flagged anyway.</p>
+    </section>
+
+    <section class="beat" data-scene="m1">
+      <h2>The GDPR playbook, again</h2>
+      <div class="callout">Running two versions of the same model, one marked and one not, roughly doubles the engineering cost and complicates every API integration a business has built. <strong>It is cheaper to build one pipeline than two</strong>, so the EU's rule became the practical floor for the entire internet. Europe has run this play before: the GDPR was written for Europeans, but complying once was cheaper than building everything twice, so privacy banners and data-export buttons went worldwide. Article 50 is following the same path, and there is no region where an unmarked Claude response is the default any more.</div>
       <p class="qline">So there is a mark now. The next question is the one almost everyone gets wrong: what kind of mark is it?</p>
     </section>
 
@@ -277,6 +324,16 @@
         </div>
       </div>
       <p class="caption">C2PA is the Coalition for Content Provenance and Authenticity, an open standard Anthropic uses for its generated image, audio and video files. Source: Anthropic Help Center, "How Claude marks AI-generated content," accessed 14 August 2026.</p>
+    </section>
+
+    <section class="beat" data-scene="m2">
+      <h2>A third kind of mark: written into the pixels</h2>
+      <div class="figfull">
+        <img src="assets/synthid-image-demo.jpg" alt="A photorealistic AI-generated image of a saltwater crocodile sitting at a Darwin cafe table, overlaid with a mock SynthID verification panel reading SynthID verified: Gemini, origin Google Gemini AI">
+        <div class="figlabel">An illustrative mock-up, itself AI-generated, of SynthID verification on a Gemini image. The overlay is not a real detector interface.</div>
+      </div>
+      <p class="caption">For images, Google's SynthID takes the other road: instead of a metadata manifest riding alongside the file, it alters <span class="mono">the pixels themselves</span>, invisibly, in a pattern its detector can find later. Google says the mark does not change visible image quality and is designed to survive cropping, filters and lossy compression, the exact operations that strip a C2PA manifest. That is a vendor claim about robustness, but the design idea matters: a mark woven into the content survives what a mark attached to the content does not. Source: Google DeepMind, SynthID, deepmind.google, accessed 17 August 2026.</p>
+      <p class="qline">Hold that idea, because text watermarking applies the same philosophy to words: the mark is the content.</p>
     </section>
 
     <section class="beat" data-scene="m2">
@@ -366,7 +423,7 @@
     <section class="beat" data-scene="m4">
       <h2>What a positive detection actually proves</h2>
       <div class="callout">Anthropic's own documentation states it plainly: <strong>"a detected mark provides a signal that content was processed by Claude, but is not fully conclusive."</strong> It cannot tell "written entirely from scratch" apart from "pasted in and asked to fix a typo." Write a deeply personal essay yourself, then ask Claude to check your commas, and the whole thing can come back flagged.</div>
-      <p class="caption">Direct quote from Anthropic Help Center, "How Claude marks AI-generated content," accessed 14 August 2026.</p>
+      <p class="caption">Direct quote from Anthropic Help Center, "How Claude marks AI-generated content," accessed 14 August 2026. Note the irony against Module 01: assistive standard editing is the very case Article 50's carve-out excuses from marking, yet a provider marking everything marks it anyway.</p>
       <p class="qline">A weak signal is still useful, until someone treats it as a verdict. That is exactly what has started happening.</p>
     </section>
 
@@ -389,6 +446,53 @@
     </section>
 
     <section class="beat" data-scene="m5">
+      <h2>What a detector report actually looks like</h2>
+      <div class="figrow">
+        <div class="shotframe no-advance">
+          <div class="shotscroll">
+            <img src="assets/pangram-iclr-report.png" alt="Pangram dashboard for one ICLR submission: 18 of 23 segments are AI across 5,344 words, with a segment strip coloured mostly orange for AI and a list of individual segments labelled AI or Human with High, Medium or Low confidence">
+          </div>
+          <div class="figlabel">Pangram's report for one real ICLR 2026 submission, from the public database. Scroll the panel.</div>
+        </div>
+        <div class="figside">
+          <p class="fp">This paper came back <strong>18 of 23 segments AI</strong> across 5,344 words, with an overall verdict of "AI content detected, but not fully AI-generated": 78 per cent AI, 22 per cent human. Notice what a serious report does: it segments the document, grades its own confidence <span class="mono">High / Medium / Low</span>, hedges its verdict as belief rather than fact, and separates AI-generated from AI-assisted.</p>
+          <p class="fp">Notice also what no report can say: who typed, why, or whether the use was permitted. The strip shows a pattern in the text; everything after that is a human judgement.</p>
+          <p class="fp">Pangram ran this over roughly 19,000 ICLR papers as well as the 70,000 reviews. On the paper side, 61 per cent stayed mostly human-written, while 9 per cent were more than half AI. The whole corpus is browsable.</p>
+        </div>
+      </div>
+      <div class="linkrow">
+        <a href="https://iclr.pangram.com/submissions.html?sort_by=fraction_ai" target="_blank" rel="noopener"><span class="sect">Pangram</span><span class="ttl">Browse the ICLR database</span></a>
+        <a href="https://www.pangram.com/blog/pangram-predicts-21-of-iclr-reviews-are-ai-generated" target="_blank" rel="noopener"><span class="sect">Pangram blog</span><span class="ttl">The ICLR analysis, explained</span></a>
+      </div>
+      <p class="caption">Report exhibit captured from the public database at iclr.pangram.com, 17 August 2026. Paper-side and review-side figures: Pangram, "Pangram Predicts 21% of ICLR Reviews are AI-Generated," 18 November 2025.</p>
+    </section>
+
+    <section class="beat" data-scene="m5">
+      <h2>The vicious cycle: detect, humanise, repeat</h2>
+      <div class="cyc" aria-hidden="true">
+        <span class="cycnode">A model writes it</span><span class="cycarrow">&rarr;</span>
+        <span class="cycnode">a detector flags it</span><span class="cycarrow">&rarr;</span>
+        <span class="cycnode hotn">a "humaniser" rewrites it</span><span class="cycarrow">&rarr;</span>
+        <span class="cycnode">the detector stops seeing it</span>
+        <span class="cycback">&#8634; detectors retrain, humanisers retrain against them, and the loop runs again</span>
+      </div>
+      <div class="figrow" style="margin-top:22px">
+        <div class="shotframe no-advance">
+          <div class="shotscroll">
+            <img src="assets/ai-humaniser-serp.png" alt="Google search results for AI humaniser, listing Humanize AI, SuperHumanizer, Grammarly, AI Humanize, Clever AI Humanizer, QuillBot and ZeroGPT, several promising to bypass AI detection">
+          </div>
+          <div class="figlabel">Page one of a Google search for "AI humaniser". Scroll the panel.</div>
+        </div>
+        <div class="figside">
+          <p class="fp">Search "AI humaniser" and page one is an entire industry, promising to <strong>"bypass all AI detection"</strong> by rewriting AI text until the statistical fingerprint, watermark included, is gone. Rewriting the words is the one attack every text watermark and every stylistic detector is known to be weakest against, because the mark is the word choices; change the words and the mark goes with them.</p>
+          <p class="fp">Look closer at the names. <strong>Grammarly, QuillBot and ZeroGPT all appear</strong>, and each also operates an AI detector. The same market sells the smoke alarm and the silencer, and every round of the loop pushes machine text closer to human text, eroding the ground detection stands on.</p>
+        </div>
+      </div>
+      <p class="caption">Screenshot: Google results for "AI humaniser," captured 17 August 2026. Paraphrasing as the standard attack on watermark and detector schemes: analysed in the KGW watermark paper itself (Kirchenbauer et al., ICML 2023) and in Sadasivan, Kumar, Balasubramanian, Wang and Feizi, "Can AI-Generated Text be Reliably Detected?", arXiv 2303.11156, first posted March 2023.</p>
+      <p class="qline">Detection has an arms-race problem on one side. On the other, it has a subtler problem: the tool can change the writer.</p>
+    </section>
+
+    <section class="beat" data-scene="m5">
       <h2>The quieter problem: it changes minds, invisibly</h2>
       <div class="callout">A 2026 <em>Science Advances</em> study gave people an AI writing assistant secretly biased toward one side of a real debate, on topics like the death penalty and felon voting rights. <strong>Participants' actual private opinions shifted toward the assistant's bias</strong>, every word still typed by their own hand, and warning them beforehand did nothing to stop it. Most did not believe they had been influenced at all.</div>
       <p class="caption">Sterling Williams-Ceci, Maurice Jakesch, Advait Bhat, Kowe Kadoma, Lior Zalmanson and Mor Naaman, "Biased AI writing assistants shift users' attitudes on societal issues," <em>Science Advances</em>, 11 March 2026.</p>
@@ -401,7 +505,7 @@
         <a href="https://blog.google/innovation-and-ai/products/google-synthid-ai-content-detector/" target="_blank" rel="noopener"><span class="sect">Google</span><span class="ttl">SynthID AI content detector</span></a>
         <a href="/presentations/"><span class="sect">NT World Ink</span><span class="ttl">Back to presentations</span></a>
       </div>
-      <p class="cite">Sources used. Regulation and rollout: European Commission Digital Strategy, "Transparency obligations under Article 50 AI Act" and "Strong backing for the Code of Practice on Transparency of AI-generated Content," accessed 14 August 2026; Anthropic Help Center, "How Claude marks AI-generated content," accessed 14 August 2026; TechCrunch, The Register and Euronews, all 11 August 2026. Mechanism: Kirchenbauer, Geiping, Wen, Katz, Miers and Goldstein, "A Watermark for Large Language Models," ICML 2023, arXiv 24 January 2023; Dathathri, See, Ghaisas et al., "Scalable watermarking for identifying large language model outputs," <em>Nature</em> 634, 23 October 2024; Google, "Google SynthID: AI content detector," blog.google. Fragility and low-entropy watermarking: arXiv 2405.14604 and arXiv 2512.14753, both on watermarking low-entropy generation. Detection and its limits: Pangram, "Pangram Predicts 21% of ICLR Reviews are AI-Generated," 18 November 2025; Jabarian and Imas, "Artificial Writing and Automated Detection," NBER Working Paper No. 34223, 26 August 2025; Arvind Narayanan's public false-positive-rate calculation, referenced via Hacker News discussion, accessed 14 August 2026; university AI-detector policy trackers, accessed 14 August 2026. Psychological influence: Williams-Ceci, Jakesch, Bhat, Kadoma, Zalmanson and Naaman, "Biased AI writing assistants shift users' attitudes on societal issues," <em>Science Advances</em>, 11 March 2026. Deliberately not used: a claimed "style loophole" where a restrictive style prompt suppresses the watermark, and a cited British Journal of Educational Technology study on "strategy-graded reliance," both of which appeared in early drafting material but could not be traced to any real, findable source.</p>
+      <p class="cite">Sources used. Regulation and rollout: Article 50(2), Regulation (EU) 2024/1689, full text via the AI Act Explorer at artificialintelligenceact.eu, accessed 17 August 2026; European Commission Digital Strategy, "Transparency obligations under Article 50 AI Act" and "Strong backing for the Code of Practice on Transparency of AI-generated Content," accessed 14 August 2026; Anthropic Help Center, "How Claude marks AI-generated content," accessed 14 August 2026; TechCrunch, The Register and Euronews, all 11 August 2026. Image watermarking: Google DeepMind, SynthID, deepmind.google, accessed 17 August 2026 (robustness description is Google's own claim); the crocodile verification image is an AI-generated illustrative mock-up made for this deck, not a real detector interface. Mechanism: Kirchenbauer, Geiping, Wen, Katz, Miers and Goldstein, "A Watermark for Large Language Models," ICML 2023, arXiv 24 January 2023; Dathathri, See, Ghaisas et al., "Scalable watermarking for identifying large language model outputs," <em>Nature</em> 634, 23 October 2024; Google, "Google SynthID: AI content detector," blog.google. Fragility and low-entropy watermarking: arXiv 2405.14604 and arXiv 2512.14753, both on watermarking low-entropy generation. Detection and its limits: Pangram, "Pangram Predicts 21% of ICLR Reviews are AI-Generated," 18 November 2025, and the public browsable corpus at iclr.pangram.com, report exhibit captured 17 August 2026; Sadasivan, Kumar, Balasubramanian, Wang and Feizi, "Can AI-Generated Text be Reliably Detected?", arXiv 2303.11156, first posted March 2023; Google search results for "AI humaniser," screenshot captured 17 August 2026; Jabarian and Imas, "Artificial Writing and Automated Detection," NBER Working Paper No. 34223, 26 August 2025; Arvind Narayanan's public false-positive-rate calculation, referenced via Hacker News discussion, accessed 14 August 2026; university AI-detector policy trackers, accessed 14 August 2026. Psychological influence: Williams-Ceci, Jakesch, Bhat, Kadoma, Zalmanson and Naaman, "Biased AI writing assistants shift users' attitudes on societal issues," <em>Science Advances</em>, 11 March 2026. Deliberately not used: a claimed "style loophole" where a restrictive style prompt suppresses the watermark, and a cited British Journal of Educational Technology study on "strategy-graded reliance," both of which appeared in early drafting material but could not be traced to any real, findable source.</p>
       <button class="btn ghost" style="margin-top:28px" onclick="goMenu()">Back to menu</button>
     </section>
 
@@ -462,6 +566,23 @@
 
   /* ---- Module 1: timeline ---- */
   function resetTimeline() { staggerShow(Array.from(document.querySelectorAll('#tlList .stp')), 420); }
+
+  /* ---- Module 1: Article 50 explorer ---- */
+  const LAW = [
+    '<span class="t">The core duty.</span> Output must carry a machine-readable mark and be detectable as AI-generated. Nothing here says a human reader must be able to see it: watermarks, fingerprints and signed metadata all qualify, alone or in combination.',
+    '<span class="t">The feasibility clause.</span> Solutions need to be effective and robust only "as far as this is technically feasible", weighing cost and the state of the art. The law concedes, in its own text, that marking some kinds of content well sits at the edge of what is currently possible.',
+    '<span class="t">The editing carve-out.</span> Where the AI only performs an assistive function for standard editing, or leaves your input and its meaning substantially unchanged, the marking duty does not apply to that extent. The line between tidying and writing is not defined anywhere in the Article.',
+    '<span class="t">The law-enforcement carve-out.</span> Systems authorised by law to detect, prevent, investigate or prosecute criminal offences are exempt from the marking duty.'
+  ];
+  let lawActive = null;
+  function lawPick(n) {
+    lawActive = n === lawActive ? null : n;
+    document.querySelectorAll('[data-law]').forEach((el, i) => el.classList.toggle('on', i === lawActive));
+    document.getElementById('lawNote').innerHTML = lawActive === null
+      ? 'The whole obligation is three sentences. Click any highlighted phrase to unpack it.'
+      : LAW[lawActive];
+  }
+  function resetLaw() { lawActive = null; lawPick(null); }
 
   /* ---- Module 3: word generator (flagship) ---- */
   const GEN = [
@@ -573,7 +694,7 @@
   function resetCons() { staggerShow(Array.from(document.querySelectorAll('#consList .stp')), 420); }
 
   const onEnterHooks = {
-    resetTimeline, resetGen, resetEnt, resetFmt, resetCons
+    resetTimeline, resetLaw, resetGen, resetEnt, resetFmt, resetCons
   };
 
   show(0);
