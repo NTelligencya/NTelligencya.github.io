@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>How Detection Technology Works &middot; AI Workshop &middot; NTell World Ink</title>
+<meta name="description" content="How AI-writing detectors actually work: perplexity and burstiness, supervised classifiers, what vendor accuracy figures mean, the base-rate problem, and why a similarity score and an AI score are different things.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+/* Base-rate calculator, this page only */
+.calc{border:1px solid var(--rule-2);border-radius:12px;background:var(--bg-2);padding:28px;margin:28px 0;}
+.calc-title{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-2);margin-bottom:18px;}
+.calc-controls{display:grid;grid-template-columns:1fr 1fr;gap:18px 28px;margin-bottom:22px;}
+.calc-control label{display:flex;justify-content:space-between;font-size:13px;color:var(--text-2);margin-bottom:8px;}
+.calc-control label output{font-family:var(--font-mono);font-size:12.5px;color:var(--text);}
+.calc-control input[type=range]{width:100%;accent-color:var(--accent);}
+.calc-bar{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--rule-2);margin:6px 0 10px;}
+.calc-bar .seg-tp{background:var(--accent-deep);}
+.calc-bar .seg-fp{background:#7a3030;}
+.calc-legend{display:flex;gap:22px;font-family:var(--font-mono);font-size:11px;color:var(--text-3);letter-spacing:.04em;margin-bottom:18px;flex-wrap:wrap;}
+.calc-legend span::before{content:'';display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;vertical-align:-1px;}
+.calc-legend .leg-tp::before{background:var(--accent-deep);}
+.calc-legend .leg-fp::before{background:#7a3030;}
+.calc-readout{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.calc-stat{background:var(--bg-3);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;}
+.calc-stat .num{font-family:var(--font-display);font-size:30px;line-height:1.1;color:var(--text);}
+.calc-stat .lbl{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-top:6px;line-height:1.5;}
+.calc-sentence{font-size:15px;color:var(--text-2);line-height:1.7;margin:18px 0 0;}
+.calc-sentence strong{color:var(--text);}
+@media(max-width:640px){.calc-controls{grid-template-columns:1fr;}.calc-readout{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container">
+    <div class="site-inner">
+      <a class="brand" href="/">
+        <div class="brand-mark"></div>
+        <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/">Home</a>
+        <a href="index.html">Workshop hub</a>
+        <a href="/index/">Index</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- =============== HERO BAND =============== -->
+<section class="plate-band r-hero-keyboard-closeup plate-band-md">
+<picture><source srcset="/assets/artwork/hero-keyboard-closeup.webp" type="image/webp"><img src="/assets/artwork/hero-keyboard-closeup.jpg" alt=""></picture>
+<div class="plate-band-fade"></div>
+</section>
+
+<section class="page-masthead">
+  <div class="container">
+    <div class="series-label">AI Workshop &middot; Charles Darwin University</div>
+    <h1>How Detection Technology Works</h1>
+    <p class="subtitle">Software that claims to detect AI writing is now built into the tools markers use every day, and the number it produces looks authoritative. This section explains what that number actually is: how the detectors work, what the accuracy figures mean and do not mean, why false positives land on particular students rather than at random, and why a detector percentage is never the probability that a student cheated.</p>
+  </div>
+</section>
+
+<div class="content-body">
+  <div class="container">
+    <div class="content-split">
+
+      <div class="main">
+
+        <section class="content-section">
+          <h2>One label, four different techniques</h2>
+          <p>"AI detection" is not one method. A peer-reviewed survey in <em>Computational Linguistics</em> (2025) sorts the field into four families: watermarking, where the AI provider marks the text at generation time; statistical methods, which analyse the text's mathematical properties without any training; supervised classifiers, which are themselves machine-learning models trained on labelled examples of human and AI writing; and human-assisted methods, where the software supports rather than replaces a person's judgement.</p>
+          <p>The detectors staff actually encounter in education, Turnitin's AI indicator, GPTZero, Pangram and their competitors, are almost all in the third family. Each one is a neural network trained to tell two piles of text apart. That has a consequence worth sitting with before any of the numbers: the output is a learned probability score, a model's guess based on patterns in its training data. It is not a measurement of who wrote the text, and there is no mechanism inside the tool that could make it one.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Perplexity and burstiness</h2>
+          <p>The first generation of detectors, and still the most common mental model, worked on two statistics. Perplexity asks: how surprising is each word in this document to a language model? Because AI text is produced by a model choosing likely next words, it tends to be low-perplexity, smooth and predictable. Burstiness asks how much that surprise varies across the document; human writing tends to lurch between plain sentences and odd ones, while machine text stays even. Low perplexity plus low burstiness reads as "AI".</p>
+          <p>You can build an intuition for this in a few minutes with the site's <a href="/simulations/next-word-prediction/">next-word prediction simulation</a>, which shows the same machinery from the other side: a language model ranking candidate next words by probability. A detector using perplexity is essentially running that simulation in reverse over a student's essay and asking how often the essay picked the boring word.</p>
+          <p>The failure modes follow directly from the method, and they are well documented in the peer-reviewed record rather than resting on any vendor's account. Famous human texts score as AI because the model has memorised them; the United States Declaration of Independence is the standard party trick, and detectors have flagged the US Constitution and biblical passages the same way. Formulaic, templated and heavily conventional writing, the register of much competent student work and most VET assessment responses, is low-perplexity by design. And writers working in English as an additional language tend toward safer, more predictable vocabulary, which the statistics read as machine-like. Liang and colleagues showed in <em>Patterns</em> (2023) that seven detectors misclassified an average of 61 per cent of essays by non-native English writers as AI-generated while being near-perfect on essays by native writers, and that the bias is an artefact of vocabulary sophistication: a one-line prompt asking an AI to "elevate the language" reversed the classification in both directions.</p>
+          <div class="callout callout-key">
+            <div class="callout-title">Why this matters at CDU</div>
+            <p>The writing styles that first-generation detection statistics penalise, conventional phrasing, templated task responses and second-language vocabulary, describe a large share of real submissions at a dual-sector university with a diverse cohort. A flag is not evidence that these students used AI; it can simply be what their honest writing looks like to the statistics.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Inside a modern detector</h2>
+          <p>Current commercial detectors are supervised classifiers, so the pipeline is the same shape whichever brand is on the report. The text is broken into tokens, the tokens are converted to numerical representations, a transformer network processes them, and a classifier head at the end outputs a probability that the document, or each sentence, came from the AI pile of its training data. Training then continues in rounds: the better vendors hunt for human texts their model wrongly flags and generate matched AI text on the same topics, forcing the model to learn finer distinctions. That is genuine engineering progress, and it is also why every accuracy figure is a snapshot: the model knows the writing styles and AI models it was trained on, and performance degrades on newer models, unfamiliar genres and writing styles it has not seen.</p>
+
+          <figure class="figure">
+            <svg viewBox="0 0 760 300" role="img" aria-label="Conceptual diagram of an AI-text detector pipeline: submitted text is tokenised, embedded, processed by a transformer network and reduced to a probability score by a classifier head" style="display:block;width:100%;height:auto;background:#111114;">
+              <defs>
+                <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M0 0 L10 5 L0 10 z" fill="#1ac9c9"/>
+                </marker>
+              </defs>
+              <!-- stage boxes -->
+              <g font-family="Manrope, sans-serif" font-size="15" fill="#f5f5f7" text-anchor="middle">
+                <rect x="20" y="90" width="120" height="72" rx="10" fill="#17171b" stroke="#2a2a30"/>
+                <text x="80" y="121">Submitted</text>
+                <text x="80" y="141">text</text>
+
+                <rect x="180" y="90" width="120" height="72" rx="10" fill="#17171b" stroke="#2a2a30"/>
+                <text x="240" y="121">Tokenise</text>
+                <text x="240" y="141" font-size="12" fill="#9b9ba0">words to pieces</text>
+
+                <rect x="340" y="90" width="120" height="72" rx="10" fill="#17171b" stroke="#2a2a30"/>
+                <text x="400" y="121">Embed</text>
+                <text x="400" y="141" font-size="12" fill="#9b9ba0">pieces to numbers</text>
+
+                <rect x="500" y="78" width="120" height="96" rx="10" fill="#0b2a2a" stroke="#1ac9c9"/>
+                <text x="560" y="113">Transformer</text>
+                <text x="560" y="133" font-size="12" fill="#9b9ba0">pattern analysis</text>
+                <text x="560" y="153" font-size="12" fill="#9b9ba0">learned in training</text>
+
+                <rect x="20" y="216" width="600" height="60" rx="10" fill="#17171b" stroke="#2a2a30"/>
+                <text x="320" y="242" font-size="13" fill="#9b9ba0">Trained on labelled examples: human-written pile versus AI-written pile.</text>
+                <text x="320" y="262" font-size="13" fill="#9b9ba0">The model can only learn styles and AI generators that were in the piles.</text>
+              </g>
+              <!-- output -->
+              <g font-family="Manrope, sans-serif" text-anchor="middle">
+                <rect x="656" y="78" width="84" height="96" rx="10" fill="#17171b" stroke="#1ac9c9"/>
+                <text x="698" y="116" font-size="13" fill="#9b9ba0">Classifier</text>
+                <text x="698" y="134" font-size="13" fill="#9b9ba0">head</text>
+                <text x="698" y="160" font-family="JetBrains Mono, monospace" font-size="15" fill="#4ddcdc">"92%"</text>
+              </g>
+              <!-- arrows -->
+              <g stroke="#1ac9c9" stroke-width="1.6" fill="none">
+                <line x1="140" y1="126" x2="176" y2="126" marker-end="url(#arr)"/>
+                <line x1="300" y1="126" x2="336" y2="126" marker-end="url(#arr)"/>
+                <line x1="460" y1="126" x2="496" y2="126" marker-end="url(#arr)"/>
+                <line x1="620" y1="126" x2="652" y2="126" marker-end="url(#arr)"/>
+                <line x1="320" y1="216" x2="320" y2="180" stroke-dasharray="4 4" opacity="0.6"/>
+              </g>
+              <!-- top annotation -->
+              <text x="380" y="40" font-family="JetBrains Mono, monospace" font-size="12" fill="#6b6b70" text-anchor="middle" letter-spacing="2">A LEARNED PROBABILITY, NOT A MEASUREMENT OF AUTHORSHIP</text>
+            </svg>
+            <figcaption>The supervised-classifier pipeline shared by the detectors used in education. Conceptual diagram drawn for this course; stage names follow the Pangram technical report (2024) and the Computational Linguistics survey (2025).</figcaption>
+          </figure>
+        </section>
+
+        <section class="content-section">
+          <h2>Benchmarks are not the marking pile</h2>
+          <p>Vendor accuracy claims are usually true of something: a benchmark the vendor chose, run at a moment in time, on text that is wholly human or wholly AI. The independent evidence is consistent that these figures do not survive contact with real coursework.</p>
+          <p>A peer-reviewed examination presented at NAACL (2025) tested seven detectors and found respectable-looking headline discrimination, but when the tools were held to the operating point fairness actually requires, catching AI text while wrongly flagging no more than one honest document in a hundred, the catch rate ranged from 58 per cent down to 3 per cent, and fell to zero on some tasks even for the best performers. The RAID benchmark (ACL 2024), built from 6.2 million generations across eleven models and eleven adversarial attacks, found the same fragility from another angle: simple settings changes during generation cut detector accuracy by up to 38 percentage points, and synonym or character-substitution tricks caused drops of 36 to 41 points. Deliberate, low-skill evasion works too: Perkins and colleagues (2024) measured a mean 17 per cent accuracy drop from techniques as basic as paraphrasing and added spelling errors.</p>
+          <p>Detectors are weakest precisely where real student work lives. TEQSA-hosted guidance by Guy Curtis (University of Western Australia) puts it plainly: the tools can reasonably distinguish wholly human from wholly AI text, but are much less reliable when AI text has been edited by a human, mixed with human writing, or the document is short. Peer-reviewed testing bears this out; Hadra, Cambridge and Mesbah (2026) measured Turnitin at 0.61 overall accuracy with near-zero detection of hybrid human-and-AI text. Most contested submissions are exactly that: mixed, edited, or a few hundred words long.</p>
+          <p>The traffic runs both ways. A detector that says "human" has not established that no AI was used; independent testing finds detectors biased toward classifying text as human, humaniser tools are sold specifically to launder AI text past them, and a 2026 study drove a leading detector to rate machine output "100 per cent human" through iterative paraphrasing. An all-clear is not evidence of anything either.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Vendor claims and independent evidence</h2>
+          <p>It matters who produced a number. A vendor benchmark run on vendor-chosen data is a marketing performance claim, not third-party confirmation, and this field is unusually thick with vendor numbers: headline accuracy near 99 per cent, false-positive rates of one in ten thousand, claims that bias against second-language writers has been eliminated. Some of these may even be true under the tested conditions. The point is that the vendor's tested conditions are not a CDU marking pile, and several vendors' own fine print concedes as much; Turnitin, for example, reports a higher false-positive incidence for documents scoring under 20 per cent AI, which is why scores in that band are hidden and shown as an asterisk, and its sentence-level false-positive rate of about 4 per cent compounds across a long, honest essay.</p>
+          <p>The independent record on the current strongest products is genuinely mixed rather than uniformly damning, and honesty requires saying so. An independent University of Chicago working paper (2025) found the specialist detector Pangram achieved near-zero error rates on medium-to-long passages and stayed robust to a humaniser tool that defeated its competitors. But the study's own boundaries are the lesson: it tested longer passages that were purely human or purely AI, and short-passage false positives still rose toward 1 per cent. The strongest independent result for any detector describes conditions that most real submissions, short answers, edited drafts, hybrid text, do not meet.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>The score is not the probability a student cheated</h2>
+          <p>Here is the misreading that does the damage. A tool advertises a 1 per cent false-positive rate, a report says "92 per cent AI", and a tired marker reads that as a 92 per cent, or 99 per cent, probability that this student used AI. Peer-reviewed Australian research (Bassett and colleagues, 2026) documents that this misunderstanding is pervasive among the staff making integrity decisions. It is wrong, and the reason is base rates.</p>
+          <p>A detector's error rates are properties of the test. The probability that a flagged student actually used AI is a different quantity, the positive predictive value, and it depends on how common undisclosed AI use actually is in the cohort being screened. When few students are doing the prohibited thing, even a small false-positive rate is multiplied across the large honest majority, and the wrongly flagged can rival or outnumber the correctly flagged. Take a detector that catches 90 per cent of AI-written work and wrongly flags only 1 per cent of honest work. If 5 in every 100 submissions genuinely breach the rules, about one flag in six is a false accusation. If 1 in 100 does, roughly half of all flags are false, from the same tool, with the same advertised accuracy. Bassett and colleagues run the same arithmetic and conclude that a flagged paper's true probability of being AI-generated can range from about 97 per cent down to under 48 per cent depending entirely on an unknown: the cohort's real rate of misuse, which nobody can measure.</p>
+          <p>Scale makes the abstraction concrete. When Vanderbilt University disabled Turnitin's AI detector in August 2023, its stated reasoning was arithmetic: a claimed 1 per cent false-positive rate across roughly 75,000 annual submissions implied about 750 honest papers flagged every year.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Run the numbers yourself</h2>
+          <p>The calculator below applies the same arithmetic to a cohort you choose. Set the number of submissions, how common genuine misuse is, and the detector's catch rate and false-positive rate, and watch what happens to the flags. The prevalence slider is the honest unknown: no one knows its true value for any real cohort, which is precisely why no fixed meaning can be read off a detector score.</p>
+
+          <div class="calc" id="baserate-calc">
+            <div class="calc-title">Base-rate calculator: who ends up flagged?</div>
+            <div class="calc-controls">
+              <div class="calc-control">
+                <label>Submissions screened <output id="out-n">1,000</output></label>
+                <input type="range" id="in-n" min="100" max="80000" step="100" value="1000" aria-label="Number of submissions screened">
+              </div>
+              <div class="calc-control">
+                <label>Actual misuse in the cohort <output id="out-prev">5%</output></label>
+                <input type="range" id="in-prev" min="0.5" max="50" step="0.5" value="5" aria-label="Prevalence of genuine AI misuse, per cent">
+              </div>
+              <div class="calc-control">
+                <label>Detector catch rate (sensitivity) <output id="out-sens">90%</output></label>
+                <input type="range" id="in-sens" min="50" max="100" step="1" value="90" aria-label="Detector sensitivity, per cent">
+              </div>
+              <div class="calc-control">
+                <label>False positives on honest work <output id="out-fpr">1%</output></label>
+                <input type="range" id="in-fpr" min="0.1" max="10" step="0.1" value="1" aria-label="False-positive rate, per cent">
+              </div>
+            </div>
+            <div class="calc-bar" aria-hidden="true">
+              <div class="seg-tp" id="bar-tp" style="width:83%"></div>
+              <div class="seg-fp" id="bar-fp" style="width:17%"></div>
+            </div>
+            <div class="calc-legend">
+              <span class="leg-tp">Flags on genuine misuse</span>
+              <span class="leg-fp">Flags on honest work</span>
+            </div>
+            <div class="calc-readout">
+              <div class="calc-stat"><div class="num" id="stat-flags">55</div><div class="lbl">Total flags raised</div></div>
+              <div class="calc-stat"><div class="num" id="stat-fp">10</div><div class="lbl">Honest students flagged</div></div>
+              <div class="calc-stat"><div class="num" id="stat-ppv">83%</div><div class="lbl">Chance a given flag is genuine</div></div>
+            </div>
+            <p class="calc-sentence" id="calc-sentence">At these settings, <strong>about 1 flag in every 6</strong> lands on a student who did nothing wrong.</p>
+          </div>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">The honest unknown</div>
+            <p>Every number this calculator produces is conditional on the misuse slider, and the true value of that slider is unknown for any real CDU cohort. That is not a flaw in the calculator; it is the finding. A detector score cannot be converted into a probability of misconduct without information nobody has.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>A similarity score is not an AI score</h2>
+          <p>Turnitin presents two percentages on the same platform, and they are routinely conflated. They are different in kind, not just in accuracy. The similarity score is produced by matching the submission against a defined corpus of web pages, journals and past student work; every highlighted passage is tied to a specific source document that a marker, and the student, can open, read and argue about. It measures text overlap, not plagiarism; quotations, reference lists and standard disciplinary phrasing inflate it legitimately, there is no valid threshold percentage, and Turnitin's own guidance states the tool does not check for plagiarism. But when it is wrong, you can see that it is wrong, because the receipt is attached.</p>
+          <p>The AI-writing score has no receipt. AI-generated text is not stored anywhere a tool could match against, so the score is a style classifier's estimate with no source to produce, no artefact to inspect, and no way for anyone, student or panel, to independently check it. Weber-Wulff and colleagues (2023) put the evidentiary consequence directly: with text matching it is at least possible to provide evidence, but for AI detection it is not, and a student accused only on a detector output has no possibility of a defence.</p>
+
+          <div class="compare-grid">
+            <div class="compare-col col-yes">
+              <div class="compare-col-label">Similarity score</div>
+              <ul>
+                <li>Deterministic matching against a known corpus</li>
+                <li>Every match links to an inspectable source document</li>
+                <li>Wrong flags are visibly wrong: open the source and compare</li>
+                <li>Measures overlap only; no valid threshold, no verdict on intent</li>
+              </ul>
+            </div>
+            <div class="compare-col col-no">
+              <div class="compare-col-label">AI-writing score</div>
+              <ul>
+                <li>Probabilistic style classification by a trained model</li>
+                <li>No source exists; nothing to open or compare</li>
+                <li>Cannot be independently reproduced or checked</li>
+                <li>Least reliable on short, edited, mixed and second-language writing</li>
+              </ul>
+            </div>
+          </div>
+          <p>What either score can carry in an actual integrity process, and what an allegation needs beyond a number, is the subject of the companion section, <a href="detection-as-evidence.html">Detection as Evidence, Not Verdict</a>.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Watch</h2>
+          <p>Two short pieces of reporting that pair well with this section. The Verge examines Pangram, the strongest current claimant to reliable detection, and is best watched with this section's vendor-claims discussion in mind; The Atlantic sits with the question underneath all of it.</p>
+
+          <div class="video-embed">
+            <button type="button" class="video-facade" onclick="ytPlay(this,'pVHSvJnSUNg')" aria-label="Play video: The One AI Detector People Actually Trust">
+              <img src="https://i.ytimg.com/vi/pVHSvJnSUNg/hqdefault.jpg" alt="Video thumbnail" loading="lazy">
+              <span class="video-play"></span>
+            </button>
+          </div>
+          <p class="video-note">The Verge &middot; The One AI Detector People Actually Trust &middot; date unavailable</p>
+
+          <div class="video-embed">
+            <button type="button" class="video-facade" onclick="ytPlay(this,'HdU7OAsdViA')" aria-label="Play video: Did a Human Write This?">
+              <img src="https://i.ytimg.com/vi/HdU7OAsdViA/hqdefault.jpg" alt="Video thumbnail" loading="lazy">
+              <span class="video-play"></span>
+            </button>
+          </div>
+          <p class="video-note">The Atlantic &middot; Did a Human Write This? &middot; date unavailable</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Sources</h2>
+          <p>Claims on this page are drawn from the peer-reviewed and independent record; vendor material is used only for what vendors say about their own tools, and is identified as such wherever it appears.</p>
+          <ul>
+            <li><a href="https://direct.mit.edu/coli/article/51/1/275/127462/A-Survey-on-LLM-Generated-Text-Detection-Necessity" target="_blank" rel="noopener">A Survey on LLM-Generated Text Detection</a>, <em>Computational Linguistics</em> 51:1, 2025. Detector taxonomy and out-of-distribution failure.</li>
+            <li><a href="https://aclanthology.org/2024.acl-long.674/" target="_blank" rel="noopener">RAID: A Shared Benchmark</a>, Dugan et al., ACL 2024. Adversarial fragility across eleven attack types.</li>
+            <li><a href="https://aclanthology.org/2025.findings-naacl.271.pdf" target="_blank" rel="noopener">A Practical Examination of AI-Generated Text Detectors</a>, Tufts et al., NAACL 2025. Catch rates at a fixed 1 per cent false-positive rate.</li>
+            <li><a href="https://www.cell.com/patterns/fulltext/S2666-3899(23)00130-7" target="_blank" rel="noopener">GPT detectors are biased against non-native English writers</a>, Liang et al., <em>Patterns</em>, 10 July 2023. The 61 per cent false-positive finding and its mechanism; United States data.</li>
+            <li><a href="https://link.springer.com/article/10.1007/s40979-023-00146-z" target="_blank" rel="noopener">Testing of detection tools for AI-generated text</a>, Weber-Wulff et al., <em>International Journal for Educational Integrity</em>, December 2023. Accuracy under editing and paraphrase; the no-evidence asymmetry.</li>
+            <li><a href="https://link.springer.com/article/10.1007/s40979-026-00213-1" target="_blank" rel="noopener">Evaluating the accuracy and reliability of AI content detectors in academic contexts</a>, Hadra, Cambridge and Mesbah, <em>International Journal for Educational Integrity</em>, February 2026. Turnitin at 0.61 accuracy; near-zero recall on hybrid text.</li>
+            <li><a href="https://researchonline.jcu.edu.au/90433/1/90433.pdf" target="_blank" rel="noopener">Heads we win, tails you lose: AI detectors in education</a>, Bassett et al., <em>Journal of Higher Education Policy and Management</em>, online 29 January 2026. The base-rate worked example; staff misreadings; Australian authors.</li>
+            <li>Perkins, Roe, Vu et al., <em>International Journal of Educational Technology in Higher Education</em>, 9 September 2024. Mean 17.4 per cent accuracy drop under low-skill evasion.</li>
+            <li><a href="https://bfi.uchicago.edu/insights/artificial-writing-and-automated-detection/" target="_blank" rel="noopener">Artificial Writing and Automated Detection</a>, Jabarian and Imas, University of Chicago BFI / NBER working paper, September to October 2025. Strongest independent corroboration for Pangram, bounded to longer pure-authorship passages; not yet peer reviewed.</li>
+            <li><a href="https://www.teqsa.gov.au/guides-resources/protecting-academic-integrity/academic-integrity-toolkit/risks-academic-integrity-ai/detecting-plagiarism-ai-generated-text-student-assessments-and-securing-take-home-written-assessments" target="_blank" rel="noopener">Detecting plagiarism of AI-generated text in student assessments</a>, Guy Curtis, TEQSA Academic Integrity Toolkit, date unavailable. Reliability limits on edited, mixed and short text.</li>
+            <li><a href="https://www.vanderbilt.edu/brightspace/2023/08/16/guidance-on-ai-detection-and-why-were-disabling-turnitins-ai-detector/" target="_blank" rel="noopener">Guidance on AI detection and why we're disabling Turnitin's AI detector</a>, Vanderbilt University, 16 August 2023. The 750-papers-a-year calculation.</li>
+            <li><a href="https://www.turnitin.com/blog/understanding-the-false-positive-rate-for-sentences-of-our-ai-writing-detection-capability" target="_blank" rel="noopener">Turnitin on sentence-level false positives</a>, 14 June 2023, and the <a href="https://www.turnitin.com/blog/ai-writing-detection-update-from-turnitins-chief-product-officer" target="_blank" rel="noopener">Chief Product Officer update</a>, 23 May 2023. Vendor's own statements on error rates and the hidden 1 to 19 per cent band; vendor claims, not independent validation.</li>
+            <li><a href="https://guides.turnitin.com/hc/en-us/articles/23435833938701-Understanding-the-similarity-score" target="_blank" rel="noopener">Understanding the similarity score</a>, Turnitin Guides, date unavailable. The vendor's own statement that the similarity score is text overlap and not a plagiarism finding.</li>
+          </ul>
+        </section>
+
+      </div>
+
+      <aside class="sidebar-rail">
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">In this section</div>
+            <ul>
+              <li>Four detection techniques, one label</li>
+              <li>Perplexity and burstiness</li>
+              <li>Inside a modern detector</li>
+              <li>Benchmarks versus real coursework</li>
+              <li>The base-rate problem, with calculator</li>
+              <li>Similarity score versus AI score</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Three sentences to keep</div>
+            <ul>
+              <li>A detector score is a learned probability, not a measurement of authorship</li>
+              <li>The score is not the probability the student cheated; that depends on a base rate nobody knows</li>
+              <li>An all-clear is not proof of no AI use, and a flag is not proof of any</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Try it</div>
+            <p>The <a href="/simulations/next-word-prediction/">next-word prediction simulation</a> shows the probability machinery detectors run in reverse.</p>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Continue</div>
+            <p><a href="detection-as-evidence.html">Detection as Evidence, Not Verdict</a>: what an integrity process can and cannot do with the number.</p>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <div class="last-updated">Last updated: 19 August 2026</div>
+  </div>
+</div>
+
+<footer class="site footer-plate">
+<div class="plate-foot"><picture><source srcset="/assets/artwork/footer-monogram-chip.webp" type="image/webp"><img src="/assets/artwork/footer-monogram-chip.jpg" alt="The NT monogram beside a processor chip" loading="lazy"></picture></div>
+  <div class="container">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Charles Darwin University&nbsp;|&nbsp;TAFE PSI&nbsp;|&nbsp;ICT, Cyber Security &amp; Digital</span>
+      <span style="font-family:'JetBrains Mono',monospace;">CDU Teaching Staff · AI Workshop</span>
+    </div>
+    <div class="footer-legal">
+      <p class="ack">Charles Darwin University acknowledges the traditional custodians across the lands on which we live and work, and we pay our respects to Elders past and present.</p>
+      <p class="reg">CRICOS Provider No: 00300K &middot; RTO Provider No: 0373 &middot; TEQSA Provider ID PRV12069</p>
+      <p><a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice">Privacy</a> &middot; <a href="https://www.cdu.edu.au/about-cdu/copyright-disclaimer">Copyright and Disclaimer</a> &middot; <a href="https://www.cdu.edu.au/files/2022-03/cdu-cookie-notice.pdf">Cookies</a></p>
+      <p class="reg">ABN 54 093 513 649</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function ytPlay(btn,id){
+  var f=document.createElement('iframe');
+  f.src='https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&rel=0';
+  f.title='Video';
+  f.allow='autoplay; encrypted-media; fullscreen; picture-in-picture';
+  f.allowFullscreen=true;
+  btn.parentNode.replaceChild(f,btn);
+}
+
+(function(){
+  var inN=document.getElementById('in-n'), inPrev=document.getElementById('in-prev'),
+      inSens=document.getElementById('in-sens'), inFpr=document.getElementById('in-fpr');
+  if(!inN) return;
+  var fmt=function(x){return x.toLocaleString('en-AU');};
+  function update(){
+    var n=+inN.value, prev=+inPrev.value/100, sens=+inSens.value/100, fpr=+inFpr.value/100;
+    document.getElementById('out-n').textContent=fmt(n);
+    document.getElementById('out-prev').textContent=inPrev.value+'%';
+    document.getElementById('out-sens').textContent=inSens.value+'%';
+    document.getElementById('out-fpr').textContent=(+inFpr.value)+'%';
+    var tp=n*prev*sens, fp=n*(1-prev)*fpr, flags=tp+fp;
+    var ppv=flags>0?tp/flags:0;
+    document.getElementById('stat-flags').textContent=fmt(Math.round(flags));
+    document.getElementById('stat-fp').textContent=fmt(Math.round(fp));
+    document.getElementById('stat-ppv').textContent=Math.round(ppv*100)+'%';
+    var tpPct=flags>0?(tp/flags*100):0;
+    document.getElementById('bar-tp').style.width=tpPct+'%';
+    document.getElementById('bar-fp').style.width=(100-tpPct)+'%';
+    var s=document.getElementById('calc-sentence');
+    if(fp<0.5){
+      s.innerHTML='At these settings, false flags are rare; but check the misuse slider, because that assumption is doing all the work.';
+    } else if(ppv>0){
+      var oneIn=Math.round(1/(1-ppv));
+      if(1-ppv>=0.995){ s.innerHTML='At these settings, <strong>almost every flag</strong> lands on a student who did nothing wrong.'; }
+      else if(oneIn<=1){ s.innerHTML='At these settings, <strong>most flags</strong> land on students who did nothing wrong.'; }
+      else if(1-ppv>0.5){ s.innerHTML='At these settings, <strong>more than half of all flags</strong> land on students who did nothing wrong.'; }
+      else { s.innerHTML='At these settings, <strong>about 1 flag in every '+fmt(oneIn)+'</strong> lands on a student who did nothing wrong.'; }
+    }
+  }
+  [inN,inPrev,inSens,inFpr].forEach(function(el){el.addEventListener('input',update);});
+  update();
+})();
+</script>
+
+<script src="/search.js" defer></script>
+</body>
+</html>
