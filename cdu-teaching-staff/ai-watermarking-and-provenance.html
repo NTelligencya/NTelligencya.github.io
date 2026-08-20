@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>AI Text Watermarking and Content Provenance &middot; AI Workshop &middot; NTell World Ink</title>
+<meta name="description" content="What an AI text watermark actually is: green-list and red-list token sampling and the z-score, C2PA signed provenance for files, why the mark thins out in code, the EU AI Act Article 50 driver, and why a detected mark never proves who wrote the text.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+/* Green/red list sampling demo, this page only */
+.wm{border:1px solid var(--rule-2);border-radius:12px;background:var(--bg-2);padding:28px;margin:28px 0;}
+.wm-title{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-2);margin-bottom:6px;}
+.wm-sub{font-size:13.5px;color:var(--text-3);margin-bottom:20px;line-height:1.6;}
+.wm-toggle{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px;font-size:13.5px;color:var(--text-2);}
+.wm-switch{display:inline-flex;align-items:center;gap:9px;cursor:pointer;user-select:none;padding:7px 13px;border:1px solid var(--rule-2);border-radius:999px;background:var(--bg-3);}
+.wm-switch input{accent-color:var(--accent);width:15px;height:15px;}
+.wm-sentence{background:var(--bg-3);border:1px solid var(--rule);border-radius:10px;padding:18px 20px;min-height:64px;font-family:var(--font-display);font-size:23px;line-height:1.55;color:var(--text);margin-bottom:18px;}
+.wm-sentence .tok{padding:1px 3px;border-radius:4px;}
+.wm-sentence .tok.g{background:rgba(26,201,201,0.16);color:#7fe6e6;}
+.wm-sentence .tok.r{background:rgba(122,48,48,0.28);color:#e59a9a;}
+.wm-sentence .caret{color:var(--accent);font-weight:400;}
+.wm-cands{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:18px;}
+.wm-cand{border:1px solid var(--rule);border-radius:9px;padding:11px 13px;background:var(--bg-3);position:relative;}
+.wm-cand.g{border-color:rgba(26,201,201,0.5);}
+.wm-cand.r{border-color:rgba(122,48,48,0.55);}
+.wm-cand .cw{font-family:var(--font-display);font-size:18px;color:var(--text);}
+.wm-cand .cp{font-family:var(--font-mono);font-size:11px;color:var(--text-3);margin-top:3px;}
+.wm-cand .clist{position:absolute;top:9px;right:11px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;}
+.wm-cand.g .clist{color:#4ddcdc;}
+.wm-cand.r .clist{color:#c96b6b;}
+.wm-cand.pick-nat{box-shadow:0 0 0 1px var(--text-3) inset;}
+.wm-cand.pick-wm{box-shadow:0 0 0 2px var(--accent) inset;}
+.wm-cand .badge{display:inline-block;margin-top:8px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);}
+.wm-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.wm-btn{font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:11px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent-deep);color:#eafcfc;cursor:pointer;}
+.wm-btn.ghost{background:transparent;border-color:var(--rule-2);color:var(--text-2);}
+.wm-btn:disabled{opacity:.4;cursor:default;}
+.wm-readout{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;}
+.wm-stat{background:var(--bg-3);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;}
+.wm-stat .num{font-family:var(--font-display);font-size:30px;line-height:1.1;color:var(--text);}
+.wm-stat .lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-3);margin-top:6px;line-height:1.5;}
+.wm-note{font-size:14.5px;color:var(--text-2);line-height:1.7;margin:4px 0 0;}
+.wm-note strong{color:var(--text);}
+@media(max-width:640px){.wm-readout{grid-template-columns:1fr;}.wm-sentence{font-size:20px;}}
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header class="site">
+  <div class="container">
+    <div class="site-inner">
+      <a class="brand" href="/">
+        <div class="brand-mark"></div>
+        <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/">Home</a>
+        <a href="index.html">Workshop hub</a>
+        <a href="/index/">Index</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<!-- =============== HERO BAND =============== -->
+<section class="plate-band r-hero-wordmark-keyboard-usb plate-band-md">
+<picture><source srcset="/assets/artwork/hero-wordmark-keyboard-usb.webp" type="image/webp"><img src="/assets/artwork/hero-wordmark-keyboard-usb.jpg" alt=""></picture>
+<div class="plate-band-fade"></div>
+</section>
+
+<section class="page-masthead">
+  <div class="container">
+    <div class="series-label">AI Workshop &middot; Charles Darwin University</div>
+    <h1>AI Text Watermarking and Content Provenance</h1>
+    <p class="subtitle">From August 2026, major AI providers began marking their text output to satisfy a European transparency law, and the mark now travels worldwide. This section explains what an AI text watermark actually is, which is not a hidden character you can strip out; how signed provenance works for files and why it is so easily lost; where the mark is strong and where it thins to nothing; and why, even when a mark is found, it never establishes who wrote the words.</p>
+  </div>
+</section>
+
+<div class="content-body">
+  <div class="container">
+    <div class="content-split">
+
+      <div class="main">
+
+        <section class="content-section">
+          <h2>Branding something with no physical form</h2>
+          <p>The word watermark comes from paper. Hold a banknote to the light and a face appears, pressed into the fibres; the mark is part of the physical object and you cannot copy the note without copying the mark. That is the mental picture most people carry into any conversation about watermarking, and it is the wrong one for plain text. Digital text has no fibres and no substrate. A paragraph is just a sequence of characters, and any character you could hide inside it, an invisible space, a swapped quotation mark, a zero-width joiner, can be stripped out by pasting the text into a plain editor. If a watermark were a hidden character, defeating it would take three seconds.</p>
+          <p>So the providers did something less obvious. Rather than adding a mark on top of the words, they changed how the words themselves are chosen, so that the mark is carried by the visible text and cannot be removed without rewriting it. Understanding that idea is the whole of this section, and it matters at a university because the same mechanism is now being read, by staff and by software, as if it answered a question it cannot answer: did a person write this.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Two different mechanisms: files and text</h2>
+          <p>It helps to separate two things that are often confused, because they work in completely different ways.</p>
+          <p>For files such as images, providers attach signed provenance metadata following an open standard called C2PA, the Coalition for Content Provenance and Authenticity. Think of it as a cryptographically signed shipping manifest that rides alongside the file: it records what made the file, with which tool, and whether it has been altered since. Because the standard is open, anyone can build a reader that checks the manifest and verifies the origin. The strength of C2PA is that it is verifiable and interoperable; the weakness is that it is a wrapper around the content, not the content itself, so it survives only while nothing disturbs the wrapper.</p>
+          <p>That wrapper is easy to lose, and usually not on purpose. Take a screenshot of a provenance-stamped image and the screenshot is a brand-new file created by the operating system, with no manifest attached. Upload the original to almost any social platform and its compression pipeline strips the metadata to save space. C2PA is designed for cooperative systems that agree to preserve and read the manifest; it was never built to withstand someone who wants the mark gone, and most ordinary sharing removes it without anyone intending to.</p>
+          <p>Text watermarking is the second mechanism, and it is the one causing the argument, because it does not rely on a wrapper at all.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>What a text watermark actually is</h2>
+          <p>The common assumption on developer forums is that AI text watermarking is a bag of formatting tricks: hidden Unicode, zero-width spaces, curly quotes standing in for straight ones. It is a reasonable guess, and it is wrong, for the reason given above: anything sitting on top of the text washes out the moment the text is retyped or pasted as plain characters.</p>
+          <p>The text watermark is not a layer on top of the words. The mark <em>is</em> the words. When a provider says the mark is woven into the text, it means the mark consists of the actual visible word choices the model made while writing. It survives being copied into a plain-text editor because what you are copying is the pattern of word choices itself. You cannot remove it without genuinely rewriting the sentences, which is a very different level of effort from running a find-and-replace.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>Green lists, red lists and the z-score</h2>
+          <p>To see how word choices can carry a hidden pattern without turning the writing into nonsense, you have to look at how a language model produces text. It does not plan a paragraph; it predicts one token, usually a word or word fragment, at a time, choosing from a ranked list of likely next tokens. The published research describes the underlying method even though providers keep their own keys secret; the clearest account is the scheme by Kirchenbauer and colleagues, presented at ICML in 2023, and the same idea sits behind Google's SynthID for text.</p>
+          <p>Freeze the moment before the model writes its next word. Suppose the text so far is "the night sky was incredibly". The model has computed probabilities for thousands of possible next words: perhaps <em>dark</em>, <em>clear</em>, <em>beautiful</em>, <em>vast</em>, each a perfectly acceptable continuation. Without a watermark, it samples from that ranked list and continues. With a watermark, a step is inserted first: a pseudo-random generator, seeded by a secret key and by the preceding words, splits the entire vocabulary into a green list and a red list for this one position. The algorithm then nudges the model toward a green-list word. If the model's favourite, <em>dark</em>, is on the red list, it is quietly passed over in favour of the best available green word, say <em>beautiful</em>. A reader sees nothing unusual; the sentence still reads well.</p>
+          <p>The signal only appears over distance. Across hundreds of words, watermarked text lands on green-list words far more often than chance would produce, because a thumb was on the scale at every step. A detector holding the same secret key can replay the split at each position, count how often the text used a green word, and compare that to the roughly half-and-half a person writing freely would produce. That comparison is expressed as a z-score, a measure of how many standard deviations the green-word count sits above what chance predicts. A z-score near zero looks human; a high z-score says the text follows the provider's pattern. The demonstration below lets you watch the count and the z-score move as a sentence is built, with the watermark on and off.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>See the mark form</h2>
+          <p>Step through the same sentence twice. With the watermark switched off, the model takes its top-ranked word at each step, and the green words fall where they may, so the z-score drifts around zero. Switch the watermark on and the model is pushed onto the green list at each step; the green count climbs and the z-score rises, all while the sentence still reads normally.</p>
+
+          <div class="wm" id="wm-demo">
+            <div class="wm-title">Green-list / red-list sampling demo</div>
+            <div class="wm-sub">The vocabulary is split into a green list and a red list at each position by a secret key. Green words are the ones the watermark prefers. Watch what the choice does to the running green count and the z-score.</div>
+            <div class="wm-toggle">
+              <label class="wm-switch"><input type="checkbox" id="wm-on" checked> Watermark on</label>
+              <span id="wm-mode-note" style="color:var(--text-3);"></span>
+            </div>
+            <div class="wm-sentence" id="wm-sentence"><span class="caret">The&nbsp;night&nbsp;sky&nbsp;was&nbsp;incredibly</span> <span class="caret">&#9612;</span></div>
+            <div class="wm-cands" id="wm-cands"></div>
+            <div class="wm-actions">
+              <button class="wm-btn" id="wm-next">Choose next word</button>
+              <button class="wm-btn ghost" id="wm-reset">Reset</button>
+            </div>
+            <div class="wm-readout">
+              <div class="wm-stat"><div class="num" id="wm-words">0</div><div class="lbl">Words chosen</div></div>
+              <div class="wm-stat"><div class="num" id="wm-green">0</div><div class="lbl">On the green list</div></div>
+              <div class="wm-stat"><div class="num" id="wm-z">0.0</div><div class="lbl">z-score</div></div>
+            </div>
+            <p class="wm-note" id="wm-note">Press "Choose next word" to begin. Each word is tinted for the list it landed on: teal for green, red for red.</p>
+          </div>
+
+          <div class="callout callout-key">
+            <div class="callout-title">What the z-score is, and is not</div>
+            <p>A high z-score is good evidence that text passed through a watermarking model. It is not a measure of how much of the text the model wrote, it carries no record of the prompt, and it cannot tell generating an essay from scratch apart from fixing the punctuation in one a person wrote. It answers "did this text go through the model", not "who is the author".</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Where the mark is strong, and where it thins to nothing</h2>
+          <p>Whether the watermark holds depends on how much freedom the model had while writing, a quantity information theory calls entropy: the number of reasonable choices available at each step. Where entropy is high the mark is robust; where it is low the mark weakens or fails, and this is a property of the mechanism rather than a trick anyone has to perform.</p>
+          <p>Ordinary prose is high-entropy. Ask for a blog post or a client email and there are many acceptable ways to phrase each sentence, so the model can nearly always find a green-list word that still reads well and the mark embeds cleanly. Source code is the opposite. Its syntax is rigid; a given line often has only one or two correct continuations, and if the correct token lands on the red list the model must either break from the green list or accept a worse token, which in code can mean an odd variable name, a clumsier structure, or an outright error. Research on watermarking low-entropy text documents this trade-off directly: pushing the mark into constrained output degrades the output or the mark, and often both.</p>
+          <p>Code rarely keeps the mark for a second reason. The moment it is pasted into a development environment, an auto-formatter such as Prettier or Black rewrites the spacing and standardises the layout. That reformatting scrambles the exact token sequence the mark depends on, and the green-to-red pattern is lost as a side effect, with no intent to evade. More deliberate removal is also documented: peer-reviewed work by Sadasivan and colleagues (2023) shows that paraphrasing tools can rewrite text enough to defeat watermarks and statistical detectors, which is why "humaniser" services that launder AI text past detectors are sold openly. The honest summary is that the mark is real and hard to remove by accident in ordinary prose, and at the same time genuinely fragile in low-entropy text and against a determined rewrite.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>SynthID and signed provenance in practice</h2>
+          <p>Google's SynthID is the most developed public example of the approach, covering both text, using the green-list style of token sampling, and images and other media, using an imperceptible pattern embedded across the file and described in a 2024 paper in <em>Nature</em>. Google states that its media watermark is designed to survive common edits such as cropping, compression and colour changes. That robustness figure is the provider's own claim about its own tool, and is worth treating as such: a vendor statement, not independent confirmation, and separate from the fragility of the C2PA metadata wrapper discussed above, which is a different layer.</p>
+          <p>Watermarking is only one of the ways software tries to identify AI text. A separate approach, stylistic detection, ignores any hidden mark and instead looks for the statistical fingerprints of machine writing, and it is the subject of the companion section on <a href="how-ai-detection-works.html">how detection technology works</a>. The two are easy to confuse but are not the same thing: a watermark is a signal a provider deliberately put there and can verify with a key; a stylistic detector is a trained guess about text it was never given a key for.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>The regulatory driver: the EU AI Act</h2>
+          <p>None of this was a spontaneous choice by the providers. The trigger was the European Union's AI Act, and specifically Article 50, which sets transparency obligations for AI-generated content, backed by a voluntary code of practice that major model providers signed. As the relevant obligations took effect in 2026, providers implemented marking on new models to stay compliant and keep access to the European market. The Act is, in spirit, a successor to the GDPR, the European data-protection law that reshaped privacy practice well beyond Europe.</p>
+          <p>The striking part is that the mark was not confined to Europe. A provider could in principle run one pipeline that marks text for European users and another that does not for everyone else, but maintaining two separate paths roughly doubles the engineering burden and complicates every enterprise deployment that crosses borders. It is cheaper and simpler to build one pipeline and apply the mark everywhere. The practical result is the same dynamic the GDPR produced: a European rule became a worldwide default, not because other countries adopted it, but because global providers found it easier to meet the strictest requirement everywhere. For a university in the Northern Territory, that means text from a compliant model arrives marked regardless of where the student or the staff member sits.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>A smoke alarm, not a meter</h2>
+          <p>Here is where the mechanism collides with how the mark is being used. A watermark detector reports whether the provider's pattern is present. It does not, and cannot, report how much of the document the model wrote, because the mark is added during output and carries no record of the input. The provider's own guidance on these tools makes the same point: a detected mark shows the text was processed by the model, not that the model authored it.</p>
+          <p>Consider a student who writes an original ten-page essay entirely themselves, then pastes it into the tool at the end and asks only for the commas to be fixed and the spelling checked. The tool reads the human text and returns it corrected, and while producing that output it runs the sampling algorithm and weaves in the mark. The essay is now watermarked, and a detector will say so, even though every idea and almost every word is the student's own. The mark cannot tell "write me an essay" apart from "fix the typos in my essay", because both produce marked output.</p>
+          <p>That is why a watermark, like the stylistic detectors beside it, is a smoke alarm rather than a meter. When it sounds, something is worth a look; it does not tell you whether the cause is a house fire or burnt toast, and it produces a weak positive signal and essentially no reliable negative one. What an integrity process can actually do with a signal like this, once base rates and fair procedure are taken into account, is worked through in <a href="detection-as-evidence.html">Detection as Evidence, Not Verdict</a>, and the arithmetic of false positives across a whole cohort is set out with a calculator in <a href="how-ai-detection-works.html">How Detection Technology Works</a>.</p>
+        </section>
+
+        <section class="content-section">
+          <h2>What none of this proves</h2>
+          <p>Watermarking is a real engineering achievement and a reasonable response to a genuine transparency problem: at scale, it helps identify which content came from which system. The mistake is to carry that population-level usefulness down to the individual case. A mark establishes that text touched a particular model. It does not establish authorship, it does not measure the human contribution, and its absence proves nothing either, because the mark can be diluted by a low-entropy task, lost to a reformat, or rewritten away.</p>
+          <p>The practical posture that follows is the same one this workshop returns to throughout. Treat any watermark or detector result as one signal among several, never as a verdict; ask what the signal can actually support before acting on it; and keep the burden of an allegation where fair process puts it, on evidence a student can see and answer, not on a number that no one, including the person reading it, can independently check.</p>
+
+          <div class="callout callout-warning">
+            <div class="callout-title">Two claims left out on purpose</div>
+            <p>SD's working notes for this topic included two points that a verification pass could not trace to any real, findable source: a "style loophole" said to switch the watermark off if you ask for a restrictive writing style, and a cited education-journal study on "strategy-graded reliance". Both have been left out of this page and the companion deck rather than repeated unverified. The entropy limits described above are the sourced version of the first idea.</p>
+          </div>
+        </section>
+
+        <section class="content-section">
+          <h2>Explore</h2>
+          <p>The interactive walkthrough deck below covers the same ground as a presenter-led session, with a step-through word generator, the SynthID image example, and the EU AI Act timeline. It suits a one-hour taster or self-paced study.</p>
+          <p><a class="app-card" href="/presentations/ai-watermarking-explained/" style="text-decoration:none;display:block;max-width:520px;">
+            <div class="app-card-category">Interactive deck &middot; 5 modules</div>
+            <h3>Can You Tell If It's AI? Watermarking Explained</h3>
+            <p>Why an AI text watermark is not a hidden character to strip out, how the green-list and red-list mechanism works, and what happens when a detector is treated as proof.</p>
+          </a></p>
+        </section>
+
+        <section class="content-section">
+          <h2>Sources</h2>
+          <p>Claims on this page draw on the peer-reviewed and primary record; provider material is used only for what providers say about their own tools, and is labelled as such wherever it appears. Verification of the underlying claim set was completed on 17 August 2026 for the companion deck.</p>
+          <ul>
+            <li><a href="https://artificialintelligenceact.eu/article/50/" target="_blank" rel="noopener">Article 50, Regulation (EU) 2024/1689 (EU AI Act)</a>, full text via the AI Act Explorer, artificialintelligenceact.eu, accessed 17 August 2026. Transparency obligations for AI-generated content.</li>
+            <li>European Commission Digital Strategy, "Transparency obligations under Article 50 AI Act" and the Code of Practice on Transparency of AI-generated Content, accessed 14 August 2026.</li>
+            <li>Kirchenbauer, Geiping, Wen, Katz, Miers and Goldstein, <a href="https://arxiv.org/abs/2301.10226" target="_blank" rel="noopener">A Watermark for Large Language Models</a>, ICML 2023, arXiv, 24 January 2023. The green-list / red-list mechanism and the z-score.</li>
+            <li>Dathathri, See, Ghaisas and colleagues, <a href="https://www.nature.com/articles/s41586-024-08025-4" target="_blank" rel="noopener">Scalable watermarking for identifying large language model outputs</a>, <em>Nature</em> 634, 23 October 2024. SynthID for text.</li>
+            <li><a href="https://deepmind.google/technologies/synthid/" target="_blank" rel="noopener">SynthID</a>, Google DeepMind, deepmind.google, accessed 17 August 2026. Coverage across text, image, audio and video; edit-robustness description is Google's own claim about its own tool.</li>
+            <li>Sadasivan, Kumar, Balasubramanian, Wang and Feizi, <a href="https://arxiv.org/abs/2303.11156" target="_blank" rel="noopener">Can AI-Generated Text be Reliably Detected?</a>, arXiv 2303.11156, first posted March 2023. Paraphrase attacks against watermarks and detectors.</li>
+            <li>Research on watermarking low-entropy generation (for example arXiv 2405.14604), on the quality-versus-robustness trade-off in constrained text such as code, accessed 14 August 2026.</li>
+            <li>Coalition for Content Provenance and Authenticity (C2PA), <a href="https://c2pa.org/" target="_blank" rel="noopener">c2pa.org</a>, accessed 17 August 2026. The signed-provenance standard and its scope as a metadata wrapper.</li>
+            <li>Provider guidance on marking AI-generated content, stating that a detected mark shows text was processed by the model rather than authored by it, accessed 14 August 2026.</li>
+          </ul>
+        </section>
+
+      </div>
+
+      <aside class="sidebar-rail">
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">In this section</div>
+            <ul>
+              <li>Marking text that has no physical form</li>
+              <li>Files versus text: C2PA and token sampling</li>
+              <li>Green lists, red lists and the z-score</li>
+              <li>The green-list sampling demo</li>
+              <li>Where the mark thins out: entropy and code</li>
+              <li>The EU AI Act as the driver</li>
+              <li>Smoke alarm, not a meter</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Three sentences to keep</div>
+            <ul>
+              <li>The text watermark is the word choices themselves, not a hidden character you can strip out</li>
+              <li>The mark thins to nothing in low-entropy text like code, and a reformat or a paraphrase removes it</li>
+              <li>A detected mark shows text went through the model, never who wrote it</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Try it</div>
+            <p>The <a href="/simulations/next-word-prediction/">next-word prediction simulation</a> shows the token-by-token machinery a watermark leans on, from the model's side.</p>
+          </div>
+        </div>
+
+        <div class="rail-card">
+          <div class="rail-body">
+            <div class="rail-label">Continue</div>
+            <p><a href="how-ai-detection-works.html">How Detection Technology Works</a> and <a href="detection-as-evidence.html">Detection as Evidence, Not Verdict</a>: what a flag is worth once base rates and fair process are applied.</p>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <div class="last-updated">Last updated: 20 August 2026</div>
+  </div>
+</div>
+
+<footer class="site footer-plate">
+<div class="plate-foot"><picture><source srcset="/assets/artwork/footer-monogram-chip.webp" type="image/webp"><img src="/assets/artwork/footer-monogram-chip.jpg" alt="The NT monogram beside a processor chip" loading="lazy"></picture></div>
+  <div class="container">
+    <div class="footer-bottom">
+      <span>&copy; 2026 Charles Darwin University&nbsp;|&nbsp;TAFE PSI&nbsp;|&nbsp;ICT, Cyber Security &amp; Digital</span>
+      <span style="font-family:'JetBrains Mono',monospace;">CDU Teaching Staff · AI Workshop</span>
+    </div>
+    <div class="footer-legal">
+      <p class="ack">Charles Darwin University acknowledges the traditional custodians across the lands on which we live and work, and we pay our respects to Elders past and present.</p>
+      <p class="reg">CRICOS Provider No: 00300K &middot; RTO Provider No: 0373 &middot; TEQSA Provider ID PRV12069</p>
+      <p><a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice">Privacy</a> &middot; <a href="https://www.cdu.edu.au/about-cdu/copyright-disclaimer">Copyright and Disclaimer</a> &middot; <a href="https://www.cdu.edu.au/files/2022-03/cdu-cookie-notice.pdf">Cookies</a></p>
+      <p class="reg">ABN 54 093 513 649</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Scripted candidate lists per step: [word, probability, isGreen].
+  // Sorted by probability. The green/red split stands in for a secret key;
+  // it is fixed so the demo is reproducible. Across the ten steps the highest
+  // probability (model's natural) word is green five times and red five times,
+  // so with the watermark off the green count sits near half and the z-score
+  // near zero; with it on the model is pushed to the first green word every
+  // step, the count climbs to ten, and the z-score rises past the threshold.
+  var STEPS = [
+    {cands:[["dark",0.22,false],["beautiful",0.18,true],["clear",0.15,false],["vast",0.12,true],["still",0.09,false]]},
+    {cands:[["and",0.24,true],["with",0.17,false],["so",0.14,true],["as",0.12,false],["while",0.08,false]]},
+    {cands:[["the",0.26,true],["a",0.19,false],["her",0.11,false],["every",0.09,true],["one",0.07,false]]},
+    {cands:[["stars",0.28,true],["moon",0.16,false],["night",0.12,true],["wind",0.10,false],["silence",0.08,false]]},
+    {cands:[["seemed",0.21,false],["felt",0.18,true],["looked",0.15,false],["burned",0.11,true],["shone",0.09,false]]},
+    {cands:[["closer",0.20,false],["brighter",0.18,true],["endless",0.14,false],["alive",0.12,true],["nearer",0.09,false]]},
+    {cands:[["than",0.30,true],["and",0.16,false],["yet",0.12,true],["as",0.10,false],["but",0.08,false]]},
+    {cands:[["ever",0.27,false],["usual",0.15,true],["before",0.14,false],["expected",0.10,true],["imagined",0.08,false]]},
+    {cands:[["that",0.22,true],["so",0.17,false],["once",0.12,true],["then",0.10,false],["there",0.08,false]]},
+    {cands:[["night",0.31,false],["evening",0.16,true],["moment",0.13,true],["winter",0.09,false],["season",0.07,false]]}
+  ];
+  var elS=document.getElementById('wm-sentence'), elC=document.getElementById('wm-cands'),
+      elNext=document.getElementById('wm-next'), elReset=document.getElementById('wm-reset'),
+      elOn=document.getElementById('wm-on'), elWords=document.getElementById('wm-words'),
+      elGreen=document.getElementById('wm-green'), elZ=document.getElementById('wm-z'),
+      elNote=document.getElementById('wm-note'), elMode=document.getElementById('wm-mode-note');
+  if(!elS) return;
+  var idx=0, chosen=[], greenCount=0;
+  var PREFIX='The night sky was incredibly';
+
+  function pickNatural(cands){ return 0; } // list is pre-sorted by probability
+  function pickWatermarked(cands){
+    for(var i=0;i<cands.length;i++){ if(cands[i][2]) return i; }
+    return 0; // no green candidate available: mark cannot embed here
+  }
+  function zScore(green,total){
+    if(total===0) return 0;
+    var expected=0.5*total, sd=Math.sqrt(total*0.25);
+    return sd>0 ? (green-expected)/sd : 0;
+  }
+  function renderSentence(){
+    var html='<span class="caret">'+PREFIX.replace(/ /g,'&nbsp;')+'</span> ';
+    chosen.forEach(function(c){ html+='<span class="tok '+(c.green?'g':'r')+'">'+c.word+'</span> '; });
+    if(idx<STEPS.length) html+='<span class="caret">&#9612;</span>';
+    elS.innerHTML=html;
+  }
+  function renderCands(){
+    elC.innerHTML='';
+    if(idx>=STEPS.length){ return; }
+    var step=STEPS[idx], on=elOn.checked;
+    var nat=pickNatural(step.cands), wm=pickWatermarked(step.cands);
+    step.cands.forEach(function(c,i){
+      var g=c[2];
+      var div=document.createElement('div');
+      div.className='wm-cand '+(g?'g':'r');
+      if(!on && i===nat) div.className+=' pick-wm';
+      if(on && i===wm) div.className+=' pick-wm';
+      if(on && i===nat && nat!==wm) div.className+=' pick-nat';
+      var badge='';
+      if(on){
+        if(i===wm) badge='<span class="badge">watermark picks this</span>';
+        else if(i===nat) badge='<span class="badge">model’s top pick, skipped</span>';
+      } else if(i===nat){ badge='<span class="badge">model picks this</span>'; }
+      div.innerHTML='<span class="clist">'+(g?'green':'red')+'</span>'+
+        '<div class="cw">'+c[0]+'</div><div class="cp">p '+c[1].toFixed(2)+'</div>'+badge;
+      elC.appendChild(div);
+    });
+  }
+  function renderStats(){
+    var t=chosen.length;
+    elWords.textContent=t;
+    elGreen.textContent=greenCount;
+    var z=zScore(greenCount,t);
+    elZ.textContent=(z>=0?'+':'')+z.toFixed(1);
+    elMode.textContent=elOn.checked?'The model is pushed onto the green list at each step.':'The model takes its top-ranked word, green or red.';
+    if(t===0){ elNote.textContent='Press "Choose next word" to begin. Each word is tinted for the list it landed on: teal for green, red for red.'; return; }
+    if(elOn.checked){
+      if(z>=2){ elNote.innerHTML='The green count is now <strong>well above chance</strong> (z of '+z.toFixed(1)+'). A detector with the key would call this watermarked, and the sentence still reads normally.'; }
+      else { elNote.innerHTML='The green words are piling up because the model is nudged onto the green list every step. Keep going and watch the z-score climb.'; }
+    } else {
+      elNote.innerHTML='With the watermark off, green words fall where they may, so the count stays near half and the z-score hovers around zero. This is what unmarked human writing looks like to a detector.';
+    }
+  }
+  function step(){
+    if(idx>=STEPS.length) return;
+    var s=STEPS[idx], on=elOn.checked;
+    var choiceIdx = on ? pickWatermarked(s.cands) : pickNatural(s.cands);
+    var word=s.cands[choiceIdx][0], green=s.cands[choiceIdx][2];
+    chosen.push({word:word,green:green});
+    if(green) greenCount++;
+    idx++;
+    if(idx>=STEPS.length){ elNext.disabled=true; }
+    renderSentence(); renderCands(); renderStats();
+  }
+  function reset(){
+    idx=0; chosen=[]; greenCount=0; elNext.disabled=false;
+    renderSentence(); renderCands(); renderStats();
+  }
+  elNext.addEventListener('click',step);
+  elReset.addEventListener('click',reset);
+  elOn.addEventListener('change',function(){ reset(); });
+  reset();
+})();
+</script>
+
+<script src="/search.js" defer></script>
+</body>
+</html>
