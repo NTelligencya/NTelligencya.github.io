@@ -116,7 +116,7 @@ const TOPICS = [
   'Cyber security',
 ];
 
-const TYPES = ['Course', 'Lesson', 'Workshop', 'Presentation', 'Simulation', 'Resource', 'Flashcards', 'Client'];
+const TYPES = ['Course', 'Lesson', 'Workshop', 'Presentation', 'Simulation', 'Resource', 'Flashcards', 'Game', 'Client'];
 
 /**
  * Section and type rules, matched in order by URL prefix.
@@ -169,6 +169,7 @@ const RULES = [
   { prefix: '/resources/',     section: 'Resources',     type: 'Resource',     topic: 'AI basics & literacy' },
   { prefix: '/references/',    section: 'Resources',     type: 'Resource',     topic: 'AI basics & literacy' },
   { prefix: '/flashcards/',    section: 'Flashcards',    type: 'Flashcards',   topic: 'Cyber security' },
+  { prefix: '/training-games/', section: 'Training Games', type: 'Game',        topic: 'AI basics & literacy' },
 
   // Client areas.
   { prefix: '/cdu-ai-staff/',      section: 'CDU AI Staff Training',      type: 'Client', topic: 'How AI works' },

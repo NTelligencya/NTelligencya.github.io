@@ -17,7 +17,7 @@
   var INDEX_URL = '/search-index.json';
 
   // Chip order, and the type each chip filters to.
-  var CHIPS = ['Everything', 'Course', 'Lesson', 'Workshop', 'Presentation', 'Simulation', 'Resource', 'Flashcards', 'Client'];
+  var CHIPS = ['Everything', 'Course', 'Lesson', 'Workshop', 'Presentation', 'Simulation', 'Resource', 'Flashcards', 'Game', 'Client'];
 
   // Group order is fixed. Empty groups are omitted at render time.
   var GROUPS = [
@@ -27,6 +27,7 @@
     { name: 'Simulation tools', types: ['Simulation'] },
     { name: 'Resources', types: ['Resource'] },
     { name: 'Flashcards', types: ['Flashcards'] },
+    { name: 'Training games', types: ['Game'] },
     { name: 'Client areas (hidden)', types: ['Client'] },
   ];
 
