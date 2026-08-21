@@ -256,7 +256,7 @@ button{font-family:inherit;cursor:pointer}
 <div class="ov show" id="titleOv"><div class="card">
   <div class="ov-label">ROPER GULF REGIONAL COUNCIL · SESSION 4 · EXCEL WITH COPILOT</div>
   <div class="big-title">Be a Champion<br>Prompt Critic</div>
-  <div class="big-sub">Eight everyday Excel questions from around the region are about to be sent to Copilot. Every one of them has a problem. Your job: call it out before the send button gets pressed.</div>
+  <div class="big-sub">Eleven everyday Excel questions from around the region are about to be sent to Copilot. Every one of them has a problem. Your job: call it out before the send button gets pressed.</div>
   <div class="big-sub" style="font-size:.95rem;margin-bottom:30px">Shout your answers; the sharpest critics carry the round. <span class="kbd">Space</span> advances.</div>
   <button class="btn primary big" onclick="startGame()">Start the first round</button>
 </div></div>
@@ -297,6 +297,7 @@ button{font-family:inherit;cursor:pointer}
   <ul class="chk">
     <li><b>Describe your sheet.</b> Copilot cannot see your screen; say which columns, which rows and what you want, like a phone call to someone who cannot see it.</li>
     <li><b>Name the real problem.</b> "Clean up my spreadsheet" gets a guess; "four spellings of Done in the Status column" gets a fix.</li>
+    <li><b>Say what you want to keep.</b> Delete is forever; a filter hides the rest and gives it back. Ask for the undo as part of the question.</li>
     <li><b>Supply the facts, especially dates.</b> Copilot fills every gap with something plausible; our financial year starts 1 July, and it will not ask.</li>
     <li><b>Describe the symptom, not the mood.</b> The exact formula, what it shows, and the tell you noticed; vent to a colleague instead.</li>
     <li><b>Data stays out of the chat.</b> Copilot can teach you the method without the names and numbers; describe the columns, never paste the list.</li>
@@ -464,6 +465,31 @@ const ROUNDS = [
       note:`No twenty-minute guessing game with the wrong ranges.` }
   ]},
 
+{ id:"palmerston", title:"The Palmerston filter", tag:"The ask: say what you want to keep",
+  steps:[
+    { do:"thought", text:`Head office wants the training list for Palmerston only. This sheet has 847 rows and one mild sense of despair. Fine. I will just get rid of everything that is not Palmerston.` },
+    { do:"type", segs:[{t:`how do i delete all the rows that arent palmerston`}] },
+    { do:"critic", questions:[
+        `Delete? Eight hundred rows of Darwin, Katherine and Alice Springs, gone.`,
+        `And next week, when head office wants the Katherine list?`,
+        `You do not want the other rows gone; you want them out of sight.`,
+        `Say what you want to keep, and ask how to get the rest back afterwards.`
+      ], button:"Keep, not delete" },
+    { do:"fix", segs:[
+        {t:`My training list has locations in column B. How do I `},
+        {t:`filter it to show only the Palmerston rows`, hl:true},
+        {t:`, `},
+        {t:`without deleting anything`, hl:true},
+        {t:`? And `},
+        {t:`how do I bring the other rows back afterwards`, hl:true},
+        {t:`? Teach me the steps.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`Filter is made for exactly this:\n\nClick any cell in your list, then Data, then Filter. Small arrows appear on each heading.\nClick the arrow on your location column, untick Select All, tick Palmerston, and OK.\n\nThe other rows are hidden, not deleted; the skipped row numbers turn blue to remind you. To bring everything back, open the same arrow and choose Clear Filter. All 847 rows, still there.` },
+    { do:"celebrate", min:90, line:`847 rows, and not one of them harmed.`,
+      note:`Somewhere, the Katherine list breathes a sigh of relief.` }
+  ]},
+
 { id:"dropdown", title:"The four spellings of Done", tag:"The ask: name the real problem",
   steps:[
     { do:"thought", text:`Done, done, Finished and In prog. Four spellings, two statuses, and the filter thinks they are all different jobs. This sheet needs sorting out.` },
@@ -512,6 +538,29 @@ const ROUNDS = [
     { do:"reply", html:`=SUMIFS(B:B, A:A, "&gt;="&amp;DATE(2026,7,1), A:A, "&lt;="&amp;DATE(2027,6,30))\n\nB:B is what gets added. The two conditions keep only the rows whose date in column A falls from 1 July 2026 through 30 June 2027.\n\nCheck it against a month you already know the total for before it goes anywhere near the report.` },
     { do:"celebrate", min:90, line:`A finance report that matches the financial year.`,
       note:`Copilot supplied the formula. You supplied the calendar.` }
+  ]},
+
+{ id:"haunted", title:"The haunted headings", tag:"Symptom: say what you see",
+  steps:[
+    { do:"thought", text:`Row 74 of the works log and the headings are long gone. Is this column Amount or Date? I am scrolling back up for the fifth time. This spreadsheet is haunted.` },
+    { do:"type", segs:[{t:`my spreadsheet is haunted, the top row keeps dissapearing when i scroll down`}] },
+    { do:"critic", questions:[
+        `Haunted is strong. What is actually happening on the screen?`,
+        `The headings are not disappearing; they are scrolling away, like everything else.`,
+        `What do you want instead? The top row staying put while the rest moves.`,
+        `Describe what you see and what you want to see, and the ghost leaves.`
+      ], button:"Describe the haunting" },
+    { do:"fix", segs:[
+        {t:`In my works log, `},
+        {t:`the headings are in row 1`, hl:true},
+        {t:`. When I scroll down I lose them and forget which column is which. How do I `},
+        {t:`keep row 1 visible while the rest of the sheet scrolls`, hl:true},
+        {t:`? Tell me where the setting is, step by step.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`That is Freeze Panes, and it takes ten seconds:\n\nClick the View tab, then Freeze Panes, then Freeze Top Row.\nA thin line appears under row 1, and the headings now stay put while everything else scrolls.\n\nIf you ever want them moving again, the same menu has Unfreeze Panes. No exorcism required.` },
+    { do:"celebrate", min:20, line:`The ghost was a scrollbar all along.`,
+      note:`Row 74 stops being archaeology; the headings stay where you left them.` }
   ]},
 
 { id:"meltdown", title:"The meltdown", tag:"Tone: describe the symptom, not the mood",
@@ -588,6 +637,31 @@ const ROUNDS = [
     { do:"reply", html:`=PROPER(TRIM(A2)&amp;" "&amp;TRIM(B2))\n\nFrom the inside out: TRIM removes the stray spaces from each name. The &amp; joins the two names with a space in the middle. PROPER tidies the capitals, so grace NGUYEN becomes Grace Nguyen.\n\nFill it down the column with the fill handle and every row gets the same treatment.` },
     { do:"celebrate", min:40, line:`A formula you can rebuild from memory.`,
       note:`The understanding stays with you; that was the point.` }
+  ]},
+
+{ id:"postage", title:"The postage graph", tag:"The ask: name the chart and the point",
+  steps:[
+    { do:"thought", text:`Six months of freight invoices in this sheet, and the boss thinks I am imagining the increase. I need a picture that proves it. Copilot can tell me how.` },
+    { do:"type", segs:[{t:`make my numbers into a gragh`}] },
+    { do:"critic", questions:[
+        `Which numbers? A graph of what, against what?`,
+        `Copilot cannot see the sheet, and "a graph" covers pie, line, bar and a dozen mistakes.`,
+        `What is the picture supposed to prove? Say the point out loud.`,
+        `Name the columns, name the chart, name the message.`
+      ], button:"Name the picture" },
+    { do:"fix", segs:[
+        {t:`My sheet has `},
+        {t:`months in column A and freight costs to Darwin in column B, January to June`, hl:true},
+        {t:`. How do I make `},
+        {t:`a column chart that shows the costs rising month by month`, hl:true},
+        {t:`? Step by step, and tell me `},
+        {t:`how to give it a proper title`, hl:true},
+        {t:`.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`Select both columns, headings included. Then Insert, and pick a Column chart from the chart group.\n\nExcel draws one bar per month, and six months of rising freight makes the pattern hard to argue with. To retitle it, click the chart title and type over it; something like "Freight to Darwin, January to June".\n\nThe pattern stops hiding in plain sight, and the chart does the arguing for you.` },
+    { do:"celebrate", min:40, line:`The boss saw the chart and stopped arguing.`,
+      note:`The Darwin e-commerce enjoyment tax, finally visible from space.` }
   ]},
 
 { id:"confident", title:"The confident formula", tag:"Trick round: test before it counts",
