@@ -128,15 +128,15 @@ function block(page) {
     `<meta property="og:title" content="${attr(page.title)}">`,
     `<meta property="og:description" content="${attr(page.description)}">`,
     `<meta property="og:url" content="${attr(ORIGIN + page.url)}">`,
-    `<meta property="og:image" content="${attr(ORIGIN + CARD)}">`,
+    `<meta property="og:image" content="${attr(ORIGIN + (page.image || CARD))}">`,
     `<meta property="og:image:width" content="1200">`,
     `<meta property="og:image:height" content="630">`,
-    `<meta property="og:image:alt" content="${attr(CARD_ALT)}">`,
+    `<meta property="og:image:alt" content="${attr(page.imageAlt || CARD_ALT)}">`,
     `<meta name="twitter:card" content="summary_large_image">`,
     `<meta name="twitter:title" content="${attr(page.title)}">`,
     `<meta name="twitter:description" content="${attr(page.description)}">`,
-    `<meta name="twitter:image" content="${attr(ORIGIN + CARD)}">`,
-    `<meta name="twitter:image:alt" content="${attr(CARD_ALT)}">`,
+    `<meta name="twitter:image" content="${attr(ORIGIN + (page.image || CARD))}">`,
+    `<meta name="twitter:image:alt" content="${attr(page.imageAlt || CARD_ALT)}">`,
     `<link rel="icon" href="/favicon.svg" type="image/svg+xml">`,
     `<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">`,
     `<link rel="apple-touch-icon" href="/apple-touch-icon.png">`,
@@ -156,6 +156,13 @@ function main() {
   } catch (e) {
     console.log('note: search-index.json not readable; falling back to page titles');
   }
+
+  // Per-page social overrides (image, imageAlt, description) live in
+  // tools/index-meta.json beside the title and published date, keyed by URL.
+  let metaByUrl = {};
+  try {
+    metaByUrl = JSON.parse(fs.readFileSync(path.join(__dirname, 'index-meta.json'), 'utf8'));
+  } catch (e) { /* no overrides */ }
 
   const files = walk(ROOT);
   let written = 0;
@@ -202,7 +209,9 @@ function main() {
 
     const ogType = url === '/' ? 'website' : 'article';
 
-    const next = block({ url, title, description, type: ogType });
+    const over = metaByUrl[url] || {};
+    const next = block({ url, title, description: over.description || description,
+      type: ogType, image: over.image, imageAlt: over.imageAlt });
 
     let updated;
     if (marker.test(html)) {
