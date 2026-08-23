@@ -1,0 +1,275 @@
+/* ============================================================
+   PROMPT GALLERY PAGES
+   Shared page CSS for /resources/basic-prompts-gallery.html and
+   /resources/advanced-prompts-gallery.html. Built on the design
+   tokens in styles.css; adds nothing new to the palette.
+
+   Documented exception to the no-page-CSS house rule, on the same
+   footing as /references/ and /flashcards/: these two pages need a
+   sticky tier rail and a fixed-ratio output frame that the shared
+   card components do not provide. Both pages share this one file.
+
+   OUTPUT SCREENSHOTS: every frame is locked to 16:10. Supply
+   images at 1600 x 1000 (or any 16:10 size at least 800 wide);
+   they are drawn with object-fit: cover, so anything else is
+   cropped from the centre rather than stretched.
+   ============================================================ */
+
+/* ---------- Split: sticky tier rail + scrolling stream ---------- */
+
+.gallery-split {
+  max-width: 1180px;
+  margin: 0 auto 56px;
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  gap: 52px;
+  align-items: start;
+}
+.gallery-split .stream { min-width: 0; }
+
+.tier-rail { position: sticky; top: 32px; }
+.tier-rail .rail-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 14px;
+}
+.tier-rail a {
+  display: block;
+  border-left: 2px solid var(--rule-2);
+  padding: 9px 0 9px 15px;
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 14.5px;
+  line-height: 1.4;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tier-rail a:hover,
+.tier-rail a:focus-visible { color: var(--accent-2); border-left-color: var(--accent); }
+.tier-rail a .rail-num {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 2px;
+}
+.tier-rail .rail-foot {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-3);
+}
+.tier-rail .rail-foot a { display: inline; border: none; padding: 0; font-size: 13px; color: var(--text-2); text-decoration: underline; text-underline-offset: 2px; }
+.tier-rail .rail-foot a:hover { color: var(--accent-2); }
+
+/* ---------- Tier band ---------- */
+
+.tier-band {
+  margin: 0 0 6px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--rule-2);
+  scroll-margin-top: 24px;
+}
+.tier-band .tier-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.tier-band h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 12px;
+  border: none;
+  padding: 0;
+}
+.tier-band p { color: var(--text-2); line-height: 1.75; margin: 0; max-width: 66ch; }
+
+.stream > section { margin-bottom: 64px; }
+.stream > section:last-child { margin-bottom: 0; }
+
+/* ---------- Showcase: prompt beside its output ---------- */
+
+.showcase {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  border: 1px solid var(--rule-2);
+  border-radius: 12px;
+  background: var(--bg-2);
+  overflow: hidden;
+  margin: 26px 0;
+}
+.showcase-body { padding: 24px 26px; min-width: 0; }
+.showcase-out {
+  border-left: 1px solid var(--rule-2);
+  background: var(--bg-3);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Alternate the image side down the stream. */
+.showcase.flip { grid-template-columns: 340px minmax(0, 1fr); }
+.showcase.flip .showcase-body { order: 2; }
+.showcase.flip .showcase-out { order: 1; border-left: none; border-right: 1px solid var(--rule-2); }
+
+.showcase h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 25px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 10px;
+}
+.showcase .the-idea { color: var(--text-2); line-height: 1.7; margin: 0 0 16px; }
+.showcase .field-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin: 18px 0 8px;
+}
+.showcase .field-label:first-of-type { margin-top: 0; }
+.showcase pre { margin: 0; white-space: pre-wrap; font-size: 12.5px; }
+.showcase .note { color: var(--text-2); line-height: 1.7; margin: 0 0 12px; font-size: 15px; }
+.showcase .note:last-child { margin-bottom: 0; }
+.showcase .note strong { color: var(--text); }
+
+/* Weaker-then-stronger pairs */
+.prompt-compare { display: grid; gap: 14px; }
+.prompt-compare .weaker pre { opacity: 0.62; }
+
+/* ---------- Output frame, locked to 16:10 ---------- */
+
+.out-frame {
+  aspect-ratio: 16 / 10;
+  width: 100%;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule-2);
+  overflow: hidden;
+}
+.out-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Placeholder until a real screenshot is dropped in. Delete the
+   .out-empty div and paste an <img> in its place. */
+.out-empty {
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--rule-2);
+  border-width: 0 0 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  background:
+    repeating-linear-gradient(135deg, transparent 0 9px, rgba(26,201,201,0.045) 9px 18px);
+}
+.out-empty .what { font-family: 'Manrope', system-ui, sans-serif; font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--text-2); line-height: 1.5; }
+
+.out-meta { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.out-meta .out-kind {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.out-meta p { font-size: 13.5px; line-height: 1.6; color: var(--text-2); margin: 0; }
+.out-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--accent-2);
+  text-decoration: none;
+  margin-top: 2px;
+}
+.out-link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.out-link::after { content: '\2197'; font-size: 12px; }
+.out-link.none { color: var(--text-3); pointer-events: none; }
+.out-link.none::after { content: ''; }
+
+/* ---------- Plain (no output) blocks: iteration, guardrails ---------- */
+
+.plain-block {
+  border: 1px solid var(--rule-2);
+  border-left: 2px solid var(--accent);
+  border-radius: 12px;
+  background: var(--bg-2);
+  padding: 24px 26px;
+  margin: 26px 0;
+}
+.plain-block h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 23px;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 10px;
+}
+.plain-block p { color: var(--text-2); line-height: 1.75; margin: 0 0 12px; }
+.plain-block p:last-child { margin-bottom: 0; }
+.plain-block pre { white-space: pre-wrap; }
+
+.anatomy { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 22px 0; }
+.anatomy .part {
+  border: 1px solid var(--rule-2);
+  border-top: 2px solid var(--accent);
+  border-radius: 8px;
+  background: var(--bg-2);
+  padding: 16px 18px;
+}
+.anatomy .part h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+  font-weight: 500;
+}
+.anatomy .part p { font-size: 14px; line-height: 1.6; color: var(--text-2); margin: 0; }
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1000px) {
+  .gallery-split { grid-template-columns: 1fr; gap: 28px; }
+  .tier-rail { position: static; }
+  .tier-rail nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 4px 18px; }
+}
+
+@media (max-width: 760px) {
+  .showcase, .showcase.flip { grid-template-columns: 1fr; }
+  .showcase-body { order: 2; padding: 20px; }
+  .showcase-out, .showcase.flip .showcase-out {
+    order: 1; border-left: none; border-right: none; border-bottom: 1px solid var(--rule-2);
+  }
+  .tier-band h2 { font-size: 27px; }
+  .showcase h3 { font-size: 21px; }
+}
+
+@media print {
+  .tier-rail, header.site, .breadcrumb { display: none; }
+  .gallery-split { grid-template-columns: 1fr; }
+  .showcase { break-inside: avoid; }
+}
