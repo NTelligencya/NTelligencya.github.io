@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Critics · CDU AI Workshop</title>
+<style>
+:root{
+  --bg:#0b0f14; --panel:#131a22; --panel2:#1a2330; --line:#26313f;
+  --ink:#e8edf2; --ink-dim:#9fb0bf; --ink-faint:#5d6f7f;
+  --steel:#4b85a9; --steel-soft:#6fa3c2; --mint:#beebd5; --sage:#8db091;
+  --wash-steel:rgba(75,133,169,.16); --wash-mint:rgba(190,235,213,.12);
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden;
+  background-image:radial-gradient(ellipse 900px 500px at 50% -10%,rgba(75,133,169,.10),transparent);}
+button{font-family:inherit;cursor:pointer}
+
+/* ---------- header ---------- */
+#hdr{position:fixed;top:0;left:0;right:0;height:58px;display:flex;align-items:center;gap:16px;
+  padding:0 22px;background:rgba(11,15,20,.92);border-bottom:1px solid var(--line);z-index:40;backdrop-filter:blur(6px)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{width:22px;height:22px}
+.brand .bt{font-family:var(--mono);font-size:.8rem;letter-spacing:.22em;color:var(--mint)}
+.simtag{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;color:var(--ink-faint);
+  border:1px solid var(--line);border-radius:4px;padding:2px 7px}
+#roundLabel{flex:1;text-align:center;font-family:var(--mono);font-size:.82rem;letter-spacing:.08em;color:var(--ink-dim);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tally{font-family:var(--mono);font-size:.8rem;color:var(--mint);border:1px solid rgba(190,235,213,.35);
+  border-radius:999px;padding:6px 14px;background:var(--wash-mint);white-space:nowrap;transition:transform .3s}
+#tally.bump{transform:scale(1.12)}
+
+/* ---------- stage / chat ---------- */
+#stage{position:absolute;top:58px;bottom:64px;left:0;right:0;display:flex;justify-content:center}
+#col{width:min(980px,94vw);display:flex;flex-direction:column;position:relative}
+#chat{flex:1;overflow-y:auto;padding:26px 8px 12px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.msg{display:flex;gap:12px;margin-bottom:20px;animation:rise .35s ease}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.avatar{flex:0 0 34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.05em}
+.msg.ai .avatar{background:linear-gradient(135deg,#365f7a,#4b85a9);color:#eaf4fa}
+.msg.user .avatar{background:var(--panel2);border:1px solid var(--line);color:var(--ink-dim)}
+.bubble{max-width:76%;padding:14px 18px;border-radius:14px;font-size:1.13rem;line-height:1.55;white-space:pre-wrap}
+.msg.ai .bubble{background:var(--panel);border:1px solid var(--line);border-top-left-radius:4px}
+.msg.user .bubble{background:var(--wash-steel);border:1px solid rgba(75,133,169,.4);border-top-right-radius:4px}
+.who{font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;color:var(--ink-faint);margin-bottom:6px}
+.subj{font-weight:700;color:var(--steel-soft);display:block;margin-bottom:6px}
+.line{opacity:0;transition:opacity .4s}
+.line.on{opacity:1}
+.hl{background:var(--wash-steel);border-bottom:2px solid var(--steel);border-radius:3px;padding:0 3px}
+.callout{background:rgba(75,133,169,.28);border-bottom:2px solid var(--steel-soft);border-radius:3px;padding:0 3px;
+  animation:pulse 1.2s ease infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(111,163,194,.0)}50%{box-shadow:0 0 0 6px rgba(111,163,194,.18)}}
+.err{border-bottom:2px dashed var(--steel-soft);border-radius:3px;padding:0 3px;cursor:default}
+.err.armed{cursor:pointer;background:rgba(75,133,169,.14)}
+.err.armed:hover{background:rgba(75,133,169,.3)}
+.err.done{background:var(--wash-mint);border-bottom:2px solid var(--sage);cursor:default;animation:fixflash .8s ease}
+@keyframes fixflash{0%{box-shadow:0 0 0 0 rgba(190,235,213,.5)}100%{box-shadow:0 0 0 12px rgba(190,235,213,0)}}
+.typing-ind{display:inline-flex;gap:5px;padding:6px 2px}
+.typing-ind i{width:8px;height:8px;border-radius:50%;background:var(--ink-faint);animation:blink 1.2s infinite}
+.typing-ind i:nth-child(2){animation-delay:.2s}.typing-ind i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+/* ---------- thought bubble (cloud) ---------- */
+#thought{position:absolute;right:24px;bottom:132px;max-width:520px;z-index:20;
+  opacity:0;transform:translateY(16px) scale(.96);transition:all .45s cubic-bezier(.2,.9,.3,1.2);pointer-events:none}
+#thought.show{opacity:1;transform:none}
+.cloud{position:relative;background:#f0f4f7;border-radius:52px;padding:30px 34px 26px;
+  font-family:var(--serif);font-style:italic;font-size:1.22rem;line-height:1.5;color:#141b23;
+  filter:drop-shadow(0 14px 34px rgba(0,0,0,.55))}
+.cloud .b{position:absolute;background:#f0f4f7;border-radius:50%}
+.cloud .b1{width:74px;height:74px;top:-28px;left:26px}
+.cloud .b2{width:100px;height:100px;top:-42px;left:35%}
+.cloud .b3{width:66px;height:66px;top:-26px;right:34px}
+.cloud .b4{width:52px;height:52px;left:-16px;top:32%}
+.cloud .b5{width:56px;height:56px;right:-14px;top:36%}
+.cloud .b6{width:62px;height:62px;bottom:-18px;left:22%}
+.cloud .b7{width:58px;height:58px;bottom:-16px;right:26%}
+.cloud-body{position:relative;z-index:2}
+.cloud .wl{font-family:var(--mono);font-style:normal;font-size:.6rem;letter-spacing:.16em;color:#5a6b7a;
+  display:block;margin-bottom:8px}
+.tdots{position:absolute;right:30px;bottom:-32px}
+.tdots i{position:absolute;background:#f0f4f7;border-radius:50%}
+.tdots i:nth-child(1){width:18px;height:18px;right:0;bottom:12px}
+.tdots i:nth-child(2){width:10px;height:10px;right:-16px;bottom:0}
+
+/* ---------- composer ---------- */
+#composerWrap{display:flex;align-items:flex-end;gap:12px;padding:0 8px 22px}
+#composer{flex:1;min-height:58px;max-height:220px;overflow-y:auto;background:var(--panel);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;font-size:1.28rem;line-height:1.55;transition:border-color .3s}
+#composer.live{border-color:var(--steel)}
+#composer .ph{color:var(--ink-faint);font-size:1.05rem}
+.caret{display:inline-block;width:2px;height:1.25em;background:var(--steel-soft);vertical-align:text-bottom;
+  margin-left:1px;animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.redact{transition:all .5s}
+.redact.strike{background:#000;color:#000;border-radius:3px;text-decoration:line-through;text-decoration-color:var(--ink-dim)}
+.redact.gone{display:inline-block;max-width:0;overflow:hidden;white-space:nowrap;vertical-align:bottom;opacity:0;
+  transition:max-width .6s ease,opacity .4s}
+.doccard{display:block;margin-top:12px;background:#0e1219;border:1px solid var(--line);border-left:4px solid var(--ink-faint);
+  border-radius:10px;padding:14px 16px;font-size:1rem;line-height:1.5;color:var(--ink-dim);
+  animation:pastepop .35s ease;transition:all .5s}
+.doccard .dc-top{font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;color:var(--steel-soft);display:block;margin-bottom:8px}
+@keyframes pastepop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+.doccard.crush{transform:scale(.02) rotate(6deg);opacity:0;max-height:0;padding:0;margin:0}
+#sendBtn{flex:0 0 58px;height:58px;border-radius:16px;border:1px solid var(--line);background:var(--panel2);
+  display:flex;align-items:center;justify-content:center;transition:all .3s}
+#sendBtn svg{width:24px;height:24px;fill:var(--ink-dim);transition:fill .3s}
+#sendBtn.ready{background:var(--steel);border-color:var(--steel-soft);animation:sendpulse 1.1s ease infinite}
+#sendBtn.ready svg{fill:#fff}
+@keyframes sendpulse{0%,100%{box-shadow:0 0 0 0 rgba(75,133,169,.5)}50%{box-shadow:0 0 0 12px rgba(75,133,169,0)}}
+
+/* ---------- footer controls ---------- */
+#foot{position:fixed;bottom:0;left:0;right:0;height:64px;display:flex;align-items:center;gap:14px;
+  padding:0 22px;background:rgba(11,15,20,.92);border-top:1px solid var(--line);z-index:40}
+.credit{flex:1;font-size:.68rem;color:var(--ink-faint);line-height:1.4;max-width:60%}
+#hint{font-family:var(--mono);font-size:.7rem;color:var(--ink-faint);letter-spacing:.06em}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;
+  padding:10px 20px;font-size:.9rem;transition:all .2s}
+.btn:hover{border-color:var(--steel);background:var(--wash-steel)}
+.btn.primary{background:var(--steel);border-color:var(--steel-soft);color:#fff;font-weight:600}
+.btn.primary:hover{background:var(--steel-soft)}
+.btn.big{font-size:1.05rem;padding:14px 30px;border-radius:12px}
+
+/* ---------- overlays ---------- */
+.ov{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
+  background:rgba(5,8,12,.78);backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:opacity .35s}
+.ov.show{opacity:1;pointer-events:auto}
+.card{width:min(760px,92vw);max-height:86vh;overflow-y:auto;background:var(--panel);border:1px solid var(--line);
+  border-radius:20px;padding:38px 44px;box-shadow:0 30px 90px rgba(0,0,0,.6);
+  transform:translateY(24px) scale(.97);transition:transform .35s cubic-bezier(.2,.9,.3,1.15)}
+.ov.show .card{transform:none}
+.ov-label{font-family:var(--mono);font-size:.72rem;letter-spacing:.26em;color:var(--steel-soft);margin-bottom:10px}
+.ov-title{font-family:var(--serif);font-size:2.1rem;line-height:1.15;margin-bottom:22px}
+.qlist{list-style:none;margin-bottom:26px}
+.qlist li{position:relative;padding:10px 0 10px 34px;font-size:1.22rem;line-height:1.5;border-bottom:1px solid rgba(38,49,63,.6)}
+.qlist li:last-child{border-bottom:none}
+.qlist li::before{content:"";position:absolute;left:4px;top:1.05em;width:14px;height:14px;
+  border:2px solid var(--steel);border-radius:50%;transform:translateY(-50%)}
+.ov-foot{display:flex;align-items:center;gap:16px;justify-content:flex-end}
+.ov-note{flex:1;font-size:.82rem;color:var(--ink-faint);font-style:italic}
+
+/* critic banner treatment */
+#criticOv .card{border-top:4px solid var(--steel)}
+
+/* ---------- celebration ---------- */
+#celebOv .card{text-align:center;width:min(640px,92vw);border-top:4px solid var(--sage);overflow:hidden}
+.tickwrap{width:96px;height:96px;margin:4px auto 18px;border-radius:50%;background:var(--wash-mint);
+  border:2px solid var(--sage);display:flex;align-items:center;justify-content:center;animation:tickin .55s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes tickin{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+.tickwrap svg{width:48px;height:48px}
+.tickwrap path{stroke:var(--mint);stroke-width:7;fill:none;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:80;stroke-dashoffset:80;animation:draw .6s .25s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.celeb-title{font-family:var(--serif);font-size:2.6rem;margin-bottom:6px;color:#fff}
+.celeb-line{color:#fff;font-size:1.15rem;font-style:italic;margin-bottom:24px}
+.saved{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:26px}
+.saved .sl{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;color:#fff;margin-bottom:6px}
+.saved .sv{font-family:var(--serif);font-size:2.2rem;color:#fff}
+.saved .st{font-size:1.56rem;color:#fff;margin-top:10px;line-height:1.35}
+.confetti{position:absolute;top:-14px;border-radius:2px;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.15}}
+
+/* ---------- title / menu / checklist ---------- */
+#titleOv .card,#doneOv .card{text-align:center}
+.big-title{font-family:var(--serif);font-size:3.4rem;line-height:1.05;margin-bottom:14px}
+.big-sub{color:var(--ink-dim);font-size:1.22rem;line-height:1.6;max-width:540px;margin:0 auto 28px}
+.kbd{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;
+  padding:2px 7px;color:var(--ink-dim);background:var(--panel2)}
+#menuOv .card{width:min(880px,94vw)}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.mcard{text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 18px;
+  color:var(--ink);transition:all .2s;display:flex;align-items:center;gap:12px}
+.mcard:hover{border-color:var(--steel);background:var(--wash-steel)}
+.mcard .mt{font-family:var(--serif);font-size:1.15rem}
+.mcard .mg{font-size:.78rem;color:var(--ink-faint)}
+.mcard .tick{margin-left:auto;font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;color:var(--sage);
+  border:1px solid rgba(141,176,145,.4);border-radius:4px;padding:2px 7px;visibility:hidden}
+.mcard.played .tick{visibility:visible}
+#checkOv .card{width:min(820px,94vw);border-top:4px solid var(--mint)}
+.chk{list-style:none;margin-bottom:24px}
+.chk li{position:relative;padding:12px 0 12px 42px;font-size:1.18rem;line-height:1.5;border-bottom:1px solid rgba(38,49,63,.6)}
+.chk li:last-child{border-bottom:none}
+.chk li::before{content:"";position:absolute;left:6px;top:1.15em;transform:translateY(-55%) rotate(-45deg);
+  width:14px;height:8px;border-left:3px solid var(--sage);border-bottom:3px solid var(--sage)}
+.chk b{color:var(--steel-soft)}
+.total-line{background:var(--wash-mint);border:1px solid rgba(190,235,213,.3);border-radius:12px;
+  padding:14px 18px;font-size:1.05rem;margin-bottom:8px}
+.fineprint{font-size:.78rem;color:var(--ink-faint);font-style:italic;margin-bottom:20px}
+
+/* hunt bar */
+#huntbar{position:fixed;left:50%;transform:translateX(-50%) translateY(30px);bottom:160px;z-index:50;
+  background:var(--panel2);border:1px solid var(--steel);border-radius:14px;padding:14px 22px;
+  display:flex;align-items:center;gap:18px;opacity:0;pointer-events:none;transition:all .4s;box-shadow:0 16px 50px rgba(0,0,0,.5)}
+#huntbar.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+#huntbar.shake{animation:shk .4s}
+@keyframes shk{0%,100%{transform:translateX(-50%)}25%{transform:translateX(calc(-50% - 8px))}75%{transform:translateX(calc(-50% + 8px))}}
+#huntmsg{font-size:1.05rem}
+#huntbtn{display:none}
+
+.roundtoast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-10px);z-index:45;
+  background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:9px 22px;
+  font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;color:var(--ink-dim);opacity:0;transition:all .5s}
+.roundtoast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <div class="brand">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 L14.2 9.8 L23 12 L14.2 14.2 L12 23 L9.8 14.2 L1 12 L9.8 9.8 Z" fill="#beebd5"/></svg>
+    <span class="bt">PROMPT CRITICS</span>
+    <span class="simtag">SIMULATION</span>
+  </div>
+  <div id="roundLabel"></div>
+  <div id="tally">Time saved: 0 min</div>
+</header>
+
+<div id="stage"><div id="col">
+  <div id="chat"></div>
+  <div id="thought"><div class="cloud">
+      <i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="b b5"></i><i class="b b6"></i><i class="b b7"></i>
+      <div class="cloud-body"><span class="wl">SOMEWHERE AT CDU, BETWEEN CLASSES, A LECTURER THINKS...</span><span id="thoughtTxt"></span></div>
+    </div>
+    <div class="tdots"><i></i><i></i></div></div>
+  <div id="composerWrap">
+    <div id="composer"><span class="ph">Message Copilot</span></div>
+    <button id="sendBtn" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M3 20.5 L22 12 L3 3.5 L3 10 L16 12 L3 14 Z"/></svg></button>
+  </div>
+</div></div>
+
+<div id="huntbar"><span id="huntmsg"></span><button id="huntbtn" class="btn primary">Send for real</button></div>
+<div id="toast" class="roundtoast"></div>
+
+<footer id="foot">
+  <div class="credit">Training simulation for the CDU AI Workshop for Teaching and Student-facing Support Staff · ntworld.ink · Not the real Copilot; no AI runs in this page. Content enhanced by AI (Claude, Anthropic); scenario, structure and review by Sally.</div>
+  <span id="hint">Space or → to advance · M for rounds</span>
+  <button id="menuBtn" class="btn">Rounds</button>
+  <button id="nextBtn" class="btn primary">Next</button>
+</footer>
+
+<!-- start screen -->
+<div class="ov show" id="titleOv"><div class="card">
+  <div class="ov-label">CHARLES DARWIN UNIVERSITY · AI WORKSHOP · COPILOT FOR TEACHING STAFF</div>
+  <div class="big-title">Be a Champion<br>Prompt Critic</div>
+  <div class="big-sub">Eight everyday prompts from around the university are about to be sent to Copilot. Every one of them has a problem. Your job: call it out before the send button gets pressed.</div>
+  <div class="big-sub" style="font-size:.95rem;margin-bottom:30px">Shout your answers; the sharpest critics carry the round. <span class="kbd">Space</span> advances.</div>
+  <button class="btn primary big" onclick="startGame()">Start the first round</button>
+</div></div>
+
+<!-- critic overlay -->
+<div class="ov" id="criticOv"><div class="card">
+  <div class="ov-label">HOLD IT RIGHT THERE</div>
+  <div class="ov-title">Your turn, Prompt Critics</div>
+  <ul class="qlist" id="qlist"></ul>
+  <div class="ov-foot"><button class="btn primary big" id="fixBtn">Fix it</button></div>
+</div></div>
+
+<!-- celebration -->
+<div class="ov" id="celebOv"><div class="card" id="celebCard">
+  <div class="tickwrap"><svg viewBox="0 0 52 52"><path d="M12 27 L22 37 L40 16"/></svg></div>
+  <div class="celeb-title">Job done</div>
+  <div class="celeb-line" id="celebLine"></div>
+  <div class="saved"><div class="sl" id="savedLabel">ESTIMATED TIME SAVED</div><div class="sv" id="savedVal">0 minutes</div>
+    <div class="st" id="savedNote"></div></div>
+  <button class="btn primary big" id="celebNext">Next round</button>
+</div></div>
+
+<!-- menu -->
+<div class="ov" id="menuOv"><div class="card">
+  <div class="ov-label">ROUNDS</div>
+  <div class="ov-title" style="font-size:1.6rem">Jump to any round, in any order</div>
+  <div class="menu-grid" id="menuGrid"></div>
+  <div class="ov-foot"><span class="ov-note">The time-saved tally keeps counting whichever order you play.</span>
+    <button class="btn" id="menuClose">Close</button>
+    <button class="btn primary" id="menuChecklist">Finish: the checklist</button></div>
+</div></div>
+
+<!-- checklist -->
+<div class="ov" id="checkOv"><div class="card">
+  <div class="ov-label">TAKE THIS WITH YOU</div>
+  <div class="ov-title">The Prompt Critic's Checklist</div>
+  <ul class="chk">
+    <li><b>Give the who, what, when and where.</b> Copilot only knows what you tell it; which unit, which assessment, which date.</li>
+    <li><b>Say what you want.</b> Source material, format, length, difficulty, and what the reader should do next.</li>
+    <li><b>Name the audience and how they read.</b> Plain English and short sentences are a choice you make, not a fluke.</li>
+    <li><b>Supply the facts.</b> Copilot fills every gap with something plausible; it will not say "I don't know".</li>
+    <li><b>Never send your worst mood.</b> Ask for the tone you want to be known for; the email carries your name, not Copilot's.</li>
+    <li><b>Student work stays out of prompts.</b> Submissions, marks and assessment content are on the never-paste list, and a prompt is a disclosure.</li>
+    <li><b>Copilot drafts, you decide.</b> Proofread every draft; the last check is always human.</li>
+    <li><b>Keep personal and health details out of prompts.</b> De-identify first; the message works without the name.</li>
+  </ul>
+  <div class="total-line">Total estimated time saved by today's critics: <b id="grandTotal">0 minutes</b>.</div>
+  <div class="fineprint">Time savings are for celebration purposes only and would not survive an audit.</div>
+  <div class="ov-foot"><button class="btn" id="checkClose">Back</button></div>
+</div></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   PROMPT CRITICS · a presenter-driven game for the CDU AI Workshop (teaching staff edition)
+   Rounds are self-contained objects in ROUNDS; reorder freely.
+   ===================================================================== */
+
+/* ---------- cohort configuration (edit these two, then the HTML strings listed in SKILL.md) ---------- */
+const AI_NAME = "Copilot";   // the AI the cohort actually uses: "Copilot", "Claude", "Gemini", "ChatGPT"
+const THINKER_LABEL = "SOMEWHERE AT CDU, BETWEEN CLASSES, A LECTURER THINKS...";
+
+const $ = id => document.getElementById(id);
+const chat = $("chat"), composer = $("composer"), sendBtn = $("sendBtn");
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- helpers: chat rendering ---------- */
+function scrollChat(){ chat.scrollTop = chat.scrollHeight; }
+
+function addMsg(kind, html, whoLabel){
+  const m = document.createElement("div");
+  m.className = "msg " + kind;
+  const av = kind === "ai" ? `<div class="avatar">AI</div>` : `<div class="avatar">YOU</div>`;
+  m.innerHTML = av + `<div class="bubble"><div class="who">${whoLabel}</div><div class="body">${html}</div></div>`;
+  chat.appendChild(m); scrollChat();
+  return m;
+}
+
+function showTypingInd(){
+  const m = addMsg("ai", `<span class="typing-ind"><i></i><i></i><i></i></span>`, AI_NAME.toUpperCase());
+  m.id = "tind"; return m;
+}
+
+/* stream an assistant reply line by line */
+async function streamReply(html){
+  const ind = $("tind"); if(ind) ind.remove();
+  const lines = html.split("\n").map(l => `<span class="line">${l}</span>`).join("\n");
+  const m = addMsg("ai", lines, AI_NAME.toUpperCase());
+  const els = m.querySelectorAll(".line");
+  for(const el of els){
+    if(state.ff){ els.forEach(e => e.classList.add("on")); break; }
+    el.classList.add("on"); scrollChat();
+    await sleep(340);
+  }
+  els.forEach(e => e.classList.add("on"));
+  scrollChat();
+  return m;
+}
+
+/* ---------- helpers: composer ---------- */
+function clearComposer(placeholder){
+  composer.innerHTML = placeholder ? `<span class="ph">Message ${AI_NAME}</span>` : "";
+  composer.classList.remove("live");
+  sendBtn.classList.remove("ready");
+}
+function caretOn(){
+  let c = composer.querySelector(".caret");
+  if(!c){ c = document.createElement("span"); c.className = "caret"; composer.appendChild(c); }
+  return c;
+}
+
+/* type segments into the composer.
+   seg: {t:"text"} plain · {t:"text",hl:true} highlighted · {card:{top,body}} pasted doc */
+async function typeSegs(segs, speed){
+  composer.innerHTML = ""; composer.classList.add("live");
+  const caret = caretOn();
+  for(const seg of segs){
+    if(seg.card){
+      caret.remove();
+      const d = document.createElement("span");
+      d.className = "doccard"; d.id = seg.card.id || "";
+      d.innerHTML = `<span class="dc-top">${seg.card.top}</span>${seg.card.body}`;
+      composer.appendChild(d);
+      composer.appendChild(caret);
+      await sleep(state.ff ? 0 : 600);
+      continue;
+    }
+    const span = document.createElement("span");
+    if(seg.hl) span.className = "hl";
+    if(seg.cls) span.className = seg.cls;
+    composer.insertBefore(span, caret);
+    for(const ch of seg.t){
+      span.textContent += ch;
+      if(!state.ff){
+        const base = seg.hl ? speed * .6 : speed;
+        await sleep(base + Math.random() * base * .9);
+        if(ch === "." || ch === ",") await sleep(state.ff ? 0 : 140);
+      }
+    }
+  }
+  sendBtn.classList.add("ready");
+}
+
+/* ---------- game state ---------- */
+const state = {
+  round: null,       // current round object
+  stepIx: 0,
+  waiting: false,    // waiting for presenter Next
+  running: false,    // a step animation is in flight
+  ff: false,         // fast-forward flag
+  hunt: 0,           // errors left to click in the finale
+  played: new Set(),
+  totalMin: 0,
+  started: false
+};
+
+/* ---------- time formatting ---------- */
+function fmtMin(min){
+  if(min < 60) return min + " minutes";
+  const h = Math.floor(min / 60), m = min % 60;
+  const hs = h === 1 ? "1 hour" : h + " hours";
+  return m ? hs + " " + m + " min" : hs;
+}
+
+/* ---------- rounds ---------- */
+const ROUNDS = [
+
+{ id:"announce", title:"The announcement", tag:"Context: who, what, when, where",
+  steps:[
+    { do:"thought", text:`The assignment due date moved so everyone gets the long weekend. Better put an announcement up before the emails start. Copilot can draft it.` },
+    { do:"type", segs:[{t:`write an anouncement for my students about the assigment change`}] },
+    { do:"critic", questions:[
+        `Which unit? Most of us teach more than one.`,
+        `What actually changed, and to what date?`,
+        `Where will students read this: an email, or the Learnline announcement?`,
+        `Is there anything in this prompt Copilot could not have guessed on its own?`
+      ], button:"Add the details" },
+    { do:"fix", segs:[
+        {t:`write a short, friendly Learnline announcement for `},
+        {t:`CYB204 Cyber Security Fundamentals`, hl:true},
+        {t:`: `},
+        {t:`Assessment 2 is now due Friday 11 September at 5pm, moved from 4 September`, hl:true},
+        {t:`. `},
+        {t:`Nothing else about the task has changed`, hl:true},
+        {t:`. Point questions to `},
+        {t:`the unit discussion board`, hl:true},
+        {t:` and keep it under 80 words.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`<span class="subj">Assessment 2: new due date, Friday 11 September</span>Hi everyone,\n\nGood news before the long weekend: Assessment 2 for CYB204 is now due Friday 11 September at 5pm, moved back from 4 September. Nothing else about the task has changed; same brief, same rubric, same submission point.\n\nQuestions? Post them on the unit discussion board so everyone sees the answer.\n\nEnjoy the extra week.` },
+    { do:"celebrate", min:25, line:`No inbox full of "which assignment?" replies.`,
+      note:`Roughly 25 one-line questions answered before they were asked.` }
+  ]},
+
+{ id:"quiz", title:"The revision quiz", tag:"The ask: source, format, purpose",
+  steps:[
+    { do:"thought", text:`Week 3 went badly; half the class glazed over at subnetting. Study and Learn could build them a practice quiz. Quick job.` },
+    { do:"type", segs:[{t:`make a quiz about week 3`}] },
+    { do:"critic", questions:[
+        `Which unit's week 3? Study and Learn was not in your lecture.`,
+        `From what source: your slides, the reading, or whatever the internet thinks week 3 means?`,
+        `How many questions, what difficulty, and is it for practice or for marks?`,
+        `A vague ask means the AI invents a week 3 of its own, and your students revise the wrong thing.`
+      ], button:"Sharpen the ask" },
+    { do:"fix", segs:[
+        {t:`using `},
+        {t:`the uploaded NET102 week 3 lecture notes on subnetting`, hl:true},
+        {t:` as the only source, make a `},
+        {t:`10-question multiple-choice practice quiz`, hl:true},
+        {t:`, `},
+        {t:`mixed difficulty with the hardest last`, hl:true},
+        {t:`, and `},
+        {t:`a short explanation for every answer`, hl:true},
+        {t:`. It is for self-study, not marks.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`Practice quiz: Subnetting (NET102, week 3). Ten questions, answers explained at the end.\n\n1. A /26 network provides how many usable host addresses?\n(a) 62  (b) 64  (c) 30  (d) 126\n\n2. Which subnet mask matches a /20 prefix?\n(a) 255.255.240.0  (b) 255.255.255.240  (c) 255.240.0.0  (d) 255.255.224.0\n\n... eight more questions follow, hardest last, each with a worked explanation.` },
+    { do:"celebrate", min:35, line:`A quiz about your week 3, not a week 3 from the internet.`,
+      note:`The uploaded notes did the steering.` }
+  ]},
+
+{ id:"translate", title:"The policy translation", tag:"Audience: who reads it, and how",
+  steps:[
+    { do:"thought", text:`Orientation is coming and first-years keep tripping over the AI rules. The policy language is not helping them.` },
+    { do:"type", segs:[{t:`draft a formal explication of the university's academic integrity requirements pertaining to generative artificial inteligence utilisation`}] },
+    { do:"critic", questions:[
+        `Who is this for? First-years read orientation handouts, not policy registers.`,
+        `For many CDU students, English is a second, third or fourth language.`,
+        `"Explication" and "utilisation" are the problem, not the answer.`,
+        `What do they actually need: what is allowed, what must be declared, who to ask.`
+      ], button:"Set the audience" },
+    { do:"fix", segs:[
+        {t:`write a short guide for `},
+        {t:`first-year students at orientation`, hl:true},
+        {t:` about using AI in assignments at CDU. `},
+        {t:`Plain English, short sentences`, hl:true},
+        {t:`, easy to read `},
+        {t:`for students whose first language is not English`, hl:true},
+        {t:`. Cover three things: `},
+        {t:`check your unit outline, declare any AI use, and ask your lecturer if unsure`, hl:true},
+        {t:`.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`<span class="subj">Using AI in your assignments: three things to know</span>Every unit is different. Your unit outline tells you if AI tools are allowed, and how. Check it first.\n\nIf you use AI in your work, say so. Declaring it keeps you safe. Hiding it is treated as cheating.\n\nNot sure? Ask your lecturer before you submit. Asking is always okay.` },
+    { do:"celebrate", min:35, line:`Rules students can actually follow.`,
+      note:`Nobody had to look up "explication".` }
+  ]},
+
+{ id:"exam", title:"The exam email", tag:"Facts: Copilot fills gaps with fiction",
+  steps:[
+    { do:"thought", text:`The exam venue changed and students need an email today. The exams office message is somewhere in my inbox. Copilot can get a draft going.` },
+    { do:"type", segs:[{t:`write an email to my students about the changed exam arangements`}] },
+    { do:"send" },
+    { do:"reply", html:`<span class="subj">Subject: Updated exam arrangements</span>Dear students,\n\nPlease note the exam arrangements for this unit have changed. Your exam will now be held on <span id="invExam">Thursday 22 October at 9am in Building Blue 5, Room 2.01</span>. Please arrive fifteen minutes early and bring your student ID.\n\nGood luck with your preparation.` },
+    { do:"critic", highlight:"invExam", questions:[
+        `Hang on. A date, a time and a room. Where did they come from?`,
+        `You never told Copilot the new arrangements, so it wrote some.`,
+        `It will not say "I don't know"; it fills every gap with something confident and plausible.`,
+        `Picture sixty students at the wrong building in exam week.`
+      ], button:"Give it the facts" },
+    { do:"fix", segs:[
+        {t:`rewrite with the real details from the exams office: `},
+        {t:`the exam moves to Wednesday 21 October at 1pm, Building Orange 12, Room 1.10, Casuarina campus`, hl:true},
+        {t:`. Tell students `},
+        {t:`their personal exam timetable on the student portal is the official source and they should check it`, hl:true},
+        {t:`, and to arrive fifteen minutes early.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`<span class="subj">Subject: Exam venue and time have changed; please check your timetable</span>Dear students,\n\nThe exam for this unit has moved. It will now run on Wednesday 21 October at 1pm in Building Orange 12, Room 1.10 at Casuarina campus.\n\nYour personal exam timetable on the student portal is the official source, so please check it before the day. Arrive fifteen minutes early with your student ID.\n\nGood luck with your preparation.` },
+    { do:"celebrate", min:45, line:`Sixty students at the right room.`,
+      note:`Copilot supplied the wording. The exams office supplied the truth.` }
+  ]},
+
+{ id:"remark", title:"The 9.40pm reply", tag:"Tone: never send your worst mood",
+  steps:[
+    { do:"thought", text:`Third email tonight from the same student, now claiming I lost their assignment. Learnline shows no submission. It is 9.40pm and I am done being polite.` },
+    { do:"type", segs:[{t:`write a reply saying I did not lose anything, learnline shows you never submited it, and stop emailing me at night and check your own work before acusing staff`}] },
+    { do:"critic", questions:[
+        `Would you be happy to see this read aloud at a student appeal?`,
+        `You are allowed to feel it. You are just not allowed to send it.`,
+        `What does a panicking student do with "stop emailing me"? Escalates, or disappears.`,
+        `Copilot will happily write your worst mood if you ask it to.`
+      ], button:"Cool it down" },
+    { do:"fix", segs:[
+        {t:`write a `},
+        {t:`calm, professional reply`, hl:true},
+        {t:` to a student who believes they submitted an assignment: `},
+        {t:`Learnline shows no record of a submission`, hl:true},
+        {t:`, explain `},
+        {t:`how to check their submission receipt email`, hl:true},
+        {t:`, and offer the next step: `},
+        {t:`contact me tomorrow and we will sort it out together`, hl:true},
+        {t:`. Kind, short, no blame.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`<span class="subj">Subject: Re: My assignment submission</span>Hi,\n\nThanks for flagging this; I know it is stressful. I have checked Learnline and there is no record of a submission at this stage.\n\nWhen a submission goes through, Learnline emails you a receipt; searching your student email for "submission receipt" is the quickest check.\n\nGet in touch tomorrow and we will sort it out together; if something went wrong technically, there are options.\n\nKind regards` },
+    { do:"celebrate", min:120, line:`No apology meeting. No file note with your name on it.`,
+      note:`The feeling was real; it just never reached the outbox.` }
+  ]},
+
+{ id:"paste", title:"The marking shortcut", tag:"Disclosure: student work stays out of prompts",
+  steps:[
+    { do:"thought", text:`Forty-two incident response reports to mark by Friday. If Copilot drafts the feedback against the rubric, I might see the weekend. Easiest way: paste the first one in.` },
+    { do:"type", segs:[
+        {t:`write feedback against my rubric for this submission: `},
+        {card:{ id:"pasteCard", top:"PASTED FROM: A2_submission_s4477812.docx",
+          body:`Student 4477812 · Assessment 2 · Incident Response Report. "In this report I analyse a 2025 ransomware incident and the organisation's response..." (2,400 more words of a student's original work)`}}
+      ] },
+    { do:"critic", questions:[
+        `Read the top line of what was just pasted: a student number and their whole submission.`,
+        `A student's work is their intellectual property, and assessment content is on the policy's never-paste list.`,
+        `A prompt is a disclosure. That report has now left the building.`,
+        `And the TAFE version of this is harder again: VET competency judgements need a qualified assessor, and a gen AI platform cannot be one.`
+      ], button:"Strip it back" },
+    { do:"strip", card:"pasteCard" },
+    { do:"fix", segs:[
+        {t:`help me with reusable wording instead: `},
+        {t:`draft three feedback comments for reports that describe an incident but never analyse cause or response`, hl:true},
+        {t:`, matched to a rubric criterion called `},
+        {t:`"analysis and evaluation"`, hl:true},
+        {t:`. I will adapt them to each student myself.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`Three reusable comments for the "analysis and evaluation" criterion:\n\n1. "Your report describes what happened clearly, but the marker needs to see why it happened; take one cause and trace it through the incident."\n\n2. "Strong narrative; now evaluate. Which response decisions worked, which did not, and what evidence supports your view?"\n\n3. "Consider closing with judgement rather than summary: what should this organisation do differently next time, and why?"` },
+    { do:"celebrate", min:90, line:`Feedback help without a privacy incident.`,
+      note:`The submissions stayed where they belong.` }
+  ]},
+
+{ id:"proofread", title:"The census reminder", tag:"Trick round: Copilot drafts, you decide",
+  steps:[
+    { do:"thought", text:`Last job tonight: the census date reminder for my first-years. I have got the hang of this prompting caper now.` },
+    { do:"type", segs:[{t:`write a short Learnline announcement for my first-year unit: the census date for Semester 2 is Monday 31 August. Students who withdraw before census avoid fees and academic penalty for this unit. Anyone unsure about their enrolment should talk to Student Central before the date. Friendly but clear, under 100 words, with a one-line heading.`}] },
+    { do:"critic", questions:[
+        `Trick round. Read it again: the date, the audience, the stakes, the action, the format. This prompt is good.`,
+        `So send it. But keep your eyes open.`
+      ], button:"Send it" },
+    { do:"send" },
+    { do:"reply", html:`<span class="subj">Census date is coming: check your enrolment</span>A quick but important reminder: the Semester 2 census date is <span class="err" data-fix="Monday 31 August">Monday 31 October</span>.\n\nIf you withdraw from the unit before census, you avoid fees and academic penalty for it. After census, both apply.\n\nNot sure about your enrolment or your plans? Talk to <span class="err" data-fix="Student Central">[insert support service]</span> before the date; a ten-minute conversation now can save a semester of regret.` },
+    { do:"hunt", msg:`The prompt was perfect. The draft is not. Find the two problems in Copilot's draft and click them.` },
+    { do:"celebrate", min:60, line:`Fifteen seconds of proofreading; one census-week disaster avoided.`,
+      note:`The perfect prompt still gets a human once-over. Every time.` }
+  ]},
+
+{ id:"extension", title:"The extension request", tag:"Privacy: de-identify before you prompt",
+  steps:[
+    { do:"thought", text:`A student has asked for an extension with a specialist's letter attached. Approved, of course. Now the tutors need to know not to chase her late submission.` },
+    { do:"type", segs:[{t:`write an email to my three tutors explaining that Aurelia Vandermeer-Okafor, student number 4491203, has a two week extention because of her epilepsy diagnosis, see the specialists letter, so dont chase her about the late submission`}] },
+    { do:"critic", questions:[
+        `Do three tutors need her name, student number and diagnosis in writing?`,
+        `Her medical information is hers. The specialist's letter came to you, not to the teaching team.`,
+        `Email gets forwarded. Once this exists, where does it end up?`,
+        `Health information is about as personal as personal information gets, and it is on the never-paste list twice over.`
+      ], button:"De-identify" },
+    { do:"redact", spans:[`Aurelia Vandermeer-Okafor, student number 4491203, `, `because of her epilepsy diagnosis, see the specialists letter, `] },
+    { do:"fix", segs:[
+        {t:`write a short email to the tutoring team: `},
+        {t:`one student in the Tuesday workshop has an approved extension to Friday 25 September`, hl:true},
+        {t:` for Assessment 2. `},
+        {t:`No follow-up needed on their submission status; I am tracking it`, hl:true},
+        {t:`. `},
+        {t:`The reasons are confidential and stay with me`, hl:true},
+        {t:`. Brief and matter-of-fact.`}
+      ] },
+    { do:"send" },
+    { do:"reply", html:`<span class="subj">Subject: Assessment 2: one approved extension</span>Hi team,\n\nOne student in the Tuesday workshop has an approved extension for Assessment 2, with a new due date of Friday 25 September. No follow-up is needed on their submission status; I am tracking it directly.\n\nThe reasons are confidential and stay with me, as always.\n\nThanks everyone.` },
+    { do:"celebrate", min:240, final:true, line:`Handled with care. No name, no number, no diagnosis.`,
+      note:`Just enough time to reply to Aurelia and wish her well.` }
+  ]}
+];
+
+/* ---------- step engine ---------- */
+const stepHandlers = {
+
+  async thought(s){
+    $("thoughtTxt").textContent = s.text;
+    $("thought").classList.add("show");
+    return "wait";
+  },
+
+  async type(s){
+    $("thought").classList.remove("show");
+    await typeSegs(s.segs, 55);
+    return "wait";
+  },
+
+  async critic(s){
+    if(s.highlight){ const el = document.getElementById(s.highlight); if(el) el.classList.add("callout"); }
+    $("qlist").innerHTML = s.questions.map(q => `<li>${q}</li>`).join("");
+    $("fixBtn").textContent = s.button;
+    $("criticOv").classList.add("show");
+    state.criticHighlight = s.highlight || null;
+    return "button";   // fixBtn advances
+  },
+
+  async redact(s){
+    // wrap each target substring in the composer, then strike and collapse
+    let html = composer.innerHTML;
+    for(const t of s.spans){ html = html.replace(t, `<span class="redact">${t}</span>`); }
+    composer.innerHTML = html; caretOn();
+    const spans = composer.querySelectorAll(".redact");
+    await sleep(state.ff ? 0 : 400);
+    for(const sp of spans){ sp.classList.add("strike"); await sleep(state.ff ? 0 : 500); }
+    await sleep(state.ff ? 0 : 500);
+    spans.forEach(sp => sp.classList.add("gone"));
+    await sleep(state.ff ? 0 : 900);
+    return "auto";
+  },
+
+  async strip(s){
+    const card = document.getElementById(s.card);
+    if(card){ card.classList.add("crush"); await sleep(state.ff ? 0 : 700); card.remove(); }
+    await sleep(state.ff ? 0 : 300);
+    return "auto";
+  },
+
+  async fix(s){
+    sendBtn.classList.remove("ready");
+    await typeSegs(s.segs, 26);
+    return "wait";
+  },
+
+  async send(){
+    const body = composer.querySelector(".caret")?.remove();
+    const html = composer.innerHTML;
+    clearComposer(true);
+    addMsg("user", html, "YOU");
+    showTypingInd();
+    await sleep(state.ff ? 120 : 1100);
+    return "auto";
+  },
+
+  async reply(s){
+    await streamReply(s.html);
+    return "wait";
+  },
+
+  async hunt(s){
+    state.hunt = 0;
+    const errs = chat.querySelectorAll(".err:not(.done)");
+    errs.forEach(e => { e.classList.add("armed"); state.hunt++; });
+    $("huntmsg").textContent = s.msg;
+    $("huntbtn").style.display = "none";
+    $("huntbar").classList.add("show");
+    return "hunt";
+  },
+
+  async celebrate(s){
+    const prev = state.totalMin;
+    state.totalMin += s.min;
+    $("celebLine").textContent = s.line;
+    $("savedNote").textContent = s.note || "";
+    $("savedLabel").textContent = s.final ? "TOTAL ESTIMATED TIME SAVED TODAY" : "ESTIMATED TIME SAVED";
+    // reset tick animation
+    const card = $("celebCard");
+    const tw = card.querySelector(".tickwrap");
+    tw.style.animation = "none"; void tw.offsetWidth; tw.style.animation = "";
+    const p = tw.querySelector("path");
+    p.style.animation = "none"; void p.getBoundingClientRect(); p.style.animation = "";
+    $("celebOv").classList.add("show");
+    if(!s.final) confetti(card.parentElement);
+    // count up: normal rounds count this round's saving; the finale counts up to the day's total
+    const from = s.final ? prev : 0;
+    const to = s.final ? state.totalMin : s.min;
+    const el = $("savedVal"), t0 = performance.now(), dur = s.final ? 1600 : 900;
+    const tick = now => {
+      const k = Math.min(1, (now - t0) / dur);
+      el.textContent = fmtMin(Math.round(from + (to - from) * (k * (2 - k))));
+      if(k < 1) requestAnimationFrame(tick);
+      else el.textContent = fmtMin(to);
+    };
+    requestAnimationFrame(tick);
+    updateTally();
+    state.played.add(state.round.id);
+    $("celebNext").textContent = state.played.size >= ROUNDS.length ? "See the checklist" : "Next round";
+    return "button";  // celebNext advances
+  }
+};
+
+/* ---------- engine plumbing ---------- */
+async function runStep(){
+  const r = state.round;
+  if(!r || state.stepIx >= r.steps.length){ afterRound(); return; }
+  const s = r.steps[state.stepIx];
+  state.running = true; state.waiting = false;
+  const mode = await stepHandlers[s.do](s);
+  state.running = false; state.ff = false;
+  state.stepIx++;
+  if(mode === "auto") runStep();
+  else state.waiting = (mode === "wait");
+  // "button" and "hunt" advance via their own controls
+}
+
+function next(){
+  if(!state.started) { startGame(); return; }
+  if($("celebOv").classList.contains("show")){ celebAdvance(); return; }
+  if($("criticOv").classList.contains("show")) return;      // must use the fix button
+  if(state.hunt > 0){ const hb=$("huntbar"); hb.classList.remove("shake"); void hb.offsetWidth; hb.classList.add("shake"); return; }
+  if(state.running){ state.ff = true; return; }              // fast-forward animation
+  if(state.waiting){ state.waiting = false; runStep(); }
+}
+
+function startRound(r){
+  state.round = r; state.stepIx = 0; state.hunt = 0; state.waiting = false; state.running = false;
+  chat.innerHTML = ""; clearComposer(true);
+  $("thought").classList.remove("show");
+  $("huntbar").classList.remove("show");
+  const pos = state.played.has(r.id) ? [...state.played].indexOf(r.id) + 1 : state.played.size + 1;
+  $("roundLabel").textContent = `Round ${Math.min(pos, ROUNDS.length)} of ${ROUNDS.length} · ${r.title} · ${r.tag}`;
+  toast(`ROUND · ${r.title.toUpperCase()}`);
+  runStep();
+}
+
+function afterRound(){
+  const nxt = ROUNDS.find(r => !state.played.has(r.id));
+  if(nxt) startRound(nxt);
+  else showChecklist();
+}
+
+function celebAdvance(){
+  $("celebOv").classList.remove("show");
+  document.querySelectorAll(".confetti").forEach(c => c.remove());
+  runStep();  // celebrate was the last step; runStep falls through to afterRound
+}
+
+function startGame(){
+  state.started = true;
+  $("titleOv").classList.remove("show");
+  startRound(ROUNDS[0]);
+}
+
+/* ---------- controls ---------- */
+$("nextBtn").addEventListener("click", next);
+sendBtn.addEventListener("click", next);
+$("fixBtn").addEventListener("click", () => {
+  $("criticOv").classList.remove("show");
+  if(state.criticHighlight){ const el = document.getElementById(state.criticHighlight); if(el) el.classList.remove("callout"); }
+  runStep();
+});
+$("celebNext").addEventListener("click", celebAdvance);
+
+chat.addEventListener("click", e => {
+  const err = e.target.closest(".err.armed");
+  if(!err) return;
+  err.textContent = err.dataset.fix;
+  err.classList.remove("armed"); err.classList.add("done");
+  state.hunt--;
+  if(state.hunt === 0){
+    $("huntmsg").textContent = "Both found. Now it can go.";
+    $("huntbtn").style.display = "inline-block";
+  }
+});
+$("huntbtn").addEventListener("click", () => {
+  $("huntbar").classList.remove("show");
+  runStep();
+});
+
+/* menu */
+function buildMenu(){
+  $("menuGrid").innerHTML = ROUNDS.map(r =>
+    `<button class="mcard ${state.played.has(r.id) ? "played" : ""}" data-r="${r.id}">
+       <span><span class="mt">${r.title}</span><br><span class="mg">${r.tag}</span></span>
+       <span class="tick">PLAYED</span></button>`).join("");
+  $("menuGrid").querySelectorAll(".mcard").forEach(b =>
+    b.addEventListener("click", () => {
+      $("menuOv").classList.remove("show");
+      closeAllOv();
+      state.started = true; $("titleOv").classList.remove("show");
+      startRound(ROUNDS.find(r => r.id === b.dataset.r));
+    }));
+}
+$("menuBtn").addEventListener("click", () => { buildMenu(); $("menuOv").classList.add("show"); });
+$("menuClose").addEventListener("click", () => $("menuOv").classList.remove("show"));
+$("menuChecklist").addEventListener("click", () => { $("menuOv").classList.remove("show"); showChecklist(); });
+$("checkClose").addEventListener("click", () => $("checkOv").classList.remove("show"));
+
+function closeAllOv(){ document.querySelectorAll(".ov").forEach(o => { if(o.id !== "titleOv") o.classList.remove("show"); }); }
+
+function showChecklist(){
+  $("grandTotal").textContent = fmtMin(state.totalMin);
+  $("checkOv").classList.add("show");
+  $("roundLabel").textContent = "The Prompt Critic's Checklist";
+}
+
+/* keyboard */
+document.addEventListener("keydown", e => {
+  if(e.key === " " || e.key === "ArrowRight"){ e.preventDefault(); next(); }
+  else if(e.key.toLowerCase() === "m"){ buildMenu(); $("menuOv").classList.toggle("show"); }
+  else if(e.key.toLowerCase() === "r"){ if(state.round){ state.played.delete(state.round.id); startRound(state.round); } }
+});
+
+document.querySelector("#thought .wl").textContent = THINKER_LABEL;
+
+/* ---------- flourishes ---------- */
+function updateTally(){
+  const t = $("tally");
+  t.textContent = "Time saved: " + fmtMin(state.totalMin);
+  t.classList.remove("bump"); void t.offsetWidth; t.classList.add("bump");
+}
+
+function toast(txt){
+  const t = $("toast");
+  t.textContent = txt; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+function confetti(host){
+  const colours = ["#4b85a9", "#beebd5", "#8db091", "#e8edf2", "#6fa3c2"];
+  for(let i = 0; i < 70; i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    const sz = 6 + Math.random() * 8;
+    c.style.cssText = `left:${Math.random() * 100}%;width:${sz}px;height:${sz * (0.4 + Math.random())}px;` +
+      `background:${colours[i % colours.length]};animation-duration:${2.2 + Math.random() * 1.8}s;` +
+      `animation-delay:${Math.random() * .5}s;`;
+    host.appendChild(c);
+    setTimeout(() => c.remove(), 4600);
+  }
+}
+</script>
+</body>
+</html>
