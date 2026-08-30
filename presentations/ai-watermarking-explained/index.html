@@ -251,9 +251,71 @@
   .genhint { margin-top: 12px; font-size: 13.5px; color: var(--ink-dim); letter-spacing: .02em; }
   .gensent .blank { color: var(--accent); border-bottom: 2px solid var(--accent-dim); padding: 0 10px; }
 
+
+  /* Module 6: watermark playground */
+  .beat.wide { max-width: 1500px; }
+  .formula { font-family: var(--mono); font-size: 26px; color: var(--ink-head); background: var(--panel-2); border: 1px solid var(--hairline-strong); border-radius: var(--radius); padding: 18px 24px; margin-top: 18px; max-width: 940px; letter-spacing: .02em; }
+  .formula .g { color: #86c79c; } .formula .k { color: var(--accent-bright); }
+  .pg { display: grid; grid-template-columns: 320px minmax(0, 1fr) 320px; gap: 16px; margin-top: 8px; align-items: start; }
+  .pgpanel { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 16px 18px; }
+  .pgtitle { font-family: var(--display); font-size: 24px; font-weight: 500; color: var(--ink-head); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .pglabel { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent-dim); margin: 12px 0 6px; display: block; }
+  .pgselect, .pginput, .pgtext { width: 100%; background: var(--panel-2); color: var(--ink-head); border: 1px solid var(--hairline-strong); border-radius: 6px; font-family: var(--serif); font-size: 14px; padding: 8px 10px; }
+  .pgselect:focus, .pginput:focus, .pgtext:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .pginput { font-family: var(--mono); font-size: 13.5px; }
+  .pgtext { font-family: var(--mono); font-size: 13px; line-height: 1.6; resize: vertical; min-height: 128px; }
+  .pgseg { display: inline-flex; background: var(--panel-2); border: 1px solid var(--hairline); border-radius: 6px; padding: 3px; gap: 2px; }
+  .pgseg button { font-family: inherit; font-size: 13.5px; padding: 6px 12px; background: transparent; color: var(--ink-muted); border: 0; border-radius: 4px; cursor: pointer; }
+  .pgseg.sm button { font-family: var(--mono); font-size: 12.5px; padding: 5px 9px; }
+  .pgseg button:hover { color: var(--ink-head); }
+  .pgseg button.on { background: rgba(26,201,201,.14); color: var(--accent-bright); }
+  .pgseg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .pgseg.off { opacity: .35; pointer-events: none; }
+  .pgparams { display: grid; gap: 8px; margin-top: 4px; }
+  .pgparam { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .pgparam .pginput { width: 140px; }
+  .pgk { white-space: nowrap; font-family: var(--mono); font-size: 13.5px; color: var(--ink-body); background: transparent; border: 0; border-bottom: 1px dashed var(--accent-dim); cursor: pointer; padding: 0 0 1px; }
+  .pgk:hover { color: var(--accent-bright); }
+  .pgk:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pghelp { margin-top: 12px; font-size: 13px; line-height: 1.55; color: var(--ink-muted); min-height: 76px; }
+  .pghelp .t { color: var(--accent-bright); }
+  .pgbtns { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .pgbtns .stepbtn { width: 100%; }
+  .pgstatus { margin-top: 10px; font-size: 13px; line-height: 1.5; color: var(--ink-muted); }
+  .pgstatus .mono { color: var(--ink-body); }
+  .pgsrc { margin-top: 8px; font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; }
+  .pgtokens { margin-top: 12px; max-height: 42vh; overflow-y: auto; font-family: var(--mono); font-size: 13.5px; line-height: 2.15; padding-right: 4px; }
+  .pgtokens .empty { color: var(--ink-dim); font-family: var(--serif); font-size: 14px; }
+  .tk { display: inline-block; padding: 0 4px; margin: 0 2px 2px 0; border-radius: 4px; border: 1px solid transparent; }
+  .tk.g { background: rgba(134,199,156,.13); border-color: rgba(134,199,156,.45); color: #b9e4c5; }
+  .tk.r { background: rgba(217,143,143,.10); border-color: rgba(217,143,143,.4); color: #e8b3b3; }
+  .tk.c { box-shadow: inset 0 -2px 0 var(--accent); }
+  .tk.skip { opacity: .4; border-style: dashed; }
+  .pglegend { font-size: 12px; color: var(--ink-muted); display: flex; gap: 12px; flex-wrap: wrap; font-family: var(--serif); font-weight: 400; }
+  .pglegend .sw { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; border: 1px solid transparent; }
+  .pglegend .sw.g { background: rgba(134,199,156,.2); border-color: rgba(134,199,156,.6); }
+  .pglegend .sw.r { background: rgba(217,143,143,.16); border-color: rgba(217,143,143,.55); }
+  .pglegend .sw.c { box-shadow: inset 0 -2px 0 var(--accent); border-color: var(--hairline-strong); }
+  .pgverdict { margin-top: 16px; font-family: var(--display); font-size: 27px; line-height: 1.15; color: var(--ink-body); }
+  .pgverdict.yes { color: #b9e4c5; } .pgverdict.weak { color: #e0b877; } .pgverdict.no { color: var(--ink-body); }
+  .pgmeter { position: relative; height: 8px; background: var(--panel-2); border: 1px solid var(--hairline); border-radius: 4px; margin: 14px 0 5px; }
+  .pgmeter .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, var(--accent-dim), var(--accent)); border-radius: 4px; transition: width .4s; }
+  .pgmeter .thr { position: absolute; top: -5px; bottom: -5px; width: 2px; background: #e0b877; }
+  .pgmeterlabels { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--ink-dim); }
+  .pgstats { margin-top: 12px; display: grid; gap: 6px; }
+  .pgstat { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13px; color: var(--ink-muted); border-bottom: 1px solid var(--hairline); padding-bottom: 5px; }
+  .pgstat .v { font-family: var(--mono); color: var(--ink-head); font-size: 14px; text-align: right; }
+  .pgexplain { margin-top: 12px; font-size: 13.5px; line-height: 1.55; color: var(--ink-body); }
+  .pgexplain .t { color: var(--accent-bright); }
+  .pgcheck { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-muted); margin-top: 10px; cursor: pointer; }
+  .pgcheck input { accent-color: var(--accent); }
+  .pgsettings { margin-top: 8px; font-size: 12.5px; color: var(--ink-dim); font-family: var(--mono); }
+  @media (max-width: 1100px) { .pg { grid-template-columns: 1fr; } .pgtokens { max-height: none; } }
+
   @media (prefers-reduced-motion: reduce) {
     .beat, .reveal-ans.shown { animation: none; }
     .stp { transition: none; }
+    .pgmeter .fill { transition: none; }
   }
   @media (max-width: 900px) {
     h1 { font-size: 40px; } h2 { font-size: 29px; }
@@ -276,13 +338,14 @@
     <section class="beat" data-scene="menu">
       <div class="eyebrow">An interactive walkthrough</div>
       <h1>Can you tell if it&rsquo;s AI?</h1>
-      <p class="lede">Since August 2026, most major AI providers mark their output, and the biggest name of all, Claude, does it worldwide. This walks through what that actually means: why the mark is not a hidden character you can delete, how a model can be nudged toward a secret pattern of word choices, a second and different real system from Google called SynthID, where the mark breaks down, and what happens when a school or a hiring manager treats a detector's result as proof rather than a hint.</p>
+      <p class="lede">Since August 2026, most major AI providers mark their output, and the biggest name of all, Claude, does it worldwide. This walks through what that actually means: why the mark is not a hidden character you can delete, how a model can be nudged toward a secret pattern of word choices, a second and different real system from Google called SynthID, where the mark breaks down, and what happens when a school or a hiring manager treats a detector's result as proof rather than a hint. It ends with a playground where you run the mark yourself and read the detector's numbers.</p>
       <div style="margin-top:34px">
         <button class="menu-item" onclick="goModule(1)"><span class="num">01</span><span class="name">The rule that changed everything</span><span class="state">Start</span></button>
         <button class="menu-item" onclick="goModule(2)"><span class="num">02</span><span class="name">Two things called "watermark"</span><span class="state">Start</span></button>
         <button class="menu-item" onclick="goModule(3)"><span class="num">03</span><span class="name">Green words, red words</span><span class="state">Start</span></button>
         <button class="menu-item" onclick="goModule(4)"><span class="num">04</span><span class="name">Where the mark breaks</span><span class="state">Start</span></button>
         <button class="menu-item" onclick="goModule(5)"><span class="num">05</span><span class="name">When a detector result is treated as proof</span><span class="state">Start</span></button>
+        <button class="menu-item" onclick="goModule(6)"><span class="num">06</span><span class="name">Try it yourself: the watermark playground</span><span class="state">Start</span></button>
       </div>
     </section>
 
@@ -543,9 +606,127 @@
       <div class="callout">The mark on AI text is real, it is worldwide since August 2026, and it is genuinely hard to strip. None of that makes it a lie detector: it fades when the task gives the model little room to choose its words, such as code; it says nothing about how much of a piece was AI-written; and the detectors built on top of it are already producing real false accusations at scale. <strong>Treat a positive flag as one signal to weigh, never as proof</strong>, and remember the mark only ever catches what you can see; it says nothing about whether a suggestion quietly nudged what you decided to write in the first place.</div>
       <div class="linkrow">
         <a href="https://blog.google/innovation-and-ai/products/google-synthid-ai-content-detector/" target="_blank" rel="noopener"><span class="sect">Google</span><span class="ttl">SynthID AI content detector</span></a>
+        <a href="#m6" onclick="goModule(6); return false;"><span class="sect">Module 06</span><span class="ttl">Try the watermark playground</span></a>
         <a href="/presentations/"><span class="sect">NT World Ink</span><span class="ttl">Back to presentations</span></a>
       </div>
       <p class="cite">Sources used. Regulation and rollout: Article 50(2), Regulation (EU) 2024/1689, full text via the AI Act Explorer at artificialintelligenceact.eu, accessed 17 August 2026; European Commission Digital Strategy, "Transparency obligations under Article 50 AI Act" and "Strong backing for the Code of Practice on Transparency of AI-generated Content," accessed 14 August 2026; Anthropic Help Center, "How Claude marks AI-generated content," accessed 14 August 2026; TechCrunch, The Register and Euronews, all 11 August 2026. Image watermarking: Google DeepMind, SynthID, deepmind.google, accessed 17 August 2026 (robustness description is Google's own claim); the crocodile verification image is an AI-generated illustrative mock-up made for this deck, not a real detector interface. Mechanism: Kirchenbauer, Geiping, Wen, Katz, Miers and Goldstein, "A Watermark for Large Language Models," ICML 2023, arXiv 24 January 2023; Dathathri, See, Ghaisas et al., "Scalable watermarking for identifying large language model outputs," <em>Nature</em> 634, 23 October 2024; Google, "Google SynthID: AI content detector," blog.google. Fragility and low-entropy watermarking: arXiv 2405.14604 and arXiv 2512.14753, both on watermarking low-entropy generation. Detection and its limits: Pangram, "Pangram Predicts 21% of ICLR Reviews are AI-Generated," 18 November 2025, and the public browsable corpus at iclr.pangram.com, report exhibit captured 17 August 2026; Sadasivan, Kumar, Balasubramanian, Wang and Feizi, "Can AI-Generated Text be Reliably Detected?", arXiv 2303.11156, first posted March 2023; Google search results for "AI humaniser," screenshot captured 17 August 2026; Jabarian and Imas, "Artificial Writing and Automated Detection," NBER Working Paper No. 34223, 26 August 2025; Arvind Narayanan's public false-positive-rate calculation, referenced via Hacker News discussion, accessed 14 August 2026; university AI-detector policy trackers, accessed 14 August 2026. Psychological influence: Williams-Ceci, Jakesch, Bhat, Kadoma, Zalmanson and Naaman, "Biased AI writing assistants shift users' attitudes on societal issues," <em>Science Advances</em>, 11 March 2026. Deliberately not used: a claimed "style loophole" where a restrictive style prompt suppresses the watermark, and a cited British Journal of Educational Technology study on "strategy-graded reliance," both of which appeared in early drafting material but could not be traced to any real, findable source.</p>
+      <button class="btn ghost" style="margin-top:28px" onclick="goMenu()">Back to menu</button>
+    </section>
+
+
+    <!-- ============ MODULE 6 ============ -->
+    <section class="beat" data-scene="m6">
+      <div class="eyebrow">Module 06</div>
+      <h1>Try it yourself: the watermark playground</h1>
+      <div class="myth">In this module: run the published watermark on real text and read the detector's numbers</div>
+      <p class="lede">Module 03 showed one sentence being steered. This module hands you the controls. A small stand-in model writes a passage, with or without the mark, and a detector that has never seen the model scores it. Then you paste in human writing and watch the score fall back to chance.</p>
+    </section>
+
+    <section class="beat" data-scene="m6">
+      <h2>What the detector counts</h2>
+      <div class="callout">The detector does not read for style. It re-runs the secret coin toss for every word and counts how many landed on the green list. A writer with no key lands there about <strong>&gamma;</strong> of the time by chance, where &gamma; is the green share of the vocabulary. <strong>The score is a z-score:</strong> how many standard deviations the green count sits above that chance level.</div>
+      <div class="formula no-advance">z &nbsp;=&nbsp; ( <span class="g">g</span> &minus; <span class="k">&gamma;</span>T ) &nbsp;/&nbsp; &radic;( T <span class="k">&gamma;</span> (1 &minus; <span class="k">&gamma;</span>) )</div>
+      <div class="codeanns" style="max-width:940px">
+        <div class="codeann"><span class="ct">g</span><span>The number of words the detector finds on the green list.</span></div>
+        <div class="codeann"><span class="ct">T</span><span>The number of words it scored.</span></div>
+        <div class="codeann"><span class="ct">&gamma;</span><span>The green share of the vocabulary, 0.5 in the paper's main setting, so chance gives &gamma;T green words.</span></div>
+      </div>
+      <p class="codepunch"><strong>A worked number.</strong> Score 300 words with &gamma; = 0.5 and chance predicts 150 green. Find 190 and the count sits 4.6 standard deviations above chance. The paper calls anything above z = 4 detected; an unmarked writer reaches that by chance about 3 times in 100,000.</p>
+      <p class="caption">Equation 3 and the z = 4 threshold: Kirchenbauer, Geiping, Wen, Katz, Miers and Goldstein, "A Watermark for Large Language Models," ICML 2023, sections 2 and 3.1.</p>
+    </section>
+
+    <section class="beat wide" data-scene="m6" data-onenter="resetPg">
+      <h2>The playground</h2>
+      <div class="pg no-advance" id="pg">
+
+        <div class="pgcol">
+          <div class="pgpanel">
+            <div class="pgtitle">Write</div>
+            <label class="pglabel" for="pgTopic">Prompt</label>
+            <select class="pgselect" id="pgTopic" onchange="pgTopicHelp()"></select>
+            <span class="pglabel">Watermark <button class="pgk" style="font-size:12px" onclick="pgHelp('mode')">?</button></span>
+            <div class="pgseg" id="pgMode">
+              <button class="on" data-v="none" onclick="pgSet('mode','none',this)">None</button>
+              <button data-v="hard" onclick="pgSet('mode','hard',this)">Hard</button>
+              <button data-v="soft" onclick="pgSet('mode','soft',this)">Soft</button>
+            </div>
+            <span class="pglabel">Settings</span>
+            <div class="pgparams">
+              <div class="pgparam"><button class="pgk" onclick="pgHelp('gamma')">&gamma; green share</button>
+                <div class="pgseg sm" id="pgGamma"><button data-v="0.25" onclick="pgSet('gamma',0.25,this)">0.25</button><button class="on" data-v="0.5" onclick="pgSet('gamma',0.5,this)">0.5</button><button data-v="0.75" onclick="pgSet('gamma',0.75,this)">0.75</button></div></div>
+              <div class="pgparam"><button class="pgk" onclick="pgHelp('delta')">&delta; hardness</button>
+                <div class="pgseg sm off" id="pgDelta"><button data-v="1" onclick="pgSet('delta',1,this)">1</button><button class="on" data-v="2" onclick="pgSet('delta',2,this)">2</button><button data-v="4" onclick="pgSet('delta',4,this)">4</button></div></div>
+              <div class="pgparam"><button class="pgk" onclick="pgHelp('h')">h context width</button>
+                <div class="pgseg sm" id="pgH"><button class="on" data-v="1" onclick="pgSet('h',1,this)">1</button><button data-v="2" onclick="pgSet('h',2,this)">2</button><button data-v="3" onclick="pgSet('h',3,this)">3</button></div></div>
+              <div class="pgparam"><button class="pgk" onclick="pgHelp('key')">secret key</button>
+                <input class="pginput" id="pgKey" value="ntworldink" aria-label="Writer's secret key" spellcheck="false"></div>
+            </div>
+            <div class="pgbtns">
+              <button class="stepbtn" id="pgWriteBtn" onclick="pgWrite()">Write it</button>
+              <button class="stepbtn restart" id="pgParaBtn" onclick="pgParaphrase()" disabled>Paraphrase 1 in 4 choices</button>
+            </div>
+            <div class="pgstatus" id="pgStatus"></div>
+            <div class="pghelp" id="pgHelp"></div>
+          </div>
+        </div>
+
+        <div class="pgcol mid">
+          <div class="pgpanel">
+            <div class="pgtitle">Text under test
+              <span class="pglegend"><span><span class="sw g"></span>green list</span><span><span class="sw r"></span>red list</span><span><span class="sw c"></span>a choice point</span></span>
+            </div>
+            <textarea class="pgtext" id="pgText" rows="5" aria-label="Text under test" oninput="pgTextEdited()"></textarea>
+            <div class="pgsrc" id="pgSrc"></div>
+            <div class="pgtokens" id="pgTokens"><span class="empty">Press Detect to score this text, or Write it to have the stand-in model write a passage.</span></div>
+          </div>
+        </div>
+
+        <div class="pgcol">
+          <div class="pgpanel">
+            <div class="pgtitle">Detect</div>
+            <label class="pglabel" for="pgDetKey">Detector key</label>
+            <input class="pginput" id="pgDetKey" value="ntworldink" spellcheck="false">
+            <div class="pgsettings" id="pgDetSettings"></div>
+            <label class="pgcheck"><input type="checkbox" id="pgDedupe" onchange="pgDetectIfScored()"> Count a repeated word pair once</label>
+            <div class="pgbtns"><button class="stepbtn" onclick="pgDetect()">Detect watermark</button></div>
+            <div class="pgverdict no" id="pgVerdict">Not scored yet</div>
+            <div class="pgmeter" aria-hidden="true"><div class="fill" id="pgFill"></div><div class="thr" id="pgThr"></div></div>
+            <div class="pgmeterlabels" aria-hidden="true"><span>z = &minus;2</span><span>z = 4, detected</span><span>10</span></div>
+            <div class="pgstats">
+              <div class="pgstat"><span>Green words</span><span class="v" id="pgG">&ndash;</span></div>
+              <div class="pgstat"><span>Chance would give</span><span class="v" id="pgExp">&ndash;</span></div>
+              <div class="pgstat"><span>z-score</span><span class="v" id="pgZ">&ndash;</span></div>
+              <div class="pgstat"><span>p-value</span><span class="v" id="pgP">&ndash;</span></div>
+            </div>
+            <div class="pgexplain" id="pgExplain"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="beat" data-scene="m6" data-onenter="resetTry">
+      <h2>Six things to try</h2>
+      <div class="steps" id="tryList">
+        <div class="stp"><span class="n">Baseline</span><span><span class="h">Detect the starting text</span><span class="p">It is a human-written passage from Wikipedia. About half its words land on the green list, which is what chance predicts, so the score sits near zero.</span></span></div>
+        <div class="stp"><span class="n">Hard</span><span><span class="h">Write the wet-season passage with the Hard mark</span><span class="p">Nearly every choice point goes green and the z-score climbs past 4. Read the passage: it still makes sense, because the model only ever swapped one good word for another.</span></span></div>
+        <div class="stp"><span class="n">Low choice</span><span><span class="h">Now write the CDU history the same way</span><span class="p">Names, dates and titles give the model nothing to choose between. Far fewer choice points means a weaker mark, and it stays below the threshold. This is Module 04's low-entropy problem, too little choice, measured.</span></span></div>
+        <div class="stp hot"><span class="n">Wrong key</span><span><span class="h">Change one letter of the detector key</span><span class="p">The detector re-runs the coin toss with the wrong seed, so the green words it finds are just chance again. The mark is still in the text; without the key, nobody can see it.</span></span></div>
+        <div class="stp"><span class="n">Soft</span><span><span class="h">Switch to Soft and try &delta; of 1, 2 and 4</span><span class="p">A small nudge leaves the model's favourite in charge and the mark faint. The paper's default, 2, is the compromise; 4 behaves almost like Hard.</span></span></div>
+        <div class="stp"><span class="n">Attack</span><span><span class="h">Press Paraphrase, then press it again</span><span class="p">Each press rewrites a quarter of the choice points without the mark. The score falls, and the paper's point shows: removing the mark means changing a large share of the words, not one or two.</span></span></div>
+      </div>
+      <p class="qline">Paste anything of your own into the text box as well. The detector scores any text; it never needs the model.</p>
+    </section>
+
+    <section class="beat" data-scene="m6">
+      <h2>What this toy leaves out</h2>
+      <div class="callout">A real model chooses from a vocabulary of 50,000 or more word fragments at every step. The stand-in here chooses between a few hand-written wordings at some steps and has no choice at all at the others, <strong>so its mark is much weaker than a real one</strong>. The green list here is a per-word coin toss seeded by the previous words and the key; the paper draws a fixed-size list from the whole vocabulary. <strong>The detector maths is the paper's, unchanged.</strong> Anthropic's production scheme is undisclosed; this is the published method it descends from.</div>
+      <div class="linkrow">
+        <a href="https://arxiv.org/abs/2301.10226" target="_blank" rel="noopener"><span class="sect">arXiv 2301.10226</span><span class="ttl">Read the paper</span></a>
+        <a href="https://github.com/jwkirchenbauer/lm-watermarking" target="_blank" rel="noopener"><span class="sect">GitHub</span><span class="ttl">The authors' code and demo</span></a>
+        <a href="/cdu-teaching-staff/ai-watermarking-and-provenance.html"><span class="sect">NT World Ink</span><span class="ttl">The course page for this topic</span></a>
+      </div>
+      <p class="cite">Sources used in this module. Mechanism, Algorithms 1 and 2, Equation 3, the z = 4 threshold, the low-entropy caveat, the repeated n-gram remedy and the private-key discussion: John Kirchenbauer, Jonas Geiping, Yuxin Wen, Jonathan Katz, Ian Miers and Tom Goldstein, "A Watermark for Large Language Models," ICML 2023, arXiv 2301.10226, version 4, 1 May 2024. Human-written test passage: the history section of the Wikipedia article "Charles Darwin University," licensed CC BY-SA 4.0, as supplied on 30 August 2026. The two passages the stand-in model writes were written for this deck; the CDU history one restates the same Wikipedia facts. The panel layout follows the public "LLM Watermarking Playground" demonstration that runs a small Qwen model in the browser; this version replaces the model with the stand-in described above.</p>
       <button class="btn ghost" style="margin-top:28px" onclick="goMenu()">Back to menu</button>
     </section>
 
@@ -565,7 +746,8 @@
     m2: 'Module 02 · Two things called "watermark"',
     m3: 'Module 03 · Green words, red words',
     m4: 'Module 04 · Where the mark breaks',
-    m5: 'Module 05 · When a detector result is treated as proof'
+    m5: 'Module 05 · When a detector result is treated as proof',
+    m6: 'Module 06 · Try it yourself: the watermark playground'
   };
 
   function show(i) {
@@ -589,11 +771,11 @@
   function prev() { if (idx > 0) show(idx - 1); }
 
   document.addEventListener('keydown', e => {
-    if (e.target.tagName === 'INPUT') return;
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
     else if (e.key === 'ArrowLeft') prev();
     else if (e.key === 'm' || e.key === 'M') goMenu();
-    else if (e.key >= '1' && e.key <= '5') goModule(Number(e.key));
+    else if (e.key >= '1' && e.key <= '6') goModule(Number(e.key));
   });
   document.getElementById('main').addEventListener('click', e => {
     if (e.target.closest('button, a, input, .no-advance')) return;
@@ -771,11 +953,265 @@
   /* ---- Module 5: consequences list ---- */
   function resetCons() { staggerShow(Array.from(document.querySelectorAll('#consList .stp')), 420); }
 
+
+  /* ---- Module 6: watermark playground ---- */
+  // A stand-in for a language model. Each passage is a template: plain text with
+  // {option|option|option} choice points, first option = the model's favourite.
+  // Everywhere outside braces the model has no choice (the paper's low-entropy case).
+  const PG_TOPICS = [
+    { id: 'wet', name: 'Describe a wet-season afternoon in Darwin (creative, many choices)',
+      help: '<span class="t">A creative passage.</span> Almost every describing word has several equally good alternatives, so the stand-in model gets a choice point every two or three words. Plenty of room for the mark.',
+      tpl: '{By|Around|Towards|Come} mid-afternoon the {sky|air|light|weather} over Darwin {slowly|steadily|gradually|quietly|visibly} {turns|goes|grows|becomes|gets} {heavy|thick|dense|swollen|leaden} and {still|quiet|close|airless|humid}. {Clouds|Storm clouds|Thunderheads|Grey towers|Dark banks} {build|pile up|gather|stack up|mass|swell} {over|above|beyond|across|behind} the harbour, {and|while|as|until} the {breeze|wind|sea breeze|last breath of wind} {drops|dies|fades|falls|sinks} {away|to nothing|completely|entirely|altogether}. {Shopkeepers|Traders|Locals|Workers|People|Drivers} {glance|look|peer|squint|stare} {up|skyward|out|upward|outside}, {then|and then|and|before they} {carry on|keep going|continue|go back to work|shrug|turn away}. The {first|opening|early|initial|leading} {drops|raindrops|spots|splashes|beads} are {fat|heavy|huge|warm|slow|lazy}, {landing|falling|hitting|splashing|dropping} {on|onto|across|against|over} the {hot|warm|baking|dusty|dry|scorched} {footpath|pavement|bitumen|road|concrete|asphalt} with a {hiss|sigh|slap|smack|sizzle|spit}. {Within|Inside|In|After} {minutes|moments|seconds|a minute|a few minutes} the {rain|downpour|deluge|storm|torrent|wall of water} {arrives|comes|hits|lands|breaks|settles in} {properly|in earnest|for real|at last|fully|completely}, {loud|thunderous|roaring|deafening|drumming|hammering} on {tin|iron|metal|corrugated|old} roofs, {and|while|as|until} the {gutters|drains|streets|roads|verges|culverts} {overflow|flood|fill|brim|run over}. {Frogs|Green frogs|The frogs|Tree frogs|Marsh frogs} {strike|start|pipe|tune|open} up {at once|immediately|straight away|instantly|right away}, {and|while|as|until} the {smell|scent|fragrance|odour|tang} of {wet|damp|soaked|drenched|sodden} {earth|soil|ground|grass|dirt|leaves} {rises|lifts|drifts|floats|climbs|spreads} {through|into|across|over|along} the {streets|suburbs|city|town|neighbourhood}. {Half an hour|Thirty minutes|A little while|An hour|Some time} {later|afterwards|on|after that} it {stops|ends|passes|clears|eases|finishes} as {suddenly|quickly|abruptly|sharply|neatly} as it {began|started|came|arrived|appeared}, {and|while|as|until} {steam|mist|vapour|haze|a shimmer} {lifts|rises|curls|drifts|climbs|floats} {off|from|above|out of} the {road|bitumen|footpath|ground|car parks}, {and|while|as|until} the {evening|dusk|sunset|night|late light} {comes in|arrives|settles|falls|closes in|drifts in} {cool|cooler|fresh|clean|washed|rinsed} and {bright|clear|golden|soft|gentle|sharp}.\n\n{Later|Afterwards|By evening|Once it clears|Soon after}, the {suburbs|streets|city|town|neighbourhoods} {smell|reek|taste} {of|like} {frangipani|wet leaves|cut grass|warm rain|mango}, and {every|each|any} {verandah|balcony|porch|doorstep|driveway} {holds|has|carries|shows|collects} a {small|little|thin|shallow|modest} {lake|pool|puddle|pond|sheet} of {rainwater|water|run-off|spill|overflow}. {Kids|Children|Teenagers|Boys|Girls} {ride|pedal|race|wheel|skid} {noisily|happily|wildly|hard|fast} {through|across|along|into|over} the {puddles|pools|water|flooded gutters|wet} {on|with} {bikes|bicycles|scooters|skateboards|old bikes}, {shouting|yelling|laughing|whooping|calling} at the {spray|splash|water|mess|wake}. {Somewhere|Nearby|Down the street|Across the road|Next door} a {generator|pump|air conditioner|fan|fridge} {hums|drones|rattles|whirs|buzzes} {back|again|once more|to life|awake} {as|when|once|after} the {power|electricity|grid|supply|mains} {returns|comes back|flickers on|steadies|holds}. {Geckos|Lizards|Green ants|Moths|Bats} {come out|appear|emerge|gather|return} {to|around|under|beside} the {lights|lamps|verandah lights|porch lights|streetlights}, {and|while|as|until} the {sky|west|horizon|evening|last light} {slowly|gently|quietly|softly|steadily} {goes|turns|fades|softens|burns} {orange|gold|pink|copper|amber} {and then|then|before going|and finally|and slowly} {grey|dark|black|violet|dim}. {Tomorrow|By morning|Next day|In the morning|Come morning} it will {happen|start|build|begin|come} {again|all over again|once more|the same way|afresh}, {and|though|because|but} {nobody|no one|hardly anyone|not one person|no local} will {mind|complain|grumble|object|notice}.' },
+    { id: 'cdu', name: 'Summarise the early history of Charles Darwin University (factual, few choices)',
+      help: '<span class="t">A factual passage.</span> Names, dates, titles and place names cannot be changed, so the stand-in model has a choice point only about one word in five. The same facts as the human-written Wikipedia text; the mark has far less room.',
+      tpl: '{Today\'s|Modern|The present-day|The current} Charles Darwin University {began life|started out|started life|originated|emerged} as the Northern Territory University, {which|and this} was {founded|established|created|formed|set up} in January 1989. {That|The|This} {new|fresh|newly formed|young} {institution|university|body|entity} {came|arose|resulted|emerged|grew} {from|out of|through|via} a merger {between|of|joining|uniting|combining} the Darwin Institute of Technology and the University College of the Northern Territory. The merger {took place|happened|occurred|came about|unfolded} under the Dawkins {Revolution|reforms|changes|agenda|programme}, a {series|set|wave|package|programme|run} of higher education {reforms|changes|measures|policies|shifts} {rolled out|introduced|launched|driven|pushed through|delivered} by {then|the then|the sitting|the serving} federal Education Minister John Dawkins. The {new|young|fledgling|merged|combined} university {opened|opened its doors|began teaching|started operating|welcomed students} on 1 January 1989, {awarding|conferring|granting|issuing|handing out} {its|the|early} degrees {through|from|under|via|in the name of} the University of Queensland.\n\n{Its|The university\'s|NTU\'s} first vice-chancellor was Professor Malcolm (Mal) Nairn, {who|and he} {came|arrived|moved|was recruited|transferred} {from|across from|over from} Murdoch University. {During|Throughout|Over|Across|In} Nairn\'s {term|time|period|years|stint} {in office|as vice-chancellor|at the helm|in charge|in the role}, {several|a number of|various|the|the existing} study centres {that|which} the NT Government had {previously|formerly|earlier|until then|once} run were {integrated|merged|brought|folded|absorbed|drawn} into the university. The Palmerston campus, {which|a site that|a campus that} had {previously|formerly|earlier|once|until then} been a TAFE College, was {also|likewise|additionally|similarly|then} {added|included|brought in|absorbed|attached}. {That|The|This} campus {sits|stands|lies|is located|is situated|is found} on University Avenue, {because|as|since|given that} {this|that|the land|the block|the ground} was the {proposed|intended|suggested|nominated|chosen} {site|location|place|spot|setting} for a new university in a 1981 {submission|proposal|bid|pitch|paper} to the federal government.\n\nIn 1996, Nairn was {replaced|succeeded|followed} by Professor Roger Holmes {from|of} Griffith University. {After|Following|Having completed|Having served} {just|only|merely|barely} {one|a single} semester, Holmes {left|departed|moved on|resigned|stepped down} to {take up|accept|assume|fill|take} the {post|role|position|job|office} of vice-chancellor at the University of Newcastle. Deputy Vice-Chancellor Professor Ron McKay {then|next|subsequently|later|in turn} {replaced|succeeded|followed|took over from|stepped in for} Holmes as the university\'s third vice-chancellor. Financial {constraints|pressures|strains|difficulties|troubles} {increased|grew|mounted|rose|deepened|intensified} as the university {struggled|battled|laboured|wrestled|fought|strained} to {provide|offer|deliver|sustain|maintain|support} a {broad|wide|full|diverse|comprehensive|rich} tertiary education {offering|programme|menu|range|mix|catalogue} {to|for|across|throughout} a small and {widespread|scattered|dispersed|far-flung|thinly spread} population.\n\nIn January 2001, the Katherine Rural College, {including|along with|together with|plus|as well as} Mataranka Station, {became|was made|joined as|was absorbed as} part of the university. {After|Following|Upon|With} McKay\'s resignation {due to|because of|owing to|on account of|through} ill health in 2002, Professor Ken McKinnon, {a former|the former|previously the|once|formerly} vice-chancellor of the University of Wollongong, was {appointed|installed|named|chosen|brought in|engaged} as interim vice-chancellor.' }
+  ];
+  // Human-written control text: the history section of the Wikipedia article
+  // "Charles Darwin University" (CC BY-SA 4.0), as supplied on 30 August 2026.
+  const PG_HUMAN = 'The Northern Territory University was founded in January 1989 by a merger between the Darwin Institute of Technology and the University College of the Northern Territory under the Dawkins Revolution, a series of higher education reforms rolled out by then federal Education Minister John Dawkins. The new university opened its doors on 1 January 1989, awarding degrees from the University of Queensland.\n\nNTU\'s first vice-chancellor was Murdoch University Professor Malcolm (Mal) Nairn. During Nairn\'s term of office, study centres that were previously run by the NT Government were integrated with the university. The Palmerston campus, which had previously been a TAFE College, was also added. The Palmerston campus is situated on University Avenue, as this was the proposed site for a new university in a submission to the federal government in 1981.\n\nIn 1996, Nairn was replaced by Professor Roger Holmes from Griffith University. After serving for a single semester, he left to take up the post of vice-chancellor at the University of Newcastle. Deputy Vice-Chancellor professor Ron McKay replaced Holmes as the university\'s third vice-chancellor. Financial constraints on the university increased as it struggled with providing a broad tertiary education offering to a small and widespread population. In January 2001, the Katherine Rural College, including Mataranka Station, became part of the university. After McKay\'s resignation due to ill health in 2002, an interim vice-chancellor, former vice-chancellor of the University of Wollongong Professor Ken McKinnon, was appointed.';
+  const PG_HUMAN_SRC = 'Starting text: human-written. History section of the Wikipedia article "Charles Darwin University" (CC BY-SA 4.0). Edit it, paste your own, or press Write it.';
+  const PG_HELP = {
+    mode: '<span class="t">Watermark mode.</span> None: the stand-in model writes with no mark. Hard: it may only pick green-list words (the paper\'s Algorithm 1). Soft: green-list words get a boost of &delta; and the model\'s favourite still wins where it is far ahead (Algorithm 2).',
+    gamma: '<span class="t">&gamma;, the green share.</span> Before each word, this fraction of all words goes on the green list. The paper\'s main setting is 0.5. Lower means fewer green words to pick from: a stronger signal per green word, at more cost to the wording.',
+    delta: '<span class="t">&delta;, the hardness.</span> In Soft mode this is added to the score of every green-list word before the model picks. The paper uses 2. Higher pushes harder toward green; Hard mode is the same idea with &delta; set to infinity.',
+    h: '<span class="t">h, the context width.</span> How many previous words are hashed with the key to seed the coin toss for the next word. The paper\'s default is 1. Wider makes a repeated phrase score differently each time, but every edit then disturbs more of the words after it.',
+    key: '<span class="t">The secret key.</span> Whoever holds it can re-run the coin toss for any text and count the green words. Change it in the detector, even by one letter, and the mark becomes invisible.'
+  };
+  const pgS = { mode: 'none', gamma: 0.5, delta: 2, h: 1 };
+  let pgGen = null;      // last generated passage: { segs, choices, text, choicePos, settings, noGreen, slots }
+  let pgScored = false;  // has the current text been scored
+  const PG_TOK = /[A-Za-z0-9]+(?:['’][A-Za-z]+)?|[^\sA-Za-z0-9]/g;
+
+  function pgHash(str) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    h ^= h >>> 16; h = Math.imul(h, 2246822507) >>> 0; h ^= h >>> 13; h = Math.imul(h, 3266489909) >>> 0; h ^= h >>> 16;
+    return h >>> 0;
+  }
+  // One coin toss per (key, previous h words, candidate word); green with probability gamma.
+  function pgGreen(ctx, tok, key, gamma) {
+    return pgHash(key + '\u0001' + ctx + '\u0001' + tok.toLowerCase()) / 4294967296 < gamma;
+  }
+  function pgTokens(text) {
+    const out = []; let m; PG_TOK.lastIndex = 0;
+    while ((m = PG_TOK.exec(text))) out.push({ t: m[0], i: m.index });
+    return out;
+  }
+  function pgCtx(toks, i, h) {
+    const prev = toks.slice(Math.max(0, i - h), i).map(x => x.t.toLowerCase());
+    return prev.length ? prev.join(' ') : '^';
+  }
+  function pgParse(tpl) {
+    const segs = []; const re = /\{([^}]*)\}/g; let last = 0, m;
+    while ((m = re.exec(tpl))) {
+      if (m.index > last) segs.push({ lit: tpl.slice(last, m.index) });
+      segs.push({ opts: m[1].split('|') });
+      last = re.lastIndex;
+    }
+    if (last < tpl.length) segs.push({ lit: tpl.slice(last) });
+    return segs;
+  }
+  function pgErfc(x) {
+    const z = Math.abs(x), t = 1 / (1 + 0.5 * z);
+    const r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+    return x >= 0 ? r : 2 - r;
+  }
+  function pgPick(weights) {
+    const sum = weights.reduce((a, b) => a + b, 0); let r = Math.random() * sum;
+    for (let i = 0; i < weights.length; i++) { r -= weights[i]; if (r <= 0) return i; }
+    return weights.length - 1;
+  }
+  // Choose one option at a choice point, given the text so far and the settings.
+  // mode 'none' ignores the lists; 'hard' keeps only green options; 'soft' boosts green by exp(delta).
+  function pgChoose(opts, textSoFar, s, key, mode) {
+    const toks = pgTokens(textSoFar);
+    const ctx = pgCtx(toks, toks.length, s.h);
+    const greens = opts.map(o => { const ft = pgTokens(o)[0]; return ft ? pgGreen(ctx, ft.t, key, s.gamma) : false; });
+    let weights = opts.map((_, i) => Math.pow(0.6, i));   // the model's own preference: first option favoured
+    let noGreen = false;
+    if (mode === 'hard') {
+      if (greens.some(Boolean)) weights = weights.map((w, i) => greens[i] ? w : 0);
+      else noGreen = true;
+    } else if (mode === 'soft') {
+      weights = weights.map((w, i) => greens[i] ? w * Math.exp(s.delta) : w);
+    }
+    return { idx: pgPick(weights), noGreen };
+  }
+  function pgBuild(segs, choices) {
+    let text = ''; const pos = [];
+    segs.forEach((seg, n) => {
+      if (seg.lit !== undefined) { text += seg.lit; return; }
+      pos.push(text.length); text += seg.opts[choices[n]];
+    });
+    return { text, pos };
+  }
+  function pgWrite() {
+    const topic = PG_TOPICS[document.getElementById('pgTopic').selectedIndex];
+    const key = document.getElementById('pgKey').value || '';
+    const s = { gamma: pgS.gamma, delta: pgS.delta, h: pgS.h };
+    const segs = pgParse(topic.tpl);
+    const choices = []; let text = '', slots = 0, noGreen = 0;
+    segs.forEach((seg, n) => {
+      if (seg.lit !== undefined) { text += seg.lit; return; }
+      const r = pgChoose(seg.opts, text, s, key, pgS.mode);
+      choices[n] = r.idx; slots++; if (r.noGreen) noGreen++;
+      text += seg.opts[r.idx];
+    });
+    const built = pgBuild(segs, choices);
+    pgGen = { segs, choices, text: built.text, choicePos: built.pos, settings: Object.assign({ mode: pgS.mode, key }, s), noGreen, slots, rewritten: 0 };
+    const ta = document.getElementById('pgText');
+    ta.value = built.text; ta.scrollTop = 0;
+    document.getElementById('pgSrc').textContent = 'Written by the stand-in model: ' + (pgS.mode === 'none' ? 'no mark' : pgS.mode + ' mark, γ ' + s.gamma + (pgS.mode === 'soft' ? ', δ ' + s.delta : '') + ', h ' + s.h + ', key "' + key + '"') + '. Edit it freely and press Detect again.';
+    document.getElementById('pgParaBtn').disabled = false;
+    pgStatusLine();
+    pgDetect();
+  }
+  function pgStatusLine() {
+    if (!pgGen) { document.getElementById('pgStatus').innerHTML = ''; return; }
+    const T = pgTokens(pgGen.text).length;
+    let msg = 'Wrote <span class="mono">' + T + '</span> tokens (words and punctuation) with <span class="mono">' + pgGen.slots + '</span> choice points.';
+    if (pgGen.settings.mode === 'hard') msg += ' At <span class="mono">' + pgGen.noGreen + '</span> of them no option was green, so a red word had to stay.';
+    if (pgGen.rewritten) msg += ' Paraphrased <span class="mono">' + pgGen.rewritten + '</span> times.';
+    document.getElementById('pgStatus').innerHTML = msg;
+  }
+  // The attack from the paper's robustness discussion: rewrite a share of the words with no
+  // knowledge of the key. Here a random quarter of the choice points are re-chosen unmarked.
+  function pgParaphrase() {
+    if (!pgGen) return;
+    const ta = document.getElementById('pgText');
+    if (ta.value !== pgGen.text) { pgGen = null; document.getElementById('pgParaBtn').disabled = true; pgStatusLine(); return; }
+    const slotIdx = []; pgGen.segs.forEach((seg, n) => { if (seg.opts) slotIdx.push(n); });
+    const target = new Set();
+    const want = Math.max(1, Math.round(slotIdx.length / 4));
+    while (target.size < want) target.add(slotIdx[Math.floor(Math.random() * slotIdx.length)]);
+    let text = '';
+    pgGen.segs.forEach((seg, n) => {
+      if (seg.lit !== undefined) { text += seg.lit; return; }
+      if (target.has(n)) {
+        let idx = pgChoose(seg.opts, text, pgGen.settings, pgGen.settings.key, 'none').idx;
+        if (seg.opts.length > 1 && idx === pgGen.choices[n]) idx = (idx + 1 + Math.floor(Math.random() * (seg.opts.length - 1))) % seg.opts.length;
+        pgGen.choices[n] = idx;
+      }
+      text += seg.opts[pgGen.choices[n]];
+    });
+    const built = pgBuild(pgGen.segs, pgGen.choices);
+    pgGen.text = built.text; pgGen.choicePos = built.pos; pgGen.rewritten++;
+    ta.value = built.text; ta.scrollTop = 0;
+    document.getElementById('pgSrc').textContent = 'Paraphrased ' + pgGen.rewritten + (pgGen.rewritten === 1 ? ' time' : ' times') + ': a quarter of the choice points re-chosen with no mark each time. The rest of the passage is unchanged.';
+    pgStatusLine();
+    pgDetect();
+  }
+  function pgFmtP(p) {
+    if (p >= 0.001) return p.toFixed(3);
+    const e = Math.floor(Math.log10(p)); const m = p / Math.pow(10, e);
+    return m.toFixed(1) + ' × 10<sup>' + e + '</sup>';
+  }
+  function pgOnceIn(p) {
+    if (p <= 0 || 1 / p > 1e12) return 'less than once in a trillion tries';
+    const n = 1 / p;
+    let r; if (n < 100) r = Math.round(n); else { const mag = Math.pow(10, Math.floor(Math.log10(n)) - 1); r = Math.round(n / mag) * mag; }
+    return 'about once in ' + r.toLocaleString('en-AU') + ' tries';
+  }
+  function pgDetect() {
+    const text = document.getElementById('pgText').value;
+    const key = document.getElementById('pgDetKey').value || '';
+    const gamma = pgS.gamma, h = pgS.h;
+    const dedupe = document.getElementById('pgDedupe').checked;
+    const toks = pgTokens(text);
+    const aligned = pgGen && text === pgGen.text;
+    const choiceSet = aligned ? new Set(pgGen.choicePos) : new Set();
+    const seen = new Set(); let g = 0, T = 0; let html = '';
+    toks.forEach((tk, i) => {
+      const ctx = pgCtx(toks, i, h);
+      const green = pgGreen(ctx, tk.t, key, gamma);
+      let skip = false;
+      if (dedupe) { const kk = ctx + '\u0001' + tk.t.toLowerCase(); if (seen.has(kk)) skip = true; else seen.add(kk); }
+      if (!skip) { T++; if (green) g++; }
+      const cls = 'tk ' + (green ? 'g' : 'r') + (choiceSet.has(tk.i) ? ' c' : '') + (skip ? ' skip' : '');
+      html += '<span class="' + cls + '">' + tk.t.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</span>';
+    });
+    document.getElementById('pgTokens').innerHTML = html || '<span class="empty">Nothing to score. Paste some text or press Write it.</span>';
+    const exp = gamma * T;
+    const z = T > 0 ? (g - exp) / Math.sqrt(T * gamma * (1 - gamma)) : 0;
+    const p = 0.5 * pgErfc(z / Math.SQRT2);
+    const verdict = document.getElementById('pgVerdict');
+    let cls, label, why;
+    const pct = T ? Math.round(100 * g / T) : 0;
+    if (T < 12) { cls = 'no'; label = 'Too short to score'; why = 'The paper needs about 16 words before even the Hard mark can show. Give the detector more text.'; }
+    else if (z >= 4) { cls = 'yes'; label = 'Watermark detected'; why = '<span class="t">Far more green words than chance predicts.</span> A writer with no knowledge of the key would reach this count ' + pgOnceIn(p) + '. The paper calls z above 4 detected.'; }
+    else if (z >= 2) { cls = 'weak'; label = 'Weak signal, not conclusive'; why = '<span class="t">More green words than chance predicts, but not by enough.</span> Chance alone gives a count like this ' + pgOnceIn(p) + '; the paper asks for better than once in 30,000 (z = 4) before it calls the mark detected.'; }
+    else { cls = 'no'; label = 'No watermark detected'; why = '<span class="t">About ' + Math.round(gamma * 100) + ' per cent of any writer\'s words land on the green list by chance.</span> This text, at ' + pct + ' per cent, is consistent with that.'; }
+    verdict.className = 'pgverdict ' + cls; verdict.textContent = label;
+    if (aligned && pgGen.settings.key !== key) why += ' <span class="t">Note:</span> the text was written with the key "' + pgGen.settings.key.replace(/</g, '&lt;') + '" and the detector is using "' + key.replace(/</g, '&lt;') + '".';
+    if (aligned && (pgGen.settings.gamma !== gamma || pgGen.settings.h !== h)) why += ' <span class="t">Note:</span> the text was written with γ ' + pgGen.settings.gamma + ' and h ' + pgGen.settings.h + '; the detector is using γ ' + gamma + ' and h ' + h + '. The detector has to match the writer\'s settings, so write it again.';
+    document.getElementById('pgExplain').innerHTML = why;
+    document.getElementById('pgG').textContent = T ? g + ' of ' + T + ' (' + pct + '%)' : '–';
+    document.getElementById('pgExp').textContent = T ? Math.round(exp) + ' (' + Math.round(gamma * 100) + '%)' : '–';
+    document.getElementById('pgZ').textContent = T ? z.toFixed(2) : '–';
+    document.getElementById('pgP').innerHTML = T ? pgFmtP(p) : '–';
+    const lo = -2, hi = 10; const frac = Math.max(0, Math.min(1, (z - lo) / (hi - lo)));
+    document.getElementById('pgFill').style.width = (frac * 100).toFixed(1) + '%';
+    document.getElementById('pgThr').style.left = ((4 - lo) / (hi - lo) * 100).toFixed(1) + '%';
+    document.getElementById('pgDetSettings').textContent = 'Using γ ' + gamma + ' and h ' + h + ' from the writer\'s settings.';
+    pgScored = true;
+  }
+  function pgDetectIfScored() { if (pgScored) pgDetect(); }
+  function pgTextEdited() {
+    if (pgGen && document.getElementById('pgText').value !== pgGen.text) {
+      document.getElementById('pgParaBtn').disabled = true;
+      document.getElementById('pgSrc').textContent = 'Edited. Press Detect to score the new text. Paraphrase is off until the model writes a fresh passage.';
+    }
+    if (pgScored) { const v = document.getElementById('pgVerdict'); v.className = 'pgverdict no'; v.textContent = 'Text changed, press Detect'; }
+  }
+  function pgSet(name, value, btn) {
+    pgS[name] = value;
+    Array.from(btn.parentNode.children).forEach(b => b.classList.toggle('on', b === btn));
+    if (name === 'mode') document.getElementById('pgDelta').classList.toggle('off', value !== 'soft');
+    pgHelp(name);
+    if ((name === 'gamma' || name === 'h') && pgScored) pgDetect();
+  }
+  function pgHelp(name) { document.getElementById('pgHelp').innerHTML = PG_HELP[name] || ''; }
+  function pgTopicHelp() { document.getElementById('pgHelp').innerHTML = PG_TOPICS[document.getElementById('pgTopic').selectedIndex].help; }
+  function resetPg() {
+    const sel = document.getElementById('pgTopic');
+    if (!sel.options.length) PG_TOPICS.forEach(t => { const o = document.createElement('option'); o.textContent = t.name; sel.appendChild(o); });
+    sel.selectedIndex = 0;
+    pgS.mode = 'none'; pgS.gamma = 0.5; pgS.delta = 2; pgS.h = 1;
+    [['pgMode', 'none'], ['pgGamma', '0.5'], ['pgDelta', '2'], ['pgH', '1']].forEach(([id, v]) => {
+      Array.from(document.getElementById(id).children).forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    });
+    document.getElementById('pgDelta').classList.add('off');
+    document.getElementById('pgKey').value = 'ntworldink';
+    document.getElementById('pgDetKey').value = 'ntworldink';
+    document.getElementById('pgDedupe').checked = false;
+    document.getElementById('pgText').value = PG_HUMAN;
+    document.getElementById('pgSrc').textContent = PG_HUMAN_SRC;
+    document.getElementById('pgTokens').innerHTML = '<span class="empty">Press Detect to score this text, or Write it to have the stand-in model write a passage.</span>';
+    document.getElementById('pgParaBtn').disabled = true;
+    document.getElementById('pgStatus').innerHTML = '';
+    pgGen = null; pgScored = false;
+    const v = document.getElementById('pgVerdict'); v.className = 'pgverdict no'; v.textContent = 'Not scored yet';
+    ['pgG', 'pgExp', 'pgZ', 'pgP'].forEach(id => document.getElementById(id).textContent = '–');
+    document.getElementById('pgFill').style.width = '0';
+    document.getElementById('pgThr').style.left = '50%';
+    document.getElementById('pgExplain').innerHTML = '';
+    document.getElementById('pgDetSettings').textContent = 'Using γ 0.5 and h 1 from the writer\'s settings.';
+    pgTopicHelp();
+  }
+  function resetTry() { staggerShow(Array.from(document.querySelectorAll('#tryList .stp')), 380); }
+
   const onEnterHooks = {
-    resetTimeline, resetLaw, resetGen, resetEnt, resetFmt, resetCons
+    resetTimeline, resetLaw, resetGen, resetEnt, resetFmt, resetCons, resetPg, resetTry
   };
 
-  show(0);
+  function fromHash() {
+    const m = /^#(?:m([1-6])|(playground))$/.exec(location.hash || '');
+    if (!m) return false;
+    goModule(m[2] ? 6 : Number(m[1]));
+    return true;
+  }
+  if (!fromHash()) show(0);
+  window.addEventListener('hashchange', fromHash);
 </script>
 </body>
 </html>
