@@ -72,12 +72,13 @@ Both are constants at the top of the script.
 - `digitalliteracy/`, the legacy Tennant Creek path that duplicates `digital-literacy/`
 - `*-original.html`, the superseded Roper Gulf drafts
 - the two redirect stubs, `/resources/websites-and-tools.html` and `/resources/articles-and-papers.html`
+- `/client-access/`, the noindex course-access hub reached from the homepage artwork
 
 All of these are named in `SKIP_DIRS`, `SKIP_URLS` and `SKIP_PATTERNS` near the top of the script.
 
 ## Client areas
 
-Pages under `/cdu-ai-staff/`, `/alice-springs-arn/` and `/roper-gulf/` are marked `hidden` in the index, appear in the site's own search with a "hidden" pill, and are kept out of `sitemap.xml`. `/roper-gulf/` carried no `noindex` tag until 8 August 2026, when all twelve of its pages were given one, bringing it in line with the other two areas.
+Pages under `/cdu-ai-staff/`, `/cdu-teaching-staff/`, `/alice-springs-arn/` and `/roper-gulf/` are marked `hidden` in the index, appear in the site's own search with a "hidden" pill, and are kept out of `sitemap.xml`. The explicit path rule remains in place even where pages carry `noindex`, so a missing page-level tag cannot expose a client area in the sitemap.
 
 A page is hidden when it carries a `noindex` meta tag, or when it sits under a path in `HIDDEN_PREFIXES`. A new client area needs its prefix added there as well as `noindex` on its pages.
 

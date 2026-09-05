@@ -79,6 +79,7 @@ const SKIP_DIRS = new Set([
 const SKIP_URLS = new Set([
   '/resources/websites-and-tools.html',   // redirect stub to /references/
   '/resources/articles-and-papers.html',  // redirect stub to /resources/
+  '/client-access/',                      // discreet noindex hub, reached from homepage artwork
 ]);
 
 // Filename patterns excluded.
@@ -88,8 +89,8 @@ const SKIP_PATTERNS = [
 
 // Paths whose pages are client-only. Marked hidden in the index and kept out
 // of sitemap.xml, whether or not the page carries a noindex meta tag.
-// NOTE: as at 8 August 2026 no /roper-gulf/ page carries noindex, so this rule
-// is the only thing keeping those pages out of the sitemap. See the README.
+// Keep this explicit even though the current client pages also carry noindex,
+// so a missing page-level tag cannot expose a client area in the sitemap.
 const HIDDEN_PREFIXES = [
   '/cdu-ai-staff/',
   '/cdu-teaching-staff/',
