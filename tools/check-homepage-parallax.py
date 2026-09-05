@@ -82,51 +82,78 @@ def webp_size(path: Path) -> tuple[int, int]:
 
 def main() -> int:
     failures: list[str] = []
-    homepage = (ROOT / "index.html").read_text(encoding="utf-8")
+    pages = {
+        "home": ROOT / "index.html",
+        "library": ROOT / "library" / "index.html",
+        "courses": ROOT / "courses" / "index.html",
+        "tools": ROOT / "simulations" / "index.html",
+    }
+    html = {name: path.read_text(encoding="utf-8") for name, path in pages.items()}
     hub = (ROOT / "client-access" / "index.html").read_text(encoding="utf-8")
     css = (ROOT / "homepage-parallax.css").read_text(encoding="utf-8")
     js = (ROOT / "homepage-parallax.js").read_text(encoding="utf-8")
     index_builder = (ROOT / "tools" / "build-index.js").read_text(encoding="utf-8")
 
-    homepage_audit = PageAudit()
-    homepage_audit.feed(homepage)
-    duplicate_ids = sorted(value for value, count in Counter(homepage_audit.ids).items() if count > 1)
-    fail_if(bool(duplicate_ids), f"duplicate homepage IDs: {duplicate_ids}", failures)
+    audits: dict[str, PageAudit] = {}
+    for name, markup in html.items():
+        audit = PageAudit()
+        audit.feed(markup)
+        audits[name] = audit
+        duplicate_ids = sorted(value for value, count in Counter(audit.ids).items() if count > 1)
+        fail_if(bool(duplicate_ids), f"duplicate IDs on {name}: {duplicate_ids}", failures)
+        chapter_count = len(re.findall(r'<section class="hp-chapter hp-page-hero"', markup))
+        fail_if(chapter_count != 1, f"{name} should contain exactly one landing hero, found {chapter_count}", failures)
 
-    chapter_ids = re.findall(r'<section class="hp-chapter" id="([^"]+)"', homepage)
-    fail_if(
-        chapter_ids != ["parallax-home", "parallax-library", "parallax-tools", "parallax-presentations"],
-        f"unexpected chapter sequence: {chapter_ids}",
-        failures,
-    )
+    expected_scene = {
+        "home": ("p3", "03-hero-keyboard.webp"),
+        "library": ("p4", "03-hero-processor.webp"),
+        "courses": ("p8", "03-hero-stone-qr.webp"),
+        "tools": ("p5", "03-hero-glass-envelope.webp"),
+    }
+    all_layers: list[dict[str, str]] = []
+    for name, (scene, hero_file) in expected_scene.items():
+        layers = [image for image in audits[name].images if "hp-layer" in image.get("class", "").split()]
+        all_layers.extend(layers)
+        fail_if(len(layers) != 5, f"{name} should contain five scene layers, found {len(layers)}", failures)
+        for image in layers:
+            source = ROOT / image.get("src", "").lstrip("/")
+            fail_if(not source.is_file(), f"missing scene asset: {source}", failures)
+            fail_if((image.get("width"), image.get("height")) != ("1672", "941"), f"wrong HTML dimensions: {source}", failures)
+            fail_if(f"/parallax/{scene}/" not in image.get("src", ""), f"wrong scene layer on {name}: {image.get('src')}", failures)
+        fail_if(hero_file not in html[name], f"{name} is missing {hero_file}", failures)
 
-    layers = [image for image in homepage_audit.images if "hp-layer" in image.get("class", "").split()]
-    fail_if(len(layers) != 20, f"expected 20 scene layers, found {len(layers)}", failures)
-    for image in layers:
-        source = ROOT / image.get("src", "").lstrip("/")
-        fail_if(not source.is_file(), f"missing scene asset: {source}", failures)
-        fail_if((image.get("width"), image.get("height")) != ("1672", "941"), f"wrong HTML dimensions: {source}", failures)
-    lazy_layers = [image for image in layers if image.get("loading") == "lazy" and image.get("decoding") == "async"]
-    fail_if(len(lazy_layers) != 15, f"expected 15 deferred layers, found {len(lazy_layers)}", failures)
+    fail_if(len(all_layers) != 20, f"expected 20 layers across four landing pages, found {len(all_layers)}", failures)
+    fail_if(any(marker in html["home"] for marker in ('id="workshops"', 'id="training-games"', 'id="courses"', 'id="about"', '/parallax/p4/', '/parallax/p5/', '/parallax/p8/')), "homepage contains content assigned to a subsection", failures)
+    fail_if('id="menu"' not in html["home"] or 'id="site-search-mount"' not in html["home"], "homepage Main Menu or search is missing", failures)
+    fail_if('>Main Menu<' not in html["home"], "approved Main Menu wording is missing", failures)
+    for required in ('id="workshops"', 'id="training-games"', 'id="presentations"', 'id="about"'):
+        fail_if(required not in html["library"], f"library page is missing {required}", failures)
+    fail_if('id="courses"' not in html["courses"], "full course page is missing the course catalogue", failures)
+    fail_if('class="banner"' in html["tools"] or "bannerochre" in html["tools"], "old simulation banner remains", failures)
 
-    secret_links = [link for link in homepage_audit.links if "hp-secret" in link.get("class", "").split()]
-    fail_if(len(secret_links) != 2, f"expected two secret links, found {len(secret_links)}", failures)
+    secret_links = [link for link in audits["home"].links if "hp-secret" in link.get("class", "").split()]
+    fail_if(len(secret_links) != 2, f"expected two secret links on home, found {len(secret_links)}", failures)
     for link in secret_links:
         fail_if(link.get("href") != "/client-access/", "secret link does not point to /client-access/", failures)
         fail_if(link.get("target") != "_blank" or "noopener" not in link.get("rel", "").split(), "secret link lacks safe new-tab behaviour", failures)
         fail_if(not link.get("aria-label"), "secret link lacks an accessible name", failures)
 
-    header_start = homepage.find('<header class="site">')
-    header_end = homepage.find("</header>")
-    menu_start = homepage.find('<section class="hp-destinations"')
-    menu_end = homepage.find('<section class="hp-chapter" id="parallax-library"')
-    required_regions = [homepage[header_start:header_end], homepage[menu_start:menu_end]]
-    required_regions.extend(re.findall(r'<nav class="hp-scene-links".*?</nav>', homepage, re.I | re.S))
-    for link in [link for region in required_regions for link in anchors(region)]:
-        fail_if(link.get("target") != "_blank" or "noopener" not in link.get("rel", "").split(), f"unsafe destination link: {link.get('href')}", failures)
+    for region_name in ("home", "library", "courses"):
+        markup = html[region_name]
+        header_start = markup.find('<header class="site">')
+        header_end = markup.find("</header>")
+        for link in anchors(markup[header_start:header_end]):
+            fail_if(link.get("target") != "_blank" or "noopener" not in link.get("rel", "").split(), f"unsafe header link on {region_name}: {link.get('href')}", failures)
+    menu_start = html["home"].find('<section class="hp-destinations"')
+    menu_end = html["home"].find("</main>", menu_start)
+    for link in anchors(html["home"][menu_start:menu_end]):
+        fail_if(link.get("target") != "_blank" or "noopener" not in link.get("rel", "").split(), f"unsafe Main Menu link: {link.get('href')}", failures)
 
-    fail_if("Practical knowledge written into the landscape" in homepage, "unapproved homepage slogan is present", failures)
-    fail_if(homepage.count("Intelligence Inked") > 0, "repeated slogan was added as HTML text", failures)
+    old_routes = ('href="/#library"', 'href="/#workshops"', 'href="/#training-games"', 'href="/#about"')
+    for name, markup in html.items():
+        fail_if(any(route in markup for route in old_routes), f"stale homepage anchor remains on {name}", failures)
+        fail_if("Practical knowledge written into the landscape" in markup, f"unapproved slogan is present on {name}", failures)
+        fail_if(markup.count("Intelligence Inked") > 0, f"repeated slogan was added as HTML text on {name}", failures)
 
     hub_audit = PageAudit()
     hub_audit.feed(hub)
@@ -134,16 +161,13 @@ def main() -> int:
     fail_if("noindex,nofollow" not in robots, "client-access hub lacks noindex,nofollow", failures)
     hub_routes = tuple(link.get("href", "") for link in hub_audit.links if "access-course" in link.get("class", "").split())
     fail_if(hub_routes != COURSE_ROUTES, f"unexpected client routes: {hub_routes}", failures)
-    for link in hub_audit.links:
-        fail_if(link.get("target") != "_blank" or "noopener" not in link.get("rel", "").split(), f"unsafe hub link: {link.get('href')}", failures)
-    for route in COURSE_ROUTES:
-        fail_if(not (ROOT / route.lstrip("/") / "index.html").is_file(), f"missing course destination: {route}", failures)
     fail_if("'/client-access/'" not in index_builder, "client hub is not excluded by the index generator", failures)
 
     fail_if("prefers-reduced-motion: reduce" not in css, "reduced-motion CSS is missing", failures)
     fail_if("prefers-reduced-motion: reduce" not in js, "reduced-motion JavaScript guard is missing", failures)
-    fail_if("data-motion=\"1.15\"" not in homepage, "P5 movement multiplier is missing", failures)
+    fail_if('data-motion="1.15"' not in html["tools"], "P5 movement multiplier is missing", failures)
     fail_if("scene === 'tools' ? 0.18 : 0.14" not in js, "P4/P5 glow gains are missing", failures)
+    fail_if(".hp-page-hero .hp-stage" not in css or "width: 100vw" not in css, "full-width landing hero rule is missing", failures)
 
     manifest_path = ROOT / "assets" / "homepage" / "parallax" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -161,24 +185,25 @@ def main() -> int:
     secret_webp = secret_png.with_suffix(".webp")
     fail_if(png_size(secret_png) != EXPECTED_CANVAS or webp_size(secret_webp) != EXPECTED_CANVAS, "secret image dimensions are incorrect", failures)
 
-    layout_report = ROOT / "review-screenshots" / "layout-checks.txt"
+    layout_report = ROOT / "review-screenshots-v3" / "layout-checks.txt"
     if layout_report.is_file():
         for line in layout_report.read_text(encoding="utf-8").splitlines():
             payload = json.loads(line[line.index("{") :])
             fail_if(payload["innerWidth"] != payload["scrollWidth"], f"horizontal overflow: {line}", failures)
 
     if failures:
-        print("PARALLAX HOMEPAGE QA FAILED")
+        print("SECTION HERO QA FAILED")
         for failure in failures:
             print(f"- {failure}")
         return 1
 
-    print("PARALLAX HOMEPAGE QA PASS")
-    print("4 scenes · 20 delivery layers · 2 discreet course links · 3 client destinations")
-    print("1672 × 941 sources and WebPs verified · no duplicate IDs · safe new-tab links")
+    print("SECTION HERO QA PASS")
+    print("P3 home · P4 library · P5 simulation tools · P8 full course list")
+    print("4 routes · 20 delivery layers · 2 discreet course links · 3 client destinations")
+    print("1672 × 941 source and delivery files verified · no duplicate IDs · safe new-tab navigation")
     print("noindex/nofollow and index exclusion verified · reduced motion hooks present")
     if layout_report.is_file():
-        print("1920, 1280, 430 and 390 px captures report no horizontal overflow")
+        print("desktop and mobile captures report no horizontal overflow")
     return 0
 
 

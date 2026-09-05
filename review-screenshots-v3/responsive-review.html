@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en-AU">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><title>Section hero responsive review</title>
+<style>body{margin:0;background:#050809;color:#d8e2e2;font:14px system-ui;padding:24px}h1{font-size:24px}.case{margin:0 0 48px}.frames{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}.frame{background:#0b1011;border:1px solid #246063;padding:10px}.frame b{display:block;margin-bottom:8px;color:#46d3d2}iframe{display:block;border:0;background:#000}.status{display:block;margin-top:8px;font:12px ui-monospace;color:#9ab0b1}</style></head>
+<body><h1>Section hero responsive review</h1><div id="mount"></div>
+<script>
+const pages=[['Home','/'],['Library','/library/'],['Simulation Tools','/simulations/'],['Full Course List','/courses/']];
+const sizes=[[430,932],[390,844]];
+const mount=document.querySelector('#mount');
+pages.forEach(([name,url],i)=>{const section=document.createElement('section');section.className='case';section.id='case-'+i;section.innerHTML='<h2>'+name+'</h2><div class="frames"></div>';const frames=section.querySelector('.frames');sizes.forEach(([w,h])=>{const box=document.createElement('div');box.className='frame';box.innerHTML='<b>'+w+' × '+h+'</b><iframe title="'+name+' at '+w+' by '+h+'" width="'+w+'" height="'+h+'" src="'+url+'?responsive-review='+w+'&rev=5"></iframe><span class="status">checking…</span>';const frame=box.querySelector('iframe');frame.addEventListener('load',()=>{const win=frame.contentWindow,doc=frame.contentDocument.documentElement;const ok=Math.ceil(doc.scrollWidth)<=Math.ceil(win.innerWidth);box.querySelector('.status').textContent='inner '+win.innerWidth+' · scroll '+doc.scrollWidth+' · '+(ok?'NO HORIZONTAL OVERFLOW':'OVERFLOW');box.querySelector('.status').style.color=ok?'#46d3d2':'#ff6767';});frames.append(box)});mount.append(section)});
+</script></body></html>

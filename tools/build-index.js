@@ -70,6 +70,8 @@ const SKIP_DIRS = new Set([
   'digitalliteracy',   // legacy Tennant Creek path; duplicates /digital-literacy/
   'node_modules',
   'assets',
+  'tools',              // build utilities and social-card source, not public content
+  'review-screenshots-v3', // branch-only responsive review evidence
   'simulations_downloads',
   'downloads_RGRC',
   'image_gen_assets',
@@ -127,6 +129,10 @@ const TYPES = ['Course', 'Lesson', 'Workshop', 'Presentation', 'Simulation', 'Re
  *   topic            fallback topic, used only when index-meta.json is silent
  */
 const RULES = [
+  // New visual landing pages.
+  { prefix: '/library/', section: 'Library', type: 'Resource', topic: 'AI basics & literacy' },
+  { prefix: '/courses/', section: 'Course library', type: 'Resource', topic: 'AI basics & literacy' },
+
   // Simulations; the subfolder decides the section label.
   { prefix: '/simulations/MS_excel/',         section: 'Simulations, Excel tutorials',  type: 'Simulation', topic: 'Excel' },
   { prefix: '/simulations/MS_word/',          section: 'Simulations, Word tutorials',   type: 'Simulation', topic: 'Word & PowerPoint' },

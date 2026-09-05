@@ -135,6 +135,28 @@
   box-shadow: 0 28px 90px #000;
 }
 
+/* Landing-page scenes use the full browser width while preserving the
+   approved 1672 × 941 proportions and keeping every layer aligned. */
+.hp-chapter.hp-page-hero {
+  height: auto;
+  min-height: 0;
+}
+
+.hp-page-hero .hp-sticky {
+  position: relative;
+  top: auto;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.hp-page-hero .hp-stage {
+  width: 100vw;
+  max-width: none;
+  box-shadow: none;
+}
+
 .hp-layer {
   position: absolute;
   inset: 0;
@@ -247,6 +269,41 @@
   font-size: 12px;
 }
 
+.hp-section-links {
+  position: sticky;
+  top: var(--hp-header-height);
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  gap: clamp(22px, 5vw, 64px);
+  overflow-x: auto;
+  padding: 18px 20px;
+  border-top: 1px solid var(--hp-line);
+  border-bottom: 1px solid var(--hp-line);
+  background: rgba(4, 8, 9, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+}
+
+.hp-section-links::-webkit-scrollbar {
+  display: none;
+}
+
+.hp-section-links a {
+  flex: 0 0 auto;
+  color: var(--hp-teal);
+  font: 500 12px/1.2 "JetBrains Mono", monospace;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.hp-section-links a:hover,
+.hp-section-links a:focus-visible {
+  color: var(--text);
+}
+
 .hp-destinations {
   width: min(1320px, calc(100% - 40px));
   margin: 0 auto;
@@ -332,6 +389,13 @@
   border-top: 1px solid var(--hp-line);
 }
 
+.homepage-parallax #workshops,
+.homepage-parallax #training-games,
+.homepage-parallax #presentations,
+.homepage-parallax #about {
+  scroll-margin-top: calc(var(--hp-header-height) + 76px);
+}
+
 .homepage-parallax .plate-foot img {
   max-height: none;
 }
@@ -413,6 +477,14 @@
   .hp-scene-links a {
     font-size: 11px;
     white-space: nowrap;
+  }
+
+  .hp-section-links {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px 24px;
+    overflow-x: visible;
+    padding-inline: 16px;
   }
 
   .hp-destinations {

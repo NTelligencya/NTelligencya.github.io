@@ -27,10 +27,13 @@
 <!-- /social -->
 <title>Simulation Tools Catalogue — NT World Ink</title>
 <meta name="description" content="Interactive browser-based simulation tools for AI literacy, cyber awareness, digital workplace skills and networking.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&amp;family=Manrope:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/homepage-parallax.css">
 <style>
   :root {
-    /* Ochre-on-black scheme; a warm sibling of the AI Workshop mono pages.
-       Tones sampled from bannerochre.png: burnt ochre #da6f00, golden highlight #d8871f. */
+    /* NT World Ink teal-on-black palette. */
     --bg: #000000;
     --panel: #0a0a0a;
     --white: #f4f4f2;
@@ -38,11 +41,11 @@
     --grey: #b9bcbd;
     --grey-dim: #7d8183;
     --grey-faint: #35383a;
-    --ochre: #e0983c;
-    --ochre-bright: #f2ab52;
-    --ochre-deep: #6b3d10;
-    --ochre-faint: #2a1c0c;
-    --glow: rgba(224, 152, 60, 0.40);
+    --teal: #1ac9c9;
+    --teal-bright: #59e0df;
+    --teal-deep: #0d5558;
+    --teal-faint: #0a2527;
+    --glow: rgba(26, 201, 201, 0.40);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -54,55 +57,15 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ---------- Banner ---------- */
-  .banner {
-    position: relative;
-    width: 100%;
-    min-height: 380px;
-    background: url("assets/bannerochre.png") center 45% / cover no-repeat;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 3rem 1.5rem;
-  }
-  .banner::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center 45%, rgba(0,0,0,0) 20%, rgba(0,0,0,0.65) 100%);
-    pointer-events: none;
-  }
-  .banner h1 {
-    position: relative;
-    z-index: 2;
-    font-size: clamp(2.4rem, 7vw, 5.2rem);
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    color: var(--white);
-    text-shadow: 0 0 34px rgba(224,152,60,0.55), 0 2px 10px rgba(0,0,0,0.95);
-  }
-  .banner p {
-    position: relative;
-    z-index: 2;
-    margin-top: 0.9rem;
-    font-size: clamp(1rem, 2.4vw, 1.35rem);
-    font-style: italic;
-    color: var(--body);
-    letter-spacing: 0.04em;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.95);
-  }
-
   /* ---------- Nav ---------- */
   nav {
     position: sticky;
     top: 0;
     z-index: 10;
     background: rgba(6,6,6,0.94);
-    border-top: 1px solid var(--ochre-faint);
-    border-bottom: 1px solid rgba(224,152,60,0.28);
-    box-shadow: 0 8px 24px -6px var(--glow), 0 16px 48px -10px rgba(224,152,60,0.15);
+    border-top: 1px solid var(--teal-faint);
+    border-bottom: 1px solid rgba(26,201,201,0.28);
+    box-shadow: 0 8px 24px -6px var(--glow), 0 16px 48px -10px rgba(26,201,201,0.15);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -117,8 +80,8 @@
     text-decoration: none;
     transition: color 0.2s ease, text-shadow 0.2s ease;
   }
-  nav a:hover { color: var(--ochre-bright); text-shadow: 0 0 14px rgba(224,152,60,0.6); }
-  nav .home { color: var(--ochre); }
+  nav a:hover { color: var(--teal-bright); text-shadow: 0 0 14px rgba(26,201,201,0.6); }
+  nav .home { color: var(--teal); }
 
   /* ---------- Layout ---------- */
   main { max-width: 1080px; margin: 0 auto; padding: 4rem 1.5rem 5rem; }
@@ -128,7 +91,7 @@
     font-family: "Consolas", "SF Mono", ui-monospace, monospace;
     font-size: 0.82rem;
     letter-spacing: 0.14em;
-    color: var(--ochre);
+    color: var(--teal);
     text-transform: lowercase;
     margin-bottom: 0.9rem;
   }
@@ -148,7 +111,7 @@
     display: flex;
     align-items: baseline;
     gap: 0.9rem;
-    border-bottom: 1px solid var(--ochre-faint);
+    border-bottom: 1px solid var(--teal-faint);
     padding-bottom: 0.6rem;
     margin-bottom: 1.8rem;
     flex-wrap: wrap;
@@ -183,18 +146,18 @@
     padding: 1.7rem 1.7rem 1.6rem;
     box-shadow:
       0 4px 18px rgba(0,0,0,0.8),
-      0 0 0 1px rgba(224,152,60,0.04),
+      0 0 0 1px rgba(26,201,201,0.04),
       inset 0 1px 0 rgba(255,255,255,0.04);
     transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
   }
   .card-link:hover .card, .card-link:focus-visible .card {
-    border-color: var(--ochre);
+    border-color: var(--teal);
     transform: translateY(-4px);
     box-shadow:
       0 12px 36px rgba(0,0,0,0.9),
       0 0 28px -4px var(--glow);
   }
-  .card-link:focus-visible .card { outline: 2px solid var(--ochre-bright); outline-offset: 2px; }
+  .card-link:focus-visible .card { outline: 2px solid var(--teal-bright); outline-offset: 2px; }
 
   .card .tag {
     align-self: flex-start;
@@ -203,8 +166,8 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     padding: 0.22rem 0.6rem;
-    border: 1px solid var(--ochre-deep);
-    color: var(--ochre);
+    border: 1px solid var(--teal-deep);
+    color: var(--teal);
     margin-bottom: 1rem;
   }
   .card .tag.soon { border-color: var(--grey-faint); color: var(--grey-dim); }
@@ -221,19 +184,19 @@
     font-size: 0.78rem;
     letter-spacing: 0.06em;
     color: var(--grey-dim);
-    border-top: 1px solid var(--ochre-faint);
+    border-top: 1px solid var(--teal-faint);
     padding-top: 0.85rem;
   }
   .card .open {
     margin-top: 0.9rem;
     font-size: 0.95rem;
     letter-spacing: 0.04em;
-    color: var(--ochre);
+    color: var(--teal);
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
   }
-  .card-link:hover .open { color: var(--ochre-bright); text-shadow: 0 0 12px rgba(224,152,60,0.5); }
+  .card-link:hover .open { color: var(--teal-bright); text-shadow: 0 0 12px rgba(26,201,201,0.5); }
   .card.placeholder { cursor: default; }
 
   /* ---------- Cards with a secondary action (file download) ----------
@@ -251,8 +214,8 @@
   .card-actions .open { margin-top: 0; text-decoration: none; }
   .card-cover::after { content: ""; position: absolute; inset: 0; }
   .card-link:has(.card-cover:focus-visible) .card {
-    border-color: var(--ochre);
-    outline: 2px solid var(--ochre-bright);
+    border-color: var(--teal);
+    outline: 2px solid var(--teal-bright);
     outline-offset: 2px;
   }
   .download-btn {
@@ -262,45 +225,57 @@
     font-size: 0.78rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--ochre);
+    color: var(--teal);
     text-decoration: none;
-    border: 1px solid var(--ochre-deep);
-    background: var(--ochre-faint);
+    border: 1px solid var(--teal-deep);
+    background: var(--teal-faint);
     padding: 0.35rem 0.75rem;
     transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
   .download-btn:hover, .download-btn:focus-visible {
-    color: var(--ochre-bright);
-    border-color: var(--ochre);
-    background: rgba(224,152,60,0.12);
+    color: var(--teal-bright);
+    border-color: var(--teal);
+    background: rgba(26,201,201,0.12);
     box-shadow: 0 0 14px -2px var(--glow);
   }
-  .download-btn:focus-visible { outline: 2px solid var(--ochre-bright); outline-offset: 2px; }
+  .download-btn:focus-visible { outline: 2px solid var(--teal-bright); outline-offset: 2px; }
 
   /* ---------- Footer ---------- */
   footer {
-    border-top: 1px solid var(--ochre-faint);
+    border-top: 1px solid var(--teal-faint);
     text-align: center;
     padding: 2.6rem 1.5rem;
     color: var(--grey-dim);
     font-size: 0.95rem;
     letter-spacing: 0.03em;
   }
-  footer a { color: var(--ochre); text-decoration: none; }
-  footer a:hover { color: var(--ochre-bright); }
+  footer a { color: var(--teal); text-decoration: none; }
+  footer a:hover { color: var(--teal-bright); }
   footer .fine { display: block; margin-top: 0.7rem; font-style: italic; color: var(--grey-faint); }
 
   @media (max-width: 520px) {
     main { padding: 2.6rem 1.1rem 3.5rem; }
-    .banner { min-height: 300px; }
   }
 </style>
 </head>
-<body>
+<body class="homepage-parallax">
+<a class="hp-skip" href="#simulation-content">Skip to content</a>
 
-  <header class="banner">
-    <h1>Simulation Tools</h1>
-  </header>
+
+<section class="hp-chapter hp-page-hero" id="parallax-tools" data-scene="tools" data-motion="1.15" aria-labelledby="hp-tools-title">
+  <div class="hp-sticky">
+    <div class="hp-stage">
+      <img class="hp-layer hp-background" data-depth="0" src="/assets/homepage/parallax/p5/01-clean-background.webp" width="1672" height="941" alt="" fetchpriority="high">
+      <img class="hp-layer hp-midground" data-depth=".032" src="/assets/homepage/parallax/p5/02-midground-trees-fence.webp" width="1672" height="941" alt="">
+      <img class="hp-layer hp-terrain" data-depth=".09" src="/assets/homepage/parallax/p5/04-foreground-earth-circuitry.webp" width="1672" height="941" alt="">
+      <img class="hp-layer hp-hero hp-glow" data-depth=".15" src="/assets/homepage/parallax/p5/03-hero-glass-envelope.webp" width="1672" height="941" alt="">
+      <img class="hp-layer hp-interface" data-depth="0" src="/assets/homepage/parallax/p5/05-brand-interface.webp" width="1672" height="941" alt="">
+      <div class="hp-caption"><div class="hp-badge">Tools</div><h1 id="hp-tools-title">Simulation Tools Catalogue</h1>
+        <p>Interactive browser-based simulation tools for AI literacy, cyber awareness, digital workplace skills and networking.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
   <nav>
     <a class="home" href="/">&larr; ntworld.ink</a>
@@ -313,7 +288,7 @@
     <a href="#digital-workplace">Digital Workplace</a>
   </nav>
 
-  <main>
+  <main id="simulation-content">
     <section class="intro">
       <h2>Interactive simulation tools for skills practice</h2>
     </section>
@@ -811,10 +786,11 @@
   </main>
 
   <footer>
-    <a href="/">Back to ntworld.ink</a> &middot; <a href="/#library">Course library</a>
+    <a href="/">Back to ntworld.ink</a> &middot; <a href="/library/">Course library</a>
     <span class="fine" style="line-height:1.8">NT World Ink is an online learning resource project: practical learning materials in cybersecurity, AI literacy, Microsoft Office and workplace digital skills.<br>
     Copyright &copy; Charles Darwin University | TAFE ICT, Cyber Security &amp; Digital | RTO Provider No: 0373 | ABN 54 093 513 649 | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/privacy-notice" target="_blank" rel="noopener">Privacy</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/copyright-and-disclaimer" target="_blank" rel="noopener">Copyright and Disclaimer</a> | <a href="https://www.cdu.edu.au/about-cdu/leadership-structure/strategic-services-governance/legal/cookie-notice" target="_blank" rel="noopener">Cookies</a> | <a href="mailto:webservices@cdu.edu.au">Feedback</a></span>
   </footer>
 
+<script src="/homepage-parallax.js" defer></script>
 </body>
 </html>
