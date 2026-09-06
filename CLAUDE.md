@@ -481,7 +481,14 @@ both real, in `tools/pd-day/elements-row.xml`; measured counts for that
 template's document.xml: 166 KB, 352 paragraphs of which 260 hold no text, 130
 runs, 6 tables, 3 content controls, 13 highlighted runs; then the full template
 quirks catalogue, which SD had Claude write after the rough start to
-population); Phases 1 to 5 (map, build the tools, pre-validate,
+population); a second interlude, Directories and context (folder rules drawn
+from SD's setup guide; the 80-page TAE manual of which about 40 pages were
+fluff; the "SLR workbook" acronym that bled from the reference set until the
+brief said student content lives on Brambling; model choice and timings in SD's
+words: Opus 4.8 high effort for nearly everything with its complex-language
+habit controlled for, Haiku too light, Fable 5 not warranted, ICTCBL322 about
+4.5 hours, the six remaining units about 8 hours all up; and the goal statement
+quoted from the workspace CLAUDE.md as the long-horizon optimiser); Phases 1 to 5 (map, build the tools, pre-validate,
 populate the templates, illustrate in ChatGPT Codex), each with Produces, What
 goes in, What you do (numbered steps with example prompts), the full SKILL.md in
 a scrollable code block (verbatim from the vault copies in
