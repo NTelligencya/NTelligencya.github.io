@@ -55,14 +55,16 @@ def anchors(fragment: str) -> list[dict[str, str]]:
 
 
 def png_size(path: Path) -> tuple[int, int]:
-    data = path.read_bytes()[:24]
+    with path.open("rb") as image_file:
+        data = image_file.read(24)
     if data[:8] != b"\x89PNG\r\n\x1a\n":
         raise ValueError(f"not a PNG: {path}")
     return struct.unpack(">II", data[16:24])
 
 
 def webp_size(path: Path) -> tuple[int, int]:
-    data = path.read_bytes()[:64]
+    with path.open("rb") as image_file:
+        data = image_file.read(64)
     if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
         raise ValueError(f"not a WebP: {path}")
     chunk = data[12:16]
