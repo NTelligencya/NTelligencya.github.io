@@ -293,12 +293,16 @@ page = f'''<!doctype html>
     <li><b>The template's machinery is untouched until the end.</b> Phase 4 copies the controlled document and edits the copy in place, through helpers that know its quirks, then runs four checks. Nothing about the content is decided there; it is a transfer.</li>
   </ul>
 
-  <h3>The interlude deck</h3>
-  <p>The same template, narrated from the inside. <a href="/cdu-ict-pd-day/template-wars/">Template Wars: field notes from inside a Word document made by humans</a> is an eighteen-slide browser deck run in the middle of the day. Every figure in it is measured from Assessment Mapping Matrix v7.docx: the 37 files inside the archive, the two-line body, the 36 namespaces declared before the first word, the phrase split across eight runs, the two cells swallowed whole by date pickers. Arrow keys or space step through it; the audience is asked to guess along the way.</p>
-
   <h3>The catalogue that came out of the rough start</h3>
   <p>Template population did not go smoothly at first. After the ICTCBL322 pack, Claude was asked to write out everything that is tricky about the templates' structure, so that later runs would not repeat the misalignments. That document became the populator skill's reference file. It reads as a list of reasons to keep content out of Word until the content is finished, and it is shown here in full.</p>
   {skill('template-quirks.md', 'cdu-unit-template-populator: references/template-quirks.md', "The catalogue Claude wrote after the ICTCBL322 population, now read by the populator skill before it touches any template. Saved in the vault as the skill's quirks catalogue.")}
+
+  <h3>The interlude deck</h3>
+  <p>The same template, narrated from the inside. <a href="/cdu-ict-pd-day/template-wars/">Template Wars: field notes from inside a Word document made by humans</a> is a twenty-one-slide browser deck run in the middle of the day. Every figure in it is measured from Assessment Mapping Matrix v7.docx: the 37 files inside the archive, the two-line body, the 36 namespaces declared before the first word, the phrase split across eight runs, the two cells swallowed whole by date pickers. Arrow keys or space step through it; the audience is asked to guess along the way.</p>
+  <a class="deckbtn" href="/cdu-ict-pd-day/template-wars/" aria-label="Open the Template Wars deck">
+    <img src="assets/template-wars-button.webp" width="1400" height="933" alt="A pixel-art red block character raises a hand beside a stack of old forms. Speech bubble: May I speak for a moment about your vintage templates?" loading="lazy">
+    <span class="deckbtn__cap">Open the deck<span class="deckbtn__arrow" aria-hidden="true">→</span></span>
+  </a>
 </section>
 
 <!-- ============================================================ context -->
