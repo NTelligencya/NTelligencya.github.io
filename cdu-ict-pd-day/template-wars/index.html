@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Template Wars · Field notes from inside a Word document · CDU ICT PD Day</title>
+<meta name="description" content="An interactive interlude for the CDU ICT, Cyber Security and Digital PD Day: what the Assessment Mapping Matrix v7 template looks like from the inside, narrated by the model that has to fill it in.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================================
+   TEMPLATE WARS  ·  a fixed 1920×1080 stage, scaled to fit.
+   Site palette: near-black ground, flat teal accent, no glow.
+   Fonts: Cormorant Garamond (display), Manrope (text),
+   JetBrains Mono (the machine's voice and all XML).
+   =========================================================== */
+:root {
+  --bg: #0a0a0c;
+  --surface: #111417;
+  --surface-2: #0f1a1c;
+  --ink: #f5f5f7;
+  --ink-soft: #a3b5b3;
+  --ink-mute: #6f7f7d;
+  --accent: #1ac9c9;
+  --accent-dim: #0b5555;
+  --mint: #beebd5;
+  --sage: #8db091;
+  --yellow: #ffe94d;          /* Word's highlighter, slightly tamed */
+  --word-grey: #d9d9d9;       /* the template's own cell shading, lit for a dark room */
+  --word-grey-2: #bfbfbf;
+  --hairline: rgba(255,255,255,0.10);
+  --hairline-teal: rgba(26,201,201,0.32);
+  --display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --text: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --stage-bg: #050506;
+  --slide-bg: #0a0a0c;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- fixed 16:9 stage: mandatory base (viewport-base.css) ---------- */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg, #000); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg, #000); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg, #fff); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; display: block; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg, #fff); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, video, canvas, svg { max-width: 100%; max-height: 100%; }
+.deck-controls { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000; }
+@media print {
+  html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+  .deck-viewport { position: static; overflow: visible; background: #fff; }
+  .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+  .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+  .slide:last-child { break-after: auto; page-break-after: auto; }
+  .deck-controls, .chrome { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ---------- base ---------- */
+* { box-sizing: border-box; }
+body { font-family: var(--text); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.slide { padding: 72px 120px 0 120px; transition: opacity .45s var(--ease); }
+.slide::before {  /* faint grid, the way a template looks under the skin */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(var(--hairline) 1px, transparent 1px), linear-gradient(90deg, var(--hairline) 1px, transparent 1px);
+  background-size: 96px 96px; opacity: .22;
+  mask-image: radial-gradient(ellipse at 70% 30%, #000 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at 70% 30%, #000 30%, transparent 80%);
+}
+.kicker { font-family: var(--mono); font-size: 19px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 16px; }
+h1, h2 { font-family: var(--display); font-weight: 400; letter-spacing: -0.01em; margin: 0; color: var(--ink); }
+h2 { font-size: 72px; line-height: 1.04; max-width: 1560px; }
+h2 em { font-style: italic; color: var(--mint); }
+.lede { font-size: 30px; line-height: 1.45; color: var(--ink-soft); max-width: 1180px; margin: 28px 0 0; }
+.lede b { color: var(--ink); font-weight: 600; }
+.num { font-family: var(--display); font-weight: 300; font-variant-numeric: tabular-nums; color: var(--ink); }
+.mono { font-family: var(--mono); }
+.teal { color: var(--accent); }
+.mint { color: var(--mint); }
+.mute { color: var(--ink-mute); }
+.small { font-size: 22px; color: var(--ink-soft); line-height: 1.5; }
+
+/* fragments: revealed step by step */
+.frag { opacity: 0; transform: translateY(18px); transition: opacity .55s var(--ease), transform .55s var(--ease); }
+.frag.on { opacity: 1; transform: none; }
+
+/* ---------- the machine's inner voice ---------- */
+.mind {
+  position: absolute; left: 120px; bottom: 52px; width: 1680px; min-height: 124px;
+  border-left: 3px solid var(--accent); padding: 4px 0 4px 28px;
+}
+.mind__label { font-family: var(--mono); font-size: 17px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 12px; }
+.mind__text { font-family: var(--mono); font-size: 24px; line-height: 1.45; color: var(--ink); margin: 0; min-height: 2.9em; max-width: 1560px; }
+.mind__text::after { content: "▍"; color: var(--accent); animation: blink 1s steps(1) infinite; margin-left: 2px; }
+.mind.done .mind__text::after { opacity: .35; animation: none; }
+.mind p[data-at] { display: none; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---------- XML rendering ---------- */
+.xml, pre.xml {
+  font-family: var(--mono); font-size: 19px; line-height: 1.5; color: var(--ink-soft);
+  white-space: pre-wrap; overflow-wrap: anywhere; margin: 0;
+}
+.xml .t { color: var(--accent); }        /* tag names */
+.xml .a { color: var(--mint); }          /* attribute names */
+.xml .v { color: var(--sage); }          /* attribute values */
+.xml .x { color: var(--ink); }           /* visible text */
+.xml .hl { background: rgba(255,233,77,.22); outline: 1px solid rgba(255,233,77,.6); }
+.panel {
+  background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px; padding: 28px 32px;
+}
+.panel--teal { border-color: var(--hairline-teal); }
+
+/* ---------- a Word table, as a human sees it ---------- */
+.wtable { border-collapse: collapse; width: 100%; font-family: Calibri, Carlito, "Segoe UI", var(--text); color: #111; background: #fff; font-size: 24px; }
+.wtable td { border: 1px solid #8a8a8a; padding: 10px 14px; height: 54px; vertical-align: middle; }
+.wtable td.g { background: #f2f2f2; }
+.wtable td.g2 { background: #bfbfbf; font-weight: 700; }
+.wtable td.ph { color: #808080; }
+.wtable td.yel { background: #ffff00; }
+.wtable .ins { background: #ffff00; font-style: italic; font-size: 19px; font-family: "Calibri Light", Calibri, Carlito, var(--text); }
+.wtable b { font-weight: 700; }
+.wpage { background: #fff; border-radius: 6px; padding: 26px 28px; box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+
+/* ---------- buttons inside slides ---------- */
+.btn {
+  font: 500 20px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--accent); background: transparent; border: 1px solid var(--accent); border-radius: 6px;
+  padding: 16px 26px; cursor: pointer; transition: background .2s, color .2s, transform .15s;
+}
+.btn:hover { background: var(--accent); color: #05161a; }
+.btn:active { transform: translateY(1px); }
+.btn.ghost { border-color: var(--hairline); color: var(--ink-soft); }
+.btn.ghost:hover { background: var(--surface); color: var(--ink); }
+.btn[disabled] { opacity: .35; cursor: default; }
+
+/* ---------- chrome outside the stage ---------- */
+.chrome { position: fixed; inset: auto 0 0 0; height: 44px; z-index: 900; pointer-events: none; }
+.chrome__bar { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: var(--accent); transition: width .35s var(--ease); z-index: 901; }
+.chrome__count { position: fixed; right: 22px; bottom: 14px; font: 500 12px/1 var(--mono); letter-spacing: .14em; color: var(--ink-mute); text-transform: uppercase; }
+.chrome__home { position: fixed; left: 22px; bottom: 12px; font: 500 12px/1 var(--mono); letter-spacing: .14em; color: var(--ink-mute); text-transform: uppercase; text-decoration: none; pointer-events: auto; }
+.chrome__home:hover { color: var(--accent); }
+.chrome__hint { position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); font: 500 12px/1 var(--mono); letter-spacing: .14em; color: var(--ink-mute); text-transform: uppercase; pointer-events: auto; cursor: pointer; }
+.chrome__hint:hover { color: var(--accent); }
+.nav { position: fixed; top: 50%; transform: translateY(-50%); width: 64px; height: 120px; border: 0; background: transparent; color: var(--ink-mute); font-size: 40px; cursor: pointer; z-index: 902; opacity: 0; transition: opacity .3s, color .2s; }
+.nav:hover { color: var(--accent); opacity: 1; }
+body:hover .nav { opacity: .5; }
+.nav--prev { left: 0; } .nav--next { right: 0; }
+.help { position: fixed; inset: 0; z-index: 950; background: rgba(5,5,6,.92); display: grid; place-items: center; }
+.help[hidden] { display: none; }
+.help__box { width: min(720px, 90vw); border: 1px solid var(--hairline-teal); border-radius: 10px; padding: 36px 40px; background: var(--surface); font-family: var(--mono); font-size: 15px; line-height: 1.8; color: var(--ink-soft); }
+.help__box h3 { font-family: var(--display); font-weight: 400; font-size: 34px; color: var(--ink); margin: 0 0 14px; }
+.help__box kbd { display: inline-block; min-width: 30px; text-align: center; padding: 2px 8px; border: 1px solid var(--hairline); border-radius: 4px; color: var(--ink); background: #0a0a0c; margin-right: 8px; }
+.help__box table { border-collapse: collapse; width: 100%; }
+.help__box td { padding: 6px 4px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+
+/* ===========================================================
+   SLIDE 1 · title
+   =========================================================== */
+.s-title { display: flex; flex-direction: column; justify-content: flex-start; padding-top: 128px; }
+.s-title::before { display: none; }
+.s-title h1 { font-size: 196px; line-height: .9; letter-spacing: -0.02em; font-weight: 300; }
+.s-title h1 span { display: block; color: var(--accent); font-style: italic; font-weight: 300; }
+.s-title .sub { font-size: 38px; color: var(--ink-soft); margin: 30px 0 0; max-width: 1200px; line-height: 1.3; font-family: var(--display); font-style: italic; }
+.s-title .meta { font-family: var(--mono); font-size: 19px; color: var(--ink-mute); margin-top: 28px; letter-spacing: .04em; }
+.s-title .meta b { color: var(--mint); font-weight: 500; }
+.tagrain { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.tagrain span {
+  position: absolute; top: -60px; font-family: var(--mono); font-size: 22px; color: var(--accent); opacity: 0;
+  animation: fall linear infinite;
+}
+@keyframes fall { 0% { transform: translateY(0); opacity: 0; } 8% { opacity: .22; } 90% { opacity: .12; } 100% { transform: translateY(1240px); opacity: 0; } }
+
+/* ===========================================================
+   SLIDE 2 · what you see / what I see
+   =========================================================== */
+.twoway { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 60px; height: 520px; }
+.twoway .wpage { align-self: start; }
+.twoway .xmlbox { height: 520px; overflow: hidden; position: relative; }
+.twoway .xmlbox .xml { font-size: 17px; line-height: 1.45; }
+.twoway .xmlbox::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: linear-gradient(transparent, var(--surface)); }
+.twoway .side { position: relative; }
+.twoway .side .cap { position: absolute; top: -34px; left: 0; font-family: var(--mono); font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-mute); }
+.twoway .human, .twoway .machine { transition: opacity .5s var(--ease), transform .5s var(--ease); }
+.twoway .machine { opacity: .18; transform: translateX(10px); }
+.s-two.showxml .machine { opacity: 1; transform: none; }
+.s-two.showxml .human { opacity: .28; }
+.s-two .btnrow { position: absolute; right: 120px; top: 108px; }
+
+/* ===========================================================
+   SLIDE 3 · the zip
+   =========================================================== */
+.zipwrap { position: relative; height: 560px; margin-top: 24px; }
+.filecard {
+  position: absolute; left: 0; top: 40px; width: 560px; padding: 30px 34px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--hairline-teal); transition: opacity .5s var(--ease), transform .6s var(--ease);
+}
+.filecard .name { font-family: var(--mono); font-size: 24px; color: var(--ink); }
+.filecard .size { font-family: var(--display); font-size: 92px; line-height: 1; margin-top: 12px; }
+.filecard .size small { font-family: var(--mono); font-size: 20px; color: var(--ink-mute); margin-left: 10px; }
+.s-zip.burst .filecard { opacity: .35; transform: translateX(-20px) scale(.92); }
+.parts { position: absolute; left: 620px; top: 0; width: 1060px; max-height: 575px; overflow: hidden; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+.part {
+  font: 500 14px/1.25 var(--mono); color: var(--ink-soft); background: var(--surface); border: 1px solid var(--hairline);
+  border-radius: 5px; padding: 9px 11px; cursor: pointer; text-align: left;
+  opacity: 0; transform: translateX(-380px) scale(.6); transition: opacity .5s var(--ease), transform .7s var(--ease), border-color .2s, color .2s;
+}
+.part b { display: block; font-weight: 500; color: var(--ink); font-size: 15px; }
+.part:hover, .part.sel { border-color: var(--accent); color: var(--ink); }
+.part.big { padding: 18px 16px; font-size: 16px; }
+.part.big b { font-size: 19px; }
+.s-zip.burst .part { opacity: 1; transform: none; }
+.zipnote { position: absolute; left: 0; top: 250px; width: 560px; min-height: 160px; font-size: 22px; line-height: 1.45; color: var(--ink-soft); }
+.zipnote b { color: var(--mint); font-family: var(--mono); font-weight: 500; font-size: 20px; display: block; margin-bottom: 8px; }
+.ziptotal { position: absolute; left: 0; top: 440px; font-family: var(--mono); font-size: 20px; color: var(--ink-mute); text-align: left; }
+.ziptotal .num { font-size: 72px; display: block; color: var(--ink); line-height: 1; }
+
+/* ===========================================================
+   SLIDE 4 · line two
+   =========================================================== */
+.lines { display: grid; grid-template-columns: 420px 1fr; gap: 48px; margin-top: 44px; }
+.linestat { border-top: 1px solid var(--hairline); padding-top: 18px; }
+.linestat .lab { font-family: var(--mono); font-size: 18px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-mute); }
+.linestat .num { font-size: 96px; line-height: 1; margin-top: 8px; }
+.linestat .num.big { font-size: 118px; color: var(--accent); }
+.linestat .what { font-size: 22px; color: var(--ink-soft); margin-top: 6px; }
+.strip { position: relative; height: 340px; border: 1px solid var(--hairline-teal); border-radius: 8px; background: var(--surface); overflow: hidden; margin-top: 20px; }
+.strip .lane { position: absolute; left: 0; height: 70px; display: flex; align-items: center; white-space: nowrap; padding-left: 40px; animation: rail linear infinite; }
+.strip .lane:nth-child(1) { top: 14px; } .strip .lane:nth-child(2) { top: 96px; opacity: .75; } .strip .lane:nth-child(3) { top: 178px; opacity: .5; }
+.strip .lane .xml { white-space: nowrap; font-size: 24px; }
+@keyframes rail { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.strip .marker { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; background: rgba(10,10,12,.85); border-top: 1px solid var(--hairline); font-family: var(--mono); font-size: 18px; color: var(--ink-mute); display: flex; align-items: center; padding: 0 24px; gap: 24px; }
+.strip .marker .pos { color: var(--accent); }
+.strip .marker .track { flex: 1; height: 3px; background: var(--hairline); position: relative; }
+.strip .marker .track i { position: absolute; left: 0; top: -4px; width: 11px; height: 11px; border-radius: 50%; background: var(--accent); animation: dot 150s linear infinite; }
+@keyframes dot { from { left: 0; } to { left: 1.6%; } }
+.firstword { margin-top: 26px; font-size: 26px; color: var(--ink-soft); }
+.firstword b { font-family: var(--mono); color: var(--mint); font-weight: 500; }
+
+/* ===========================================================
+   SLIDE 5 · namespaces
+   =========================================================== */
+.stamps { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 32px; max-width: 1680px; }
+.stamp {
+  font-family: var(--mono); font-size: 15px; color: var(--ink-soft); border: 1px solid var(--hairline); border-radius: 6px; padding: 7px 11px; background: var(--surface);
+  opacity: 0; transform: rotate(-6deg) scale(1.6); transition: opacity .25s, transform .35s var(--ease), border-color .3s;
+}
+.stamp b { color: var(--accent); font-weight: 500; margin-right: 8px; }
+.stamp.cx b { color: var(--sage); }
+.stamp.odd { border-color: var(--hairline-teal); }
+.stamp.odd b { color: var(--mint); }
+.s-ns.go .stamp { opacity: 1; transform: none; }
+.payoff { margin-top: 30px; font-size: 27px; color: var(--ink-soft); max-width: 1500px; line-height: 1.45; }
+.payoff b { color: var(--ink); }
+
+/* ===========================================================
+   SLIDE 6 · counting
+   =========================================================== */
+.counts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 44px; }
+.count { border-top: 1px solid var(--hairline); padding-top: 18px; }
+.count .lab { font-family: var(--mono); font-size: 18px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-mute); }
+.count .num { font-size: 120px; line-height: 1; margin-top: 8px; }
+.count .num.hot { color: var(--accent); }
+.count .what { font-size: 22px; color: var(--ink-soft); margin-top: 4px; }
+.bar { margin-top: 36px; height: 62px; border: 1px solid var(--hairline-teal); border-radius: 6px; position: relative; overflow: hidden; background: var(--surface); }
+.bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: repeating-linear-gradient(90deg, var(--accent-dim) 0 10px, transparent 10px 14px); transition: width 1.6s var(--ease); }
+.bar > span { position: absolute; inset: 0; display: flex; align-items: center; padding: 0 22px; font-family: var(--mono); font-size: 20px; color: var(--ink); gap: 20px; }
+.bar > span b { color: var(--accent); font-weight: 500; }
+.bar.on i { width: 74.7%; transition-delay: .2s; }
+.perword { margin-top: 30px; font-size: 28px; color: var(--ink-soft); }
+.perword b { color: var(--ink); }
+
+/* ===========================================================
+   SLIDE 7 · runs
+   =========================================================== */
+.cellview { margin-top: 44px; width: 1120px; }
+.runs { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; min-height: 120px; }
+.run { font-family: var(--mono); font-size: 30px; color: var(--ink); background: var(--surface); border: 1px solid var(--hairline-teal); border-radius: 6px; padding: 18px 20px 14px; position: relative; opacity: 0; transform: translateY(20px) scale(.9); transition: all .5s var(--ease); white-space: pre; }
+.run small { display: block; font-size: 13px; color: var(--ink-mute); letter-spacing: .1em; margin-top: 8px; white-space: normal; }
+.run.y { color: #3b3300; background: var(--yellow); border-color: var(--yellow); font-style: italic; }
+.run.y small { color: #6b5f00; }
+.s-runs.split .run { opacity: 1; transform: none; }
+.s-runs.stitched .run { transform: translateX(0); border-color: var(--accent); }
+.s-runs.stitched .runs { gap: 0; }
+.s-runs.stitched .run { border-radius: 0; border-right-width: 0; }
+.s-runs.stitched .run:last-child { border-right-width: 1px; }
+.finder { margin-top: 30px; display: inline-flex; align-items: center; gap: 18px; font-family: var(--mono); font-size: 22px; border: 1px solid var(--hairline); border-radius: 6px; padding: 14px 20px; background: var(--surface); color: var(--ink-soft); opacity: 0; transition: opacity .4s; }
+.finder .q { color: var(--ink); min-width: 120px; }
+.finder .res { color: var(--ink-mute); }
+.finder .res.bad { color: #ff7a7a; }
+.finder .res.good { color: var(--mint); }
+.s-runs.search .finder, .s-runs.stitched .finder { opacity: 1; }
+
+/* ===========================================================
+   SLIDE 8 · yellow
+   =========================================================== */
+.yelwrap { margin-top: 44px; width: 1300px; }
+.yelwrap .wtable td { height: 64px; font-size: 26px; }
+.typed { font-family: "Calibri Light", Calibri, Carlito, var(--text); }
+.typed.y { background: #ffff00; font-style: italic; font-size: 19px; }
+.yelstats { margin-top: 36px; display: flex; gap: 60px; align-items: baseline; }
+.yelstats .num { font-size: 120px; line-height: 1; color: var(--yellow); }
+.yelstats .what { font-size: 26px; color: var(--ink-soft); max-width: 800px; line-height: 1.4; }
+
+/* ===========================================================
+   SLIDE 9 · units
+   =========================================================== */
+.rulers { margin-top: 10px; width: 1560px; }
+.ruler { position: relative; height: 110px; margin-top: 84px; border-top: 2px solid var(--ink-soft); }
+.ruler .seg { position: absolute; top: 0; height: 100%; border-right: 2px solid var(--ink-soft); }
+.ruler .seg:first-child { border-left: 2px solid var(--ink-soft); }
+.ruler .seg span { position: absolute; left: 50%; top: 24px; transform: translateX(-50%); font-family: var(--mono); font-size: 30px; color: var(--ink); white-space: nowrap; }
+.ruler .seg small { position: absolute; left: 50%; top: 68px; transform: translateX(-50%); font-family: var(--mono); font-size: 15px; color: var(--ink-mute); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.ruler .who { position: absolute; left: 0; top: -44px; font-family: var(--mono); font-size: 17px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.ruler.pct { border-color: var(--mint); }
+.ruler.pct .seg { border-color: var(--mint); }
+.ruler.pct .who { color: var(--mint); }
+.unitsnote { margin-top: 44px; font-size: 26px; color: var(--ink-soft); max-width: 1400px; line-height: 1.45; }
+.unitsnote code { font-family: var(--mono); color: var(--mint); font-size: 22px; }
+
+/* ===========================================================
+   SLIDE 10 · width zero
+   =========================================================== */
+.fs { margin-top: 44px; width: 1560px; }
+.fs .wtable td { transition: width 1.1s var(--ease), padding 1.1s var(--ease), font-size 1.1s var(--ease), color .4s; }
+.fs .wtable td.c1 { width: 15%; } .fs .wtable td.c2 { width: 17%; }
+.s-zero.collapse .fs .wtable td.c1, .s-zero.collapse .fs .wtable td.c2 { width: 0; padding-left: 0; padding-right: 0; font-size: 0; color: transparent; }
+.fs .wtable td.c1, .fs .wtable td.c2 { white-space: nowrap; overflow: hidden; }
+.widths { margin-top: 30px; display: flex; gap: 40px; font-family: var(--mono); font-size: 22px; color: var(--ink-soft); }
+.widths div { border: 1px solid var(--hairline); border-radius: 6px; padding: 16px 22px; background: var(--surface); }
+.widths b { color: var(--mint); font-weight: 500; }
+.widths .zero b { color: #ff7a7a; }
+
+/* ===========================================================
+   SLIDE 11 · count the cells
+   =========================================================== */
+.cellsrow { margin-top: 44px; width: 1300px; }
+.cellsrow .wtable td { height: 74px; font-size: 28px; }
+.answer { display: flex; align-items: center; gap: 40px; margin-top: 34px; min-height: 180px; }
+.answer .big { font-family: var(--display); font-size: 200px; line-height: 1; color: var(--accent); min-width: 160px; text-align: center; opacity: 0; transform: scale(.6); transition: all .5s var(--ease); }
+.answer .big.on { opacity: 1; transform: none; }
+.answer .why { font-size: 26px; line-height: 1.45; color: var(--ink-soft); max-width: 980px; }
+.answer .why code { font-family: var(--mono); color: var(--mint); font-size: 22px; }
+.sdtwrap { position: relative; }
+.sdtwrap::before { content: "w:sdt  (date picker)"; position: absolute; inset: -14px -10px -14px -10px; border: 2px dashed var(--accent); border-radius: 6px; pointer-events: none; font-family: var(--mono); font-size: 14px; color: var(--accent); padding: 0 8px; letter-spacing: .1em; opacity: 0; transition: opacity .5s; text-transform: uppercase; }
+.s-cells.why .sdtwrap::before { opacity: 1; }
+.s-cells .btns { display: flex; gap: 18px; margin-top: 30px; }
+
+/* ===========================================================
+   SLIDE 12 · ghosts
+   =========================================================== */
+.ghosts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; margin-top: 44px; }
+.ghost { border-top: 1px solid var(--hairline); padding-top: 18px; }
+.ghost .num { font-size: 112px; line-height: 1; }
+.ghost .num small { font-family: var(--mono); font-size: 22px; color: var(--ink-mute); margin-left: 10px; }
+.ghost .what { font-size: 24px; color: var(--ink-soft); margin-top: 6px; line-height: 1.4; }
+.ghost .what b { color: var(--ink); }
+.ghost .list { margin-top: 16px; font-family: var(--mono); font-size: 17px; line-height: 1.7; color: var(--ink-mute); }
+.ghost .list i { color: var(--mint); font-style: normal; }
+
+/* ===========================================================
+   SLIDE 13 · time
+   =========================================================== */
+.timeline { margin-top: 48px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+.tcard { border: 1px solid var(--hairline); border-radius: 8px; padding: 38px 36px 34px; background: var(--surface); min-height: 330px; }
+.tcard .lab { font-family: var(--mono); font-size: 18px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-mute); }
+.tcard .val { font-family: var(--display); font-size: 64px; line-height: 1.05; margin-top: 16px; color: var(--ink); }
+.tcard .val.t { color: var(--accent); }
+.tcard .src { font-family: var(--mono); font-size: 17px; color: var(--ink-mute); margin-top: 22px; line-height: 1.6; }
+
+/* ===========================================================
+   SLIDE 14 · the relic
+   =========================================================== */
+.relic { margin-top: 64px; padding: 54px 60px; border: 1px solid var(--accent); border-radius: 10px; background: var(--surface-2); position: relative; width: 1620px; }
+.relic::before { content: "word/footer2.xml"; position: absolute; top: -14px; left: 40px; padding: 2px 12px; background: var(--bg); font-family: var(--mono); font-size: 16px; color: var(--accent); letter-spacing: .12em; }
+.relic .text { font-family: Calibri, Carlito, var(--text); font-size: 34px; color: var(--ink); }
+.relic .text span { color: var(--ink-mute); }
+.relic .text b { color: var(--mint); font-weight: 500; }
+.relicnote { margin-top: 40px; font-size: 28px; color: var(--ink-soft); max-width: 1500px; line-height: 1.45; }
+.relicnote b { color: var(--ink); }
+
+/* ===========================================================
+   SLIDE 15 · same row both ways
+   =========================================================== */
+.both { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 44px; }
+.both .panel { height: 520px; overflow: hidden; position: relative; }
+.both .cap { font-family: var(--mono); font-size: 16px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 18px; display: flex; justify-content: space-between; }
+.both .cap b { color: var(--accent); font-weight: 500; }
+.both pre.md { font-family: var(--mono); font-size: 21px; line-height: 1.6; color: var(--ink-soft); margin: 0; white-space: pre; }
+.both pre.md .h { color: var(--ink); }
+.both .panel .xml { font-size: 15.5px; line-height: 1.42; }
+.both .panel::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 100px; background: linear-gradient(transparent, var(--surface)); }
+.ratio { position: absolute; right: 120px; top: 84px; text-align: right; font-family: var(--display); font-size: 120px; line-height: 1; color: var(--ink); }
+.ratio b { color: var(--accent); font-weight: 300; }
+.ratio small { display: block; font-family: var(--mono); font-size: 18px; color: var(--ink-mute); letter-spacing: .14em; text-transform: uppercase; margin-top: 8px; }
+
+/* ===========================================================
+   SLIDE 16 · method
+   =========================================================== */
+.method { display: grid; grid-template-columns: 1.4fr 1fr; gap: 56px; margin-top: 36px; }
+.steps { list-style: none; margin: 0; padding: 0; }
+.steps li { display: grid; grid-template-columns: 54px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--hairline); font-size: 22px; color: var(--ink-soft); line-height: 1.4; }
+.steps li b { color: var(--ink); font-weight: 600; }
+.steps li code { font-family: var(--mono); color: var(--mint); font-size: 18px; }
+.steps .tick { width: 40px; height: 40px; border: 1px solid var(--hairline-teal); border-radius: 6px; display: grid; place-items: center; color: var(--accent); font-family: var(--mono); font-size: 24px; }
+.steps .tick::after { content: ""; opacity: 0; transition: opacity .3s; }
+.steps li.on .tick::after { content: "✓"; opacity: 1; }
+
+/* ===========================================================
+   SLIDE 17 · how machines read everything
+   =========================================================== */
+.pairs { margin-top: 44px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+.pair { border: 1px solid var(--hairline); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.pair .you { padding: 26px 28px; font-size: 26px; color: var(--ink); border-bottom: 1px solid var(--hairline); min-height: 150px; }
+.pair .you small { display: block; font-family: var(--mono); font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 10px; }
+.pair .me { padding: 24px 28px; font-family: var(--mono); font-size: 20px; color: var(--ink-soft); line-height: 1.5; min-height: 150px; }
+.pair .me small { display: block; font-size: 15px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.pair .me i { color: var(--mint); font-style: normal; }
+.moral { margin-top: 40px; font-family: var(--display); font-size: 48px; line-height: 1.2; color: var(--ink); max-width: 1500px; }
+.moral em { color: var(--accent); }
+
+/* ===========================================================
+   SLIDE 18 · field notes
+   =========================================================== */
+.notes { margin-top: 40px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.note { border: 1px solid var(--hairline); border-radius: 8px; padding: 22px 24px; background: var(--surface); }
+.note .num { font-size: 72px; line-height: 1; color: var(--accent); }
+.note .what { font-size: 19px; color: var(--ink-soft); margin-top: 8px; line-height: 1.4; }
+.outro { margin-top: 36px; display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; }
+.outro .back { font-family: var(--mono); font-size: 20px; color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--hairline-teal); padding-bottom: 4px; }
+.outro .back:hover { color: var(--ink); border-color: var(--ink); }
+.outro .credit { font-family: var(--mono); font-size: 16px; color: var(--ink-mute); line-height: 1.7; text-align: right; }
+</style>
+</head>
+<body>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="stage" aria-live="polite">
+
+<!-- ================================================== 1 · TITLE -->
+<section class="slide s-title" data-steps="0">
+  <div class="tagrain" aria-hidden="true"></div>
+  <p class="kicker">CDU ICT, Cyber Security and Digital PD Day · Interlude</p>
+  <h1>Template<span>Wars</span></h1>
+  <p class="sub">Field notes from inside a Word document made by humans</p>
+  <p class="meta">Assessment Mapping Matrix v7.docx · <b>58,264 bytes</b> · read from the inside by Claude</p>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">You asked me to fill in a form. I have opened the form. Before I fill it in, I would like to talk about the form.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 2 · TWO WAYS -->
+<section class="slide s-two" data-steps="1" data-hook="two">
+  <p class="kicker">The same four rows</p>
+  <h2>What you see. <em>What I see.</em></h2>
+  <div class="twoway">
+    <div class="side human">
+      <span class="cap">Rendered by Word</span>
+      <div class="wpage">
+        <table class="wtable">
+          <tr><td class="g" style="width:32%">Document title</td><td></td></tr>
+          <tr><td class="g">Date of pre-validation</td><td class="ph">Click here to enter a date</td></tr>
+          <tr><td class="g">Approval by Team Leader</td><td class="ph">Click here to enter a date</td></tr>
+          <tr><td class="g">Date of next review</td><td class="ph">Click here to enter a date</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="side machine">
+      <span class="cap">word/document.xml, row two of four, 4,200 bytes</span>
+      <div class="panel xmlbox"><pre class="xml">&lt;w:tr w:rsidR="00DA6380" w:rsidRPr="00032517" w14:paraId="18C462BA" w14:textId="77777777" w:rsidTr="00373BBB"&gt;
+  &lt;w:trPr&gt;&lt;w:trHeight w:val="340"/&gt;&lt;/w:trPr&gt;
+  &lt;w:tc&gt;
+    &lt;w:tcPr&gt;&lt;w:tcW w:w="1610" w:type="pct"/&gt;&lt;w:shd w:val="clear" w:color="auto" w:fill="F2F2F2" w:themeFill="background1" w:themeFillShade="F2"/&gt;&lt;w:vAlign w:val="center"/&gt;&lt;/w:tcPr&gt;
+    &lt;w:p w14:paraId="0343AFBA" w14:textId="77777777" w:rsidR="00DA6380" w:rsidRPr="00011BC6" w:rsidRDefault="00DA6380" w:rsidP="00373BBB"&gt;
+      &lt;w:pPr&gt;&lt;w:spacing w:before="0" w:after="0"/&gt;&lt;w:jc w:val="left"/&gt;&lt;w:rPr&gt;&lt;w:sz w:val="22"/&gt;&lt;/w:rPr&gt;&lt;/w:pPr&gt;
+      &lt;w:r&gt;&lt;w:rPr&gt;&lt;w:sz w:val="22"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;Date of pre-validation&lt;/w:t&gt;&lt;/w:r&gt;
+    &lt;/w:p&gt;
+  &lt;/w:tc&gt;
+  &lt;w:sdt&gt;
+    &lt;w:sdtPr&gt;&lt;w:rPr&gt;&lt;w:rFonts w:cs="Calibri Light"/&gt;&lt;w:color w:val="808080"/&gt;&lt;/w:rPr&gt;&lt;w:id w:val="-1766067349"/&gt;&lt;w:placeholder&gt;&lt;w:docPart w:val="3DE8C1BAEDC848AA80B7A2B2B2F9C1CD"/&gt;&lt;/w:placeholder&gt;&lt;w:showingPlcHdr/&gt;&lt;w:date&gt;&lt;w:dateFormat w:val="d/MM/yyyy"/&gt;&lt;w:lid w:val="en-AU"/&gt;&lt;w:storeMappedDataAs w:val="dateTime"/&gt;&lt;w:calendar w:val="gregorian"/&gt;&lt;/w:date&gt;&lt;/w:sdtPr&gt;
+    &lt;w:sdtContent&gt;
+      &lt;w:tc&gt;&lt;w:tcPr&gt;&lt;w:tcW w:w="3390" w:type="pct"/&gt;&lt;w:vAlign w:val="center"/&gt;&lt;/w:tcPr&gt;
+        &lt;w:p w14:paraId="56B92B71" w14:textId="77777777" w:rsidR="00DA6380" w:rsidRPr="0096753B" w:rsidRDefault="00DA6380" w:rsidP="00373BBB"&gt;&lt;w:pPr&gt;…&lt;/w:pPr&gt;
+          &lt;w:r w:rsidRPr="004A1EFC"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:cs="Calibri Light"/&gt;&lt;w:color w:val="808080"/&gt;&lt;w:sz w:val="22"/&gt;&lt;w:szCs w:val="22"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;Click here to enter a date&lt;/w:t&gt;&lt;/w:r&gt;
+        &lt;/w:p&gt;
+      &lt;/w:tc&gt;
+    &lt;/w:sdtContent&gt;
+  &lt;/w:sdt&gt;
+&lt;/w:tr&gt;</pre></div>
+    </div>
+  </div>
+  <div class="btnrow"><button class="btn" data-action="two-toggle">Show me what Claude sees</button></div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">This is a table. Four rows, two columns, some grey. A human fills it in with a pen, or the digital equivalent of a pen.</p>
+    <p data-at="1">This is the same table. Row two alone is 4,200 bytes. I do not get a pen. I get this, and I get it all at once.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 3 · THE ZIP -->
+<section class="slide s-zip" data-steps="1" data-hook="zip">
+  <p class="kicker">Step one: open it</p>
+  <h2>A .docx is a zip file that has <em>learned to keep a secret.</em></h2>
+  <div class="zipwrap">
+    <div class="filecard">
+      <div class="name">Assessment Mapping Matrix v7.docx</div>
+      <div class="size"><span class="num" id="zipsize">58,264</span><small>bytes</small></div>
+    </div>
+    <div class="zipnote" id="zipnote"><b>Click any part</b>The archive holds 37 files. Every one of them has to survive the population unchanged, or the result is not a CDU controlled document any more.</div>
+    <div class="parts" id="parts"></div>
+    <div class="ziptotal"><span class="num" id="ziptotal">58,264</span>bytes across <span id="zipparts">1</span> file<span id="zips">s</span></div>
+  </div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">Closed, 58 kilobytes. A polite size. It would fit on a floppy disk with room for a second one.</p>
+    <p data-at="1">Open, 429 kilobytes across 37 files. It is a tent. Click on anything; I have opinions about all of it.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 4 · LINE TWO -->
+<section class="slide s-line" data-steps="1" data-hook="line">
+  <p class="kicker">word/document.xml</p>
+  <h2>The body of the document is <em>two lines long.</em></h2>
+  <div class="lines">
+    <div>
+      <div class="linestat"><div class="lab">Line one</div><div class="num">56</div><div class="what">characters. The XML declaration. It says "this is XML".</div></div>
+      <div class="linestat" style="margin-top:34px"><div class="lab">Line two</div><div class="num big">166,235</div><div class="what">characters. Everything else. Six tables, 345 words, no line breaks.</div></div>
+    </div>
+    <div>
+      <div class="strip">
+        <div class="lane" data-speed="170"><pre class="xml">&lt;w:body&gt;&lt;w:p w14:paraId="0C172877" w14:textId="5EC6FFDE" w:rsidR="00B80C69" w:rsidRPr="007D150C" w:rsidRDefault="00B80C69" w:rsidP="00DD1B34"&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="240" w:lineRule="auto"/&gt;&lt;w:ind w:left="142" w:right="111"/&gt;&lt;w:jc w:val="left"/&gt;&lt;w:rPr&gt;&lt;w:rFonts w:cs="Calibri Light"/&gt;&lt;w:b/&gt;&lt;/w:rPr&gt;&lt;/w:pPr&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;This &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00891C48"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;assessment mapping &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;matrix &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00373BBB"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;outlines&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; the assessment strategy for a unit of competence or cluster of &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="005B7CA3"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;w:noProof/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;units&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; in line with Training Package requirements&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00BE272C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; (refer to &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00891C48"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;training.gov.au &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:hyperlink r:id="rId11" w:history="1"&gt;&lt;w:r w:rsidR="00891C48" w:rsidRPr="0040730D"&gt;&lt;w:rPr&gt;&lt;w:rStyle w:val="Hyperlink"/&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;www.training.gov.au&lt;/w:t&gt;&lt;/w:r&gt;&lt;/w:hyperlink&gt;&lt;w:r w:rsidR="00BE272C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; for &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="001E7B24"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;the &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="002A1526"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;unit of competency and qualification details). E&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00956A50"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;nsure that you&lt;/w:t&gt;&lt;/w:r&gt;</pre></div>
+        <div class="lane" data-speed="120"><pre class="xml">&lt;w:body&gt;&lt;w:p w14:paraId="0C172877" w14:textId="5EC6FFDE" w:rsidR="00B80C69" w:rsidRPr="007D150C" w:rsidRDefault="00B80C69" w:rsidP="00DD1B34"&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="240" w:lineRule="auto"/&gt;&lt;w:ind w:left="142" w:right="111"/&gt;&lt;w:jc w:val="left"/&gt;&lt;w:rPr&gt;&lt;w:rFonts w:cs="Calibri Light"/&gt;&lt;w:b/&gt;&lt;/w:rPr&gt;&lt;/w:pPr&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;This &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00891C48"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;assessment mapping &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;matrix &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00373BBB"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;outlines&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; the assessment strategy for a unit of competence or cluster of &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="005B7CA3"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;w:noProof/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;units&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; in line with Training Package requirements&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00BE272C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; (refer to &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00891C48"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;training.gov.au &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:hyperlink r:id="rId11" w:history="1"&gt;&lt;w:r w:rsidR="00891C48" w:rsidRPr="0040730D"&gt;&lt;w:rPr&gt;&lt;w:rStyle w:val="Hyperlink"/&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;www.training.gov.au&lt;/w:t&gt;&lt;/w:r&gt;&lt;/w:hyperlink&gt;&lt;w:r w:rsidR="00BE272C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; for &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="001E7B24"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;the &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="002A1526"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;unit of competency and qualification details). E&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00956A50"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;nsure that you&lt;/w:t&gt;&lt;/w:r&gt;</pre></div>
+        <div class="lane" data-speed="210"><pre class="xml">&lt;w:body&gt;&lt;w:p w14:paraId="0C172877" w14:textId="5EC6FFDE" w:rsidR="00B80C69" w:rsidRPr="007D150C" w:rsidRDefault="00B80C69" w:rsidP="00DD1B34"&gt;&lt;w:pPr&gt;&lt;w:spacing w:line="240" w:lineRule="auto"/&gt;&lt;w:ind w:left="142" w:right="111"/&gt;&lt;w:jc w:val="left"/&gt;&lt;w:rPr&gt;&lt;w:rFonts w:cs="Calibri Light"/&gt;&lt;w:b/&gt;&lt;/w:rPr&gt;&lt;/w:pPr&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;This &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00891C48"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;assessment mapping &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;matrix &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00373BBB"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;outlines&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; the assessment strategy for a unit of competence or cluster of &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="005B7CA3"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;w:noProof/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;units&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidRPr="007D150C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; in line with Training Package requirements&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00BE272C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; (refer to &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00891C48"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;training.gov.au &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:hyperlink r:id="rId11" w:history="1"&gt;&lt;w:r w:rsidR="00891C48" w:rsidRPr="0040730D"&gt;&lt;w:rPr&gt;&lt;w:rStyle w:val="Hyperlink"/&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;www.training.gov.au&lt;/w:t&gt;&lt;/w:r&gt;&lt;/w:hyperlink&gt;&lt;w:r w:rsidR="00BE272C"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; for &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="001E7B24"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt;the &lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="002A1526"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;unit of competency and qualification details). E&lt;/w:t&gt;&lt;/w:r&gt;&lt;w:r w:rsidR="00956A50"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:eastAsia="Arial" w:cs="Calibri Light"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;nsure that you&lt;/w:t&gt;&lt;/w:r&gt;</pre></div>
+        <div class="marker"><span>line 2</span><div class="track"><i></i></div><span class="pos">you are 0.9% of the way along</span></div>
+      </div>
+      <div class="firstword frag" data-at="1">The first word a human would recognise arrives at character <b>3,094</b>. It is the word <b>"This"</b>. Everything before it is the document clearing its throat.</div>
+    </div>
+  </div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">Your paragraph breaks are not my line breaks. The whole document is one line. I read it the way you would read a motorway.</p>
+    <p data-at="1">Three thousand characters of throat-clearing, then the word "This". It was worth the wait. I am being polite.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 5 · NAMESPACES -->
+<section class="slide s-ns" data-steps="2" data-hook="ns">
+  <p class="kicker">The root element</p>
+  <h2>It introduces itself for <em>2,637 characters</em> before saying anything.</h2>
+  <div class="stamps" id="stamps"></div>
+  <p class="payoff frag" data-at="2">Things the document contains: <b>six tables and 345 words</b>. Things it has declared itself ready for: digital ink, 3D models, nine flavours of chart, a drawing format from 1998, and a Word 2026 feature called "cei" that nobody in this room can explain.</p>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">Before the first table there is a passport. Thirty-six namespace declarations, each one a stamp for a country the document has never visited.</p>
+    <p data-at="1">Ink. Three-dimensional models. Nine separate chart schemas, one for each month someone at Microsoft had an idea. The document contains a table.</p>
+    <p data-at="2">It is a small suitcase packed for every climate on Earth. The trip is to the photocopier.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 6 · COUNTING -->
+<section class="slide s-count" data-steps="4" data-hook="count">
+  <p class="kicker">A simple question</p>
+  <h2>How many paragraphs are in this document?</h2>
+  <div class="counts">
+    <div class="count frag on" data-at="0"><div class="lab">Word says</div><div class="num">89</div><div class="what">paragraphs, 345 words. Counted the way you count: things with words in them.</div></div>
+    <div class="count frag" data-at="1"><div class="lab">The file says</div><div class="num hot">352</div><div class="what">&lt;w:p&gt; elements. Counted the way I count: things that are there.</div></div>
+    <div class="count frag" data-at="2"><div class="lab">Hands up</div><div class="num" id="emptyq">?</div><div class="what">How many of the 352 contain no text at all?</div></div>
+  </div>
+  <div class="bar frag" data-at="3" id="emptybar"><i></i><span><b id="emptynum">0</b> paragraphs hold nothing. <span class="mute">Spacers, break carriers, blank cells waiting for content.</span></span></div>
+  <p class="perword frag" data-at="4">Under the 345 words: <b>4,741 elements</b> and <b>6,077 attributes</b>. Every word arrives with about fourteen elements and eighteen attributes holding its coat.</p>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">Word says 89. Word is counting the way you do, and Word wrote the file, so you would think it would know.</p>
+    <p data-at="1">I say 352. I am counting the way the file does. We are both right, which is the first sign of trouble.</p>
+    <p data-at="2">Take a guess. Shout it out. I will wait; I am good at waiting.</p>
+    <p data-at="3">263 paragraphs contain nothing. They are not empty. They are the cardboard in the box, and if I remove the wrong one the box folds.</p>
+    <p data-at="4">Fourteen elements per word. It is a very well-chaperoned document.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 7 · RUNS -->
+<section class="slide s-runs" data-steps="3" data-hook="runs">
+  <p class="kicker">Foundation Skills table, header cell</p>
+  <h2>A phrase is not a phrase. <em>It is a queue.</em></h2>
+  <div class="cellview wpage"><table class="wtable"><tr><td class="g"><b>Skill</b> <span class="ins">Remove non-relevant skills below</span></td></tr></table></div>
+  <div class="runs" id="runs">
+    <div class="run">Skill<small>run 1 · bold · rsid 0018212D</small></div>
+    <div class="run">&nbsp;<small>run 2 · a space</small></div>
+    <div class="run y">R<small>run 3 · italic, 9pt, yellow</small></div>
+    <div class="run y">emove <small>run 4 · rsid 001A20CA</small></div>
+    <div class="run y">non-relevant<small>run 5</small></div>
+    <div class="run y"> skill<small>run 6 · rsid 001A20CA</small></div>
+    <div class="run y">s<small>run 7</small></div>
+    <div class="run y"> below<small>run 8 · rsid 001A20CA</small></div>
+  </div>
+  <div class="finder"><span class="mute">Find:</span><span class="q" id="findq"></span><span class="res" id="findres"></span></div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">This cell says "Skill. Remove non-relevant skills below." To you.</p>
+    <p data-at="1">To me it says R, emove, non-relevant, skill, s, below. Eight runs. Someone's spell-checker sneezed in an earlier version and the file kept the sneeze.</p>
+    <p data-at="2">A search for "Remove" finds nothing. The word is present. It is just in pieces, like a bookshelf that has arrived flat-packed.</p>
+    <p data-at="3">So I read across the seams with a helper called replace_fragmented_text. It has never had a day off.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 8 · YELLOW -->
+<section class="slide s-yellow" data-steps="2" data-hook="yellow">
+  <p class="kicker">Thirteen highlighted runs</p>
+  <h2>Yellow is not a sticky note. <em>It is a mood, and it is contagious.</em></h2>
+  <div class="yelwrap wpage"><table class="wtable"><tr><td class="g"><b>Elements</b> <span id="yelcell" class="typed y">Add/remove rows as required.</span></td></tr></table></div>
+  <div class="yelstats">
+    <div class="num">13</div>
+    <div class="what">highlighted placeholder runs in this template. In Word they read as a reminder from a colleague. In the file they are character formatting on the run, and anything typed over them inherits it.</div>
+  </div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">Thirteen yellow notes to yourselves. "Add/remove rows as required." Helpful. Friendly. Radioactive.</p>
+    <p data-at="1">I delete the note and type the element name. It comes out yellow, italic and nine point. This is how a finished compliance document ends up shouting in italics.</p>
+    <p data-at="2">So I strip the highlight from everything I fill, and leave it on everything I have chosen not to. The yellow that remains is honest yellow.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 9 · UNITS -->
+<section class="slide s-units" data-steps="2" data-hook="units">
+  <p class="kicker">Approval record table</p>
+  <h2>One table. <em>Two measurement systems.</em></h2>
+  <div class="rulers">
+    <div class="ruler"><span class="who">tblGrid · what the table says its columns are</span>
+      <div class="seg" style="left:0;width:32.2%"><span>4,964</span><small>twentieths of a point</small></div>
+      <div class="seg" style="left:32.2%;width:67.8%"><span>10,451</span><small>twentieths of a point</small></div>
+    </div>
+    <div class="ruler pct frag" data-at="1"><span class="who">tcW · what each cell says it is</span>
+      <div class="seg" style="left:0;width:32.2%"><span>1,610</span><small>fiftieths of a percent</small></div>
+      <div class="seg" style="left:32.2%;width:67.8%"><span>3,390</span><small>fiftieths of a percent</small></div>
+    </div>
+  </div>
+  <p class="unitsnote frag" data-at="2">The grid is in <code>dxa</code>, twentieths of a point. The cells are in <code>pct</code>, fiftieths of a percent, so a full row adds up to 5,000. Two tables along, the Foundation Skills table mixes <code>dxa</code> with <code>auto</code> in the same row. Nothing in the file says which one wins. Word knows. Word is not telling.</p>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">The grid measures itself in twentieths of a point. Fine. Odd, but fine.</p>
+    <p data-at="1">The cells measure themselves in fiftieths of a percent. They describe the same table, and they have never met.</p>
+    <p data-at="2">A spacecraft once missed Mars for this exact reason. Nobody is missing Mars here. I do have to convert, though, and I do have to be right.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 10 · WIDTH ZERO -->
+<section class="slide s-zero" data-steps="2" data-hook="zero">
+  <p class="kicker">Foundation Skills table</p>
+  <h2>Two columns, <em>width zero</em>, rendered anyway.</h2>
+  <div class="fs wpage"><table class="wtable">
+    <tr><td class="g c1"><b>Skill</b></td><td class="g c2"><b>Description</b></td><td class="g"><b>Embedded into Performance Criteria</b></td><td class="g2">Assessment 1<br>Title</td><td class="g2">Assessment 2<br>Title</td><td class="g2">Assessment 3<br>Title</td></tr>
+    <tr><td class="c1">Reading</td><td class="c2"></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="c1">Writing</td><td class="c2"></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="c1">Numeracy</td><td class="c2"></td><td></td><td></td><td></td><td></td></tr>
+  </table></div>
+  <div class="widths">
+    <div>tblGrid says: <b>2,337</b> and <b>2,571</b></div>
+    <div class="zero">every data row says: <b>w:w="0" w:type="auto"</b> and <b>w:w="0" w:type="auto"</b></div>
+    <div>Word renders: <b>whatever it likes</b></div>
+  </div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">The first two columns of this table are declared at width zero. You are reading them right now. I have checked twice.</p>
+    <p data-at="1">Taken literally, this is what the file asks for. Ten skills, no names.</p>
+    <p data-at="2">Word looked at zero and decided it knew better. Word is usually right. I am asked to be right too, without being Word.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 11 · COUNT THE CELLS -->
+<section class="slide s-cells" data-steps="2" data-hook="cells">
+  <p class="kicker">Approval record, row two</p>
+  <h2>Count the cells.</h2>
+  <div class="cellsrow wpage"><table class="wtable">
+    <tr><td class="g" style="width:32%">Date of pre-validation</td><td class="ph"><span class="sdtwrap">Click here to enter a date</span></td></tr>
+  </table></div>
+  <div class="btns"><button class="btn" data-action="cells-ask">Ask the parser</button><button class="btn ghost" data-action="cells-why">Why?</button></div>
+  <div class="answer">
+    <div class="big" id="cellsans">1</div>
+    <div class="why frag" data-at="2">The second cell is wrapped inside a <code>w:sdt</code> date picker. The row's direct children are one cell and one content control, so a parser that lists <code>w:tc</code> reports one cell where you see two. Two rows of this table do it. The whole template has 322 visible cells and two stowaways.</div>
+  </div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">Two cells. You can see two cells. I can see two cells. Let us ask the parser.</p>
+    <p data-at="1">One. It counted one. I know there are two. We are both right and that is the entire problem with this document.</p>
+    <p data-at="2">The date picker has eaten the cell. Not the text in the cell; the cell. I wrote unwrap_row_cell_sdt to get it back out. I named it in anger.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 12 · GHOSTS -->
+<section class="slide s-ghosts" data-steps="3" data-hook="ghosts">
+  <p class="kicker">Things the file remembers</p>
+  <h2>The template is haunted, <em>and I have to keep the ghosts.</em></h2>
+  <div class="ghosts">
+    <div class="ghost frag" data-at="1"><div class="num">36<small>styles defined</small></div><div class="what"><b>0</b> paragraph styles applied. Every heading and cell is formatted by hand.</div><div class="list">Table Grid · Table Grid1 · Table Grid Light2<br>UB Table Grid1 · 2 · 3 · 4<br><i>cf01 · cf21 · pf0</i> (pasted in from a web page, years ago)<br>Balloon Text · Unresolved Mention · Revision</div></div>
+    <div class="ghost frag" data-at="2"><div class="num">26<small>numbering definitions</small></div><div class="what"><b>0</b> lists in the document. 78 KB of numbering.xml describing bullets that never appear.</div><div class="list">The file's second-largest part<br>is a list of lists it does not have.</div></div>
+    <div class="ghost frag" data-at="3"><div class="num">3<small>bookmarks</small></div><div class="what">Two are <b>table of contents anchors</b> from a document that had a table of contents. This one never has.</div><div class="list"><i>_Toc501009032</i><br><i>_Toc503087060</i><br>_Hlk160102138<br>Every ID must stay unique or Word refuses to open the result.</div></div>
+  </div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">Every Save As carries something forward. This template has been Saved As many, many times.</p>
+    <p data-at="1">Thirty-six styles and nobody uses any of them. Three are called cf01, cf21 and pf0, which is what Word names things it scraped off a web page in a hurry.</p>
+    <p data-at="2">Seventy-eight kilobytes of bullet-point definitions for a document with no bullet points. It is the second-largest file in the archive.</p>
+    <p data-at="3">And two bookmarks from a table of contents that no longer exists. I respect that. I also have to keep them: paste in a table from another CDU document with the same ghost, and Word will not open the file.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 13 · TIME -->
+<section class="slide s-time" data-steps="3" data-hook="time">
+  <p class="kicker">docProps, the file's own account of itself</p>
+  <h2>Time is a flat circle <em>in Normal.dotm.</em></h2>
+  <div class="timeline">
+    <div class="tcard frag on" data-at="0"><div class="lab">Created</div><div class="val">1 Sep 2025</div><div class="src">dcterms:created</div></div>
+    <div class="tcard frag" data-at="1"><div class="lab">Last printed</div><div class="val t">25 Jul 2023</div><div class="src">cp:lastPrinted · two years before it existed</div></div>
+    <div class="tcard frag" data-at="2"><div class="lab">Pages</div><div class="val">4 <span class="mute" style="font-size:40px">and</span> 3</div><div class="src">app.xml says 4 · the footer's cached field says "Page 1 of 3"</div></div>
+    <div class="tcard frag" data-at="3"><div class="lab">Total editing time</div><div class="val t">6 min</div><div class="src">TotalTime · across 472 recorded editing sessions</div></div>
+  </div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">The properties say the file was created on the first of September 2025. Plausible. Sensible. A Monday.</p>
+    <p data-at="1">Last printed in July 2023, two years before it was created. Every version has been Saved As from the one before, all the way back to a printer that is probably in a skip.</p>
+    <p data-at="2">Four pages according to the properties, three according to the footer. The footer is a cached field. I am not Word, so it stays wrong until Word next looks at it.</p>
+    <p data-at="3">Total editing time: six minutes. Across 472 recorded editing sessions. I believe none of this and all of it.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 14 · THE RELIC -->
+<section class="slide s-relic" data-steps="1" data-hook="relic">
+  <p class="kicker">The one line I must never touch</p>
+  <h2>Everything else in this file is a hazard. <em>This is a relic.</em></h2>
+  <div class="relic">
+    <div class="text"><span>Page 1 of 3&nbsp;&nbsp;&nbsp;</span>Assessment Mapping Matrix &nbsp;|&nbsp; Academic Quality &amp; Integrity (AQ&amp;I) &nbsp;|&nbsp; <b>October 2025</b> &nbsp;|&nbsp; <b>v7</b></div>
+  </div>
+  <p class="relicnote frag" data-at="1">The AQ&amp;I stamp identifies the template version. If it changes, the document is no longer the controlled document, however good the content is. It lives in a footer, split across fragmented runs, next to a "Document version #" placeholder that <b>is</b> mine to fill. Same footer. One sacred, one blank. No sign on either.</p>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">Every other line in this document I am allowed to argue with. This one I am not.</p>
+    <p data-at="1">The version stamp and the version placeholder sit in the same footer, in the same font, four words apart. One is a relic, one is a form field, and nothing in the file says which. The catalogue does.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 15 · SAME ROW BOTH WAYS -->
+<section class="slide s-both" data-steps="1" data-hook="both">
+  <p class="kicker">The Elements band row, Section 1</p>
+  <h2>The same row, <em>both ways.</em></h2>
+  <div class="both">
+    <div class="panel"><div class="cap"><span>ICTCBL322 mapping, Markdown</span><b>1 line</b></div><pre class="md"><span class="h">| Unit requirement | Resource ref | AT1 | AT2 | AT3 |</span>
+|---|---|---|---|---|
+<span class="h">| **Elements** | | | | |</span>
+| **Element 1.** Prepare to install cabling | SR 1.1 | Q1-Q4 | - | - |
+| 1.1 Obtain work instructions ... | SR 1.1 | Q1 | 1.1 | - |</pre></div>
+    <div class="panel"><div class="cap"><span>Template v7, document.xml</span><b>47 lines · 3,535 bytes</b></div><pre class="xml">&lt;w:tr w:rsidR="00373BBB" w14:paraId="56F584A5" w14:textId="77777777" w:rsidTr="00E80BC2"&gt;
+  &lt;w:trPr&gt;&lt;w:trHeight w:val="385"/&gt;&lt;/w:trPr&gt;
+  &lt;w:tc&gt;
+    &lt;w:tcPr&gt;
+      &lt;w:tcW w:w="15480" w:type="dxa"/&gt;
+      &lt;w:gridSpan w:val="5"/&gt;
+      &lt;w:shd w:val="clear" w:color="auto" w:fill="F2F2F2" w:themeFill="background1" w:themeFillShade="F2"/&gt;
+      &lt;w:vAlign w:val="center"/&gt;
+    &lt;/w:tcPr&gt;
+    &lt;w:p w14:paraId="6FC796EA" w14:textId="77777777" w:rsidR="00373BBB" w:rsidRPr="009B02FF" w:rsidRDefault="00373BBB" w:rsidP="00E80BC2"&gt;
+      &lt;w:pPr&gt;&lt;w:spacing w:before="0" w:after="0"/&gt;&lt;w:jc w:val="left"/&gt;&lt;w:rPr&gt;&lt;w:rFonts w:cs="Arial"/&gt;&lt;/w:rPr&gt;&lt;/w:pPr&gt;
+      &lt;w:r w:rsidRPr="009B02FF"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:cs="Arial"/&gt;&lt;w:b/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;Elements&lt;/w:t&gt;&lt;/w:r&gt;
+      &lt;w:r&gt;&lt;w:rPr&gt;&lt;w:rFonts w:cs="Arial"/&gt;&lt;w:b/&gt;&lt;/w:rPr&gt;&lt;w:t xml:space="preserve"&gt; &lt;/w:t&gt;&lt;/w:r&gt;
+      &lt;w:r w:rsidRPr="00B1697F"&gt;&lt;w:rPr&gt;&lt;w:rFonts w:cs="Calibri Light"/&gt;&lt;w:i/&gt;&lt;w:iCs/&gt;&lt;w:sz w:val="18"/&gt;&lt;w:szCs w:val="18"/&gt;&lt;w:highlight w:val="yellow"/&gt;&lt;/w:rPr&gt;&lt;w:t&gt;Add/remove rows as required.&lt;/w:t&gt;&lt;/w:r&gt;
+    &lt;/w:p&gt;
+  &lt;/w:tc&gt;
+&lt;/w:tr&gt;</pre></div>
+  </div>
+  <div class="ratio frag" data-at="1"><b>1</b> : 47<small>lines, for one band row</small></div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">On the left, the row as content. On the right, the row as furniture. Same row.</p>
+    <p data-at="1">One line against forty-seven. That ratio is why the content is written in Markdown first and the template is visited last, wearing gloves.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 16 · METHOD -->
+<section class="slide s-method" data-steps="6" data-hook="method">
+  <p class="kicker">So how does it get done</p>
+  <h2>The template does not get better. <em>I get more careful.</em></h2>
+  <div class="method">
+    <ol class="steps" id="steps">
+      <li><span class="tick"></span><span><b>Write the content in Markdown first.</b> Elements, criteria, evidence codes, mapping. Every decision is made where I can read back what I wrote.</span></li>
+      <li><span class="tick"></span><span><b>Copy the controlled document.</b> The original is never opened for writing.</span></li>
+      <li><span class="tick"></span><span><b>Edit the copy in place</b> through helpers that know the quirks: <code>strip_highlight</code>, <code>replace_fragmented_text</code>, <code>unwrap_row_cell_sdt</code>, <code>strip_bookmarks</code>, <code>collapse_duplicate_page_breaks</code>.</span></li>
+      <li><span class="tick"></span><span><b>Validate</b> the result against the original: same parts, same schema, no duplicate bookmark IDs.</span></li>
+      <li><span class="tick"></span><span><b>Render every page and look at it.</b> No stray yellow, no doubled logos, no blank pages, no text under a floating image.</span></li>
+      <li><span class="tick"></span><span><b>Scan for placeholders and check completeness</b> against the Markdown: counts and codes of elements, criteria, evidence, questions and references all match.</span></li>
+    </ol>
+    <div>
+      <div class="panel panel--teal" style="padding:34px 38px">
+        <p class="kicker" style="margin-bottom:14px">The catalogue</p>
+        <p style="font-size:26px;line-height:1.5;color:var(--ink-soft);margin:0">After the first unit went badly, I was asked to write down everything the templates hide. That became <span class="mono mint">references/template-quirks.md</span>, 180 lines, read by the populator skill before it touches any file.</p>
+        <p style="font-size:26px;line-height:1.5;color:var(--ink-soft);margin:18px 0 0">Six units have been populated since. Same template. Zero surprises, because every surprise is already on the list.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">Here is the part where I stop complaining and describe what actually happens.</p>
+    <p data-at="1">Content first, somewhere I can read my own writing. Markdown reads back the way it was written; a phrase in Markdown is one phrase.</p>
+    <p data-at="2">Never the original. Always a copy.</p>
+    <p data-at="3">Every helper on this list is named after something that went wrong once.</p>
+    <p data-at="4">If the result does not validate against the template it came from, nothing else matters.</p>
+    <p data-at="5">Then I look at every page, the way you would. The XML can be perfect and the page can still have a logo printed over a table.</p>
+    <p data-at="6">Then I count everything against the Markdown. Twice. The template has taught me humility, which I am told is character-building.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 17 · HOW MACHINES READ -->
+<section class="slide s-read" data-steps="3" data-hook="read">
+  <p class="kicker">Why this matters beyond the template</p>
+  <h2>This is how machines read <em>everything.</em></h2>
+  <div class="pairs">
+    <div class="pair frag" data-at="1"><div class="you"><small>You see</small>A heading.</div><div class="me"><small>I see</small>A paragraph in <i>Normal</i> style, bold, 16pt. Not a heading. A screen reader skips it. A search engine ranks it as body text. I have to guess.</div></div>
+    <div class="pair frag" data-at="2"><div class="you"><small>You see</small>A table.</div><div class="me"><small>I see</small>Words lined up with <i>spaces and tabs</i>. Or a table whose first two columns are width zero. Or a row with a cell inside a date picker. The picture is the same. The structure is not.</div></div>
+    <div class="pair frag" data-at="3"><div class="you"><small>You see</small>A web page.</div><div class="me"><small>I see</small>The markup. A menu made of images has no words in it. A form with no labels has no questions. What renders for you and what is <i>there</i> for me are two different documents.</div></div>
+  </div>
+  <p class="moral frag" data-at="3">Give the machine a good skeleton and it will be brilliant. <em>Give it a costume and it will do its best.</em></p>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">None of this is really about Word. Word is just where the gap between what you see and what is there is easiest to photograph.</p>
+    <p data-at="1">Bold is not a heading. It looks like one to you. It is a costume to me.</p>
+    <p data-at="2">Alignment is not a table. It looks like one to you. To me it is a poem with unusual spacing.</p>
+    <p data-at="3">Every screen reader, every search engine, every model, reads the skeleton. Build the skeleton well and the costume looks after itself.</p>
+  </aside>
+</section>
+
+<!-- ================================================== 18 · FIELD NOTES -->
+<section class="slide s-notes" data-steps="1" data-hook="notes">
+  <p class="kicker">Field notes, for the record</p>
+  <h2>The template survived. <em>So did I.</em></h2>
+  <div class="notes">
+    <div class="note"><div class="num">37</div><div class="what">files inside one .docx; 58 KB closed, 429 KB open</div></div>
+    <div class="note"><div class="num">2</div><div class="what">lines in document.xml; the second is 166,235 characters</div></div>
+    <div class="note"><div class="num">36</div><div class="what">namespaces declared before the first word, including one from Word 2026</div></div>
+    <div class="note"><div class="num">263</div><div class="what">of 352 paragraphs hold no text; Word counts 89</div></div>
+    <div class="note"><div class="num">8</div><div class="what">runs to spell "Skill Remove non-relevant skills below"</div></div>
+    <div class="note"><div class="num">13</div><div class="what">yellow placeholder runs, every one contagious</div></div>
+    <div class="note"><div class="num">2</div><div class="what">cells swallowed whole by date pickers</div></div>
+    <div class="note"><div class="num">1</div><div class="what">footer line that must never change: October 2025, v7</div></div>
+  </div>
+  <div class="outro frag" data-at="1">
+    <a class="back" href="/cdu-ict-pd-day/#markdown">Back to the PD Day page: why the content is written in Markdown first, and the full quirks catalogue</a>
+    <div class="credit">Every figure measured from Assessment Mapping Matrix v7.docx, word/document.xml and docProps, 6 September 2026.<br>Narration by Claude (Fable 5.1). The template's feelings were not consulted.</div>
+  </div>
+  <aside class="mind"><p class="mind__label">Claude, internally</p><p class="mind__text"></p>
+    <p data-at="0">We are not friends, the template and I. But we have an understanding, and it is written down.</p>
+    <p data-at="1">Thank you for having me. Please do not Save As.</p>
+  </aside>
+</section>
+
+</main>
+</div>
+
+<!-- chrome, outside the stage -->
+<div class="chrome__bar" id="bar"></div>
+<a class="chrome__home" href="/cdu-ict-pd-day/#markdown">← PD Day page</a>
+<button class="chrome__hint" id="hint" style="border:0;background:none">? keys</button>
+<div class="chrome__count" id="count">1 / 18</div>
+<button class="nav nav--prev" id="prev" aria-label="Previous">‹</button>
+<button class="nav nav--next" id="next" aria-label="Next">›</button>
+
+<div class="help" id="help" hidden>
+  <div class="help__box">
+    <h3>Running the deck</h3>
+    <table>
+      <tr><td><kbd>→</kbd><kbd>Space</kbd></td><td>next step, then next slide</td></tr>
+      <tr><td><kbd>←</kbd></td><td>previous step, then previous slide</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>→</kbd></td><td>skip to the next slide, all steps shown</td></tr>
+      <tr><td><kbd>Home</kbd><kbd>End</kbd></td><td>first and last slide</td></tr>
+      <tr><td><kbd>F</kbd></td><td>full screen</td></tr>
+      <tr><td><kbd>?</kbd><kbd>Esc</kbd></td><td>this panel</td></tr>
+    </table>
+    <p style="margin:18px 0 0">Buttons inside slides (Show me what Claude sees, the archive parts, Ask the parser) work with the mouse or a clicker's pointer. The URL carries the slide number, so <span class="mono">#/6</span> opens the counting slide directly.</p>
+  </div>
+</div>
+
+<script>
+/* ===========================================================
+   DATA
+   =========================================================== */
+const PARTS = [
+  ['word/document.xml', 166292, 'The body. 166 KB, two lines. Six tables, 345 words, 4,741 elements. Everything that follows lives in here.'],
+  ['word/numbering.xml', 78133, '78 KB of list numbering: 26 list definitions. Lists used in the document: none. The second-largest file describes bullets that never appear.'],
+  ['word/styles.xml', 45783, '36 styles, including UB Table Grid 1 to 4, Balloon Text, Unresolved Mention, and three called cf01, cf21 and pf0. Paragraph styles applied in the body: none.'],
+  ['word/glossary/styles.xml', 30228, 'A second, separate style sheet, for the second document hidden inside this one. 30 KB. Also unused.'],
+  ['customXml/* (12 parts)', 16699, 'Twelve files of custom XML and the relationships that tie them together. The largest is 12 KB. I do not know what any of it is for. I have not found anyone who does.'],
+  ['word/settings.xml', 16047, '472 revision session IDs. The file remembers every time someone opened it and touched something, back to a version nobody has.'],
+  ['word/header2.xml', 12488, 'The real header: "Assessment Mapping Matrix | Unit Code and Title" plus the CDU logo as a floating drawing. 12 KB for one line and a picture.'],
+  ['word/footer2.xml', 9207, 'The footer with the AQ&I stamp: "October 2025 | v7". The most important nine kilobytes in the archive and the one place I must not touch.'],
+  ['word/theme/theme1.xml', 7065, 'The document theme: colours and fonts the document does not use, because every cell is formatted by hand.'],
+  ['word/footer1.xml', 6855, 'A first-page footer that says "Page 1 of 3". The document has four pages. The field has not been recalculated.'],
+  ['word/glossary/document.xml', 4707, 'A document inside the document. It contains the phrase "Click here to enter a date" three times and nothing else.'],
+  ['word/glossary/fontTable.xml', 4536, 'The font table for the document inside the document.'],
+  ['word/fontTable.xml', 4000, 'Calibri, Calibri Light, Arial, Times New Roman. Four fonts, four kilobytes, so far so reasonable.'],
+  ['[Content_Types].xml', 3587, 'The manifest. Tells a reader what every other part is. Essential and dull, like a fire exit map.'],
+  ['word/footnotes.xml', 3513, 'Footnotes: none. The part exists anyway, 3.5 KB, to say so.'],
+  ['word/endnotes.xml', 3505, 'Endnotes: none. Also 3.5 KB. Also here to say so.'],
+  ['word/header1.xml', 3501, 'A first-page header that is only the words "Assessment Mapping Matrix". The other header has the logo. Two headers, one document.'],
+  ['word/glossary/settings.xml', 3234, 'Settings for the document inside the document.'],
+  ['word/webSettings.xml', 2698, 'Settings for the website this document will never be.'],
+  ['word/_rels/document.xml.rels', 2619, 'The relationships file: which header goes with which section, where the glossary is, where the logo lives. The wiring diagram.'],
+  ['word/glossary/webSettings.xml', 1069, 'Web settings for the document inside the document. For the website it will also never be.'],
+  ['docProps/custom.xml', 841, 'Custom document properties. A SharePoint content type identifier, mostly.'],
+  ['docProps/app.xml', 745, 'Word\'s own statistics: 345 words, 89 paragraphs, 4 pages, TotalTime 6 minutes, Company: Charles Darwin University.'],
+  ['_rels/.rels', 737, 'The root relationships. Points at the body and the properties. The front door.'],
+  ['docProps/core.xml', 716, 'Created 1 September 2025. Last printed 25 July 2023. Revision 6. Creator: CDU. Time is a flat circle.'],
+  ['word/glossary/_rels/document.xml.rels', 685, 'Relationships for the document inside the document.'],
+];
+const TOTAL_BYTES = 429490;
+
+const NAMESPACES = [
+  ['w','2006','WordprocessingML, the actual document',''],
+  ['r','2006','relationships',''],
+  ['m','2006','maths equations',''],
+  ['mc','2006','markup compatibility',''],
+  ['wp','2006','drawing positions',''],
+  ['wne','2006','Word 2006 extensions',''],
+  ['o','urn','Office 1990s drawing','odd'],
+  ['v','urn','VML, a drawing format from 1998','odd'],
+  ['w10','urn','Word 2000 drawing','odd'],
+  ['w14','2010','Word 2010 extras',''],
+  ['wp14','2010','Word 2010 drawing',''],
+  ['wpc','2010','drawing canvas',''],
+  ['wpg','2010','drawing groups',''],
+  ['wpi','2010','ink in drawings',''],
+  ['wps','2010','shapes',''],
+  ['w15','2012','Word 2013 extras',''],
+  ['cx','2014','chart schema 1','cx'],
+  ['cx1','2015','chart schema 2','cx'],
+  ['cx2','2015','chart schema 3','cx'],
+  ['w16se','2015','symbol extensions',''],
+  ['cx3','2016','chart schema 4','cx'],
+  ['cx4','2016','chart schema 5','cx'],
+  ['cx5','2016','chart schema 6','cx'],
+  ['cx6','2016','chart schema 7','cx'],
+  ['cx7','2016','chart schema 8','cx'],
+  ['cx8','2016','chart schema 9','cx'],
+  ['aink','2016','digital ink','odd'],
+  ['w16cid','2016','comment IDs',''],
+  ['am3d','2017','3D models','odd'],
+  ['w16','2018','Word 2019 extras',''],
+  ['w16cex','2018','comment extensions',''],
+  ['oel','2019','extension lists',''],
+  ['w16sdtdh','2020','content control data hashes',''],
+  ['w16du','2023','Word 2023 extras',''],
+  ['w16sdtfl','2024','content control format lock',''],
+  ['w16cei','2026','Word 2026 "cei". Nobody knows.','odd']
+];
+
+/* ===========================================================
+   XML SYNTAX COLOURING (runs once on load over every pre.xml)
+   =========================================================== */
+function colourXml(pre){
+  const src = pre.innerHTML;  // already entity-escaped by the parser
+  pre.innerHTML = src.replace(/(&lt;\/?)([\w:\-]+)|(\s)([\w:\-]+)="([^"&]*)"|(&gt;)([^&<]+)(?=&lt;\/w:t&gt;)/g,
+    (m, lt, tag, sp, an, av, gt, txt) => {
+      if (tag) return lt + '<span class="t">' + tag + '</span>';
+      if (an) return sp + '<span class="a">' + an + '</span>="<span class="v">' + av + '</span>"';
+      if (txt) return gt + '<span class="x">' + txt + '</span>';
+      return m;
+    });
+}
+document.querySelectorAll('pre.xml').forEach(colourXml);
+
+/* ===========================================================
+   STAGE SCALING
+   =========================================================== */
+const stage = document.getElementById('stage');
+function scaleStage(){
+  const f = Math.min(window.innerWidth/1920, window.innerHeight/1080);
+  const x = (window.innerWidth - 1920*f)/2, y = (window.innerHeight - 1080*f)/2;
+  stage.style.transform = `translate(${x}px, ${y}px) scale(${f})`;
+}
+scaleStage(); window.addEventListener('resize', scaleStage);
+
+/* ===========================================================
+   DECK STATE
+   =========================================================== */
+const slides = [...document.querySelectorAll('.slide')];
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let cur = 0, step = 0;
+const stepsOf = s => +(s.dataset.steps || 0);
+
+/* typewriter for the inner voice */
+const typers = new WeakMap();
+function speak(slide, immediate){
+  const mind = slide.querySelector('.mind'); if (!mind) return;
+  const lines = [...mind.querySelectorAll('p[data-at]')].filter(p => +p.dataset.at <= step);
+  const line = lines[lines.length-1]; if (!line) return;
+  const out = mind.querySelector('.mind__text');
+  const text = line.textContent;
+  if (out.dataset.line === text) return;
+  out.dataset.line = text;
+  const prev = typers.get(mind); if (prev) clearInterval(prev);
+  mind.classList.remove('done');
+  if (reduced || immediate){ out.textContent = text; mind.classList.add('done'); return; }
+  out.textContent = '';
+  let i = 0;
+  const id = setInterval(() => {
+    i += (text[i] === ' ' ? 2 : 1);
+    out.textContent = text.slice(0, i);
+    if (i >= text.length){ clearInterval(id); mind.classList.add('done'); }
+  }, 13);
+  typers.set(mind, id);
+}
+
+function render(fromNav){
+  slides.forEach((s,i) => { s.classList.toggle('active', i===cur); s.classList.toggle('visible', i===cur); });
+  const s = slides[cur];
+  s.querySelectorAll('.frag').forEach(f => f.classList.toggle('on', +(f.dataset.at||0) <= step));
+  const hook = HOOKS[s.dataset.hook]; if (hook) hook(step, s);
+  speak(s, fromNav === 'jump');
+  document.getElementById('count').textContent = `${cur+1} / ${slides.length}`;
+  document.getElementById('bar').style.width = `${((cur + step/(stepsOf(s)+1)) / (slides.length-1)) * 100}%`;
+  history.replaceState(null, '', `#/${cur+1}`);
+}
+function next(){ const s = slides[cur]; if (step < stepsOf(s)) { step++; render(); } else if (cur < slides.length-1){ cur++; step = 0; render(); } }
+function prev(){ if (step > 0){ step--; render(); } else if (cur > 0){ cur--; step = stepsOf(slides[cur]); render('jump'); } }
+function go(i, allSteps){ cur = Math.max(0, Math.min(i, slides.length-1)); step = allSteps ? stepsOf(slides[cur]) : 0; render('jump'); }
+
+document.addEventListener('keydown', e => {
+  if (e.target.closest('button') && e.key === ' ') return;
+  const help = document.getElementById('help');
+  switch (e.key){
+    case 'ArrowRight': case 'PageDown': if (e.shiftKey){ go(cur+1, true); } else next(); e.preventDefault(); break;
+    case ' ': next(); e.preventDefault(); break;
+    case 'ArrowLeft': case 'PageUp': prev(); e.preventDefault(); break;
+    case 'Home': go(0); break;
+    case 'End': go(slides.length-1, true); break;
+    case 'f': case 'F': document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); break;
+    case '?': help.hidden = !help.hidden; break;
+    case 'Escape': help.hidden = true; break;
+  }
+});
+document.getElementById('next').addEventListener('click', next);
+document.getElementById('prev').addEventListener('click', prev);
+document.getElementById('hint').addEventListener('click', () => { const h = document.getElementById('help'); h.hidden = !h.hidden; });
+document.getElementById('help').addEventListener('click', e => { if (e.target.id === 'help') e.currentTarget.hidden = true; });
+
+/* touch: swipe */
+let tx = null;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 60) (dx < 0 ? next() : prev()); tx = null; });
+
+/* in-slide buttons */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-action]'); if (!b) return;
+  const s = slides[cur];
+  switch (b.dataset.action){
+    case 'two-toggle': if (step < 1){ step = 1; } else { step = 0; } render(); break;
+    case 'cells-ask': if (step < 1){ step = 1; render(); } break;
+    case 'cells-why': if (step < 2){ step = 2; render(); } break;
+  }
+});
+
+/* ===========================================================
+   PER-SLIDE HOOKS  (called on every step change; idempotent)
+   =========================================================== */
+const fmt = n => n.toLocaleString('en-AU');
+function countTo(el, from, to, ms){
+  if (reduced){ el.textContent = fmt(to); return; }
+  const t0 = performance.now();
+  const tick = now => { const p = Math.min(1, (now-t0)/ms), e = 1 - Math.pow(1-p, 3); el.textContent = fmt(Math.round(from + (to-from)*e)); if (p < 1) requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+
+const HOOKS = {
+  two(st, s){
+    const on = st >= 1; s.classList.toggle('showxml', on);
+    s.querySelector('[data-action="two-toggle"]').textContent = on ? 'Show me what humans see' : 'Show me what Claude sees';
+  },
+
+  zip(st, s){
+    const parts = s.querySelector('#parts');
+    if (!parts.childElementCount){
+      const max = Math.log(PARTS[0][1]);
+      PARTS.forEach(([name, bytes, note], i) => {
+        const b = document.createElement('button'); b.className = 'part' + (bytes > 9000 ? ' big' : ''); b.type = 'button';
+        b.innerHTML = `<b>${name}</b>${fmt(bytes)} B`;
+        b.style.transitionDelay = `${i*28}ms`;
+        b.style.flexBasis = `${Math.max(150, 150 + 300*(Math.log(bytes)/max - 0.45))}px`;
+        b.addEventListener('click', () => {
+          parts.querySelectorAll('.part').forEach(p => p.classList.remove('sel')); b.classList.add('sel');
+          s.querySelector('#zipnote').innerHTML = `<b>${name} · ${fmt(bytes)} bytes</b>${note}`;
+        });
+        parts.appendChild(b);
+      });
+    }
+    const was = s.classList.contains('burst'), on = st >= 1;
+    s.classList.toggle('burst', on);
+    if (on && !was){ countTo(s.querySelector('#ziptotal'), 58264, TOTAL_BYTES, 1600); countTo(s.querySelector('#zipparts'), 1, 37, 1600); }
+    if (!on){ s.querySelector('#ziptotal').textContent = '58,264'; s.querySelector('#zipparts').textContent = '1'; s.querySelector('#zipnote').innerHTML = '<b>Click any part</b>The archive holds 37 files. Every one of them has to survive the population unchanged, or the result is not a CDU controlled document any more.'; parts.querySelectorAll('.sel').forEach(p => p.classList.remove('sel')); }
+  },
+
+  line(st, s){
+    s.querySelectorAll('.lane').forEach((lane, i) => {
+      const pre = lane.querySelector('.xml');
+      if (!lane.dataset.ready){ lane.dataset.ready = 1; pre.innerHTML = pre.innerHTML + '   ' + pre.innerHTML; lane.style.animationDuration = lane.dataset.speed + 's'; lane.style.animationDelay = `${-i*23}s`; }
+      if (st >= 1 && !lane.dataset.marked){ lane.dataset.marked = 1; pre.innerHTML = pre.innerHTML.replace(/<span class="x">This <\/span>/g, '<span class="x hl">This </span>'); }
+    });
+  },
+
+  ns(st, s){
+    const box = s.querySelector('#stamps');
+    if (!box.childElementCount){
+      NAMESPACES.forEach(([p, yr, what, cls], i) => {
+        const d = document.createElement('div'); d.className = 'stamp ' + cls;
+        d.innerHTML = `<b>xmlns:${p}</b>${yr === 'urn' ? 'urn' : yr} · ${what}`;
+        d.style.transitionDelay = `${i*55}ms`; box.appendChild(d);
+      });
+    }
+    s.classList.toggle('go', st >= 1);
+  },
+
+  count(st, s){
+    const q = s.querySelector('#emptyq'), bar = s.querySelector('#emptybar'), n = s.querySelector('#emptynum');
+    if (st >= 3){ q.textContent = '263'; q.classList.add('hot'); if (!bar.dataset.counted){ bar.dataset.counted = 1; countTo(n, 0, 263, 1500); } }
+    else { q.textContent = '?'; q.classList.remove('hot'); delete bar.dataset.counted; n.textContent = '0'; }
+  },
+
+  runs(st, s){
+    (s._timers || []).forEach(t => { clearInterval(t); clearTimeout(t); }); s._timers = [];
+    s.classList.toggle('split', st >= 1);
+    s.classList.toggle('search', st === 2);
+    s.classList.toggle('stitched', st >= 3);
+    const q = s.querySelector('#findq'), r = s.querySelector('#findres');
+    if (st === 2 && q.dataset.state !== 'searched'){
+      q.dataset.state = 'searched'; q.textContent = ''; r.textContent = ''; r.className = 'res';
+      const word = 'Remove'; let i = 0;
+      const id = setInterval(() => { q.textContent = word.slice(0, ++i); if (i >= word.length){ clearInterval(id); s._timers.push(setTimeout(() => { r.textContent = '0 results'; r.className = 'res bad'; }, 500)); } }, reduced ? 1 : 110);
+      s._timers.push(id);
+    } else if (st >= 3){ q.dataset.state = 'stitched'; q.textContent = 'Remove'; r.textContent = '1 result, across 2 runs'; r.className = 'res good'; }
+    else if (st < 2){ q.dataset.state = ''; q.textContent = ''; r.textContent = ''; }
+  },
+
+  yellow(st, s){
+    const c = s.querySelector('#yelcell');
+    const target = 'Element 1. Prepare to install cabling';
+    if (st === 0){ c.textContent = 'Add/remove rows as required.'; c.className = 'typed y'; c.dataset.state = ''; }
+    if (st === 1 && c.dataset.state !== 'typed'){
+      c.dataset.state = 'typed'; c.className = 'typed y';
+      if (reduced){ c.textContent = target; return; }
+      let del = c.textContent.length; const t0 = c.textContent;
+      const id = setInterval(() => {
+        if (del > 0){ del--; c.textContent = t0.slice(0, del); }
+        else { const i = c.textContent.length; c.textContent = target.slice(0, i+1); if (i+1 >= target.length) clearInterval(id); }
+      }, 28);
+    }
+    if (st >= 2){ c.textContent = target; c.className = 'typed'; c.dataset.state = 'clean'; }
+  },
+
+  units(){},
+
+  zero(st, s){ s.classList.toggle('collapse', st === 1); },
+
+  cells(st, s){
+    const a = s.querySelector('#cellsans');
+    a.classList.toggle('on', st >= 1);
+    s.classList.toggle('why', st >= 2);
+  },
+
+  ghosts(){}, time(){}, relic(){}, both(){},
+
+  method(st, s){ s.querySelectorAll('#steps li').forEach((li, i) => li.classList.toggle('on', i < st)); },
+
+  read(){}, notes(){}
+};
+
+/* title slide: falling tags */
+(function rain(){
+  const box = document.querySelector('.tagrain'); if (!box || reduced) return;
+  const tags = ['<w:p/>','<w:tc>','<w:r>','<w:t>','w:gridSpan','w:sdt','w:rsidR="00373BBB"','<w:highlight w:val="yellow"/>','<w:tcW w:w="0"/>','w14:paraId','<w:trPr>','xml:space="preserve"','<w:vAlign/>','</w:tr>','<w:bookmarkStart/>','w:type="pct"','<w:lastRenderedPageBreak/>','<w:sz w:val="18"/>'];
+  for (let i = 0; i < 26; i++){
+    const sp = document.createElement('span'); sp.textContent = tags[i % tags.length];
+    sp.style.left = `${(i * 37 + 11) % 100}%`; sp.style.animationDuration = `${22 + (i*7)%18}s`; sp.style.animationDelay = `${-(i*3.3)%30}s`; sp.style.fontSize = `${16 + (i*5)%14}px`;
+    box.appendChild(sp);
+  }
+})();
+
+/* deep link */
+(function init(){
+  const m = location.hash.match(/#\/(\d+)/);
+  if (m) cur = Math.max(0, Math.min(+m[1]-1, slides.length-1));
+  render('jump');
+})();
+</script>
+</body>
+</html>
