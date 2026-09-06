@@ -45,31 +45,31 @@ const SKIP_DIRS = new Set([
      type    'masthead' puts the plate behind the masthead at 0.42 opacity;
              'band' runs it uncropped above the masthead at its own ratio.
      band    depth cap for a band: 'sm' 240px, 'md' 300px, 'lg' 360px,
-             omitted for the 420px default.
+             or 'topic-hero' for a wide page hero capped at 620px.
      session plate for the session pages inside a course folder, which take
              the masthead treatment even where the course home takes a band.
      pos     'high' shifts a masthead crop to 78% 42%.
      foot    the footer plate, shown whole.                                */
 const PLATES = {
-  'presentations':    { type: 'masthead', plate: 'hero-envelope-mouse-wordmark', foot: 'banner-mouse-lightbulb-keyboard' },
-  'flashcards':       { type: 'masthead', plate: 'hero-qr-mouse-wordmark',       foot: 'footer-keyboard-data-monogram' },
+  'presentations':    { type: 'band', plate: 'hero-keyboard-closeup', band: 'topic-hero', foot: 'banner-mouse-lightbulb-keyboard' },
+  'flashcards':       { type: 'band', plate: 'hero-keyboard-closeup', band: 'topic-hero', foot: 'footer-keyboard-data-monogram' },
   'resources':        { type: 'band', plate: 'banner-mouse-lightbulb-keyboard', band: 'md', foot: 'footer-mouse-lightbulb-monogram' },
-  'references':       { type: 'masthead', plate: 'hero-motherboard-chip1',       foot: 'footer-data-table-monogram' },
+  'references':       { type: 'band', plate: 'hero-motherboard-chip1', band: 'topic-hero', foot: 'footer-data-table-monogram' },
   'index':            { type: 'band', plate: 'banner-wordmark-usb', band: 'sm',   foot: 'footer-data-table-monogram' },
 
-  'excel':            { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'lg', session: 'hero-square-laptop-spreadsheet', foot: 'footer-keyboard-data-monogram' },
-  'powerbi-siem':     { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'lg', foot: 'footer-keyboard-data-monogram' },
-  'pandanus-reach':   { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'lg', foot: 'footer-keyboard-data-monogram' },
+  'excel':            { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'topic-hero', foot: 'footer-keyboard-data-monogram' },
+  'powerbi-siem':     { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'topic-hero', foot: 'footer-keyboard-data-monogram' },
+  'pandanus-reach':   { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'topic-hero', foot: 'footer-keyboard-data-monogram' },
 
-  'cybersecurity':    { type: 'masthead', plate: 'hero-envelope-connect', session: 'hero-padlock-wordmark', foot: 'footer-data-table-monogram' },
-  'ai-literacy':      { type: 'masthead', plate: 'hero-cloud-monogram',          foot: 'footer-envelope-mouse-wordmark' },
-  'ai-for-research':  { type: 'masthead', plate: 'hero-portrait-chip-wordmark',  foot: 'footer-mouse-lightbulb-monogram' },
-  'digital-literacy': { type: 'masthead', plate: 'hero-wordmark-keyboard-usb',   foot: 'footer-mouse-lightbulb-monogram' },
-  'word':             { type: 'masthead', plate: 'hero-keyboard-closeup',        foot: 'footer-data-table-monogram' },
-  'powerpoint':       { type: 'masthead', plate: 'hero-padlock-circuit',        foot: 'footer-data-table-monogram' },
-  'visio':            { type: 'masthead', plate: 'hero-motherboard-chip',        foot: 'footer-keyboard-data-monogram' },
-  'agentic-web-dev':  { type: 'masthead', plate: 'hero-envelope-wordmark',       foot: 'footer-data-table-monogram' },
-  'cdu-ai-staff':     { type: 'masthead', plate: 'hero-cloud-monogram',          foot: 'footer-wordmark-url' },
+  'cybersecurity':    { type: 'band', plate: 'hero-padlock-circuit', band: 'topic-hero', foot: 'footer-data-table-monogram' },
+  'ai-literacy':      { type: 'band', plate: 'hero-motherboard-chip1', band: 'topic-hero', foot: 'footer-envelope-mouse-wordmark' },
+  'ai-for-research':  { type: 'band', plate: 'hero-motherboard-chip1', band: 'topic-hero', foot: 'footer-mouse-lightbulb-monogram' },
+  'digital-literacy': { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'topic-hero', foot: 'footer-mouse-lightbulb-monogram' },
+  'word':             { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'topic-hero', foot: 'footer-data-table-monogram' },
+  'powerpoint':       { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'topic-hero', foot: 'footer-data-table-monogram' },
+  'visio':            { type: 'band', plate: 'banner-laptop-spreadsheet', band: 'topic-hero', foot: 'footer-keyboard-data-monogram' },
+  'agentic-web-dev':  { type: 'band', plate: 'hero-keyboard-closeup', band: 'topic-hero', foot: 'footer-data-table-monogram' },
+  'cdu-ai-staff':     { type: 'band', plate: 'hero-motherboard-chip1', band: 'topic-hero', foot: 'footer-wordmark-url' },
 
   // The manual runs its own .manual-masthead, so it takes the footer plate only.
   'shadow-ai-manual': { type: 'none', foot: 'footer-wordmark-url' },
@@ -77,12 +77,12 @@ const PLATES = {
   // Client areas. Artwork deliberately minimal: a plate behind the masthead
   // and a footer plate, nothing else. A page carrying an Acknowledgement of
   // Country should not have artwork competing with it.
-  'roper-gulf':       { type: 'masthead', plate: 'hero-portrait-keyboard',       foot: 'footer-envelope-mouse-wordmark' },
-  'alice-springs-arn':{ type: 'masthead', plate: 'hero-qr-mouse',                foot: 'footer-mouse-lightbulb-monogram' },
+  'roper-gulf':       { type: 'band', plate: 'hero-keyboard-closeup', band: 'topic-hero', foot: 'footer-envelope-mouse-wordmark' },
+  'alice-springs-arn':{ type: 'band', plate: 'hero-motherboard-chip1', band: 'topic-hero', foot: 'footer-mouse-lightbulb-monogram' },
 
   // Home. The band and the divider are hand-authored in index.html, since the
   // page has no masthead; the script only maintains its footer plate.
-  '':                 { type: 'none', foot: 'footer-mouse-lightbulb-monogram' },
+  '':                 { type: 'none', foot: 'banner-mouse-lightbulb-keyboard' },
 };
 
 /* Alt text for the plates shown whole. Plates behind a masthead are decorative
@@ -90,7 +90,7 @@ const PLATES = {
 const ALT = {
   'banner-wordmark-keyboard':        'The Ntell World Ink wordmark across a backlit keyboard',
   'banner-wordmark-usb':             'The Ntell World Ink wordmark with a USB drive',
-  'banner-mouse-lightbulb-keyboard': 'Circuitry, a keyboard and a mouse holding a lit bulb',
+  'banner-mouse-lightbulb-keyboard': 'A mouse holding a lit bulb beside a keyboard',
   'banner-laptop-spreadsheet':       'A laptop showing a spreadsheet, with circuitry and the NT monogram',
   'banner-laptop-monogram':          'A laptop beside the NT monogram',
   'footer-mouse-lightbulb-monogram': 'A mouse holding a lit bulb, with the NT monogram',
@@ -210,16 +210,25 @@ function applyMasthead(html, cfg, plate) {
 
 function applyBand(html, cfg, plate) {
   const depth = cfg.band ? ' plate-band-' + cfg.band : '';
-  const block = OPEN + '\n<section class="plate-band r-' + plate + depth + '">\n'
+  const section = '<section class="plate-band plate-band-uncropped r-' + plate + depth + '">\n'
     + picture(plate, ALT[plate] || '', false) + '\n'
     + '<div class="plate-band-fade"></div>\n'
-    + '</section>\n' + CLOSE;
+    + '</section>';
+  const block = OPEN + '\n' + section + '\n' + CLOSE;
 
   if (/class="plate-band /.test(html) || /class="plate-band"/.test(html)) {
-    const re = new RegExp(OPEN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      + '\\n<section class="plate-band[\\s\\S]*?</section>\\n' + CLOSE);
-    const swapped = html.replace(re, block);
+    const swapped = html.replace(/<section class="plate-band[^\"]*">[\s\S]*?<\/section>/, section);
     return { html: swapped, action: swapped === html ? 'unchanged' : 'band swapped' };
+  }
+
+  // Convert a generated overlay masthead in place: remove the old art layer,
+  // keep the breadcrumb and masthead wrapper, and mount the complete plate
+  // immediately above them inside the same generated region.
+  if (/class="masthead-plate"/.test(html)) {
+    const withoutArt = html.replace(/<div class="masthead-art[^"]*">[\s\S]*?<\/div>\n/, '');
+    const marker = OPEN + '\n<div class="masthead-plate">';
+    const swapped = withoutArt.replace(marker, OPEN + '\n' + section + '\n<div class="masthead-plate">');
+    return { html: swapped, action: swapped === html ? 'unchanged' : 'masthead converted to band' };
   }
 
   const mast = findMasthead(html);
@@ -259,12 +268,15 @@ function configFor(rel) {
 }
 
 const dryRun = process.argv.includes('--dry-run');
+const onlyArg = process.argv.find((arg) => arg.startsWith('--only='));
+const only = onlyArg ? onlyArg.slice('--only='.length).replace(/^\/+|\/+$/g, '') : '';
 let touched = 0, skipped = 0, noConfig = 0;
 const report = [];
 
 for (const file of walk(ROOT)) {
   const rel = path.relative(ROOT, file).split(path.sep).join('/');
   if (/-original\.html$/.test(rel)) { skipped++; continue; }
+  if (only && rel !== only && !rel.startsWith(only + '/')) continue;
 
   const original = fs.readFileSync(file, 'utf8');
   if (!/<header class="site">/.test(original)) { skipped++; continue; }
@@ -286,6 +298,7 @@ for (const file of walk(ROOT)) {
     const r = applyMasthead(html, cfg, plate); html = r.html; actions.push(r.action);
   } else if (type === 'band' && plate) {
     const r = applyBand(html, cfg, plate); html = r.html; actions.push(r.action);
+    html = html.replace(/href="(?:\.\.\/)*styles\.css(?:\?[^\"]*)?"/, 'href="/styles.css?v=20260906-hero-repair-2"');
   }
 
   if (cfg.foot) {

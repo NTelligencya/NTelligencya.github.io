@@ -16,6 +16,18 @@ Date: 6 September 2026
 - The busy primary nav no longer includes Contact; the footer's Get in touch link remains available.
 - The Copilot Study and Learn page now uses the wide AI-processor artwork in a page-specific uncropped topic-hero treatment; the unsuitable square cloud plate is no longer used there.
 
+## Broader repair implementation — 6 September 2026
+
+- Added a complete 110-route treatment register at `review/HERO-TREATMENT-REGISTER.md`; the in-progress ICT PD area is explicitly excluded.
+- Corrected the shared ratio system so each plate's recorded intrinsic ratio overrides the generic fallback ratio.
+- Converted all 21 existing plate heroes to `object-fit: contain` and removed the fade that obscured their lower framed edge.
+- Replaced the portrait and square CDU hero assignments with wide AI-processor or cyber-security padlock artwork according to topic.
+- Converted all 89 text-overlay mastheads to full uncropped topic plates above the page heading. Production now has zero `masthead-art` overlays.
+- Standardised the topic cues: processor for AI, padlock for cyber security, spreadsheet for Office/tools, and keyboard for general technical material, flashcards and presentations.
+- Updated `tools/add-artwork.js` so future regeneration preserves these assignments and is idempotent. The in-progress `cdu-ict-pd-day/` section remains untouched.
+
+The final homepage/footer information-architecture rationalisation remains deliberately deferred until the repaired hero pages have been reviewed.
+
 An automatic global switch from `cover` to `contain` was tested and rejected: it prevents cropping, but makes portrait artwork tiny inside a wide hero band. The correct repair is to pair wide spaces with wide assets and reserve portrait artwork for square/inset treatments.
 
 ## Proposed repair sequence

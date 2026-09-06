@@ -474,15 +474,26 @@ add-meta's report for unrelated pages it touches before committing.
 Structure: title; contents (sticky on desktop); Before you start (chat against
 Cowork, what a skill is with the "made by doing it first, then create-skill"
 pattern SD described, the workspace tree, the eight inputs Claude needs, the
-one numbering rule); Phases 1 to 5 (map, build the tools, pre-validate,
+one numbering rule); an Interlude on why the working format is Markdown, for
+readers who know XML (what a .docx is; the Elements band row of the Matrix v7
+template shown as one Markdown line beside its 47-line document.xml fragment,
+both real, in `tools/pd-day/elements-row.xml`; measured counts for that
+template's document.xml: 166 KB, 352 paragraphs of which 260 hold no text, 130
+runs, 6 tables, 3 content controls, 13 highlighted runs; then the full template
+quirks catalogue, which SD had Claude write after the rough start to
+population); Phases 1 to 5 (map, build the tools, pre-validate,
 populate the templates, illustrate in ChatGPT Codex), each with Produces, What
 goes in, What you do (numbered steps with example prompts), the full SKILL.md in
 a scrollable code block (verbatim from the vault copies in
 `TAFE Mapping/3. TAFE Mapping Claude Skills and files/` and
 `4. Example CTCBL322 Mapping/`, plus the Codex skill SD pasted in chat), What
-came out, What you check; the phase 4 template-quirks catalogue is shown as a
-second block; phase 5 also carries SD's account of the second pass (the model
-preferred vector diagrams to photographs, about half of round-one drafts failed
+came out, What you check; phase 4 points back to the catalogue in the interlude; phase 5 also carries SD's account of the Codex set-up (a mini folder of
+workbook pages and diagram recommendations plus four directives: accuracy,
+technical accuracy, clear labelling, wires to and from the right holes) and of
+the second pass (the model, Sol 5.6 in SD's words, preferred vector diagrams
+to photographs; the PC 4.1 draft is captioned as a completely inappropriate
+vector; SD's own yes-or-no check with the commands "verify for clarity" and
+"audit for labelling", about half of round-one drafts failed
 the model's own verification, label placement and wire routing had to be
 checked image by image on the proof sheet, SME review essential) with the
 proof-sheet figures; Where the person steered; What the SME and program area still

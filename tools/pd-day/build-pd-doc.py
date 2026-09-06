@@ -124,6 +124,13 @@ CTREE = '''<ul class="ctree" aria-label="The mapping workspace and the ICTCBL303
 </ul>
 <ul class="legend" aria-label="Key"><li class="s">Set up once</li><li class="i">The one input per unit</li><li class="o">Written by the pipeline</li></ul>'''
 
+XML_ROW = open(os.path.join(HERE, 'elements-row.xml')).read().rstrip('\n')
+MD_ROWS = """| **Mandatory Unit Requirements** | **Student Resource Reference** | **Assessment 1** **Knowledge Quiz** | **Assessment 2** **Direct Observation** | **Assessment 3** **Portfolio** |
+|---|---|---|---|---|
+| **Elements** | - | - | - | - |
+| Element 1: Prepare for installation of optical fibre cable | Workbook Element 1 | - | AT2 Obs Item 1-8 | - |
+| Performance Criteria **1.1** Access site according to enterprise procedures | Workbook Element 1, section 1.1 | - | AT2 Obs Item 1 | - |"""
+
 page = f'''<!doctype html>
 <html lang="en-AU">
 <head>
@@ -154,6 +161,8 @@ page = f'''<!doctype html>
   <p class="toc__h">Contents</p>
   <ol class="toc__list">
     <li><a href="#before">Before you start</a></li>
+    <li><a href="#markdown">Interlude: why Markdown first</a></li>
+    <li><a href="#context">Directories and context</a></li>
     <li><a href="#phase-1">Phase 1: map the unit</a></li>
     <li><a href="#phase-2">Phase 2: build the tools</a></li>
     <li><a href="#phase-3">Phase 3: pre-validate</a></li>
@@ -250,6 +259,92 @@ page = f'''<!doctype html>
     <p class="rule__k">The one rule that governs every phase</p>
     <p>Content and mapping are organised against the unit's own Elements and Performance Criteria, using the unit's own numbering, unchanged. Nothing is renumbered, regrouped, merged or paraphrased. An auditor must be able to trace any question, checklist item or paragraph straight back to the competency it covers.</p>
   </div>
+</section>
+
+<!-- ============================================================ interlude -->
+<section class="sec" id="markdown">
+  <h2><span class="sec__n">Interlude</span>Why the content is written in Markdown first</h2>
+  <p class="produces"><b>The rule:</b> Markdown is the working format. Word documents come only from the template-populator skill, at phase 4, once the content is finished. Content decisions are never made inside a Word file.</p>
+  <p>This is what keeps Claude's effort on the content: the unit's wording, the evidence codes, the traceability, the compliance. Not on navigating the structure of a legacy Word document. For anyone who has worked with XML, the reason is quick to show.</p>
+
+  <h3>What a .docx actually is</h3>
+  <p>A .docx is a zip archive of XML parts: document.xml for the body, then separate parts for headers, footers, styles, numbering, settings and a glossary, plus the relationship files that tie them together. The visible text sits inside runs, w:r elements, and Word splits a run wherever formatting, spell-check state or edit history changed, so one phrase can be three runs. Tables carry merged cells (w:gridSpan, w:vMerge). Content controls (w:sdt) wrap checkboxes, dropdowns and sometimes an entire cell, so a four-column row reports three cells. Bookmarks carry IDs that must stay unique across the file. The yellow "fill me" placeholder is character formatting on the run, not an overlay, so text typed in its place inherits it. None of that is content. All of it has to be preserved for the file to remain a valid CDU controlled document.</p>
+  <p>The Assessment Mapping Matrix v7 template, unzipped: document.xml alone is 166 KB. It holds 352 paragraphs, 260 of them with no text at all (spacers and break carriers), 130 text runs, 6 tables, 3 content controls and 13 highlighted placeholder runs.</p>
+
+  <h3>The same row, both ways</h3>
+  <p>The Elements band row that opens Section 1 of the matrix. On the left, the ICTCBL322 matrix in Markdown: one line for that row, with the table header and the two rows that follow it for context. On the right, the same band row in the template's document.xml: 47 lines, three runs, one of them the highlighted instruction the model has to find and remove before the document is finished.</p>
+  <div class="two two--code">
+    <figure class="fig">
+      <pre class="tree pre--cap"><code>{html.escape(MD_ROWS)}</code></pre>
+      <figcaption>ICTCBL322_AssessmentMappingMatrix_v2_20260815.md, Section 1, first five lines of the table.</figcaption>
+    </figure>
+    <figure class="fig">
+      <pre class="tree pre--cap"><code>{html.escape(XML_ROW)}</code></pre>
+      <figcaption>Assessment Mapping Matrix v7.docx, word/document.xml, the same band row. Pretty-printed; the file stores it on one line.</figcaption>
+    </figure>
+  </div>
+
+  <h3>Why that matters for the model</h3>
+  <ul>
+    <li><b>Effort goes to the content.</b> Every token spent on structure is a token not spent on the unit. In Markdown the structure is nearly free: a heading is a hash, a table row is pipes, bold is asterisks. The whole file is the content.</li>
+    <li><b>The model can check what it wrote.</b> A Markdown file reads back the way it was written, so a completeness check is a read of the file. A phrase split across three w:r elements cannot be checked by reading; it needs a parser and a helper that knows the split is there.</li>
+    <li><b>Versions diff.</b> v1 to v2 of a matrix is a readable line diff. Two .docx files do not diff in any useful way.</li>
+    <li><b>Every viewer renders it.</b> Obsidian, GitHub, Word's Markdown import, a chat preview. The skills use pipe tables only, never raw HTML tables, for that reason.</li>
+    <li><b>The template's machinery is untouched until the end.</b> Phase 4 copies the controlled document and edits the copy in place, through helpers that know its quirks, then runs four checks. Nothing about the content is decided there; it is a transfer.</li>
+  </ul>
+
+  <h3>The catalogue that came out of the rough start</h3>
+  <p>Template population did not go smoothly at first. After the ICTCBL322 pack, Claude was asked to write out everything that is tricky about the templates' structure, so that later runs would not repeat the misalignments. That document became the populator skill's reference file. It reads as a list of reasons to keep content out of Word until the content is finished, and it is shown here in full.</p>
+  {skill('template-quirks.md', 'cdu-unit-template-populator: references/template-quirks.md', "The catalogue Claude wrote after the ICTCBL322 population, now read by the populator skill before it touches any template. Saved in the vault as the skill's quirks catalogue.")}
+</section>
+
+<!-- ============================================================ context -->
+<section class="sec" id="context">
+  <h2><span class="sec__n">Interlude</span>Directories and context: what Claude is given, and where</h2>
+  <p class="produces"><b>The claim:</b> the quality of what comes out is set before the first prompt is written. It is set by what is put in front of the model, how the folder is laid out, and what the files are called.</p>
+  <p>Cowork finds files by name and by place. The brief refers to files by name. The skills refer to folders by name. A file that is in the wrong folder, or named so that its unit, version or date cannot be read from the name, is a file the model has to guess about. Every guess is a place an error gets in.</p>
+
+  <h3>Rules for the folder</h3>
+  <ul>
+    <li><b>One workspace, one folder per unit, the same sub-folders in every unit.</b> The model learns the layout once and applies it to every unit that follows.</li>
+    <li><b>The brief at the root, named CLAUDE.md exactly.</b> Cowork reads it on its own the moment the folder is connected. Move it or rename it and nothing reads it.</li>
+    <li><b>Source of truth kept apart from outputs.</b> The register download folder holds the unit's two PDFs and nothing else. Outputs land in their own folder, so the model never mistakes its own draft for the register.</li>
+    <li><b>Superseded material in its own folder, labelled as superseded.</b> The regulatory library keeps the 2014 Rules, S009:2013 and the 2023 Pathways guide in a folder called Superseded, historical reference only. Beside current material they would be cited as current.</li>
+    <li><b>File names that carry the facts.</b> ICTCBL303_AssessmentMappingMatrix_v2_20260830.md tells the model the unit, the document, the version and the date without opening the file. The whole pipeline uses that pattern, and version lineage flows from the Markdown name to the Word name.</li>
+    <li><b>Nothing the model does not need.</b> Every page it reads that it does not need is context spent, and a chance for something irrelevant to bleed into the output.</li>
+  </ul>
+
+  <h3>What would be done differently: the 80-page manual</h3>
+  <p>The how-to-map folder included the TAE assessment design manual, about 80 pages. Read again later, about 40 of those pages were fluff as far as Claude's job was concerned: framing, pedagogy, worked narrative. Claude did not need them to know what to do. Run again, that manual would be slimmed to the pure instructions for compliant assessment design before it went into the folder. The point is not that the model cannot cope with 80 pages. It is that the 40 unneeded pages are read on every run that touches the reference set, and they carry assumptions of their own.</p>
+
+  <h3>A harmless case of data poisoning: the SLR workbook</h3>
+  <p>One of those assumptions got through. The reference material referred to the student learning resource as the SLR workbook. The acronym, and the assumption that the student-facing content was a workbook document, bled into the pipeline: the mapping skill still says "if the SLR isn't structured yet", and early outputs treated the student resource as a document to be written. It stayed that way until Claude was told, in the brief, that student-facing content goes onto a site called Brambling, CDU's online delivery shell, as pages.</p>
+  <p>To anyone at CDU that is an obvious detail. To the model it was invisible, because nothing in the folder said it. It is the kind of detail that costs most at the end, when a later phase is asked for: the request to put all the text into plain HTML and embed the images would have been answered for the wrong destination. Write down the things that are obvious to you. They are exactly the things the model cannot know.</p>
+
+  <h3>Choosing the model, and how long it took</h3>
+  <div class="tblwrap"><table class="tbl">
+    <thead><tr><th>Model</th><th>Used for</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td>Haiku</td><td>Not used</td><td>Probably too light for the mapping and the compliance checks. Something stronger is needed where the coding and the traceability are decided.</td></tr>
+      <tr><td>Opus 4.8, high effort</td><td>Nearly everything</td><td>The workhorse for the whole set. One known habit had to be controlled for in the instructions: a tendency to overly complex language, which other users had reported too.</td></tr>
+      <tr><td>Fable 5</td><td>Not warranted</td><td>Perhaps at the mapping phase, but even that is not complicated for the model. There is a difference between complicated, difficult, and plain painful: onerous, busy knowledge work. Mapping is the third kind. It is tedious for a person, not hard for Claude.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tblwrap"><table class="tbl">
+    <thead><tr><th>Work</th><th>Time</th><th>What the time went on</th></tr></thead>
+    <tbody>
+      <tr><td>ICTCBL322, the first unit</td><td>about 4.5 hours</td><td>The original folder set-up; sourcing, engineering and cleaning the context files; the initial instructions; then the mapping and tools themselves. Most of this is done once.</td></tr>
+      <tr><td>The six remaining units</td><td>about 8 hours all up</td><td>Mapped, tooled and pre-validated on 23 August 2026; Word sets, workbooks and v2 matrices on 30 August 2026. Set-up already existed; each unit added only its own folder.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Give it the goal, not just the step</h3>
+  <p>With the newer models, a stated long-term goal in the prompt works as an optimiser. Even when the work is prompted one phase at a time, with a person checking each step, the model should be told where it is all headed and what the finished set looks like. The workspace brief opens with exactly that:</p>
+  <div class="rule">
+    <p class="rule__k">The goal, from the workspace CLAUDE.md</p>
+    <p>CDU is having the ACMA Open Cabler units added to its scope of registration. To progress the change-of-scope application for the Advanced Cabler Registration Skill Set (ICTSS00086), every unit needs a full set of assessment resources at the quality standard already reached for ICTCBL322, whose finished outputs are the model for the set. For each unit that means, in order of production: an Assessment Mapping Matrix, the assessment tools with their Assessor Guide, a Student Unit Guide holding each assessment task, pre-validation findings, and a Student Workbook for the Brambling learning shell; produced first in Markdown, then populated into CDU's official Word templates.</p>
+  </div>
+  <p>Twelve months ago this would have been too much for a frontier model. Tasks had to be broken into staged sections and chained, with the person carrying the overall state between them. This time the phased breakdown was mostly for the person, a way to keep track of what was happening. Claude held the full length and breadth of the task: it stayed on top of every outstanding edit to every corresponding document, and it reminded, relentlessly, whenever something had been missed. The phases on this page are the human's map of the work, not the limit of what the model can hold.</p>
 </section>
 
 <!-- ============================================================ phase 1 -->
@@ -421,7 +516,7 @@ page = f'''<!doctype html>
   <h3>The skill file</h3>
   <p>The ICTCBL322 documents were populated first, and the traps found on the way were written into the skill's quirks catalogue. ICTCBL303 was then built end to end as the pattern on 30 August 2026, and the other five units followed it the same day.</p>
   {skill('cdu-unit-template-populator.md', 'cdu-unit-template-populator', 'The SKILL.md text as saved in the vault, with its frontmatter.')}
-  {skill('template-quirks.md', 'cdu-unit-template-populator: references/template-quirks.md', "The supplement the skill reads before touching any template: what each of CDU's templates hides. Saved in the vault as the skill's quirks catalogue.")}
+  <p>The catalogue of template quirks the skill reads first is shown in full in <a href="#markdown">the interlude on Markdown</a>.</p>
 
   <h3>The seven units</h3>
   <div class="tblwrap"><table class="tbl">
@@ -444,9 +539,14 @@ page = f'''<!doctype html>
   <h2><span class="sec__n">Phase 5</span>Illustrate <span class="sec__skill">brambling-technical-illustrations, in ChatGPT Codex</span></h2>
   <p class="produces"><b>Produces</b> the technical diagrams the student workbooks name, as PNG files with an image register and a proof sheet per batch, one working folder per unit; and the audit of the licensed ICTTEN202 workbook's images.</p>
 
+  <h3>Setting up Codex: a mini folder and a brief</h3>
+  <p>Codex knew nothing about the project, so the first job was context engineering: give it just the amount of information it needed and no more. That was a small folder holding two things, the student workbook pages for the unit and the diagram recommendations Claude had written for each Element, plus a short set of directives on what to optimise for: accuracy; technical accuracy; clear labelling; wires going to and from the right holes, which image generation gets wrong easily. The skill was then created from that set-up the same way the Cowork skills were: run the job, correct it, have the agent write down the method.</p>
+
   <h3>What goes in</h3>
   <ul>
-    <li>The DiagramRecommendations file each workbook Element carries, describing every diagram that Element needs.</li>
+    <li>The student workbook pages for the unit.</li>
+    <li>The DiagramRecommendations file each workbook Element carries, written by Claude alongside the workbook pages, describing every diagram that Element needs.</li>
+    <li>The directives: accuracy, technical accuracy, clear labelling, wires to and from the right holes.</li>
     <li>The master list, SME Diagrams and Illustrations to source.md: 214 recommendations across the seven units, 113 of them Essential.</li>
     <li>For ICTTEN202, the licensed workbook itself: 174 embedded images, 130 of them under 400 pixels wide.</li>
     <li>Manufacturer documentation and equipment references where recognition matters.</li>
@@ -454,20 +554,20 @@ page = f'''<!doctype html>
 
   <h3>What you do</h3>
   <ol class="steps">
-    <li>In ChatGPT Codex with the skill installed, attach the unit folder or the recommendations file.</li>
+    <li>In ChatGPT Codex with the skill installed, attach the unit's mini folder: workbook pages and the recommendations file.</li>
     <li>Prompt with one of the skill's own typical requests, for example: <code>Create the 14 ICTCBL322 Element 1 draft illustrations from the attached project.</code> or <code>Audit ICTTEN202 TRCP32 learning images and propose replacements, without drawing yet.</code></li>
     <li>Codex reads the recommendation and the whole surrounding workbook section, then prepares a short brief per image: the teaching point, the visual method and why, the recognition features, the exact labels, the references.</li>
     <li>It chooses the method by teaching purpose: clear text graphics for comparisons and flows; photographs or reference-based realistic illustration for equipment and worksites, where a student has to recognise the real thing; precise schematics for hidden mechanisms, connections and geometry.</li>
     <li>It keeps variable values symbolic unless verified, and marks anything it cannot establish as needs-clarification rather than drawing it.</li>
     <li>Round one lands the drafts in the unit's drafts folder and writes the proof sheet: a draft image review gallery with one card per image carrying its PC, whether it is Essential or Supporting, its caption, and its alternative text and production notes.</li>
     <li>Round two: ask the model to verify and audit every draft for accuracy and technical clarity. In this build about half of the round-one drafts failed the model's own check and were redrawn.</li>
-    <li>Go through every image on the proof sheet yourself. Tell the model to verify that each label sits on the thing it names, and check where every wire runs and what it connects to. Most of the illustration time went here, iterating over small visual fixes.</li>
+    <li>Go through every image on the proof sheet yourself, before any SME sees it, with two yes-or-no questions: can I see what is going on here; are the labels actually pointing at things in the picture. On a no, order the model to <code>verify for clarity</code> or <code>audit for labelling</code>. Either command makes the Codex model (Sol 5.6, at the time of the build) open the illustration itself and check it against the directives for technical accuracy. Then check where every wire runs and what it connects to. Most of the illustration time went here, iterating over small visual fixes.</li>
     <li>SME review before anything is approved. The model's verification pass is not approval. When the batch is confirmed usable, the approved images go to the unit's Brambling Images folder as PNG, with no status tag in the artwork: vector masters exported at 2000 pixels wide, photographic originals kept at their own resolution.</li>
   </ol>
 
   <h3>What went wrong, and what the second pass is for</h3>
   <ul>
-    <li><b>Vector by default.</b> The model kept choosing a vector diagram where a photograph would teach better, even for equipment a student has to recognise on a bench. That is why every image gets a second, verifying pass, and why the skill's rule reads "photographs or reference-based realistic illustration for equipment and worksites".</li>
+    <li><b>Vector by default.</b> The model kept choosing a vector diagram where a photograph would teach better, even for equipment and handling a student has to recognise on a bench. The ICTCBL247 draft below is the example: cable bend radius and dragging a cable over an edge are things a student needs to see, not a symbol for. That is why every image gets a second, verifying pass, and why the skill's rule reads "photographs or reference-based realistic illustration for equipment and worksites".</li>
     <li><b>Labels placed arbitrarily.</b> A label would sit near, not on, the part it named. Every image was sent back with the instruction to verify the placement of each label.</li>
     <li><b>Wires heading the wrong way.</b> Where a wire runs, and whether it connects or does not connect, was the other common error. Check every connection against the reference before it goes near a student.</li>
     <li><b>The proof sheet is the workflow.</b> Iterating over the gallery, image by image, took most of the illustration time. Budget for it.</li>
@@ -475,7 +575,7 @@ page = f'''<!doctype html>
 
   <figure class="fig fig--wide">
     <img src="assets/draft-ictcbl247-pc4-1.png" width="1600" height="1076" alt="A draft illustration open in the review viewer: Protect cable geometry while installing, ICTCBL247 PC 4.1, a two-panel vector diagram contrasting compliant handling with a sweeping curve against damaging handling with a too-tight bend dragged over an edge; the footer reads R is symbolic, not to scale; a filmstrip of other drafts runs down the left">
-    <figcaption>A round-one draft in the review viewer, ICTCBL247 PC 4.1. A vector diagram, the model's default choice; the bend radius is marked symbolic, not to scale.</figcaption>
+    <figcaption>A round-one draft in the review viewer, ICTCBL247 PC 4.1. A completely inappropriate use of a vector diagram: the model's default choice, with the bend radius marked symbolic, not to scale. This one needs to be a photograph.</figcaption>
   </figure>
   <div class="two two--figs">
     <figure class="fig">
@@ -494,8 +594,9 @@ page = f'''<!doctype html>
 
   <h3>What you check</h3>
   <ul>
+    <li>Can a non-SME see what is going on in the image, yes or no. If no, it goes back.</li>
     <li>The visual method fits the teaching purpose: a photograph or realistic illustration where a student must recognise the real thing, a diagram where a diagram teaches.</li>
-    <li>Every label sits on the part it names.</li>
+    <li>Every label points clearly at the thing it names.</li>
     <li>Every wire runs where it should and connects, or does not connect, as the reference says.</li>
     <li>Equipment is drawn with the features that tell one tool from another; no generic box-and-circle icons.</li>
     <li>No DRAFT, FINAL or review tag appears in the image itself. Filenames, folders and the register carry status.</li>
