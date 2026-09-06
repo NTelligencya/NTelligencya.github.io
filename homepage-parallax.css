@@ -173,6 +173,28 @@
 .hp-hero { z-index: 4; }
 .hp-interface { z-index: 5; }
 
+.hp-home-background,
+.hp-home-interface {
+  transform: none;
+}
+
+.hp-home-keyboard {
+  --keyboard-x: 0px;
+  --keyboard-y: 0px;
+  --keyboard-r: 0deg;
+  --keyboard-scale: 1;
+  --keyboard-shadow-y: 8px;
+  --keyboard-shadow-blur: 12px;
+  --keyboard-shadow-alpha: 0.24;
+  transform:
+    translate3d(var(--keyboard-x), var(--keyboard-y), 0)
+    rotate(var(--keyboard-r))
+    scale(var(--keyboard-scale));
+  transform-origin: 55% 72%;
+  filter: drop-shadow(0 var(--keyboard-shadow-y) var(--keyboard-shadow-blur) rgb(0 0 0 / var(--keyboard-shadow-alpha)));
+  will-change: transform, filter;
+}
+
 .hp-glow {
   filter: brightness(var(--hp-bright, 1)) drop-shadow(0 0 var(--hp-halo, 0) rgba(35, 214, 216, var(--hp-halo-alpha, 0)));
 }
@@ -517,6 +539,13 @@
     grid-template-columns: 1fr;
     gap: 38px;
     padding-top: 34px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .hp-home-keyboard {
+    transform: none !important;
+    transition: none !important;
   }
 }
 

@@ -4,7 +4,13 @@
   var chapters = Array.prototype.slice.call(document.querySelectorAll('.hp-chapter'));
   var header = document.querySelector('header.site');
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finePointer = window.matchMedia('(pointer: fine)').matches;
+  var keyboardStage = document.querySelector('[data-scene="home"] .hp-stage');
+  var keyboard = keyboardStage ? keyboardStage.querySelector('.hp-home-keyboard') : null;
   var scheduled = false;
+  var keyboardFrame = 0;
+  var keyboardTarget = { x: 0, y: 0, rotation: 0, scale: 1 };
+  var keyboardCurrent = { x: 0, y: 0, rotation: 0, scale: 1 };
 
   if (!chapters.length) return;
 
@@ -60,10 +66,66 @@
     window.requestAnimationFrame(update);
   }
 
+  function applyKeyboardMotion() {
+    keyboardFrame = 0;
+    var easing = 0.12;
+    var largestDelta = 0;
+
+    Object.keys(keyboardCurrent).forEach(function (key) {
+      var delta = keyboardTarget[key] - keyboardCurrent[key];
+      keyboardCurrent[key] += delta * easing;
+      largestDelta = Math.max(largestDelta, Math.abs(delta));
+    });
+
+    var lift = clamp(-keyboardCurrent.y / 8);
+    keyboard.style.setProperty('--keyboard-x', keyboardCurrent.x.toFixed(2) + 'px');
+    keyboard.style.setProperty('--keyboard-y', keyboardCurrent.y.toFixed(2) + 'px');
+    keyboard.style.setProperty('--keyboard-r', keyboardCurrent.rotation.toFixed(3) + 'deg');
+    keyboard.style.setProperty('--keyboard-scale', keyboardCurrent.scale.toFixed(4));
+    keyboard.style.setProperty('--keyboard-shadow-y', (8 + lift * 5).toFixed(2) + 'px');
+    keyboard.style.setProperty('--keyboard-shadow-blur', (12 + lift * 5).toFixed(2) + 'px');
+    keyboard.style.setProperty('--keyboard-shadow-alpha', (0.24 + lift * 0.06).toFixed(3));
+
+    if (largestDelta > 0.002) {
+      keyboardFrame = window.requestAnimationFrame(applyKeyboardMotion);
+    }
+  }
+
+  function requestKeyboardMotion() {
+    if (keyboardFrame) return;
+    keyboardFrame = window.requestAnimationFrame(applyKeyboardMotion);
+  }
+
+  function updateKeyboardTarget(event) {
+    var rect = keyboardStage.getBoundingClientRect();
+    var pointerX = clamp((event.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1;
+    var pointerY = clamp((event.clientY - rect.top) / Math.max(1, rect.height)) * 2 - 1;
+    var lift = clamp((1 - pointerY) / 2);
+
+    keyboardTarget.x = pointerX * 4;
+    keyboardTarget.y = lift * -8;
+    keyboardTarget.rotation = pointerX * 0.2;
+    keyboardTarget.scale = 1 + lift * 0.003;
+    requestKeyboardMotion();
+  }
+
+  function resetKeyboardTarget() {
+    keyboardTarget.x = 0;
+    keyboardTarget.y = 0;
+    keyboardTarget.rotation = 0;
+    keyboardTarget.scale = 1;
+    requestKeyboardMotion();
+  }
+
   measureHeader();
   if (!reducedMotion) {
     window.addEventListener('scroll', requestUpdate, { passive: true });
     window.addEventListener('resize', requestUpdate);
+  }
+  if (keyboard && finePointer && !reducedMotion) {
+    keyboardStage.addEventListener('pointermove', updateKeyboardTarget, { passive: true });
+    keyboardStage.addEventListener('pointerleave', resetKeyboardTarget);
+    keyboardStage.addEventListener('pointercancel', resetKeyboardTarget);
   }
   update();
 }());

@@ -80,6 +80,36 @@ def webp_size(path: Path) -> tuple[int, int]:
     raise ValueError(f"unsupported WebP chunk {chunk!r}: {path}")
 
 
+def jpeg_size(path: Path) -> tuple[int, int]:
+    data = path.read_bytes()
+    if data[:2] != b"\xff\xd8":
+        raise ValueError(f"not a JPEG: {path}")
+    offset = 2
+    while offset < len(data):
+        if data[offset] != 0xFF:
+            offset += 1
+            continue
+        marker = data[offset + 1]
+        offset += 2
+        if marker in (0xD8, 0xD9):
+            continue
+        length = int.from_bytes(data[offset : offset + 2], "big")
+        if marker in range(0xC0, 0xC4):
+            return int.from_bytes(data[offset + 5 : offset + 7], "big"), int.from_bytes(data[offset + 3 : offset + 5], "big")
+        offset += length
+    raise ValueError(f"missing JPEG frame header: {path}")
+
+
+def image_size(path: Path) -> tuple[int, int]:
+    if path.suffix.lower() == ".png":
+        return png_size(path)
+    if path.suffix.lower() == ".webp":
+        return webp_size(path)
+    if path.suffix.lower() in (".jpg", ".jpeg"):
+        return jpeg_size(path)
+    raise ValueError(f"unsupported image type: {path}")
+
+
 def main() -> int:
     failures: list[str] = []
     pages = {
@@ -105,24 +135,26 @@ def main() -> int:
         fail_if(chapter_count != 1, f"{name} should contain exactly one landing hero, found {chapter_count}", failures)
 
     expected_scene = {
-        "home": ("p3", "03-hero-keyboard.webp"),
-        "library": ("p4", "03-hero-processor.webp"),
-        "courses": ("p8", "03-hero-stone-qr.webp"),
-        "tools": ("p5", "03-hero-glass-envelope.webp"),
+        "home": ("p3", ("01-clean-background-v2.jpg", "03-hero-keyboard-v2.png", "05-brand-interface.webp")),
+        "library": ("p4", ("01-clean-background.webp", "02-midground-trees-fence.webp", "04-foreground-earth-circuitry.webp", "03-hero-processor.webp", "05-brand-interface.webp")),
+        "courses": ("p8", ("01-clean-background.webp", "02-midground-trees-fence.webp", "04-foreground-earth-circuitry.webp", "03-hero-stone-qr.webp", "05-brand-interface.webp")),
+        "tools": ("p5", ("01-clean-background.webp", "02-midground-trees-fence.webp", "04-foreground-earth-circuitry.webp", "03-hero-glass-envelope.webp", "05-brand-interface.webp")),
     }
     all_layers: list[dict[str, str]] = []
-    for name, (scene, hero_file) in expected_scene.items():
+    for name, (scene, expected_files) in expected_scene.items():
         layers = [image for image in audits[name].images if "hp-layer" in image.get("class", "").split()]
         all_layers.extend(layers)
-        fail_if(len(layers) != 5, f"{name} should contain five scene layers, found {len(layers)}", failures)
+        fail_if(len(layers) != len(expected_files), f"{name} should contain {len(expected_files)} scene layers, found {len(layers)}", failures)
+        active_files = tuple(Path(image.get("src", "")).name for image in layers)
+        fail_if(active_files != expected_files, f"unexpected active layers on {name}: {active_files}", failures)
         for image in layers:
             source = ROOT / image.get("src", "").lstrip("/")
             fail_if(not source.is_file(), f"missing scene asset: {source}", failures)
             fail_if((image.get("width"), image.get("height")) != ("1672", "941"), f"wrong HTML dimensions: {source}", failures)
             fail_if(f"/parallax/{scene}/" not in image.get("src", ""), f"wrong scene layer on {name}: {image.get('src')}", failures)
-        fail_if(hero_file not in html[name], f"{name} is missing {hero_file}", failures)
 
-    fail_if(len(all_layers) != 20, f"expected 20 layers across four landing pages, found {len(all_layers)}", failures)
+    fail_if(len(all_layers) != 18, f"expected 18 active layers across four landing pages, found {len(all_layers)}", failures)
+    fail_if(any(retired in html["home"] for retired in ("02-midground-trees-fence.webp", "03-hero-keyboard.webp", "04-foreground-earth-circuitry.webp")), "homepage still references a retired damaged P3 layer", failures)
     fail_if(any(marker in html["home"] for marker in ('id="workshops"', 'id="training-games"', 'id="courses"', 'id="about"', '/parallax/p4/', '/parallax/p5/', '/parallax/p8/')), "homepage contains content assigned to a subsection", failures)
     fail_if('id="menu"' not in html["home"] or 'id="site-search-mount"' not in html["home"], "homepage Main Menu or search is missing", failures)
     fail_if('>Main Menu<' not in html["home"], "approved Main Menu wording is missing", failures)
@@ -165,6 +197,10 @@ def main() -> int:
 
     fail_if("prefers-reduced-motion: reduce" not in css, "reduced-motion CSS is missing", failures)
     fail_if("prefers-reduced-motion: reduce" not in js, "reduced-motion JavaScript guard is missing", failures)
+    fail_if("(pointer: coarse)" not in css or "(pointer: fine)" not in js, "coarse-pointer keyboard guard is missing", failures)
+    fail_if("requestAnimationFrame(applyKeyboardMotion)" not in js, "keyboard interpolation loop is missing", failures)
+    fail_if("pointerleave" not in js or "resetKeyboardTarget" not in js, "keyboard pointer-leave reset is missing", failures)
+    fail_if("pointerX * 4" not in js or "lift * -8" not in js, "keyboard motion range is not ±4px by 0 to -8px", failures)
     fail_if('data-motion="1.15"' not in html["tools"], "P5 movement multiplier is missing", failures)
     fail_if("scene === 'tools' ? 0.18 : 0.14" not in js, "P4/P5 glow gains are missing", failures)
     fail_if(".hp-page-hero .hp-stage" not in css or "width: 100vw" not in css, "full-width landing hero rule is missing", failures)
@@ -172,6 +208,14 @@ def main() -> int:
     manifest_path = ROOT / "assets" / "homepage" / "parallax" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     fail_if(tuple(manifest.get("canvas", [])) != EXPECTED_CANVAS, "asset manifest canvas is incorrect", failures)
+    for path in (
+        ROOT / "assets" / "homepage" / "parallax" / "p3" / "01-clean-background-v2.jpg",
+        ROOT / "assets" / "homepage" / "parallax" / "p3" / "03-hero-keyboard-v2.png",
+        ROOT / "assets" / "homepage" / "parallax" / "p3" / "05-brand-interface.webp",
+    ):
+        fail_if(not path.is_file(), f"missing active P3 v2 asset: {path}", failures)
+        if path.is_file():
+            fail_if(image_size(path) != EXPECTED_CANVAS, f"wrong active P3 v2 dimensions: {path}", failures)
     for scene in SCENES:
         source_files = sorted((ROOT / "assets" / "homepage" / "parallax" / "_source" / scene).glob("*.png"))
         delivery_files = sorted((ROOT / "assets" / "homepage" / "parallax" / scene).glob("*.webp"))
@@ -199,8 +243,9 @@ def main() -> int:
 
     print("SECTION HERO QA PASS")
     print("P3 home · P4 library · P5 simulation tools · P8 full course list")
-    print("4 routes · 20 delivery layers · 2 discreet course links · 3 client destinations")
-    print("1672 × 941 source and delivery files verified · no duplicate IDs · safe new-tab navigation")
+    print("4 routes · 18 active delivery layers · 2 discreet course links · 3 client destinations")
+    print("P3 uses 3 registered v2 planes; retired damaged layers remain stored but unreferenced")
+    print("1672 × 941 active, source and delivery files verified · no duplicate IDs · safe new-tab navigation")
     print("noindex/nofollow and index exclusion verified · reduced motion hooks present")
     if layout_report.is_file():
         print("desktop and mobile captures report no horizontal overflow")
