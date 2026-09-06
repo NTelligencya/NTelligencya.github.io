@@ -96,6 +96,7 @@ const SKIP_PATTERNS = [
 const HIDDEN_PREFIXES = [
   '/cdu-ai-staff/',
   '/cdu-teaching-staff/',
+  '/cdu-ict-pd-day/',
   '/roper-gulf/',
   '/alice-springs-arn/',
 ];
@@ -182,6 +183,7 @@ const RULES = [
   // Client areas.
   { prefix: '/cdu-ai-staff/',      section: 'CDU AI Staff Training',      type: 'Client', topic: 'How AI works' },
   { prefix: '/cdu-teaching-staff/', section: 'CDU Teaching Staff',        type: 'Client', topic: 'AI basics & literacy' },
+  { prefix: '/cdu-ict-pd-day/',     section: 'CDU ICT PD Day',            type: 'Client', topic: 'AI basics & literacy' },
   { prefix: '/roper-gulf/',        section: 'Roper Gulf Regional Council', type: 'Client', topic: 'AI basics & literacy' },
   { prefix: '/alice-springs-arn/', section: 'Alice Springs ARN',          type: 'Client', topic: 'Research practice & ethics' },
 

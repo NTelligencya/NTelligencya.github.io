@@ -8,6 +8,9 @@
   var keyboardStage = document.querySelector('[data-scene="home"] .hp-stage');
   var keyboard = keyboardStage ? keyboardStage.querySelector('.hp-home-keyboard') : null;
   var scheduled = false;
+  var parallaxFrame = 0;
+  var parallaxStates = [];
+  var parallaxStateByLayer = new WeakMap();
   var keyboardFrame = 0;
   var keyboardTarget = { x: 0, y: 0, rotation: 0, scale: 1 };
   var keyboardCurrent = { x: 0, y: 0, rotation: 0, scale: 1 };
@@ -24,6 +27,68 @@
     return height;
   }
 
+  function setParallaxTarget(layer, x, y, brightness, halo, haloAlpha) {
+    var state = parallaxStateByLayer.get(layer);
+
+    if (!state) {
+      state = {
+        layer: layer,
+        currentX: x,
+        currentY: y,
+        currentBrightness: brightness,
+        currentHalo: halo,
+        currentHaloAlpha: haloAlpha,
+        targetX: x,
+        targetY: y,
+        targetBrightness: brightness,
+        targetHalo: halo,
+        targetHaloAlpha: haloAlpha
+      };
+      parallaxStateByLayer.set(layer, state);
+      parallaxStates.push(state);
+    }
+
+    state.targetX = x;
+    state.targetY = y;
+    state.targetBrightness = brightness;
+    state.targetHalo = halo;
+    state.targetHaloAlpha = haloAlpha;
+  }
+
+  function applyParallaxMotion() {
+    parallaxFrame = 0;
+    var easing = 0.14;
+    var largestDelta = 0;
+
+    parallaxStates.forEach(function (state) {
+      ['X', 'Y', 'Brightness', 'Halo', 'HaloAlpha'].forEach(function (key) {
+        var currentKey = 'current' + key;
+        var targetKey = 'target' + key;
+        var delta = state[targetKey] - state[currentKey];
+        state[currentKey] += delta * easing;
+        largestDelta = Math.max(largestDelta, Math.abs(delta));
+      });
+
+      state.layer.style.setProperty('--hp-x', state.currentX.toFixed(2) + 'px');
+      state.layer.style.setProperty('--hp-y', state.currentY.toFixed(2) + 'px');
+
+      if (state.layer.classList.contains('hp-glow')) {
+        state.layer.style.setProperty('--hp-bright', state.currentBrightness.toFixed(3));
+        state.layer.style.setProperty('--hp-halo', state.currentHalo.toFixed(1) + 'px');
+        state.layer.style.setProperty('--hp-halo-alpha', state.currentHaloAlpha.toFixed(3));
+      }
+    });
+
+    if (largestDelta > 0.002) {
+      parallaxFrame = window.requestAnimationFrame(applyParallaxMotion);
+    }
+  }
+
+  function requestParallaxMotion() {
+    if (parallaxFrame) return;
+    parallaxFrame = window.requestAnimationFrame(applyParallaxMotion);
+  }
+
   function update() {
     scheduled = false;
     var viewportHeight = window.innerHeight;
@@ -33,7 +98,14 @@
       var rect = chapter.getBoundingClientRect();
       if (rect.bottom < -viewportHeight || rect.top > viewportHeight * 2) return;
 
-      var travel = Math.max(1, rect.height - viewportHeight + headerHeight);
+      /* Full-width page heroes are usually shorter than the viewport. Using
+         the sticky-chapter travel formula made their entire motion range
+         collapse into a single scroll pixel. Let them travel across their
+         own visible height instead. */
+      var isPageHero = chapter.classList.contains('hp-page-hero');
+      var travel = isPageHero
+        ? Math.max(1, rect.height)
+        : Math.max(1, rect.height - viewportHeight + headerHeight);
       var progress = clamp((headerHeight - rect.top) / travel);
       var centred = (progress - 0.5) * 2;
       var motion = Number(chapter.getAttribute('data-motion') || 1);
@@ -41,20 +113,27 @@
 
       chapter.querySelectorAll('[data-depth]').forEach(function (layer) {
         var depth = Number(layer.getAttribute('data-depth') || 0);
-        layer.style.setProperty('--hp-x', (centred * depth * -28 * motion).toFixed(2) + 'px');
-        layer.style.setProperty('--hp-y', (centred * depth * 115 * motion).toFixed(2) + 'px');
+        var x = centred * depth * -28 * motion;
+        var y = centred * depth * 115 * motion;
+        var brightness = 1;
+        var halo = 0;
+        var haloAlpha = 0;
 
         if (layer.classList.contains('hp-glow')) {
           var lift = clamp((progress - 0.12) / 0.62);
           var brightnessGain = scene === 'tools' ? 0.18 : 0.14;
           var haloSize = scene === 'tools' ? 22 : 18;
-          var haloAlpha = scene === 'tools' ? 0.26 : 0.22;
-          layer.style.setProperty('--hp-bright', (1 + lift * brightnessGain).toFixed(3));
-          layer.style.setProperty('--hp-halo', (lift * haloSize).toFixed(1) + 'px');
-          layer.style.setProperty('--hp-halo-alpha', (lift * haloAlpha).toFixed(3));
+          var haloAlphaMax = scene === 'tools' ? 0.26 : 0.22;
+          brightness = 1 + lift * brightnessGain;
+          halo = lift * haloSize;
+          haloAlpha = lift * haloAlphaMax;
         }
+
+        setParallaxTarget(layer, x, y, brightness, halo, haloAlpha);
       });
     });
+
+    requestParallaxMotion();
 
     var pageTravel = Math.max(1, document.documentElement.scrollHeight - viewportHeight);
     document.documentElement.style.setProperty('--hp-site-progress', clamp(window.scrollY / pageTravel).toFixed(4));

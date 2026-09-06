@@ -427,3 +427,85 @@ all TOC anchors resolve, no horizontal overflow at 1440px, no page errors.
 The two decks were NOT rewritten; their register is the walkthrough-deck
 register, which is a different job. Worth checking with SD whether they need
 the same treatment.
+
+## ICT, CS and Digital PD Day (6 September 2026)
+
+`/cdu-ict-pd-day/index.html`, a plain procedure page for SD's one-day Claude
+Cowork session with the CDU TAFE ICT, Cyber Security and Digital team, requested
+by the team leader ("you need to show us the workflow you used"). It is a client
+area: `noindex,nofollow`, in `HIDDEN_PREFIXES` and `RULES` in
+`tools/build-index.js`, reached only from the card "ICT, CS and Digital PD Day"
+on `/client-access/` (that page moved from a three-column to a two-by-two grid
+to hold four cards).
+
+HISTORY, worth knowing before touching it: the first version, built the same
+morning with the `nateherk-design:scroll-craft` plugin (pinned scenes, an
+unfolding card deck over parallax ridges, cue crossfades, counters), was
+rejected by SD within the hour as "gimmicky marketing look and feel ... I'm not
+selling them the solution, I'm showing them HOW TO DO the solution". The page
+was rebuilt as a procedure: numbered phases, what goes in, what you do, the full
+skill file, what comes out, what you check. Two pieces of the first version
+survived at SD's explicit request and must stay: the "Populate the templates"
+slide (serif title left, the colour-coded ICTCBL303 folder tree right, with the
+set-up-once / one-input / written-by-the-pipeline legend), now the opener of
+phase 4; and the "Where the person steered" section, three stories with Cowork
+screenshots, which SD called "exactly what I wanted to explain to them". The
+scroll-craft build is archived at
+`~/Desktop/Websites/scrollcraft-workspace/builds/cdu-cowork-pd/` and is not
+served anywhere.
+
+Files: `index.html`, `doc.css`, `doc.js` (two enhancements only: "Show the
+whole file" on each skill block, and the current section marked in the contents
+list), `assets/` (three Cowork screenshots from the vault's PD notes folder, the
+skill file-list screenshot, and three illustration-phase screenshots SD supplied
+on 6 September 2026: a round-one draft in the review viewer and the two pages of
+the ICTCBL323 proof sheet). Self-contained, no shared `styles.css`, like the
+other decks and client pages. FOURTH deliberate exception to the
+no-page-CSS-or-JS rule, alongside `/references/`, `/index/` and `/flashcards/`.
+The page is generated: the source of truth for the copy is
+`tools/pd-day/build-pd-doc.py`, which reads the five skill texts from
+`tools/pd-day/skills/` and writes `index.html`. Edit the generator and rerun it
+rather than editing `index.html` by hand, or the next run will overwrite the
+hand edit. The generator does not write the social/icon block that
+`tools/add-meta.js` adds, so after a regenerate run `node tools/add-meta.js`
+if that block is wanted (the page is noindex, so it matters little); check
+add-meta's report for unrelated pages it touches before committing.
+
+Structure: title; contents (sticky on desktop); Before you start (chat against
+Cowork, what a skill is with the "made by doing it first, then create-skill"
+pattern SD described, the workspace tree, the eight inputs Claude needs, the
+one numbering rule); Phases 1 to 5 (map, build the tools, pre-validate,
+populate the templates, illustrate in ChatGPT Codex), each with Produces, What
+goes in, What you do (numbered steps with example prompts), the full SKILL.md in
+a scrollable code block (verbatim from the vault copies in
+`TAFE Mapping/3. TAFE Mapping Claude Skills and files/` and
+`4. Example CTCBL322 Mapping/`, plus the Codex skill SD pasted in chat), What
+came out, What you check; the phase 4 template-quirks catalogue is shown as a
+second block; phase 5 also carries SD's account of the second pass (the model
+preferred vector diagrams to photographs, about half of round-one drafts failed
+the model's own verification, label placement and wire routing had to be
+checked image by image on the proof sheet, SME review essential) with the
+proof-sheet figures; Where the person steered; What the SME and program area still
+supply; The next unit with the first prompt. Every figure comes from the vault
+(`TAFE Mapping/CLAUDE.md`, the PD notes, the ICTCBL303 folder); the only
+prompts on the page are labelled "for example", and the Codex ones are the
+skill's own "typical requests".
+
+CONTENT RULES SD set on 6 September 2026, in her words: procedural, not
+promotional ("here's the info we have that Claude needs"); no pull-quotes from
+the skill files ("feels like a customer testimony"); the whole skill on screen
+("putting little quotes from the MD skill isn't actually going to teach them
+anything"); phases, starting from "Phase one, I mapped the unit, instructing
+Claude by providing the type of guidance from a unit design TAE course. Once
+Claude had it right I used skill creator to make unit mapping a skill."
+
+Verified 6 September 2026 on the repo copy: 1440x900, 1280x720 and 390x844
+screenshots of every section, no horizontal overflow at any size (the trees and
+tables scroll inside their own boxes), console clean, no em dashes outside the
+verbatim skill files (which contain none either). Not tested on a real phone or
+a projector.
+
+Still open for SD: the mapping skill's vault copy has an empty "Included Files"
+heading where an Obsidian screenshot embed sat; the screenshot is shown beside
+the "What a skill is" text instead. The ISO 24495-1 plain-language skill idea
+and the Hugging Face transcript from the PD notes folder are not on the page.

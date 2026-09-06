@@ -1618,6 +1618,20 @@ footer.site {
 .plate-band-md { max-height: 300px; }
 .plate-band-lg { max-height: 360px; }
 
+/* Topic heroes use a genuinely wide source and show the complete framed
+   artwork. This is intentionally opt-in: portrait plates belong in square
+   or inset treatments, not stretched across a page header. */
+.plate-band.plate-band-topic-hero {
+  height: clamp(240px, 38vw, 620px);
+  max-height: none;
+  aspect-ratio: auto;
+}
+
+.plate-band-topic-hero img {
+  object-fit: contain;
+  object-position: center;
+}
+
 /* Headline and standfirst, set on flat ground below the band. */
 .plate-band-text { padding: 44px 0 0; }
 
@@ -1992,4 +2006,173 @@ footer.site.footer-plate > .container { padding-top: 52px; }
 @media (max-width: 540px) {
   .plate-row { grid-template-columns: 72px 1fr; gap: 14px; }
   .plate-inset { width: 72px; height: 72px; }
+}
+
+
+/* ============================================================
+   26. TOPIC-FIRST LIBRARY
+   ============================================================ */
+
+.library-topic-intro {
+  padding-top: clamp(54px, 7vw, 92px);
+  padding-bottom: clamp(42px, 5vw, 68px);
+}
+
+.library-topic-intro h2 {
+  max-width: 900px;
+  margin: 14px 0 18px;
+  font-size: clamp(44px, 6.4vw, 78px);
+  line-height: .96;
+  letter-spacing: -.02em;
+}
+
+.library-topic-intro p {
+  max-width: 760px;
+  font-size: clamp(16px, 1.7vw, 19px);
+  line-height: 1.75;
+}
+
+.library-anchor-alias {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.library-topic-atlas {
+  columns: 2;
+  column-gap: clamp(28px, 4vw, 54px);
+  padding-bottom: clamp(48px, 7vw, 96px);
+}
+
+.library-topic-cluster {
+  display: inline-block;
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 clamp(42px, 6vw, 72px);
+  break-inside: avoid;
+  vertical-align: top;
+  border-top: 1px solid rgba(77, 220, 220, .24);
+  scroll-margin-top: 176px;
+}
+
+.library-topic-art {
+  position: relative;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(77, 220, 220, .20);
+  background: #030405;
+}
+
+.library-topic-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10, 10, 12, .70), transparent 58%);
+  pointer-events: none;
+}
+
+.library-topic-art picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.library-topic-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.library-topic-cluster--cyber .library-topic-art img { object-position: 54% 50%; }
+.library-topic-cluster--ai .library-topic-art img { object-position: 57% 50%; }
+
+.library-topic-copy { padding: 24px 0 8px; }
+
+.library-topic-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.library-topic-heading h2 {
+  margin: 0;
+  font-size: clamp(30px, 3.4vw, 44px);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.library-topic-count {
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.library-topic-list {
+  list-style: none;
+}
+
+.library-topic-list li + li {
+  border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.library-topic-list a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: baseline;
+  padding: 13px 0;
+  color: #dfe3e2;
+  text-decoration: none;
+}
+
+.library-topic-list a > span {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.library-topic-list small {
+  color: var(--text-3);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.35;
+  letter-spacing: .06em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.library-topic-list a:hover,
+.library-topic-list a:focus-visible {
+  color: var(--accent-2);
+}
+
+.library-topic-list a:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 5px;
+}
+
+@media (max-width: 860px) {
+  .library-topic-atlas { columns: 1; }
+  .library-topic-cluster { scroll-margin-top: 132px; }
+}
+
+@media (max-width: 600px) {
+  .library-topic-heading {
+    align-items: flex-end;
+  }
+
+  .library-topic-list a {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .library-topic-list small { text-align: left; }
 }
