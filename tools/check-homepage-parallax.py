@@ -15,7 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_CANVAS = (1672, 941)
 SCENES = ("p3", "p4", "p5", "p8")
-COURSE_ROUTES = ("/cdu-ai-staff/", "/cdu-teaching-staff/", "/roper-gulf/")
+COURSE_ROUTES = ("/cdu-ai-staff/", "/cdu-teaching-staff/", "/cdu-ict-pd-day/", "/roper-gulf/")
 
 
 class PageAudit(HTMLParser):
@@ -119,6 +119,7 @@ def main() -> int:
         "library": ROOT / "library" / "index.html",
         "courses": ROOT / "courses" / "index.html",
         "tools": ROOT / "simulations" / "index.html",
+        "flashcards": ROOT / "flashcards" / "index.html",
     }
     html = {name: path.read_text(encoding="utf-8") for name, path in pages.items()}
     hub = (ROOT / "client-access" / "index.html").read_text(encoding="utf-8")
@@ -141,6 +142,7 @@ def main() -> int:
         "library": ("p4", ("01-clean-background.webp", "02-midground-trees-fence.webp", "04-foreground-earth-circuitry.webp", "03-hero-processor.webp", "05-brand-interface.webp")),
         "courses": ("p8", ("01-clean-background.webp", "02-midground-trees-fence.webp", "04-foreground-earth-circuitry.webp", "03-hero-stone-qr.webp", "05-brand-interface.webp")),
         "tools": ("p5", ("01-clean-background.webp", "02-midground-trees-fence.webp", "04-foreground-earth-circuitry.webp", "03-hero-glass-envelope.webp", "05-brand-interface.webp")),
+        "flashcards": ("p8", ("01-clean-background.webp", "02-midground-trees-fence.webp", "04-foreground-earth-circuitry.webp", "03-hero-stone-qr.webp", "05-brand-interface.webp")),
     }
     all_layers: list[dict[str, str]] = []
     for name, (scene, expected_files) in expected_scene.items():
@@ -155,7 +157,7 @@ def main() -> int:
             fail_if((image.get("width"), image.get("height")) != ("1672", "941"), f"wrong HTML dimensions: {source}", failures)
             fail_if(f"/parallax/{scene}/" not in image.get("src", ""), f"wrong scene layer on {name}: {image.get('src')}", failures)
 
-    fail_if(len(all_layers) != 18, f"expected 18 active layers across four landing pages, found {len(all_layers)}", failures)
+    fail_if(len(all_layers) != 23, f"expected 23 active layers across five landing pages, found {len(all_layers)}", failures)
     fail_if(any(retired in html["home"] for retired in ("02-midground-trees-fence.webp", "03-hero-keyboard.webp", "04-foreground-earth-circuitry.webp")), "homepage still references a retired damaged P3 layer", failures)
     fail_if(any(marker in html["home"] for marker in ('id="workshops"', 'id="training-games"', 'id="courses"', 'id="about"', '/parallax/p4/', '/parallax/p5/', '/parallax/p8/')), "homepage contains content assigned to a subsection", failures)
     fail_if('id="menu"' not in html["home"] or 'id="site-search-mount"' not in html["home"], "homepage Main Menu or search is missing", failures)
@@ -205,6 +207,9 @@ def main() -> int:
     fail_if("pointerX * 4" not in js or "lift * -8" not in js, "keyboard motion range is not ±4px by 0 to -8px", failures)
     fail_if('data-motion="1.15"' not in html["tools"], "P5 movement multiplier is missing", failures)
     fail_if("scene === 'tools' ? 0.18 : 0.14" not in js, "P4/P5 glow gains are missing", failures)
+    fail_if(js.count("data-pointer-motion") < 2, "pointer-responsive page-hero hooks are missing", failures)
+    for name in ("library", "courses", "tools", "flashcards"):
+        fail_if("data-pointer-motion" not in html[name], f"pointer motion is missing on {name}", failures)
     fail_if(".hp-page-hero .hp-stage" not in css or "width: 100vw" not in css, "full-width landing hero rule is missing", failures)
 
     manifest_path = ROOT / "assets" / "homepage" / "parallax" / "manifest.json"
@@ -244,8 +249,8 @@ def main() -> int:
         return 1
 
     print("SECTION HERO QA PASS")
-    print("P3 home · P4 library · P5 simulation tools · P8 full course list")
-    print("4 routes · 18 active delivery layers · 2 discreet course links · 3 client destinations")
+    print("P3 home · P4 library · P5 simulation tools · P8 full course list and flashcards")
+    print("5 routes · 23 active delivery layers · 2 discreet course links · 4 client destinations")
     print("P3 uses 3 registered v2 planes; retired damaged layers remain stored but unreferenced")
     print("1672 × 941 active, source and delivery files verified · no duplicate IDs · safe new-tab navigation")
     print("noindex/nofollow and index exclusion verified · reduced motion hooks present")

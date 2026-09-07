@@ -52,7 +52,9 @@ const SKIP_DIRS = new Set([
      foot    the footer plate, shown whole.                                */
 const PLATES = {
   'presentations':    { type: 'band', plate: 'hero-keyboard-closeup', band: 'topic-hero', foot: 'banner-mouse-lightbulb-keyboard' },
-  'flashcards':       { type: 'band', plate: 'hero-keyboard-closeup', band: 'topic-hero', foot: 'footer-keyboard-data-monogram' },
+  // Flashcards owns a hand-authored registered QR parallax scene. Maintain
+  // its footer only so future generator runs cannot replace that hero.
+  'flashcards':       { type: 'none', foot: 'footer-keyboard-data-monogram' },
   'resources':        { type: 'band', plate: 'banner-mouse-lightbulb-keyboard', band: 'md', foot: 'footer-mouse-lightbulb-monogram' },
   'references':       { type: 'band', plate: 'hero-motherboard-chip1', band: 'topic-hero', foot: 'footer-data-table-monogram' },
   'index':            { type: 'band', plate: 'banner-wordmark-usb', band: 'sm',   foot: 'footer-data-table-monogram' },

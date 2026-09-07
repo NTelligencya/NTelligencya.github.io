@@ -11,6 +11,7 @@
   var parallaxFrame = 0;
   var parallaxStates = [];
   var parallaxStateByLayer = new WeakMap();
+  var pointerStateByChapter = new WeakMap();
   var keyboardFrame = 0;
   var keyboardTarget = { x: 0, y: 0, rotation: 0, scale: 1 };
   var keyboardCurrent = { x: 0, y: 0, rotation: 0, scale: 1 };
@@ -110,11 +111,14 @@
       var centred = (progress - 0.5) * 2;
       var motion = Number(chapter.getAttribute('data-motion') || 1);
       var scene = chapter.getAttribute('data-scene');
+      var pointer = pointerStateByChapter.get(chapter) || { x: 0, y: 0 };
 
       chapter.querySelectorAll('[data-depth]').forEach(function (layer) {
         var depth = Number(layer.getAttribute('data-depth') || 0);
-        var x = centred * depth * -28 * motion;
-        var y = centred * depth * 115 * motion;
+        var pointerX = isPageHero ? pointer.x * depth * 42 * motion : 0;
+        var pointerY = isPageHero ? pointer.y * depth * 28 * motion : 0;
+        var x = centred * depth * -28 * motion + pointerX;
+        var y = centred * depth * 115 * motion + pointerY;
         var brightness = 1;
         var halo = 0;
         var haloAlpha = 0;
@@ -143,6 +147,26 @@
     if (scheduled) return;
     scheduled = true;
     window.requestAnimationFrame(update);
+  }
+
+  function updateChapterPointer(event) {
+    var stage = event.currentTarget;
+    var chapter = stage.closest('[data-pointer-motion]');
+    if (!chapter) return;
+
+    var rect = stage.getBoundingClientRect();
+    pointerStateByChapter.set(chapter, {
+      x: clamp((event.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1,
+      y: clamp((event.clientY - rect.top) / Math.max(1, rect.height)) * 2 - 1
+    });
+    requestUpdate();
+  }
+
+  function resetChapterPointer(event) {
+    var chapter = event.currentTarget.closest('[data-pointer-motion]');
+    if (!chapter) return;
+    pointerStateByChapter.set(chapter, { x: 0, y: 0 });
+    requestUpdate();
   }
 
   function applyKeyboardMotion() {
@@ -205,6 +229,13 @@
     keyboardStage.addEventListener('pointermove', updateKeyboardTarget, { passive: true });
     keyboardStage.addEventListener('pointerleave', resetKeyboardTarget);
     keyboardStage.addEventListener('pointercancel', resetKeyboardTarget);
+  }
+  if (finePointer && !reducedMotion) {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-pointer-motion] .hp-stage'), function (stage) {
+      stage.addEventListener('pointermove', updateChapterPointer, { passive: true });
+      stage.addEventListener('pointerleave', resetChapterPointer);
+      stage.addEventListener('pointercancel', resetChapterPointer);
+    });
   }
   update();
 }());

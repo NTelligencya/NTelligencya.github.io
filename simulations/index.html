@@ -30,6 +30,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&amp;family=Manrope:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=20260906-hero-repair-2">
 <link rel="stylesheet" href="/homepage-parallax.css">
 <style>
   :root {
@@ -56,11 +57,12 @@
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
   }
+  .homepage-parallax header.site { font-family: "Manrope", sans-serif; }
 
   /* ---------- Nav ---------- */
-  nav {
+  .simulation-section-nav {
     position: sticky;
-    top: 0;
+    top: var(--hp-header-height);
     z-index: 10;
     background: rgba(6,6,6,0.94);
     border-top: 1px solid var(--teal-faint);
@@ -75,13 +77,13 @@
     font-size: 1.02rem;
     letter-spacing: 0.05em;
   }
-  nav a {
+  .simulation-section-nav a {
     color: var(--grey-dim);
     text-decoration: none;
     transition: color 0.2s ease, text-shadow 0.2s ease;
   }
-  nav a:hover { color: var(--teal-bright); text-shadow: 0 0 14px rgba(26,201,201,0.6); }
-  nav .home { color: var(--teal); }
+  .simulation-section-nav a:hover { color: var(--teal-bright); text-shadow: 0 0 14px rgba(26,201,201,0.6); }
+  .simulation-section-nav .home { color: var(--teal); }
 
   /* ---------- Layout ---------- */
   main { max-width: 1080px; margin: 0 auto; padding: 4rem 1.5rem 5rem; }
@@ -260,9 +262,30 @@
 </head>
 <body class="homepage-parallax">
 <a class="hp-skip" href="#simulation-content">Skip to content</a>
+<div class="noise-overlay"></div>
+<header class="site">
+  <div class="container site-inner">
+    <a class="brand" href="/">
+      <div class="brand-mark"></div>
+      <span class="brand-name">ntworld<span class="dot">.</span>ink</span>
+    </a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="/">Home</a>
+      <a href="/library/">Library</a>
+      <a href="/library/#workshops">Workshops</a>
+      <a href="/library/#training-games">Training Games</a>
+      <a href="/simulations/">Tools</a>
+      <a href="/library/#presentations">Presentations</a>
+      <a href="/resources/">Resources</a>
+      <a href="/flashcards/">Flashcards</a>
+      <a href="/index/">Index</a>
+      <a href="/library/#about">About</a>
+    </nav>
+    <span class="hp-progress" aria-hidden="true"><i></i></span>
+  </div>
+</header>
 
-
-<section class="hp-chapter hp-page-hero" id="parallax-tools" data-scene="tools" data-motion="1.15" aria-labelledby="hp-tools-title">
+<section class="hp-chapter hp-page-hero" id="parallax-tools" data-scene="tools" data-motion="1.15" data-pointer-motion aria-labelledby="hp-tools-title">
   <div class="hp-sticky">
     <div class="hp-stage">
       <img class="hp-layer hp-background" data-depth="0" src="/assets/homepage/parallax/p5/01-clean-background.webp" width="1672" height="941" alt="" fetchpriority="high">
@@ -277,7 +300,7 @@
   </div>
 </section>
 
-  <nav>
+  <nav class="simulation-section-nav" aria-label="Simulation categories">
     <a class="home" href="/">&larr; ntworld.ink</a>
     <a href="#ai-workshop">AI Workshop</a>
     <a href="#it-cyber">IT &amp; Cyber</a>
