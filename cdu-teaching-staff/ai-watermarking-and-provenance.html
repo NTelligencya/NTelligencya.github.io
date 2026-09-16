@@ -168,13 +168,13 @@
       <div class="main">
 
         <section class="content-section">
-          <h2>Branding something with no physical form</h2>
+          <h2>Why text is hard to watermark</h2>
           <p>The word watermark comes from paper. Hold a banknote to the light and a face appears, pressed into the fibres; the mark is part of the physical object and you cannot copy the note without copying the mark. That is the mental picture most people carry into any conversation about watermarking, and it is the wrong one for plain text. Digital text has no fibres and no substrate. A paragraph is just a sequence of characters, and any character you could hide inside it, an invisible space, a swapped quotation mark, a zero-width joiner, can be stripped out by pasting the text into a plain editor. If a watermark were a hidden character, defeating it would take three seconds.</p>
           <p>So the providers did something less obvious. Rather than adding a mark on top of the words, they changed how the words themselves are chosen, so that the mark is carried by the visible text and cannot be removed without rewriting it. Understanding that idea is the whole of this section, and it matters at a university because the same mechanism is now being read, by staff and by software, as if it answered a question it cannot answer: did a person write this.</p>
         </section>
 
         <section class="content-section">
-          <h2>Two different things are called a watermark</h2>
+          <h2>Two kinds of watermark: files and text</h2>
           <p>A generated image and a piece of generated text are marked in two completely different ways, and mixing them up is where most of the online confusion starts. Files get a label attached to them. Text gets no label at all; the mark is the writing itself.</p>
 
           <div class="compare-grid">
@@ -193,11 +193,10 @@
               <div class="pfoot">You cannot strip it without rewriting the sentences, because there is no separate layer to strip. A full rewrite, or a task that leaves the model little choice of words, does weaken it.</div>
             </div>
           </div>
-          <p>The two halves of this page take each in turn: the label first, because it is the easier idea and the one most people have already met without knowing it, then the text mark, which is the one causing the argument.</p>
         </section>
 
         <section class="content-section">
-          <h2>Files: a signed label, unpacked</h2>
+          <h2>How files are marked: signed metadata explained</h2>
           <p>Every digital photo already carries a label you never see. Take a picture on a phone and the file quietly records the camera model, the date and time, and often the location. That hidden label is called <strong>metadata</strong>, literally data about the data, and you can read it yourself by right-clicking a photo and choosing Get Info on a Mac or Properties on Windows. The trouble with an ordinary label is that anyone can change it with a free tool in a few seconds, so on its own it proves nothing about where the picture came from.</p>
           <p>The C2PA standard, from the Coalition for Content Provenance and Authenticity, adds two things to that label. First, it records more: which app or AI model created the file, what edits were made and with what, in a structured list the standard calls a manifest. Second, and this is the part the word "signed" refers to, it <strong>seals</strong> the label. The seal is a digital signature: a short code calculated from the exact contents of the file and the label together, using a private key that only the signer holds, whether that is Anthropic, Adobe, a camera maker or a newsroom. Change a single pixel, or a single word in the label, and the code no longer matches, and any checking tool can see that it does not match. Think of the tamper-evident band on a medicine bottle: cheap for anyone to check, obvious when broken, and only the manufacturer can fit an intact one. The checker needs no secret to verify the seal, only the signer's public certificate, which is why the standard is open and anyone can build a reader.</p>
 
@@ -256,8 +255,8 @@
 
           <p>That fragility is the reason the label is described as designed for cooperative systems: platforms that agree to keep the label and readers that agree to check it. It was never built to withstand someone who wants the mark gone. Anthropic's own help article lists the same losses: format conversion, re-saving and screenshots can all remove the metadata, and a missing label does not mean a file was not made with AI.</p>
 
-          <h3>Check a file yourself</h3>
-          <p>Two free readers are worth showing a room. The Content Credentials <a href="https://verify.contentauthenticity.org/" target="_blank" rel="noopener">Verify tool</a>, reached from the Verify link on <a href="https://contentcredentials.org/" target="_blank" rel="noopener">contentcredentials.org</a>, reads any C2PA label, whoever signed it, and shows the same panel as the penguin example above for any file you drop in.</p>
+          <h3>How to check a file</h3>
+          <p>Two free tools will read the label for you. The Content Credentials <a href="https://verify.contentauthenticity.org/" target="_blank" rel="noopener">Verify tool</a>, reached from the Verify link on <a href="https://contentcredentials.org/" target="_blank" rel="noopener">contentcredentials.org</a>, reads any C2PA label, whoever signed it, and shows the same panel as the penguin example above for any file you drop in.</p>
 
           <figure class="figure">
             <div class="exhibit">
@@ -272,33 +271,33 @@
             <div class="exhibit dark">
               <picture><source srcset="exhibit-claude-check-files.webp" type="image/webp"><img src="exhibit-claude-check-files.jpg" alt="The claude.com Check if a file was made with Claude page. Left: 'What the tool does': the tool checks a file for a Content Credential from Claude; if it finds one, that tells you Claude may have made or processed the file; it does not tell you who authored the underlying content and carries no identifying information about the user; the tool does not check text. Right: a drag-and-drop box, 'Check a file', listing supported formats JPG, PNG, GIF, WEBP, TIFF, HEIC, AVIF, SVG, DNG, JXL, MP4, MOV, AVI, WAV, MP3, M4A, FLAC up to 100 MB, and a note that the tool runs in your browser and the file never leaves your device."></picture>
             </div>
-            <figcaption>Anthropic's free file checker at <a class="fig-link" href="https://claude.com/check-files" target="_blank" rel="noopener">claude.com/check-files</a>, captured 16 September 2026. Note the two limits on its own page: it does not identify the author, and it does not check text.</figcaption>
+            <figcaption>Anthropic's free file checker at <a class="fig-link" href="https://claude.com/check-files" target="_blank" rel="noopener">claude.com/check-files</a>, captured 16 September 2026. Its own page states two limits: it does not identify the author, and it does not check text.</figcaption>
           </figure>
         </section>
 
         <section class="content-section">
-          <h2>Text: the mark is the words</h2>
+          <h2>How text is marked: the mark is in the words themselves</h2>
           <p>The common assumption on developer forums is that AI text watermarking is a bag of formatting tricks: hidden Unicode, zero-width spaces, curly quotes standing in for straight ones. It is a reasonable guess, and it is wrong, for the reason given at the top of the page: anything sitting on top of the text washes out the moment the text is retyped or pasted as plain characters.</p>
           <div class="callout callout-key">
-            <div class="callout-title">The Notepad test</div>
+            <div class="callout-title">Why copying and pasting does not remove it</div>
             <p>If a text watermark were a hidden character or a swapped curly quote, copying the words into a plain-text editor would strip the formatting and destroy it in seconds. That is exactly the test a text watermark has to survive, and it does, because the mark is not sitting on top of the words. It is which words got chosen in the first place. Anthropic describes it the same way: the watermark "will travel with the text when it's copied and pasted elsewhere, and may persist through some editing".</p>
           </div>
           <p>The text watermark is not a layer on top of the words. The mark <em>is</em> the words. When a provider says the mark is woven into the text, it means the mark consists of the actual visible word choices the model made while writing. You cannot remove it without genuinely rewriting the sentences, which is a very different level of effort from running a find-and-replace.</p>
         </section>
 
         <section class="content-section">
-          <h2>Green lists, red lists and the z-score</h2>
+          <h2>How the text watermark works: green lists, red lists and the z-score</h2>
           <p>To see how word choices can carry a hidden pattern without turning the writing into nonsense, you have to look at how a language model produces text. It does not plan a paragraph; it predicts one token, usually a word or word fragment, at a time, choosing from a ranked list of likely next tokens. A watermark intercepts that exact moment.</p>
-          <p>The clearest published account is the scheme by Kirchenbauer and colleagues, presented at ICML in 2023, and it is the one used to teach the idea here. Freeze the moment before the model writes its next word. Suppose the text so far is "the night sky was incredibly". The model has computed probabilities for thousands of possible next words: perhaps <em>dark</em>, <em>clear</em>, <em>beautiful</em>, <em>vast</em>, each a perfectly acceptable continuation. Without a watermark, it samples from that ranked list and continues. With a watermark, a step is inserted first: a pseudo-random generator, seeded by a secret key and by the preceding words, splits the entire vocabulary into a green list and a red list for this one position. The algorithm then nudges the model toward a green-list word. If the model's favourite, <em>dark</em>, is on the red list, it is quietly passed over in favour of the best available green word, say <em>beautiful</em>. A reader sees nothing unusual; the sentence still reads well.</p>
+          <p>The clearest published account is the scheme by Kirchenbauer and colleagues, presented at ICML in 2023, and it is the version explained on this page. Freeze the moment before the model writes its next word. Suppose the text so far is "the night sky was incredibly". The model has computed probabilities for thousands of possible next words: perhaps <em>dark</em>, <em>clear</em>, <em>beautiful</em>, <em>vast</em>, each a perfectly acceptable continuation. Without a watermark, it samples from that ranked list and continues. With a watermark, a step is inserted first: a pseudo-random generator, seeded by a secret key and by the preceding words, splits the entire vocabulary into a green list and a red list for this one position. The algorithm then nudges the model toward a green-list word. If the model's favourite, <em>dark</em>, is on the red list, it is quietly passed over in favour of the best available green word, say <em>beautiful</em>. A reader sees nothing unusual; the sentence still reads well.</p>
           <p>The signal only appears over distance. Across hundreds of words, watermarked text lands on green-list words far more often than chance would produce, because a thumb was on the scale at every step. A detector holding the same secret key can replay the split at each position, count how often the text used a green word, and compare that to the roughly half-and-half a person writing freely would produce. That comparison is expressed as a z-score, a measure of how many standard deviations the green-word count sits above what chance predicts. A z-score near zero looks human; a high z-score says the text follows the provider's pattern.</p>
           <div class="callout">
-            <div class="callout-title">Why nobody notices while reading</div>
+            <div class="callout-title">Why the writing still reads naturally</div>
             <p>Think of the party game Taboo: your card says "brain", but the five most obvious words are banned, so you end up saying "the squishy grey computer inside your bone helmet". The sentence still makes sense; it is just steered away from the writer's absolute first choice, over and over, in a pattern only someone holding the same secret key can measure.</p>
           </div>
         </section>
 
         <section class="content-section">
-          <h2>See the mark form</h2>
+          <h2>Demonstration: watch the watermark build up</h2>
           <p>Step through the same sentence twice. With the watermark switched off, the model takes its top-ranked word at each step, and the green words fall where they may, so the z-score drifts around zero. Switch the watermark on and the model is pushed onto the green list at each step; the green count climbs and the z-score rises, all while the sentence still reads normally.</p>
 
           <div class="wm" id="wm-demo">
@@ -325,19 +324,19 @@
           <p>A worked number gives the scale. Score 300 words with the vocabulary split half and half, and chance predicts about 150 green words. Find 190 and the count sits 4.6 standard deviations above chance. The paper treats anything above a z-score of 4 as detected; an unmarked writer reaches that by chance roughly three times in 100,000. Ten words, as in the demo above, are far too few for a real detector; the mark is a property of long passages.</p>
 
           <div class="callout callout-key">
-            <div class="callout-title">What the z-score is, and is not</div>
+            <div class="callout-title">What the z-score does and does not measure</div>
             <p>A high z-score is good evidence that text passed through a watermarking model. It is not a measure of how much of the text the model wrote, it carries no record of the prompt, and it cannot tell generating an essay from scratch apart from fixing the punctuation in one a person wrote. It answers "did this text go through the model", not "who is the author".</p>
           </div>
         </section>
 
         <section class="content-section">
-          <h2>What the real systems do: SynthID, and now Claude</h2>
-          <p>The green-list scheme above is the simplest published version of the idea. The system actually in production is Google DeepMind's <strong>SynthID-Text</strong>, described in <em>Nature</em> in October 2024 and running inside the Gemini app since then. Instead of a single green list, it runs a small elimination "tournament" among the candidate words at each step, with the secret key deciding the winners; the detector then scores how consistently the text follows the key's preferences. The teaching model and the production model share the same shape: a secret key nudges word choice during writing, and a detector with the key counts how far the text sits above chance.</p>
+          <h2>The systems in use: Google's SynthID, now also in Claude</h2>
+          <p>The green-list scheme above is the simplest published version of the idea, and the one the playground at the end of this page uses. The system actually in production is Google DeepMind's <strong>SynthID-Text</strong>, described in <em>Nature</em> in October 2024 and running inside the Gemini app since then. Instead of a single green list, it runs a small elimination "tournament" among the candidate words at each step, with the secret key deciding the winners; the detector then scores how consistently the text follows the key's preferences. The simpler scheme and the production system share the same shape: a secret key nudges word choice during writing, and a detector with the key counts how far the text sits above chance.</p>
           <p>On 14 August 2026 Anthropic said that Claude's text mark uses this same SynthID-Text approach rather than a scheme of its own, that the mark is applied to all supported models worldwide, and that it applies globally "because we don't yet have a durable way to scope it by region". The same post sets out the limits in the provider's own words: light editing does not remove the mark completely, but a full rewrite does; a translation carries the mark, because every word of it was chosen by Claude; the mark is sparser on factual passages where the word choices are constrained; and it is minimal in code, where exact output is required, although comments inside code may carry it. Those are vendor statements about a vendor's own tool, and independent confirmation does not yet exist; they are also consistent with the published research, which is why they are repeated here.</p>
 
           <div class="compare-grid">
             <div class="compare-col col-yes">
-              <div class="compare-col-label">Green list / red list (teaching model)</div>
+              <div class="compare-col-label">Green list / red list (the simpler published scheme)</div>
               <div class="prow">Splits the candidate words into two lists, nudges toward one</div>
               <div class="prow">Detected via a z-score on the green-word rate</div>
               <div class="prow">Kirchenbauer and colleagues, ICML 2023; the basis of the playground at the end of this page</div>
@@ -352,7 +351,7 @@
         </section>
 
         <section class="content-section">
-          <h2>A third kind of mark: written into the pixels</h2>
+          <h2>Image watermarks: a mark written into the pixels</h2>
           <p>For images, SynthID takes the other road from C2PA: instead of a label riding alongside the file, it alters the pixels themselves, invisibly, in a pattern its detector can find later. Google says the mark does not change visible image quality and is designed to survive cropping, filters and lossy compression, the exact operations that strip a C2PA label. That is a vendor claim about robustness, but the design idea matters: a mark woven into the content survives what a mark attached to the content does not. It is the same philosophy the text mark applies to words.</p>
 
           <figure class="figure">
@@ -364,9 +363,9 @@
         </section>
 
         <section class="content-section">
-          <h2>Where the mark is strong, and where it thins to nothing</h2>
+          <h2>When the text watermark fails: code, reformatting and rewriting</h2>
           <p>Whether the text watermark holds depends on how much freedom the model had while writing, a quantity information theory calls entropy: the number of reasonable choices available at each step. Where entropy is high the mark is robust; where it is low the mark weakens or fails, and this is a property of the mechanism rather than a trick anyone has to perform.</p>
-          <p>Ordinary prose is high-entropy. Ask for a blog post or a client email and there are many acceptable ways to phrase each sentence, so the model can nearly always find a green-list word that still reads well and the mark embeds cleanly. Source code is the opposite. Its syntax is rigid; a given line often has only one or two correct continuations, and if the correct token lands on the red list the model must either break from the green list or accept a worse token, which in code can mean an odd variable name, a clumsier structure, or an outright error. Look at how little room a short function leaves.</p>
+          <p>Ordinary prose is high-entropy. Ask for a blog post or a client email and there are many acceptable ways to phrase each sentence, so the model can nearly always find a green-list word that still reads well and the mark embeds cleanly. Source code is the opposite. Its syntax is rigid; a given line often has only one or two correct continuations, and if the correct token lands on the red list the model must either break from the green list or accept a worse token, which in code can mean an odd variable name, a clumsier structure, or an outright error. A short function shows how little room there is.</p>
 
           <div class="codeblock"><span class="kw">def</span> <span class="fn">area_of_circle</span>(<span class="var">radius</span>):
     <span class="kw">return</span> <span class="num">3.14159</span> <span class="op">*</span> <span class="var">radius</span> <span class="op">**</span> <span class="num">2</span></div>
@@ -379,7 +378,7 @@
           <p>There is no other way to write this. Every token is the only correct choice, so there is no spare green-list option to steer the model onto, and the mark has nowhere to hide. Research on watermarking low-entropy text documents the trade-off directly: pushing the mark into constrained output degrades the output or the mark, and often both. A September 2026 paper from Case Western Reserve University measured it on two open models: with the watermark applied, detection on code sat close to a coin toss while detection on prose was clearly better, and on one of the two models the watermark cost about three percentage points of code correctness.</p>
           <p>Code rarely keeps the mark for a second reason. The moment it is pasted into a development environment, an auto-formatter such as Prettier or Black rewrites the spacing and standardises the layout. That reformatting scrambles the exact token sequence the mark depends on, and the green-to-red pattern is lost as a side effect, with no intent to evade. That specific point is a sound conclusion from the research on low-entropy watermarking rather than a separately tested finding, and it is presented here as such.</p>
 
-          <h3>The deliberate attack: rewrite the words</h3>
+          <h3>Deliberate removal: paraphrasing and humaniser tools</h3>
           <p>More deliberate removal is also documented. Peer-reviewed work by Sadasivan and colleagues (2023) shows that paraphrasing tools can rewrite text enough to defeat watermarks and statistical detectors alike, and the watermark paper itself analyses paraphrase as the standard attack. Because the mark is the word choices, changing the words takes the mark with them. That is why "humaniser" services that launder AI text past detectors are sold openly.</p>
 
           <div class="cyc" aria-hidden="true">
@@ -401,16 +400,16 @@
         </section>
 
         <section class="content-section">
-          <h2>The regulatory driver: Article 50 of the EU AI Act</h2>
+          <h2>Why this is happening: Article 50 of the EU AI Act</h2>
           <p>None of this was a spontaneous choice by the providers. The trigger was the European Union's AI Act, Regulation (EU) 2024/1689, and specifically Article 50, which sets transparency obligations for AI-generated content. The Act is, in spirit, a successor to the GDPR, the European data-protection law that reshaped privacy practice well beyond Europe. The obligation itself is three sentences long.</p>
 
           <div class="law">
             <div class="lawhead">EU AI Act &middot; Article 50(2)</div>
             Providers of AI systems, including general-purpose AI systems, generating synthetic audio, image, video or text content, shall ensure that the outputs of the AI system are <mark>marked in a machine-readable format and detectable as artificially generated or manipulated</mark>. Providers shall ensure their technical solutions are <mark>effective, interoperable, robust and reliable as far as this is technically feasible</mark>, taking into account the specificities and limitations of various types of content, the costs of implementation and the generally acknowledged state of the art, as may be reflected in relevant technical standards. <mark class="warn">This obligation shall not apply to the extent the AI systems perform an assistive function for standard editing or do not substantially alter the input data provided by the deployer or the semantics thereof</mark>, or where authorised by law to detect, prevent, investigate or prosecute criminal offences.
           </div>
-          <p>Read the third sentence again. If the AI performs "an assistive function for standard editing", or does not substantially alter what you gave it or what it means, the marking duty does not apply to that extent. The law itself distinguishes AI that writes from AI that tidies. Where tidying ends and writing begins, the Article does not say, and a provider that marks everything marks the tidied essay anyway; that collision returns below.</p>
+          <p>The third sentence matters most. If the AI performs "an assistive function for standard editing", or does not substantially alter what you gave it or what it means, the marking duty does not apply to that extent. The law itself distinguishes AI that writes from AI that tidies. Where tidying ends and writing begins, the Article does not say, and a provider that marks everything marks the tidied essay anyway. More on that below.</p>
 
-          <h3>How the rule arrived</h3>
+          <h3>Timeline</h3>
           <ul class="tl">
             <li><span class="d">10 June 2026</span><span class="h">The final Code of Practice is published</span><span class="p">The European Commission's Code of Practice on Transparency of AI-generated Content, a voluntary route to compliance, reaches its final text after two drafts. Providers who sign commit to machine-readable marking and to offering free marking-detection tools; deployers who sign commit to visibly labelling deepfakes and AI-generated text on matters of public interest.</span></li>
             <li><span class="d">24 to 31 July 2026</span><span class="h">The providers sign</span><span class="p">Google signs and names five partners adopting its SynthID watermark: Apple, ElevenLabs, Kakao, NVIDIA and OpenAI. By 31 July the Commission counts roughly 190 signatories, naming Anthropic, Google, Meta, Microsoft, OpenAI and Mistral among the providers.</span></li>
@@ -419,10 +418,10 @@
             <li><span class="d">2 December 2026</span><span class="h">The grace period ends</span><span class="p">Systems already on the EU market before 2 August have until this date to bring their marking into line.</span></li>
           </ul>
 
-          <h3>What non-compliance costs</h3>
+          <h3>Penalties for non-compliance</h3>
           <p>Article 99 of the Act puts a breach of Article 50 in its middle tier: administrative fines of up to 15 million euros or, for a company, up to 3 per cent of total worldwide annual turnover for the preceding year, whichever is higher. Signing the Code is voluntary, and the Commission's own guidance says non-signatories must still comply by other means and can expect more detailed requests for information from the market-surveillance authorities. Enforcement is by national authorities, and no fine under Article 50 has yet been reported.</p>
 
-          <h3>Why the mark went worldwide</h3>
+          <h3>Why the mark applies outside Europe</h3>
           <p>The striking part is that the mark was not confined to Europe. A provider could in principle run one pipeline that marks text for European users and another that does not for everyone else, but maintaining two separate paths roughly doubles the engineering burden and complicates every enterprise deployment that crosses borders. Anthropic's stated reason is blunter still: it does not yet have a reliable way to tell which region a request belongs to, so it marks everything. The practical result is the same dynamic the GDPR produced: a European rule became a worldwide default, not because other countries adopted it, but because a global provider found it easier to meet the strictest requirement everywhere. For a university in the Northern Territory, that means text from a supported Claude model arrives marked regardless of where the student or the staff member sits.</p>
 
           <div class="linkrow">
@@ -433,7 +432,7 @@
         </section>
 
         <section class="content-section">
-          <h2>Who is marking what, and who can check</h2>
+          <h2>Which providers mark their output, and who can run a detector</h2>
           <p>Signing the Code and switching on a text mark are two different things, and as at mid-September 2026 only two providers have publicly confirmed marking text. The table separates the two, and adds the question that matters most in a marking office: who is allowed to run the detector.</p>
           <div class="tablewrap"><table class="spec-table">
             <thead><tr><th>Provider</th><th>Text</th><th>Files</th><th>Who can check</th></tr></thead>
@@ -445,20 +444,20 @@
             </tbody>
           </table></div>
           <div class="callout callout-warning">
-            <div class="callout-title">What this means in a marking office</div>
+            <div class="callout-title">What this means for marking at CDU</div>
             <p>Today, no one at CDU can run a Claude text watermark check themselves. The detector needs the provider's key, and Anthropic's text detector is in private preview; Google's portal is on a waitlist. Educational organisations are on Anthropic's eligible list, so an institution could register interest, but the commercial "AI scores" a lecturer sees in a similarity report are not watermark checks. They are stylistic detectors working without any key, and they carry the error rates set out in the companion section on <a href="how-ai-detection-works.html">how detection technology works</a>.</p>
           </div>
         </section>
 
         <section class="content-section">
-          <h2>A smoke alarm, not a meter</h2>
+          <h2>What a detected watermark does and does not prove</h2>
           <p>Here is where the mechanism collides with how the mark is being used. A watermark detector reports whether the provider's pattern is present. It does not, and cannot, report how much of the document the model wrote, because the mark is added during output and carries no record of the input. Anthropic's help article makes the same point in its own words: a detected mark signals that content "may have been processed by Claude", and Claude "may only have proofread, translated, or converted" material that someone else wrote.</p>
-          <p>Consider a student who writes an original ten-page essay entirely themselves, then pastes it into the tool at the end and asks only for the commas to be fixed and the spelling checked. The tool reads the human text and returns it corrected, and while producing that output it runs the sampling algorithm and weaves in the mark. The essay is now watermarked, and a detector will say so, even though every idea and almost every word is the student's own. The mark cannot tell "write me an essay" apart from "fix the typos in my essay", because both produce marked output. Note the irony against Article 50: assistive standard editing is the very case the law's carve-out excuses from marking, and a provider that marks everything marks it anyway.</p>
+          <p>Consider a student who writes an original ten-page essay entirely themselves, then pastes it into the tool at the end and asks only for the commas to be fixed and the spelling checked. The tool reads the human text and returns it corrected, and while producing that output it runs the sampling algorithm and weaves in the mark. The essay is now watermarked, and a detector will say so, even though every idea and almost every word is the student's own. The mark cannot tell "write me an essay" apart from "fix the typos in my essay", because both produce marked output. There is an irony here against Article 50: assistive standard editing is the very case the law's carve-out excuses from marking, and a provider that marks everything marks it anyway.</p>
           <p>That is why a watermark, like the stylistic detectors beside it, is a smoke alarm rather than a meter. When it sounds, something is worth a look; it does not tell you whether the cause is a house fire or burnt toast, and it produces a weak positive signal and essentially no reliable negative one.</p>
         </section>
 
         <section class="content-section">
-          <h2>When a detector result is treated as proof</h2>
+          <h2>The problems with treating detector results as proof</h2>
           <p>A detector can tell you a piece of writing looks AI-generated. It cannot tell you who wrote it, how much of it was AI, or whether any rule was broken. Some institutions have nonetheless started treating that result as proof of misconduct, and the numbers show why that goes wrong.</p>
           <ul class="tl">
             <li><span class="d">Peer review</span><span class="h">21 per cent of ICLR reviews, AI-generated</span><span class="p">Detection company Pangram analysed roughly 70,000 peer reviews submitted to the ICLR machine-learning conference and found about 21 per cent were fully AI-written, with longer, more sycophantic text and formulaic bolded headers as the tell.</span></li>
@@ -474,20 +473,20 @@
             <figcaption>What a serious detector report looks like: Pangram's report for one real ICLR 2026 submission, 18 of 23 segments AI across 5,344 words, from the public database at iclr.pangram.com, captured 17 August 2026. Scroll the panel to see the segment list. It segments the document, grades its own confidence, and separates AI-generated from AI-assisted. What no report can say: who typed, why, or whether the use was permitted.</figcaption>
           </figure>
 
-          <h3>Nobody outside the company can check the claims either</h3>
+          <h3>The providers' claims cannot be independently verified</h3>
           <p>A further problem sits underneath all of this, and a paper from Case Western Reserve University published on 9 September 2026 states it plainly: the vendors' claims about their watermarks, that quality is unaffected, that the false-positive rate is low, that the key is managed safely, cannot currently be verified by anyone outside the vendor. No provider has released matched watermarked and unwatermarked outputs for testing; the detectors return a verdict rather than a score; and there is no shared interface for checking text against more than one provider's key. The authors' conclusion is that the governance failure is not watermarking itself but its unverifiability, and they call for released test sets, disclosed settings, accredited auditors and an interoperable detector. Until something like that exists, every statement on this page about how well the mark works is, at bottom, the provider's word.</p>
           <p>What an integrity process can actually do with a signal like this, once base rates and fair procedure are taken into account, is worked through in <a href="detection-as-evidence.html">Detection as Evidence, Not Verdict</a>, and the arithmetic of false positives across a whole cohort is set out with a calculator in <a href="how-ai-detection-works.html">How Detection Technology Works</a>.</p>
         </section>
 
         <section class="content-section">
-          <h2>What none of this proves</h2>
+          <h2>Summary: what a watermark can and cannot tell you</h2>
           <p>Watermarking is a real engineering achievement and a reasonable response to a genuine transparency problem: at scale, it helps identify which content came from which system. The mistake is to carry that population-level usefulness down to the individual case. A mark establishes that text touched a particular model. It does not establish authorship, it does not measure the human contribution, and its absence proves nothing either, because the mark can be diluted by a low-entropy task, lost to a reformat, rewritten away, or simply never applied by an older model or another provider.</p>
-          <p>The practical posture that follows is the same one this workshop returns to throughout. Treat any watermark or detector result as one signal among several, never as a verdict; ask what the signal can actually support before acting on it; and keep the burden of an allegation where fair process puts it, on evidence a student can see and answer, not on a number that no one, including the person reading it, can independently check.</p>
+          <p>The practical position that follows is the same one that runs through the rest of these pages. Treat any watermark or detector result as one signal among several, never as a verdict; ask what the signal can actually support before acting on it; and keep the burden of an allegation where fair process puts it, on evidence a student can see and answer, not on a number that no one, including the person reading it, can independently check.</p>
         </section>
 
         <section class="content-section">
-          <h2>Finish in the playground</h2>
-          <p>Everything above can be run for real in the final module of the companion deck. A small stand-in model writes a passage with the mark off, hard or soft, and a detector built on the Kirchenbauer z-score counts the green-list words and reports whether the mark is there. The human-written history of CDU from Wikipedia is pre-loaded as the control text; paste in anything of your own and the detector scores it without needing the model. Two settings worth showing a room: change one letter of the detector key and the mark vanishes, and switch from the creative passage to the factual one to see how little room names and dates leave for a mark.</p>
+          <h2>Try the watermark playground</h2>
+          <p>Everything above can be run for real in the final module of the companion deck. A small stand-in model writes a passage with the mark off, hard or soft, and a detector built on the Kirchenbauer z-score counts the green-list words and reports whether the mark is there. The human-written history of CDU from Wikipedia is pre-loaded as the control text; paste in anything of your own and the detector scores it without needing the model. Two settings to try: change one letter of the detector key and the mark vanishes, and switch from the creative passage to the factual one to see how little room names and dates leave for a mark.</p>
 
           <div class="pgcard">
             <div class="eyebrow">Interactive &middot; opens the deck at Module 06</div>
@@ -496,7 +495,7 @@
             <a class="btn btn-primary" href="/presentations/ai-watermarking-explained/#playground">Open the playground</a>
           </div>
 
-          <p>The full deck covers the same ground as this page in a presenter-led format, with the step-through word generator and the Article 50 timeline as click-through modules. It suits a one-hour taster or self-paced study.</p>
+          <p>The companion deck covers the same ground as this page in six click-through modules, including the step-through word generator and the Article 50 timeline, and can be worked through at your own pace.</p>
           <a class="app-card" href="/presentations/ai-watermarking-explained/" style="text-decoration:none;display:block;max-width:520px;">
             <div class="app-card-category">Interactive deck &middot; 6 modules</div>
             <h3>Can You Tell If It's AI? Watermarking Explained</h3>
@@ -536,25 +535,25 @@
       <aside class="sidebar-rail">
         <div class="rail-card">
           <div class="rail-body">
-            <div class="rail-label">In this section</div>
+            <div class="rail-label">On this page</div>
             <ul>
-              <li>Marking text that has no physical form</li>
-              <li>Files versus text: two different marks</li>
-              <li>A signed label, unpacked: metadata, manifest, seal</li>
-              <li>Green lists, red lists and the z-score, with a demo</li>
-              <li>SynthID-Text: the real system, now in Claude</li>
-              <li>Where the mark thins out: entropy, code, rewrites</li>
-              <li>Article 50: the rule, the dates, the penalties</li>
-              <li>Who is marking what, and who can check</li>
-              <li>Smoke alarm, not a meter</li>
-              <li>Finish in the playground</li>
+              <li>Why text is hard to watermark</li>
+              <li>Two kinds of watermark: files and text</li>
+              <li>How files are marked: signed metadata explained</li>
+              <li>How the text watermark works, with a demonstration</li>
+              <li>The systems in use: SynthID and Claude</li>
+              <li>When the text watermark fails</li>
+              <li>Article 50: the rule, the timeline, the penalties</li>
+              <li>Which providers mark their output, and who can run a detector</li>
+              <li>What a detected watermark does and does not prove</li>
+              <li>Try the watermark playground</li>
             </ul>
           </div>
         </div>
 
         <div class="rail-card">
           <div class="rail-body">
-            <div class="rail-label">Three sentences to keep</div>
+            <div class="rail-label">Key points</div>
             <ul>
               <li>The text watermark is the word choices themselves, not a hidden character you can strip out</li>
               <li>The mark thins to nothing in low-entropy text like code, and a reformat or a paraphrase removes it</li>
@@ -572,14 +571,14 @@
 
         <div class="rail-card">
           <div class="rail-body">
-            <div class="rail-label">Try it</div>
+            <div class="rail-label">Related simulation</div>
             <p>The <a href="/simulations/next-word-prediction/">next-word prediction simulation</a> shows the token-by-token machinery a watermark leans on, from the model's side.</p>
           </div>
         </div>
 
         <div class="rail-card">
           <div class="rail-body">
-            <div class="rail-label">Continue</div>
+            <div class="rail-label">Related pages</div>
             <p><a href="how-ai-detection-works.html">How Detection Technology Works</a> and <a href="detection-as-evidence.html">Detection as Evidence, Not Verdict</a>: what a flag is worth once base rates and fair process are applied.</p>
           </div>
         </div>
