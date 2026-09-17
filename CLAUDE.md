@@ -528,3 +528,59 @@ Still open for SD: the mapping skill's vault copy has an empty "Included Files"
 heading where an Obsidian screenshot embed sat; the screenshot is shown beside
 the "What a skill is" text instead. The ISO 24495-1 plain-language skill idea
 and the Hugging Face transcript from the PD notes folder are not on the page.
+
+## Prompt Critics: Copilot Study and Learn at CDU (17 September 2026)
+
+`/training-games/prompt-critics-study-and-learn/index.html`, a fifteen-round Prompt Critics
+game for the CDU AI Workshop's Copilot Study and Learn section, built with the
+`prompt-critics-game` skill on the Excel three-screen engine (thought bubble, two monitors,
+medal) and replacing the eight-round dark-chat game that lived at
+`/cdu-teaching-staff/prompt-critics.html`. That old page is now a redirect stub to the new
+game (the original is in git history before this commit) and is listed in `SKIP_URLS` in
+both `tools/build-index.js` and `tools/add-meta.js` like the two `/resources/` stubs.
+Linked from the course page (`copilot-study-and-learn.html`, both the group-activity
+paragraph and the Related rail), the course hub card, and the Copilot practice list on
+`/library/` (now "3 games"). Indexable; `index-meta.json` carries its title, description and
+published date. The standalone checklist ships beside it as
+`prompt-critics-study-and-learn-checklist.md`.
+
+SD's decisions, 16 to 17 September 2026: combine student prompts and staff prompts in one
+game rather than two; five student-screen rounds, five lecturer rounds, five student support
+rounds (library, referencing, Access and Inclusion); reuse the Excel artwork including the
+puzzled emoji, recoloured so nothing reads as Excel. Student rounds use the student's own
+thought bubble; the lecturer's guidance sits in the critic questions (each critic overlay
+carries a "YOU ARE THE LECTURER" / "YOU ARE THE SUPPORT STAFF MEMBER" line) and the fixed
+prompt, which is the prompt worth teaching students.
+
+Engine additions over the Excel edition, all in the one file: per-round `label` (thinker
+eyebrow, three variants in `LABELS`), `screen` (whose-screen chip), `agent` ("chat" or
+"study"; the left monitor is now a Microsoft 365 Copilot agent picker instead of the Excel
+grid) and a `{do:"switch", to:...}` step that moves the picker with a toast, used by the
+three wrong-agent rounds (the verbatim question, the coached lecturer, the stress test).
+Replies are labelled with the active agent's name. The nudge eyebrow reads "FOR THE ROOM".
+
+Artwork: the four baked-in JPEGs were hue-shifted from Excel green to teal (green hues
+70 to 175 degrees moved to 192 degrees; emoji, cloud outline and monitors untouched), the
+left-monitor grid was painted out in the monitor and medal scenes, the "ExcelAssistant"
+tab label and the Excel icon on the popup were painted over, and a live CSS gold badge
+(`#medalBadge`, "PROMPT CRITIC / CDU") sits over the drawn "Excel Skills" medal face. Scene
+zones are unchanged from the Excel edition. Stage ground is `--ground` #39636f (medal scene
+#0f5263). If SD supplies new artwork, re-measure the zones per the skill's
+excel-edition.md.
+
+Round order (privacy finale last, trick round second-last, invented-facts variant at 7):
+the verbatim question, the coached lecturer, the flashcards from nowhere, the study guide,
+the stress test, the negotiation, the five references, the policy translation, the essay
+hand-over, the 9.40pm reply, yes or no, the demo at the desk, the marking shortcut, the
+confident citation, the access plan. Tally 16 hours 30 minutes. Fictional names only
+(Tobias Wentworth-Adebayo, Desmond Featherstone-Kaminski, Beverley Okonkwo-Thistlewaite,
+fictional journal with a non-resolving 10.0000 DOI prefix); unit codes CYB204, HIT137.
+
+Verified 17 September 2026: Playwright drive through all fifteen rounds at 1600x900,
+every fix button, both hunt errors, every celebration, finale total and checklist, console
+clean; screenshots of title, cloud, monitor with picker and nudge, critic overlay,
+celebration and finale checked. Side effect of the maintenance scripts, documented
+behaviour: `build-index.js` picked up three pages never indexed before
+(`/cdu-ict-pd-day/template-wars/`, the two `/review/topic-index-prototypes/` pages),
+`add-search.js` added the search script to three pages and `add-meta.js` added social
+blocks to six pages outside this build; `social-card.html` restored from HEAD afterwards.
