@@ -584,3 +584,11 @@ behaviour: `build-index.js` picked up three pages never indexed before
 (`/cdu-ict-pd-day/template-wars/`, the two `/review/topic-index-prototypes/` pages),
 `add-search.js` added the search script to three pages and `add-meta.js` added social
 blocks to six pages outside this build; `social-card.html` restored from HEAD afterwards.
+
+Same day, at SD's request: the course page's group-activity section now carries a
+thumbnail and a button, using shared classes only (`.figure` with a `<picture>` linking to
+the game, then a `.cta-row` with `.btn.btn-primary` "Open the game" in a new window and a
+`.btn.btn-download` for the checklist MD). The thumbnail is a crop of the round-one monitor
+scene after the fix, saved beside the page as `exhibit-prompt-critics-study-and-learn.webp`
+and `.jpg` (1280 by 640), following the exhibit-file convention the watermarking course page
+uses. No index or meta rerun needed (no new pages).
