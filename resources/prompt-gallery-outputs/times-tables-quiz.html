@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Times Tables Quiz</title>
+<style>
+  :root {
+    --ink: #1f2547;
+    --paper: #fffdf6;
+    --sky: #2e7dd1;
+    --sun: #ffc93c;
+    --leaf: #1f9d63;
+    --leaf-soft: #dcf5e7;
+    --berry: #d6336c;
+    --berry-soft: #fde3ec;
+    --grape: #7048c6;
+    --tang: #f2762e;
+    --line: #e3e0d2;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: "Trebuchet MS", "Segoe UI", Verdana, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 8% 12%, rgba(255,201,60,.55) 0 90px, transparent 91px),
+      radial-gradient(circle at 93% 20%, rgba(214,51,108,.28) 0 130px, transparent 131px),
+      radial-gradient(circle at 86% 88%, rgba(31,157,99,.30) 0 110px, transparent 111px),
+      radial-gradient(circle at 12% 85%, rgba(112,72,198,.26) 0 140px, transparent 141px),
+      linear-gradient(160deg, #bfe3ff 0%, #e8f5ff 50%, #fff3d1 100%);
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .app {
+    width: 100%;
+    max-width: 1240px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .card {
+    background: var(--paper);
+    border: 4px solid var(--ink);
+    border-radius: 28px;
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .main { padding: 28px 36px 32px; min-height: 760px; display: flex; flex-direction: column; }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  h1 { margin: 0; font-size: 38px; letter-spacing: -.5px; line-height: 1.1; }
+  h1 span { display: inline-block; }
+  h1 .a { color: var(--sky); } h1 .b { color: var(--berry); } h1 .c { color: var(--leaf); }
+  .sub { margin: 6px 0 0; font-size: 17px; color: #4a5078; }
+
+  .tables { display: flex; gap: 10px; align-items: center; }
+  .tables .label { font-weight: bold; font-size: 15px; margin-right: 4px; }
+  .chip {
+    font: inherit; font-weight: bold; font-size: 20px;
+    width: 58px; height: 58px; border-radius: 50%;
+    border: 3px solid var(--ink); cursor: pointer;
+    background: #fff; color: var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform .12s;
+  }
+  .chip:hover { transform: translateY(-2px); }
+  .chip[aria-pressed="true"][data-t="2"] { background: var(--sky); color: #fff; }
+  .chip[aria-pressed="true"][data-t="3"] { background: var(--berry); color: #fff; }
+  .chip[aria-pressed="true"][data-t="5"] { background: var(--leaf); color: #fff; }
+  .chip[aria-pressed="true"][data-t="10"] { background: var(--grape); color: #fff; }
+  .chip[aria-pressed="false"] { opacity: .55; box-shadow: none; }
+
+  .progress { margin-top: 22px; display: flex; align-items: center; gap: 14px; }
+  .progress .count { font-weight: bold; font-size: 16px; white-space: nowrap; }
+  .dots { display: flex; gap: 8px; flex: 1; }
+  .dot { flex: 1; height: 16px; border-radius: 8px; border: 2px solid var(--ink); background: #fff; }
+  .dot.right { background: var(--leaf); }
+  .dot.wrong { background: var(--berry); }
+  .dot.now { background: var(--sun); }
+
+  .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 10px; }
+  .question {
+    font-size: 120px; font-weight: bold; line-height: 1; letter-spacing: -2px;
+    display: flex; align-items: center; gap: 26px; margin: 8px 0 6px;
+  }
+  .question .n1 { color: var(--sky); } .question .n2 { color: var(--tang); }
+  .question .op { color: var(--ink); font-size: 84px; }
+  .question .q {
+    min-width: 170px; height: 130px; padding: 0 18px; border-radius: 22px;
+    border: 4px dashed var(--ink); display: inline-flex; align-items: center; justify-content: center;
+    color: var(--grape); background: #f3eeff;
+  }
+  .question .q.right { border-style: solid; background: var(--leaf-soft); color: var(--leaf); }
+  .question .q.wrong { border-style: solid; background: var(--berry-soft); color: var(--berry); }
+  .pop { animation: pop .35s ease; }
+  .shake { animation: shake .4s ease; }
+  @keyframes pop { 0% { transform: scale(.7); } 60% { transform: scale(1.15); } 100% { transform: scale(1); } }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-12px); } 40% { transform: translateX(12px); } 60% { transform: translateX(-8px); } 80% { transform: translateX(8px); } }
+
+  .answers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; width: 100%; max-width: 760px; margin-top: 26px; }
+  .ans {
+    font: inherit; font-size: 46px; font-weight: bold; color: #fff;
+    height: 110px; border-radius: 22px; border: 4px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--ink); cursor: pointer; position: relative;
+    transition: transform .1s, box-shadow .1s;
+  }
+  .ans:nth-child(1) { background: var(--sky); }
+  .ans:nth-child(2) { background: var(--berry); }
+  .ans:nth-child(3) { background: var(--leaf); }
+  .ans:nth-child(4) { background: var(--grape); }
+  .ans:hover:not(:disabled) { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--ink); }
+  .ans:active:not(:disabled) { transform: translate(3px,3px); box-shadow: 2px 2px 0 var(--ink); }
+  .ans:focus-visible, .chip:focus-visible, .btn:focus-visible { outline: 4px solid var(--sun); outline-offset: 3px; }
+  .ans:disabled { cursor: default; opacity: .4; }
+  .ans.is-right, .ans.is-wrong { opacity: 1; }
+  .ans.is-right { background: var(--leaf); }
+  .ans.is-wrong { background: var(--berry); }
+  .ans .key { position: absolute; top: 6px; left: 10px; font-size: 13px; opacity: .85; }
+  /* CSS tick and cross */
+  .ans.is-right::after {
+    content: ""; position: absolute; right: 16px; top: 8px; width: 9px; height: 17px;
+    border: solid #fff; border-width: 0 5px 5px 0; transform: rotate(45deg);
+  }
+  .ans.is-wrong::before, .ans.is-wrong::after {
+    content: ""; position: absolute; right: 20px; top: 8px; width: 5px; height: 22px; background: #fff; border-radius: 3px;
+  }
+  .ans.is-wrong::before { transform: rotate(45deg); } .ans.is-wrong::after { transform: rotate(-45deg); }
+
+  .feedback {
+    margin-top: 24px; width: 100%; max-width: 760px; min-height: 96px;
+    border-radius: 20px; border: 3px solid transparent; padding: 14px 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  }
+  .feedback.right { background: var(--leaf-soft); border-color: var(--leaf); }
+  .feedback.wrong { background: var(--berry-soft); border-color: var(--berry); }
+  .feedback .big { font-size: 26px; font-weight: bold; }
+  .feedback.right .big { color: #14784a; } .feedback.wrong .big { color: #a81f50; }
+  .feedback .tip { font-size: 17px; margin-top: 4px; }
+  .hint { color: #4a5078; font-size: 16px; text-align: center; width: 100%; }
+
+  .btn {
+    font: inherit; font-size: 20px; font-weight: bold; color: var(--ink);
+    background: var(--sun); border: 3px solid var(--ink); border-radius: 16px;
+    padding: 14px 26px; cursor: pointer; box-shadow: 4px 4px 0 var(--ink); white-space: nowrap;
+  }
+  .btn:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--ink); }
+
+  .side { padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+  .side h2 { margin: 0; font-size: 20px; }
+  .stat { border: 3px solid var(--ink); border-radius: 18px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+  .stat .name { font-size: 16px; font-weight: bold; }
+  .stat .val { font-size: 40px; font-weight: bold; line-height: 1; }
+  .stat.s1 { background: #dcefff; } .stat.s2 { background: #fff0c2; } .stat.s3 { background: #eadfff; }
+  .stars { display: flex; gap: 4px; flex-wrap: nowrap; min-height: 34px; }
+  .star {
+    width: 22px; height: 22px; background: #e6e2d3;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  }
+  .star.on { background: var(--sun); filter: drop-shadow(0 0 0 var(--ink)); animation: pop .35s ease; }
+  .howto { font-size: 15px; line-height: 1.5; color: #3b416b; border-top: 2px dashed var(--line); padding-top: 14px; margin-top: auto; }
+  .howto b { color: var(--ink); }
+
+  .end { text-align: center; }
+  .end .score { font-size: 96px; font-weight: bold; color: var(--grape); line-height: 1; margin: 10px 0; }
+  .end h2 { font-size: 40px; margin: 0; }
+  .end p { font-size: 20px; color: #3b416b; max-width: 620px; margin: 12px auto 22px; }
+  .review { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 24px; }
+  .review span { background: var(--berry-soft); border: 2px solid var(--berry); border-radius: 12px; padding: 8px 14px; font-weight: bold; font-size: 18px; }
+  .hidden { display: none !important; }
+
+  .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+  .bit { position: absolute; top: -20px; width: 12px; height: 18px; border-radius: 3px; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+  @media (max-width: 980px) {
+    .app { grid-template-columns: 1fr; }
+    .main { min-height: 0; padding: 22px; }
+    .question { font-size: 68px; gap: 12px; } .question .op { font-size: 48px; }
+    .question .q { min-width: 100px; height: 84px; }
+    .answers { grid-template-columns: repeat(2, 1fr); }
+    .feedback { flex-direction: column; align-items: flex-start; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="card main">
+    <header>
+      <div>
+        <h1><span class="a">Times</span> <span class="b">Tables</span> <span class="c">Challenge</span></h1>
+        <p class="sub">Ten questions a round. Pick the right answer as fast as you can!</p>
+      </div>
+      <div class="tables" role="group" aria-label="Choose which tables to practise">
+        <span class="label">Tables:</span>
+        <button class="chip" data-t="2" aria-pressed="true">2</button>
+        <button class="chip" data-t="3" aria-pressed="true">3</button>
+        <button class="chip" data-t="5" aria-pressed="true">5</button>
+        <button class="chip" data-t="10" aria-pressed="true">10</button>
+      </div>
+    </header>
+
+    <div class="progress">
+      <div class="count" id="count">Question 1 of 10</div>
+      <div class="dots" id="dots"></div>
+    </div>
+
+    <section class="stage" id="play">
+      <div class="question" id="question" aria-live="polite"></div>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" aria-live="assertive">
+        <div class="hint">Click an answer, or press 1, 2, 3 or 4 on the keyboard.</div>
+      </div>
+    </section>
+
+    <section class="stage end hidden" id="end">
+      <h2 id="endTitle"></h2>
+      <div class="score" id="endScore"></div>
+      <p id="endMsg"></p>
+      <div class="review" id="review"></div>
+      <button class="btn" id="again">Play again</button>
+    </section>
+  </main>
+
+  <aside class="card side">
+    <h2>Scoreboard</h2>
+    <div class="stat s1"><span class="name">Correct</span><span class="val" id="score">0</span></div>
+    <div class="stat s2"><span class="name">Streak</span><span class="val" id="streak">0</span></div>
+    <div class="stat s3"><span class="name">Best streak</span><span class="val" id="best">0</span></div>
+    <h2>Stars earned</h2>
+    <div class="stars" id="stars"></div>
+    <div class="howto">
+      <b>How to play</b><br>
+      Tap the circles at the top to choose your tables. Green means correct, pink means have another look. Get three in a row for a streak!
+    </div>
+  </aside>
+</div>
+<div class="confetti" id="confetti" aria-hidden="true"></div>
+
+<script>
+(function () {
+  var TOTAL = 10;
+  var CHEERS = ["Correct!", "Spot on!", "Brilliant!", "You beauty!", "Too easy!", "Ripper!", "Nailed it!"];
+  var state;
+  var el = function (id) { return document.getElementById(id); };
+
+  function activeTables() {
+    return Array.prototype.filter.call(document.querySelectorAll(".chip"), function (c) {
+      return c.getAttribute("aria-pressed") === "true";
+    }).map(function (c) { return +c.dataset.t; });
+  }
+  function rand(n) { return Math.floor(Math.random() * n); }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = rand(i + 1); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+  function newGame() {
+    state = { i: 0, score: 0, streak: 0, best: 0, results: [], missed: [], asked: {}, locked: false, current: null };
+    el("end").classList.add("hidden");
+    el("play").classList.remove("hidden");
+    el("confetti").innerHTML = "";
+    drawStars(); updateStats(); nextQuestion();
+  }
+
+  function makeQuestion() {
+    var tables = activeTables(), t, n, key, tries = 0;
+    do { t = tables[rand(tables.length)]; n = 1 + rand(12); key = t + "x" + n; tries++; }
+    while (state.asked[key] && tries < 40);
+    state.asked[key] = true;
+    var flip = Math.random() < 0.5;
+    var answer = t * n;
+    var opts = {}; opts[answer] = true;
+    var near = [answer + t, answer - t, answer + n, answer - n, answer + 1, answer - 1, answer + 2, answer + 10, answer - 10, t + n];
+    shuffle(near);
+    for (var k = 0; k < near.length && Object.keys(opts).length < 4; k++) if (near[k] > 0) opts[near[k]] = true;
+    var extra = answer + 3;
+    while (Object.keys(opts).length < 4) { opts[extra++] = true; }
+    return { a: flip ? n : t, b: flip ? t : n, t: t, n: n, answer: answer, options: shuffle(Object.keys(opts).map(Number)) };
+  }
+
+  function nextQuestion() {
+    if (state.i >= TOTAL) return finish();
+    state.locked = false;
+    var q = state.current = makeQuestion();
+    el("count").textContent = "Question " + (state.i + 1) + " of " + TOTAL;
+    el("question").innerHTML = '<span class="n1">' + q.a + '</span><span class="op">&times;</span><span class="n2">' + q.b +
+      '</span><span class="op">=</span><span class="q" id="slot">?</span>';
+    var box = el("answers"); box.innerHTML = "";
+    q.options.forEach(function (v, idx) {
+      var b = document.createElement("button");
+      b.className = "ans"; b.dataset.v = v;
+      b.innerHTML = '<span class="key">' + (idx + 1) + '</span>' + v;
+      b.setAttribute("aria-label", "Answer " + v);
+      b.addEventListener("click", function () { choose(b); });
+      box.appendChild(b);
+    });
+    el("feedback").className = "feedback";
+    el("feedback").innerHTML = '<div class="hint">Click an answer, or press 1, 2, 3 or 4 on the keyboard.</div>';
+    drawDots();
+  }
+
+  function choose(btn) {
+    if (state.locked) return;
+    state.locked = true;
+    var q = state.current, picked = +btn.dataset.v, right = picked === q.answer;
+    Array.prototype.forEach.call(document.querySelectorAll(".ans"), function (b) {
+      b.disabled = true;
+      if (+b.dataset.v === q.answer) b.classList.add("is-right");
+    });
+    var slot = el("slot");
+    slot.textContent = q.answer;
+    var fb = el("feedback"), sum = q.a + " &times; " + q.b + " = " + q.answer;
+    if (right) {
+      state.score++; state.streak++; state.best = Math.max(state.best, state.streak);
+      slot.className = "q right pop";
+      var extra = state.streak >= 3 ? " That is " + state.streak + " in a row!" : "";
+      fb.className = "feedback right";
+      fb.innerHTML = '<div><div class="big">' + CHEERS[rand(CHEERS.length)] + '</div><div class="tip">' + sum + "." + extra + '</div></div>';
+    } else {
+      btn.classList.add("is-wrong");
+      state.streak = 0; state.missed.push(q.a + " × " + q.b + " = " + q.answer);
+      slot.className = "q wrong shake";
+      fb.className = "feedback wrong";
+      fb.innerHTML = '<div><div class="big">Not quite. The answer is ' + q.answer + '.</div><div class="tip">' + tip(q) + '</div></div>';
+    }
+    state.results.push(right);
+    var next = document.createElement("button");
+    next.className = "btn"; next.id = "next";
+    next.textContent = state.i + 1 >= TOTAL ? "See my score" : "Next question";
+    next.addEventListener("click", advance);
+    fb.appendChild(next);
+    next.focus();
+    state.i++;
+    updateStats(); drawDots(); drawStars();
+  }
+
+  function tip(q) {
+    if (q.t === 10) return "Tip: to multiply by 10, pop a zero on the end. " + q.n + " becomes " + q.answer + ".";
+    if (q.t === 2) return "Tip: multiplying by 2 is doubling. " + q.n + " + " + q.n + " = " + q.answer + ".";
+    if (q.t === 5) return "Tip: count by fives " + q.n + " times. Answers in the 5 times table always end in 0 or 5.";
+    return "Tip: count by threes " + q.n + " times: " + Array.apply(null, Array(q.n)).map(function (_, i) { return 3 * (i + 1); }).join(", ") + ".";
+  }
+
+  function advance() { if (state.locked) nextQuestion(); }
+
+  function updateStats() {
+    el("score").textContent = state.score;
+    el("streak").textContent = state.streak;
+    el("best").textContent = state.best;
+  }
+  function drawDots() {
+    var h = "";
+    for (var k = 0; k < TOTAL; k++) {
+      var c = k < state.results.length ? (state.results[k] ? "right" : "wrong") : (k === state.i && !state.locked ? "now" : "");
+      h += '<div class="dot ' + c + '"></div>';
+    }
+    el("dots").innerHTML = h;
+  }
+  function drawStars() {
+    var h = "";
+    for (var k = 0; k < TOTAL; k++) h += '<div class="star' + (k < state.score ? " on" : "") + '"></div>';
+    el("stars").innerHTML = h;
+  }
+
+  function finish() {
+    el("play").classList.add("hidden");
+    el("end").classList.remove("hidden");
+    el("count").textContent = "Round finished";
+    var s = state.score;
+    el("endScore").textContent = s + " / " + TOTAL;
+    el("endTitle").textContent = s === TOTAL ? "Perfect round!" : s >= 8 ? "Fantastic work!" : s >= 5 ? "Good effort!" : "Keep practising!";
+    el("endMsg").textContent = s === TOTAL ? "Every single one correct. You are a times tables champion."
+      : state.missed.length ? "Here are the ones to practise before your next go:" : "";
+    el("review").innerHTML = state.missed.map(function (m) { return "<span>" + m + "</span>"; }).join("");
+    if (s >= 8) confetti();
+    el("again").focus();
+  }
+
+  function confetti() {
+    var colours = ["#2e7dd1", "#d6336c", "#1f9d63", "#7048c6", "#ffc93c", "#f2762e"], box = el("confetti");
+    for (var k = 0; k < 90; k++) {
+      var d = document.createElement("div");
+      d.className = "bit";
+      d.style.left = rand(100) + "%";
+      d.style.background = colours[k % colours.length];
+      d.style.animationDuration = (2 + Math.random() * 2.5) + "s";
+      d.style.animationDelay = (Math.random() * 1.2) + "s";
+      box.appendChild(d);
+    }
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"), function (c) {
+    c.addEventListener("click", function () {
+      var on = c.getAttribute("aria-pressed") === "true";
+      if (on && activeTables().length === 1) return; // keep at least one table
+      c.setAttribute("aria-pressed", on ? "false" : "true");
+      newGame();
+    });
+  });
+  el("again").addEventListener("click", newGame);
+  document.addEventListener("keydown", function (e) {
+    if (e.key >= "1" && e.key <= "4" && !state.locked) {
+      var b = document.querySelectorAll(".ans")[+e.key - 1];
+      if (b) choose(b);
+    }
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>

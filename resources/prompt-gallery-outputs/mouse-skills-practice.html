@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mouse Skills Practice</title>
+<style>
+  :root {
+    --indigo: #211645;
+    --plum: #6D2D41;
+    --teal: #007A87;
+    --teal-dark: #005F69;
+    --teal-light: #8ADCE4;
+    --indigo-tint: #ECEAF4;
+    --plum-tint: #F7E9EE;
+    --teal-tint: #E2F3F4;
+    --page: #F5F4FA;
+    --card: #FFFFFF;
+    --line: #D6D2E4;
+    --muted: #4E4668;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--indigo);
+    background: var(--page);
+    display: flex;
+    flex-direction: column;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+
+  /* Header */
+  header {
+    background: var(--indigo);
+    color: #fff;
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 16px; }
+  .brand svg { width: 38px; height: 52px; flex: none; }
+  .brand h1 { font-size: 26px; line-height: 1.15; margin: 0; letter-spacing: 0.2px; }
+  .brand p { margin: 2px 0 0; font-size: 16px; color: #D5D0E8; }
+  nav ol { list-style: none; margin: 0; padding: 0; display: flex; gap: 10px; flex-wrap: wrap; }
+  nav button {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.09);
+    border: 2px solid rgba(255,255,255,0.22);
+    color: #fff;
+    border-radius: 999px;
+    padding: 7px 18px 7px 8px;
+    font-size: 16px; font-weight: 600;
+  }
+  nav button:hover { background: rgba(255,255,255,0.18); }
+  nav button:focus-visible, .btn:focus-visible, .link-btn:focus-visible { outline: 3px solid var(--teal-light); outline-offset: 3px; }
+  nav .num {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: rgba(255,255,255,0.16); font-size: 15px;
+  }
+  nav .num svg { width: 16px; height: 16px; display: none; }
+  nav button.done .num { background: var(--teal); }
+  nav button.done .num span { display: none; }
+  nav button.done .num svg { display: block; }
+  nav button[aria-current="step"] { background: #fff; color: var(--indigo); border-color: #fff; }
+  nav button[aria-current="step"] .num { background: var(--indigo); color: #fff; }
+  nav button[aria-current="step"].done .num { background: var(--teal); }
+
+  /* Layout */
+  main {
+    flex: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: 450px 1fr;
+    gap: 28px;
+    padding: 28px 40px 32px;
+    width: 100%; max-width: 1640px; margin: 0 auto;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 2px 10px rgba(33,22,69,0.06);
+  }
+  .guide { padding: 30px 32px; display: flex; flex-direction: column; gap: 24px; overflow: auto; }
+  .eyebrow { font-size: 15px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--teal); margin: 0; }
+  .guide h2 { font-size: 34px; line-height: 1.15; margin: 2px 0 0; }
+  .guide .why { margin: 0; font-size: 20px; color: var(--muted); }
+  .guide h3 { font-size: 17px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 1px; color: var(--plum); }
+  .guide ol { margin: 0; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 14px; }
+  .guide ol li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; font-size: 20px; }
+  .guide ol li::before {
+    content: counter(s);
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--indigo); color: #fff; font-weight: 700; font-size: 16px;
+    display: grid; place-items: center; margin-top: -1px;
+  }
+  .which {
+    display: grid; grid-template-columns: 96px 1fr; gap: 20px; align-items: center;
+    background: var(--indigo-tint); border-radius: 14px; padding: 18px 20px;
+  }
+  .which svg { width: 96px; height: 137px; }
+  .which strong { display: block; font-size: 19px; }
+  .which span { font-size: 17px; color: var(--muted); }
+  .trackpad { margin: 0; font-size: 18px; color: var(--muted); border-left: 4px solid var(--teal); padding: 2px 0 2px 14px; }
+  .trackpad b { color: var(--indigo); }
+
+  .work { display: flex; flex-direction: column; gap: 20px; min-height: 0; min-width: 0; }
+  .practice { flex: 1; min-height: 430px; display: flex; flex-direction: column; overflow: hidden; }
+  .taskbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 16px 26px; border-bottom: 1px solid var(--line); background: #FBFAFD;
+  }
+  .taskbar .task { font-size: 22px; font-weight: 700; margin: 0; }
+  .taskbar .task small { display: block; font-size: 14px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--teal); }
+  .meta { display: flex; align-items: center; gap: 18px; flex: none; }
+  .rounds { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; color: var(--muted); }
+  .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--teal); background: #fff; }
+  .dot.on { background: var(--teal); }
+  .link-btn { background: none; border: 2px solid var(--line); border-radius: 10px; padding: 6px 14px; font-size: 16px; font-weight: 600; color: var(--indigo); }
+  .link-btn:hover { border-color: var(--indigo); }
+  #stage { position: relative; flex: 1; min-height: 0; overflow: hidden;
+    background-image: radial-gradient(circle, #DCD8EA 1.2px, transparent 1.3px); background-size: 28px 28px; }
+
+  /* Feedback */
+  #feedback {
+    display: grid; grid-template-columns: 56px 1fr auto; gap: 20px; align-items: center;
+    padding: 20px 26px; min-height: 128px;
+    border-width: 2px; border-left-width: 10px;
+  }
+  #feedback .icon { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; color: #fff; }
+  #feedback .icon svg { width: 30px; height: 30px; }
+  #feedback h3 { margin: 0 0 2px; font-size: 23px; line-height: 1.2; }
+  #feedback p { margin: 0; font-size: 19px; }
+  #feedback.info { border-color: var(--indigo); background: #fff; }
+  #feedback.info .icon { background: var(--indigo); }
+  #feedback.good { border-color: var(--teal); background: var(--teal-tint); }
+  #feedback.good .icon { background: var(--teal); }
+  #feedback.good h3 { color: var(--teal-dark); }
+  #feedback.retry { border-color: var(--plum); background: var(--plum-tint); }
+  #feedback.retry .icon { background: var(--plum); }
+  #feedback.retry h3 { color: var(--plum); }
+  #feedback.pop { animation: pop 0.35s ease-out; }
+  @keyframes pop { 0% { transform: scale(0.985); opacity: 0.4; } 100% { transform: none; opacity: 1; } }
+
+  .btn {
+    background: var(--teal); color: #fff; border: 0; border-radius: 14px;
+    font-size: 21px; font-weight: 700; padding: 16px 30px;
+    box-shadow: 0 4px 0 var(--teal-dark);
+  }
+  .btn:hover { background: var(--teal-dark); }
+  .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--teal-dark); }
+  .btn.big { font-size: 30px; padding: 26px 64px; border-radius: 20px; }
+
+  /* Centre screens (welcome, finish) */
+  .centre { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; }
+  .centre .box { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 40px 56px; max-width: 760px; }
+  .centre h2 { font-size: 36px; margin: 0 0 8px; }
+  .centre p { font-size: 21px; margin: 0 0 28px; color: var(--muted); }
+  .ticks { list-style: none; padding: 0; margin: 0 0 30px; display: grid; gap: 10px; text-align: left; font-size: 21px; font-weight: 600; }
+  .ticks li { display: flex; align-items: center; gap: 14px; }
+  .ticks svg { width: 30px; height: 30px; padding: 6px; border-radius: 50%; background: var(--teal); color: #fff; flex: none; }
+
+  /* Skill 1 */
+  .target {
+    position: absolute; width: 150px; height: 150px; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--teal); color: #fff; font-weight: 700; font-size: 22px;
+    display: grid; place-items: center; text-align: center;
+    border: 6px solid #fff; box-shadow: 0 0 0 4px var(--teal), 0 10px 22px rgba(33,22,69,0.22);
+    cursor: pointer; transition: left 0.3s, top 0.3s;
+  }
+  .target:hover { background: var(--teal-dark); }
+  .target.hit { animation: hit 0.3s; }
+  @keyframes hit { 50% { transform: translate(-50%, -50%) scale(0.9); } }
+
+  /* Skill 2 */
+  .folders { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 56px; flex-wrap: wrap; }
+  .folder {
+    width: 210px; padding: 22px 14px 18px; border-radius: 16px; text-align: center;
+    border: 3px solid transparent; background: rgba(255,255,255,0.85); cursor: pointer;
+  }
+  .folder:hover { border-color: var(--line); }
+  .folder.sel { border-color: var(--indigo); background: var(--indigo-tint); }
+  .folder svg { width: 120px; height: 96px; display: block; margin: 0 auto 10px; }
+  .folder .name { font-size: 21px; font-weight: 700; }
+  .folder .state { font-size: 16px; color: var(--muted); }
+  .folder.open { border-color: var(--teal); background: var(--teal-tint); cursor: default; }
+  .folder.open .state { color: var(--teal-dark); font-weight: 700; }
+  .folder .fo { display: none; }
+  .folder.open .fo { display: block; }
+  .folder.open .fc { display: none; }
+
+  /* Skill 3 */
+  .pic-wrap { position: absolute; inset: 0; display: grid; place-items: center; }
+  .pic {
+    width: 300px; border-radius: 14px; background: #fff; padding: 16px 16px 12px;
+    border: 3px solid var(--indigo); box-shadow: 0 10px 22px rgba(33,22,69,0.18); text-align: center; cursor: pointer;
+  }
+  .pic .fill { height: 170px; border-radius: 8px; background: #8C879C; transition: background 0.25s; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 20px; }
+  .pic .cap { margin-top: 10px; font-weight: 700; font-size: 19px; }
+  .menu {
+    position: absolute; z-index: 5; width: 250px; background: #fff; border: 2px solid var(--indigo); border-radius: 12px;
+    box-shadow: 0 14px 30px rgba(33,22,69,0.3); padding: 8px; display: grid; gap: 4px;
+  }
+  .menu button { display: flex; align-items: center; gap: 12px; background: #fff; border: 0; border-radius: 8px; padding: 12px 14px; font-size: 19px; font-weight: 600; text-align: left; }
+  .menu button:hover { background: var(--indigo-tint); }
+  .menu i { width: 22px; height: 22px; border-radius: 5px; flex: none; border: 2px solid rgba(33,22,69,0.25); }
+
+  /* Skill 4 */
+  .read-wrap { position: absolute; inset: 0; display: grid; place-items: center; padding: 30px; }
+  .read {
+    max-width: 860px; background: #fff; border: 3px solid var(--indigo); border-radius: 16px;
+    padding: 34px 42px; font-size: 30px; line-height: 1.9; cursor: text;
+    -webkit-user-select: text; user-select: text;
+  }
+  .read ::selection, .read::selection { background: var(--teal); color: #fff; }
+  .read .goal { border-bottom: 4px dashed var(--plum); padding-bottom: 2px; font-weight: 700; color: var(--plum); }
+  .read .got { background: var(--teal-tint); border-radius: 6px; box-shadow: 0 0 0 4px var(--teal-tint); color: var(--teal-dark); font-weight: 700; }
+
+  /* Skill 5 */
+  .drag-area { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1.2fr; align-items: center; justify-items: center; padding: 24px 40px; }
+  .shelf { display: grid; gap: 30px; justify-items: center; }
+  .shelf-label, .zone-label { font-size: 17px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+  .slot { width: 104px; height: 104px; }
+  .shape { width: 104px; height: 104px; cursor: grab; touch-action: none; position: relative; z-index: 2; filter: drop-shadow(0 6px 8px rgba(33,22,69,0.25)); }
+  .shape.dragging { cursor: grabbing; z-index: 10; filter: drop-shadow(0 16px 16px rgba(33,22,69,0.35)); }
+  .shape.back { transition: transform 0.35s; }
+  .shape svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+  .zone {
+    width: 440px; height: 330px; border: 5px dashed var(--teal); border-radius: 22px; background: rgba(255,255,255,0.8);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; transition: background 0.15s;
+  }
+  .zone.over { background: var(--teal-tint); border-style: solid; }
+  .zone-items { display: flex; gap: 22px; min-height: 104px; align-items: center; }
+  .zone .shape { cursor: default; filter: none; }
+
+  @media (max-width: 1100px) {
+    body { height: auto; }
+    main { grid-template-columns: 1fr; padding: 20px; }
+    header { padding: 16px 20px; }
+    .practice { min-height: 560px; }
+    #feedback { grid-template-columns: 56px 1fr; }
+    #feedback .btn { grid-column: 1 / -1; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 140 200" aria-hidden="true">
+      <path d="M70 10H40A30 30 0 0 0 10 40V85H70Z" fill="#007A87" stroke="#fff" stroke-width="6"/>
+      <path d="M70 10H100A30 30 0 0 1 130 40V85H70Z" fill="none" stroke="#fff" stroke-width="6"/>
+      <path d="M10 85H130V130A60 60 0 0 1 10 130Z" fill="none" stroke="#fff" stroke-width="6"/>
+    </svg>
+    <div>
+      <h1>Mouse Skills Practice</h1>
+      <p>Five skills. Go at your own pace. You cannot break anything here.</p>
+    </div>
+  </div>
+  <nav aria-label="Skills"><ol id="steps"></ol></nav>
+</header>
+
+<main>
+  <section class="panel guide" id="guide" aria-live="off"></section>
+  <div class="work">
+    <section class="panel practice" aria-label="Practice area">
+      <div class="taskbar">
+        <p class="task"><small>Your task</small><span id="task"></span></p>
+        <div class="meta">
+          <div class="rounds" id="rounds"></div>
+          <button class="link-btn" id="restart" type="button">Restart this skill</button>
+        </div>
+      </div>
+      <div id="stage"></div>
+    </section>
+    <section class="panel info" id="feedback" role="status" aria-live="polite">
+      <div class="icon" id="fb-icon"></div>
+      <div><h3 id="fb-title"></h3><p id="fb-text"></p></div>
+      <div id="fb-action"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5.2 5.2L20 6.8"/></svg>';
+  var ICONS = {
+    good: CHECK,
+    info: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5.2" r="2.2"/><rect x="10" y="9.5" width="4" height="12" rx="2"/></svg>',
+    retry: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v5h5"/></svg>'
+  };
+
+  function mouseSvg(which) {
+    var l = which === 'left' ? '#007A87' : '#fff';
+    var r = which === 'right' ? '#6D2D41' : '#fff';
+    return '<svg viewBox="0 0 140 200" aria-hidden="true">' +
+      '<path d="M70 10H40A30 30 0 0 0 10 40V85H70Z" fill="' + l + '" stroke="#211645" stroke-width="5"/>' +
+      '<path d="M70 10H100A30 30 0 0 1 130 40V85H70Z" fill="' + r + '" stroke="#211645" stroke-width="5"/>' +
+      '<path d="M10 85H130V130A60 60 0 0 1 10 130Z" fill="#fff" stroke="#211645" stroke-width="5"/>' +
+      '<rect x="61" y="28" width="18" height="38" rx="9" fill="#fff" stroke="#211645" stroke-width="5"/></svg>';
+  }
+
+  var stage = $('#stage'), guide = $('#guide'), fb = $('#feedback');
+  var current = 0, doneSet = {}, cleanups = [];
+
+  function say(kind, title, text, action) {
+    fb.className = 'panel ' + kind;
+    $('#fb-icon').innerHTML = ICONS[kind];
+    $('#fb-title').textContent = title;
+    $('#fb-text').textContent = text;
+    var slot = $('#fb-action');
+    slot.innerHTML = '';
+    if (action) {
+      var b = document.createElement('button');
+      b.className = 'btn'; b.type = 'button'; b.id = 'next'; b.textContent = action.label;
+      b.addEventListener('click', action.run);
+      slot.appendChild(b);
+    }
+    void fb.offsetWidth;
+    fb.classList.add('pop');
+  }
+
+  function hit(e, sel) {
+    var x = document.elementFromPoint(e.clientX, e.clientY);
+    return x && x.closest ? x.closest(sel) : null;
+  }
+
+  function makeApi(index) {
+    var api = {
+      stage: stage,
+      done: false,
+      say: say,
+      task: function (t) { $('#task').textContent = t; },
+      rounds: function (n, total) {
+        var h = '';
+        for (var i = 0; i < total; i++) h += '<span class="dot' + (i < n ? ' on' : '') + '"></span>';
+        $('#rounds').innerHTML = h + '<span>' + n + ' of ' + total + ' done</span>';
+      },
+      on: function (t, type, fn, opts) {
+        t.addEventListener(type, fn, opts);
+        cleanups.push(function () { t.removeEventListener(type, fn, opts); });
+      },
+      later: function (fn, ms) {
+        var id = setTimeout(fn, ms);
+        cleanups.push(function () { clearTimeout(id); });
+        return id;
+      },
+      wrongButton: function (btn, leftUse) {
+        if (btn === 0) return false;
+        if (btn === 2) {
+          say('retry', 'That was the right button', 'This skill uses the left button, the one under your pointing finger. ' + (leftUse || 'Try again with the left button.'));
+        } else {
+          say('retry', 'That was a different button', 'You pressed the wheel or a side button. This skill uses the left button, the one under your pointing finger.');
+        }
+        return true;
+      },
+      finish: function (title, text) {
+        api.done = true;
+        doneSet[index] = true;
+        drawSteps();
+        var last = index === screens.length - 2;
+        say('good', title, text, {
+          label: last ? 'Finish' : 'Next skill',
+          run: function () { show(index + 1); }
+        });
+      }
+    };
+    return api;
+  }
+
+  /* ---------- Screens ---------- */
+  var screens = [
+    {
+      intro: true,
+      eyebrow: 'Welcome',
+      title: 'Before you start',
+      why: 'The mouse moves the small arrow on the screen. The arrow is called the pointer.',
+      steps: [
+        'Rest your hand on the mouse with your pointing finger on the left button.',
+        'Slide the mouse on the desk. Watch the pointer move the same way.',
+        'If you run out of desk, lift the mouse, put it back down and keep going.'
+      ],
+      button: 'left', buttonTitle: 'Most things use the left button', buttonText: 'It sits under your pointing finger.',
+      trackpad: 'Slide one finger on the pad to move the pointer. Press down on the pad to click.',
+      setup: function (a) {
+        a.task('Move the pointer onto the Start button and press the left button once.');
+        $('#rounds').innerHTML = '';
+        stage.innerHTML = '<div class="centre"><div class="box"><h2>Ready to practise?</h2>' +
+          '<p>There are five short skills. Each one tells you what to do and tells you what happened if it does not work.</p>' +
+          '<button class="btn big" id="start" type="button">Start</button></div></div>';
+        a.on($('#start'), 'click', function () { show(1); });
+        say('info', 'Take your time', 'There is no timer and no score. If something does not work, this box will explain why.');
+      }
+    },
+    {
+      nav: 'Click',
+      title: 'Single click',
+      why: 'A click chooses something, like pressing a button or following a link.',
+      steps: [
+        'Move the pointer so the tip of the arrow is on the teal circle.',
+        'Hold the mouse still.',
+        'Press the left button once and let go straight away.'
+      ],
+      button: 'left', buttonTitle: 'Left button, one press', buttonText: 'A quick press and release. You will hear one click sound.',
+      trackpad: 'Press down once on the pad, or tap it once with one finger.',
+      setup: function (a) {
+        var pos = [[50, 50], [24, 30], [75, 68]], n = 0, lastOk = -1e9, down = null;
+        stage.innerHTML = '<div class="target" id="target"><span>Click me</span></div>';
+        var t = $('#target');
+        function place() { t.style.left = pos[n][0] + '%'; t.style.top = pos[n][1] + '%'; }
+        place();
+        a.task('Click the teal circle. It will move each time.');
+        a.rounds(0, 3);
+        say('info', 'Click the teal circle', 'Move the pointer onto the circle, then press the left button once.');
+        a.on(stage, 'pointerdown', function (e) {
+          down = { onT: !!hit(e, '.target'), time: performance.now(), btn: e.button };
+        });
+        a.on(document, 'pointerup', function (e) {
+          if (!down || a.done) { down = null; return; }
+          var d = down; down = null;
+          if (a.wrongButton(d.btn, 'Press the left button once on the teal circle.')) return;
+          var now = performance.now(), upOn = !!hit(e, '.target');
+          if (now - lastOk < 600) {
+            say('retry', 'That was a double click', 'You pressed two times quickly. Your first press already worked. For a single click, press once and then lift your finger.');
+            return;
+          }
+          if (d.onT && !upOn) {
+            say('retry', 'The pointer slid off the circle', 'You pressed down on the circle, but the mouse moved before you let go. Keep your hand still while you press and release.');
+            return;
+          }
+          if (!d.onT) {
+            say('retry', 'You clicked beside the circle', 'The click landed on empty space, so nothing happened. Move the pointer until the tip of the arrow is on top of the teal circle, then click.');
+            return;
+          }
+          var slow = now - d.time > 900;
+          n++; lastOk = now;
+          a.rounds(n, 3);
+          t.classList.remove('hit'); void t.offsetWidth; t.classList.add('hit');
+          if (n === 3) {
+            t.style.display = 'none';
+            a.finish('You can single click', 'Three out of three. A single click is the skill you will use the most.');
+            return;
+          }
+          place();
+          say('good', 'Good click', (slow ? 'That worked. Tip: you held the button down for a while. A click is a quick press and release. ' : 'One press, and it worked. ') + 'The circle has moved. Click it again.');
+        });
+      }
+    },
+    {
+      nav: 'Double click',
+      title: 'Double click',
+      why: 'A double click opens things, like a folder or a file on the desktop.',
+      steps: [
+        'Move the pointer onto a folder.',
+        'Hold the mouse very still.',
+        'Press the left button two times quickly, like knocking on a door: knock, knock.'
+      ],
+      button: 'left', buttonTitle: 'Left button, two quick presses', buttonText: 'Both presses happen in under one second.',
+      trackpad: 'Press down twice quickly, or tap twice quickly with one finger.',
+      setup: function (a) {
+        var names = ['Photos', 'Letters', 'Music'], n = 0, last = null, timer = null;
+        var h = '<div class="folders">';
+        names.forEach(function (nm) {
+          h += '<div class="folder" data-name="' + nm + '"><svg viewBox="0 0 120 96" aria-hidden="true">' +
+            '<g class="fc"><path d="M6 14a8 8 0 0 1 8-8h28l10 12h54a8 8 0 0 1 8 8v56a8 8 0 0 1-8 8H14a8 8 0 0 1-8-8Z" fill="#6D2D41"/><rect x="6" y="28" width="108" height="62" rx="8" fill="#8E4A60"/></g>' +
+            '<g class="fo"><path d="M6 14a8 8 0 0 1 8-8h28l10 12h54a8 8 0 0 1 8 8v56a8 8 0 0 1-8 8H14a8 8 0 0 1-8-8Z" fill="#005F69"/><rect x="22" y="22" width="76" height="50" rx="4" fill="#fff"/><path d="M2 46a6 6 0 0 1 6-7h104a6 6 0 0 1 6 7l-6 38a7 7 0 0 1-7 6H15a7 7 0 0 1-7-6Z" fill="#007A87"/></g>' +
+            '</svg><div class="name">' + nm + '</div><div class="state">Closed</div></div>';
+        });
+        stage.innerHTML = h + '</div>';
+        a.task('Double click each folder to open it.');
+        a.rounds(0, 3);
+        say('info', 'Open the three folders', 'Put the pointer on a folder and press the left button two times quickly.');
+        function clearSel() { Array.prototype.forEach.call(stage.querySelectorAll('.folder.sel'), function (f) { f.classList.remove('sel'); }); }
+        a.on(stage, 'pointerup', function (e) {
+          if (a.done) return;
+          if (a.wrongButton(e.button, 'Press the left button two times quickly on a folder.')) return;
+          var f = hit(e, '.folder'), now = performance.now();
+          clearTimeout(timer);
+          if (!f) {
+            last = null; clearSel();
+            say('retry', 'You clicked beside the folders', 'The click landed on empty space. Move the pointer onto a folder picture or its name, then double click.');
+            return;
+          }
+          if (f.classList.contains('open')) {
+            last = null;
+            say('info', 'That folder is already open', 'Choose a folder that still says Closed and double click it.');
+            return;
+          }
+          if (last && last.el === f) {
+            var dt = now - last.time;
+            var dist = Math.hypot(e.clientX - last.x, e.clientY - last.y);
+            if (dt <= 600 && dist > 12) {
+              last = null;
+              say('retry', 'The mouse moved between your two clicks', 'Your timing was good, but the pointer moved in between, so the computer saw two separate clicks. Relax your hand and keep the mouse still while you press twice.');
+              return;
+            }
+            if (dt <= 600) {
+              last = null; clearSel();
+              f.classList.add('open');
+              $('.state', f).textContent = 'Open';
+              n++; a.rounds(n, 3);
+              if (n === 3) { a.finish('You can double click', 'All three folders are open. Two quick presses, hand held still.'); }
+              else { say('good', f.dataset.name + ' is open', 'Two quick clicks opened the folder. Now open another one.'); }
+              return;
+            }
+            if (dt <= 1500) {
+              last = null;
+              say('retry', 'Your two clicks were too far apart', 'There was about ' + (dt / 1000).toFixed(1) + ' seconds between them, so the computer counted two single clicks. Try again a little faster: knock, knock.');
+              return;
+            }
+          }
+          clearSel(); f.classList.add('sel');
+          last = { el: f, time: now, x: e.clientX, y: e.clientY };
+          timer = a.later(function () {
+            if (a.done || !last) return;
+            say('retry', 'That was one click', 'One click only selects the folder, which is why it now has a border. To open it, press two times quickly without moving the mouse.');
+          }, 650);
+        });
+      }
+    },
+    {
+      nav: 'Right click',
+      title: 'Right click',
+      why: 'A right click opens a small menu of extra choices for the thing you are pointing at.',
+      steps: [
+        'Move the pointer onto the picture.',
+        'Press the right button once. A menu appears.',
+        'Choose from the menu with a normal left click.'
+      ],
+      button: 'right', buttonTitle: 'Right button, one press', buttonText: 'Use your middle finger. Then go back to the left button for the menu.',
+      trackpad: 'Tap the pad with two fingers at the same time. On some laptops, press the bottom right corner.',
+      setup: function (a) {
+        var wants = [{ c: 'teal', hex: '#007A87' }, { c: 'plum', hex: '#6D2D41' }], n = 0, menu = null, menuAt = 0;
+        var colours = { teal: '#007A87', plum: '#6D2D41', grey: '#8C879C' };
+        stage.innerHTML = '<div class="pic-wrap"><div class="pic"><div class="fill" id="fill">Grey</div><div class="cap">My picture</div></div></div>';
+        function setTask() {
+          a.task('Right click the picture. Choose "Colour it ' + wants[n].c + '".');
+        }
+        setTask(); a.rounds(0, 2);
+        say('info', 'Open the menu with a right click', 'Put the pointer on the picture and press the right button once.');
+        function closeMenu() { if (menu) { menu.remove(); menu = null; } }
+        function openMenu(e) {
+          closeMenu();
+          menu = document.createElement('div');
+          menu.className = 'menu';
+          menu.innerHTML = ['teal', 'plum', 'grey'].map(function (c) {
+            return '<button type="button" data-c="' + c + '"><i style="background:' + colours[c] + '"></i>Colour it ' + c + '</button>';
+          }).join('');
+          stage.appendChild(menu);
+          var r = stage.getBoundingClientRect();
+          var x = Math.min(e.clientX - r.left + 4, r.width - menu.offsetWidth - 10);
+          var y = Math.min(e.clientY - r.top + 4, r.height - menu.offsetHeight - 10);
+          menu.style.left = Math.max(10, x) + 'px';
+          menu.style.top = Math.max(10, y) + 'px';
+          menuAt = performance.now();
+        }
+        a.on(stage, 'contextmenu', function (e) {
+          e.preventDefault();
+          if (a.done) return;
+          if (hit(e, '.menu')) {
+            say('retry', 'Use the left button inside the menu', 'The right button opens the menu. To choose something from the menu, use a normal left click.');
+            return;
+          }
+          if (hit(e, '.pic')) {
+            openMenu(e);
+            say('good', 'The menu is open', 'That was a right click. Now move the pointer onto "Colour it ' + wants[n].c + '" and press the left button once.');
+          } else {
+            closeMenu();
+            say('retry', 'Right button, but beside the picture', 'You pressed the correct button, but the pointer was on empty space. The menu belongs to whatever is under the pointer, so move onto the picture first.');
+          }
+        });
+        a.on(stage, 'pointerup', function (e) {
+          if (a.done || e.button === 2) return;
+          if (e.button !== 0) { a.wrongButton(e.button); return; }
+          if (performance.now() - menuAt < 300) return;
+          var opt = hit(e, '.menu button');
+          if (menu) {
+            if (!opt) {
+              if (hit(e, '.menu')) return;
+              closeMenu();
+              say('retry', 'The menu closed', 'Clicking away from a menu closes it. That is normal and handy to know. Right click the picture again to bring the menu back.');
+              return;
+            }
+            if (opt.dataset.c !== wants[n].c) {
+              say('retry', 'That is a different choice', 'You clicked "Colour it ' + opt.dataset.c + '". Your task is "Colour it ' + wants[n].c + '". The menu is still open, so try again.');
+              return;
+            }
+            closeMenu();
+            $('#fill').style.background = wants[n].hex;
+            $('#fill').textContent = wants[n].c.charAt(0).toUpperCase() + wants[n].c.slice(1);
+            n++; a.rounds(n, 2);
+            if (n === 2) { a.finish('You can right click', 'Right click to open the menu, left click to choose from it.'); }
+            else { setTask(); say('good', 'The picture is teal', 'Right click opened the menu and left click chose from it. Now do it once more and choose plum.'); }
+            return;
+          }
+          if (hit(e, '.pic')) {
+            say('retry', 'That was a left click', 'You pressed the left button, so no menu appeared. Press the button on the right side of the mouse, using your middle finger. On a trackpad, tap with two fingers.');
+          } else {
+            say('retry', 'You clicked beside the picture', 'Move the pointer onto the picture, then press the right button once.');
+          }
+        });
+      }
+    },
+    {
+      nav: 'Highlight',
+      title: 'Highlighting text',
+      why: 'Highlighting tells the computer which words you want to copy, change or delete.',
+      steps: [
+        'Put the pointer just before the first letter.',
+        'Press the left button and keep it held down.',
+        'Slide across to the end of the last letter, then let go.'
+      ],
+      button: 'left', buttonTitle: 'Left button, press and hold', buttonText: 'The words change colour as you slide across them.',
+      trackpad: 'Press down with one finger and slide it across. Or hold the pad down with your thumb and slide a finger.',
+      setup: function (a) {
+        var goals = ['market', 'green apples', 'Then she has a cup of tea with her neighbour.'];
+        var parts = ['Every Saturday morning, Maria walks to the ', 0, '. She buys ', 1, ' and fresh bread. ', 2];
+        var n = 0, began = false, emptyTimer = null, hadSel = false, inText = false;
+        stage.innerHTML = '<div class="read-wrap"><p class="read" id="read">' + parts.map(function (p) {
+          return typeof p === 'number' ? '<span data-g="' + p + '">' + goals[p] + '</span>' : p;
+        }).join('') + '</p></div>';
+        function norm(s) { return s.toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim(); }
+        function mark() {
+          goals.forEach(function (g, i) {
+            var s = $('[data-g="' + i + '"]', stage);
+            s.className = i < n ? 'got' : (i === n ? 'goal' : '');
+          });
+          if (n < goals.length) a.task(n === 2 ? 'Highlight the whole last sentence.' : 'Highlight the ' + (n === 0 ? 'word' : 'words') + ' "' + goals[n] + '".');
+        }
+        mark(); a.rounds(0, 3);
+        say('info', 'Highlight the underlined word', 'Press and hold the left button just before the "m" in market, slide to the end of the word, then let go.');
+        a.on(stage, 'pointerdown', function (e) {
+          began = !!hit(e, '.read-wrap') && e.button === 0;
+          inText = !!hit(e, '.read');
+          hadSel = !!norm(String(window.getSelection()));
+          if (e.button !== 0) a.wrongButton(e.button, 'Press and hold the left button, then slide across the words.');
+        });
+        a.on(document, 'pointerup', function () {
+          if (!began || a.done) return;
+          began = false;
+          a.later(check, 10);
+        });
+        function check() {
+          if (a.done) return;
+          var raw = String(window.getSelection());
+          var sel = norm(raw), goal = norm(goals[n]);
+          clearTimeout(emptyTimer);
+          if (!sel && hadSel) {
+            say('info', 'Highlight cleared', 'Good. One click on a blank spot removes the highlight. Now try again: press and hold just before the first letter, slide to the end, then let go.');
+            return;
+          }
+          if (!sel && !inText) {
+            say('retry', 'You started outside the text box', 'Highlighting only works when you start on the writing. Move the pointer inside the white box, right beside the first letter, then press and hold.');
+            return;
+          }
+          if (!sel) {
+            emptyTimer = a.later(function () {
+              if (a.done || norm(String(window.getSelection()))) return;
+              say('retry', 'Nothing was highlighted', 'You pressed and let go without sliding, which is a click. Keep the button held down while you slide across the words, and only let go at the end.');
+            }, 380);
+            return;
+          }
+          var shown = raw.replace(/\s+/g, ' ').trim();
+          if (shown.length > 50) shown = shown.slice(0, 47) + '...';
+          if (sel === goal) {
+            n++; a.rounds(n, 3); mark();
+            a.later(function () { window.getSelection().removeAllRanges(); }, 900);
+            if (n === 3) { a.finish('You can highlight text', 'You highlighted a word, two words and a whole sentence.'); }
+            else { say('good', 'Exactly right', 'You highlighted "' + shown + '". Now highlight the next underlined part.'); }
+          } else if (goal.indexOf(sel) !== -1) {
+            say('retry', 'Only part of it is highlighted', 'You highlighted "' + shown + '". You let go too early or started too late. Click once on a blank spot to clear it, then start just before the first letter and hold until after the last letter.');
+          } else if (sel.indexOf(goal) !== -1) {
+            say('retry', 'A little too much is highlighted', 'You highlighted "' + shown + '". That includes extra words. Click once on a blank spot to clear it, then try again and stop at the end of the underlined part.');
+          } else {
+            say('retry', 'Those are different words', 'You highlighted "' + shown + '". Look for the underlined plum words and highlight only those. Click once on a blank spot to clear your highlight first.');
+          }
+        }
+      }
+    },
+    {
+      nav: 'Drag',
+      title: 'Click and drag',
+      why: 'Dragging moves things, like a file into a folder or a window across the screen.',
+      steps: [
+        'Move the pointer onto a shape.',
+        'Press the left button and keep it held down.',
+        'Slide the shape into the dashed box, then let go.'
+      ],
+      button: 'left', buttonTitle: 'Left button, press and hold', buttonText: 'Holding the button is like holding the shape in your hand.',
+      trackpad: 'Press down with one finger and slide it. Or hold the pad down with your thumb and slide a finger.',
+      setup: function (a) {
+        var shapes = [
+          ['circle', '<circle cx="52" cy="52" r="48" fill="#007A87"/>'],
+          ['square', '<rect x="6" y="6" width="92" height="92" rx="12" fill="#6D2D41"/>'],
+          ['triangle', '<path d="M52 6L100 96H4Z" fill="#211645" stroke="#211645" stroke-width="6" stroke-linejoin="round"/>']
+        ];
+        var n = 0, drag = null;
+        stage.innerHTML = '<div class="drag-area"><div class="shelf"><div class="shelf-label">Shapes</div>' + shapes.map(function (s) {
+          return '<div class="slot"><div class="shape" data-name="' + s[0] + '"><svg viewBox="0 0 104 104" aria-hidden="true">' + s[1] + '</svg></div></div>';
+        }).join('') + '</div><div class="zone" id="zone"><div class="zone-label">Drop the shapes here</div><div class="zone-items" id="zone-items"></div></div></div>';
+        var zone = $('#zone');
+        a.task('Drag all three shapes into the dashed box.');
+        a.rounds(0, 3);
+        say('info', 'Move the shapes into the box', 'Press and hold the left button on a shape, slide it into the dashed box, then let go.');
+        function overZone(el) {
+          var s = el.getBoundingClientRect(), z = zone.getBoundingClientRect();
+          var cx = s.left + s.width / 2, cy = s.top + s.height / 2;
+          return cx > z.left && cx < z.right && cy > z.top && cy < z.bottom;
+        }
+        function sendBack(el) {
+          el.classList.add('back'); el.style.transform = '';
+          a.later(function () { el.classList.remove('back'); }, 400);
+        }
+        a.on(stage, 'pointerdown', function (e) {
+          if (a.done) return;
+          var s = hit(e, '.shelf .shape');
+          if (e.button !== 0) { a.wrongButton(e.button, 'Dragging uses the left button. Press and hold it on a shape.'); return; }
+          if (!s) return;
+          e.preventDefault();
+          drag = { el: s, x: e.clientX, y: e.clientY, moved: 0, id: e.pointerId };
+          try { s.setPointerCapture(e.pointerId); } catch (err) {}
+          s.classList.remove('back'); s.classList.add('dragging');
+        });
+        a.on(stage, 'pointermove', function (e) {
+          if (!drag) return;
+          var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+          drag.moved = Math.max(drag.moved, Math.hypot(dx, dy));
+          drag.el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+          zone.classList.toggle('over', overZone(drag.el));
+        });
+        function end(e) {
+          if (!drag) {
+            if (!a.done && e.type === 'pointerup' && e.button === 0 && !hit(e, '.shape') && hit(e, '#stage')) {
+              say('retry', 'You clicked beside the shapes', 'Move the pointer onto one of the shapes on the left first, then press and hold the left button.');
+            }
+            return;
+          }
+          var d = drag; drag = null;
+          d.el.classList.remove('dragging'); zone.classList.remove('over');
+          if (e.type === 'pointercancel') { sendBack(d.el); return; }
+          if (d.moved < 8) {
+            sendBack(d.el);
+            say('retry', 'You let go straight away', 'You pressed and released on the ' + d.el.dataset.name + ' without moving, which is a click. To drag, keep the button held down while you slide the mouse.');
+            return;
+          }
+          if (!overZone(d.el)) {
+            sendBack(d.el);
+            say('retry', 'You let go before reaching the box', 'The ' + d.el.dataset.name + ' was dropped outside the dashed box, so it went back to its place. Keep the button held down until the box turns teal, then let go.');
+            return;
+          }
+          d.el.style.transform = '';
+          $('#zone-items').appendChild(d.el);
+          n++; a.rounds(n, 3);
+          if (n === 3) { a.finish('You can click and drag', 'All three shapes are in the box. Press, hold, slide, let go.'); }
+          else { say('good', 'The ' + d.el.dataset.name + ' is in the box', 'You held the button all the way there. Now drag the next shape.'); }
+        }
+        a.on(document, 'pointerup', end);
+        a.on(document, 'pointercancel', end);
+      }
+    },
+    {
+      outro: true,
+      eyebrow: 'Finished',
+      title: 'Well done',
+      why: 'You have practised every core mouse skill. These five actions are all you need to use most programs and websites.',
+      steps: [
+        'Single click to choose.',
+        'Double click to open.',
+        'Right click for a menu. Hold and slide to highlight or drag.'
+      ],
+      button: 'left', buttonTitle: 'It gets easier with practice', buttonText: 'Come back and repeat any skill using the numbers at the top.',
+      trackpad: 'Every skill here also works on a laptop trackpad.',
+      setup: function (a) {
+        a.task('All five skills complete.');
+        $('#rounds').innerHTML = '';
+        stage.innerHTML = '<div class="centre"><div class="box"><h2>You finished all five skills</h2><p>Here is what you can now do with a mouse.</p><ul class="ticks">' +
+          screens.filter(function (s) { return s.nav; }).map(function (s) { return '<li>' + CHECK + s.title + '</li>'; }).join('') +
+          '</ul><button class="btn" id="again" type="button">Practise again from the start</button></div></div>';
+        a.on($('#again'), 'click', function () { doneSet = {}; show(1); });
+        say('good', 'Congratulations', 'Keep practising and these actions will soon feel natural. Choose any skill at the top to repeat it.');
+      }
+    }
+  ];
+
+  function drawSteps() {
+    var h = '';
+    screens.forEach(function (s, i) {
+      if (!s.nav) return;
+      h += '<li><button type="button" data-i="' + i + '" class="' + (doneSet[i] ? 'done' : '') + '"' + (i === current ? ' aria-current="step"' : '') + '>' +
+        '<span class="num"><span>' + i + '</span>' + CHECK + '</span>' + s.nav + (doneSet[i] ? '<span style="position:absolute;left:-9999px"> (done)</span>' : '') + '</button></li>';
+    });
+    $('#steps').innerHTML = h;
+  }
+
+  function show(i) {
+    cleanups.forEach(function (fn) { fn(); });
+    cleanups = [];
+    try { window.getSelection().removeAllRanges(); } catch (err) {}
+    current = i;
+    var s = screens[i];
+    guide.innerHTML =
+      '<div><p class="eyebrow">' + (s.eyebrow || 'Skill ' + i + ' of 5') + '</p><h2>' + s.title + '</h2></div>' +
+      '<p class="why">' + s.why + '</p>' +
+      '<div><h3>' + (s.outro ? 'Remember' : 'How to do it') + '</h3><ol>' + s.steps.map(function (t) { return '<li><span>' + t + '</span></li>'; }).join('') + '</ol></div>' +
+      '<div class="which">' + mouseSvg(s.outro ? 'none' : s.button) + '<div><strong>' + s.buttonTitle + '</strong><span>' + s.buttonText + '</span></div></div>' +
+      '<p class="trackpad"><b>Using a trackpad?</b> ' + s.trackpad + '</p>';
+    $('#restart').style.display = s.nav ? '' : 'none';
+    stage.innerHTML = '';
+    drawSteps();
+    s.setup(makeApi(i));
+  }
+
+  $('#steps').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (b) show(Number(b.dataset.i));
+  });
+  $('#restart').addEventListener('click', function () { show(current); });
+  document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  document.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+  show(0);
+})();
+</script>
+</body>
+</html>

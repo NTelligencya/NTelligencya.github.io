@@ -1,4 +1,4 @@
-import * as E from './engine.mjs?v=20260920.1';
+import * as E from './engine.mjs?v=20260920.2';
 
 const STORAGE = 'ntwi-home-wifi-v1';
 const $ = id => document.getElementById(id);
@@ -83,7 +83,7 @@ function renderBench() {
 
   const lanOn = n => s.pc.ethernet.port === `lan${n}` && E.ethernetLinkUp(s);
   const light = (name, on, blink) => `<span><i class="${blink ? 'blink' : on ? 'on' : ''}"></i>${name}</span>`;
-  const router = `<div class="card"><h3>${esc(sc.routerModel)}</h3><div class="label">Label on the base<br>Address <b>${esc(sc.lanAddress)}</b><br>User <b>${esc(sc.defaultUser)}</b> · Password <b>${esc(sc.defaultPass)}</b><br>Wi-Fi <b>${esc(sc.defaultSsid)}</b> · Key <b>${esc(sc.defaultPassphrase)}</b></div>
+  const router = `<div class="card"><h3>${esc(sc.routerModel)}</h3><div class="label">Sticker on the base of the router<br>Address <b>${esc(sc.lanAddress)}</b><br>User <b>${esc(sc.defaultUser)}</b> · Password <b>${esc(sc.defaultPass)}</b><br>Wi-Fi <b>${esc(sc.defaultSsid)}</b> · Key <b>${esc(sc.defaultPassphrase)}</b></div>
     <div class="lights" aria-label="Router lights">${light('Power', r.powered)}${light('Internet', r.powered)}${light('2.4G', r.powered && r.radios.g24.enabled)}${light('5G', r.powered && r.radios.g5.enabled)}${[1, 2, 3, 4].map(n => light(`LAN${n}`, lanOn(n))).join('')}</div>
     <div class="row"><button data-action="power" class="${r.powered ? '' : 'primary'}">${r.powered ? 'Switch off' : 'Switch on'}</button><span class="status">${r.powered ? '<b>Powered</b>' : 'Unplugged'}${r.everReset ? ' · reset done' : ''}</span></div>
     <div class="hold"><label>Hold for (seconds)<input type="number" id="hold-seconds" min="0" max="60" step="1" value="${esc(v('hold', 3))}" data-draft="hold"></label><button id="reset-btn" data-action="reset-click" title="Press and hold with the mouse, or set the seconds and press">Press and hold Reset</button><output id="hold-out" for="hold-seconds" aria-live="polite"></output></div></div>`;
@@ -96,13 +96,13 @@ function renderBench() {
     <p class="status">${s.pc.adapter.present ? `USB adapter in a front port. ${s.pc.adapter.driver === 'installed' ? '<b>Windows set it up.</b>' : '<b>Windows says "device driver was not successfully installed".</b>'}` : 'No wireless adapter fitted.'}</p></div>`;
 
   const nets24 = E.visibleNetworks(s).filter(n => n.band === '2.4');
-  const printer = `<div class="card"><h3>${esc(sc.printerModel)}</h3><p class="small">Network page on the printer's own screen. Fixed address <b>${esc(s.printer.address)}</b>. 2.4 GHz only.</p>
+  const printer = `<div class="card"><h3>${esc(sc.printerModel)}</h3><p class="small">Network page on the printer's own screen. Fixed address <b>${esc(s.printer.address)}</b>. 2.4 GHz only. The passphrase it needs is the one set on the router's 2.4 GHz network: your own if you have changed it, otherwise the Wi-Fi key on the router's sticker.</p>
     <div class="row"><button data-action="printer-power" class="small">${s.printer.powered ? 'Switch off' : 'Switch on'}</button><span class="status ${s.printer.ssid ? 'good' : ''}">${!s.printer.powered ? 'Off' : s.printer.ssid ? `Joined <b>${esc(s.printer.ssid)}</b>` : '<b>Not connected</b>'}</span></div>
-    <form data-form="printer" class="form-grid"><label>Wireless setup wizard: network<select name="ssid" data-draft="pr-ssid">${nets24.length ? nets24.map(n => `<option ${v('pr-ssid', '') === n.ssid ? 'selected' : ''}>${esc(n.ssid)}</option>`).join('') : '<option value="">No 2.4 GHz networks found</option>'}</select></label><label>Passphrase<input name="pass" type="text" data-draft="pr-pass" value="${esc(v('pr-pass', ''))}" autocomplete="off"></label><button type="submit" class="small">Join</button></form></div>`;
+    <form data-form="printer" class="form-grid"><label>Wireless setup wizard: network<select name="ssid" data-draft="pr-ssid">${nets24.length ? nets24.map(n => `<option ${v('pr-ssid', '') === n.ssid ? 'selected' : ''}>${esc(n.ssid)}</option>`).join('') : '<option value="">No 2.4 GHz networks found</option>'}</select></label><label>Wi-Fi passphrase (as set on the router)<input name="pass" type="text" data-draft="pr-pass" value="${esc(v('pr-pass', ''))}" autocomplete="off"></label><button type="submit" class="small">Join</button></form></div>`;
 
   const netsAll = E.visibleNetworks(s);
   const phone = `<div class="card"><h3>Phone</h3><p class="small">A second wireless client for testing.</p><p class="status ${s.phone.ssid ? 'good' : ''}">${s.phone.ssid ? `Joined <b>${esc(s.phone.ssid)}</b> · ${esc(s.phone.lease || '')}` : 'Not connected'}</p>
-    <form data-form="phone" class="form-grid"><label>Wi-Fi<select name="ssid" data-draft="ph-ssid">${netsAll.length ? netsAll.map(n => `<option ${v('ph-ssid', '') === n.ssid ? 'selected' : ''}>${esc(n.ssid)} (${n.band} GHz)</option>`).join('') : '<option value="">No networks</option>'}</select></label><label>Password<input name="pass" type="text" data-draft="ph-pass" value="${esc(v('ph-pass', ''))}" autocomplete="off"></label><button type="submit" class="small">Join</button></form></div>`;
+    <form data-form="phone" class="form-grid"><label>Wi-Fi<select name="ssid" data-draft="ph-ssid">${netsAll.length ? netsAll.map(n => `<option ${v('ph-ssid', '') === n.ssid ? 'selected' : ''}>${esc(n.ssid)} (${n.band} GHz)</option>`).join('') : '<option value="">No networks</option>'}</select></label><label>Wi-Fi passphrase (as set on the router)<input name="pass" type="text" data-draft="ph-pass" value="${esc(v('ph-pass', ''))}" autocomplete="off"></label><button type="submit" class="small">Join</button></form></div>`;
 
   $('bench').innerHTML = packing + router + pc + printer + phone;
 }

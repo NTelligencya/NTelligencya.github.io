@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyber Law's Most Wanted</title>
+<style>
+  :root{
+    --paper:#f3e6c8; --paper-deep:#e7d3a6; --card:#fbf3df; --ink:#2a1d12; --ink-soft:#5b4632;
+    --red:#a3241b; --red-deep:#7c170f; --gold:#b8862d; --line:#c9b27f; --slate:#33404a; --teal:#1f5e5a;
+  }
+  *{box-sizing:border-box}
+  html{background:#3a2a1c}
+  body{
+    margin:0; color:var(--ink); font-family:Georgia,"Times New Roman",serif; font-size:15px; line-height:1.5;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,.35), transparent 40%),
+      repeating-linear-gradient(0deg, rgba(90,60,20,.035) 0 2px, transparent 2px 5px),
+      var(--paper);
+  }
+  .wrap{max-width:1520px; margin:0 auto; padding:0 28px 48px}
+
+  /* Masthead */
+  header{
+    display:grid; grid-template-columns:auto 1fr auto; gap:28px; align-items:center;
+    padding:18px 0 14px; border-bottom:6px double var(--ink);
+  }
+  .badge{
+    width:92px; height:92px; border-radius:50%; background:var(--red); color:var(--card);
+    display:grid; place-items:center; text-align:center; font:700 11px/1.15 "Arial Narrow",Arial,sans-serif;
+    letter-spacing:.12em; text-transform:uppercase; border:4px solid var(--card);
+    box-shadow:0 0 0 3px var(--red), 0 4px 0 3px rgba(0,0,0,.25); transform:rotate(-8deg);
+  }
+  .badge b{display:block; font-size:24px; letter-spacing:.02em}
+  h1{
+    margin:0; font-family:Impact,"Arial Black","Franklin Gothic Heavy",sans-serif; font-weight:400;
+    font-size:64px; line-height:1; letter-spacing:.04em; text-transform:uppercase;
+    text-shadow:3px 3px 0 var(--paper-deep);
+  }
+  h1 span{color:var(--red)}
+  .tagline{margin:8px 0 0; font-style:italic; font-size:17px; color:var(--ink-soft); max-width:70ch}
+  .stamp{
+    border:3px solid var(--red); color:var(--red); padding:8px 14px; text-align:center; transform:rotate(4deg);
+    font:700 12px/1.3 "Courier New",monospace; letter-spacing:.1em; text-transform:uppercase; border-radius:6px;
+    opacity:.9;
+  }
+  .stamp b{display:block; font-size:18px}
+
+  /* Grid */
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:26px; margin-top:24px; align-items:start}
+  .card{
+    background:var(--card); border:2px solid var(--ink); border-radius:4px; position:relative;
+    box-shadow:6px 7px 0 rgba(42,29,18,.28); display:flex; flex-direction:column;
+  }
+  .card::before,.card::after{
+    content:""; position:absolute; top:-9px; width:16px; height:16px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #e9e9e9, #777 60%, #444); box-shadow:0 2px 2px rgba(0,0,0,.4); z-index:2;
+  }
+  .card::before{left:18px} .card::after{right:18px}
+  .wanted{
+    text-align:center; background:var(--ink); color:var(--paper); padding:6px 0 4px;
+    font:400 22px/1 Impact,"Arial Black",sans-serif; letter-spacing:.32em; text-transform:uppercase;
+  }
+  .top{display:grid; grid-template-columns:190px 1fr; gap:16px; padding:14px 16px 10px; border-bottom:2px dashed var(--line)}
+  .mug{
+    height:200px; border:3px solid var(--ink); position:relative; overflow:hidden;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 24px, rgba(42,29,18,.45) 24px 25px),
+      linear-gradient(#dfe5e6,#c3ccce);
+  }
+  .mug svg{position:absolute; inset:0; width:100%; height:100%}
+  .mug .ht{position:absolute; right:4px; font:700 9px/1 "Courier New",monospace; color:rgba(42,29,18,.7)}
+  .plate{
+    position:absolute; left:50%; bottom:6px; transform:translateX(-50%); background:#1c1c1c; color:#fff;
+    font:700 10px/1.25 "Courier New",monospace; letter-spacing:.08em; padding:4px 8px; text-align:center; white-space:nowrap;
+    border:1px solid #fff;
+  }
+  h2{margin:2px 0 2px; font:400 30px/1.02 Impact,"Arial Black",sans-serif; letter-spacing:.03em; text-transform:uppercase}
+  .alias{font-style:italic; color:var(--ink-soft); margin:0 0 8px; font-size:14px}
+  .for{
+    display:inline-block; background:var(--red); color:#fff; padding:3px 9px; font:700 11px/1.4 Arial,sans-serif;
+    letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px;
+  }
+  .charge{margin:0; font-weight:700; font-size:15.5px; line-height:1.35}
+  .danger{margin:8px 0 0; font:700 11px/1.3 "Courier New",monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft)}
+  .body{padding:12px 16px 16px; display:flex; flex-direction:column; gap:12px}
+  .label{
+    font:700 11px/1 Arial,sans-serif; letter-spacing:.16em; text-transform:uppercase; color:var(--red-deep);
+    display:flex; align-items:center; gap:8px; margin-bottom:5px;
+  }
+  .label::after{content:""; flex:1; height:1px; background:var(--line)}
+  .story p{margin:0}
+  .tag{font:700 10px/1 Arial,sans-serif; letter-spacing:.1em; text-transform:uppercase; padding:3px 6px; border-radius:3px; vertical-align:1px}
+  .tag.fic{background:#e9d9f2; color:#4b2363}
+  .tag.real{background:#d5ebe6; color:#0f4a44}
+  .sheet{border:2px solid var(--slate); background:#fff; font-family:"Courier New",monospace; font-size:13px; line-height:1.45}
+  .sheet .hd{background:var(--slate); color:#fff; padding:5px 10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; font-size:12px; display:flex; justify-content:space-between}
+  .sheet dl{margin:0; display:grid; grid-template-columns:96px 1fr}
+  .sheet dt,.sheet dd{margin:0; padding:7px 10px; border-top:1px solid #d5d9dc}
+  .sheet dt{font-weight:700; background:#eef1f2; text-transform:uppercase; font-size:11px; letter-spacing:.06em; color:var(--slate)}
+  .sheet dd b{color:var(--red-deep)}
+  .lesson{background:var(--teal); color:#f2fbf9; padding:11px 14px; border-radius:3px; font-size:14.5px}
+  .lesson .label{color:#bfe8e0} .lesson .label::after{background:rgba(255,255,255,.3)}
+  .lesson p{margin:0}
+
+  .side{background:var(--ink); color:var(--paper); border-radius:4px; padding:18px 20px; box-shadow:6px 7px 0 rgba(42,29,18,.28)}
+  .side h3{margin:0 0 8px; font:400 24px/1.1 Impact,"Arial Black",sans-serif; letter-spacing:.06em; text-transform:uppercase; color:#f0c766}
+  .side p,.side li{font-size:14px; margin:0 0 8px}
+  .side ul{margin:0 0 10px; padding-left:18px}
+  .side table{width:100%; border-collapse:collapse; font:13px/1.4 "Courier New",monospace; margin:6px 0 12px}
+  .side th,.side td{border-bottom:1px solid rgba(243,230,200,.3); padding:5px 4px; text-align:left}
+  .side th{color:#f0c766; font-size:11px; letter-spacing:.08em; text-transform:uppercase}
+
+  footer{margin-top:30px; border-top:6px double var(--ink); padding-top:16px; display:grid; grid-template-columns:1.2fr 1fr; gap:30px; font-size:13.5px}
+  footer h4{margin:0 0 6px; font:700 12px/1 Arial,sans-serif; letter-spacing:.16em; text-transform:uppercase; color:var(--red-deep)}
+  footer p{margin:0 0 8px}
+  footer ul{margin:0; padding-left:18px}
+  footer a{color:var(--teal); word-break:break-word}
+
+  @media (max-width:1180px){ .grid{grid-template-columns:repeat(2,1fr)} h1{font-size:48px} }
+  @media (max-width:760px){
+    .grid{grid-template-columns:1fr} header{grid-template-columns:1fr; text-align:center} .badge,.stamp{margin:0 auto}
+    h1{font-size:38px} .top{grid-template-columns:1fr} .mug{width:200px; margin:0 auto} footer{grid-template-columns:1fr}
+  }
+  @media print{ html,body{background:#fff} .card,.side{box-shadow:none; break-inside:avoid} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="badge"><span>Cyber Law<b>5</b>Most Wanted</span></div>
+  <div>
+    <h1>Cyber Law's <span>Most Wanted</span></h1>
+    <p class="tagline">Five thoroughly made-up rascals, five very real Australian laws. The villains are fiction. The section numbers and penalties are not.</p>
+  </div>
+  <div class="stamp">Characters<b>100% Fictional</b>Laws checked 20 Sep 2026</div>
+</header>
+
+<main class="grid">
+
+  <!-- 1 -->
+  <article class="card">
+    <div class="wanted">Wanted</div>
+    <div class="top">
+      <div class="mug" role="img" aria-label="Cartoon mugshot: a round purple blob with one enormous eye and a keyhole for a mouth">
+        <span class="ht" style="top:16px">180</span><span class="ht" style="top:64px">150</span><span class="ht" style="top:112px">120</span>
+        <svg viewBox="0 0 190 200" aria-hidden="true">
+          <path d="M35 200 Q35 150 95 150 Q155 150 155 200Z" fill="#4a3b78"/>
+          <circle cx="95" cy="92" r="58" fill="#6b57a8" stroke="#2a1d12" stroke-width="4"/>
+          <circle cx="95" cy="78" r="30" fill="#fff" stroke="#2a1d12" stroke-width="4"/>
+          <circle cx="102" cy="82" r="13" fill="#2a1d12"/><circle cx="107" cy="77" r="4" fill="#fff"/>
+          <path d="M62 44 Q95 22 128 44" fill="none" stroke="#2a1d12" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="95" cy="124" r="7" fill="#2a1d12"/><path d="M91 126 L99 126 L102 142 L88 142Z" fill="#2a1d12"/>
+        </svg>
+        <div class="plate">NT-CYB 4781<br>P. McPASSWORD</div>
+      </div>
+      <div>
+        <h2>Peeky McPassword</h2>
+        <p class="alias">alias "The Shoulder Surfer of Humpty Doo"</p>
+        <span class="for">Wanted for</span>
+        <p class="charge">Logging in to the boss's payroll system with a password read off a sticky note, just to have a squiz.</p>
+        <p class="danger">Threat level: nosy. Approach with a privacy screen.</p>
+      </div>
+    </div>
+    <div class="body">
+      <div class="story">
+        <div class="label">The caper <span class="tag fic">Invented</span></div>
+        <p>Peeky, junior biscuit auditor at Crumbleton Bikkies, spotted "Tim-Tam-4-Eva!" stuck to the payroll manager's monitor. At 12.07 pm, while everyone queued for the microwave, Peeky logged in and scrolled through everyone's salaries. Peeky changed nothing, stole nothing and told only eleven people. "I was only looking!" was the full extent of the defence.</p>
+      </div>
+      <div class="sheet">
+        <div class="hd"><span>Rap sheet</span><span class="tag real">Real law</span></div>
+        <dl>
+          <dt>Law</dt><dd>Criminal Code Act 1995 (Cth), Part 10.7 (Computer offences), <b>s 478.1</b>: unauthorised access to, or modification of, restricted data.</dd>
+          <dt>Rule broken</dt><dd>Intentionally causing access to restricted data while knowing the access is unauthorised. "Restricted data" is data held in a computer where access is restricted by an access control system, such as a password.</dd>
+          <dt>Maximum</dt><dd><b>2 years imprisonment.</b></dd>
+        </dl>
+      </div>
+      <div class="lesson">
+        <div class="label">Lesson for students</div>
+        <p>"Just looking" is the offence. No damage, theft or profit is needed: knowing you are not authorised and getting past the access control anyway is enough. Knowing a password is not the same as having permission.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- 2 -->
+  <article class="card">
+    <div class="wanted">Wanted</div>
+    <div class="top">
+      <div class="mug" role="img" aria-label="Cartoon mugshot: a green goblin with pointy ears wearing an orange traffic cone as a hat">
+        <span class="ht" style="top:16px">180</span><span class="ht" style="top:64px">150</span><span class="ht" style="top:112px">120</span>
+        <svg viewBox="0 0 190 200" aria-hidden="true">
+          <path d="M40 200 Q40 155 95 155 Q150 155 150 200Z" fill="#2f5d34"/>
+          <path d="M42 100 L8 78 L46 120Z M148 100 L182 78 L144 120Z" fill="#6fae57" stroke="#2a1d12" stroke-width="4" stroke-linejoin="round"/>
+          <ellipse cx="95" cy="112" rx="52" ry="48" fill="#7dbf63" stroke="#2a1d12" stroke-width="4"/>
+          <path d="M95 8 L126 72 L64 72Z" fill="#f07c1f" stroke="#2a1d12" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M80 40 L110 40 L116 53 L74 53Z" fill="#fff"/>
+          <rect x="50" y="68" width="90" height="11" rx="3" fill="#f07c1f" stroke="#2a1d12" stroke-width="4"/>
+          <circle cx="76" cy="104" r="11" fill="#fff" stroke="#2a1d12" stroke-width="3"/><circle cx="114" cy="104" r="11" fill="#fff" stroke="#2a1d12" stroke-width="3"/>
+          <circle cx="78" cy="106" r="4.5" fill="#2a1d12"/><circle cx="112" cy="106" r="4.5" fill="#2a1d12"/>
+          <path d="M62 88 L88 95 M128 88 L102 95" stroke="#2a1d12" stroke-width="5" stroke-linecap="round"/>
+          <path d="M68 130 Q95 152 122 130 L114 130 L109 138 L102 130 L88 130 L81 138 L76 130Z" fill="#fff" stroke="#2a1d12" stroke-width="3" stroke-linejoin="round"/>
+        </svg>
+        <div class="plate">NT-CYB 4773<br>D. DOSS</div>
+      </div>
+      <div>
+        <h2>Dee Doss</h2>
+        <p class="alias">alias "The Traffic Goblin"</p>
+        <span class="for">Wanted for</span>
+        <p class="charge">Flooding a rival pie shop's online ordering site with junk traffic until it fell over on grand final day.</p>
+        <p class="danger">Threat level: loud. Known to travel in a swarm of 40,000 toasters.</p>
+      </div>
+    </div>
+    <div class="body">
+      <div class="story">
+        <div class="label">The caper <span class="tag fic">Invented</span></div>
+        <p>Furious that Pie Hard 2: Pie Harder had won Best Chunky Steak three years running, Dee rented a botnet of hijacked smart toasters and aimed it at the shop's ordering page. For six hours every genuine customer got a spinning wheel instead of a pie. Dee never broke in, never read a single file and considered it "basically a prank".</p>
+      </div>
+      <div class="sheet">
+        <div class="hd"><span>Rap sheet</span><span class="tag real">Real law</span></div>
+        <dl>
+          <dt>Law</dt><dd>Criminal Code Act 1995 (Cth), Part 10.7, Division 477 (Serious computer offences), <b>s 477.3</b>: unauthorised impairment of electronic communication.</dd>
+          <dt>Rule broken</dt><dd>Causing an unauthorised impairment of electronic communication to or from a computer, knowing the impairment is unauthorised. Its sibling, <b>s 477.2</b> (unauthorised modification of data to cause impairment), carries the same maximum.</dd>
+          <dt>Maximum</dt><dd><b>10 years imprisonment.</b></dd>
+        </dl>
+      </div>
+      <div class="lesson">
+        <div class="label">Lesson for students</div>
+        <p>You do not have to get inside a system to commit a serious computer offence. Knocking a service offline is treated far more harshly than Peeky's snooping: a 10 year maximum, compared with 2.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- 3 -->
+  <article class="card">
+    <div class="wanted">Wanted</div>
+    <div class="top">
+      <div class="mug" role="img" aria-label="Cartoon mugshot: a tin can with a grand moustache and a military cap">
+        <span class="ht" style="top:16px">180</span><span class="ht" style="top:64px">150</span><span class="ht" style="top:112px">120</span>
+        <svg viewBox="0 0 190 200" aria-hidden="true">
+          <rect x="48" y="58" width="94" height="130" rx="10" fill="#c9ced1" stroke="#2a1d12" stroke-width="4"/>
+          <rect x="48" y="120" width="94" height="40" fill="#2f6fb0" stroke="#2a1d12" stroke-width="4"/>
+          <path d="M40 58 Q40 22 95 22 Q150 22 150 58Z" fill="#55602f" stroke="#2a1d12" stroke-width="4"/>
+          <rect x="34" y="54" width="122" height="12" rx="4" fill="#3c4420" stroke="#2a1d12" stroke-width="4"/>
+          <path d="M95 30 l4 9 l10 1 l-8 6 l3 10 l-9 -6 l-9 6 l3 -10 l-8 -6 l10 -1Z" fill="#f0c766" stroke="#2a1d12" stroke-width="2"/>
+          <circle cx="76" cy="88" r="9" fill="#fff" stroke="#2a1d12" stroke-width="3"/><circle cx="114" cy="88" r="9" fill="#fff" stroke="#2a1d12" stroke-width="3"/>
+          <circle cx="76" cy="89" r="4" fill="#2a1d12"/><circle cx="114" cy="89" r="4" fill="#2a1d12"/>
+          <path d="M95 104 Q80 96 66 106 Q52 116 42 104 Q52 126 72 120 Q88 116 95 108 Q102 116 118 120 Q138 126 148 104 Q138 116 124 106 Q110 96 95 104Z" fill="#2a1d12"/>
+          <rect x="62" y="130" width="66" height="20" rx="3" fill="#fff" opacity=".9"/>
+          <path d="M70 140 h50 M70 146 h32" stroke="#2f6fb0" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <div class="plate">NT-CYB 0016<br>COL. CLICKBAIT</div>
+      </div>
+      <div>
+        <h2>Colonel Clickbait</h2>
+        <p class="alias">alias "The Inbox Invader"</p>
+        <span class="for">Wanted for</span>
+        <p class="charge">Blasting 90,000 marketing emails to people who never signed up, from a fake sender name, with an unsubscribe link that went nowhere.</p>
+        <p class="danger">Threat level: relentless. Subject lines contain up to nine exclamation marks.</p>
+      </div>
+    </div>
+    <div class="body">
+      <div class="story">
+        <div class="label">The caper <span class="tag fic">Invented</span></div>
+        <p>To launch Colonel's Cut-Price Camo Cushions, the Colonel bought a "guaranteed fresh" email list from a bloke at the markets. Every message came from "Your Mate Dave" with no business name or contact details. The unsubscribe link led to a photo of a cushion. People who replied STOP were moved to a second list called "Keen".</p>
+      </div>
+      <div class="sheet">
+        <div class="hd"><span>Rap sheet</span><span class="tag real">Real law</span></div>
+        <dl>
+          <dt>Law</dt><dd>Spam Act 2003 (Cth), regulated by the ACMA. <b>s 16</b>: unsolicited commercial electronic messages must not be sent. <b>s 17</b>: messages must include accurate sender information. <b>s 18</b>: messages must contain a functional unsubscribe facility.</dd>
+          <dt>Rule broken</dt><dd>All three: no consent, no identification, no working unsubscribe. ACMA guidance says unsubscribe requests must be honoured within 5 working days.</dd>
+          <dt>Penalty</dt><dd><b>Civil penalties, not jail.</b> The ACMA can investigate and take enforcement action, including financial penalties and court-enforceable undertakings. In March 2026 the ACMA reported that businesses had paid over <b>$6.7 million</b> in spam penalties in the previous 18 months, including one penalty of $702,900 for emails with no way to unsubscribe.</dd>
+        </dl>
+      </div>
+      <div class="lesson">
+        <div class="label">Lesson for students</div>
+        <p>Remember three words: consent, identify, unsubscribe. Most real spam penalties are paid by ordinary, legitimate businesses with sloppy mailing systems, not by cartoon villains.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- 4 -->
+  <article class="card">
+    <div class="wanted">Wanted</div>
+    <div class="top">
+      <div class="mug" role="img" aria-label="Cartoon mugshot: a leaky bucket wearing a tiara, with water dripping from holes">
+        <span class="ht" style="top:16px">180</span><span class="ht" style="top:64px">150</span><span class="ht" style="top:112px">120</span>
+        <svg viewBox="0 0 190 200" aria-hidden="true">
+          <path d="M44 62 Q95 -6 146 62" fill="none" stroke="#2a1d12" stroke-width="5"/>
+          <path d="M40 62 L150 62 L134 176 L56 176Z" fill="#d98b9c" stroke="#2a1d12" stroke-width="4" stroke-linejoin="round"/>
+          <ellipse cx="95" cy="62" rx="55" ry="10" fill="#b96a7c" stroke="#2a1d12" stroke-width="4"/>
+          <path d="M62 50 L70 22 L82 42 L95 14 L108 42 L120 22 L128 50Z" fill="#f0c766" stroke="#2a1d12" stroke-width="3.5" stroke-linejoin="round"/>
+          <circle cx="95" cy="16" r="5" fill="#a3241b" stroke="#2a1d12" stroke-width="2"/>
+          <circle cx="78" cy="98" r="9" fill="#fff" stroke="#2a1d12" stroke-width="3"/><circle cx="112" cy="98" r="9" fill="#fff" stroke="#2a1d12" stroke-width="3"/>
+          <circle cx="78" cy="96" r="4" fill="#2a1d12"/><circle cx="112" cy="96" r="4" fill="#2a1d12"/>
+          <path d="M66 82 L90 84 M124 82 L100 84" stroke="#2a1d12" stroke-width="4" stroke-linecap="round"/>
+          <path d="M80 126 Q95 116 110 126" fill="none" stroke="#2a1d12" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="62" cy="140" r="5" fill="#2a1d12"/><circle cx="126" cy="150" r="5" fill="#2a1d12"/><circle cx="96" cy="160" r="5" fill="#2a1d12"/>
+          <path d="M62 146 q-7 12 0 18 q7 -6 0 -18Z M126 156 q-7 12 0 18 q7 -6 0 -18Z M96 166 q-7 12 0 18 q7 -6 0 -18Z" fill="#4aa3d8" stroke="#2a1d12" stroke-width="2"/>
+        </svg>
+        <div class="plate">NT-CYB 0013<br>LADY LEAKSWORTH</div>
+      </div>
+      <div>
+        <h2>Lady Leaksworth</h2>
+        <p class="alias">alias "The Duchess of Loose Buckets"</p>
+        <span class="for">Wanted for</span>
+        <p class="charge">Leaving 200,000 customer records in a public cloud folder, then sitting on the breach for months and telling no one.</p>
+        <p class="danger">Threat level: drippy. Believes "the cloud" is a kind of weather.</p>
+      </div>
+    </div>
+    <div class="body">
+      <div class="story">
+        <div class="label">The caper <span class="tag fic">Invented</span></div>
+        <p>Her Ladyship runs Posh Paws Pet Insurance Pty Ltd. Names, addresses, bank details and the dental histories of 200,000 owners and their schnauzers sat in an open storage bucket labelled "backup_final_FINAL2". When a researcher emailed a warning, she filed it under "Later". When the data turned up for sale, she told the board it was "probably fine" and asked that nobody mention it to the customers, or to the regulator.</p>
+      </div>
+      <div class="sheet">
+        <div class="hd"><span>Rap sheet</span><span class="tag real">Real law</span></div>
+        <dl>
+          <dt>Law</dt><dd>Privacy Act 1988 (Cth). <b>APP 11</b>: take reasonable steps to protect personal information from misuse, interference, loss and unauthorised access, modification or disclosure. <b>Part IIIC</b>: Notifiable Data Breaches scheme. <b>s 13G</b>: civil penalty for a serious interference with privacy.</dd>
+          <dt>Rule broken</dt><dd>An eligible data breach (<b>s 26WE</b>) is unauthorised access to, disclosure of, or loss of personal information that is likely to result in serious harm and that cannot be prevented by remedial action. An entity that suspects a breach must take all reasonable steps to complete its assessment within 30 calendar days (<b>s 26WH</b>). The OAIC and affected individuals must then be notified as soon as practicable (<b>ss 26WK, 26WL</b>). Failing to do so is itself an interference with privacy (<b>s 13(4A)</b>).</dd>
+          <dt>Maximum</dt><dd>Under s 13G, for a body corporate, the <b>greater of $50 million</b>, three times the value of the benefit obtained, or 30% of adjusted turnover in the breach turnover period. For an individual, <b>$2.5 million</b>. These are civil penalties ordered by a court.</dd>
+        </dl>
+      </div>
+      <div class="lesson">
+        <div class="label">Lesson for students</div>
+        <p>Two separate failures: weak security, then silence. The breach may be forgiven; the cover-up rarely is. Know the three-part test for an eligible data breach and the two clocks: 30 days to assess, then notify as soon as practicable.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- 5 -->
+  <article class="card">
+    <div class="wanted">Wanted</div>
+    <div class="top">
+      <div class="mug" role="img" aria-label="Cartoon mugshot: a round brown wombat-like figure in a bow tie with a zip for a mouth">
+        <span class="ht" style="top:16px">180</span><span class="ht" style="top:64px">150</span><span class="ht" style="top:112px">120</span>
+        <svg viewBox="0 0 190 200" aria-hidden="true">
+          <path d="M30 200 Q30 150 95 150 Q160 150 160 200Z" fill="#33404a"/>
+          <circle cx="52" cy="50" r="17" fill="#8a6a4a" stroke="#2a1d12" stroke-width="4"/><circle cx="138" cy="50" r="17" fill="#8a6a4a" stroke="#2a1d12" stroke-width="4"/>
+          <circle cx="52" cy="50" r="7" fill="#d9a9a0"/><circle cx="138" cy="50" r="7" fill="#d9a9a0"/>
+          <ellipse cx="95" cy="98" rx="62" ry="56" fill="#a07c58" stroke="#2a1d12" stroke-width="4"/>
+          <circle cx="72" cy="84" r="8" fill="#fff" stroke="#2a1d12" stroke-width="3"/><circle cx="118" cy="84" r="8" fill="#fff" stroke="#2a1d12" stroke-width="3"/>
+          <circle cx="69" cy="85" r="3.5" fill="#2a1d12"/><circle cx="115" cy="85" r="3.5" fill="#2a1d12"/>
+          <ellipse cx="95" cy="104" rx="16" ry="11" fill="#2a1d12"/>
+          <path d="M62 128 H128" stroke="#2a1d12" stroke-width="5" stroke-linecap="round"/>
+          <path d="M68 122 v12 M78 122 v12 M88 122 v12 M98 122 v12 M108 122 v12 M118 122 v12" stroke="#2a1d12" stroke-width="3"/>
+          <rect x="126" y="122" width="10" height="12" rx="2" fill="#f0c766" stroke="#2a1d12" stroke-width="2.5"/>
+          <path d="M95 160 L70 148 L70 174Z M95 160 L120 148 L120 174Z" fill="#a3241b" stroke="#2a1d12" stroke-width="3.5" stroke-linejoin="round"/>
+          <circle cx="95" cy="160" r="6" fill="#a3241b" stroke="#2a1d12" stroke-width="3.5"/>
+        </svg>
+        <div class="plate">NT-CYB 0027<br>H. HUSHINGTON</div>
+      </div>
+      <div>
+        <h2>Hush-Hush Harold</h2>
+        <p class="alias">alias "The Wombat Who Said Nothing"</p>
+        <span class="for">Wanted for</span>
+        <p class="charge">Quietly paying a ransomware gang, then hiding the payment in the accounts and never reporting it.</p>
+        <p class="danger">Threat level: shifty. Last seen shredding a receipt.</p>
+      </div>
+    </div>
+    <div class="body">
+      <div class="story">
+        <div class="label">The caper <span class="tag fic">Invented</span></div>
+        <p>Harold Hushington is chief financial officer of Wombat Widgets Pty Ltd, annual turnover $12 million. When a gang calling itself the Naughty Numbats locked every widget blueprint, Harold paid the ransom in cryptocurrency on a Friday night and booked it as "miscellaneous stationery". Seventy-two hours ticked by. Then a week. Harold's plan was simple: if nobody knows, it never happened.</p>
+      </div>
+      <div class="sheet">
+        <div class="hd"><span>Rap sheet</span><span class="tag real">Real law</span></div>
+        <dl>
+          <dt>Law</dt><dd>Cyber Security Act 2024 (Cth), Part 3 (Ransomware reporting obligations), <b>s 27</b>. Mandatory reporting has been active since 30 May 2025.</dd>
+          <dt>Rule broken</dt><dd>A reporting business entity must report within <b>72 hours</b> of making a ransomware or cyber extortion payment, or becoming aware one was made on its behalf. That covers businesses carrying on business in Australia with annual turnover above <b>$3 million</b>, and responsible entities for critical infrastructure assets. Reports are made through the Australian Signals Directorate form at cyber.gov.au.</dd>
+          <dt>Penalty</dt><dd>Civil penalty of <b>60 penalty units</b> for failing to report. A Commonwealth penalty unit is $364 for contraventions on or after 1 July 2026 (previously $330), so 60 units works out to $21,840.</dd>
+        </dl>
+      </div>
+      <div class="lesson">
+        <div class="label">Lesson for students</div>
+        <p>Harold's contravention is the silence, not the payment. Paying a ransom is not generally prohibited under Australian law, although the Government strongly discourages it. If you pay, the 72 hour clock starts.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- side panel -->
+  <aside class="side">
+    <h3>Line-up cheat sheet</h3>
+    <table>
+      <tr><th>Suspect</th><th>Law</th><th>Maximum</th></tr>
+      <tr><td>Peeky</td><td>Criminal Code s 478.1</td><td>2 years</td></tr>
+      <tr><td>Dee Doss</td><td>Criminal Code s 477.3</td><td>10 years</td></tr>
+      <tr><td>Colonel</td><td>Spam Act ss 16-18</td><td>Civil penalties</td></tr>
+      <tr><td>Lady L.</td><td>Privacy Act s 13G, Pt IIIC</td><td>$50m or more</td></tr>
+      <tr><td>Harold</td><td>Cyber Security Act s 27</td><td>60 penalty units</td></tr>
+    </table>
+    <h3>Try it in class</h3>
+    <ul>
+      <li><b>Criminal or civil?</b> Sort the five suspects. Two face prison; three face civil penalties. Ask why Parliament chose differently.</li>
+      <li><b>Spot the clock.</b> Which laws have deadlines? (30 days, as soon as practicable, 72 hours, 5 working days.)</li>
+      <li><b>Swap the facts.</b> What if Peeky had changed a salary? What if Harold's firm turned over $2 million?</li>
+      <li><b>Invent a sixth.</b> Students write their own villain, and must cite a real section to match.</li>
+    </ul>
+    <p><b>About penalty units:</b> many Commonwealth penalties are written in units so they keep pace with inflation. The dollar value is set under s 4AA of the Crimes Act 1914 (Cth) and depends on when the contravention happened.</p>
+  </aside>
+
+</main>
+
+<footer>
+  <div>
+    <h4>The fine print</h4>
+    <p><b>The characters and their stories on this page are invented.</b> Any resemblance to real people, wombats, goblins or businesses is coincidental. The legal references are a simplified teaching summary, <b>not legal advice</b>. Maximum penalties are the ceiling set by Parliament, not the usual result; courts decide actual outcomes case by case. State and territory laws may also apply and are not covered here.</p>
+    <p><b>Legal references checked: 20 September 2026.</b> Laws and penalty unit values change. Check the current compilation on the Federal Register of Legislation before relying on any detail.</p>
+  </div>
+  <div>
+    <h4>Sources checked</h4>
+    <ul>
+      <li>Federal Register of Legislation: <a href="https://www.legislation.gov.au/">legislation.gov.au</a> (Criminal Code Act 1995, Privacy Act 1988, Spam Act 2003, Cyber Security Act 2024, Crimes (Amount of a Penalty Unit) Instrument 2026)</li>
+      <li>Commonwealth Director of Public Prosecutions, Cybercrime: <a href="https://www.cdpp.gov.au/cybercrime">cdpp.gov.au/cybercrime</a></li>
+      <li>OAIC, Notifiable Data Breaches scheme and Guide to privacy regulatory action: <a href="https://www.oaic.gov.au/">oaic.gov.au</a></li>
+      <li>ACMA, Avoid sending spam: <a href="https://www.acma.gov.au/avoid-sending-spam">acma.gov.au/avoid-sending-spam</a></li>
+      <li>Department of Home Affairs, ransomware payment reporting factsheet: <a href="https://www.homeaffairs.gov.au/cyber-security-subsite/Pages/cyber-security-act.aspx">homeaffairs.gov.au</a></li>
+    </ul>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

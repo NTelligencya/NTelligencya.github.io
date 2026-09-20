@@ -69,6 +69,7 @@ const SKIP_DIRS = new Set([
   '_to_delete',        // duplicate copy of the site kept for screenshot rendering
   'digitalliteracy',   // legacy Tennant Creek path; duplicates /digital-literacy/
   'node_modules',
+  'prompt-gallery-outputs',  // model outputs linked from /resources/basic-prompts-gallery.html; noindex, not pages in their own right
   'assets',
   'tools',              // build utilities and social-card source, not public content
   'review-screenshots-v3', // branch-only responsive review evidence

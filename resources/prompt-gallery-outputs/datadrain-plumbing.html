@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataDrain Plumbing Co. | Plumbing for people who cannot log off</title>
+<style>
+  :root {
+    --bg: #070c11;
+    --bg-2: #0c141c;
+    --panel: #101b25;
+    --panel-2: #142231;
+    --line: #1f3243;
+    --text: #e8f1f7;
+    --muted: #93a8b8;
+    --green: #2ee59d;
+    --green-dim: #12935f;
+    --blue: #3db4ff;
+    --blue-dim: #1b6fa8;
+    --display: "Arial Black", "Helvetica Neue", "Segoe UI Black", "Archivo Black", Impact, system-ui, sans-serif;
+    --body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    line-height: 1.55;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { width: min(1320px, 100% - 48px); margin-inline: auto; }
+  h1, h2, h3, .display {
+    font-family: var(--display);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.02;
+    text-transform: uppercase;
+  }
+  .grad {
+    background: linear-gradient(90deg, var(--green), var(--blue));
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(7, 12, 17, 0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 24px; }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo svg { width: 40px; height: 40px; flex: none; }
+  .logo-text { font-family: var(--display); font-weight: 900; font-size: 20px; letter-spacing: -0.01em; text-transform: uppercase; line-height: 1; }
+  .logo-text small { display: block; font-family: var(--mono); font-weight: 400; font-size: 10.5px; letter-spacing: 0.2em; color: var(--muted); margin-top: 5px; }
+  nav ul { display: flex; list-style: none; gap: 30px; font-size: 14.5px; color: var(--muted); }
+  nav a:hover { color: var(--green); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--body); font-weight: 700; font-size: 15px;
+    padding: 13px 22px; border-radius: 10px; border: 1px solid transparent;
+    cursor: pointer; transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: linear-gradient(90deg, var(--green), #35d0c0); color: #04140d; box-shadow: 0 8px 28px rgba(46, 229, 157, 0.25); }
+  .btn-ghost { border-color: var(--blue-dim); color: var(--blue); background: rgba(61, 180, 255, 0.06); }
+  .btn-small { padding: 9px 16px; font-size: 13.5px; }
+
+  /* Hero */
+  .hero {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(700px 380px at 82% 20%, rgba(61, 180, 255, 0.16), transparent 70%),
+      radial-gradient(620px 360px at 8% 90%, rgba(46, 229, 157, 0.12), transparent 70%),
+      var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 56px 56px; opacity: 0.28;
+    mask-image: linear-gradient(180deg, #000, transparent 92%);
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent 92%);
+  }
+  .hero-inner { position: relative; display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 56px; align-items: center; padding: 30px 0 30px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--green); border: 1px solid rgba(46, 229, 157, 0.35); background: rgba(46, 229, 157, 0.07);
+    padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(46, 229, 157, 0.2); }
+  .hero h1 { font-size: clamp(36px, 3.6vw, 58px); }
+  .tagline { font-size: 21px; color: var(--text); margin: 16px 0 10px; font-style: italic; border-left: 3px solid var(--blue); padding-left: 16px; }
+  .hero p.lead { color: var(--muted); max-width: 720px; font-size: 16px; }
+  .hero-cta { display: flex; gap: 14px; margin-top: 20px; flex-wrap: wrap; }
+  .stats { display: flex; gap: 34px; margin-top: 20px; }
+  .stat b { display: block; font-family: var(--display); font-size: 26px; color: var(--text); line-height: 1.1; }
+  .stat span { font-size: 12.5px; color: var(--muted); font-family: var(--mono); letter-spacing: 0.04em; }
+
+  .hero-art { position: relative; }
+  .hero-art svg { width: 100%; height: auto; display: block; }
+  .term {
+    position: absolute; right: -14px; top: -58px; width: 280px;
+    background: rgba(9, 16, 23, 0.94); border: 1px solid var(--line); border-radius: 12px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  }
+  .term-bar { display: flex; gap: 6px; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  .term-bar i { width: 9px; height: 9px; border-radius: 50%; background: #2a3f52; }
+  .term-body { padding: 11px 14px 13px; line-height: 1.7; }
+  .term-body .g { color: var(--green); } .term-body .b { color: var(--blue); }
+
+  /* Sections */
+  section { padding: 72px 0; }
+  .sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 32px; }
+  .sec-head h2 { font-size: clamp(30px, 3vw, 44px); margin-top: 10px; }
+  .sec-head p { color: var(--muted); max-width: 470px; font-size: 15.5px; }
+  #products { padding-top: 30px; }
+  #products .sec-head { margin-bottom: 22px; }
+
+  /* Products */
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .card {
+    position: relative; background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--line); border-radius: 16px; padding: 22px; display: flex; flex-direction: column;
+    transition: transform .2s ease, border-color .2s ease;
+  }
+  .card:hover { transform: translateY(-4px); border-color: var(--green-dim); }
+  .card-art {
+    height: 124px; border-radius: 12px; margin-bottom: 18px; display: grid; place-items: center;
+    background: radial-gradient(circle at 50% 40%, rgba(61, 180, 255, 0.16), transparent 70%), #0a131b;
+    border: 1px solid var(--line);
+  }
+  .card-art svg { width: 84px; height: 84px; }
+  .badge {
+    position: absolute; top: 34px; right: 34px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--green); color: #04140d; padding: 4px 9px; border-radius: 6px; font-weight: 700;
+  }
+  .badge.blue { background: var(--blue); }
+  .card h3 { font-size: 19px; letter-spacing: -0.01em; }
+  .card .sku { font-family: var(--mono); font-size: 11.5px; color: var(--blue); margin: 6px 0 10px; letter-spacing: 0.06em; }
+  .card p { color: var(--muted); font-size: 14.5px; flex: 1; }
+  .specs { list-style: none; margin: 14px 0 0; font-family: var(--mono); font-size: 12px; color: #b6c7d4; }
+  .specs li { padding: 5px 0; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; gap: 10px; }
+  .specs li span:last-child { color: var(--green); text-align: right; }
+  .buy { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .price { font-family: var(--display); font-size: 25px; }
+  .price small { font-family: var(--mono); font-size: 11px; color: var(--muted); font-weight: 400; margin-left: 5px; letter-spacing: 0.06em; }
+
+  /* Offer */
+  .offer-sec { padding: 24px 0 72px; }
+  .offer {
+    position: relative; overflow: hidden; border-radius: 22px;
+    background: linear-gradient(120deg, #06281c 0%, #0a2238 60%, #0b1a33 100%);
+    border: 1px solid rgba(46, 229, 157, 0.4);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 0 120px rgba(61, 180, 255, 0.08);
+  }
+  .offer-banner {
+    background: repeating-linear-gradient(-45deg, var(--green) 0 22px, #22c98a 22px 44px);
+    color: #03130c; font-family: var(--display); font-size: 17px; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 12px 0; white-space: nowrap; overflow: hidden; text-align: center;
+  }
+  .offer-banner span { margin: 0 22px; }
+  .offer-banner span.dot { display: inline-block; width: 8px; height: 8px; background: #03130c; transform: rotate(45deg); margin: 0 4px 2px; }
+  .offer-body { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 48px; padding: 44px 52px 48px; align-items: center; }
+  .offer h2 { font-size: clamp(34px, 3.6vw, 54px); margin: 12px 0 16px; }
+  .offer p { color: #c4d6e2; font-size: 16.5px; max-width: 640px; }
+  .offer-price { display: flex; align-items: baseline; gap: 16px; margin: 24px 0 26px; }
+  .offer-price .now { font-family: var(--display); font-size: 52px; color: var(--green); line-height: 1; }
+  .offer-price .was { color: var(--muted); text-decoration: line-through; font-size: 20px; }
+  .offer-price .note { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .freebie {
+    background: rgba(7, 12, 17, 0.72); border: 1px dashed rgba(61, 180, 255, 0.55); border-radius: 18px; padding: 26px;
+  }
+  .freebie .tag { font-family: var(--display); color: var(--blue); font-size: 15px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .freebie h3 { font-size: 25px; margin: 8px 0 12px; }
+  .freebie p { font-size: 14.5px; color: var(--muted); }
+  .freebie-art { display: flex; gap: 22px; align-items: flex-end; justify-content: center; margin-bottom: 18px; }
+  .freebie-art svg { height: 130px; width: auto; }
+  .fine { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 14px; }
+
+  /* Tiles */
+  .tiles-sec { background: var(--bg-2); border-block: 1px solid var(--line); }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .tile-card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; }
+  .swatch { position: relative; height: 270px; overflow: hidden; }
+  .swatch::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(255,255,255,0.22) 3px, transparent 3px), linear-gradient(90deg, rgba(255,255,255,0.22) 3px, transparent 3px);
+    background-size: 90px 90px; background-position: -2px -2px;
+    box-shadow: inset 0 -40px 60px rgba(0,0,0,0.25);
+  }
+  .tile-info { padding: 22px 24px 24px; display: flex; flex-direction: column; flex: 1; }
+  .tile-info .edition { font-family: var(--mono); font-size: 11.5px; color: var(--green); letter-spacing: 0.12em; text-transform: uppercase; }
+  .tile-info h3 { font-size: 23px; margin: 8px 0 10px; }
+  .tile-info p { color: var(--muted); font-size: 14.5px; flex: 1; }
+  .tile-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .tile-foot .price { font-size: 22px; }
+  .chip { font-family: var(--mono); font-size: 11.5px; color: var(--blue); border: 1px solid var(--blue-dim); padding: 4px 10px; border-radius: 999px; }
+
+  /* spreadsheet swatch */
+  .sw-sheet { background: #fdfefe; font-family: var(--mono); color: #1d2b25; }
+  .sheet-grid { display: grid; grid-template-columns: 34px repeat(5, 1fr); grid-auto-rows: 30px; font-size: 11.5px; height: 100%; }
+  .sheet-grid div { border-right: 1px solid #cfd8d3; border-bottom: 1px solid #cfd8d3; padding: 6px 7px; white-space: nowrap; overflow: hidden; }
+  .sheet-grid .h { background: #e4ece7; color: #4c5f56; text-align: center; font-weight: 700; }
+  .sheet-grid .top { background: #178a55; color: #fff; font-weight: 700; }
+  .sheet-grid .sel { outline: 2px solid #178a55; outline-offset: -2px; background: #e3f6ec; }
+  .sheet-grid .err { color: #c0392b; font-weight: 700; }
+  .sheet-grid .num { text-align: right; }
+
+  /* retro desktop swatch */
+  .sw-hills {
+    background:
+      radial-gradient(60px 22px at 22% 22%, #fff 60%, transparent 62%),
+      radial-gradient(44px 18px at 30% 27%, #fff 60%, transparent 62%),
+      radial-gradient(70px 22px at 72% 16%, rgba(255,255,255,0.95) 60%, transparent 62%),
+      radial-gradient(50px 16px at 64% 21%, rgba(255,255,255,0.95) 60%, transparent 62%),
+      radial-gradient(120% 95% at 30% 128%, #5fc02d 0 58%, transparent 58.5%),
+      radial-gradient(110% 90% at 88% 135%, #3f9d1f 0 60%, transparent 60.5%),
+      linear-gradient(180deg, #1f6fe0 0%, #58a6f5 55%, #bfe0ff 100%);
+  }
+  .taskbar { position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: linear-gradient(180deg, #2f6fdd, #1c4fb3); display: flex; align-items: center; z-index: 1; }
+  .taskbar b { background: linear-gradient(180deg, #46b04a, #2c8a31); color: #fff; font: italic 700 12px var(--body); padding: 5px 16px 5px 12px; border-radius: 0 10px 10px 0; height: 100%; display: flex; align-items: center; }
+  .taskbar span { margin-left: auto; color: #fff; font: 11px var(--body); padding: 0 12px; background: rgba(0,0,0,0.18); height: 100%; display: flex; align-items: center; }
+
+  /* code editor swatch */
+  .sw-code { background: #161b24; font-family: var(--mono); font-size: 12px; color: #c9d4e0; display: grid; grid-template-columns: 44px 1fr; }
+  .gutter { background: #11151c; color: #4b5a6b; text-align: right; padding: 14px 10px; line-height: 21px; border-right: 1px solid #222a36; }
+  .code { padding: 14px 16px; line-height: 21px; white-space: pre; overflow: hidden; }
+  .k { color: #c792ea; } .f { color: #82aaff; } .s { color: #a5e075; } .c { color: #5c6b7d; font-style: italic; } .n { color: #f7a96b; }
+
+  /* Why */
+  .why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .why-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 26px; position: relative; overflow: hidden; }
+  .why-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(var(--green), var(--blue)); }
+  .ico { width: 50px; height: 50px; border-radius: 12px; display: grid; place-items: center; background: rgba(46, 229, 157, 0.09); border: 1px solid rgba(46, 229, 157, 0.3); margin-bottom: 16px; }
+  .ico svg { width: 26px; height: 26px; }
+  .why-card:nth-child(even) .ico { background: rgba(61, 180, 255, 0.09); border-color: rgba(61, 180, 255, 0.35); }
+  .why-card h3 { font-size: 19px; margin-bottom: 10px; line-height: 1.12; }
+  .why-card p { color: var(--muted); font-size: 14.5px; }
+  .why-card code { font-family: var(--mono); font-size: 12.5px; color: var(--green); background: #0a131b; padding: 2px 6px; border-radius: 5px; }
+
+  /* Testimonials */
+  .quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .quote { background: linear-gradient(180deg, var(--panel-2), var(--panel)); border: 1px solid var(--line); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; }
+  .stars { display: flex; gap: 4px; margin-bottom: 16px; }
+  .stars svg { width: 18px; height: 18px; fill: var(--green); }
+  .quote blockquote { font-size: 16px; color: #d5e2ec; flex: 1; }
+  .who { display: flex; align-items: center; gap: 14px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .avatar { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-size: 15px; color: #04140d; background: linear-gradient(135deg, var(--green), var(--blue)); flex: none; }
+  .who b { display: block; font-size: 15px; }
+  .who span { font-size: 13px; color: var(--muted); }
+  .verified { margin-left: auto; font-family: var(--mono); font-size: 10.5px; color: var(--blue); border: 1px solid var(--blue-dim); border-radius: 6px; padding: 3px 7px; letter-spacing: 0.06em; white-space: nowrap; }
+
+  /* Footer */
+  footer { background: #050a0e; border-top: 1px solid var(--line); padding: 56px 0 40px; }
+  .foot { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 40px; }
+  .foot h4 { font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--green); margin-bottom: 14px; font-weight: 400; }
+  .foot p, .foot li { color: var(--muted); font-size: 14.5px; }
+  .foot ul { list-style: none; display: grid; gap: 8px; }
+  .foot .contact li { display: flex; gap: 10px; align-items: flex-start; }
+  .foot .contact svg { width: 17px; height: 17px; flex: none; margin-top: 3px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .disclaimer {
+    margin-top: 44px; border: 1px solid rgba(61, 180, 255, 0.5); background: rgba(61, 180, 255, 0.07);
+    border-radius: 14px; padding: 20px 24px; display: flex; gap: 18px; align-items: flex-start;
+  }
+  .disclaimer svg { width: 30px; height: 30px; flex: none; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; margin-top: 2px; }
+  .disclaimer b { font-family: var(--display); text-transform: uppercase; letter-spacing: 0.04em; font-size: 15px; display: block; margin-bottom: 4px; color: var(--text); }
+  .disclaimer p { color: #b9cbd8; font-size: 14.5px; }
+  .copy { margin-top: 26px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; color: #5d7284; font-size: 13px; font-family: var(--mono); }
+
+  @media (max-width: 1080px) {
+    .hero-inner, .offer-body { grid-template-columns: 1fr; }
+    .cards, .why, .foot { grid-template-columns: repeat(2, 1fr); }
+    .tiles, .quotes { grid-template-columns: 1fr; }
+    nav ul { display: none; }
+    .term { left: 8px; }
+    .sec-head { flex-direction: column; align-items: flex-start; }
+  }
+  @media (max-width: 640px) {
+    .cards, .why, .foot { grid-template-columns: 1fr; }
+    .offer-body { padding: 30px 22px; }
+    .stats { flex-wrap: wrap; gap: 20px; }
+    .offer-banner { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#top" aria-label="DataDrain Plumbing Co. home">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2ee59d"/><stop offset="1" stop-color="#3db4ff"/></linearGradient></defs>
+        <rect x="2" y="2" width="44" height="44" rx="12" fill="#0c1821" stroke="url(#lg)" stroke-width="2"/>
+        <path d="M24 9 C24 9 14 21 14 28 a10 10 0 0 0 20 0 C34 21 24 9 24 9Z" fill="url(#lg)"/>
+        <path d="M19 27h4v-4h2v4h4M24 27v6" stroke="#06110c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="24" cy="34" r="1.6" fill="#06110c"/>
+      </svg>
+      <span class="logo-text">DataDrain<small>PLUMBING CO.</small></span>
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="#products">Products</a></li>
+        <li><a href="#offer">Special offer</a></li>
+        <li><a href="#tiles">Tile collections</a></li>
+        <li><a href="#why">Why choose us</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-primary btn-small" href="#contact">Raise a ticket</a>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <div class="pill"><i></i>Opening in Bendigo, 2026 &middot; status: all drains operational</div>
+        <h1>Never go <span class="grad">offline</span><br>in the bathroom.</h1>
+        <p class="tagline">"Because your data should flow as smoothly as your water."</p>
+        <p class="lead">Specialty plumbing, cabling and adapters for IT and cyber security professionals who consider a shower to be unplanned downtime. We wire the smallest room in the house so you never miss an alert.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#products">Browse the hardware</a>
+          <a class="btn btn-ghost" href="#offer">See the limited time offer</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>99.99%</b><span>bathroom uptime SLA</span></div>
+          <div class="stat"><b>0 ms</b><span>from loo to inbox</span></div>
+          <div class="stat"><b>IP68</b><span>everything, including staff</span></div>
+        </div>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 520 400">
+          <defs>
+            <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2ee59d"/><stop offset="1" stop-color="#3db4ff"/></linearGradient>
+            <linearGradient id="tub" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b3042"/><stop offset="1" stop-color="#0f1d29"/></linearGradient>
+            <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3db4ff" stop-opacity=".55"/><stop offset="1" stop-color="#3db4ff" stop-opacity=".12"/></linearGradient>
+          </defs>
+          <!-- wall panel -->
+          <rect x="60" y="14" width="440" height="300" rx="18" fill="#0b151e" stroke="#1f3243"/>
+          <g stroke="#16283a" stroke-width="1">
+            <path d="M60 89h440M60 164h440M60 239h440M170 14v300M280 14v300M390 14v300"/>
+          </g>
+          <!-- shower head and binary water -->
+          <path d="M120 14v50h60" stroke="#3a5368" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <rect x="172" y="52" width="46" height="18" rx="6" fill="#3a5368"/>
+          <g font-family="ui-monospace, Menlo, Consolas, monospace" font-size="13" fill="#3db4ff">
+            <text x="176" y="94">1</text><text x="190" y="108" fill="#2ee59d">0</text><text x="204" y="92">1</text>
+            <text x="178" y="128" fill="#2ee59d">0</text><text x="194" y="142">1</text><text x="207" y="124">0</text>
+            <text x="182" y="164">1</text><text x="200" y="176" fill="#2ee59d">1</text><text x="188" y="198" opacity=".6">0</text>
+            <text x="205" y="212" opacity=".4">1</text>
+          </g>
+          <!-- wall port -->
+          <g transform="translate(0 44)">
+          <rect x="408" y="92" width="64" height="76" rx="8" fill="#13212d" stroke="#2ee59d"/>
+          <rect x="424" y="106" width="32" height="22" rx="3" fill="#070c11" stroke="#3db4ff"/>
+          <path d="M430 112v8M436 112v8M442 112v8M448 112v8" stroke="#3db4ff" stroke-width="1.5"/>
+          <circle cx="430" cy="148" r="4" fill="#2ee59d"/><circle cx="444" cy="148" r="4" fill="#3db4ff"/>
+          <text x="440" y="186" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace" font-size="10" fill="#93a8b8">LOO-NET 01</text>
+          </g>
+          <!-- cable -->
+          <path d="M440 172 C440 240 384 204 372 240" stroke="url(#hg)" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <!-- tablet on arm -->
+          <path d="M352 300 L352 232 L318 204" stroke="#4b657b" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <g transform="rotate(-8 300 170)">
+            <rect x="232" y="122" width="150" height="100" rx="10" fill="#0a131b" stroke="url(#hg)" stroke-width="3"/>
+            <rect x="244" y="134" width="126" height="12" rx="3" fill="#16283a"/>
+            <rect x="244" y="152" width="56" height="58" rx="4" fill="#10202c"/>
+            <path d="M250 200l10-16 10 8 12-22 12 14" stroke="#2ee59d" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="308" y="152" width="62" height="8" rx="3" fill="#3db4ff" opacity=".8"/>
+            <rect x="308" y="166" width="48" height="8" rx="3" fill="#2a4157"/>
+            <rect x="308" y="180" width="56" height="8" rx="3" fill="#2a4157"/>
+            <rect x="308" y="194" width="34" height="14" rx="4" fill="#2ee59d"/>
+          </g>
+          <!-- tub -->
+          <path d="M96 258h370c8 0 12 6 10 13l-18 66c-4 14-16 22-30 22H150c-14 0-26-8-30-22l-30-66c-3-7 0-13 6-13Z" fill="url(#tub)" stroke="#2f485d" stroke-width="2"/>
+          <path d="M104 272h356l-6 22c-60 10-100-10-160 0s-110 8-180 0Z" fill="url(#water)"/>
+          <rect x="80" y="250" width="402" height="14" rx="7" fill="#2a4157"/>
+          <!-- bubbles -->
+          <g fill="none" stroke="#3db4ff" stroke-width="2" opacity=".75">
+            <circle cx="150" cy="242" r="10"/><circle cx="174" cy="232" r="6"/><circle cx="132" cy="228" r="5"/><circle cx="258" cy="244" r="7"/>
+          </g>
+          <!-- feet -->
+          <path d="M160 358l-8 22h22l4-22ZM400 358l6 22h-22l-4-22Z" fill="#2a4157"/>
+          <rect x="40" y="380" width="460" height="4" rx="2" fill="#1f3243"/>
+        </svg>
+        <div class="term">
+          <div class="term-bar"><i></i><i></i><i></i></div>
+          <div class="term-body">
+            <div><span class="g">$</span> ping bathroom.local</div>
+            <div>64 bytes from bidet: <span class="b">time=0.4 ms</span></div>
+            <div>64 bytes from shower: <span class="b">time=0.6 ms</span></div>
+            <div><span class="g">0% packet loss, 0% pressure loss</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <section id="products">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">// 01 The hardware</div>
+          <h2>Wet room. <span class="grad">Dry ports.</span></h2>
+        </div>
+        <p>Every product is pressure tested, splash tested and tested by someone who swore they would only check one email. All prices in Australian dollars, GST included.</p>
+      </div>
+
+      <div class="cards">
+        <article class="card">
+          <span class="badge">Best seller</span>
+          <div class="card-art">
+            <svg viewBox="0 0 96 96" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="14" y="40" width="68" height="30" rx="8" stroke="#2ee59d" stroke-width="3"/>
+              <rect x="22" y="50" width="10" height="10" rx="2" fill="#3db4ff"/><rect x="36" y="50" width="10" height="10" rx="2" fill="#3db4ff"/>
+              <rect x="50" y="50" width="10" height="10" rx="2" fill="#3db4ff"/><rect x="64" y="50" width="10" height="10" rx="2" fill="#3db4ff"/>
+              <path d="M48 70v14" stroke="#2ee59d" stroke-width="3"/>
+              <path d="M30 12c0 0-6 8-6 12a6 6 0 0 0 12 0c0-4-6-12-6-12ZM66 16c0 0-5 7-5 10a5 5 0 0 0 10 0c0-3-5-10-5-10ZM48 8c0 0-4 6-4 9a4 4 0 0 0 8 0c0-3-4-9-4-9Z" fill="#3db4ff" opacity=".85"/>
+            </svg>
+          </div>
+          <h3>ShowerHub 7</h3>
+          <div class="sku">SKU DD-USB-H2O</div>
+          <p>A seven port waterproof USB hub that suction mounts beside the shampoo. Rated for 45 degree water, steam, and 400 open browser tabs.</p>
+          <ul class="specs">
+            <li><span>Ingress rating</span><span>IP68</span></li>
+            <li><span>Ports</span><span>7 (one always faulty)</span></li>
+          </ul>
+          <div class="buy"><div class="price">$189<small>AUD</small></div><a class="btn btn-ghost btn-small" href="#contact">Add to cart</a></div>
+        </article>
+
+        <article class="card">
+          <div class="card-art">
+            <svg viewBox="0 0 96 96" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 62h76l-5 14a10 10 0 0 1-9 6H24a10 10 0 0 1-9-6Z" stroke="#3db4ff" stroke-width="3"/>
+              <path d="M66 62V46l-12-8" stroke="#93a8b8" stroke-width="3"/>
+              <rect x="22" y="14" width="40" height="28" rx="5" stroke="#2ee59d" stroke-width="3" transform="rotate(-10 42 28)"/>
+              <path d="M30 32l6-7 6 4 8-10" stroke="#2ee59d" stroke-width="2.5" transform="rotate(-10 42 28)"/>
+            </svg>
+          </div>
+          <h3>TubMount Pro</h3>
+          <div class="sku">SKU DD-MNT-SOAK</div>
+          <p>An articulated phone and tablet arm that clamps to any bathtub. Holds a 13 inch tablet above the waterline through even the longest post-incident review.</p>
+          <ul class="specs">
+            <li><span>Max load</span><span>1.2 kg of regret</span></li>
+            <li><span>Fog wiper</span><span>Included</span></li>
+          </ul>
+          <div class="buy"><div class="price">$129<small>AUD</small></div><a class="btn btn-ghost btn-small" href="#contact">Add to cart</a></div>
+        </article>
+
+        <article class="card">
+          <span class="badge blue">New</span>
+          <div class="card-art">
+            <svg viewBox="0 0 96 96" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="26" y="10" width="44" height="30" rx="5" stroke="#3db4ff" stroke-width="3"/>
+              <path d="M18 46h60" stroke="#3db4ff" stroke-width="3"/>
+              <rect x="10" y="54" width="76" height="14" rx="5" stroke="#2ee59d" stroke-width="3"/>
+              <path d="M22 61h6M34 61h6M46 61h6M64 61h10" stroke="#2ee59d" stroke-width="3"/>
+              <path d="M20 68v18M76 68v18" stroke="#93a8b8" stroke-width="3"/>
+              <path d="M40 78a8 5 0 0 0 16 0Z" stroke="#93a8b8" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h3>VanityDock Thunderbasin</h3>
+          <div class="sku">SKU DD-DOCK-VAN</div>
+          <p>A laptop docking station built into the vanity. Dual display output turns your mirror into a second monitor, so you can finally look yourself in the eye during a deployment.</p>
+          <ul class="specs">
+            <li><span>Power delivery</span><span>100 W</span></li>
+            <li><span>Toothbrush slot</span><span>Hot swappable</span></li>
+          </ul>
+          <div class="buy"><div class="price">$449<small>AUD</small></div><a class="btn btn-ghost btn-small" href="#contact">Add to cart</a></div>
+        </article>
+
+        <article class="card">
+          <span class="badge">Flagship</span>
+          <div class="card-art">
+            <svg viewBox="0 0 96 96" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="20" y="10" width="26" height="34" rx="5" stroke="#93a8b8" stroke-width="3"/>
+              <path d="M20 48h58c0 16-10 26-26 26H40C28 74 20 64 20 48Z" stroke="#2ee59d" stroke-width="3"/>
+              <path d="M38 74l-4 12h30l-4-12" stroke="#2ee59d" stroke-width="3"/>
+              <rect x="26" y="18" width="14" height="10" rx="2" stroke="#3db4ff" stroke-width="2.5"/>
+              <path d="M30 22v3M33 22v3M36 22v3" stroke="#3db4ff" stroke-width="1.5"/>
+              <path d="M52 40c4-6 10-6 14 0M47 33c7-10 17-10 24 0" stroke="#3db4ff" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h3>PacketFlush S1 Smart Bidet</h3>
+          <div class="sku">SKU DD-BDT-RJ45</div>
+          <p>The world's first bidet with gigabit ethernet passthrough. Quality of service settings prioritise critical traffic. Supports PoE: Power over Ethernet, not the other kind.</p>
+          <ul class="specs">
+            <li><span>Throughput</span><span>1 Gbps / 6 L per min</span></li>
+            <li><span>Firmware updates</span><span>Never mid-session</span></li>
+          </ul>
+          <div class="buy"><div class="price">$1,299<small>AUD</small></div><a class="btn btn-ghost btn-small" href="#contact">Add to cart</a></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- OFFER -->
+  <section class="offer-sec" id="offer">
+    <div class="wrap">
+      <div class="offer">
+        <div class="offer-banner" role="heading" aria-level="2">
+          <span>Limited time offer</span><span class="dot"></span><span>Limited time offer</span><span class="dot"></span><span>Limited time offer</span><span class="dot"></span><span>Limited time offer</span><span class="dot"></span><span>Limited time offer</span>
+        </div>
+        <div class="offer-body">
+          <div>
+            <div class="eyebrow">// Launch special &middot; while stocks and sanity last</div>
+            <h2>The Limited Edition <span class="grad">Themed Bathroom</span></h2>
+            <p>A complete bathroom fit-out in the tile collection of your choice, pre-wired with a ShowerHub 7, TubMount Pro, VanityDock and the PacketFlush S1. Only 64 will ever be built, because our inventory system stores the count in a very small integer.</p>
+            <div class="offer-price">
+              <span class="now">$14,999</span>
+              <span class="was">$19,999</span>
+              <span class="note">AUD, installed. Cheaper than a data breach.</span>
+            </div>
+            <a class="btn btn-primary" href="#contact">Reserve build slot 1 of 64</a>
+            <p class="fine">Offer ends 31 December 2026 or when the sprint ends, whichever gets extended first.</p>
+          </div>
+          <div class="freebie">
+            <div class="freebie-art" aria-hidden="true">
+              <svg viewBox="0 0 90 150">
+                <rect x="30" y="4" width="30" height="16" rx="3" fill="#3db4ff"/>
+                <rect x="38" y="20" width="14" height="12" fill="#1b6fa8"/>
+                <rect x="12" y="32" width="66" height="112" rx="14" fill="#0e2a20" stroke="#2ee59d" stroke-width="3"/>
+                <rect x="22" y="58" width="46" height="56" rx="6" fill="#2ee59d"/>
+                <text x="45" y="80" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="11" fill="#04140d">FRESH</text>
+                <text x="45" y="94" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="10" fill="#04140d">INSTALL</text>
+                <text x="45" y="107" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="7" fill="#04140d">v2.0.26 body wash</text>
+              </svg>
+              <svg viewBox="0 0 130 150">
+                <path d="M65 8c-14 0-14 22 0 22" stroke="#93a8b8" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <g stroke="#3db4ff" stroke-width="3" fill="rgba(61,180,255,0.18)">
+                  <circle cx="65" cy="88" r="46"/>
+                  <circle cx="44" cy="70" r="22"/><circle cx="86" cy="70" r="22"/>
+                  <circle cx="44" cy="106" r="22"/><circle cx="86" cy="106" r="22"/>
+                  <circle cx="65" cy="88" r="20" fill="rgba(46,229,157,0.25)" stroke="#2ee59d"/>
+                </g>
+              </svg>
+            </div>
+            <div class="tag">Free with any order</div>
+            <h3>Themed body wash and loofah</h3>
+            <p>Every order, from a single adapter to a full bathroom, ships with a bottle of <b style="color:var(--text)">Fresh Install</b> body wash (notes of cold server room and new laptop) and our <b style="color:var(--text)">Defragmenter</b> loofah, which reorganises dead skin into contiguous blocks.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TILES -->
+  <section class="tiles-sec" id="tiles">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">// 02 Limited edition tile collections</div>
+          <h2>Tiles that <span class="grad">feel like work.</span></h2>
+        </div>
+        <p>Three hand-glazed ceramic collections inspired by the software you stare at all day. Now you can stare at it all night, too. Priced per square metre.</p>
+      </div>
+
+      <div class="tiles">
+        <article class="tile-card">
+          <div class="swatch sw-sheet" aria-hidden="true">
+            <div class="sheet-grid">
+              <div class="h"></div><div class="h">A</div><div class="h">B</div><div class="h">C</div><div class="h">D</div><div class="h">E</div>
+              <div class="h">1</div><div class="top">Fixture</div><div class="top">Qty</div><div class="top">Cost</div><div class="top">Status</div><div class="top">Notes</div>
+              <div class="h">2</div><div>Basin</div><div class="num">1</div><div class="num">$420</div><div>Done</div><div>final_v2</div>
+              <div class="h">3</div><div>Bidet</div><div class="num">1</div><div class="num">$1,299</div><div>Online</div><div>final_v3</div>
+              <div class="h">4</div><div>Grout</div><div class="num">12</div><div class="err">#REF!</div><div>Hmm</div><div>FINAL_final</div>
+              <div class="h">5</div><div>Towels</div><div class="num">4</div><div class="num">$96</div><div>Damp</div><div></div>
+              <div class="h">6</div><div>Total</div><div class="num">18</div><div class="sel">=SUM(C:C)</div><div class="err">#VALUE!</div><div></div>
+              <div class="h">7</div><div></div><div></div><div></div><div></div><div></div>
+              <div class="h">8</div><div></div><div></div><div></div><div></div><div></div>
+            </div>
+          </div>
+          <div class="tile-info">
+            <div class="edition">Edition of 1,048,576 tiles</div>
+            <h3>The Gridline Collection</h3>
+            <p>A crisp spreadsheet grid where every tile is a cell. Freeze the top row of your splashback. Merging tiles is possible but, as always, a terrible idea. One tile per room arrives reading #REF! and we cannot explain why.</p>
+            <div class="tile-foot"><div class="price">$89<small>AUD / m&sup2;</small></div><span class="chip">Pairs with pivot tables</span></div>
+          </div>
+        </article>
+
+        <article class="tile-card">
+          <div class="swatch sw-hills" aria-hidden="true">
+            <div class="taskbar"><b>begin</b><span>4:59 pm</span></div>
+          </div>
+          <div class="tile-info">
+            <div class="edition">Retro desktop edition</div>
+            <h3>Rolling Hills '01</h3>
+            <p>A serene green hill beneath an impossibly blue sky, rendered across a full feature wall. Pure nostalgia for the era when your computer took longer to start up than your shower took to get hot.</p>
+            <div class="tile-foot"><div class="price">$119<small>AUD / m&sup2;</small></div><span class="chip">Calming until it crashes</span></div>
+          </div>
+        </article>
+
+        <article class="tile-card">
+          <div class="swatch sw-code" aria-hidden="true">
+            <div class="gutter">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11</div>
+            <div class="code"><span class="c">// TODO: fix leak (added 2019)</span>
+<span class="k">async function</span> <span class="f">haveShower</span>(user) {
+  <span class="k">const</span> water = <span class="k">await</span> <span class="f">heat</span>(<span class="n">42</span>);
+  <span class="k">while</span> (user.<span class="f">hasUnreadAlerts</span>()) {
+    user.<span class="f">scroll</span>(<span class="s">"just one more"</span>);
+  }
+  <span class="k">try</span> { water.<span class="f">flow</span>(); }
+  <span class="k">catch</span> (leak) {
+    <span class="f">blame</span>(<span class="s">"the network"</span>);
+  }
+  <span class="k">return</span> <span class="s">"clean-ish"</span>;</div>
+          </div>
+          <div class="tile-info">
+            <div class="edition">Dark mode edition</div>
+            <h3>Midnight Monospace</h3>
+            <p>A code editor dark theme with syntax highlighted grout. Hides soap scum and technical debt equally well. A light theme is available on request, but our installers will look at you differently.</p>
+            <div class="tile-foot"><div class="price">$135<small>AUD / m&sup2;</small></div><span class="chip">Tabs, not spaces</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section id="why">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">// 03 Why choose us</div>
+          <h2>Tradies who <span class="grad">speak fluent ticket.</span></h2>
+        </div>
+        <p>We are licensed plumbers who have also sat through a change advisory board. We have seen things.</p>
+      </div>
+      <div class="why">
+        <div class="why-card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2ee59d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></div>
+          <h3>Quotes delivered as spreadsheets</h3>
+          <p>Every quote arrives as a workbook with pivot tables, so you can slice your bathroom spend by room, fixture and level of regret. Conditional formatting turns the total red, for your convenience.</p>
+        </div>
+        <div class="why-card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#3db4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>
+          <h3>Agile renovations, delivered in sprints</h3>
+          <p>Two week sprints, daily stand-ups in your hallway and a retro in the driveway. Your shower ships first as an MVP (Minimum Viable Plumbing). The toilet is in the backlog. It has been groomed.</p>
+        </div>
+        <div class="why-card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2ee59d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2" y="14" width="5" height="6" rx="1.5"/><rect x="17" y="14" width="5" height="6" rx="1.5"/></svg></div>
+          <h3>24/7 support for every kind of loss</h3>
+          <p>Our help desk understands both packet loss and pressure loss, and can tell which one is making you cry. First line support will still ask if you have tried turning the tap off and on again.</p>
+        </div>
+        <div class="why-card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#3db4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6Z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h3>Zero trust plumbing</h3>
+          <p>Never trust, always verify. Every tap requires multi-factor authentication before dispensing hot water. Cold water remains available to guests on the untrusted network.</p>
+        </div>
+        <div class="why-card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#2ee59d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
+          <h3>99.99% uptime guarantee</h3>
+          <p>Monitored around the clock with alerts sent straight to your phone, which is already in the bathroom with you. Planned maintenance windows are announced by a sticky note on the door.</p>
+        </div>
+        <div class="why-card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#3db4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6M13 4l-2 16"/></svg></div>
+          <h3>Fully documented, mostly</h3>
+          <p>Every install includes a network diagram, a pipe diagram and a README taped inside the vanity. Undocumented legacy pipework is labelled <code>do_not_touch_ask_gary</code>. Gary has left the company.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="tiles-sec" id="reviews">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <div class="eyebrow">// 04 Testimonials</div>
+          <h2>Reviewed by people <span class="grad">still in there.</span></h2>
+        </div>
+        <p>Real feelings from entirely made up customers. Average rating: five stars, averaged in a pivot table.</p>
+      </div>
+      <div class="quotes">
+        <figure class="quote">
+          <div class="stars" aria-label="5 out of 5 stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg>
+          </div>
+          <blockquote>"I pushed a hotfix to production from the bath and rolled it back from the shower. My deployment pipeline and my actual pipes have never been so continuous. The bidet is now part of our on-call rotation."</blockquote>
+          <figcaption class="who"><div class="avatar">PK</div><div><b>Priya K.</b><span>DevOps Engineer</span></div><span class="verified">VERIFIED SOAKER</span></figcaption>
+        </figure>
+        <figure class="quote">
+          <div class="stars" aria-label="5 out of 5 stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg>
+          </div>
+          <blockquote>"The quote came with a pivot table and three slicers. I cried. Then I filtered by 'grout' and cried again. My partner asked why the bathroom has column headers. I said it is called structure."</blockquote>
+          <figcaption class="who"><div class="avatar">MT</div><div><b>Marcus T.</b><span>Data Analyst</span></div><span class="verified">VERIFIED SOAKER</span></figcaption>
+        </figure>
+        <figure class="quote">
+          <div class="stars" aria-label="5 out of 5 stars">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 .6-5.4 4.6 1.7 7.1L12 17.5 5.7 21.3l1.7-7.1L2 9.6 9 9Z"/></svg>
+          </div>
+          <blockquote>"The bidet dropped off the network, so I turned it off and on again. I will not be elaborating. Ticket closed. Honestly the first users I have ever supported that did not argue back, and they are taps."</blockquote>
+          <figcaption class="who"><div class="avatar">DW</div><div><b>Dale W.</b><span>IT Support Technician</span></div><span class="verified">VERIFIED SOAKER</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a class="logo" href="#top" style="margin-bottom:16px">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="2" y="2" width="44" height="44" rx="12" fill="#0c1821" stroke="url(#lg)" stroke-width="2"/>
+            <path d="M24 9 C24 9 14 21 14 28 a10 10 0 0 0 20 0 C34 21 24 9 24 9Z" fill="url(#lg)"/>
+            <path d="M19 27h4v-4h2v4h4M24 27v6" stroke="#06110c" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="24" cy="34" r="1.6" fill="#06110c"/>
+          </svg>
+          <span class="logo-text">DataDrain<small>PLUMBING CO.</small></span>
+        </a>
+        <p>Because your data should flow as smoothly as your water. Proudly serving the IT and cyber security professionals of regional Victoria from 2026.</p>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul class="contact">
+          <li><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.800 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Shop 404, Notfound Arcade<br>Bendigo VIC 3550</span></li>
+          <li><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg><span>(03) 5550 0142</span></li>
+          <li><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>helpdesk@datadrain.example</span></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Opening hours</h4>
+        <ul>
+          <li>Showroom: Mon to Fri, 9 am to 5 pm</li>
+          <li>Support: 24/7/365</li>
+          <li>Closed for Patch Tuesday</li>
+          <li>Response time: P1 within one flush</li>
+        </ul>
+      </div>
+      <div>
+        <h4>The fine print</h4>
+        <ul>
+          <li>ABN 00 000 000 000 (fictional)</li>
+          <li>Plumbing licence no. 127.0.0.1</li>
+          <li>Warranty void if you read the terms</li>
+          <li>We accept cookies, but not in the bath</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="disclaimer" role="note">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.500v.500"/></svg>
+      <div>
+        <b>Disclaimer: AI training demonstration</b>
+        <p>This web page was generated by an AI assistant as part of an AI training demonstration. DataDrain Plumbing Co. is entirely fictional and satirical. The business, products, prices, offers, testimonials, people and contact details are all made up, and nothing here is for sale. Please do not take your laptop into the bath.</p>
+      </div>
+    </div>
+
+    <div class="copy"><span>&copy; 2026 DataDrain Plumbing Co. A fictional business. All rights reserved, none exercised.</span><span>exit code 0</span></div>
+  </div>
+</footer>
+
+</body>
+</html>

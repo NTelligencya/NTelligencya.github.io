@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training session directions</title>
+<style>
+  :root {
+    --ink: #1c2530;
+    --muted: #5a6675;
+    --rule: #d9dee5;
+    --accent: #1f4e5f;
+    --accent-soft: #eef3f5;
+    --paper: #ffffff;
+    --desk: #e9ecef;
+    --flag-bg: #fff6d6;
+    --flag-ink: #6b5200;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--desk);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, "Segoe UI", sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 28px 16px;
+  }
+  .page {
+    width: 210mm;
+    max-width: 100%;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: var(--paper);
+    padding: 18mm 18mm 14mm;
+    box-shadow: 0 1px 3px rgba(20, 30, 40, 0.12), 0 12px 32px rgba(20, 30, 40, 0.10);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .eyebrow {
+    font-size: 8.5pt;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  h1 {
+    font-size: 25pt;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    margin: 0 0 6px;
+    font-weight: 700;
+  }
+  .lede { margin: 0; color: var(--muted); font-size: 11pt; max-width: 62ch; }
+  header { border-bottom: 2px solid var(--accent); padding-bottom: 14px; }
+
+  /* Key details strip */
+  .details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 16px 0 6px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .details div { padding: 10px 14px; border-left: 1px solid var(--rule); }
+  .details div:first-child { border-left: 0; }
+  .label {
+    display: block;
+    font-size: 7.5pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .value { font-weight: 600; font-size: 10.5pt; }
+
+  /* Sections */
+  section { margin-top: 18px; }
+  h2 {
+    font-size: 8.5pt;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 8px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 8.5pt;
+    letter-spacing: 0;
+  }
+  h2::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+  p { margin: 0 0 6px; }
+  .big { font-size: 13pt; font-weight: 600; line-height: 1.35; margin-bottom: 4px; }
+  .note { color: var(--muted); font-size: 9.5pt; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+
+  /* Steps */
+  ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 7px 0 7px 34px;
+    border-bottom: 1px solid var(--rule);
+  }
+  ol.steps li:last-child { border-bottom: 0; }
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 21px;
+    height: 21px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 9pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  ol.steps strong { font-weight: 700; }
+
+  /* Bring and provided */
+  .panel {
+    background: var(--accent-soft);
+    border-radius: 4px;
+    padding: 12px 14px;
+    height: 100%;
+  }
+  .panel h3 { margin: 0 0 6px; font-size: 10.5pt; }
+  ul.ticks { list-style: none; margin: 0; padding: 0; }
+  ul.ticks li { position: relative; padding-left: 20px; margin-bottom: 3px; }
+  ul.ticks li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 0.42em;
+    width: 9px;
+    height: 5px;
+    border-left: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    transform: rotate(-45deg);
+  }
+
+  /* Placeholders to fill in */
+  .fill {
+    background: var(--flag-bg);
+    color: var(--flag-ink);
+    border-radius: 2px;
+    padding: 0 3px;
+    font-weight: 600;
+  }
+
+  footer {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    font-size: 9.5pt;
+    color: var(--muted);
+  }
+  footer strong { color: var(--ink); }
+
+  @media (max-width: 640px) {
+    .page { padding: 24px 20px; min-height: 0; }
+    .details, .two-col { grid-template-columns: 1fr; }
+    .details div { border-left: 0; border-top: 1px solid var(--rule); }
+    .details div:first-child { border-top: 0; }
+    .two-col { gap: 12px; }
+    footer { flex-direction: column; gap: 4px; }
+    h1 { font-size: 20pt; }
+  }
+
+  @page { size: A4; margin: 0; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .page { box-shadow: none; width: 210mm; height: 297mm; min-height: 0; }
+    .fill, .panel { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <p class="eyebrow">Attendee directions</p>
+      <h1><span class="fill">[Training session name]</span></h1>
+      <p class="lede">Everything you need to find us on the day: where to park, how to reach the room and what to bring.</p>
+    </header>
+
+    <div class="details" aria-label="Session details">
+      <div><span class="label">Date</span><span class="value"><span class="fill">[Day, date]</span></span></div>
+      <div><span class="label">Time</span><span class="value"><span class="fill">[Start time]</span> to <span class="fill">[finish time]</span></span></div>
+      <div><span class="label">Room</span><span class="value">Level 3, <span class="fill">[Room name]</span></span></div>
+    </div>
+
+    <section>
+      <h2><span class="num">1</span>Getting there</h2>
+      <div class="two-col">
+        <div>
+          <span class="label">Venue</span>
+          <p class="big"><span class="fill">[Venue name]</span><br><span class="fill">[Venue address]</span></p>
+          <p class="note">Please aim to arrive 10 to 15 minutes before the start so we can begin on time.</p>
+        </div>
+        <div>
+          <span class="label">Parking</span>
+          <p class="big">Use <span class="fill">[Car park name]</span></p>
+          <p class="note">Entry via <span class="fill">[street or entrance]</span>. <span class="fill">[Parking cost or permit details]</span>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">2</span>Finding the room</h2>
+      <ol class="steps">
+        <li>From the car park, walk to the <strong>main entrance</strong> of <span class="fill">[Venue name]</span>.</li>
+        <li>Take the <strong>lift to level 3</strong>.</li>
+        <li>As you step out of the lift, <strong>follow the signs</strong> to the training room.</li>
+        <li>Sign in at the door and take a seat. If you get lost, call the number at the bottom of this page.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2><span class="num">3</span>What to bring</h2>
+      <div class="two-col">
+        <div class="panel">
+          <h3>Please bring</h3>
+          <ul class="ticks">
+            <li>Your laptop</li>
+            <li>Your laptop charger</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>We provide</h3>
+          <ul class="ticks">
+            <li>Tea and coffee</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span><strong>Questions or running late?</strong> Contact <span class="fill">[Contact name]</span></span>
+      <span><span class="fill">[Phone number]</span> &nbsp;|&nbsp; <span class="fill">[Email address]</span></span>
+    </footer>
+  </main>
+</body>
+</html>
