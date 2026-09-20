@@ -82,6 +82,7 @@ const SKIP_URLS = new Set([
   '/resources/websites-and-tools.html',   // redirect stub to /references/
   '/resources/articles-and-papers.html',  // redirect stub to /resources/
   '/cdu-teaching-staff/prompt-critics.html',  // redirect stub to /training-games/prompt-critics-study-and-learn/ (17 Sept 2026)
+  '/AI Workshop Gallery Pages/site/resources/basic-prompts-gallery.html',  // redirect stub to /resources/basic-prompts-gallery.html (20 Sept 2026)
   '/client-access/',                      // discreet noindex hub, reached from homepage artwork
 ]);
 

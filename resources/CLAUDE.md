@@ -10,6 +10,7 @@ House rules and card format for the NT World Ink Resources section. Read this be
 - `websites-and-tools.html`: RETIRED 27 July 2026; now a redirect stub to the filterable References library at `/references/` (documented in the main `/CLAUDE.md`). Its curated resources were merged into that tool, and the hub's "Websites & Tools" card now points to `/references/`.
 - `legislation-and-guidelines.html`: policy, frameworks and law; must keep its link to the presentation at `/presentations/australias-ai-laws-explained/`.
 - `ai-benchmarks.html`: the benchmark catalogue (built 28 July 2026), grouped by capability area. Its cards carry a status flag in the category line (Watch / Watch, nearing saturation / Retired, historical) and a release paper link at the end of each annotation; the page's own template comment shows the variant. Scores and statuses date quickly; recheck against the linked leaderboards when editing.
+- `basic-prompts-gallery.html`: the Basic Prompts Gallery (moved here 20 September 2026 from `/AI Workshop Gallery Pages/site/resources/`, where a redirect stub remains). It is a showcase page, not a card list; it uses `prompt-gallery.css` in this folder on top of the shared `styles.css`, and its own copy-paste showcase template sits in a comment near the top of the file. The advanced companion is still Markdown source at the old path and is not yet a page.
 
 ## The resource card
 

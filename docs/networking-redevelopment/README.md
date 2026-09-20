@@ -21,6 +21,7 @@ This folder is the durable record for continuing the networking tools across ses
 | [ROADMAP.md](ROADMAP.md) | Ordered rebuilds, relative size, dependencies and completion gates |
 | [LAN-BUILDER.md](LAN-BUILDER.md) | Pilot architecture, supported behaviour and maintenance notes |
 | [VERIFICATION.md](VERIFICATION.md) | Executed checks, reproducible steps and outstanding release checks |
+| [HOME-WIFI-PRACTICAL.md](HOME-WIFI-PRACTICAL.md) | Tool 10 specification, model contract and verification (20 September 2026) |
 
 ## Resume checklist
 
@@ -38,3 +39,4 @@ This folder is the durable record for continuing the networking tools across ses
 |---|---|---|
 | 14 September 2026 | Networking audit; preserved audit; implemented LAN model, UI, guided tasks and tests; began browser checks | Finish recovery, import and responsive verification |
 | 17 September 2026 | Verified current files against saved work; passed 34 model tests; completed browser interaction/recovery checks; added copy/paste data fallback; recorded roadmap and release gates | Trainer/learner pilot; next development batch is correctness containment, then IP Calculator |
+| 20 September 2026 | Planned and built tool 10, Home Wi-Fi Practical (ICTSAS217), as a bounded parallel job outside the roadmap order: model, three panes, 14 checkpoints, second occasion with seeded faults, 24 model tests, browser run-through. Card added to the simulations index; search index, sitemap and meta regenerated. See [HOME-WIFI-PRACTICAL.md](HOME-WIFI-PRACTICAL.md). Not committed or published | SD to review in the browser, then commit and publish; roadmap items 1 and 2 unchanged |
