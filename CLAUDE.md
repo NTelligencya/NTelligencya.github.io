@@ -429,6 +429,31 @@ The two decks were NOT rewritten; their register is the walkthrough-deck
 register, which is a different job. Worth checking with SD whether they need
 the same treatment.
 
+## NT Regional Travel Planner (23 September 2026)
+
+`/client-access/nt-travel-planner/index.html`, SD's internal planning tool for
+taking the AGC22-0112 training to Alice Springs, Katherine, Tennant Creek,
+Nhulunbuy, Jabiru and Yulara. Single self-contained file (inline CSS and JS,
+Lato and Barlow Semi Condensed from Google Fonts, teal and black scheme); a
+FIFTH deliberate exception to the no-page-CSS-or-JS rule, like the other client
+pages. Client area: `noindex,nofollow`, listed in `SKIP_URLS` in
+`tools/build-index.js` (a planning tool, not a learning resource, so it is
+skipped rather than marked hidden), reached only from the card on
+`/client-access/`. Plans and checklist ticks save to the browser's
+localStorage; the "Planning report and map" view prints through the browser's
+print dialog (A4 print CSS) and can be saved as a standalone HTML file. Data
+block at the top of the script: AGC22-0112 Table 5 rates (March 2026), places,
+road corridors, scheduled flights, coaches, seasons, events, checklists and
+sources, each with a confidence label and source date. The `AFB` constant
+holds the CDU Away from Base Guidelines (First Nations Leadership, January
+2025) as eligibility gates, coverage and process; the guidelines carry no
+dollar rates, so the planner runs an eligibility check and a coverage split
+(travel, meals and accommodation claimable; venue hire and delivery not) when
+the delivery type is set to an accredited mixed-mode course. Individual AFB
+staff names, phone numbers and the internal account codes were deliberately
+left out of the public page; the shared afb@cdu.edu.au address is used. Research notes behind the data live in the Copilot in Enterprise and
+Government tenancies Claude project. Never git commit or push here; SD commits.
+
 ## ICT, CS and Digital PD Day (6 September 2026)
 
 `/cdu-ict-pd-day/index.html`, a plain procedure page for SD's one-day Claude

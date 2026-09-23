@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Planning-phase travel tool for CDU TAFE regional training delivery in the Northern Territory.">
+<link rel="canonical" href="https://ntworldink.com/client-access/nt-travel-planner/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#111417">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>NT Regional Travel Planner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F3F6F6; --surface:#FFFFFF; --surface-2:#E9F0F0; --line:#D3DCDD; --ink:#111417; --muted:#5A6A6D;
+  --teal:#008387; --teal-deep:#0F4761; --teal-soft:#D9EFEF; --black:#111417; --on-black:#F2F6F6;
+  --warn:#B86A14; --warn-soft:#FBEBD6; --crit:#B3261E; --crit-soft:#F9E0DD; --good:#2E7D32; --good-soft:#DFF0E0;
+  --wet:#2F6F9F; --wet-soft:#DCE9F4; --dry:#B08A1E; --dry-soft:#F6EDD0;
+  --radius:6px; --shadow:0 1px 2px rgba(17,20,23,.08);
+  --font-body:"Lato","Segoe UI",Arial,sans-serif; --font-display:"Barlow Semi Condensed","Arial Narrow",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1416; --surface:#16201F; --surface-2:#1E2B2B; --line:#2B3B3C; --ink:#E7EEEE; --muted:#9BACAE;
+    --teal:#27B6BA; --teal-deep:#7CC3D3; --teal-soft:#123C3E; --black:#0A0F10; --on-black:#F2F6F6;
+    --warn:#E9A24A; --warn-soft:#3A2A12; --crit:#F08A80; --crit-soft:#3E1A17; --good:#7DCB82; --good-soft:#163A1A;
+    --wet:#7FB4DE; --wet-soft:#16303F; --dry:#E0C05C; --dry-soft:#3A3012;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1416; --surface:#16201F; --surface-2:#1E2B2B; --line:#2B3B3C; --ink:#E7EEEE; --muted:#9BACAE;
+  --teal:#27B6BA; --teal-deep:#7CC3D3; --teal-soft:#123C3E; --black:#0A0F10; --on-black:#F2F6F6;
+  --warn:#E9A24A; --warn-soft:#3A2A12; --crit:#F08A80; --crit-soft:#3E1A17; --good:#7DCB82; --good-soft:#163A1A;
+  --wet:#7FB4DE; --wet-soft:#16303F; --dry:#E0C05C; --dry-soft:#3A3012;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:1.5rem;letter-spacing:.01em}
+h2{font-size:1.25rem;color:var(--teal-deep)}
+h3{font-size:1.05rem}
+h4{font-size:.95rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+p{margin:0}
+a{color:var(--teal-deep);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+a:hover{color:var(--teal)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.small{font-size:.86rem;color:var(--muted)}
+.tag{display:inline-block;font-family:var(--font-display);font-size:.78rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.1rem .45rem;border-radius:3px;border:1px solid var(--line);color:var(--muted);vertical-align:middle;white-space:nowrap}
+.tag.high{border-color:var(--good);color:var(--good)}
+.tag.medium{border-color:var(--warn);color:var(--warn)}
+.tag.low{border-color:var(--crit);color:var(--crit)}
+.tag.wet{background:var(--wet-soft);border-color:transparent;color:var(--wet)}
+.tag.dry{background:var(--dry-soft);border-color:transparent;color:var(--dry)}
+.tag.teal{background:var(--teal-soft);border-color:transparent;color:var(--teal-deep)}
+.tag.warn{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.tag.crit{background:var(--crit-soft);border-color:transparent;color:var(--crit)}
+.tag.good{background:var(--good-soft);border-color:transparent;color:var(--good)}
+
+/* Header */
+.topbar{background:var(--black);color:var(--on-black);position:sticky;top:env(safe-area-inset-top,0px);z-index:20;border-bottom:3px solid var(--teal)}
+.topbar-inner{max-width:1360px;margin:0 auto;padding:.6rem 16px;display:flex;flex-wrap:wrap;gap:.6rem 1rem;align-items:center}
+.brand{display:flex;flex-direction:column;gap:.1rem;margin-right:auto}
+.brand h1{color:#fff}
+.brand .small{color:#B9C9CA}
+.topbar .field{display:flex;align-items:center;gap:.4rem}
+.topbar input[type=text]{background:#1C2628;border:1px solid #33484A;color:#fff;border-radius:4px;padding:.4rem .55rem;min-width:200px}
+.topbar select{background:#1C2628;border:1px solid #33484A;color:#fff;border-radius:4px;padding:.4rem .5rem}
+.btn{font-family:var(--font-display);font-weight:600;font-size:.92rem;letter-spacing:.03em;text-transform:uppercase;border:1px solid var(--teal);background:transparent;color:var(--teal-deep);border-radius:4px;padding:.45rem .8rem;line-height:1;display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap}
+.btn:hover{background:var(--teal-soft)}
+.btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+.btn.primary:hover{background:var(--teal-deep);border-color:var(--teal-deep)}
+.btn.ghost{border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn.sm{font-size:.8rem;padding:.3rem .55rem}
+.btn:disabled{opacity:.5;cursor:default}
+.topbar .btn{color:#fff;border-color:#4A6B6D}
+.topbar .btn:hover{background:#1C2628}
+.topbar .btn.primary{background:var(--teal);border-color:var(--teal)}
+.topbar .btn.primary:hover{background:#00A2A7}
+
+/* Layout */
+.wrap{max-width:1360px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(300px,360px) 1fr;gap:16px;align-items:start}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}}
+.aside{position:sticky;top:calc(env(safe-area-inset-top,0px) + 66px);display:flex;flex-direction:column;gap:12px;max-height:calc(100vh - 80px);overflow:auto;padding-bottom:8px}
+@media (max-width:900px){.aside{position:static;max-height:none;overflow:visible}}
+.main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.panel-h{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;border-bottom:1px solid var(--line)}
+.panel-h h2{margin-right:auto}
+.panel-b{padding:.9rem}
+.panel-b + .panel-b{border-top:1px solid var(--line)}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem}
+label.f{display:flex;flex-direction:column;gap:.25rem;font-size:.86rem;color:var(--muted)}
+label.f > span{font-family:var(--font-display);font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:.75rem}
+label.f input,label.f select{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.4rem .5rem;color:var(--ink);width:100%;min-width:0}
+label.chk{display:flex;align-items:flex-start;gap:.5rem;font-size:.9rem;cursor:pointer}
+label.chk input{margin-top:.2rem;accent-color:var(--teal)}
+.stops{display:flex;flex-direction:column;gap:.5rem}
+.stop{border:1px solid var(--line);border-radius:var(--radius);padding:.6rem;background:var(--surface-2);display:flex;flex-direction:column;gap:.5rem}
+.stop-h{display:flex;align-items:center;gap:.4rem}
+.stop-h select{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.35rem .4rem}
+.stop-h .btn.sm{padding:.25rem .4rem}
+.stop .grid-2{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:.6rem .75rem}
+.stat .v{font-family:var(--font-display);font-size:1.5rem;font-weight:600;color:var(--teal-deep);line-height:1.1}
+.stat .l{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-family:var(--font-display);font-weight:600}
+.leg{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden}
+.leg-h{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem;padding:.65rem .9rem;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.leg-h h3{margin-right:auto}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.7rem;padding:.8rem .9rem}
+.opt{border:1px solid var(--line);border-radius:var(--radius);padding:.7rem .8rem;display:flex;flex-direction:column;gap:.5rem;background:var(--surface)}
+.opt.selected{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal)}
+.opt.na{opacity:.75}
+.opt-h{display:flex;align-items:center;gap:.5rem}
+.opt-h .mode{font-family:var(--font-display);font-weight:700;font-size:1rem;text-transform:uppercase;letter-spacing:.04em;color:var(--teal-deep)}
+.opt-h .btn{margin-left:auto}
+.opt .kv{display:flex;flex-direction:column;gap:.1rem;font-size:.88rem;margin:0}
+.opt .kv dt{color:var(--teal-deep);font-family:var(--font-display);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;margin-top:.3rem}
+.opt .kv dd{margin:0}
+.rep .mapwrap svg{margin:0 auto}
+.issues{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.3rem;font-size:.86rem}
+.issues li{padding-left:.9rem;position:relative}
+.issues li::before{content:"";position:absolute;left:0;top:.5em;width:.45rem;height:.45rem;border-radius:50%;background:var(--warn)}
+.issues li.crit::before{background:var(--crit)}
+.issues li.info::before{background:var(--teal)}
+.issues li.good::before{background:var(--good)}
+.daylist{display:flex;flex-direction:column;gap:.3rem;font-size:.86rem}
+.daylist div{display:flex;gap:.5rem;align-items:baseline}
+.daylist b{font-family:var(--font-display);color:var(--teal-deep);min-width:3.2rem}
+table.t{width:100%;border-collapse:collapse;font-size:.88rem}
+table.t th,table.t td{padding:.45rem .5rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.t th{font-family:var(--font-display);font-weight:600;font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+table.t td.n,table.t th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.t tr.total td{font-weight:700;border-top:2px solid var(--ink);border-bottom:none}
+table.t input.q{width:4.5rem;text-align:right;border:1px solid var(--line);border-radius:3px;padding:.2rem .3rem;background:var(--surface);color:var(--ink)}
+table.t input.q.wide{width:6.5rem}
+.tscroll{overflow-x:auto}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.place{border:1px solid var(--line);border-radius:var(--radius);padding:.75rem .85rem;background:var(--surface);display:flex;flex-direction:column;gap:.55rem}
+.place ul{margin:0;padding-left:1.1rem;font-size:.87rem;display:flex;flex-direction:column;gap:.25rem}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.checkgroup ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.35rem}
+.checkgroup li label{display:flex;gap:.5rem;align-items:flex-start;font-size:.88rem;cursor:pointer}
+.checkgroup li input{margin-top:.2rem;accent-color:var(--teal)}
+.checkgroup li.done label{color:var(--muted);text-decoration:line-through}
+.season-strip{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
+.season-strip div{font-family:var(--font-display);font-size:.72rem;text-align:center;padding:.3rem 0;border-radius:3px;background:var(--surface-2);color:var(--muted);font-weight:600}
+.season-strip div.wet{background:var(--wet-soft);color:var(--wet)}
+.season-strip div.dry{background:var(--dry-soft);color:var(--dry)}
+.season-strip div.buildup{background:var(--warn-soft);color:var(--warn)}
+.season-strip div.on{outline:2px solid var(--ink);outline-offset:-2px}
+.note{background:var(--surface-2);border-left:3px solid var(--teal);padding:.55rem .75rem;font-size:.88rem;border-radius:0 4px 4px 0}
+.note.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+.note.crit{border-left-color:var(--crit);background:var(--crit-soft)}
+.sources li{font-size:.85rem;margin-bottom:.3rem}
+.sources ul{padding-left:1.1rem;margin:0}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);background:var(--black);color:#fff;padding:.55rem .9rem;border-radius:4px;font-size:.9rem;z-index:50;box-shadow:0 4px 14px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+details.more summary{cursor:pointer;font-family:var(--font-display);font-weight:600;color:var(--teal-deep);font-size:.9rem}
+.mapwrap{overflow-x:auto}
+.mapwrap svg{max-width:100%;height:auto;display:block}
+.plans{display:flex;flex-direction:column;gap:.35rem}
+.plans button{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.4rem .55rem;display:flex;gap:.5rem;align-items:center}
+.plans button:hover{border-color:var(--teal)}
+.plans button span.t{font-size:.78rem;color:var(--muted);margin-left:auto;white-space:nowrap}
+.modal-bg{position:fixed;inset:0;background:rgba(10,15,16,.55);z-index:40;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:var(--surface);color:var(--ink);border-radius:var(--radius);max-width:520px;width:100%;padding:1rem;display:flex;flex-direction:column;gap:.8rem;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+
+.site-foot{background:var(--black);color:#B9C9CA;font-size:.82rem;margin-top:24px;border-top:3px solid var(--teal)}
+.site-foot-inner{max-width:1360px;margin:0 auto;padding:.9rem 16px;display:flex;flex-wrap:wrap;gap:.4rem 1.5rem;justify-content:space-between}
+.site-foot a{color:#fff}
+body.report-mode .site-foot{display:none}
+@media print{.site-foot{display:none !important}}
+/* Report view */
+#report{display:none}
+body.report-mode #app{display:none}
+body.report-mode #report{display:block}
+.rep{max-width:960px;margin:0 auto;padding:16px;color:var(--ink);background:var(--surface)}
+.rep-tools{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;padding:.6rem 0 1rem;border-bottom:1px solid var(--line);margin-bottom:1rem}
+.rep-tools .hint{font-size:.85rem;color:var(--muted);flex-basis:100%}
+.rep h1{font-size:1.7rem}
+.rep h2{margin-top:1.4rem;padding-bottom:.25rem;border-bottom:2px solid var(--teal);font-size:1.2rem;color:var(--ink)}
+.rep h3{margin-top:.9rem;font-size:1rem;color:var(--teal-deep)}
+.rep .cover{border:1px solid var(--line);border-top:6px solid var(--teal);padding:1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.6rem 1rem;margin-top:.8rem}
+.rep .cover div b{font-family:var(--font-display);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);display:block}
+.rep table.t{font-size:.84rem}
+.rep .issues{font-size:.86rem}
+.rep .two{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:700px){.rep .two{grid-template-columns:1fr}}
+.rep .cl ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.25rem;font-size:.86rem}
+.rep .cl li::before{content:"\2610";margin-right:.45rem;color:var(--muted)}
+.rep .cl li.done::before{content:"\2611";color:var(--good)}
+.rep .foot{margin-top:1.5rem;padding-top:.6rem;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted)}
+.rep .map-note{font-size:.8rem;color:var(--muted);margin-top:.3rem}
+.pb{break-before:page}
+@media print{
+  :root{--bg:#fff;--surface:#fff;--surface-2:#f2f2f2;--line:#bbb;--ink:#000;--muted:#444;--teal:#008387;--teal-deep:#0F4761;--teal-soft:#e6f2f2;--warn:#8a4b00;--warn-soft:#f6e9d8;--crit:#9b1c14;--crit-soft:#f7dedb;--good:#1f5f23;--good-soft:#e2efe3;--wet:#25587f;--wet-soft:#e0eaf3;--dry:#7f6210;--dry-soft:#f3ecd2}
+  body{background:#fff;color:#000;font-size:11pt}
+  .topbar,#app,.rep-tools,.toast{display:none !important}
+  #report{display:block !important}
+  .rep{max-width:none;padding:0}
+  .rep h2{break-after:avoid}
+  table,figure,.leg,.place{break-inside:avoid}
+  a{color:#000;text-decoration:none}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:8pt;color:#444;word-break:break-all}
+  .pb{break-before:page}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <h1>NT Regional Travel Planner</h1>
+      <span class="small">Planning-phase tool for CDU TAFE training delivery under AGC22-0112. Verify everything before booking.</span>
+    </div>
+    <div class="field"><input type="text" id="planName" placeholder="Plan name" aria-label="Plan name"></div>
+    <button class="btn" id="btnSave" type="button">Save plan</button>
+    <button class="btn" id="btnLoad" type="button">Saved plans</button>
+    <button class="btn primary" id="btnReport" type="button">Planning report and map</button>
+  </div>
+</header>
+
+<div id="app" class="wrap">
+  <aside class="aside">
+    <section class="panel">
+      <div class="panel-h"><h2>Trip</h2><span class="tag" id="storageTag">this browser</span></div>
+      <div class="panel-b" style="display:flex;flex-direction:column;gap:.7rem">
+        <div class="grid-2">
+          <label class="f"><span>Origin</span><select id="origin"></select></label>
+          <label class="f"><span>Travel month</span><select id="month"></select></label>
+          <label class="f"><span>Year</span><select id="year"><option>2026</option><option>2027</option></select></label>
+          <label class="f"><span>Trainers</span><select id="trainers"><option value="1">1</option><option value="2">2 (Excel)</option></select></label>
+        </div>
+        <label class="chk"><input type="checkbox" id="returnHome" checked> Return to origin at the end</label>
+        <label class="f"><span>Delivery type</span><select id="delivery"><option value="agc">AGC22-0112 non-accredited (DCDD quote)</option><option value="accredited">Accredited mixed-mode course (Away from Base check)</option></select></label>
+        <div id="afbInputs" class="grid-2" hidden>
+          <label class="f"><span>Accredited, mixed-mode</span><select data-afb="accredited"><option value="yes">Yes</option><option value="no">No</option></select></label>
+          <label class="f"><span>ABSTUDY approved</span><select data-afb="abstudy"><option value="yes">Yes</option><option value="unsure">Unsure</option><option value="no">No</option></select></label>
+          <label class="f"><span>Nominal hours</span><input type="number" min="0" max="2000" step="1" data-afb="hours"></label>
+          <label class="f"><span>Face-to-face share (%)</span><input type="number" min="0" max="100" step="1" data-afb="f2f"></label>
+          <label class="f"><span>Eligible First Nations students</span><input type="number" min="0" max="60" step="1" data-afb="students"></label>
+          <label class="f"><span>Majority First Nations cohort</span><select data-afb="majority"><option value="yes">Yes</option><option value="no">No</option></select></label>
+        </div>
+        <div>
+          <h4 style="margin-bottom:.4rem">Stops, in order</h4>
+          <div class="stops" id="stops"></div>
+          <button class="btn sm" id="btnAddStop" type="button" style="margin-top:.5rem">Add stop</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Driving and kit</h2></div>
+      <div class="panel-b" style="display:flex;flex-direction:column;gap:.7rem">
+        <div class="grid-2">
+          <label class="f"><span>Max driving hours per day</span><input type="number" id="maxDrive" min="4" max="12" step="0.5" value="8"></label>
+          <label class="f"><span>Pelican case weight (kg)</span><input type="number" id="kitKg" min="0" max="60" step="1" value="28"></label>
+          <label class="f"><span>Fleet car</span><select id="fleetType"><option value="2wd">2WD sedan or wagon</option><option value="4wd">4WD (trained driver)</option></select></label>
+          <label class="f"><span>Starlink dish packed</span><select id="starlink"><option value="yes">Yes</option><option value="no">No</option></select></label>
+        </div>
+        <p class="small">Driving days are split at the hours cap and at towns with accommodation. The public CDU fleet policy requires breaks every two hours, no regional driving between sunset and sunrise without an approved risk assessment, and 4WD training before unsealed roads (medium; policy page read 22 Sep 2026).</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Rates in use</h2><span class="tag high">AGC22-0112</span></div>
+      <div class="panel-b">
+        <table class="t" id="ratesTable"></table>
+        <p class="small" style="margin-top:.5rem">Table 5, March 2026, from the costing sheet dated 4 Aug 2026 (high). Meals allowance is GST exempt; other lines are GST inclusive.</p>
+      </div>
+    </section>
+  </aside>
+
+  <main class="main">
+    <section class="summary" id="summary"></section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Legs and options</h2><span class="small">Pick one option per leg. The costing follows your picks.</span></div>
+      <div class="panel-b" id="legs" style="display:flex;flex-direction:column;gap:1rem"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Season, roads and events</h2></div>
+      <div class="panel-b" id="season"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Kit and baggage</h2></div>
+      <div class="panel-b" id="kit"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Costing</h2><span class="small">Quantities are editable; blank a quantity to drop a line.</span></div>
+      <div class="panel-b">
+        <h3 style="margin-bottom:.5rem">Contract quote (AGC22-0112 Table 5 rates)</h3>
+        <div class="tscroll"><table class="t" id="quoteTable"></table></div>
+      </div>
+      <div class="panel-b">
+        <h3 style="margin-bottom:.5rem">Internal cost estimate</h3>
+        <p class="small" style="margin-bottom:.5rem">Unit costs default to the contract rate unless a researched figure exists. Replace them with live quotes before relying on the margin.</p>
+        <div class="tscroll"><table class="t" id="internalTable"></table></div>
+      </div>
+      <div class="panel-b" id="awayFromBase"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Venues, accommodation, hire cars and connectivity</h2></div>
+      <div class="panel-b" id="places"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Checklists</h2><span class="small">Ticks are saved with the plan.</span></div>
+      <div class="panel-b checks" id="checklists"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Data notes and sources</h2></div>
+      <div class="panel-b" id="sources"></div>
+    </section>
+  </main>
+</div>
+
+<footer class="site-foot"><div class="site-foot-inner"><span>NT Regional Travel Planner, CDU TAFE ICT, Cyber Security and Digital. Planning-phase tool; verify with carriers, Road Report NT and venues before booking.</span><span>Last updated 23 September 2026. <a href="/client-access/">Back to course access</a></span></div></footer>
+<div id="report"></div>
+<div id="modalHost"></div>
+
+<script>
+/* ---------- DATA (compiled 22 to 23 September 2026; every item carries a confidence label) ---------- */
+const DATA_DATE = "22 to 23 September 2026";
+
+const RATES = {
+  meals:{label:"Meals and incidentals (travel allowance)",unit:"per trainer per day",rate:120,gst:false},
+  accom:{label:"Overnight accommodation",unit:"per trainer per night",rate:243.51,gst:true},
+  hire:{label:"Car hire",unit:"per day",rate:79.40,gst:true},
+  flight:{label:"Flights (flexi, cap per return)",unit:"per trainer per return",rate:1270.48,gst:true},
+  km:{label:"Mileage",unit:"per km",rate:0.64,gst:true},
+  taxi:{label:"Airport taxi and fares",unit:"per day",rate:158.81,gst:true},
+  half:{label:"Half-day session (4 h)",unit:"per session",rate:1319.34,gst:true},
+  full:{label:"Full-day session (8 h)",unit:"per session",rate:2198.90,gst:true},
+  hour:{label:"Delivery, contextualisation, evaluation or design",unit:"per hour",rate:300.15,gst:true},
+  roomFull:{label:"Room hire (full day)",unit:"per day",rate:462.11,gst:true},
+  roomHalf:{label:"Room hire (half day)",unit:"per half day",rate:231.05,gst:true},
+  consum:{label:"Consumables (workbooks)",unit:"per participant",rate:25,gst:true}
+};
+/* CDU Away from Base (AFB) program, from the First Nations Leadership AFB Guidelines, January 2025 (UniPrint 09.25). Read directly (high). The guidelines set eligibility, coverage and process; they contain no dollar rates. */
+const AFB = {
+  source:"CDU Away from Base Guidelines, First Nations Leadership, January 2025",
+  web:"https://www.cdu.edu.au/first-nations-leadership/away-base-afb-program",
+  email:"afb@cdu.edu.au",
+  what:"A Commonwealth program funded through the National Indigenous Australians Agency that supplements the reasonable travel, meals and accommodation costs of eligible First Nations students in ABSTUDY-approved mixed-mode courses. Reverse-block delivery lets CDU claim a lecturer's fares, meals and accommodation for teaching in the students' community instead of bringing students to campus. Funding is per capita (Education Provider Unit Cost) and never covers delivery costs.",
+  courseGates:[
+    "Accredited course delivered mixed-mode or online",
+    "At least 50 per cent distance education and at most 50 per cent face-to-face delivery",
+    "Approved as a mixed-mode course under the ABSTUDY scheme",
+    "At least 100 nominal hours in total"
+  ],
+  studentGates:[
+    "Students are Australian Aboriginal or Torres Strait Islander people approved for ABSTUDY",
+    "Aim for 12 eligible students; 8 is the working minimum; one or two students is not generally feasible",
+    "The majority of the cohort must be First Nations; only AFB-approved students count, though delivery can be to all students present",
+    "Students already receiving travel, meals or accommodation assistance through a scholarship, traineeship or VETiS are ineligible"
+  ],
+  covers:["Flights, bus services, charter, private hire car, CDU fleet car, taxi reimbursement","Meals or a monetary meals allowance, catering, or travel allowance for TAFE lecturers","Accommodation: IHD, motel or hotel, camping allowance"],
+  excludes:["Course delivery costs such as venue, room or facility hire","Course fees, assets, materials or freight","Entry, registration or exhibition fees","Costs of anyone other than the students and training professionals","Car hire for personal use; childcare; income support; costs beyond the end of the approved activity"],
+  process:[
+    "Talk to the AFB team before planning so the course meets the eligibility rules",
+    "Lodge a Remote Training Request through AFB Online 4 to 6 weeks before the training start date (register for AFB Online through the AFB team first)",
+    "Expect a follow-up call within 3 business days to confirm student and lecturer trip data",
+    "Approval issues a unique AFB number per delivery; three communities need three AFB numbers",
+    "Book all travel through CDU's corporate travel manager (CTM)",
+    "Pay expenses from the TAFE team budget, then raise a journal transfer to AFB for reimbursement, quoting the AFB number, course code and expense type on every line, using the AFB account codes in the guidelines",
+    "Return completed ABSTUDY incidentals claim forms to the AFB team within 14 days of the activity start",
+    "Report bi-annually on training time delivered and student numbers; a 10 per cent admin charge on the total reimbursed can be claimed by the team"
+  ],
+  adminPct:10
+};
+
+/* Places offered as origin or stop */
+const PLACES = {
+  darwin:{name:"Darwin (CDU Casuarina)",short:"Darwin",lat:-12.372,lon:130.868,airport:"DRW",airportName:"Darwin International",hub:"darwin",region:"topend",
+    cdu:"Casuarina campus: home base, fleet cars available (stated).",
+    venues:[{n:"CDU Danala computer lab (Danala 3.25)",d:"Usual delivery venue, capacity 25 (stated)."}],
+    accom:[],hire:[{n:"All major brands at Darwin Airport",d:"Aggregator teaser rates from about A$21 to 34 per day are not real quotes (low; Skyscanner, read 22 Sep 2026).",u:"https://www.skyscanner.com/car-rental-from/drw/car-rental-from-darwin-airport.html"}],
+    connect:"Full Telstra and Optus mobile coverage in the urban area (high)."},
+  katherine:{name:"Katherine",short:"Katherine",lat:-14.465,lon:132.263,airport:"KTR",airportName:"Katherine Tindal (RAAF joint user)",hub:"katherine",region:"topend",
+    cdu:"CDU Katherine Town Centre, 19 Second Street, and CDU Katherine Rural Campus (Cossack); both inside the CDU venue hire list (high; cdu.edu.au/locations, read 22 Sep 2026).",
+    venues:[
+      {n:"CDU Katherine Town Centre",d:"19 Second Street. Book through the CDU venue hire request form.",u:"https://www.cdu.edu.au/about-cdu/property-facilities/venue-hire"},
+      {n:"CDU Katherine Rural Campus",d:"Cossack, out of town. Same booking route."},
+      {n:"Godinymayin Yijard Rivers Arts and Culture Centre (GYRACC)",d:"Boardroom up to 30, half theatre 120, projector, TV, whiteboard, wireless internet, technical support; quotes on request, venue@gyracc.org.au (high; gyracc.org.au, read 22 Sep 2026).",u:"https://gyracc.org.au/venue-hire/"}
+    ],
+    accom:[
+      {n:"Knotts Crossing Resort",d:"Referenced business option; current rate not verified (low)."},
+      {n:"Contour Hotel Katherine",d:"Referenced business option; current rate not verified (low)."},
+      {n:"Ibis Styles Katherine",d:"Chain option; rate not checked (low)."}
+    ],
+    hire:[{n:"Thrifty Katherine",d:"Downtown location plus a separate Tindal airport listing; rates not published on the location page (medium; thrifty.com.au, read 22 Sep 2026).",u:"https://www.thrifty.com.au/locations/australia/northern-territory/katherine"}],
+    connect:"Town-area 4G expected; crowdsourced checkers gave inconsistent results (low). Verify with the Telstra coverage map."},
+  tennant:{name:"Tennant Creek",short:"Tennant Creek",lat:-19.647,lon:134.190,airport:"TCA",airportName:"Tennant Creek",hub:"tennant",region:"centre",
+    cdu:"CDU Tennant Creek centre, 65 Staunton Street; a smaller centre rather than a full campus (medium; cdu.edu.au/locations).",
+    venues:[
+      {n:"CDU Tennant Creek centre",d:"65 Staunton Street. Confirm room, computers and internet before relying on it.",u:"https://www.cdu.edu.au/locations"},
+      {n:"Barkly Regional Council Civic Hall",d:"41 Peko Road, reception@barkly.nt.gov.au, (08) 8962 0000. Kitchen, tables and chairs; wifi and computers not documented (medium; barkly.nt.gov.au, read 22 Sep 2026).",u:"https://www.barkly.nt.gov.au/facilities"}
+    ],
+    accom:[{n:"Bluestone Motor Inn",d:"Season deals from A$169; FAQ text says rooms from A$152 (medium; property site, read 22 Sep 2026).",u:"https://bluestone-motor-inn.innorthernterritory.com/en/"}],
+    hire:[{n:"Hertz Tennant Creek",d:"59 Paterson Street, (08) 8962 3040, Monday to Friday 8 am to 5 pm, closed weekends (high; hertz.com, read 22 Sep 2026). Weekend arrivals cannot collect a car.",u:"https://www.hertz.com/us/en/location/australia/northernterritory/tennantcreek/tcat50"}],
+    connect:"Telstra 4G in town expected; not verified this pass (low)."},
+  alice:{name:"Alice Springs",short:"Alice Springs",lat:-23.698,lon:133.881,airport:"ASP",airportName:"Alice Springs",hub:"alice",region:"centre",
+    cdu:"CDU Alice Springs campus, 10 Grevillea Drive; lecture theatres and meeting rooms with data projectors and computer connectivity are in the CDU venue hire program (high; cdu.edu.au venue hire, read 22 Sep 2026). Some fleet cars, usually local hire relied on (stated).",
+    venues:[
+      {n:"CDU Alice Springs campus",d:"10 Grevillea Drive. Book through the CDU venue hire request form; confirm a computer lab is available.",u:"https://www.cdu.edu.au/about-cdu/property-facilities/venue-hire"},
+      {n:"Alice Springs Public Library, Multi-Purpose Room",d:"Capacity 15, wifi, AV, kitchenette; A$51.50 per hour commercial, A$27 non-commercial; (08) 8950 0555, library@astc.nt.gov.au (high; alicesprings.nt.gov.au, read 22 Sep 2026).",u:"https://www.alicesprings.nt.gov.au/residents/services/resident-info/venue-hire-in-alice-springs.aspx"},
+      {n:"Alice Springs Convention Centre",d:"Boardrooms to 500-plus capacity rooms, wifi, AV, catering; (08) 8950 0200, info@aspcc.com.au (high)."}
+    ],
+    accom:[
+      {n:"DoubleTree by Hilton Alice Springs",d:"Aggregator teaser from A$79, not a corporate rate (low; read 22 Sep 2026)."},
+      {n:"Crowne Plaza Alice Springs Lasseters",d:"Snippet showed from A$102; booking page could not be verified (low)."},
+      {n:"Mercure Alice Springs Resort",d:"Referenced; rate not verified (low)."}
+    ],
+    hire:[
+      {n:"Alice Springs Airport: Avis, Budget, Hertz, Thrifty, Europcar, Sixt and others",d:"Economy from about A$69 to 70 per day off-peak; intermediate A$156 to 201; Prado-class 4WD A$183 to 294 for a late Sept to early Oct 2026 sample (medium; airportrentals.com and stressfreecarrental.com, 18 to 22 Sep 2026).",u:"https://www.airportrentals.com/australia/alice-springs-airport-car-rental"},
+      {n:"Britz and Apollo (4WD)",d:"Branches in Alice Springs and Darwin; rates not captured (medium).",u:"https://www.britz.com/au/en/4wd-alice-springs"}
+    ],
+    connect:"Telstra and Optus 4G and 5G in town expected; crowdsourced checker results were inconsistent (low). Verify with the carrier maps."},
+  nhulunbuy:{name:"Nhulunbuy (Gove)",short:"Nhulunbuy",lat:-12.183,lon:136.778,airport:"GOV",airportName:"Gove",hub:"nhulunbuy",region:"topend",
+    cdu:"CDU Nhulunbuy campus, Lot 1468 Dartnall Close; contact eartraining@cdu.edu.au (high; cdu.edu.au/locations, read 22 Sep 2026).",
+    venues:[
+      {n:"CDU Nhulunbuy campus",d:"Lot 1468 Dartnall Close, eartraining@cdu.edu.au.",u:"https://www.cdu.edu.au/locations"},
+      {n:"Nhulunbuy Library and East Arnhem Regional Council spaces",d:"Bookable through SpacetoCo (medium).",u:"https://www.spacetoco.com/space/nhulunbuy-library-northern-territory-nt"}
+    ],
+    accom:[{n:"Walkabout Lodge",d:"Season deals from A$240 (medium; property site, read 22 Sep 2026).",u:"https://walkabout-lodge.innorthernterritory.com/en/"},{n:"Gove Peninsula Motel",d:"Not checked (low)."}],
+    hire:[{n:"Hertz at Gove Airport",d:"Listed on aggregators (medium)."},{n:"Manny's Car Rental",d:"Local independent operator; contact directly for rates (medium)."}],
+    connect:"Telstra operates in town in practice; third-party checker understated it (low). Garma week fills flights and rooms."},
+  jabiru:{name:"Jabiru (Kakadu)",short:"Jabiru",lat:-12.671,lon:132.836,airport:null,airportName:"No scheduled flights (charter only)",hub:"jabiru",region:"topend",
+    cdu:"No CDU presence (high; not on the CDU locations page).",
+    venues:[{n:"No verified training venue",d:"Ask West Arnhem Regional Council or the Jabiru Town Development Authority; not researched this pass (low)."}],
+    accom:[{n:"Mercure Kakadu Crocodile Hotel",d:"Snippet showed from A$109; booking page returned an error (low)."},{n:"Anbinik Kakadu Resort",d:"Not rate-checked (low)."}],
+    hire:[{n:"No hire car found in Jabiru",d:"Hire in Darwin or take a fleet car (medium)."}],
+    connect:"Telstra 4G in Jabiru township expected; not verified (low). Kakadu park pass required: A$40 adult in the 1 Jul to 31 Oct season, A$25 in the tropical summer season (medium; kakadu.gov.au)."},
+  yulara:{name:"Yulara (Uluru)",short:"Yulara",lat:-25.240,lon:130.984,airport:"AYQ",airportName:"Ayers Rock (Connellan)",hub:"yulara",region:"centre",
+    cdu:"No CDU presence (high).",
+    venues:[{n:"Ayers Rock Resort conference facilities (Voyages)",d:"Single-operator town; not researched this pass (low)."}],
+    accom:[{n:"Ayers Rock Resort (Sails in the Desert, Desert Gardens, Emu Walk, Outback Pioneer)",d:"Expedia listing from A$222; single-operator precinct so corporate rates will differ (low; read 22 Sep 2026)."}],
+    hire:[{n:"Airport hire desks",d:"Not researched this pass (low). Most visitors drive from Alice Springs or fly interstate."}],
+    connect:"Telstra 4G in the resort area expected (low). Uluru-Kata Tjuta park pass A$38 for 3 days (medium; uluru.gov.au)."}
+};
+
+/* Road nodes (approximate coordinates, used for the map and for overnight splitting) */
+const NODES = {
+  darwin:{n:"Darwin",lat:-12.372,lon:130.868,accom:true,fuel:true},
+  adelaideRiver:{n:"Adelaide River",lat:-13.238,lon:131.108,accom:true,fuel:true},
+  pineCreek:{n:"Pine Creek",lat:-13.822,lon:131.835,accom:true,fuel:true},
+  katherine:{n:"Katherine",lat:-14.465,lon:132.263,accom:true,fuel:true},
+  mataranka:{n:"Mataranka",lat:-14.921,lon:133.066,accom:true,fuel:true},
+  larrimah:{n:"Larrimah",lat:-15.577,lon:133.213,accom:true,fuel:true},
+  dalyWaters:{n:"Daly Waters",lat:-16.253,lon:133.369,accom:true,fuel:true},
+  dunmarra:{n:"Dunmarra",lat:-16.680,lon:133.410,accom:true,fuel:true},
+  elliott:{n:"Elliott",lat:-17.553,lon:133.541,accom:true,fuel:true},
+  rennerSprings:{n:"Renner Springs",lat:-18.317,lon:133.802,accom:true,fuel:true},
+  threeWays:{n:"Three Ways",lat:-19.440,lon:134.210,accom:true,fuel:true},
+  tennant:{n:"Tennant Creek",lat:-19.647,lon:134.190,accom:true,fuel:true},
+  wauchope:{n:"Wauchope (Devils Marbles)",lat:-20.640,lon:134.220,accom:true,fuel:true},
+  wycliffe:{n:"Wycliffe Well",lat:-20.780,lon:134.230,accom:true,fuel:true},
+  barrowCreek:{n:"Barrow Creek",lat:-21.530,lon:133.890,accom:true,fuel:true},
+  tiTree:{n:"Ti Tree",lat:-22.130,lon:133.410,accom:true,fuel:true},
+  aileron:{n:"Aileron",lat:-22.650,lon:133.350,accom:true,fuel:true},
+  alice:{n:"Alice Springs",lat:-23.698,lon:133.881,accom:true,fuel:true},
+  stuartsWell:{n:"Stuarts Well",lat:-24.340,lon:133.450,accom:true,fuel:true},
+  erldunda:{n:"Erldunda",lat:-25.200,lon:133.200,accom:true,fuel:true},
+  curtinSprings:{n:"Curtin Springs",lat:-25.310,lon:131.750,accom:true,fuel:true},
+  yulara:{n:"Yulara",lat:-25.240,lon:130.984,accom:true,fuel:true},
+  humptyDoo:{n:"Humpty Doo",lat:-12.580,lon:131.130,accom:false,fuel:true},
+  barkHut:{n:"Bark Hut (Annaburroo)",lat:-12.850,lon:131.680,accom:true,fuel:true},
+  jabiru:{n:"Jabiru",lat:-12.671,lon:132.836,accom:true,fuel:true},
+  cooinda:{n:"Cooinda",lat:-12.900,lon:132.520,accom:true,fuel:true},
+  maryRiver:{n:"Mary River Roadhouse",lat:-13.600,lon:132.200,accom:true,fuel:true},
+  caTurnoff:{n:"Central Arnhem Road turnoff",lat:-14.750,lon:132.500,accom:false,fuel:false},
+  barunga:{n:"Barunga",lat:-14.520,lon:132.870,accom:false,fuel:true},
+  mainoru:{n:"Mainoru Store",lat:-14.050,lon:134.090,accom:false,fuel:true},
+  bulman:{n:"Bulman",lat:-13.660,lon:134.350,accom:false,fuel:true},
+  nhulunbuy:{n:"Nhulunbuy",lat:-12.183,lon:136.778,accom:true,fuel:true}
+};
+
+/* Corridors between hub nodes. Each waypoint: [nodeId, cumulative km, surface to reach it]. Speeds: sealed 90 km/h, park 80, unsealed 50. */
+const CORRIDORS = [
+  {id:"stuart_dp",name:"Stuart Highway",a:"darwin",b:"pineCreek",conf:"high",wp:[["darwin",0,"sealed"],["adelaideRiver",113,"sealed"],["pineCreek",226,"sealed"]]},
+  {id:"stuart_pk",name:"Stuart Highway",a:"pineCreek",b:"katherine",conf:"high",wp:[["pineCreek",0,"sealed"],["katherine",90,"sealed"]]},
+  {id:"stuart_kt",name:"Stuart Highway",a:"katherine",b:"tennant",conf:"medium",wp:[["katherine",0,"sealed"],["mataranka",106,"sealed"],["larrimah",179,"sealed"],["dalyWaters",273,"sealed"],["dunmarra",315,"sealed"],["elliott",422,"sealed"],["rennerSprings",514,"sealed"],["threeWays",647,"sealed"],["tennant",673,"sealed"]]},
+  {id:"stuart_ta",name:"Stuart Highway",a:"tennant",b:"alice",conf:"high",wp:[["tennant",0,"sealed"],["wauchope",114,"sealed"],["wycliffe",131,"sealed"],["barrowCreek",230,"sealed"],["tiTree",315,"sealed"],["aileron",371,"sealed"],["alice",510,"sealed"]]},
+  {id:"lasseter",name:"Stuart and Lasseter Highways",a:"alice",b:"yulara",conf:"high",wp:[["alice",0,"sealed"],["stuartsWell",91,"sealed"],["erldunda",200,"sealed"],["curtinSprings",344,"sealed"],["yulara",444,"sealed"]]},
+  {id:"arnhem",name:"Arnhem Highway",a:"darwin",b:"jabiru",conf:"medium",wp:[["darwin",0,"sealed"],["humptyDoo",40,"sealed"],["barkHut",115,"sealed"],["jabiru",255,"sealed"]]},
+  {id:"kakadu",name:"Kakadu Highway",a:"pineCreek",b:"jabiru",conf:"medium",wp:[["pineCreek",0,"park"],["maryRiver",60,"park"],["cooinda",150,"park"],["jabiru",210,"park"]]},
+  {id:"centralArnhem",name:"Central Arnhem Road",a:"katherine",b:"nhulunbuy",conf:"medium",wp:[["katherine",0,"sealed"],["caTurnoff",50,"sealed"],["barunga",80,"sealed"],["mainoru",250,"unsealed"],["bulman",330,"unsealed"],["nhulunbuy",725,"unsealed"]]}
+];
+const SPEED = {sealed:90,park:80,unsealed:50};
+
+/* Scheduled flights between the places (RPT only). Sectors are symmetric unless noted. */
+const FLIGHTS = [
+  {a:"darwin",b:"alice",carrier:"QantasLink",days:"About 10 flights a week: mornings around 06:45 and afternoons around 15:40 ex Darwin",dur:"2 h 10 min",aircraft:"Not confirmed",bag:23,conf:"medium",src:"FlightsFrom.com, date unavailable",u:"https://www.flightsfrom.com/DRW-ASP"},
+  {a:"darwin",b:"alice",carrier:"Airnorth non-stop",days:"Tuesday and Thursday",dur:"Not stated (jet)",aircraft:"Embraer E170, 76 seats",bag:20,conf:"medium",src:"Airnorth media release, about Mar to Apr 2026",u:"https://www.airnorth.com.au/media_releases/airnorth-operates-non-stop-darwin-to-alice-springs/"},
+  {a:"darwin",b:"alice",carrier:"Airnorth centre run via Katherine and Tennant Creek",days:"Monday, Wednesday, Friday",dur:"Multi-stop, several hours",aircraft:"Embraer E120 turboprop, 30 seats",bag:15,conf:"low",src:"Airnorth release 2015 and FlightsFrom.com; confirm current timetable",u:"https://www.airnorth.com.au/plan/destinations/"},
+  {a:"darwin",b:"katherine",carrier:"Airnorth centre run",days:"Monday, Wednesday, Friday (about 13 flights a month)",dur:"Not confirmed",aircraft:"Embraer E120 turboprop, 30 seats",bag:15,conf:"medium",src:"FlightsFrom.com KTR, date unavailable",u:"https://www.flightsfrom.com/KTR"},
+  {a:"darwin",b:"katherine",carrier:"Chartair scheduled",days:"Darwin to Katherine Sunday; Katherine to Darwin Tuesday",dur:"Not stated",aircraft:"Small aircraft",bag:null,conf:"medium",src:"chartair.com.au/scheduled, date unavailable",u:"https://www.chartair.com.au/scheduled",oneway:true},
+  {a:"darwin",b:"tennant",carrier:"Airnorth centre run via Katherine",days:"Monday, Wednesday, Friday",dur:"Not confirmed",aircraft:"Embraer E120 turboprop, 30 seats",bag:15,conf:"medium",src:"Airnorth Tennant Creek page and FlightsFrom.com",u:"https://www.airnorth.com.au/locations/tennant-creek/"},
+  {a:"katherine",b:"tennant",carrier:"Airnorth centre run",days:"Monday, Wednesday, Friday",dur:"Not confirmed",aircraft:"Embraer E120 turboprop",bag:15,conf:"medium",src:"FlightsFrom.com KTR",u:"https://www.flightsfrom.com/KTR"},
+  {a:"katherine",b:"alice",carrier:"Airnorth centre run via Tennant Creek",days:"Monday, Wednesday, Friday",dur:"Not confirmed",aircraft:"Embraer E120 turboprop",bag:15,conf:"low",src:"Airnorth 2015 release; confirm",u:"https://www.airnorth.com.au/plan/destinations/"},
+  {a:"tennant",b:"alice",carrier:"Airnorth centre run",days:"Monday, Wednesday, Friday",dur:"Not confirmed",aircraft:"Embraer E120 turboprop",bag:15,conf:"medium",src:"Alice Springs Airport destinations page",u:"https://www.alicespringsairport.com.au/traveller/flights/destinations"},
+  {a:"darwin",b:"nhulunbuy",carrier:"Airnorth",days:"Reported as daily; figure dated about 2020 to 2021",dur:"Not confirmed",aircraft:"Not confirmed",bag:20,conf:"low",src:"Gove Airport, Wikipedia; confirm with Airnorth",u:"https://www.airnorth.com.au/plan/destinations/"}
+];
+const BAG_NOTE = "Airnorth: 20 kg checked on jets, 15 kg on the E120 turboprop, 32 kg maximum per piece; a fuel levy applies to bookings from 1 April 2026; excess baggage fees are on the Airnorth fees page (high; airnorth.com.au, fees page last modified 1 Sep 2026). Qantas domestic economy: 1 piece up to 23 kg (high; qantas.com).";
+
+/* Coaches */
+const BUSES = [
+  {a:"darwin",b:"katherine",operator:"Greyhound (Darwin to Alice Springs service)",days:"Sunday to Friday per the timetable PDF (effective 29 Oct 2023); site shows Monday to Saturday",dur:"About 4 h (departs Darwin 09:55)",fare:"Sector fare not captured; full Darwin to Alice from about A$224 to 303",conf:"medium",u:"https://www.greyhound.com.au/buses/darwin-to-alice-springs"},
+  {a:"darwin",b:"tennant",operator:"Greyhound",days:"As above",dur:"About 14 h (arrives Tennant Creek 00:05)",fare:"See Darwin to Alice fare",conf:"medium",u:"https://www.greyhound.com.au/buses/darwin-to-alice-springs"},
+  {a:"darwin",b:"alice",operator:"Greyhound",days:"As above",dur:"About 21 h overnight (09:55 to 07:00 next day)",fare:"From about A$224 to 303 depending on fare tier",conf:"medium",u:"https://documents.greyhound.com.au/common/timetables/Darwin-Alice_Springs.pdf"},
+  {a:"katherine",b:"tennant",operator:"Greyhound",days:"As above",dur:"About 10 h",fare:"Sector fare not captured",conf:"medium",u:"https://www.greyhound.com.au/buses/darwin-to-alice-springs"},
+  {a:"katherine",b:"alice",operator:"Greyhound",days:"As above",dur:"About 17 h overnight",fare:"Sector fare not captured",conf:"medium",u:"https://www.greyhound.com.au/buses/darwin-to-alice-springs"},
+  {a:"tennant",b:"alice",operator:"Greyhound",days:"As above",dur:"About 7 h overnight (00:05 to 07:00)",fare:"Sector fare not captured",conf:"medium",u:"https://www.greyhound.com.au/buses/darwin-to-alice-springs"}
+];
+
+/* Seasons by month: 1 = January */
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const SEASON = {
+  topend:{1:"wet",2:"wet",3:"wet",4:"wet",5:"dry",6:"dry",7:"dry",8:"dry",9:"dry",10:"buildup",11:"buildup",12:"wet"},
+  centre:{1:"hot",2:"hot",3:"warm",4:"mild",5:"mild",6:"cold",7:"cold",8:"cold",9:"mild",10:"warm",11:"hot",12:"hot"}
+};
+const CLIMATE = {
+  darwin:{1:[31.8,24.9],2:[31.5,24.8],3:[32.0,24.6],4:[32.8,24.1],5:[32.1,22.2],6:[30.8,20.0],7:[30.7,19.3],8:[31.5,20.3],9:[32.7,23.0],10:[33.4,25.0],11:[33.4,25.4],12:[32.8,25.4]},
+  katherine:{1:[34.9,23.9],2:[34.3,23.7],3:[34.5,22.9],4:[34.0,20.4],5:[32.1,17.1],6:[29.9,14.0],7:[30.1,13.2],8:[32.5,15.5],9:[35.4,19.6],10:[37.7,23.6],11:[38.0,24.7],12:[36.5,24.4]},
+  tennant:{1:[37.4,24.6],2:[36.3,23.9],3:[35.0,22.5],4:[32.0,19.3],5:[27.6,15.1],6:[24.4,11.0],7:[24.4,11.0],8:[27.3,12.7],9:[31.4,16.4],10:[35.1,20.5],11:[37.0,23.0],12:[37.7,24.2]},
+  alice:{1:[36.6,21.6],2:[35.3,20.7],3:[32.9,17.7],4:[28.4,12.6],5:[23.1,8.1],6:[19.9,3.9],7:[19.9,3.9],8:[22.9,5.9],9:[27.5,10.3],10:[31.3,14.9],11:[33.8,17.9],12:[35.6,20.3]}
+};
+const CLIMATE_SRC = "Bureau of Meteorology climate averages (high; tables cw_014015, cw_014902, cw_015087, cw_015590, read 22 Sep 2026). Tennant Creek June and July values are approximate.";
+
+/* Corridor risks by season key */
+const CORRIDOR_RISK = {
+  stuart_dp:{wet:["Stuart Highway north of Katherine has been cut by major floods (Katherine January 2023; ex-Tropical Cyclone Megan March 2024) (high; ABC, NT PFES)."],buildup:["Build-up storms and afternoon downpours; expect road trains and standing water late in the day (medium)."]},
+  stuart_pk:{wet:["Katherine River flooding can close the highway and the town crossing (high)."]},
+  stuart_kt:{wet:["Flood cuts recorded at Katherine, Elliott and the Barkly in the 2023, 2024 and 2026 wets; 2025-26 wet damage was still being repaired into the dry (high; ABC 27 Mar 2026 and 22 Apr 2026).","Cattle and wildlife on unfenced sections at dawn and dusk (high)."],buildup:["Heat: Katherine averages 37 to 38 degrees in October and November (high; BoM)."],dry:["Long fuel gaps of about 200 km; Daly Waters, Dunmarra, Elliott and Renner Springs roadhouses (medium)."]},
+  stuart_ta:{hot:["Summer maxima 36 to 38 degrees between Tennant Creek and Alice Springs; carry extra water (high; BoM).","February 2026 rain closed Barkly and Central Australian roads and inundated stations (high; ABC 23 Feb 2026)."],cold:["Winter nights near or below freezing in Alice Springs (high; BoM June and July minimum 3.9 degrees)."]},
+  lasseter:{hot:["Summer heat on the Lasseter Highway; fuel gap up to 250 km (medium; Discover Central Australia)."]},
+  arnhem:{wet:["Arnhem Highway floods across the Adelaide River and Mary River floodplains; Kakadu access changes daily, check the Parks Australia access report (high)."],buildup:["Storm cells and slippery bitumen; magpie geese and buffalo on the road at dusk (medium)."]},
+  kakadu:{wet:["Kakadu Highway sections and park roads close in the wet; check the access report (high)."]},
+  centralArnhem:{wet:["Central Arnhem Road is impassable for most of the wet, roughly December to May (medium; operators)."],dry:["675 km unsealed, corrugated, three fuel points; NLC transit permit required; standard hire agreements prohibit it (high; Visit East Arnhem, NLC, drivenow.com.au)."],buildup:["Early storms can close creek crossings without notice (medium)."]}
+};
+const GENERAL_RISK = {
+  wet:["Cyclone season runs 1 November to 30 April; flights and roads can stop for days (high; BoM).","Accommodation demand is low but some regional operators reduce services in the wet (medium)."],
+  buildup:["High humidity and afternoon storms; flight delays from thunderstorm activity are common in the afternoons (medium)."],
+  dry:["Peak tourist season June to August: book cars and rooms early (high).","School holiday and show-day weeks squeeze rooms in every centre (high; nt.gov.au)."],
+  hot:["Central Australian summer: plan early starts, carry water, and avoid midday outdoor loading (high).","Summer thunderstorms can run the Todd River and cut low-level crossings (medium)."],
+  cold:["Alice Springs and Tennant Creek winter nights are cold; check the venue heating and pack layers (high)."],
+  mild:["Best travel window for Central Australia: April, May and September (high)."],
+  warm:["Spring in the Centre is pleasant but the shoulder season fills with grey nomads in April and May and September (medium)."]
+};
+
+/* Events that fill accommodation (dates as published, read 22 Sep 2026) */
+const EVENTS = [
+  {place:"alice",name:"Parrtjima, A Festival in Light",m:4,when:"10 to 19 April 2026",conf:"medium"},
+  {place:"alice",name:"Finke Desert Race",m:6,when:"5 to 8 June 2026",conf:"medium",big:true},
+  {place:"alice",name:"Alice Springs Show and show day",m:7,when:"3 to 4 July 2026; 2 July 2027 show day",conf:"high"},
+  {place:"alice",name:"Henley-on-Todd Regatta",m:8,when:"15 August 2026",conf:"medium"},
+  {place:"alice",name:"Alice Springs Masters Games",m:10,when:"10 to 17 October 2026",conf:"high",big:true},
+  {place:"tennant",name:"Tennant Creek Show and show day",m:7,when:"10 July 2026; 9 July 2027",conf:"high"},
+  {place:"tennant",name:"Tennant Creek Races",m:5,when:"16 May 2026",conf:"low"},
+  {place:"katherine",name:"Katherine Show and Rodeo, show day",m:7,when:"17 to 18 July 2026; 16 July 2027 show day",conf:"high"},
+  {place:"katherine",name:"Barunga Festival",m:6,when:"2026 and 2027 dates not published at time of research",conf:"low"},
+  {place:"nhulunbuy",name:"Garma Festival (Gulkula)",m:8,when:"31 July to 3 August 2026; 2027 not announced",conf:"medium",big:true},
+  {place:"darwin",name:"Darwin Festival",m:8,when:"5 to 23 August 2026; 4 to 22 August 2027",conf:"high"},
+  {place:"darwin",name:"Darwin Show and show day",m:7,when:"24 July 2026; 23 July 2027",conf:"high"},
+  {place:"all",name:"Picnic Day long weekend",m:8,when:"3 August 2026; 2 August 2027",conf:"high"},
+  {place:"all",name:"NT school holidays",m:0,when:"2026: 3 to 13 April, 20 June to 13 July, 19 Sept to 5 Oct, from 11 Dec. 2027: 3 to 12 April, 19 June to 12 July, 18 Sept to 4 Oct, from 10 Dec (high; nt.gov.au, updated 5 Aug 2026)",conf:"high"}
+];
+const SCHOOL_HOL_MONTHS = [4,6,7,9,10,12];
+
+/* Checklists */
+const CHECKLISTS = {
+  "Before you quote":[
+    "Confirm participant numbers, venue and dates with DCDD (Keri) in writing",
+    "Check the travel month against the season panel and the events list",
+    "Check the Airnorth and QantasLink timetables for the actual travel days (days of operation change)",
+    "Price a flexi fare; if it exceeds the A$1,270.48 contract cap, note the gap in the quote",
+    "Confirm a CDU campus room is free before adding room hire to the quote",
+    "Decide fleet car versus hire car per stop and confirm the fleet car is bookable for the dates",
+    "Add contextualisation hours if the agency wants regional examples"
+  ],
+  "Before you book":[
+    "Road Report NT checked for every corridor (roadreport.nt.gov.au or 1800 246 199)",
+    "BoM warnings and the 7-day forecast checked for each region",
+    "Parks Australia Kakadu access report checked (Jabiru trips)",
+    "Fleet booking includes the Field Work Travel Plan and risk assessment where the route is regional or remote",
+    "4WD training current if any unsealed driving is planned",
+    "Night driving avoided in the day plan; sunset times checked for the month",
+    "Hire car collection hours confirmed (Hertz Tennant Creek is weekdays only)",
+    "Hire agreement checked for unsealed road exclusions",
+    "Accommodation booked with a lockable door, working air conditioning and secure parking; ask the property to confirm in writing",
+    "Excess baggage for the Pelican case pre-booked and priced with the carrier",
+    "Return-to-work travel day allowed for after long drives"
+  ],
+  "Kit (Pelican case and trainer bag)":[
+    "8 Surface Pros charged, imaged, and signed in to the CDU sandbox accounts",
+    "10 Windows laptops charged and tested",
+    "Chargers, two power boards, extension lead, spare HDMI and USB-C adapters",
+    "Starlink dish, router, cabling and a clear-sky spot checked at the venue",
+    "4G hotspot as second backup; Telstra SIM",
+    "Printed participant list, sign-in sheet, evaluation forms",
+    "Offline copies of course files and companion guides on a USB drive",
+    "Case weight checked on a scale and written on the tag; keep under 32 kg per piece"
+  ],
+  "On the road (fleet car)":[
+    "Water: at least 4 litres per person per day plus a reserve",
+    "Spare tyre, jack, wheel brace checked; second spare for unsealed roads",
+    "First aid kit, torch, hi-vis vest, basic tools",
+    "Satellite phone or PLB for remote corridors; mobile coverage is patchy between roadhouses",
+    "Fuel card accepted at planned stops; carry a backup card and cash",
+    "Travel plan lodged with the team leader; check in on arrival at each stop",
+    "Breaks every two hours; no driving after sunset in regional areas",
+    "Never swerve for animals; slow down for road trains and cattle"
+  ],
+  "Away from Base (accredited reverse-block only)":[
+    "Course confirmed as ABSTUDY-approved mixed-mode with at least 100 nominal hours and no more than half face-to-face",
+    "At least 8 eligible First Nations students confirmed, aiming for 12",
+    "AFB Online access registered through afb@cdu.edu.au",
+    "Remote Training Request lodged 4 to 6 weeks before the start date, one per community",
+    "AFB number received and quoted on every travel booking and expense line",
+    "Travel booked through CTM; venue hire kept out of the AFB claim",
+    "ABSTUDY incidentals forms collected on day one and returned within 14 days",
+    "Journal transfer raised for reimbursement plus the 10 per cent admin charge"
+  ],
+  "At the venue":[
+    "Room layout, power points and internet tested the afternoon before",
+    "Projector or screen and audio tested with a Surface Pro",
+    "Sign-in, acknowledgement of country and housekeeping ready",
+    "Evaluation forms collected and photographed before leaving",
+    "Kit counted back into the case; chargers included"
+  ]
+};
+
+/* Sources list for the notes panel */
+const SOURCES = [
+  ["AGC22-0112 Table 5 costing sheet (CDU), file dated 4 Aug 2026","high"],
+  ["CDU Away from Base Guidelines, First Nations Leadership, January 2025 (eligibility, coverage and process; no rates)","high","https://www.cdu.edu.au/first-nations-leadership/away-base-afb-program"],
+  ["Airnorth destinations, fare types, checked baggage and fees pages, airnorth.com.au (fees page last modified 1 Sep 2026)","high","https://www.airnorth.com.au/plan/fare-information/fees/"],
+  ["Airnorth media release, non-stop Darwin to Alice Springs (about Mar to Apr 2026)","medium","https://www.airnorth.com.au/media_releases/airnorth-operates-non-stop-darwin-to-alice-springs/"],
+  ["FlightsFrom.com Darwin to Alice Springs and Katherine pages (date unavailable)","medium","https://www.flightsfrom.com/DRW-ASP"],
+  ["ABC News, Qantas axes Alice Springs to Melbourne, 25 Jun 2026","high","https://www.abc.net.au/news/2026-06-25/qantas-axes-flights-alice-springs-melbourne-darwin-singapore/106842548"],
+  ["Chartair scheduled services page (date unavailable)","medium","https://www.chartair.com.au/scheduled"],
+  ["Greyhound Darwin to Alice Springs timetable PDF (effective 29 Oct 2023) and route pages","medium","https://documents.greyhound.com.au/common/timetables/Darwin-Alice_Springs.pdf"],
+  ["Katherine Coaches and Bodhi Bus route pages (remote services, out of scope for this version)","medium","https://katherinecoaches.com.au/route-services/"],
+  ["NT Government, check road conditions (modified 30 Dec 2024) and Road Report NT","high","https://nt.gov.au/driving/safety/check-road-conditions"],
+  ["SecureNT flooding pages (Big Rivers update 8 Sep 2026)","high","https://securent.nt.gov.au/respond/flooding-big-rivers"],
+  ["Bureau of Meteorology NT rainfall and river conditions, climate averages","high","https://www.bom.gov.au/nt/flood/index.shtml"],
+  ["ABC News, Barkly and Central Australia roads closed, 23 Feb 2026; NT state of the roads, 27 Mar 2026; flood repair funding, 22 Apr 2026","high","https://www.abc.net.au/news/2026-02-23/nt-rain-barkly-central-australia-roads-closed-stations-inundated/106375970"],
+  ["Road Safety NT, Safe Driving Guidelines for Workplaces (April 2020)","high","https://roadsafety.nt.gov.au/_media/documents/safe-driving-guidelines-for-workplaces.pdf"],
+  ["CDU Fleet Vehicle Usage Policy and Procedure (policy page, no date visible; clause detail should be re-read from the PDF)","medium","https://policies.cdu.edu.au/view-current.php?id=195"],
+  ["CDU locations and venue hire pages (read 22 Sep 2026)","high","https://www.cdu.edu.au/locations"],
+  ["Alice Springs Town Council venue hire; GYRACC venue hire; Barkly Regional Council facilities (read 22 Sep 2026)","high","https://www.alicesprings.nt.gov.au/residents/services/resident-info/venue-hire-in-alice-springs.aspx"],
+  ["Hire car snapshots: airportrentals.com and stressfreecarrental.com (18 to 22 Sep 2026); Hertz Tennant Creek; Thrifty Katherine; drivenow.com.au road restrictions","medium","https://www.drivenow.com.au/car-hire/before-you-book/road-restrictions"],
+  ["Accommodation: Bluestone Motor Inn and Walkabout Lodge property sites (read 22 Sep 2026); aggregator teasers for Alice Springs, Jabiru and Yulara (low)","medium","https://bluestone-motor-inn.innorthernterritory.com/en/"],
+  ["NT public holidays (updated 21 Jul 2026) and school term dates (updated 5 Aug 2026), nt.gov.au","high","https://nt.gov.au/nt-public-holidays"],
+  ["Event dates: Discover Central Australia, Katherine Show, North West Star (Masters Games), Visit East Arnhem (Garma), Darwin Festival","medium","https://www.discovercentralaustralia.com/"],
+  ["Northern Land Council permits (9 Sep 2026); Central Land Council permits (23 Jul 2026); Kakadu and Uluru park pass pages","high","https://www.nlc.org.au/permits"],
+  ["NT Economy retail fuel market, August 2026 data (reported about 8 Sep 2026)","medium","https://nteconomy.nt.gov.au/prices-and-wages/retail-fuel-market"],
+  ["Starlink Roam pricing snapshot, starlink-prices.com (updated 5 Jul 2026)","medium","https://www.starlink-prices.com/personal/roam/aud/low"],
+  ["Coastline for the map: world-atlas 2.0.2 (Natural Earth 1:10m) clipped to the NT; town positions approximate","high"]
+];
+const UNSURE = [
+  "Current weekly frequency of Airnorth Darwin to Gove, and whether the centre run still operates on Monday, Wednesday and Friday in 2026",
+  "Qantas aircraft type on Darwin to Alice Springs, and any published fixed economy versus flexi fare",
+  "Excess baggage prices for a 23 to 32 kg case on Airnorth and QantasLink",
+  "Whether the Greyhound timetable effective 29 Oct 2023 is still current",
+  "Current nightly corporate rates in Katherine, Jabiru and Alice Springs (booking pages blocked)",
+  "Any NT Government accommodation panel or government rate",
+  "Exact 2026-27 closure dates for the Central Arnhem Road and Cahills Crossing",
+  "CDU internal fleet vehicle charge per kilometre, if any",
+  "Away from Base per capita amount (the EPUC) for a given course; the guidelines say it is indexed annually and non-negotiable but give no figure",
+  "Mobile coverage in each town from carrier maps (third-party checkers were inconsistent)",
+  "Overnight options along the Central Arnhem Road (Mainoru and Bulman not verified)"
+];
+</script>
+
+<script>
+/* ---------- STATE ---------- */
+const now = new Date();
+const DEFAULT_STATE = () => ({
+  name:"", origin:"darwin", month: ((now.getMonth()+2) % 12) || 12, year: (now.getMonth()+2 > 12 ? now.getFullYear()+1 : now.getFullYear()),
+  trainers:1, returnHome:true,
+  stops:[{place:"alice", half:1, full:0, participants:15, venue:"cdu", nights:"", local:"auto"}],
+  maxDrive:8, kitKg:28, fleetType:"2wd", starlink:"yes",
+  delivery:"agc", afb:{accredited:"no", abstudy:"unsure", hours:100, f2f:50, students:8, majority:"yes"},
+  picks:{}, qty:{}, internal:{}, checks:{}
+});
+let state = DEFAULT_STATE();
+let dbNS = null, dlNS = null, currentPlanId = null;
+const isTop = (()=>{ try { return window.self === window.top; } catch(e){ return false; } })();
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => (isFinite(n)? n : 0).toLocaleString("en-AU",{style:"currency",currency:"AUD"});
+const fmtH = h => { const m = Math.round(h*60); return Math.floor(m/60) + " h " + String(m%60).padStart(2,"0") + " min"; };
+const conf = c => `<span class="tag ${c}">${c}</span>`;
+let toastT; function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2600); }
+
+/* ---------- ROUTING ---------- */
+function corridorSegments(c, reverse){
+  const wp = reverse ? [...c.wp].reverse() : c.wp;
+  const segs = [];
+  for(let i=1;i<wp.length;i++){
+    const km = Math.abs(wp[i][1]-wp[i-1][1]);
+    const surface = reverse ? c.wp[c.wp.length-i][2] : c.wp[i][2];
+    segs.push({from:wp[i-1][0], to:wp[i][0], km, surface, corridor:c.id, corridorName:c.name, conf:c.conf});
+  }
+  return segs;
+}
+function route(a,b){
+  if(a===b) return null;
+  const hubs = new Set(); CORRIDORS.forEach(c=>{hubs.add(c.a);hubs.add(c.b);});
+  const dist = {}, prev = {}; hubs.forEach(h=>dist[h]=Infinity); dist[a]=0;
+  const todo = new Set(hubs);
+  while(todo.size){
+    let u=null; todo.forEach(h=>{ if(u===null || dist[h]<dist[u]) u=h; });
+    todo.delete(u); if(dist[u]===Infinity) break;
+    CORRIDORS.forEach(c=>{
+      let v=null, rev=false;
+      if(c.a===u) v=c.b; else if(c.b===u){ v=c.a; rev=true; }
+      if(v===null) return;
+      const km = c.wp[c.wp.length-1][1];
+      if(dist[u]+km < dist[v]){ dist[v]=dist[u]+km; prev[v]={from:u, c, rev}; }
+    });
+  }
+  if(dist[b]===Infinity) return null;
+  const chain=[]; let cur=b; while(cur!==a){ const p=prev[cur]; chain.unshift(p); cur=p.from; }
+  const segs=[]; chain.forEach(p=>segs.push(...corridorSegments(p.c,p.rev)));
+  const km = segs.reduce((s,x)=>s+x.km,0);
+  const hours = segs.reduce((s,x)=>s+x.km/SPEED[x.surface],0);
+  const unsealedKm = segs.filter(x=>x.surface==="unsealed").reduce((s,x)=>s+x.km,0);
+  const corridors = [...new Set(segs.map(s=>s.corridor))];
+  return {segs, km, hours, unsealedKm, corridors};
+}
+function splitDays(r, cap){
+  const days=[]; let day={from:r.segs[0].from, km:0, hours:0, to:null, over:false}; let lastAccom=null;
+  const capH = cap;
+  let i=0;
+  while(i<r.segs.length){
+    const s=r.segs[i]; const h=s.km/SPEED[s.surface];
+    if(day.hours + h <= capH + 1e-9){
+      day.hours+=h; day.km+=s.km; day.to=s.to; if(NODES[s.to].accom) lastAccom={idx:i,to:s.to,km:day.km,hours:day.hours}; i++;
+      continue;
+    }
+    if(lastAccom && lastAccom.to!==day.from){
+      days.push({from:day.from,to:lastAccom.to,km:lastAccom.km,hours:lastAccom.hours,over:false});
+      i=lastAccom.idx+1; day={from:lastAccom.to,km:0,hours:0,to:null,over:false}; lastAccom=null;
+    } else {
+      day.hours+=h; day.km+=s.km; day.to=s.to; day.over=true;
+      if(NODES[s.to].accom){ days.push({...day}); i++; day={from:s.to,km:0,hours:0,to:null,over:false}; lastAccom=null; }
+      else i++;
+    }
+  }
+  if(day.to) days.push(day);
+  return days;
+}
+
+/* ---------- LEG OPTIONS ---------- */
+function seasonKeys(placeA, placeB){
+  const m = state.month; const keys = new Set();
+  [placeA,placeB].forEach(p=>{ const reg=PLACES[p].region; keys.add(SEASON[reg][m]); });
+  return [...keys];
+}
+function corridorRisks(corridorIds, keys){
+  const out=[]; corridorIds.forEach(id=>{ const r=CORRIDOR_RISK[id]||{}; keys.forEach(k=>{ (r[k]||[]).forEach(t=>out.push(t)); }); });
+  return [...new Set(out)];
+}
+function flightsFor(a,b){
+  return FLIGHTS.filter(f=> (f.a===a&&f.b===b) || (!f.oneway && f.a===b&&f.b===a) || (f.oneway && f.a===b && f.b===a));
+}
+function legOptions(a,b){
+  const opts=[]; const keys=seasonKeys(a,b); const kg=+state.kitKg||0;
+  /* Fly */
+  const fl = flightsFor(a,b);
+  if(PLACES[a].airport && PLACES[b].airport && fl.length){
+    const issues=[]; const verify=[];
+    fl.forEach(f=>{
+      if(f.bag!=null && kg>f.bag) issues.push({t:`Pelican case at ${kg} kg exceeds the ${f.bag} kg allowance on ${f.carrier}; excess applies. Price and pre-book it.`,lvl:kg>32?"crit":"warn"});
+      if(/E120|turboprop/i.test(f.aircraft)) issues.push({t:`${f.carrier} uses a 30-seat turboprop with limited hold space; confirm the case can be carried on the day.`,lvl:"warn"});
+    });
+    if(kg>32) issues.push({t:"Over 32 kg per piece: split the kit into two cases or send it as freight.",lvl:"crit"});
+    if(a==="katherine"||b==="katherine") issues.push({t:"Katherine flights use Tindal, a RAAF joint-user airport about 15 km from town; arrange a hire car or taxi (medium).",lvl:"info"});
+    if(keys.includes("wet")||keys.includes("buildup")) issues.push({t:"Afternoon storms in the wet and build-up delay flights; prefer morning departures (medium).",lvl:"warn"});
+    if(a==="nhulunbuy"||b==="nhulunbuy") issues.push({t:"Garma week (late July to early August) sells out Gove flights well ahead (medium).",lvl:"warn"});
+    verify.push("Days of operation and times on the carrier site for the actual dates");
+    verify.push("Flexi fare price against the A$1,270.48 contract cap");
+    verify.push("Excess baggage price for the case; Airnorth fees page, Qantas baggage page");
+    opts.push({mode:"fly",title:"Fly",sub:fl.map(f=>f.carrier).join("; "),flights:fl,issues,verify,travelDays:1,km:0,nights:0,
+      kv:fl.map(f=>[f.carrier,`${f.days}. ${f.dur}. ${f.aircraft}. ${f.bag!=null?f.bag+" kg checked":"Baggage not stated"} ${conf(f.conf)} <a href="${f.u}" target="_blank" rel="noopener">source</a>`])});
+  } else {
+    const why = !PLACES[a].airport ? `${PLACES[a].short} has no scheduled flights` : !PLACES[b].airport ? `${PLACES[b].short} has no scheduled flights` : "No direct scheduled service found; connect through Darwin by adding it as a stop";
+    opts.push({mode:"fly",title:"Fly",na:true,sub:why,issues:[{t:(a==="yulara"||b==="yulara")?"Yulara has interstate flights only (Jetstar, Qantas, Virgin until 25 Oct 2026); from Darwin the usual path is fly to Alice Springs then drive 444 km (medium).":"Consider driving or a charter quote (Chartair, Katherine Aviation, NTAS).",lvl:"info"}],verify:[],travelDays:0,km:0,nights:0,kv:[]});
+  }
+  /* Drive */
+  const r = route(PLACES[a].hub, PLACES[b].hub);
+  if(r){
+    const days = splitDays(r, +state.maxDrive||8);
+    const issues=[]; const verify=[];
+    if(r.unsealedKm>0){
+      issues.push({t:`${Math.round(r.unsealedKm)} km unsealed: 4WD with a trained driver, second spare, extra fuel and an NLC transit permit (free, allow up to two weeks).`,lvl:"crit"});
+      if(state.fleetType==="2wd") issues.push({t:"A 2WD fleet car is not suitable for this route under the CDU fleet policy.",lvl:"crit"});
+    }
+    if(days.length>1) issues.push({t:`${days.length} driving days at a ${state.maxDrive} hour cap; ${days.length-1} overnight${days.length>2?"s":""} en route.`,lvl:"info"});
+    days.filter(d=>d.over).forEach(d=>issues.push({t:`No accommodation stop fits the cap between ${NODES[d.from].n} and ${NODES[d.to].n}; that day runs ${fmtH(d.hours)}.`,lvl:"warn"}));
+    if(r.hours>11 && days.length===1) issues.push({t:"Single day over 11 hours of driving; not compatible with the fatigue and daylight rules.",lvl:"crit"});
+    corridorRisks(r.corridors, keys).forEach(t=>issues.push({t,lvl:/impassable|cut|closed|inundated/i.test(t)?"crit":"warn"}));
+    issues.push({t:"Fuel roughly every 200 km on the Stuart Highway; NT regional average unleaded 226.0 c/L and diesel 269.3 c/L in August 2026 (medium; NT Economy).",lvl:"info"});
+    verify.push("Road Report NT for each corridor on the day before departure");
+    verify.push("Fleet car booked for the full span including en-route nights; Field Work Travel Plan lodged if regional");
+    verify.push("Sunset time for the month; last driving hour ends before sunset");
+    if(r.unsealedKm>0) verify.push("NLC transit permit issued; hire agreements exclude this road");
+    opts.push({mode:"drive",title:"Drive (fleet car)",sub:`${Math.round(r.km)} km, ${fmtH(r.hours)} driving, ${days.length} day${days.length>1?"s":""}`,route:r,days,issues,verify,travelDays:days.length,km:r.km,nights:days.length-1,
+      kv:[["Route",[...new Set(r.segs.map(s=>s.corridorName))].join(", ")],["Surface",r.unsealedKm>0?`${Math.round(r.km-r.unsealedKm)} km sealed, ${Math.round(r.unsealedKm)} km unsealed`:"Sealed throughout"],["Distance basis","Wikipedia road and town articles cross-checked against the Greyhound timetable; drive time assumes 90 km/h sealed, 80 in Kakadu, 50 unsealed, plus breaks "+conf("medium")]]});
+  } else {
+    opts.push({mode:"drive",title:"Drive (fleet car)",na:true,sub:"No road route in this version",issues:[],verify:[],travelDays:0,km:0,nights:0,kv:[]});
+  }
+  /* Coach */
+  const bs = BUSES.filter(x=>(x.a===a&&x.b===b)||(x.a===b&&x.b===a));
+  if(bs.length){
+    const issues=[]; const verify=["Timetable currency (the PDF found is dated 29 Oct 2023)","Luggage allowance for the case with the coach operator"];
+    if(/overnight/i.test(bs[0].dur)) issues.push({t:"Overnight coach; arrive tired, allow a rest before delivery.",lvl:"warn"});
+    issues.push({t:"Coach luggage limits usually sit around 20 kg per bag; confirm the case is accepted (low).",lvl:"warn"});
+    opts.push({mode:"bus",title:"Coach",sub:bs[0].operator,issues,verify,travelDays:/overnight/i.test(bs[0].dur)?2:1,km:0,nights:0,
+      kv:bs.map(x=>[x.operator,`${x.days}. ${x.dur}. ${x.fare} ${conf(x.conf)} <a href="${x.u}" target="_blank" rel="noopener">source</a>`])});
+  } else {
+    opts.push({mode:"bus",title:"Coach",na:true,sub:(a==="nhulunbuy"||b==="nhulunbuy")?"No coach; Katherine Coaches serves remote communities on other routes":"No scheduled coach on this leg",issues:[],verify:[],travelDays:0,km:0,nights:0,kv:[]});
+  }
+  return opts;
+}
+function sequence(){
+  const seq=[state.origin, ...state.stops.map(s=>s.place)];
+  if(state.returnHome) seq.push(state.origin);
+  return seq;
+}
+function legs(){
+  const seq=sequence(); const out=[];
+  for(let i=0;i<seq.length-1;i++){
+    if(seq[i]===seq[i+1]) continue;
+    const opts=legOptions(seq[i],seq[i+1]);
+    const key=`${i}:${seq[i]}-${seq[i+1]}`;
+    let pick=state.picks[key];
+    if(!pick || opts.find(o=>o.mode===pick)?.na){ pick = opts.find(o=>!o.na)?.mode || "drive"; }
+    out.push({i,a:seq[i],b:seq[i+1],key,opts,pick,chosen:opts.find(o=>o.mode===pick)});
+  }
+  return out;
+}
+
+/* ---------- COSTING ---------- */
+function stopNights(stop){
+  const td = (+stop.half||0)+(+stop.full||0);
+  if(stop.nights!=="" && stop.nights!=null && !isNaN(+stop.nights)) return +stop.nights;
+  return td>0 ? td+1 : 0;
+}
+function localMode(stop, arrivedBy){
+  if(stop.local && stop.local!=="auto") return stop.local;
+  if(arrivedBy==="drive") return "fleet";
+  const p=PLACES[stop.place];
+  return p.hire.some(h=>!/no hire/i.test(h.n)) ? "hire" : "taxi";
+}
+function computeQuantities(L){
+  const T=+state.trainers||1;
+  let flyLegs=0, driveKm=0, enrouteNights=0, busLegs=0;
+  L.forEach(l=>{ const c=l.chosen; if(!c||c.na) return; if(c.mode==="fly") flyLegs++; if(c.mode==="drive"){ driveKm+=c.km; enrouteNights+=c.nights; } if(c.mode==="bus") busLegs++; });
+  let nights=enrouteNights, half=0, full=0, participants=0, roomFull=0, roomHalf=0, hireDays=0, taxiDays=0;
+  state.stops.forEach((s,idx)=>{
+    const n=stopNights(s); nights+=n; half+=(+s.half||0); full+=(+s.full||0); participants+=(+s.participants||0)*((+s.half||0)+(+s.full||0));
+    if(s.venue==="hired"){ roomFull+=(+s.full||0); roomHalf+=(+s.half||0); }
+    const arrival=L.find(l=>l.i===idx); const by=arrival?.chosen?.mode||"drive";
+    const lm=localMode(s,by); if(lm==="hire") hireDays+=n+1;
+    if(by==="fly" && (lm==="taxi"||lm==="none")) taxiDays+=1;
+  });
+  /* home-end airport transfer on the final flight back to the origin */
+  const lastLeg=L[L.length-1]; if(state.returnHome && lastLeg && lastLeg.chosen && lastLeg.chosen.mode==="fly") taxiDays+=1;
+  const daysAway = nights+1 + Math.max(0, busLegs);
+  return {T,flyLegs,driveKm,enrouteNights,nights,half,full,participants,roomFull,roomHalf,hireDays,taxiDays,daysAway,
+    returns: Math.ceil(flyLegs/2)};
+}
+function quoteLines(q){
+  const T=q.T;
+  return [
+    {k:"meals",desc:`${q.daysAway} days away x ${T} trainer${T>1?"s":""}`,qty:q.daysAway*T},
+    {k:"accom",desc:`${q.nights} nights x ${T} (stops plus en-route)`,qty:q.nights*T},
+    {k:"hire",desc:q.hireDays?`Hire car at stops, ${q.hireDays} days`:"No hire car in this plan",qty:q.hireDays},
+    {k:"flight",desc:q.flyLegs?`${q.flyLegs} flight sector${q.flyLegs>1?"s":""} = ${q.returns} return${q.returns>1?"s":""} x ${T}${q.flyLegs%2?" (odd sector count, check the cap)":""}`:"No flights in this plan",qty:q.returns*T},
+    {k:"km",desc:q.driveKm?`Fleet car ${Math.round(q.driveKm)} km`:"No fleet driving",qty:Math.round(q.driveKm)},
+    {k:"taxi",desc:q.taxiDays?`Airport transfer days without a hire car, ${q.taxiDays} x ${T}`:(q.flyLegs?"Hire car covers airport transfers":"None"),qty:q.taxiDays*T},
+    {sep:"Delivery"},
+    {k:"half",desc:"Half-day sessions",qty:q.half},
+    {k:"full",desc:"Full-day sessions",qty:q.full},
+    {k:"hour",desc:"Contextualisation, evaluation or design hours",qty:0},
+    {k:"roomFull",desc:"Hired venue, full days",qty:q.roomFull},
+    {k:"roomHalf",desc:"Hired venue, half days",qty:q.roomHalf},
+    {k:"consum",desc:"Participant places across sessions",qty:q.participants}
+  ];
+}
+function quoteTotals(q){
+  const lines=quoteLines(q); let exTravel=0,gstTravel=0,incTravel=0,exDel=0,gstDel=0,incDel=0; let inDelivery=false; const rows=[];
+  lines.forEach(l=>{
+    if(l.sep){ inDelivery=true; rows.push(l); return; }
+    const ov=state.qty[l.k]; const qty = (ov!==undefined && ov!=="") ? +ov : l.qty;
+    const r=RATES[l.k]; const inc=qty*r.rate; const gst=r.gst?inc/11:0; const ex=inc-gst;
+    rows.push({...l,qty,inc,gst,ex,rate:r,over:ov!==undefined&&ov!==""});
+    if(inDelivery){exDel+=ex;gstDel+=gst;incDel+=inc;} else {exTravel+=ex;gstTravel+=gst;incTravel+=inc;}
+  });
+  return {rows,exTravel,gstTravel,incTravel,exDel,gstDel,incDel,ex:exTravel+exDel,gst:gstTravel+gstDel,inc:incTravel+incDel};
+}
+const INTERNAL_DEFAULTS = {flight:1270.48,excess:0,accom:243.51,meals:120,hire:79.40,lper100:9,fuelc:226,fleetkm:0,venue:null,consum:25,travelDay:0};
+function internalLines(q,L){
+  const g=k=>{ const v=state.internal[k]; return (v===undefined||v==="")?INTERNAL_DEFAULTS[k]:+v; };
+  const T=q.T; const kmL=g("lper100"); const fuel = q.driveKm*kmL/100*g("fuelc")/100;
+  const venueContract = q.roomFull*RATES.roomFull.rate+q.roomHalf*RATES.roomHalf.rate;
+  const venue = state.internal.venue===undefined||state.internal.venue===""? venueContract : +state.internal.venue;
+  const travelDays = L.reduce((s,l)=>s+((l.chosen&&!l.chosen.na)?l.chosen.travelDays:0),0);
+  return [
+    {k:"flight",label:"Flights, actual fare per trainer per return",qty:q.returns*T,unit:g("flight"),hint:"Placeholder equals the contract cap; OTA snapshots on 22 Sep 2026 showed Darwin to Alice from about A$227 to 460 one way (low)"},
+    {k:"excess",label:"Excess baggage per sector",qty:q.flyLegs,unit:g("excess"),hint:"Not found; price with the carrier"},
+    {k:"accom",label:"Accommodation per night",qty:q.nights*T,unit:g("accom"),hint:"Found: Bluestone Tennant Creek from A$152 to 169; Walkabout Lodge Nhulunbuy from A$240 (medium)"},
+    {k:"meals",label:"Meals and incidentals per day",qty:q.daysAway*T,unit:g("meals"),hint:"Paid as allowance"},
+    {k:"hire",label:"Hire car per day",qty:q.hireDays,unit:g("hire"),hint:"Alice Springs airport economy about A$69 to 70, intermediate A$156 to 201, 4WD A$183 to 294 (medium, Sept 2026)"},
+    {k:"fuelc",label:`Fleet fuel: ${Math.round(q.driveKm)} km at ${kmL} L/100 km`,qty:q.driveKm?1:0,unit:fuel,hint:"Cents per litre input below; NT regional average August 2026 (medium)",derived:true},
+    {k:"fleetkm",label:"CDU internal fleet charge per km",qty:Math.round(q.driveKm),unit:g("fleetkm"),hint:"Unknown; enter if CDU recharges fleet use"},
+    {k:"venue",label:"Venue hire, actual",qty:1,unit:venue,hint:"Defaults to the contract room hire lines; CDU campus rooms may be free"},
+    {k:"consum",label:"Consumables per participant place",qty:q.participants,unit:g("consum"),hint:""},
+    {k:"travelDay",label:"Trainer cost per travel day (optional)",qty:travelDays*T,unit:g("travelDay"),hint:"Salary cost of non-delivery days if you want it in the margin"}
+  ];
+}
+
+/* ---------- AWAY FROM BASE ---------- */
+function afbAssess(){
+  const a=state.afb; const fails=[]; const unsure=[];
+  if(state.delivery!=="accredited") fails.push("Non-accredited AGC22-0112 sessions for government staff are outside the program: it funds First Nations students in ABSTUDY-approved mixed-mode courses, not fee-for-service delivery.");
+  else {
+    if(a.accredited!=="yes") fails.push("The course must be accredited and delivered mixed-mode or online.");
+    if(a.abstudy==="no") fails.push("The course must be approved as mixed-mode under the ABSTUDY scheme."); else if(a.abstudy==="unsure") unsure.push("Confirm with the AFB team that the course is on the ABSTUDY mixed-mode list.");
+    if(+a.hours<100) fails.push(`Nominal hours ${a.hours} are below the 100-hour minimum.`);
+    if(+a.f2f>50) fails.push(`Face-to-face share ${a.f2f} per cent exceeds the 50 per cent maximum.`);
+    if(+a.students<8) fails.push(`${a.students} eligible First Nations students is below the working minimum of 8 (aim for 12).`); else if(+a.students<12) unsure.push(`${a.students} students meets the minimum; 12 is the target the AFB team assesses feasibility against.`);
+    if(a.majority!=="yes") fails.push("The majority of the cohort must be First Nations students.");
+  }
+  return {ok:fails.length===0, fails, unsure};
+}
+function renderAfb(q,tot,L){
+  const host=$("awayFromBase"); const r=afbAssess();
+  const il=internalLines(q,L); const covered=il.filter(x=>["flight","excess","accom","meals","hire","fuelc","fleetkm"].includes(x.k)).reduce((s,x)=>s+x.qty*x.unit,0);
+  const excluded=il.filter(x=>["venue","consum","travelDay"].includes(x.k)).reduce((s,x)=>s+x.qty*x.unit,0);
+  const status = state.delivery!=="accredited" ? `<span class="tag">not applicable</span>` : r.ok ? (r.unsure.length?`<span class="tag warn">likely eligible, confirm</span>`:`<span class="tag good">meets the gates</span>`) : `<span class="tag crit">does not meet the gates</span>`;
+  host.innerHTML=`
+    <h3 style="margin-bottom:.4rem">Away from Base reverse-block funding ${status}</h3>
+    <p class="small" style="margin-bottom:.6rem">${esc(AFB.what)} (high; ${esc(AFB.source)}). <a href="${AFB.web}" target="_blank" rel="noopener">Program page</a>. Contact: ${esc(AFB.email)}.</p>
+    ${state.delivery!=="accredited"?`<p class="note">This plan is set to AGC22-0112 non-accredited delivery, so nothing here offsets the DCDD quote. Switch the delivery type in the Trip panel to run the check for an accredited mixed-mode course taken to a remote community.</p>`:`
+    <div class="cols">
+      <div>
+        <h4 style="margin-bottom:.4rem">Eligibility check</h4>
+        <ul class="issues">${r.fails.map(f=>`<li class="crit">${esc(f)}</li>`).join("")}${r.unsure.map(u=>`<li class="warn">${esc(u)}</li>`).join("")}${r.ok&&!r.unsure.length?`<li class="good">Course and cohort inputs meet the published gates; the AFB team still assesses feasibility against the per capita funding.</li>`:""}</ul>
+        <h4 style="margin:.7rem 0 .4rem">What the program can reimburse from this plan (internal estimate)</h4>
+        <table class="t"><tbody>
+          <tr><td>Travel, meals and accommodation lines</td><td class="n num">${money(covered)}</td></tr>
+          <tr><td>Venue hire, consumables and trainer time (not claimable)</td><td class="n num">${money(excluded)}</td></tr>
+          <tr><td>Admin charge the team can claim (${AFB.adminPct} per cent of the reimbursed total)</td><td class="n num">${money(covered*AFB.adminPct/100)}</td></tr>
+        </tbody></table>
+        <p class="small" style="margin-top:.4rem">Reimbursement is of reasonable actual costs booked through CTM and paid from the team budget first; it is not a rate card, and the per capita amount (EPUC) is not published in the guidelines.</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:.4rem">Process and lead time</h4>
+        <ul class="issues">${AFB.process.map(p=>`<li class="info">${esc(p)}</li>`).join("")}</ul>
+      </div>
+    </div>`}
+    <details class="more" style="margin-top:.6rem"><summary>Program rules in brief</summary>
+      <div class="cols" style="margin-top:.5rem">
+        <div><h4>Course gates</h4><ul class="issues">${AFB.courseGates.map(x=>`<li class="info">${esc(x)}</li>`).join("")}</ul></div>
+        <div><h4>Student gates</h4><ul class="issues">${AFB.studentGates.map(x=>`<li class="info">${esc(x)}</li>`).join("")}</ul></div>
+        <div><h4>Covers</h4><ul class="issues">${AFB.covers.map(x=>`<li class="good">${esc(x)}</li>`).join("")}</ul></div>
+        <div><h4>Does not cover</h4><ul class="issues">${AFB.excludes.map(x=>`<li class="crit">${esc(x)}</li>`).join("")}</ul></div>
+      </div>
+    </details>`;
+}
+
+/* ---------- RENDER: BUILDER ---------- */
+function fillSelect(sel, items, val){ sel.innerHTML=items.map(([v,t])=>`<option value="${v}"${String(v)===String(val)?" selected":""}>${esc(t)}</option>`).join(""); }
+function renderBuilder(){
+  fillSelect($("origin"), Object.keys(PLACES).map(k=>[k,PLACES[k].name]), state.origin);
+  fillSelect($("month"), MONTHS.map((m,i)=>[i+1,m]), state.month);
+  $("year").value=state.year; $("trainers").value=state.trainers; $("returnHome").checked=!!state.returnHome;
+  $("maxDrive").value=state.maxDrive; $("kitKg").value=state.kitKg; $("fleetType").value=state.fleetType; $("starlink").value=state.starlink; $("planName").value=state.name||"";
+  $("delivery").value=state.delivery||"agc"; $("afbInputs").hidden=(state.delivery!=="accredited");
+  document.querySelectorAll("[data-afb]").forEach(el=>{ el.value=state.afb[el.dataset.afb]; });
+  const host=$("stops"); host.innerHTML="";
+  state.stops.forEach((s,i)=>{
+    const d=document.createElement("div"); d.className="stop";
+    d.innerHTML=`<div class="stop-h">
+      <select data-i="${i}" data-k="place" aria-label="Stop ${i+1} place">${Object.keys(PLACES).map(k=>`<option value="${k}"${k===s.place?" selected":""}>${esc(PLACES[k].name)}</option>`).join("")}</select>
+      <button class="btn sm ghost" type="button" data-act="up" data-i="${i}" title="Move up" aria-label="Move up"${i===0?" disabled":""}>&#9650;</button>
+      <button class="btn sm ghost" type="button" data-act="down" data-i="${i}" title="Move down" aria-label="Move down"${i===state.stops.length-1?" disabled":""}>&#9660;</button>
+      <button class="btn sm ghost" type="button" data-act="del" data-i="${i}" title="Remove" aria-label="Remove stop">&#10005;</button>
+    </div>
+    <div class="grid-2">
+      <label class="f"><span>Half-day sessions</span><input type="number" min="0" max="20" data-i="${i}" data-k="half" value="${esc(s.half)}"></label>
+      <label class="f"><span>Full-day sessions</span><input type="number" min="0" max="20" data-i="${i}" data-k="full" value="${esc(s.full)}"></label>
+      <label class="f"><span>Participants per session</span><input type="number" min="0" max="40" data-i="${i}" data-k="participants" value="${esc(s.participants)}"></label>
+      <label class="f"><span>Nights (blank = auto)</span><input type="number" min="0" max="30" data-i="${i}" data-k="nights" value="${esc(s.nights)}" placeholder="${stopNights(s)}"></label>
+      <label class="f"><span>Venue</span><select data-i="${i}" data-k="venue"><option value="cdu"${s.venue==="cdu"?" selected":""}>CDU campus (no room hire)</option><option value="hired"${s.venue==="hired"?" selected":""}>Hired venue</option></select></label>
+      <label class="f"><span>Local transport</span><select data-i="${i}" data-k="local"><option value="auto"${s.local==="auto"?" selected":""}>Auto</option><option value="fleet"${s.local==="fleet"?" selected":""}>Fleet car</option><option value="hire"${s.local==="hire"?" selected":""}>Hire car</option><option value="taxi"${s.local==="taxi"?" selected":""}>Taxi</option><option value="none"${s.local==="none"?" selected":""}>None</option></select></label>
+    </div>`;
+    host.appendChild(d);
+  });
+  const rt=$("ratesTable"); rt.innerHTML=Object.entries(RATES).map(([k,r])=>`<tr><td>${esc(r.label)}<br><span class="small">${esc(r.unit)}${r.gst?"":" (GST exempt)"}</span></td><td class="n">${money(r.rate)}</td></tr>`).join("");
+}
+
+/* ---------- RENDER: MAIN ---------- */
+function renderAll(){
+  const L=legs(); const q=computeQuantities(L); const tot=quoteTotals(q);
+  /* summary */
+  const keys=[...new Set(sequence().map(p=>SEASON[PLACES[p].region][state.month]))];
+  const critCount=L.reduce((s,l)=>s+(l.chosen?.issues||[]).filter(x=>x.lvl==="crit").length,0);
+  $("summary").innerHTML=[
+    ["Legs",L.length],["Days away",q.daysAway],["Nights",q.nights],["Fleet km",Math.round(q.driveKm).toLocaleString("en-AU")],["Flight sectors",q.flyLegs],
+    ["Quote (GST incl)",money(tot.inc)],["Season",keys.map(k=>k==="buildup"?"build-up":k).join(" / ")],["Red flags",critCount]
+  ].map(([l,v])=>`<div class="stat"><div class="v num">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join("");
+  /* legs */
+  $("legs").innerHTML = L.length? L.map(l=>`
+    <div class="leg">
+      <div class="leg-h"><h3>${esc(PLACES[l.a].short)} to ${esc(PLACES[l.b].short)}</h3>${l.chosen?`<span class="tag teal">${esc(l.chosen.title)}</span>`:""}<span class="small">${MONTHS[state.month-1]} ${state.year}</span></div>
+      <div class="opts">${l.opts.map(o=>`
+        <div class="opt${o.mode===l.pick?" selected":""}${o.na?" na":""}">
+          <div class="opt-h"><span class="mode">${esc(o.title)}</span>${o.na?`<span class="tag">n/a</span>`:o.mode===l.pick?`<span class="tag good">chosen</span>`:`<button class="btn sm" type="button" data-pick="${l.key}" data-mode="${o.mode}">Choose</button>`}</div>
+          <p class="small">${esc(o.sub)}</p>
+          ${o.kv.length?`<dl class="kv">${o.kv.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${v}</dd>`).join("")}</dl>`:""}
+          ${o.days&&o.days.length?`<div class="daylist">${o.days.map((d,di)=>`<div><b>Day ${di+1}</b><span>${esc(NODES[d.from].n)} to ${esc(NODES[d.to].n)}, ${Math.round(d.km)} km, ${fmtH(d.hours)}${d.over?" (over cap)":""}</span></div>`).join("")}</div>`:""}
+          ${o.issues.length?`<ul class="issues">${o.issues.map(x=>`<li class="${x.lvl}">${x.t}</li>`).join("")}</ul>`:""}
+          ${o.verify.length?`<details class="more"><summary>Verify before booking</summary><ul class="issues">${o.verify.map(v=>`<li class="info">${esc(v)}</li>`).join("")}</ul></details>`:""}
+        </div>`).join("")}
+      </div>
+    </div>`).join("") : `<p class="note">Add a stop to see the legs.</p>`;
+  renderSeason(L); renderKit(L); renderCosting(q,tot,L); renderPlaces(L); renderChecklists(); renderSources();
+}
+function renderSeason(L){
+  const m=state.month; const places=[...new Set(sequence())];
+  const strip=(reg,label)=>`<div><h4 style="margin-bottom:.35rem">${label}</h4><div class="season-strip">${MONTHS.map((mm,i)=>{const k=SEASON[reg][i+1];const cls=reg==="topend"?k:(k==="hot"?"buildup":k==="cold"?"wet":"dry");return `<div class="${cls}${i+1===m?" on":""}" title="${mm}: ${k}">${mm.slice(0,3)}</div>`;}).join("")}</div></div>`;
+  const clim=places.filter(p=>CLIMATE[p]).map(p=>`<div class="stat"><div class="v num">${CLIMATE[p][m][0]}&deg; / ${CLIMATE[p][m][1]}&deg;</div><div class="l">${esc(PLACES[p].short)} avg max / min</div></div>`).join("");
+  const keys=[...new Set(places.map(p=>SEASON[PLACES[p].region][m]))];
+  const gen=[...new Set(keys.flatMap(k=>GENERAL_RISK[k]||[]))];
+  const ev=EVENTS.filter(e=>(e.m===m||e.m===0)&&(e.place==="all"||places.includes(e.place)));
+  const schoolHol=SCHOOL_HOL_MONTHS.includes(m);
+  $("season").innerHTML=`
+    <div class="grid-3" style="margin-bottom:.9rem">${strip("topend","Top End: wet, dry and build-up")}${strip("centre","Centre: hot, mild and cold")}</div>
+    <div class="summary" style="margin-bottom:.9rem">${clim}</div>
+    <p class="small" style="margin-bottom:.8rem">${esc(CLIMATE_SRC)}</p>
+    <div class="cols">
+      <div><h4 style="margin-bottom:.4rem">Conditions in ${MONTHS[m-1]}</h4><ul class="issues">${gen.map(t=>`<li class="${/cyclone|impassable/i.test(t)?"crit":"warn"}">${esc(t)}</li>`).join("")}${schoolHol?`<li class="warn">NT school holidays fall in ${MONTHS[m-1]}; rooms and hire cars go early (high).</li>`:""}</ul></div>
+      <div><h4 style="margin-bottom:.4rem">Events that fill rooms</h4>${ev.length?`<ul class="issues">${ev.map(e=>`<li class="${e.big?"crit":"info"}"><b>${esc(e.name)}</b>${e.place!=="all"?", "+esc(PLACES[e.place].short):""}: ${esc(e.when)} ${conf(e.conf)}</li>`).join("")}</ul>`:`<p class="small">No listed event in this month for the places on the route.</p>`}</div>
+    </div>
+    <div class="note" style="margin-top:.9rem">Live sources: <a href="https://roadreport.nt.gov.au/" target="_blank" rel="noopener">Road Report NT</a> (freecall 1800 246 199), <a href="https://securent.nt.gov.au/" target="_blank" rel="noopener">SecureNT</a>, <a href="https://www.bom.gov.au/nt/" target="_blank" rel="noopener">BoM Northern Territory</a>, <a href="https://parksaustralia.gov.au/kakadu/access/" target="_blank" rel="noopener">Kakadu access report</a>.</div>`;
+}
+function renderKit(L){
+  const kg=+state.kitKg||0; const flyLegs=L.filter(l=>l.chosen&&l.chosen.mode==="fly"&&!l.chosen.na);
+  const carriers={}; flyLegs.forEach(l=>l.chosen.flights.forEach(f=>{ if(f.bag!=null) carriers[f.carrier]=f.bag; }));
+  const rows=Object.entries(carriers).map(([c,b])=>`<tr><td>${esc(c)}</td><td class="n">${b} kg</td><td class="n">${kg>b?`<span class="tag warn">${kg-b} kg over</span>`:`<span class="tag good">within</span>`}</td></tr>`).join("");
+  $("kit").innerHTML=`
+    <div class="cols">
+      <div>
+        <p style="margin-bottom:.5rem">Mobile classroom: 8 Surface Pros and 10 older Windows laptops in a wheeled Pelican case, packed weight ${kg} kg (stated). Starlink dish ${state.starlink==="yes"?"packed":"not packed"}.</p>
+        ${rows?`<table class="t"><thead><tr><th>Carrier on this plan</th><th class="n">Allowance</th><th class="n">Case</th></tr></thead><tbody>${rows}</tbody></table>`:`<p class="small">No flights chosen; the case travels in the fleet car.</p>`}
+        ${kg>32?`<p class="note crit" style="margin-top:.6rem">Over the 32 kg single-piece maximum: split into two cases or send as freight.</p>`:""}
+        <p class="small" style="margin-top:.6rem">${esc(BAG_NOTE)}</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:.4rem">Connectivity plan</h4>
+        <ul class="issues">
+          <li class="info">Primary: venue wifi or NBN where a CDU campus room is used.</li>
+          <li class="info">Backup: Starlink Roam (kit A$520 to 690; about A$62.70 a month on the base Roam tier; medium, starlink-prices.com 5 Jul 2026). Needs a clear sky view and mains power.</li>
+          <li class="info">Tertiary: Telstra 4G hotspot. Carrier coverage in each town was not confirmed from carrier maps this pass (low).</li>
+          <li class="warn">Participants use CDU sandbox accounts, so the session depends on internet; test the day before at the venue.</li>
+        </ul>
+      </div>
+    </div>`;
+}
+function renderCosting(q,tot,L){
+  const qt=$("quoteTable");
+  qt.innerHTML=`<thead><tr><th>Service</th><th>Basis</th><th class="n">Qty</th><th class="n">Rate (GST incl)</th><th class="n">GST excl</th><th class="n">GST</th><th class="n">GST incl</th></tr></thead><tbody>
+    <tr><td colspan="7"><h4>Travel expenses</h4></td></tr>
+    ${tot.rows.map(r=>r.sep?`<tr><td colspan="4"><h4>${esc(r.sep)}</h4></td><td class="n num">${money(tot.exTravel)}</td><td class="n num">${money(tot.gstTravel)}</td><td class="n num">${money(tot.incTravel)}</td></tr>`:`
+      <tr><td>${esc(r.rate.label)}</td><td class="small">${esc(r.desc)}${r.over?' <span class="tag">edited</span>':""}</td><td class="n"><input class="q" type="number" min="0" step="1" data-qty="${r.k}" value="${r.qty}" aria-label="Quantity ${esc(r.rate.label)}"></td><td class="n num">${money(r.rate.rate)}<br><span class="small">${esc(r.rate.unit)}</span></td><td class="n num">${money(r.ex)}</td><td class="n num">${r.rate.gst?money(r.gst):"exempt"}</td><td class="n num">${money(r.inc)}</td></tr>`).join("")}
+    <tr><td colspan="4"><h4>Delivery subtotal</h4></td><td class="n num">${money(tot.exDel)}</td><td class="n num">${money(tot.gstDel)}</td><td class="n num">${money(tot.incDel)}</td></tr>
+    <tr class="total"><td colspan="4">Total</td><td class="n num">${money(tot.ex)}</td><td class="n num">${money(tot.gst)}</td><td class="n num">${money(tot.inc)}</td></tr>
+  </tbody>`;
+  const il=internalLines(q,L); const itot=il.reduce((s,x)=>s+x.qty*x.unit,0);
+  const margin=tot.ex-itot;
+  $("internalTable").innerHTML=`<thead><tr><th>Cost</th><th class="n">Qty</th><th class="n">Unit</th><th class="n">Total</th><th>Notes</th></tr></thead><tbody>
+    ${il.map(x=>`<tr><td>${esc(x.label)}</td><td class="n num">${x.qty}</td><td class="n">${x.derived?`<span class="num">${money(x.unit)}</span><br><input class="q" type="number" min="0" step="1" data-int="fuelc" value="${state.internal.fuelc??INTERNAL_DEFAULTS.fuelc}" aria-label="Fuel cents per litre"> c/L <input class="q" type="number" min="1" step="0.5" data-int="lper100" value="${state.internal.lper100??INTERNAL_DEFAULTS.lper100}" aria-label="Litres per 100 km"> L/100`:`<input class="q wide" type="number" min="0" step="0.01" data-int="${x.k}" value="${(state.internal[x.k]===undefined||state.internal[x.k]==="")?(x.k==="venue"?x.unit.toFixed(2):INTERNAL_DEFAULTS[x.k]):state.internal[x.k]}" aria-label="${esc(x.label)} unit cost">`}</td><td class="n num">${money(x.qty*x.unit)}</td><td class="small">${esc(x.hint)}</td></tr>`).join("")}
+    <tr class="total"><td>Internal estimate</td><td></td><td></td><td class="n num">${money(itot)}</td><td class="small">Quote GST excl ${money(tot.ex)}; difference ${money(margin)} ${margin<0?'<span class="tag crit">under</span>':'<span class="tag good">margin</span>'}</td></tr>
+  </tbody>`;
+  renderAfb(q,tot,L);
+}
+function renderPlaces(L){
+  const places=[...new Set(state.stops.map(s=>s.place))];
+  const item=x=>`<li><b>${esc(x.n)}</b>${x.d?": "+esc(x.d):""}${x.u?` <a href="${x.u}" target="_blank" rel="noopener">link</a>`:""}</li>`;
+  $("places").innerHTML=places.length?`<div class="cols">${places.map(p=>{const P=PLACES[p];return `
+    <div class="place">
+      <h3>${esc(P.name)}</h3>
+      <p class="small">${esc(P.cdu)}</p>
+      <h4>Venues</h4><ul>${P.venues.map(item).join("")}</ul>
+      <h4>Accommodation (contract rate A$243.51 a night)</h4><ul>${P.accom.length?P.accom.map(item).join(""):"<li>Home base</li>"}</ul>
+      <p class="small">Safety check when booking: lockable door, working air conditioning, lit parking, and a room not on the ground floor facing a car park where possible; ask for written confirmation.</p>
+      <h4>Hire cars</h4><ul>${P.hire.map(item).join("")}</ul>
+      <p class="small">Standard 2WD hire agreements exclude unsealed roads; the Central Arnhem Road and Tanami Road are named exclusions (medium; drivenow.com.au, read 22 Sep 2026).</p>
+      <h4>Connectivity</h4><p class="small">${esc(P.connect)}</p>
+    </div>`;}).join("")}</div>`:`<p class="note">Add a stop to see venue and accommodation notes.</p>`;
+}
+function activeChecklists(){ return Object.entries(CHECKLISTS).filter(([g])=> state.delivery==="accredited" || !/Away from Base/.test(g)); }
+function renderChecklists(){
+  $("checklists").innerHTML=activeChecklists().map(([g,items])=>`<div class="checkgroup"><h3 style="margin-bottom:.45rem">${esc(g)}</h3><ul>${items.map((t,i)=>{const k=g+"|"+i;const on=!!state.checks[k];return `<li class="${on?"done":""}"><label><input type="checkbox" data-chk="${esc(k)}"${on?" checked":""}> <span>${esc(t)}</span></label></li>`;}).join("")}</ul></div>`).join("");
+}
+function renderSources(){
+  $("sources").innerHTML=`
+    <p class="small" style="margin-bottom:.6rem">Data compiled ${DATA_DATE}. Distances and times are planning estimates; timetables, fares and rates change without notice. This tool is for planning phases, not for booking.</p>
+    <div class="cols">
+      <div class="sources"><h4 style="margin-bottom:.4rem">Sources used</h4><ul>${SOURCES.map(s=>`<li>${s[2]?`<a href="${s[2]}" target="_blank" rel="noopener">${esc(s[0])}</a>`:esc(s[0])} ${conf(s[1])}</li>`).join("")}</ul></div>
+      <div class="sources"><h4 style="margin-bottom:.4rem">Unsure or not found</h4><ul>${UNSURE.map(u=>`<li>${esc(u)}</li>`).join("")}</ul></div>
+    </div>`;
+}
+
+/* ---------- MAP ---------- */
+const NT_RINGS = [[[129,-26],[129,-14.868],[129.092,-14.898],[129.185,-14.982],[129.2,-15.117],[129.153,-15.224],[129.221,-15.17],[129.214,-15.237],[129.265,-15.107],[129.229,-14.837],[129.265,-14.888],[129.326,-14.862],[129.477,-14.933],[129.596,-15.104],[129.585,-15.17],[129.661,-15.138],[129.679,-15.198],[129.733,-15.187],[129.653,-15.077],[129.61,-14.943],[129.65,-14.832],[129.787,-14.862],[129.934,-14.783],[129.981,-14.807],[129.981,-14.71],[129.956,-14.756],[129.797,-14.817],[129.761,-14.82],[129.797,-14.764],[129.711,-14.785],[129.589,-14.614],[129.718,-14.596],[129.79,-14.531],[129.668,-14.575],[129.535,-14.545],[129.358,-14.408],[129.373,-14.329],[129.491,-14.145],[129.481,-14.052],[129.585,-14.092],[129.607,-13.998],[129.632,-14.035],[129.736,-13.991],[129.751,-13.932],[129.715,-13.868],[129.815,-13.761],[129.783,-13.758],[129.787,-13.675],[129.837,-13.51],[129.891,-13.437],[129.905,-13.501],[129.97,-13.53],[130.132,-13.461],[130.255,-13.324],[130.334,-13.346],[130.161,-13.172],[130.122,-13.165],[130.129,-12.941],[130.183,-12.902],[130.226,-12.942],[130.32,-12.905],[130.352,-12.843],[130.356,-12.672],[130.399,-12.681],[130.449,-12.627],[130.518,-12.654],[130.507,-12.596],[130.586,-12.709],[130.694,-12.701],[130.597,-12.672],[130.561,-12.628],[130.618,-12.605],[130.579,-12.569],[130.59,-12.463],[130.622,-12.438],[130.579,-12.4],[130.64,-12.383],[130.784,-12.436],[130.791,-12.584],[130.813,-12.537],[130.899,-12.64],[130.91,-12.598],[130.968,-12.627],[130.874,-12.513],[130.964,-12.52],[130.881,-12.451],[130.824,-12.448],[130.824,-12.4],[130.906,-12.331],[131.05,-12.373],[130.996,-12.191],[131.025,-12.147],[131.079,-12.167],[131.104,-12.147],[131.259,-12.237],[131.238,-12.193],[131.295,-12.044],[131.346,-12.22],[131.446,-12.291],[131.785,-12.27],[131.896,-12.216],[131.932,-12.264],[132.058,-12.307],[132.253,-12.156],[132.278,-12.228],[132.379,-12.216],[132.422,-12.304],[132.386,-12.38],[132.451,-12.301],[132.422,-12.231],[132.44,-12.156],[132.562,-12.091],[132.678,-12.137],[132.757,-12.134],[132.627,-12.044],[132.652,-11.848],[132.595,-11.784],[132.696,-11.654],[132.58,-11.612],[132.494,-11.477],[132.372,-11.434],[132.231,-11.458],[132.105,-11.522],[132.037,-11.473],[132.04,-11.419],[131.954,-11.404],[131.965,-11.345],[131.857,-11.303],[131.767,-11.311],[131.806,-11.291],[131.788,-11.264],[131.839,-11.277],[131.821,-11.201],[131.868,-11.22],[131.882,-11.173],[131.94,-11.252],[131.983,-11.227],[131.986,-11.129],[132.087,-11.228],[132.116,-11.208],[132.109,-11.331],[132.134,-11.338],[132.141,-11.303],[132.152,-11.386],[132.202,-11.411],[132.188,-11.352],[132.228,-11.364],[132.235,-11.34],[132.188,-11.303],[132.192,-11.217],[132.148,-11.137],[132.188,-11.132],[132.285,-11.269],[132.271,-11.178],[132.343,-11.122],[132.386,-11.218],[132.379,-11.283],[132.444,-11.213],[132.476,-11.234],[132.512,-11.33],[132.613,-11.406],[132.674,-11.509],[132.739,-11.509],[132.832,-11.399],[132.894,-11.419],[132.901,-11.372],[132.868,-11.338],[132.912,-11.331],[133.077,-11.51],[133.074,-11.561],[133.185,-11.716],[133.261,-11.73],[133.293,-11.688],[133.347,-11.688],[133.365,-11.698],[133.326,-11.759],[133.365,-11.764],[133.408,-11.723],[133.405,-11.767],[133.477,-11.791],[133.531,-11.749],[133.531,-11.865],[133.56,-11.811],[133.657,-11.821],[133.682,-11.771],[133.75,-11.771],[133.801,-11.715],[133.884,-11.74],[133.916,-11.722],[133.938,-11.759],[133.848,-11.806],[133.844,-11.855],[133.945,-11.914],[134.056,-11.845],[134.089,-11.928],[134.139,-11.88],[134.197,-11.948],[134.168,-11.968],[134.193,-12.08],[134.287,-11.968],[134.431,-12.058],[134.593,-12.064],[134.704,-11.961],[134.769,-11.948],[134.863,-12.127],[134.967,-12.145],[135.072,-12.26],[135.147,-12.243],[135.219,-12.301],[135.23,-12.275],[135.169,-12.228],[135.338,-12.245],[135.349,-12.226],[135.223,-12.191],[135.313,-12.154],[135.302,-12.128],[135.367,-12.088],[135.46,-12.113],[135.536,-12.063],[135.586,-12.098],[135.712,-12.019],[135.583,-12.058],[135.565,-12.025],[135.601,-11.956],[135.738,-11.941],[135.874,-11.847],[135.867,-11.767],[135.9,-11.759],[135.936,-11.777],[135.903,-11.85],[135.795,-11.965],[135.716,-12.004],[135.918,-11.968],[135.828,-12.005],[135.651,-12.164],[135.73,-12.311],[135.882,-12.152],[135.914,-12.183],[136.054,-12.064],[135.936,-12.201],[135.975,-12.265],[136.062,-12.231],[135.986,-12.363],[136.022,-12.456],[136.072,-12.427],[136.173,-12.461],[136.252,-12.441],[136.364,-12.223],[136.234,-12.211],[136.177,-12.171],[136.224,-12.154],[136.299,-12.051],[136.566,-11.892],[136.576,-11.917],[136.472,-11.987],[136.533,-11.993],[136.558,-12.08],[136.587,-12.083],[136.591,-12.174],[136.663,-12.264],[136.72,-12.282],[136.767,-12.243],[136.702,-12.191],[136.681,-12.204],[136.76,-12.164],[136.875,-12.223],[136.926,-12.289],[136.929,-12.35],[136.983,-12.345],[136.771,-12.542],[136.807,-12.456],[136.742,-12.476],[136.76,-12.574],[136.702,-12.616],[136.692,-12.713],[136.609,-12.714],[136.612,-12.831],[136.558,-12.745],[136.526,-12.755],[136.533,-12.804],[136.472,-12.774],[136.49,-12.851],[136.659,-12.996],[136.616,-12.98],[136.566,-13.012],[136.555,-12.964],[136.497,-12.974],[136.497,-13.008],[136.566,-13.059],[136.53,-13.155],[136.483,-13.167],[136.472,-13.243],[136.443,-13.216],[136.342,-13.322],[136.321,-13.309],[136.339,-13.248],[136.389,-13.226],[136.371,-13.066],[136.332,-13.047],[136.303,-13.091],[136.31,-13.164],[136.249,-13.13],[136.245,-13.197],[136.159,-13.263],[136.148,-13.123],[136.087,-13.229],[136.054,-13.229],[136.054,-13.312],[136.008,-13.216],[135.957,-13.289],[135.943,-13.256],[135.91,-13.283],[135.885,-13.368],[135.968,-13.435],[135.921,-13.464],[135.86,-13.437],[135.846,-13.601],[135.871,-13.653],[135.925,-13.675],[135.885,-13.714],[135.972,-13.743],[136.036,-13.655],[136.08,-13.663],[136.004,-13.798],[135.993,-13.901],[135.925,-13.959],[135.91,-14.195],[135.759,-14.266],[135.669,-14.427],[135.608,-14.452],[135.522,-14.651],[135.435,-14.72],[135.367,-14.722],[135.471,-14.948],[136.238,-15.42],[136.285,-15.572],[136.418,-15.622],[136.53,-15.718],[136.594,-15.712],[136.724,-15.862],[136.717,-15.936],[136.767,-15.901],[136.926,-15.935],[136.929,-15.896],[136.99,-15.864],[137.361,-16.122],[137.746,-16.252],[137.865,-16.438],[138,-16.542],[138,-26]],[[129.632,-14.847],[129.61,-14.867],[129.581,-14.803],[129.632,-14.847]],[[129.535,-14.798],[129.589,-14.884],[129.592,-14.964],[129.502,-14.798],[129.535,-14.798]],[[134.884,-12.058],[134.928,-12.068],[134.91,-12.118],[134.856,-12.037],[134.884,-12.058]],[[134.964,-12.027],[134.985,-12.041],[134.91,-12.036],[134.964,-12.027]],[[135.122,-11.929],[135.046,-11.941],[135.054,-11.919],[135.122,-11.929]],[[133.408,-11.592],[133.484,-11.602],[133.362,-11.661],[133.358,-11.617],[133.408,-11.592]],[[133.477,-11.455],[133.513,-11.504],[133.444,-11.504],[133.394,-11.544],[133.394,-11.489],[133.477,-11.455]],[[136.67,-15.663],[136.713,-15.703],[136.663,-15.779],[136.616,-15.713],[136.67,-15.663]],[[136.8,-15.642],[136.836,-15.683],[136.782,-15.673],[136.792,-15.722],[136.731,-15.744],[136.731,-15.649],[136.8,-15.642]],[[137.077,-15.75],[137.106,-15.774],[137.073,-15.847],[137.001,-15.788],[136.983,-15.712],[136.936,-15.722],[136.951,-15.656],[136.99,-15.661],[136.994,-15.593],[137.084,-15.653],[137.077,-15.75]],[[136.616,-15.539],[136.587,-15.636],[136.497,-15.627],[136.526,-15.534],[136.602,-15.516],[136.616,-15.539]],[[136.897,-15.587],[136.85,-15.636],[136.846,-15.536],[136.882,-15.499],[136.897,-15.587]],[[135.766,-14.867],[135.763,-14.901],[135.687,-14.903],[135.727,-14.835],[135.766,-14.867]],[[136.288,-13.706],[136.245,-13.758],[136.281,-13.792],[136.234,-13.847],[136.198,-13.853],[136.213,-13.826],[136.177,-13.763],[136.155,-13.839],[136.116,-13.817],[136.116,-13.724],[136.166,-13.743],[136.195,-13.67],[136.288,-13.706]],[[136.951,-14.182],[136.951,-14.278],[136.904,-14.298],[136.735,-14.256],[136.641,-14.28],[136.425,-14.195],[136.324,-14.229],[136.436,-14.121],[136.411,-13.819],[136.512,-13.834],[136.53,-13.787],[136.594,-13.812],[136.63,-13.777],[136.566,-13.695],[136.616,-13.685],[136.627,-13.716],[136.717,-13.648],[136.724,-13.687],[136.677,-13.744],[136.724,-13.763],[136.706,-13.792],[136.731,-13.839],[136.814,-13.849],[136.843,-13.75],[136.904,-13.758],[136.926,-13.805],[136.857,-13.915],[136.821,-13.905],[136.767,-13.945],[136.764,-13.996],[136.81,-14.03],[136.753,-14.052],[136.753,-14.079],[136.717,-14.064],[136.706,-14.126],[136.735,-14.189],[136.785,-14.187],[136.789,-14.15],[136.882,-14.209],[136.918,-14.148],[136.98,-14.148],[136.951,-14.182]],[[136.137,-13.435],[136.094,-13.361],[136.202,-13.461],[136.155,-13.473],[136.144,-13.56],[136.137,-13.435]],[[136.818,-12.076],[136.821,-12.139],[136.796,-12.108],[136.818,-12.076]],[[132.386,-12.071],[132.408,-12.134],[132.339,-12.098],[132.386,-12.071]],[[136.292,-11.977],[136.317,-11.987],[136.27,-12.039],[136.184,-12.078],[136.13,-12.058],[136.13,-12.017],[136.162,-12.034],[136.198,-12],[136.209,-12.031],[136.242,-12.024],[136.292,-11.977]],[[136.605,-11.745],[136.58,-11.798],[136.519,-11.791],[136.605,-11.745]],[[135.957,-11.706],[135.982,-11.661],[136.054,-11.651],[136.008,-11.708],[135.957,-11.706]],[[132.62,-11.647],[132.645,-11.651],[132.642,-11.691],[132.584,-11.72],[132.508,-11.649],[132.62,-11.647]],[[136.422,-11.509],[136.479,-11.462],[136.476,-11.505],[136.375,-11.592],[136.177,-11.688],[136.267,-11.573],[136.321,-11.603],[136.422,-11.509]],[[130.536,-11.705],[130.633,-11.762],[130.629,-11.804],[130.496,-11.84],[130.32,-11.771],[130.086,-11.828],[130.017,-11.786],[130.071,-11.755],[130.071,-11.671],[130.147,-11.7],[130.186,-11.676],[130.197,-11.507],[130.147,-11.489],[130.269,-11.338],[130.345,-11.316],[130.399,-11.433],[130.388,-11.519],[130.46,-11.592],[130.449,-11.701],[130.536,-11.705]],[[131.536,-11.413],[131.529,-11.475],[131.472,-11.494],[131.475,-11.6],[131.385,-11.578],[131.292,-11.723],[130.96,-11.934],[130.496,-11.649],[130.366,-11.205],[130.399,-11.152],[130.518,-11.296],[130.575,-11.276],[130.6,-11.316],[130.568,-11.394],[130.658,-11.331],[130.694,-11.434],[130.723,-11.386],[130.845,-11.36],[130.921,-11.31],[131.004,-11.347],[131.022,-11.413],[131.05,-11.315],[131.155,-11.249],[131.22,-11.399],[131.194,-11.284],[131.23,-11.208],[131.274,-11.19],[131.302,-11.277],[131.331,-11.242],[131.428,-11.25],[131.475,-11.391],[131.518,-11.38],[131.536,-11.413]],[[136.764,-11.039],[136.717,-11.207],[136.537,-11.443],[136.479,-11.448],[136.616,-11.237],[136.688,-11.178],[136.72,-11.051],[136.764,-11.019],[136.764,-11.039]],[[132.49,-11.159],[132.519,-11.127],[132.469,-11.029],[132.552,-11.033],[132.598,-10.968],[132.58,-11.026],[132.613,-11.109],[132.58,-11.154],[132.634,-11.174],[132.598,-11.345],[132.49,-11.159]]];
+function buildMap(L){
+  const K=54, cs=Math.cos(18*Math.PI/180), lon0=129, lat0=-10.5;
+  const X=lon=>(lon-lon0)*K*cs, Y=lat=>(lat0-lat)*K;
+  const W=X(138)+1, H=Y(-26)+1; const pad=28;
+  const vbW=W+pad*2+150, vbH=H+pad*2, outW=560, outH=Math.round(outW*vbH/vbW);
+  let s=`<svg viewBox="${-pad} ${-pad} ${vbW} ${vbH}" width="${outW}" height="${outH}" role="img" aria-label="Schematic map of the Northern Territory showing the planned route, stops and travel modes" xmlns="http://www.w3.org/2000/svg" style="font-family:Lato,Arial,sans-serif;font-size:11px">`;
+  s+=`<rect x="${-pad}" y="${-pad}" width="${W+pad*2+150}" height="${H+pad*2}" fill="#F7FAFA"/>`;
+  s+=`<rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="#B9C6C7" stroke-dasharray="4 3"/>`;
+  s+=`<path d="${NT_RINGS.map(r=>"M"+r.map(p=>X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1)).join("L")+"Z").join(" ")}" fill="#E4EEEE" stroke="#7FA3A5" stroke-width="1"/>`;
+  /* all corridors, faint */
+  CORRIDORS.forEach(c=>{ s+=`<polyline points="${c.wp.map(w=>X(NODES[w[0]].lon).toFixed(1)+","+Y(NODES[w[0]].lat).toFixed(1)).join(" ")}" fill="none" stroke="${c.wp.some(w=>w[2]==="unsealed")?"#B98C4A":"#9AAEB0"}" stroke-width="1.6" stroke-dasharray="${c.wp.some(w=>w[2]==="unsealed")?"5 3":"none"}"/>`; });
+  /* highway labels */
+  const lab=(id,t,dx,dy)=>{const n=NODES[id];s+=`<text x="${(X(n.lon)+dx).toFixed(1)}" y="${(Y(n.lat)+dy).toFixed(1)}" fill="#7A8C8E" font-size="9">${t}</text>`;};
+  lab("elliott","Stuart Hwy",8,-4); lab("curtinSprings","Lasseter Hwy",-10,-8); lab("barkHut","Arnhem Hwy",-6,-8); lab("bulman","Central Arnhem Rd",6,-6); lab("cooinda","Kakadu Hwy",8,4);
+  /* chosen legs */
+  const notes=[];
+  L.forEach((l,i)=>{
+    const c=l.chosen; if(!c||c.na) return; const A=PLACES[l.a],B=PLACES[l.b];
+    if(c.mode==="drive"){
+      s+=`<polyline points="${[c.route.segs[0].from,...c.route.segs.map(x=>x.to)].map(id=>X(NODES[id].lon).toFixed(1)+","+Y(NODES[id].lat).toFixed(1)).join(" ")}" fill="none" stroke="#008387" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>`;
+      c.days.slice(0,-1).forEach(d=>{const n=NODES[d.to];s+=`<rect x="${(X(n.lon)-4).toFixed(1)}" y="${(Y(n.lat)-4).toFixed(1)}" width="8" height="8" fill="#fff" stroke="#008387" stroke-width="2"/><text x="${(X(n.lon)+8).toFixed(1)}" y="${(Y(n.lat)+4).toFixed(1)}" font-size="9" fill="#0F4761">overnight: ${esc(n.n)}</text>`;});
+      notes.push({a:A,b:B,t:`Drive ${Math.round(c.km)} km, ${c.days.length} day${c.days.length>1?"s":""}`});
+    } else if(c.mode==="fly"){
+      const x1=X(A.lon),y1=Y(A.lat),x2=X(B.lon),y2=Y(B.lat); const mx=(x1+x2)/2+(y2-y1)*0.18, my=(y1+y2)/2-(x2-x1)*0.18;
+      s+=`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="#0F4761" stroke-width="2.4" stroke-dasharray="7 4"/>`;
+      notes.push({a:A,b:B,t:`Fly: ${c.flights.map(f=>f.carrier.split(" ")[0]).filter((v,i,arr)=>arr.indexOf(v)===i).join(", ")}`});
+    } else if(c.mode==="bus"){
+      const r=route(A.hub,B.hub); if(r) s+=`<polyline points="${[r.segs[0].from,...r.segs.map(x=>x.to)].map(id=>X(NODES[id].lon).toFixed(1)+","+Y(NODES[id].lat).toFixed(1)).join(" ")}" fill="none" stroke="#552855" stroke-width="3" stroke-dasharray="2 4" stroke-linecap="round"/>`;
+      notes.push({a:A,b:B,t:"Coach"});
+    }
+  });
+  /* stops */
+  const seq=[...new Set(sequence())];
+  seq.forEach(p=>{const P=PLACES[p];const x=X(P.lon),y=Y(P.lat);const isO=p===state.origin;
+    s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${isO?7:6}" fill="${isO?"#111417":"#008387"}" stroke="#fff" stroke-width="2"/>`;
+    const dx = P.lon>135.5? -8 : 10; const anchor = P.lon>135.5?"end":"start";
+    s+=`<text x="${(x+dx).toFixed(1)}" y="${(y-8).toFixed(1)}" text-anchor="${anchor}" font-size="12" font-weight="700" fill="#111417">${esc(P.short)}</text>`;
+    if(P.airport) s+=`<text x="${(x+dx).toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="${anchor}" font-size="9" fill="#5A6A6D">${P.airport}</text>`;
+  });
+  /* leg notes column */
+  let ny=10; const nx=W+40;
+  s+=`<text x="${nx}" y="${ny}" font-size="11" font-weight="700" fill="#111417">Legs</text>`; ny+=16;
+  notes.forEach(n=>{ s+=`<text x="${nx}" y="${ny}" font-size="10" font-weight="700" fill="#0F4761">${esc(n.a.short)} to ${esc(n.b.short)}</text>`; ny+=12; s+=`<text x="${nx}" y="${ny}" font-size="9.5" fill="#111417">${esc(n.t)}</text>`; ny+=16; });
+  ny+=8; s+=`<text x="${nx}" y="${ny}" font-size="11" font-weight="700" fill="#111417">Key</text>`; ny+=14;
+  const key=[["#008387","4","none","Drive, fleet car"],["#0F4761","2.4","7 4","Fly"],["#552855","3","2 4","Coach"],["#9AAEB0","1.6","none","Sealed highway"],["#B98C4A","1.6","5 3","Unsealed road"]];
+  key.forEach(k=>{ s+=`<line x1="${nx}" y1="${ny-4}" x2="${nx+26}" y2="${ny-4}" stroke="${k[0]}" stroke-width="${k[1]}" stroke-dasharray="${k[2]}"/><text x="${nx+32}" y="${ny}" font-size="9.5" fill="#111417">${k[3]}</text>`; ny+=14; });
+  s+=`<rect x="${nx}" y="${ny-8}" width="8" height="8" fill="#fff" stroke="#008387" stroke-width="2"/><text x="${nx+32}" y="${ny}" font-size="9.5" fill="#111417">Overnight en route</text>`; ny+=14;
+  s+=`<text x="${nx}" y="${H-4}" font-size="8.5" fill="#7A8C8E">Positions approximate; not for navigation.</text>`;
+  s+=`</svg>`;
+  return s;
+}
+
+/* ---------- REPORT ---------- */
+function buildReport(){
+  const L=legs(); const q=computeQuantities(L); const tot=quoteTotals(q); const il=internalLines(q,L); const itot=il.reduce((s,x)=>s+x.qty*x.unit,0);
+  const seq=sequence(); const m=MONTHS[state.month-1];
+  const allVerify=[]; L.forEach(l=>{ (l.chosen?.verify||[]).forEach(v=>allVerify.push(`${PLACES[l.a].short} to ${PLACES[l.b].short}: ${v}`)); });
+  const places=[...new Set(state.stops.map(s=>s.place))];
+  const keys=[...new Set(seq.map(p=>SEASON[PLACES[p].region][state.month]))]; const gen=[...new Set(keys.flatMap(k=>GENERAL_RISK[k]||[]))];
+  const ev=EVENTS.filter(e=>(e.m===state.month||e.m===0)&&(e.place==="all"||seq.includes(e.place)));
+  const h=`
+  <div class="rep">
+    <div class="rep-tools">
+      <button class="btn" type="button" id="repBack">Back to planner</button>
+      <button class="btn" type="button" id="repCopy">Copy report text</button>
+      <button class="btn" type="button" id="repSave">Save report as HTML</button>
+      ${isTop?`<button class="btn primary" type="button" id="repPrint">Print or save as PDF</button>`:""}
+      <span class="hint">${isTop?"Printing uses your browser's print dialog; the layout is set for A4.":"Printing is not available inside this viewer. Save the report as HTML, open the file in your browser and print from there, or use the downloadable file version of the planner."}</span>
+    </div>
+    <h1>NT regional travel planning report</h1>
+    <p class="small">${esc(state.name||"Untitled plan")}. Prepared ${new Date().toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric"})} with data compiled ${DATA_DATE}. Planning-phase estimate only; verify before booking.</p>
+    <div class="cover">
+      <div><b>Route</b>${seq.map(p=>esc(PLACES[p].short)).join(" &rarr; ")}</div>
+      <div><b>When</b>${m} ${state.year}</div>
+      <div><b>Trainers</b>${state.trainers}</div>
+      <div><b>Days away</b>${q.daysAway}</div>
+      <div><b>Nights</b>${q.nights}</div>
+      <div><b>Fleet km</b>${Math.round(q.driveKm).toLocaleString("en-AU")}</div>
+      <div><b>Flight sectors</b>${q.flyLegs}</div>
+      <div><b>Quote (GST incl)</b>${money(tot.inc)}</div>
+      <div><b>Internal estimate</b>${money(itot)}</div>
+    </div>
+
+    <h2>Route map</h2>
+    <figure style="margin:0"><div class="mapwrap">${buildMap(L)}</div><figcaption class="map-note">Planned legs by mode, overnight stops en route, and the highway network used by the planner. Coastline from Natural Earth via world-atlas; town positions approximate.</figcaption></figure>
+
+    <h2>Legs and chosen options</h2>
+    ${L.map(l=>{const c=l.chosen;return `<h3>${esc(PLACES[l.a].short)} to ${esc(PLACES[l.b].short)}: ${c?esc(c.title):"no option"}</h3>
+      ${c?`<p class="small">${esc(c.sub)}</p>${c.kv.length?`<dl class="kv" style="display:grid;grid-template-columns:auto 1fr;gap:.15rem .6rem;font-size:.86rem;margin:.4rem 0">${c.kv.map(([k,v])=>`<dt style="color:var(--muted)">${esc(k)}</dt><dd style="margin:0">${v}</dd>`).join("")}</dl>`:""}
+      ${c.days&&c.days.length?`<div class="daylist">${c.days.map((d,di)=>`<div><b>Day ${di+1}</b><span>${esc(NODES[d.from].n)} to ${esc(NODES[d.to].n)}, ${Math.round(d.km)} km, ${fmtH(d.hours)}${d.over?" (over cap)":""}</span></div>`).join("")}</div>`:""}
+      ${c.issues.length?`<ul class="issues" style="margin-top:.4rem">${c.issues.map(x=>`<li class="${x.lvl}">${x.t}</li>`).join("")}</ul>`:""}
+      <details class="more" open><summary>Other options considered</summary><ul class="issues">${l.opts.filter(o=>o!==c).map(o=>`<li class="info"><b>${esc(o.title)}</b>: ${esc(o.sub)}</li>`).join("")}</ul></details>`:""}`;}).join("")}
+
+    <h2 class="pb">Season, roads and events for ${m}</h2>
+    <ul class="issues">${gen.map(t=>`<li class="${/cyclone|impassable/i.test(t)?"crit":"warn"}">${esc(t)}</li>`).join("")}${SCHOOL_HOL_MONTHS.includes(state.month)?`<li class="warn">NT school holidays fall in ${m} (high).</li>`:""}</ul>
+    ${ev.length?`<h3>Events that fill rooms</h3><ul class="issues">${ev.map(e=>`<li class="${e.big?"crit":"info"}"><b>${esc(e.name)}</b>${e.place!=="all"?", "+esc(PLACES[e.place].short):""}: ${esc(e.when)} (${e.conf})</li>`).join("")}</ul>`:""}
+    <h3>Kit and baggage</h3>
+    <p>Pelican case ${state.kitKg} kg. ${esc(BAG_NOTE)}</p>
+
+    <h2>Contract quote (AGC22-0112 Table 5)</h2>
+    <div class="tscroll"><table class="t"><thead><tr><th>Service</th><th>Basis</th><th class="n">Qty</th><th class="n">Rate</th><th class="n">GST excl</th><th class="n">GST</th><th class="n">GST incl</th></tr></thead><tbody>
+      ${tot.rows.map(r=>r.sep?`<tr><td colspan="4"><b>Travel subtotal</b></td><td class="n num">${money(tot.exTravel)}</td><td class="n num">${money(tot.gstTravel)}</td><td class="n num">${money(tot.incTravel)}</td></tr><tr><td colspan="7"><b>${esc(r.sep)}</b></td></tr>`:(r.qty?`<tr><td>${esc(r.rate.label)}</td><td class="small">${esc(r.desc)}</td><td class="n num">${r.qty}</td><td class="n num">${money(r.rate.rate)}</td><td class="n num">${money(r.ex)}</td><td class="n num">${r.rate.gst?money(r.gst):"exempt"}</td><td class="n num">${money(r.inc)}</td></tr>`:"")).join("")}
+      <tr><td colspan="4"><b>Delivery subtotal</b></td><td class="n num">${money(tot.exDel)}</td><td class="n num">${money(tot.gstDel)}</td><td class="n num">${money(tot.incDel)}</td></tr>
+      <tr class="total"><td colspan="4">Total</td><td class="n num">${money(tot.ex)}</td><td class="n num">${money(tot.gst)}</td><td class="n num">${money(tot.inc)}</td></tr>
+    </tbody></table></div>
+    <h3>Internal cost estimate</h3>
+    <div class="tscroll"><table class="t"><thead><tr><th>Cost</th><th class="n">Qty</th><th class="n">Unit</th><th class="n">Total</th></tr></thead><tbody>
+      ${il.filter(x=>x.qty*x.unit>0).map(x=>`<tr><td>${esc(x.label)}</td><td class="n num">${x.qty}</td><td class="n num">${money(x.unit)}</td><td class="n num">${money(x.qty*x.unit)}</td></tr>`).join("")}
+      <tr class="total"><td>Internal estimate</td><td></td><td></td><td class="n num">${money(itot)}</td></tr>
+      <tr><td colspan="3">Quote GST excl less internal estimate</td><td class="n num">${money(tot.ex-itot)}</td></tr>
+    </tbody></table></div>
+
+    ${state.delivery==="accredited"?(()=>{const r=afbAssess();const cov=il.filter(x=>["flight","excess","accom","meals","hire","fuelc","fleetkm"].includes(x.k)).reduce((s,x)=>s+x.qty*x.unit,0);return `
+    <h2>Away from Base reverse-block check</h2>
+    <p class="small">${esc(AFB.source)} (high). Contact ${esc(AFB.email)}; <a href="${AFB.web}">program page</a>.</p>
+    <ul class="issues" style="margin-top:.5rem">${r.fails.map(f=>`<li class="crit">${esc(f)}</li>`).join("")}${r.unsure.map(u=>`<li class="warn">${esc(u)}</li>`).join("")}${r.ok&&!r.unsure.length?`<li class="good">Inputs meet the published course and cohort gates; feasibility is still assessed by the AFB team.</li>`:""}</ul>
+    <p style="margin-top:.5rem">Travel, meals and accommodation lines in the internal estimate that the program can reimburse: <b>${money(cov)}</b>; team admin charge at ${AFB.adminPct} per cent: <b>${money(cov*AFB.adminPct/100)}</b>. Venue hire, consumables and delivery time are not claimable.</p>
+    <p class="small" style="margin-top:.3rem">Inputs used: accredited mixed-mode ${esc(state.afb.accredited)}; ABSTUDY approved ${esc(state.afb.abstudy)}; ${esc(state.afb.hours)} nominal hours; ${esc(state.afb.f2f)} per cent face-to-face; ${esc(state.afb.students)} eligible students; majority First Nations ${esc(state.afb.majority)}.</p>
+    <h3>Process</h3><ul class="issues">${AFB.process.map(p=>`<li class="info">${esc(p)}</li>`).join("")}</ul>`;})():""}
+
+    <h2 class="pb">Stops: venues, accommodation, hire cars</h2>
+    ${places.map(p=>{const P=PLACES[p];const li=x=>`<li><b>${esc(x.n)}</b>${x.d?": "+esc(x.d):""}${x.u?` <a href="${x.u}">link</a>`:""}</li>`;return `<h3>${esc(P.name)}</h3><p class="small">${esc(P.cdu)}</p><div class="two"><div><b>Venues</b><ul class="issues">${P.venues.map(li).join("")}</ul></div><div><b>Accommodation</b><ul class="issues">${P.accom.map(li).join("")}</ul><b>Hire cars</b><ul class="issues">${P.hire.map(li).join("")}</ul></div></div><p class="small">Connectivity: ${esc(P.connect)}</p>`;}).join("")}
+
+    <h2 class="pb">Verify before booking</h2>
+    <div class="cl"><ul>${allVerify.map(v=>`<li>${esc(v)}</li>`).join("")}<li>Road Report NT, SecureNT and BoM checked on the day before departure</li><li>Accommodation confirmed in writing: lockable door, air conditioning, secure parking</li></ul></div>
+
+    <h2>Checklists</h2>
+    <div class="two">${activeChecklists().map(([g,items])=>`<div class="cl"><h3>${esc(g)}</h3><ul>${items.map((t,i)=>`<li class="${state.checks[g+"|"+i]?"done":""}">${esc(t)}</li>`).join("")}</ul></div>`).join("")}</div>
+
+    <h2>Sources used</h2>
+    <div class="sources"><ul>${SOURCES.map(s=>`<li>${s[2]?`<a href="${s[2]}">${esc(s[0])}</a>`:esc(s[0])} (${s[1]})</li>`).join("")}</ul></div>
+    <h3>Unsure or not found</h3>
+    <div class="sources"><ul>${UNSURE.map(u=>`<li>${esc(u)}</li>`).join("")}</ul></div>
+    <p class="foot">NT Regional Travel Planner, CDU TAFE. Contract rates from AGC22-0112 Table 5 (March 2026). Distances, times and conditions are estimates for planning; confirm with Road Report NT, carriers and venues before booking.</p>
+  </div>`;
+  return h;
+}
+function reportText(){
+  const el=document.createElement("div"); el.innerHTML=buildReport(); el.querySelector(".rep-tools")?.remove(); el.querySelector("figure")?.remove();
+  el.querySelectorAll("h1,h2,h3").forEach(x=>x.insertAdjacentText("beforebegin","\n"));
+  el.querySelectorAll("li,tr,p,dt,dd,div.stat").forEach(x=>x.insertAdjacentText("afterend","\n"));
+  el.querySelectorAll("td,th").forEach(x=>x.insertAdjacentText("afterend","\t"));
+  return el.textContent.replace(/[ \t]+\n/g,"\n").replace(/\n{3,}/g,"\n\n").trim();
+}
+function reportHtmlFile(){
+  const css=document.querySelector("style").textContent;
+  return `<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NT travel planning report</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap"><style>${css}\nbody.report-mode{background:#fff}</style></head><body class="report-mode"><div id="report">${buildReport().replace(/<div class="rep-tools">[\s\S]*?<\/div>/,'<div class="rep-tools"><button class="btn primary" type="button" onclick="window.print()">Print or save as PDF</button></div>')}</div></body></html>`;
+}
+function showReport(){
+  $("report").innerHTML=buildReport(); document.body.classList.add("report-mode"); window.scrollTo(0,0);
+  $("repBack").onclick=()=>{ document.body.classList.remove("report-mode"); };
+  $("repCopy").onclick=async()=>{ const t=reportText(); try{ await navigator.clipboard.writeText(t); toast("Report text copied"); }catch(e){ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); toast("Report text copied");}catch(e2){toast("Copy failed; select the report and copy manually");} ta.remove(); } };
+  $("repSave").onclick=async()=>{ const html=reportHtmlFile(); const fn=`NT-travel-plan-${(state.name||"plan").replace(/[^a-z0-9]+/gi,"-").toLowerCase()}.html`;
+    if(dlNS){ try{ await dlNS.save({filename:fn,data:html}); toast("Report saved"); }catch(e){ if(e&&e.code==="declined") toast("Save cancelled"); else toast("Save not available here"); } return; }
+    if(isTop){ try{ const b=new Blob([html],{type:"text/html"}); const u=URL.createObjectURL(b); const a=document.createElement("a"); a.href=u; a.download=fn; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),2000); toast("Report file offered by the browser"); }catch(e){ toast("Save failed"); } return; }
+    toast("Saving is not available in this viewer; use Copy report text");
+  };
+  const pb=$("repPrint"); if(pb) pb.onclick=()=>{ try{ window.print(); }catch(e){} };
+}
+
+/* ---------- PERSISTENCE ---------- */
+const LS_KEY="ntplanner.plans.v1", LS_DRAFT="ntplanner.draft.v1";
+function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k)||"null"); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } }
+function saveDraft(){ lsSet(LS_DRAFT,state); }
+async function savePlan(){
+  const name=($("planName").value||"").trim(); if(!name){ toast("Give the plan a name first"); $("planName").focus(); return; }
+  state.name=name; const id=currentPlanId||(name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"plan")+"-"+Date.now().toString(36);
+  const rec={name,updatedAt:new Date().toISOString(),state:JSON.parse(JSON.stringify(state))};
+  if(dbNS){ try{ await dbNS.doc("plans/"+id).set(rec); currentPlanId=id; toast("Plan saved to the shared store"); return; }catch(e){ toast("Shared save failed; saved in this browser instead"); } }
+  const all=lsGet(LS_KEY)||{}; all[id]=rec; if(lsSet(LS_KEY,all)){ currentPlanId=id; toast("Plan saved in this browser"); } else toast("Could not save in this browser");
+}
+async function listPlans(){
+  let items=[];
+  if(dbNS){ try{ const snap=await dbNS.collection("plans").orderBy("updatedAt","desc").limit(100).get(); items=snap.docs.map(d=>({id:d.id,...d.data()})); }catch(e){ } }
+  const local=lsGet(LS_KEY)||{}; Object.entries(local).forEach(([id,r])=>{ if(!items.find(x=>x.id===id)) items.push({id,...r,local:true}); });
+  items.sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  return items;
+}
+async function openPlans(){
+  const items=await listPlans(); const host=$("modalHost");
+  host.innerHTML=`<div class="modal-bg" id="modalBg"><div class="modal" role="dialog" aria-label="Saved plans"><h2>Saved plans</h2>${items.length?`<div class="plans">${items.map(p=>`<button type="button" data-open="${esc(p.id)}"><span>${esc(p.name)}</span>${p.local?'<span class="tag">this browser</span>':""}<span class="t">${new Date(p.updatedAt).toLocaleDateString("en-AU")}</span></button>`).join("")}</div>`:`<p class="small">No saved plans yet.</p>`}
+    <div style="display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" type="button" id="modalNew">New blank plan</button><button class="btn" type="button" id="modalClose">Close</button></div></div></div>`;
+  $("modalClose").onclick=()=>host.innerHTML=""; $("modalBg").addEventListener("click",e=>{ if(e.target.id==="modalBg") host.innerHTML=""; });
+  $("modalNew").onclick=()=>{ state=DEFAULT_STATE(); currentPlanId=null; host.innerHTML=""; renderBuilder(); renderAll(); saveDraft(); };
+  host.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{ const p=items.find(x=>x.id===b.dataset.open); if(p&&p.state){ state=Object.assign(DEFAULT_STATE(),p.state); currentPlanId=p.id; host.innerHTML=""; renderBuilder(); renderAll(); saveDraft(); toast("Plan loaded"); } });
+}
+
+/* ---------- EVENTS ---------- */
+function bind(){
+  ["origin","month","year","trainers","maxDrive","kitKg","fleetType","starlink"].forEach(id=>{ $(id).addEventListener("change",()=>{ const v=$(id).value; state[id]=(["month","year","trainers"].includes(id))?+v:(["maxDrive","kitKg"].includes(id)?+v:v); renderAll(); renderBuilder(); saveDraft(); }); });
+  $("returnHome").addEventListener("change",()=>{ state.returnHome=$("returnHome").checked; renderAll(); saveDraft(); });
+  $("delivery").addEventListener("change",()=>{ state.delivery=$("delivery").value; $("afbInputs").hidden=(state.delivery!=="accredited"); renderAll(); renderChecklists(); saveDraft(); });
+  $("afbInputs").addEventListener("change",e=>{ const el=e.target; if(!el.dataset.afb) return; state.afb[el.dataset.afb]=(el.type==="number")?+el.value:el.value; renderAll(); saveDraft(); });
+  $("planName").addEventListener("input",()=>{ state.name=$("planName").value; saveDraft(); });
+  $("btnAddStop").addEventListener("click",()=>{ const last=state.stops[state.stops.length-1]; state.stops.push({place:last&&last.place!=="katherine"?"katherine":"alice",half:1,full:0,participants:15,venue:"cdu",nights:"",local:"auto"}); renderBuilder(); renderAll(); saveDraft(); });
+  $("stops").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.k) return; const s=state.stops[+t.dataset.i]; s[t.dataset.k]=(t.type==="number")?(t.value===""?"":+t.value):t.value; renderAll(); if(t.dataset.k==="place") renderBuilder(); saveDraft(); });
+  $("stops").addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const i=+b.dataset.i; const a=b.dataset.act;
+    if(a==="del") state.stops.splice(i,1); if(a==="up"&&i>0) [state.stops[i-1],state.stops[i]]=[state.stops[i],state.stops[i-1]]; if(a==="down"&&i<state.stops.length-1) [state.stops[i+1],state.stops[i]]=[state.stops[i],state.stops[i+1]];
+    state.picks={}; renderBuilder(); renderAll(); saveDraft(); });
+  $("legs").addEventListener("click",e=>{ const b=e.target.closest("[data-pick]"); if(!b) return; state.picks[b.dataset.pick]=b.dataset.mode; renderAll(); saveDraft(); });
+  $("quoteTable").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.qty) return; state.qty[t.dataset.qty]=t.value; renderAll(); saveDraft(); });
+  $("internalTable").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.int) return; state.internal[t.dataset.int]=t.value; renderAll(); saveDraft(); });
+  $("checklists").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.chk) return; state.checks[t.dataset.chk]=t.checked; renderChecklists(); saveDraft(); });
+  $("btnSave").addEventListener("click",savePlan); $("btnLoad").addEventListener("click",openPlans); $("btnReport").addEventListener("click",showReport);
+}
+function init(){
+  const d=lsGet(LS_DRAFT); if(d&&d.stops) state=Object.assign(DEFAULT_STATE(),d);
+  renderBuilder(); renderAll(); bind();
+  if(window.claude && typeof window.claude.use==="function"){
+    window.claude.use("db").then(ns=>{ dbNS=ns; if(ns){ $("storageTag").textContent="shared store"; $("storageTag").classList.add("good"); } }).catch(()=>{});
+    window.claude.use("downloads").then(ns=>{ dlNS=ns; }).catch(()=>{});
+  }
+}
+init();
+</script>
+
+</body>
+</html>

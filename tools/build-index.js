@@ -85,6 +85,7 @@ const SKIP_URLS = new Set([
   '/cdu-teaching-staff/prompt-critics.html',  // redirect stub to /training-games/prompt-critics-study-and-learn/ (17 Sept 2026)
   '/AI Workshop Gallery Pages/site/resources/basic-prompts-gallery.html',  // redirect stub to /resources/basic-prompts-gallery.html (20 Sept 2026)
   '/client-access/',                      // discreet noindex hub, reached from homepage artwork
+  '/client-access/nt-travel-planner/',    // SD's internal NT travel planning tool (23 Sept 2026); noindex, not a learning resource
 ]);
 
 // Filename patterns excluded.
