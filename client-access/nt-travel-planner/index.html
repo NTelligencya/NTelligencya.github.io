@@ -17,7 +17,7 @@
 <style>
 :root{
   --bg:#F4F6FA; --surface:#FFFFFF; --surface-2:#EDF1F7; --line:#C9D3E0; --ink:#0B1F3A; --muted:#4B5D74;
-  --navy:#1F3864; --navy-deep:#003251; --navy-soft:#E2E9F4; --bar:#1F3864; --on-bar:#FFFFFF;
+  --navy:#13294B; --navy-deep:#0B1B36; --navy-soft:#E1E7F1; --bar:#0F2140; --on-bar:#FFFFFF;
   --warn:#9A5A0C; --warn-soft:#FBEBD6; --crit:#A5241C; --crit-soft:#F9E0DD; --good:#2A6E2E; --good-soft:#DFF0E0;
   --wet:#2F6F9F; --wet-soft:#DCE9F4; --dry:#8F6E12; --dry-soft:#F6EDD0;
   --radius:6px; --shadow:0 1px 2px rgba(11,31,58,.08);
@@ -88,6 +88,7 @@ label.f > span{font-family:var(--font-display);font-weight:600;letter-spacing:.0
 label.f.req > span{font-weight:800;color:var(--navy);font-size:.8rem}
 label.f.req > span::after{content:" required";font-weight:600;color:var(--muted);text-transform:none;letter-spacing:0;font-size:.7rem}
 label.f.req input,label.f.req select{border-color:var(--navy);border-width:1.5px;background:#fff}
+label.f textarea{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.4rem .5rem;color:var(--ink);width:100%;min-width:0;resize:vertical;font-size:.9rem}
 label.f input,label.f select{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.4rem .5rem;color:var(--ink);width:100%;min-width:0}
 label.chk{display:flex;align-items:flex-start;gap:.5rem;font-size:.9rem;cursor:pointer}
 label.chk input{margin-top:.2rem;accent-color:var(--navy)}
@@ -133,6 +134,7 @@ table.t tr.has-qty td,table.t tr.has-qty input.q{font-weight:700}
 table.t tr.has-qty td:first-child{border-left:3px solid var(--navy);padding-left:.4rem}
 table.t input.q{width:4.5rem;text-align:right;border:1px solid var(--line);border-radius:3px;padding:.2rem .3rem;background:var(--surface);color:var(--ink)}
 table.t input.q.wide{width:6.5rem}
+table.t input.pw{width:9rem;border:1px solid var(--line);border-radius:3px;padding:.2rem .3rem;background:var(--surface);color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem}
 .tscroll{overflow-x:auto}
 .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
 .place{border:1px solid var(--line);border-radius:var(--radius);padding:.75rem .85rem;background:var(--surface);display:flex;flex-direction:column;gap:.55rem}
@@ -190,11 +192,12 @@ body.report-mode #report{display:block}
 .rep .cl ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.25rem;font-size:.86rem}
 .rep .cl li::before{content:"\2610";margin-right:.45rem;color:var(--muted)}
 .rep .cl li.done::before{content:"\2611";color:var(--good)}
+.rep.client-view .internal{display:none !important}
 .rep .foot{margin-top:1.5rem;padding-top:.6rem;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted)}
 .rep .map-note{font-size:.8rem;color:var(--muted);margin-top:.3rem}
 .pb{break-before:page}
 @media print{
-  :root{--bg:#fff;--surface:#fff;--surface-2:#f2f2f2;--line:#bbb;--ink:#000;--muted:#444;--navy:#1F3864;--navy-deep:#003251;--navy-soft:#e6ecf5;--warn:#8a4b00;--warn-soft:#f6e9d8;--crit:#9b1c14;--crit-soft:#f7dedb;--good:#1f5f23;--good-soft:#e2efe3;--wet:#25587f;--wet-soft:#e0eaf3;--dry:#7f6210;--dry-soft:#f3ecd2}
+  :root{--bg:#fff;--surface:#fff;--surface-2:#f2f2f2;--line:#bbb;--ink:#000;--muted:#444;--navy:#13294B;--navy-deep:#0B1B36;--navy-soft:#e6ecf5;--warn:#8a4b00;--warn-soft:#f6e9d8;--crit:#9b1c14;--crit-soft:#f7dedb;--good:#1f5f23;--good-soft:#e2efe3;--wet:#25587f;--wet-soft:#e0eaf3;--dry:#7f6210;--dry-soft:#f3ecd2}
   body{background:#fff;color:#000;font-size:11pt}
   .topbar,#app,.rep-tools,.toast{display:none !important}
   #report{display:block !important}
@@ -234,13 +237,15 @@ body.report-mode #report{display:block}
       <div class="panel-b" style="display:flex;flex-direction:column;gap:.7rem">
         <div class="grid-2">
           <label class="f req" style="grid-column:1 / -1"><span>Course name</span><input type="text" id="courseName" placeholder="e.g. Excel with Copilot, AI in Government"></label>
-          <label class="f req"><span>Origin</span><select id="origin"></select></label>
+          <label class="f" style="grid-column:1 / -1"><span>Trainer name</span><input type="text" id="trainerName" placeholder="Shown in the report header"></label>
+          <label class="f" style="grid-column:1 / -1"><span>Training arrangement description</span><textarea id="arrangement" rows="3" placeholder="Optional; appears in the report and map header"></textarea></label>
           <label class="f req"><span>Travel month</span><select id="month"></select></label>
           <label class="f req"><span>Year</span><select id="year"><option>2026</option><option>2027</option></select></label>
-          <label class="f req"><span>Trainers</span><select id="trainers"><option value="1">1</option><option value="2">2 (Excel)</option></select></label>
+          <label class="f req"><span>Trainers</span><select id="trainers"><option value="1">1</option><option value="2">2</option></select></label>
         </div>
-        <label class="chk"><input type="checkbox" id="returnHome" checked> Return to origin at the end</label>
-        <label class="f req"><span>Quote type</span><select id="delivery"><option value="agc">NTG regional quote (AGC22-0112, non-accredited)</option><option value="accredited">Accredited unit delivery (Away from Base check)</option></select></label>
+        <p class="small">Trips start from Darwin (CDU Casuarina).</p>
+        <label class="chk"><input type="checkbox" id="returnHome" checked> Return to Darwin at the end</label>
+        <label class="f req"><span>Quote type</span><select id="delivery"><option value="agc">NTG regional quote (AGC22-0112, non-accredited)</option><option value="ffs">Non-accredited fee for service</option><option value="accredited">Accredited unit delivery (Away from Base check)</option></select></label>
         <p class="small" id="afbNote" hidden>The fields below apply to accredited units only; they are not used for an NTG quote.</p>
         <div id="afbInputs" class="grid-2" hidden>
           <label class="f"><span>Accredited, mixed-mode</span><select data-afb="accredited"><option value="yes">Yes</option><option value="no">No</option></select></label>
@@ -259,13 +264,20 @@ body.report-mode #report{display:block}
     </section>
 
     <section class="panel">
-      <div class="panel-h"><h2>Driving and kit</h2></div>
+      <div class="panel-h"><h2>Driving and mobile classroom</h2></div>
       <div class="panel-b" style="display:flex;flex-direction:column;gap:.7rem">
         <div class="grid-2">
           <label class="f"><span>Max driving hours per day</span><input type="number" id="maxDrive" min="4" max="12" step="0.5" value="8"></label>
-          <label class="f"><span>Mobile classroom weight (kg)</span><input type="number" id="kitKg" min="0" max="60" step="1" value="28"></label>
+          <label class="f req"><span>Mobile classroom required</span><select id="kitNeed"><option value="yes">Yes</option><option value="no">No</option><option value="partial">Partially</option></select></label>
+          <label class="f" id="kitKgWrap"><span>Mobile classroom weight (kg)</span><input type="number" id="kitKg" min="0" max="60" step="1" value="28"></label>
           <label class="f"><span>Fleet car</span><select id="fleetType"><option value="2wd">2WD sedan or wagon</option><option value="4wd">4WD (trained driver)</option></select></label>
           <label class="f"><span>Starlink dish packed</span><select id="starlink"><option value="yes">Yes</option><option value="no">No</option></select></label>
+        </div>
+        <div id="kitPartial" class="grid-2" hidden>
+          <label class="f"><span>Surface Pros</span><input type="number" min="0" max="8" step="1" data-kit="surface"></label>
+          <label class="f"><span>Laptops</span><input type="number" min="0" max="10" step="1" data-kit="laptops"></label>
+          <label class="f"><span>Mice</span><input type="number" min="0" max="30" step="1" data-kit="mice"></label>
+          <label class="f" style="grid-column:1 / -1"><span>Other bits and pieces</span><input type="text" data-kit="other" placeholder="e.g. 2 power boards, HDMI adapters, Starlink"></label>
         </div>
         <p class="small">Driving days are split at the hours cap and at towns with accommodation. The public CDU fleet policy requires breaks every two hours, no regional driving between sunset and sunrise without an approved risk assessment, and 4WD training before unsealed roads (policy page read 22 Sep 2026).</p>
       </div>
@@ -320,6 +332,11 @@ body.report-mode #report{display:block}
     <section class="panel">
       <div class="panel-h"><h2>Checklists</h2><span class="small">Ticks are saved with the plan.</span></div>
       <div class="panel-b checks" id="checklists"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h2>Student training accounts</h2><button class="btn sm" id="btnCopyUsers" type="button">Copy usernames</button><button class="btn sm" id="btnCopyUsersPw" type="button">Copy with passwords</button></div>
+      <div class="panel-b" id="accounts"></div>
     </section>
 
     <section class="panel">
@@ -544,23 +561,23 @@ const CLIMATE_SRC = "Bureau of Meteorology climate averages (tables cw_014015, c
 
 /* Corridor risks by season key */
 const CORRIDOR_RISK = {
-  stuart_dp:{wet:["Stuart Highway north of Katherine has been cut by major floods (Katherine January 2023; ex-Tropical Cyclone Megan March 2024) (ABC, NT PFES)."],buildup:["Build-up storms and afternoon downpours; expect road trains and standing water late in the day."]},
+  stuart_dp:{wet:["Stuart Highway north of Katherine has been cut by major floods (Katherine January 2023; ex-Tropical Cyclone Megan March 2024) (ABC, NT PFES)."],buildup:["Build-up storms; standing water on the highway late in the day."]},
   stuart_pk:{wet:["Katherine River flooding can close the highway and the town crossing."]},
   stuart_kt:{wet:["Flood cuts recorded at Katherine, Elliott and the Barkly in the 2023, 2024 and 2026 wets; 2025-26 wet damage was still being repaired into the dry (ABC 27 Mar 2026 and 22 Apr 2026).","Cattle and wildlife on unfenced sections at dawn and dusk."],buildup:["Heat: Katherine averages 37 to 38 degrees in October and November (BoM)."],dry:["Long fuel gaps of about 200 km; Daly Waters, Dunmarra, Elliott and Renner Springs roadhouses."]},
-  stuart_ta:{hot:["Summer maxima 36 to 38 degrees between Tennant Creek and Alice Springs; carry extra water (BoM).","February 2026 rain closed Barkly and Central Australian roads and inundated stations (ABC 23 Feb 2026)."],cold:["Winter nights near or below freezing in Alice Springs (BoM June and July minimum 3.9 degrees)."]},
+  stuart_ta:{hot:["Summer maxima 36 to 38 degrees between Tennant Creek and Alice Springs (BoM).","February 2026 rain closed Barkly and Central Australian roads and inundated stations (ABC 23 Feb 2026)."],cold:["Winter nights near or below freezing in Alice Springs (BoM June and July minimum 3.9 degrees)."]},
   lasseter:{hot:["Summer heat on the Lasseter Highway; fuel gap up to 250 km (Discover Central Australia)."]},
-  arnhem:{wet:["Arnhem Highway floods across the Adelaide River and Mary River floodplains; Kakadu access changes daily, check the Parks Australia access report."],buildup:["Storm cells and slippery bitumen; magpie geese and buffalo on the road at dusk."]},
+  arnhem:{wet:["Arnhem Highway floods across the Adelaide River and Mary River floodplains; Kakadu access changes daily, check the Parks Australia access report."],buildup:["Storm cells; magpie geese and buffalo on the road at dusk."]},
   kakadu:{wet:["Kakadu Highway sections and park roads close in the wet; check the access report."]},
   centralArnhem:{wet:["Central Arnhem Road is impassable for most of the wet, roughly December to May (operators)."],dry:["675 km unsealed, corrugated, three fuel points; NLC transit permit required; standard hire agreements prohibit it (Visit East Arnhem, NLC, drivenow.com.au)."],buildup:["Early storms can close creek crossings without notice."]}
 };
 const GENERAL_RISK = {
   wet:["Cyclone season runs 1 November to 30 April; flights and roads can stop for days (BoM).","Accommodation demand is low but some regional operators reduce services in the wet."],
-  buildup:["High humidity and afternoon storms; flight delays from thunderstorm activity are common in the afternoons."],
+  buildup:["Build-up thunderstorms: afternoon flight delays are common."],
   dry:["Peak tourist season June to August: book cars and rooms early.","School holiday and show-day weeks squeeze rooms in every centre (nt.gov.au)."],
-  hot:["Central Australian summer: plan early starts, carry water, and avoid midday outdoor loading.","Summer thunderstorms can run the Todd River and cut low-level crossings."],
-  cold:["Alice Springs and Tennant Creek winter nights are cold; check the venue heating and pack layers."],
+  hot:["Central Australian summer maxima 36 to 38 degrees (BoM).","Summer thunderstorms can run the Todd River and cut low-level crossings."],
+  cold:["Alice Springs and Tennant Creek winter nights are near or below freezing (BoM)."],
   mild:["Best travel window for Central Australia: April, May and September."],
-  warm:["Spring in the Centre is pleasant but the shoulder season fills with grey nomads in April and May and September."]
+  warm:["Shoulder season in the Centre fills with grey nomads in April, May and September."]
 };
 
 /* Events that fill accommodation (dates as published, read 22 Sep 2026) */
@@ -584,7 +601,11 @@ const SCHOOL_HOL_MONTHS = [4,6,7,9,10,12];
 
 /* Checklists */
 const CHECKLISTS = {
-  "Before you book":[
+  "3 weeks before":[
+    "Book Starlink with DTS",
+    "Confirm usernames and passwords are working for the student accounts",
+    "Book the fleet car",
+    "Get participant workbooks printed with UniPrint",
     "Road Report NT checked for every corridor (roadreport.nt.gov.au or 1800 246 199)",
     "BoM warnings and the 7-day forecast checked for each region",
     "Fleet booking includes the Field Work Travel Plan and risk assessment where the route is regional or remote",
@@ -616,8 +637,6 @@ const CHECKLISTS = {
     "Satellite phone or PLB for remote corridors; mobile coverage is patchy between roadhouses",
     "Fuel card accepted at planned stops; carry a backup card and cash",
     "Travel plan lodged with the team leader; check in on arrival at each stop",
-    "Breaks every two hours; no driving after sunset in regional areas",
-    "Never swerve for animals; slow down for road trains and cattle"
   ],
   "Away from Base (accredited reverse-block only)":[
     "Course confirmed as ABSTUDY-approved mixed-mode with at least 100 nominal hours and no more than half face-to-face",
@@ -663,32 +682,22 @@ const SOURCES = [
   ["Event dates: Discover Central Australia, Katherine Show, North West Star (Masters Games), Visit East Arnhem (Garma), Darwin Festival","medium","https://www.discovercentralaustralia.com/"],
   ["Northern Land Council permits (9 Sep 2026); Central Land Council permits (23 Jul 2026); Kakadu and Uluru park pass pages","high","https://www.nlc.org.au/permits"],
   ["NT Economy retail fuel market, August 2026 data (reported about 8 Sep 2026)","medium","https://nteconomy.nt.gov.au/prices-and-wages/retail-fuel-market"],
-  ["Starlink Roam pricing snapshot, starlink-prices.com (updated 5 Jul 2026)","medium","https://www.starlink-prices.com/personal/roam/aud/low"],
   ["Coastline for the map: world-atlas 2.0.2 (Natural Earth 1:10m) clipped to the NT; town positions approximate","high"]
 ];
-const UNSURE = [
-  "Current weekly frequency of Airnorth Darwin to Gove, and whether the centre run still operates on Monday, Wednesday and Friday in 2026",
-  "Qantas aircraft type on Darwin to Alice Springs, and any published fixed economy versus flexi fare",
-  "Excess baggage prices for a 23 to 32 kg case on Airnorth and QantasLink",
-  "Whether the Greyhound timetable effective 29 Oct 2023 is still current",
-  "Current nightly corporate rates in Katherine, Jabiru and Alice Springs (booking pages blocked)",
-  "Any NT Government accommodation panel or government rate",
-  "Exact 2026-27 closure dates for the Central Arnhem Road and Cahills Crossing",
-  "CDU internal fleet vehicle charge per kilometre, if any",
-  "Away from Base per capita amount (the EPUC) for a given course; the guidelines say it is indexed annually and non-negotiable but give no figure",
-  "Mobile coverage in each town from carrier maps (third-party checkers were inconsistent)",
-  "Overnight options along the Central Arnhem Road (Mainoru and Bulman not verified)"
-];
+const UNSURE = [];
+
+/* CDU student training accounts (usernames supplied by SD, 23 September 2026). Passwords are never stored in this file; the planner keeps any you type in this browser only. */
+const ACCOUNTS=[["Stella Office","T032782@students.cdu.edu.au"],["Reuben Office","T032784@students.cdu.edu.au"],["Daisy Office","T032785@students.cdu.edu.au"],["Leo Office","T032786@students.cdu.edu.au"],["Pearl Office","T032787@students.cdu.edu.au"],["Otto Office","T032788@students.cdu.edu.au"],["Ruby Office","T032789@students.cdu.edu.au"],["Felix Office","T032790@students.cdu.edu.au"],["Wren Office","T032791@students.cdu.edu.au"],["Dash Office","T032792@students.cdu.edu.au"],["Iris Office","T032793@students.cdu.edu.au"],["Eden Office","T032805@students.cdu.edu.au"],["Hugo Office","T032794@students.cdu.edu.au"],["Knox Office","T032795@students.cdu.edu.au"],["Mabel Office","T032796@students.cdu.edu.au"],["Theo Office","T032797@students.cdu.edu.au"],["June Office","T032798@students.cdu.edu.au"],["Arlo Office","T032799@students.cdu.edu.au"],["Sadie Office","T032800@students.cdu.edu.au"],["Beau Office","T032801@students.cdu.edu.au"],["Frankie Office","T032991@students.cdu.edu.au"],["Hazel Office","T032992@students.cdu.edu.au"],["Jasper Office","T032993@students.cdu.edu.au"],["Indi Office","T032994@students.cdu.edu.au"],["Wade Office","T032995@students.cdu.edu.au"],["Sally Office","T032996@students.cdu.edu.au"]];
 </script>
 
 <script>
 /* ---------- STATE ---------- */
 const now = new Date();
 const DEFAULT_STATE = () => ({
-  name:"", courseName:"", origin:"darwin", month: ((now.getMonth()+2) % 12) || 12, year: (now.getMonth()+2 > 12 ? now.getFullYear()+1 : now.getFullYear()),
+  name:"", courseName:"", trainerName:"", arrangement:"", clientView:false, pw:{}, origin:"darwin", month: ((now.getMonth()+2) % 12) || 12, year: (now.getMonth()+2 > 12 ? now.getFullYear()+1 : now.getFullYear()),
   trainers:1, returnHome:true,
   stops:[{place:"alice", half:1, full:0, participants:15, venue:"cdu", nights:"", local:"auto"}],
-  maxDrive:8, kitKg:28, fleetType:"2wd", starlink:"yes",
+  maxDrive:8, kitKg:28, kitNeed:"yes", kitPartial:{surface:4, laptops:0, mice:4, other:""}, fleetType:"2wd", starlink:"yes",
   delivery:"agc", afb:{accredited:"no", abstudy:"unsure", hours:100, f2f:50, students:8, majority:"yes"},
   picks:{}, qty:{}, internal:{}, checks:{}
 });
@@ -775,7 +784,7 @@ function flightsFor(a,b){
   return FLIGHTS.filter(f=> (f.a===a&&f.b===b) || (!f.oneway && f.a===b&&f.b===a) || (f.oneway && f.a===b && f.b===a));
 }
 function legOptions(a,b){
-  const opts=[]; const keys=seasonKeys(a,b); const kg=+state.kitKg||0;
+  const opts=[]; const keys=seasonKeys(a,b); const kg=state.kitNeed==="no"?0:(+state.kitKg||0);
   /* Fly */
   const fl = flightsFor(a,b);
   if(PLACES[a].airport && PLACES[b].airport && fl.length){
@@ -786,7 +795,6 @@ function legOptions(a,b){
     });
     if(kg>32) issues.push({t:"Over 32 kg per piece: split the kit into two cases or send it as freight.",lvl:"crit"});
     if(a==="katherine"||b==="katherine") issues.push({t:"Katherine flights use Tindal, a RAAF joint-user airport about 15 km from town; arrange a hire car or taxi.",lvl:"info"});
-    if(keys.includes("wet")||keys.includes("buildup")) issues.push({t:"Afternoon storms in the wet and build-up delay flights; prefer morning departures.",lvl:"warn"});
     if(a==="nhulunbuy"||b==="nhulunbuy") issues.push({t:"Garma week (late July to early August) sells out Gove flights well ahead.",lvl:"warn"});
     verify.push("Days of operation and times on the carrier site for the actual dates");
     verify.push("Flexi fare price against the A$1,270.48 contract cap");
@@ -824,7 +832,6 @@ function legOptions(a,b){
   const bs = BUSES.filter(x=>(x.a===a&&x.b===b)||(x.a===b&&x.b===a));
   if(bs.length){
     const issues=[]; const verify=["Timetable currency (the PDF found is dated 29 Oct 2023)","Luggage allowance for the mobile classroom with the coach operator"];
-    if(/overnight/i.test(bs[0].dur)) issues.push({t:"Overnight coach; arrive tired, allow a rest before delivery.",lvl:"warn"});
     issues.push({t:"Coach luggage limits usually sit around 20 kg per bag; confirm the mobile classroom case is accepted.",lvl:"warn"});
     opts.push({mode:"bus",title:"Coach",sub:bs[0].operator,issues,verify,travelDays:/overnight/i.test(bs[0].dur)?2:1,km:0,nights:0,
       kv:bs.map(x=>[x.operator,`${x.days}. ${x.dur}. ${x.fare} ${conf(x.conf)} <a href="${x.u}" target="_blank" rel="noopener">source</a>`])});
@@ -953,7 +960,7 @@ function renderAfb(q,tot,L){
   host.innerHTML=`
     <h3 style="margin-bottom:.4rem">Away from Base reverse-block funding ${status}</h3>
     <p class="small" style="margin-bottom:.6rem">${esc(AFB.what)} (${esc(AFB.source)}). <a href="${AFB.web}" target="_blank" rel="noopener">Program page</a>. Contact: ${esc(AFB.email)}.</p>
-    ${state.delivery!=="accredited"?`<p class="note">This plan is set to AGC22-0112 non-accredited delivery, so nothing here offsets the DCDD quote. Switch the delivery type in the Trip panel to run the check for an accredited mixed-mode course taken to a remote community.</p>`:`
+    ${state.delivery!=="accredited"?`<p class="note">This plan is a non-accredited quote, so nothing here offsets it. Switch the quote type in the Trip panel to run the check for an accredited mixed-mode course taken to a remote community.</p>`:`
     <div class="cols">
       <div>
         <h4 style="margin-bottom:.4rem">Eligibility check</h4>
@@ -984,17 +991,18 @@ function renderAfb(q,tot,L){
 /* ---------- RENDER: BUILDER ---------- */
 function fillSelect(sel, items, val){ sel.innerHTML=items.map(([v,t])=>`<option value="${v}"${String(v)===String(val)?" selected":""}>${esc(t)}</option>`).join(""); }
 function renderBuilder(){
-  fillSelect($("origin"), Object.keys(PLACES).map(k=>[k,PLACES[k].name]), state.origin);
   fillSelect($("month"), MONTHS.map((m,i)=>[i+1,m]), state.month);
   $("year").value=state.year; $("trainers").value=state.trainers; $("returnHome").checked=!!state.returnHome;
-  $("maxDrive").value=state.maxDrive; $("kitKg").value=state.kitKg; $("fleetType").value=state.fleetType; $("starlink").value=state.starlink; $("planName").value=state.name||""; $("courseName").value=state.courseName||"";
+  $("maxDrive").value=state.maxDrive; $("kitKg").value=state.kitKg; $("fleetType").value=state.fleetType; $("starlink").value=state.starlink; $("planName").value=state.name||""; $("courseName").value=state.courseName||""; $("trainerName").value=state.trainerName||""; $("arrangement").value=state.arrangement||"";
+  $("kitNeed").value=state.kitNeed||"yes"; $("kitPartial").hidden=(state.kitNeed!=="partial"); $("kitKgWrap").hidden=(state.kitNeed==="no");
+  document.querySelectorAll("[data-kit]").forEach(el=>{ el.value=state.kitPartial[el.dataset.kit]; });
   $("delivery").value=state.delivery||"agc"; $("afbInputs").hidden=(state.delivery!=="accredited"); $("afbNote").hidden=(state.delivery!=="accredited");
   document.querySelectorAll("[data-afb]").forEach(el=>{ el.value=state.afb[el.dataset.afb]; });
   const host=$("stops"); host.innerHTML="";
   state.stops.forEach((s,i)=>{
     const d=document.createElement("div"); d.className="stop";
     d.innerHTML=`<div class="stop-h">
-      <select data-i="${i}" data-k="place" aria-label="Stop ${i+1} place">${Object.keys(PLACES).map(k=>`<option value="${k}"${k===s.place?" selected":""}>${esc(PLACES[k].name)}</option>`).join("")}</select>
+      <select data-i="${i}" data-k="place" aria-label="Stop ${i+1} place">${Object.keys(PLACES).filter(k=>k!=="darwin").map(k=>`<option value="${k}"${k===s.place?" selected":""}>${esc(PLACES[k].name)}</option>`).join("")}</select>
       <button class="btn sm ghost" type="button" data-act="up" data-i="${i}" title="Move up" aria-label="Move up"${i===0?" disabled":""}>&#9650;</button>
       <button class="btn sm ghost" type="button" data-act="down" data-i="${i}" title="Move down" aria-label="Move down"${i===state.stops.length-1?" disabled":""}>&#9660;</button>
       <button class="btn sm ghost" type="button" data-act="del" data-i="${i}" title="Remove" aria-label="Remove stop">&#10005;</button>
@@ -1037,7 +1045,7 @@ function renderAll(){
         </div>`).join("")}
       </div>
     </div>`).join("") : `<p class="note">Add a stop to see the legs.</p>`;
-  renderSeason(L); renderKit(L); renderCosting(q,tot,L); renderPlaces(L); renderChecklists(); renderSources();
+  renderSeason(L); renderKit(L); renderCosting(q,tot,L); renderPlaces(L); renderChecklists(); renderAccounts(); renderSources();
 }
 function renderSeason(L){
   const m=state.month; const places=[...new Set(sequence())];
@@ -1053,19 +1061,24 @@ function renderSeason(L){
     <p class="small" style="margin-bottom:.8rem">${esc(CLIMATE_SRC)}</p>
     <div class="cols">
       <div><h4 style="margin-bottom:.4rem">Conditions in ${MONTHS[m-1]}</h4><ul class="issues">${gen.map(t=>`<li class="${/cyclone|impassable/i.test(t)?"crit":"warn"}">${esc(t)}</li>`).join("")}${schoolHol?`<li class="warn">NT school holidays fall in ${MONTHS[m-1]}; rooms and hire cars go early.</li>`:""}</ul></div>
-      <div><h4 style="margin-bottom:.4rem">Events that fill rooms</h4>${ev.length?`<ul class="issues">${ev.map(e=>`<li class="${e.big?"crit":"info"}"><b>${esc(e.name)}</b>${e.place!=="all"?", "+esc(PLACES[e.place].short):""}: ${esc(e.when)} ${conf(e.conf)}</li>`).join("")}</ul>`:`<p class="small">No listed event in this month for the places on the route.</p>`}</div>
+      <div><h4 style="margin-bottom:.4rem">Events</h4>${ev.length?`<ul class="issues">${ev.map(e=>`<li class="${e.big?"crit":"info"}"><b>${esc(e.name)}</b>${e.place!=="all"?", "+esc(PLACES[e.place].short):""}: ${esc(e.when)} ${conf(e.conf)}</li>`).join("")}</ul>`:`<p class="small">No listed event in this month for the places on the route.</p>`}</div>
     </div>
     <div class="note" style="margin-top:.9rem">Live sources: <a href="https://roadreport.nt.gov.au/" target="_blank" rel="noopener">Road Report NT</a> (freecall 1800 246 199), <a href="https://securent.nt.gov.au/" target="_blank" rel="noopener">SecureNT</a>, <a href="https://www.bom.gov.au/nt/" target="_blank" rel="noopener">BoM Northern Territory</a>, <a href="https://parksaustralia.gov.au/kakadu/access/" target="_blank" rel="noopener">Kakadu access report</a>.</div>`;
 }
+function kitSummary(){
+  if(state.kitNeed==="no") return "Mobile classroom not required for this trip.";
+  if(state.kitNeed==="partial"){ const k=state.kitPartial; return `Mobile classroom, partial: ${k.surface||0} Surface Pro${(k.surface||0)===1?"":"s"}, ${k.laptops||0} laptop${(k.laptops||0)===1?"":"s"}, ${k.mice||0} mice${k.other?"; "+k.other:""}. Packed weight ${+state.kitKg||0} kg.`; }
+  return `Mobile classroom required: 8 Surface Pros and 10 Windows laptops in a wheeled case, packed weight ${+state.kitKg||0} kg.`;
+}
 function renderKit(L){
-  const kg=+state.kitKg||0; const flyLegs=L.filter(l=>l.chosen&&l.chosen.mode==="fly"&&!l.chosen.na);
+  const kg=state.kitNeed==="no"?0:(+state.kitKg||0); const flyLegs=L.filter(l=>l.chosen&&l.chosen.mode==="fly"&&!l.chosen.na);
   const carriers={}; flyLegs.forEach(l=>l.chosen.flights.forEach(f=>{ if(f.bag!=null) carriers[f.carrier]=f.bag; }));
   const rows=Object.entries(carriers).map(([c,b])=>`<tr><td>${esc(c)}</td><td class="n">${b} kg</td><td class="n">${kg>b?`<span class="tag warn">${kg-b} kg over</span>`:`<span class="tag good">within</span>`}</td></tr>`).join("");
   $("kit").innerHTML=`
     <div class="cols">
       <div>
-        <p style="margin-bottom:.5rem">Mobile classroom: 8 Surface Pros and 10 older Windows laptops in a wheeled case, packed weight ${kg} kg. Starlink dish ${state.starlink==="yes"?"packed":"not packed"}.</p>
-        ${rows?`<table class="t"><thead><tr><th>Carrier on this plan</th><th class="n">Allowance</th><th class="n">Case</th></tr></thead><tbody>${rows}</tbody></table>`:`<p class="small">No flights chosen; the case travels in the fleet car.</p>`}
+        <p style="margin-bottom:.5rem">${esc(kitSummary())} Starlink dish ${state.starlink==="yes"?"packed":"not packed"}.</p>
+        ${state.kitNeed==="no"?"":rows?`<table class="t"><thead><tr><th>Carrier on this plan</th><th class="n">Allowance</th><th class="n">Case</th></tr></thead><tbody>${rows}</tbody></table>`:`<p class="small">No flights chosen; the case travels in the fleet car.</p>`}
         ${kg>32?`<p class="note crit" style="margin-top:.6rem">Over the 32 kg single-piece maximum: split into two cases or send as freight.</p>`:""}
         <p class="small" style="margin-top:.6rem">${esc(BAG_NOTE)}</p>
       </div>
@@ -1073,7 +1086,7 @@ function renderKit(L){
         <h4 style="margin-bottom:.4rem">Connectivity plan</h4>
         <ul class="issues">
           <li class="info">Primary: venue wifi or NBN where a CDU campus room is used.</li>
-          <li class="info">Backup: Starlink Roam (kit A$520 to 690; about A$62.70 a month on the base Roam tier; medium, starlink-prices.com 5 Jul 2026). Needs a clear sky view and mains power.</li>
+          <li class="info">Backup: Starlink Roam, pre-booked with DTS. Needs a clear sky view and mains power.</li>
           <li class="info">Tertiary: Telstra 4G hotspot. Carrier coverage in each town was not confirmed from carrier maps this pass.</li>
           <li class="warn">Participants use CDU training accounts, so the session depends on internet; test the day before at the venue.</li>
         </ul>
@@ -1113,6 +1126,11 @@ function renderPlaces(L){
     </div>`;}).join("")}</div>`:`<p class="note">Add a stop to see venue and accommodation notes.</p>`;
 }
 function activeChecklists(){ return Object.entries(CHECKLISTS).filter(([g])=> state.delivery==="accredited" || !/Away from Base/.test(g)); }
+function renderAccounts(){
+  $("accounts").innerHTML=`<p class="small" style="margin-bottom:.5rem">CDU student training accounts for participants. Passwords typed here stay in this browser only and are never part of the page file; use the copy buttons to paste the list elsewhere.</p>
+    <div class="tscroll"><table class="t"><thead><tr><th class="n">No.</th><th>Name</th><th>Username</th><th>Password</th></tr></thead><tbody>${ACCOUNTS.map((a,i)=>`<tr><td class="n num">${i+1}</td><td>${esc(a[0])}</td><td><span class="num" style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88rem">${esc(a[1])}</span></td><td><input class="pw" type="text" data-pw="${esc(a[1])}" value="${esc(state.pw[a[1]]||"")}" aria-label="Password for ${esc(a[0])}" autocomplete="off"></td></tr>`).join("")}</tbody></table></div>`;
+}
+function copyText(t,msg){ navigator.clipboard.writeText(t).then(()=>toast(msg)).catch(()=>{ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy"); toast(msg);}catch(e){toast("Copy failed");} ta.remove(); }); }
 function renderChecklists(){
   $("checklists").innerHTML=activeChecklists().map(([g,items])=>`<div class="checkgroup"><h3 style="margin-bottom:.45rem">${esc(g)}</h3><ul>${items.map((t,i)=>{const k=g+"|"+i;const on=!!state.checks[k];return `<li class="${on?"done":""}"><label><input type="checkbox" data-chk="${esc(k)}"${on?" checked":""}> <span>${esc(t)}</span></label></li>`;}).join("")}</ul></div>`).join("");
 }
@@ -1121,7 +1139,6 @@ function renderSources(){
     <p class="small" style="margin-bottom:.6rem">Data compiled ${DATA_DATE}; source dates are shown where the source gave one. Distances and times are planning estimates; timetables, fares and rates change without notice. This tool is for planning phases, not for booking.</p>
     <div class="cols">
       <div class="sources"><h4 style="margin-bottom:.4rem">Sources used</h4><ul>${SOURCES.map(s=>`<li>${s[2]?`<a href="${s[2]}" target="_blank" rel="noopener">${esc(s[0])}</a>`:esc(s[0])}</li>`).join("")}</ul></div>
-      <div class="sources"><h4 style="margin-bottom:.4rem">Unsure or not found</h4><ul>${UNSURE.map(u=>`<li>${esc(u)}</li>`).join("")}</ul></div>
     </div>`;
 }
 
@@ -1146,8 +1163,8 @@ function buildMap(L){
   L.forEach((l,i)=>{
     const c=l.chosen; if(!c||c.na) return; const A=PLACES[l.a],B=PLACES[l.b];
     if(c.mode==="drive"){
-      s+=`<polyline points="${[c.route.segs[0].from,...c.route.segs.map(x=>x.to)].map(id=>X(NODES[id].lon).toFixed(1)+","+Y(NODES[id].lat).toFixed(1)).join(" ")}" fill="none" stroke="#1F3864" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>`;
-      c.days.slice(0,-1).forEach(d=>{const n=NODES[d.to];s+=`<rect x="${(X(n.lon)-4).toFixed(1)}" y="${(Y(n.lat)-4).toFixed(1)}" width="8" height="8" fill="#fff" stroke="#1F3864" stroke-width="2"/><text x="${(X(n.lon)+8).toFixed(1)}" y="${(Y(n.lat)+4).toFixed(1)}" font-size="9" fill="#003251">overnight: ${esc(n.n)}</text>`;});
+      s+=`<polyline points="${[c.route.segs[0].from,...c.route.segs.map(x=>x.to)].map(id=>X(NODES[id].lon).toFixed(1)+","+Y(NODES[id].lat).toFixed(1)).join(" ")}" fill="none" stroke="#13294B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>`;
+      c.days.slice(0,-1).forEach(d=>{const n=NODES[d.to];s+=`<rect x="${(X(n.lon)-4).toFixed(1)}" y="${(Y(n.lat)-4).toFixed(1)}" width="8" height="8" fill="#fff" stroke="#13294B" stroke-width="2"/><text x="${(X(n.lon)+8).toFixed(1)}" y="${(Y(n.lat)+4).toFixed(1)}" font-size="9" fill="#003251">overnight: ${esc(n.n)}</text>`;});
       notes.push({a:A,b:B,t:`Drive ${Math.round(c.km)} km, ${c.days.length} day${c.days.length>1?"s":""}`});
     } else if(c.mode==="fly"){
       const x1=X(A.lon),y1=Y(A.lat),x2=X(B.lon),y2=Y(B.lat); const mx=(x1+x2)/2+(y2-y1)*0.18, my=(y1+y2)/2-(x2-x1)*0.18;
@@ -1161,7 +1178,7 @@ function buildMap(L){
   /* stops */
   const seq=[...new Set(sequence())];
   seq.forEach(p=>{const P=PLACES[p];const x=X(P.lon),y=Y(P.lat);const isO=p===state.origin;
-    s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${isO?7:6}" fill="${isO?"#003251":"#1F3864"}" stroke="#fff" stroke-width="2"/>`;
+    s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${isO?7:6}" fill="${isO?"#0B1B36":"#13294B"}" stroke="#fff" stroke-width="2"/>`;
     const dx = P.lon>135.5? -8 : 10; const anchor = P.lon>135.5?"end":"start";
     s+=`<text x="${(x+dx).toFixed(1)}" y="${(y-8).toFixed(1)}" text-anchor="${anchor}" font-size="12" font-weight="700" fill="#0B1F3A">${esc(P.short)}</text>`;
     if(P.airport) s+=`<text x="${(x+dx).toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="${anchor}" font-size="9" fill="#5A6A6D">${P.airport}</text>`;
@@ -1171,9 +1188,9 @@ function buildMap(L){
   s+=`<text x="${nx}" y="${ny}" font-size="11" font-weight="700" fill="#111417">Legs</text>`; ny+=16;
   notes.forEach(n=>{ s+=`<text x="${nx}" y="${ny}" font-size="10" font-weight="700" fill="#003251">${esc(n.a.short)} to ${esc(n.b.short)}</text>`; ny+=12; s+=`<text x="${nx}" y="${ny}" font-size="9.5" fill="#111417">${esc(n.t)}</text>`; ny+=16; });
   ny+=8; s+=`<text x="${nx}" y="${ny}" font-size="11" font-weight="700" fill="#111417">Key</text>`; ny+=14;
-  const key=[["#1F3864","4","none","Drive, fleet car"],["#009DC1","2.4","7 4","Fly"],["#552855","3","2 4","Coach"],["#9AAEB0","1.6","none","Sealed highway"],["#B98C4A","1.6","5 3","Unsealed road"]];
+  const key=[["#13294B","4","none","Drive, fleet car"],["#009DC1","2.4","7 4","Fly"],["#552855","3","2 4","Coach"],["#9AAEB0","1.6","none","Sealed highway"],["#B98C4A","1.6","5 3","Unsealed road"]];
   key.forEach(k=>{ s+=`<line x1="${nx}" y1="${ny-4}" x2="${nx+26}" y2="${ny-4}" stroke="${k[0]}" stroke-width="${k[1]}" stroke-dasharray="${k[2]}"/><text x="${nx+32}" y="${ny}" font-size="9.5" fill="#111417">${k[3]}</text>`; ny+=14; });
-  s+=`<rect x="${nx}" y="${ny-8}" width="8" height="8" fill="#fff" stroke="#1F3864" stroke-width="2"/><text x="${nx+32}" y="${ny}" font-size="9.5" fill="#111417">Overnight en route</text>`; ny+=14;
+  s+=`<rect x="${nx}" y="${ny-8}" width="8" height="8" fill="#fff" stroke="#13294B" stroke-width="2"/><text x="${nx+32}" y="${ny}" font-size="9.5" fill="#111417">Overnight en route</text>`; ny+=14;
   s+=`<text x="${nx}" y="${H-4}" font-size="8.5" fill="#7A8C8E">Positions approximate; not for navigation.</text>`;
   s+=`</svg>`;
   return s;
@@ -1188,18 +1205,21 @@ function buildReport(){
   const keys=[...new Set(seq.map(p=>SEASON[PLACES[p].region][state.month]))]; const gen=[...new Set(keys.flatMap(k=>GENERAL_RISK[k]||[]))];
   const ev=EVENTS.filter(e=>(e.m===state.month||e.m===0)&&(e.place==="all"||seq.includes(e.place)));
   const h=`
-  <div class="rep">
+  <div class="rep${state.clientView?" client-view":""}">
     <div class="rep-tools">
       <button class="btn" type="button" id="repBack">Back to planner</button>
       <button class="btn" type="button" id="repCopy">Copy report text</button>
       <button class="btn" type="button" id="repSave">Save report as HTML</button>
+      <button class="btn" type="button" id="repToggle">${state.clientView?"Show internal costs":"Hide internal costs"}</button>
       ${isTop?`<button class="btn primary" type="button" id="repPrint">Print or save as PDF</button>`:""}
       <span class="hint">${isTop?"Printing uses your browser's print dialog; the layout is set for A4.":"Printing is not available inside this viewer. Save the report as HTML, open the file in your browser and print from there, or use the downloadable file version of the planner."}</span>
     </div>
     <h1>NT regional travel planning report</h1>
     <p class="small">${esc(state.name||"Untitled plan")}. Prepared ${new Date().toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric"})} with data compiled ${DATA_DATE}. Planning-phase estimate only; verify before booking.</p>
+    ${state.arrangement?`<p style="margin-top:.8rem">${esc(state.arrangement)}</p>`:""}
     <div class="cover">
       <div><b>Course</b>${esc(state.courseName||"Not entered")}</div>
+      ${state.trainerName?`<div><b>Trainer</b>${esc(state.trainerName)}</div>`:""}
       <div><b>Route</b>${seq.map(p=>esc(PLACES[p].short)).join(" &rarr; ")}</div>
       <div><b>When</b>${m} ${state.year}</div>
       <div><b>Trainers</b>${state.trainers}</div>
@@ -1208,7 +1228,7 @@ function buildReport(){
       <div><b>Fleet km</b>${Math.round(q.driveKm).toLocaleString("en-AU")}</div>
       <div><b>Flight sectors</b>${q.flyLegs}</div>
       <div><b>Quote (GST incl)</b>${money(tot.inc)}</div>
-      <div><b>Internal estimate</b>${money(itot)}</div>
+      <div class="internal"><b>Internal estimate</b>${money(itot)}</div>
     </div>
 
     <h2>Route map</h2>
@@ -1223,28 +1243,30 @@ function buildReport(){
 
     <h2 class="pb">Season, roads and events for ${m}</h2>
     <ul class="issues">${gen.map(t=>`<li class="${/cyclone|impassable/i.test(t)?"crit":"warn"}">${esc(t)}</li>`).join("")}${SCHOOL_HOL_MONTHS.includes(state.month)?`<li class="warn">NT school holidays fall in ${m}.</li>`:""}</ul>
-    ${ev.length?`<h3>Events that fill rooms</h3><ul class="issues">${ev.map(e=>`<li class="${e.big?"crit":"info"}"><b>${esc(e.name)}</b>${e.place!=="all"?", "+esc(PLACES[e.place].short):""}: ${esc(e.when)}</li>`).join("")}</ul>`:""}
+    ${ev.length?`<h3>Events</h3><ul class="issues">${ev.map(e=>`<li class="${e.big?"crit":"info"}"><b>${esc(e.name)}</b>${e.place!=="all"?", "+esc(PLACES[e.place].short):""}: ${esc(e.when)}</li>`).join("")}</ul>`:""}
     <h3>Kit and baggage</h3>
-    <p>Mobile classroom ${state.kitKg} kg. ${esc(BAG_NOTE)}</p>
+    <p>${esc(kitSummary())}${state.kitNeed==="no"?"":" "+esc(BAG_NOTE)}</p>
 
-    <h2>Contract quote (AGC22-0112 Table 5)</h2>
+    <h2>${state.delivery==="agc"?"Contract quote (AGC22-0112 Table 5 rates)":state.delivery==="ffs"?"Fee-for-service quote (AGC22-0112 Table 5 rates as the basis)":"Quote (AGC22-0112 Table 5 rates as the basis)"}</h2>
     <div class="tscroll"><table class="t"><thead><tr><th>Service</th><th>Basis</th><th class="n">Qty</th><th class="n">Rate</th><th class="n">GST excl</th><th class="n">GST</th><th class="n">GST incl</th></tr></thead><tbody>
       ${tot.rows.map(r=>r.sep?`<tr><td colspan="4"><b>Travel subtotal</b></td><td class="n num">${money(tot.exTravel)}</td><td class="n num">${money(tot.gstTravel)}</td><td class="n num">${money(tot.incTravel)}</td></tr><tr><td colspan="7"><b>${esc(r.sep)}</b></td></tr>`:(r.qty?`<tr><td>${esc(r.rate.label)}</td><td class="small">${esc(r.desc)}</td><td class="n num">${r.qty}</td><td class="n num">${money(r.rate.rate)}</td><td class="n num">${money(r.ex)}</td><td class="n num">${r.rate.gst?money(r.gst):"exempt"}</td><td class="n num">${money(r.inc)}</td></tr>`:"")).join("")}
       <tr><td colspan="4"><b>Delivery subtotal</b></td><td class="n num">${money(tot.exDel)}</td><td class="n num">${money(tot.gstDel)}</td><td class="n num">${money(tot.incDel)}</td></tr>
       <tr class="total"><td colspan="4">Total</td><td class="n num">${money(tot.ex)}</td><td class="n num">${money(tot.gst)}</td><td class="n num">${money(tot.inc)}</td></tr>
     </tbody></table></div>
+    <div class="internal">
     <h3>Internal cost estimate</h3>
     <div class="tscroll"><table class="t"><thead><tr><th>Cost</th><th class="n">Qty</th><th class="n">Unit</th><th class="n">Total</th></tr></thead><tbody>
       ${il.filter(x=>x.qty*x.unit>0).map(x=>`<tr><td>${esc(x.label)}</td><td class="n num">${x.qty}</td><td class="n num">${money(x.unit)}</td><td class="n num">${money(x.qty*x.unit)}</td></tr>`).join("")}
       <tr class="total"><td>Internal estimate</td><td></td><td></td><td class="n num">${money(itot)}</td></tr>
       <tr><td colspan="3">Quote GST excl less internal estimate</td><td class="n num">${money(tot.ex-itot)}</td></tr>
     </tbody></table></div>
+    </div>
 
     ${state.delivery==="accredited"?(()=>{const r=afbAssess();const cov=il.filter(x=>["flight","excess","accom","meals","hire","fuelc","fleetkm"].includes(x.k)).reduce((s,x)=>s+x.qty*x.unit,0);return `
     <h2>Away from Base reverse-block check</h2>
     <p class="small">${esc(AFB.source)}. Contact ${esc(AFB.email)}; <a href="${AFB.web}">program page</a>.</p>
     <ul class="issues" style="margin-top:.5rem">${r.fails.map(f=>`<li class="crit">${esc(f)}</li>`).join("")}${r.unsure.map(u=>`<li class="warn">${esc(u)}</li>`).join("")}${r.ok&&!r.unsure.length?`<li class="good">Inputs meet the published course and cohort gates; feasibility is still assessed by the AFB team.</li>`:""}</ul>
-    <p style="margin-top:.5rem">Travel, meals and accommodation lines in the internal estimate that the program can reimburse: <b>${money(cov)}</b>; team admin charge at ${AFB.adminPct} per cent: <b>${money(cov*AFB.adminPct/100)}</b>. Venue hire, consumables and delivery time are not claimable.</p>
+    <p class="internal" style="margin-top:.5rem">Travel, meals and accommodation lines in the internal estimate that the program can reimburse: <b>${money(cov)}</b>; team admin charge at ${AFB.adminPct} per cent: <b>${money(cov*AFB.adminPct/100)}</b>. Venue hire, consumables and delivery time are not claimable.</p>
     <p class="small" style="margin-top:.3rem">Inputs used: accredited mixed-mode ${esc(state.afb.accredited)}; ABSTUDY approved ${esc(state.afb.abstudy)}; ${esc(state.afb.hours)} nominal hours; ${esc(state.afb.f2f)} per cent face-to-face; ${esc(state.afb.students)} eligible students; majority First Nations ${esc(state.afb.majority)}.</p>
     <h3>Process</h3><ul class="issues">${AFB.process.map(p=>`<li class="info">${esc(p)}</li>`).join("")}</ul>`;})():""}
 
@@ -1259,14 +1281,12 @@ function buildReport(){
 
     <h2>Sources used</h2>
     <div class="sources"><ul>${SOURCES.map(s=>`<li>${s[2]?`<a href="${s[2]}">${esc(s[0])}</a>`:esc(s[0])}</li>`).join("")}</ul></div>
-    <h3>Unsure or not found</h3>
-    <div class="sources"><ul>${UNSURE.map(u=>`<li>${esc(u)}</li>`).join("")}</ul></div>
-    <p class="foot">NT Regional Travel Planner, CDU TAFE. Contract rates from AGC22-0112 Table 5 (March 2026). Distances, times and conditions are estimates for planning; confirm with Road Report NT, carriers and venues before booking.</p>
+    <p class="foot">NT Regional Travel Planner, CDU TAFE. Distances, times and conditions are estimates for planning; confirm with Road Report NT, carriers and venues before booking.</p>
   </div>`;
   return h;
 }
 function reportText(){
-  const el=document.createElement("div"); el.innerHTML=buildReport(); el.querySelector(".rep-tools")?.remove(); el.querySelector("figure")?.remove();
+  const el=document.createElement("div"); el.innerHTML=buildReport(); el.querySelector(".rep-tools")?.remove(); el.querySelector("figure")?.remove(); if(state.clientView) el.querySelectorAll(".internal").forEach(x=>x.remove());
   el.querySelectorAll("h1,h2,h3").forEach(x=>x.insertAdjacentText("beforebegin","\n"));
   el.querySelectorAll("li,tr,p,dt,dd,div.stat").forEach(x=>x.insertAdjacentText("afterend","\n"));
   el.querySelectorAll("td,th").forEach(x=>x.insertAdjacentText("afterend","\t"));
@@ -1274,7 +1294,9 @@ function reportText(){
 }
 function reportHtmlFile(){
   const css=document.querySelector("style").textContent;
-  return `<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NT travel planning report</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap"><style>${css}\nbody.report-mode{background:#fff}</style></head><body class="report-mode"><div id="report">${buildReport().replace(/<div class="rep-tools">[\s\S]*?<\/div>/,'<div class="rep-tools"><button class="btn primary" type="button" onclick="window.print()">Print or save as PDF</button></div>')}</div></body></html>`;
+  const el=document.createElement("div"); el.innerHTML=buildReport(); if(state.clientView) el.querySelectorAll(".internal").forEach(x=>x.remove());
+  const body=el.innerHTML;
+  return `<!doctype html><html lang="en-AU"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NT travel planning report</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap"><style>${css}\nbody.report-mode{background:#fff}</style></head><body class="report-mode"><div id="report">${body.replace(/<div class="rep-tools">[\s\S]*?<\/div>/,'<div class="rep-tools"><button class="btn primary" type="button" onclick="window.print()">Print or save as PDF</button></div>')}</div></body></html>`;
 }
 function showReport(){
   $("report").innerHTML=buildReport(); document.body.classList.add("report-mode"); window.scrollTo(0,0);
@@ -1285,6 +1307,7 @@ function showReport(){
     if(isTop){ try{ const b=new Blob([html],{type:"text/html"}); const u=URL.createObjectURL(b); const a=document.createElement("a"); a.href=u; a.download=fn; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),2000); toast("Report file offered by the browser"); }catch(e){ toast("Save failed"); } return; }
     toast("Saving is not available in this viewer; use Copy report text");
   };
+  $("repToggle").onclick=()=>{ state.clientView=!state.clientView; saveDraft(); showReport(); toast(state.clientView?"Internal costs hidden; shared copies leave them out":"Internal costs shown"); };
   const pb=$("repPrint"); if(pb) pb.onclick=()=>{ try{ window.print(); }catch(e){} };
 }
 
@@ -1325,12 +1348,19 @@ function resetAll(){
 
 /* ---------- EVENTS ---------- */
 function bind(){
-  ["origin","month","year","trainers","maxDrive","kitKg","fleetType","starlink"].forEach(id=>{ $(id).addEventListener("change",()=>{ const v=$(id).value; state[id]=(["month","year","trainers"].includes(id))?+v:(["maxDrive","kitKg"].includes(id)?+v:v); renderAll(); renderBuilder(); saveDraft(); }); });
+  ["month","year","trainers","maxDrive","kitKg","fleetType","starlink"].forEach(id=>{ $(id).addEventListener("change",()=>{ const v=$(id).value; state[id]=(["month","year","trainers"].includes(id))?+v:(["maxDrive","kitKg"].includes(id)?+v:v); renderAll(); renderBuilder(); saveDraft(); }); });
   $("returnHome").addEventListener("change",()=>{ state.returnHome=$("returnHome").checked; renderAll(); saveDraft(); });
   $("delivery").addEventListener("change",()=>{ state.delivery=$("delivery").value; $("afbInputs").hidden=(state.delivery!=="accredited"); $("afbNote").hidden=(state.delivery!=="accredited"); renderAll(); renderChecklists(); saveDraft(); });
   $("afbInputs").addEventListener("change",e=>{ const el=e.target; if(!el.dataset.afb) return; state.afb[el.dataset.afb]=(el.type==="number")?+el.value:el.value; renderAll(); saveDraft(); });
   $("planName").addEventListener("input",()=>{ state.name=$("planName").value; saveDraft(); });
   $("courseName").addEventListener("input",()=>{ state.courseName=$("courseName").value; saveDraft(); });
+  $("trainerName").addEventListener("input",()=>{ state.trainerName=$("trainerName").value; saveDraft(); });
+  $("arrangement").addEventListener("input",()=>{ state.arrangement=$("arrangement").value; saveDraft(); });
+  $("kitNeed").addEventListener("change",()=>{ state.kitNeed=$("kitNeed").value; $("kitPartial").hidden=(state.kitNeed!=="partial"); $("kitKgWrap").hidden=(state.kitNeed==="no"); renderAll(); saveDraft(); });
+  $("kitPartial").addEventListener("change",e=>{ const el=e.target; if(!el.dataset.kit) return; state.kitPartial[el.dataset.kit]=(el.type==="number")?+el.value:el.value; renderAll(); saveDraft(); });
+  $("accounts").addEventListener("input",e=>{ const el=e.target; if(!el.dataset.pw) return; state.pw[el.dataset.pw]=el.value; saveDraft(); });
+  $("btnCopyUsers").addEventListener("click",()=>copyText(ACCOUNTS.map((a,i)=>`${i+1}\t${a[0]}\t${a[1]}`).join("\n"),"Usernames copied"));
+  $("btnCopyUsersPw").addEventListener("click",()=>copyText(ACCOUNTS.map((a,i)=>`${i+1}\t${a[0]}\t${a[1]}\t${state.pw[a[1]]||""}`).join("\n"),"Usernames and passwords copied"));
   $("btnReset").addEventListener("click",resetAll);
   $("btnAddStop").addEventListener("click",()=>{ const last=state.stops[state.stops.length-1]; state.stops.push({place:last&&last.place!=="katherine"?"katherine":"alice",half:1,full:0,participants:15,venue:"cdu",nights:"",local:"auto"}); renderBuilder(); renderAll(); saveDraft(); });
   $("stops").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.k) return; const s=state.stops[+t.dataset.i]; s[t.dataset.k]=(t.type==="number")?(t.value===""?"":+t.value):t.value; renderAll(); if(t.dataset.k==="place") renderBuilder(); saveDraft(); });

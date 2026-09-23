@@ -438,7 +438,14 @@ Lato and Barlow Semi Condensed from Google Fonts, navy on white, single
 theme, no dark mode; SD's revision of 23 September 2026 also dropped the
 confidence labels from this tool, bolds required fields, charges room hire
 for CDU campus rooms and added a free-text course name and a Reset all
-button); a
+button; the second revision the same day moved to a midnight navy, added
+trainer name and training arrangement fields for the report header, a
+mobile classroom yes/no/partially selector, a third quote type for
+non-accredited fee for service, a "Hide internal costs" toggle on the report
+that also strips the internal estimate from copied text and saved HTML, a
+student training accounts table with the 26 CDU T-number usernames (no
+passwords in the file; any typed stay in the browser's localStorage), and
+trimmed the checklists and advice text at SD's direction); a
 FIFTH deliberate exception to the no-page-CSS-or-JS rule, like the other client
 pages. Client area: `noindex,nofollow`, listed in `SKIP_URLS` in
 `tools/build-index.js` (a planning tool, not a learning resource, so it is
