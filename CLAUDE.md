@@ -434,7 +434,11 @@ the same treatment.
 `/client-access/nt-travel-planner/index.html`, SD's internal planning tool for
 taking the AGC22-0112 training to Alice Springs, Katherine, Tennant Creek,
 Nhulunbuy, Jabiru and Yulara. Single self-contained file (inline CSS and JS,
-Lato and Barlow Semi Condensed from Google Fonts, teal and black scheme); a
+Lato and Barlow Semi Condensed from Google Fonts, navy on white, single
+theme, no dark mode; SD's revision of 23 September 2026 also dropped the
+confidence labels from this tool, bolds required fields, charges room hire
+for CDU campus rooms and added a free-text course name and a Reset all
+button); a
 FIFTH deliberate exception to the no-page-CSS-or-JS rule, like the other client
 pages. Client area: `noindex,nofollow`, listed in `SKIP_URLS` in
 `tools/build-index.js` (a planning tool, not a learning resource, so it is
