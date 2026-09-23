@@ -143,7 +143,7 @@ table.t input.pw{width:9rem;border:1px solid var(--line);border-radius:3px;paddi
 .checkgroup ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.35rem}
 .checkgroup li label{display:flex;gap:.5rem;align-items:flex-start;font-size:.88rem;cursor:pointer}
 .checkgroup li input{margin-top:.2rem;accent-color:var(--navy)}
-.checkgroup li.done label{color:var(--muted);text-decoration:line-through}
+.checkgroup li.done label{color:var(--ink);font-weight:700}
 .season-strip{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
 .season-strip div{font-family:var(--font-display);font-size:.72rem;text-align:center;padding:.3rem 0;border-radius:3px;background:var(--surface-2);color:var(--muted);font-weight:600}
 .season-strip div.wet{background:var(--wet-soft);color:var(--wet)}
@@ -192,6 +192,12 @@ body.report-mode #report{display:block}
 .rep .cl ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.25rem;font-size:.86rem}
 .rep .cl li::before{content:"\2610";margin-right:.45rem;color:var(--muted)}
 .rep .cl li.done::before{content:"\2611";color:var(--good)}
+.rich p{margin:0 0 .6rem}
+.rich ul{margin:0 0 .6rem;padding-left:1.2rem}
+.rich li{margin-bottom:.15rem}
+.rep .rich{font-size:.95rem}
+.rep .avail-note{margin-top:.6rem}
+label.f .hint{font-family:var(--font-body);text-transform:none;letter-spacing:0;font-size:.75rem;font-weight:400;color:var(--muted)}
 .rep.client-view .internal{display:none !important}
 .rep .foot{margin-top:1.5rem;padding-top:.6rem;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted)}
 .rep .map-note{font-size:.8rem;color:var(--muted);margin-top:.3rem}
@@ -238,7 +244,8 @@ body.report-mode #report{display:block}
         <div class="grid-2">
           <label class="f req" style="grid-column:1 / -1"><span>Course name</span><input type="text" id="courseName" placeholder="e.g. Excel with Copilot, AI in Government"></label>
           <label class="f" style="grid-column:1 / -1"><span>Trainer name</span><input type="text" id="trainerName" placeholder="Shown in the report header"></label>
-          <label class="f" style="grid-column:1 / -1"><span>Training arrangement description</span><textarea id="arrangement" rows="3" placeholder="Optional; appears in the report and map header"></textarea></label>
+          <label class="f" style="grid-column:1 / -1"><span>Training arrangement description</span><textarea id="arrangement" rows="6" placeholder="Optional; appears in the report as the training arrangement"></textarea><span class="hint">Formatting: a blank line starts a new paragraph; start a line with - for a bullet point; *italic* and **bold**.</span></label>
+          <label class="f" style="grid-column:1 / -1"><span>Trainer availability and proposed dates</span><textarea id="availability" rows="5" placeholder="e.g.&#10;- Friday 6 November 2026 and Monday 9 November 2026&#10;- Friday 13 November 2026 and Monday 16 November 2026"></textarea><span class="hint">Same formatting as above. The standard availability note is added under these dates in the report.</span></label>
           <label class="f req"><span>Travel month</span><select id="month"></select></label>
           <label class="f req"><span>Year</span><select id="year"><option>2026</option><option>2027</option></select></label>
           <label class="f req"><span>Trainers</span><select id="trainers"><option value="1">1</option><option value="2">2</option></select></label>
@@ -279,7 +286,6 @@ body.report-mode #report{display:block}
           <label class="f"><span>Mice</span><input type="number" min="0" max="30" step="1" data-kit="mice"></label>
           <label class="f" style="grid-column:1 / -1"><span>Other bits and pieces</span><input type="text" data-kit="other" placeholder="e.g. 2 power boards, HDMI adapters, Starlink"></label>
         </div>
-        <p class="small">Driving days are split at the hours cap and at towns with accommodation. The public CDU fleet policy requires breaks every two hours, no regional driving between sunset and sunrise without an approved risk assessment, and 4WD training before unsealed roads (policy page read 22 Sep 2026).</p>
       </div>
     </section>
 
@@ -330,7 +336,7 @@ body.report-mode #report{display:block}
     </section>
 
     <section class="panel">
-      <div class="panel-h"><h2>Checklists</h2><span class="small">Ticks are saved with the plan.</span></div>
+      <div class="panel-h"><h2>Checklists</h2><span class="small">Tick the items that apply to this trip; ticked items show in bold and go to the report as a checklist.</span></div>
       <div class="panel-b checks" id="checklists"></div>
     </section>
 
@@ -346,7 +352,7 @@ body.report-mode #report{display:block}
   </main>
 </div>
 
-<footer class="site-foot"><div class="site-foot-inner"><span>NT Regional Travel Planner, CDU TAFE ICT, Cyber Security and Digital. Planning-phase tool; verify with carriers, Road Report NT and venues before booking.</span><span>Last updated 23 September 2026. <a href="/client-access/">Back to course access</a></span></div></footer>
+<footer class="site-foot"><div class="site-foot-inner"><span>NT Regional Travel Planner, CDU TAFE ICT, Cyber Security and Digital. Planning-phase tool; verify with carriers, Road Report NT and venues before booking.</span><span>Last updated 24 September 2026. <a href="/client-access/">Back to course access</a></span></div></footer>
 <div id="report"></div>
 <div id="modalHost"></div>
 
@@ -694,9 +700,9 @@ const ACCOUNTS=[["Stella Office","T032782@students.cdu.edu.au"],["Reuben Office"
 /* ---------- STATE ---------- */
 const now = new Date();
 const DEFAULT_STATE = () => ({
-  name:"", courseName:"", trainerName:"", arrangement:"", clientView:false, pw:{}, origin:"darwin", month: ((now.getMonth()+2) % 12) || 12, year: (now.getMonth()+2 > 12 ? now.getFullYear()+1 : now.getFullYear()),
+  name:"", courseName:"", trainerName:"", arrangement:"", availability:"", clientView:false, pw:{}, origin:"darwin", month: ((now.getMonth()+2) % 12) || 12, year: (now.getMonth()+2 > 12 ? now.getFullYear()+1 : now.getFullYear()),
   trainers:1, returnHome:true,
-  stops:[{place:"alice", half:1, full:0, participants:15, venue:"cdu", nights:"", local:"auto"}],
+  stops:[],
   maxDrive:8, kitKg:28, kitNeed:"yes", kitPartial:{surface:4, laptops:0, mice:4, other:""}, fleetType:"2wd", starlink:"yes",
   delivery:"agc", afb:{accredited:"no", abstudy:"unsure", hours:100, f2f:50, students:8, majority:"yes"},
   picks:{}, qty:{}, internal:{}, checks:{}
@@ -709,6 +715,17 @@ const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<"
 const money = n => (isFinite(n)? n : 0).toLocaleString("en-AU",{style:"currency",currency:"AUD"});
 const fmtH = h => { const m = Math.round(h*60); return Math.floor(m/60) + " h " + String(m%60).padStart(2,"0") + " min"; };
 const conf = () => "";
+/* Light text formatting for the report: blank line = paragraph, "- " = bullet, *italic*, **bold** */
+function inlineFmt(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\*(.+?)\*/g,"<em>$1</em>"); }
+function richText(src){
+  const lines=String(src||"").replace(/\r/g,"").split("\n"); let out="", para=[], list=[];
+  const flushP=()=>{ if(para.length){ out+=`<p>${para.map(inlineFmt).join("<br>")}</p>`; para=[]; } };
+  const flushL=()=>{ if(list.length){ out+=`<ul>${list.map(x=>`<li>${inlineFmt(x)}</li>`).join("")}</ul>`; list=[]; } };
+  lines.forEach(l=>{ const t=l.trim(); const m=t.match(/^[-\u2022]\s+(.*)$/);
+    if(!t){ flushP(); flushL(); } else if(m){ flushP(); list.push(m[1]); } else { flushL(); para.push(t); } });
+  flushP(); flushL(); return out;
+}
+const AVAIL_NOTE = "Please note that trainer and room availability are indicative only and need to be confirmed when the purchase order is accepted. The trainer dates can only be held for 7 days and no venue can be booked until a purchase order is accepted. Venues are indicative only of what is available and vacant at the time of quoting.";
 let toastT; function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2600); }
 
 /* ---------- ROUTING ---------- */
@@ -864,6 +881,8 @@ function stopNights(stop){
   if(stop.nights!=="" && stop.nights!=null && !isNaN(+stop.nights)) return +stop.nights;
   return td>0 ? td+1 : 0;
 }
+function autoWorkbooks(stop){ return (+stop.participants||0)*((+stop.half||0)+(+stop.full||0)); }
+function workbooks(stop){ return (stop.workbooks!=="" && stop.workbooks!=null && !isNaN(+stop.workbooks)) ? +stop.workbooks : autoWorkbooks(stop); }
 function localMode(stop, arrivedBy){
   if(stop.local && stop.local!=="auto") return stop.local;
   if(arrivedBy==="drive") return "fleet";
@@ -876,7 +895,7 @@ function computeQuantities(L){
   L.forEach(l=>{ const c=l.chosen; if(!c||c.na) return; if(c.mode==="fly") flyLegs++; if(c.mode==="drive"){ driveKm+=c.km; enrouteNights+=c.nights; } if(c.mode==="bus") busLegs++; });
   let nights=enrouteNights, half=0, full=0, participants=0, roomFull=0, roomHalf=0, hireDays=0, taxiDays=0;
   state.stops.forEach((s,idx)=>{
-    const n=stopNights(s); nights+=n; half+=(+s.half||0); full+=(+s.full||0); participants+=(+s.participants||0)*((+s.half||0)+(+s.full||0));
+    const n=stopNights(s); nights+=n; half+=(+s.half||0); full+=(+s.full||0); participants+=workbooks(s);
     if(s.venue!=="none"){ roomFull+=(+s.full||0); roomHalf+=(+s.half||0); }
     const arrival=L.find(l=>l.i===idx); const by=arrival?.chosen?.mode||"drive";
     const lm=localMode(s,by); if(lm==="hire") hireDays+=n+1;
@@ -884,7 +903,7 @@ function computeQuantities(L){
   });
   /* home-end airport transfer on the final flight back to the origin */
   const lastLeg=L[L.length-1]; if(state.returnHome && lastLeg && lastLeg.chosen && lastLeg.chosen.mode==="fly") taxiDays+=1;
-  const daysAway = nights+1 + Math.max(0, busLegs);
+  const daysAway = state.stops.length ? nights+1 + Math.max(0, busLegs) : 0;
   return {T,flyLegs,driveKm,enrouteNights,nights,half,full,participants,roomFull,roomHalf,hireDays,taxiDays,daysAway,
     returns: Math.ceil(flyLegs/2)};
 }
@@ -903,7 +922,7 @@ function quoteLines(q){
     {k:"hour",desc:"Contextualisation, evaluation or design hours",qty:0},
     {k:"roomFull",desc:"Room hire, full days (CDU campus or external)",qty:q.roomFull},
     {k:"roomHalf",desc:"Room hire, half days (CDU campus or external)",qty:q.roomHalf},
-    {k:"consum",desc:"Participant places across sessions",qty:q.participants}
+    {k:"consum",desc:"Workbooks: participants per session x sessions, or the Workbooks figure entered per stop",qty:q.participants}
   ];
 }
 function quoteTotals(q){
@@ -933,7 +952,7 @@ function internalLines(q,L){
     {k:"fuelc",label:`Fleet fuel: ${Math.round(q.driveKm)} km at ${kmL} L/100 km`,qty:q.driveKm?1:0,unit:fuel,hint:"Cents per litre input below; NT regional average August 2026",derived:true},
     {k:"fleetkm",label:"CDU internal fleet charge per km",qty:Math.round(q.driveKm),unit:g("fleetkm"),hint:"Unknown; enter if CDU recharges fleet use"},
     {k:"venue",label:"Venue hire, actual",qty:1,unit:venue,hint:"Defaults to the contract room hire lines"},
-    {k:"consum",label:"Consumables per participant place",qty:q.participants,unit:g("consum"),hint:""},
+    {k:"consum",label:"Consumables per workbook",qty:q.participants,unit:g("consum"),hint:""},
     {k:"travelDay",label:"Trainer cost per travel day (optional)",qty:travelDays*T,unit:g("travelDay"),hint:"Salary cost of non-delivery days if you want it in the margin"}
   ];
 }
@@ -993,7 +1012,7 @@ function fillSelect(sel, items, val){ sel.innerHTML=items.map(([v,t])=>`<option 
 function renderBuilder(){
   fillSelect($("month"), MONTHS.map((m,i)=>[i+1,m]), state.month);
   $("year").value=state.year; $("trainers").value=state.trainers; $("returnHome").checked=!!state.returnHome;
-  $("maxDrive").value=state.maxDrive; $("kitKg").value=state.kitKg; $("fleetType").value=state.fleetType; $("starlink").value=state.starlink; $("planName").value=state.name||""; $("courseName").value=state.courseName||""; $("trainerName").value=state.trainerName||""; $("arrangement").value=state.arrangement||"";
+  $("maxDrive").value=state.maxDrive; $("kitKg").value=state.kitKg; $("fleetType").value=state.fleetType; $("starlink").value=state.starlink; $("planName").value=state.name||""; $("courseName").value=state.courseName||""; $("trainerName").value=state.trainerName||""; $("arrangement").value=state.arrangement||""; $("availability").value=state.availability||"";
   $("kitNeed").value=state.kitNeed||"yes"; $("kitPartial").hidden=(state.kitNeed!=="partial"); $("kitKgWrap").hidden=(state.kitNeed==="no");
   document.querySelectorAll("[data-kit]").forEach(el=>{ el.value=state.kitPartial[el.dataset.kit]; });
   $("delivery").value=state.delivery||"agc"; $("afbInputs").hidden=(state.delivery!=="accredited"); $("afbNote").hidden=(state.delivery!=="accredited");
@@ -1011,6 +1030,7 @@ function renderBuilder(){
       <label class="f req"><span>Half-day sessions</span><input type="number" min="0" max="20" data-i="${i}" data-k="half" value="${esc(s.half)}"></label>
       <label class="f req"><span>Full-day sessions</span><input type="number" min="0" max="20" data-i="${i}" data-k="full" value="${esc(s.full)}"></label>
       <label class="f req"><span>Participants per session</span><input type="number" min="0" max="40" data-i="${i}" data-k="participants" value="${esc(s.participants)}"></label>
+      <label class="f"><span>Workbooks (blank = auto)</span><input type="number" min="0" max="500" data-i="${i}" data-k="workbooks" value="${esc(s.workbooks??"")}" placeholder="${autoWorkbooks(s)}" title="Auto = participants per session x sessions"></label>
       <label class="f"><span>Nights (blank = auto)</span><input type="number" min="0" max="30" data-i="${i}" data-k="nights" value="${esc(s.nights)}" placeholder="${stopNights(s)}"></label>
       <label class="f req"><span>Venue</span><select data-i="${i}" data-k="venue"><option value="cdu"${s.venue==="cdu"?" selected":""}>CDU campus room (room hire charged)</option><option value="hired"${s.venue==="hired"?" selected":""}>External venue (room hire charged)</option><option value="none"${s.venue==="none"?" selected":""}>No room charge</option></select></label>
       <label class="f"><span>Local transport</span><select data-i="${i}" data-k="local"><option value="auto"${s.local==="auto"?" selected":""}>Auto</option><option value="fleet"${s.local==="fleet"?" selected":""}>Fleet car</option><option value="hire"${s.local==="hire"?" selected":""}>Hire car</option><option value="taxi"${s.local==="taxi"?" selected":""}>Taxi</option><option value="none"${s.local==="none"?" selected":""}>None</option></select></label>
@@ -1119,9 +1139,7 @@ function renderPlaces(L){
       <p class="small">${esc(P.cdu)}</p>
       <h4>Venues</h4><ul>${P.venues.map(item).join("")}</ul>
       <h4>Accommodation (contract rate A$243.51 a night)</h4><ul>${P.accom.length?P.accom.map(item).join(""):"<li>Home base</li>"}</ul>
-      <p class="small">Safety check when booking: lockable door, working air conditioning, lit parking, and a room not on the ground floor facing a car park where possible; ask for written confirmation.</p>
       <h4>Hire cars</h4><ul>${P.hire.map(item).join("")}</ul>
-      <p class="small">Standard 2WD hire agreements exclude unsealed roads; the Central Arnhem Road and Tanami Road are named exclusions (drivenow.com.au, read 22 Sep 2026).</p>
       <h4>Connectivity</h4><p class="small">${esc(P.connect)}</p>
     </div>`;}).join("")}</div>`:`<p class="note">Add a stop to see venue and accommodation notes.</p>`;
 }
@@ -1216,7 +1234,6 @@ function buildReport(){
     </div>
     <h1>NT regional travel planning report</h1>
     <p class="small">${esc(state.name||"Untitled plan")}. Prepared ${new Date().toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric"})} with data compiled ${DATA_DATE}. Planning-phase estimate only; verify before booking.</p>
-    ${state.arrangement?`<p style="margin-top:.8rem">${esc(state.arrangement)}</p>`:""}
     <div class="cover">
       <div><b>Course</b>${esc(state.courseName||"Not entered")}</div>
       ${state.trainerName?`<div><b>Trainer</b>${esc(state.trainerName)}</div>`:""}
@@ -1230,6 +1247,11 @@ function buildReport(){
       <div><b>Quote (GST incl)</b>${money(tot.inc)}</div>
       <div class="internal"><b>Internal estimate</b>${money(itot)}</div>
     </div>
+
+    ${state.arrangement?`<h2>Training arrangement</h2><div class="rich" style="margin-top:.6rem">${richText(state.arrangement)}</div>`:""}
+    <h2>Proposed dates and availability</h2>
+    ${state.availability?`<div class="rich" style="margin-top:.6rem">${richText(state.availability)}</div>`:""}
+    <p class="note avail-note">${esc(AVAIL_NOTE)}</p>
 
     <h2>Route map</h2>
     <figure style="margin:0"><div class="mapwrap">${buildMap(L)}</div><figcaption class="map-note">Planned legs by mode, overnight stops en route, and the highway network used by the planner. Coastline from Natural Earth via world-atlas; town positions approximate.</figcaption></figure>
@@ -1276,8 +1298,8 @@ function buildReport(){
     <h2 class="pb">Verify before booking</h2>
     <div class="cl"><ul>${allVerify.map(v=>`<li>${esc(v)}</li>`).join("")}<li>Road Report NT, SecureNT and BoM checked on the day before departure</li><li>Accommodation confirmed</li></ul></div>
 
-    <h2>Checklists</h2>
-    <div class="two">${activeChecklists().map(([g,items])=>`<div class="cl"><h3>${esc(g)}</h3><ul>${items.map((t,i)=>`<li class="${state.checks[g+"|"+i]?"done":""}">${esc(t)}</li>`).join("")}</ul></div>`).join("")}</div>
+    ${(()=>{ const groups=activeChecklists().map(([g,items])=>[g,items.filter((t,i)=>state.checks[g+"|"+i])]).filter(([g,it])=>it.length);
+      return groups.length?`<h2>Checklist</h2><div class="two">${groups.map(([g,it])=>`<div class="cl"><h3>${esc(g)}</h3><ul>${it.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`).join("")}</div>`:""; })()}
 
     <h2>Sources used</h2>
     <div class="sources"><ul>${SOURCES.map(s=>`<li>${s[2]?`<a href="${s[2]}">${esc(s[0])}</a>`:esc(s[0])}</li>`).join("")}</ul></div>
@@ -1341,9 +1363,9 @@ async function openPlans(){
 
 function resetAll(){
   const host=$("modalHost");
-  host.innerHTML=`<div class="modal-bg" id="modalBg"><div class="modal" role="dialog" aria-label="Reset all values"><h2>Reset all values?</h2><p class="small">Clears every field, chosen option, quantity and checklist tick on this page. Saved plans are kept.</p><div style="display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" type="button" id="modalCancel">Keep working</button><button class="btn primary" type="button" id="modalReset">Reset all</button></div></div></div>`;
+  host.innerHTML=`<div class="modal-bg" id="modalBg"><div class="modal" role="dialog" aria-label="Reset all values"><h2>Reset all values?</h2><p class="small">Clears every field, stop, chosen option, quantity and checklist tick on this page. Saved plans and the account passwords are kept.</p><div style="display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap"><button class="btn ghost" type="button" id="modalCancel">Keep working</button><button class="btn primary" type="button" id="modalReset">Reset all</button></div></div></div>`;
   $("modalCancel").onclick=()=>host.innerHTML=""; $("modalBg").addEventListener("click",e=>{ if(e.target.id==="modalBg") host.innerHTML=""; });
-  $("modalReset").onclick=()=>{ state=DEFAULT_STATE(); currentPlanId=null; try{ localStorage.removeItem(LS_DRAFT); }catch(e){} host.innerHTML=""; renderBuilder(); renderAll(); window.scrollTo(0,0); toast("All values reset"); };
+  $("modalReset").onclick=()=>{ const pw=state.pw||{}; state=DEFAULT_STATE(); state.pw=pw; currentPlanId=null; try{ localStorage.removeItem(LS_DRAFT); }catch(e){} host.innerHTML=""; renderBuilder(); renderAll(); window.scrollTo(0,0); toast("All values reset"); };
 }
 
 /* ---------- EVENTS ---------- */
@@ -1356,13 +1378,14 @@ function bind(){
   $("courseName").addEventListener("input",()=>{ state.courseName=$("courseName").value; saveDraft(); });
   $("trainerName").addEventListener("input",()=>{ state.trainerName=$("trainerName").value; saveDraft(); });
   $("arrangement").addEventListener("input",()=>{ state.arrangement=$("arrangement").value; saveDraft(); });
+  $("availability").addEventListener("input",()=>{ state.availability=$("availability").value; saveDraft(); });
   $("kitNeed").addEventListener("change",()=>{ state.kitNeed=$("kitNeed").value; $("kitPartial").hidden=(state.kitNeed!=="partial"); $("kitKgWrap").hidden=(state.kitNeed==="no"); renderAll(); saveDraft(); });
   $("kitPartial").addEventListener("change",e=>{ const el=e.target; if(!el.dataset.kit) return; state.kitPartial[el.dataset.kit]=(el.type==="number")?+el.value:el.value; renderAll(); saveDraft(); });
   $("accounts").addEventListener("input",e=>{ const el=e.target; if(!el.dataset.pw) return; state.pw[el.dataset.pw]=el.value; saveDraft(); });
   $("btnCopyUsers").addEventListener("click",()=>copyText(ACCOUNTS.map((a,i)=>`${i+1}\t${a[0]}\t${a[1]}`).join("\n"),"Usernames copied"));
   $("btnCopyUsersPw").addEventListener("click",()=>copyText(ACCOUNTS.map((a,i)=>`${i+1}\t${a[0]}\t${a[1]}\t${state.pw[a[1]]||""}`).join("\n"),"Usernames and passwords copied"));
   $("btnReset").addEventListener("click",resetAll);
-  $("btnAddStop").addEventListener("click",()=>{ const last=state.stops[state.stops.length-1]; state.stops.push({place:last&&last.place!=="katherine"?"katherine":"alice",half:1,full:0,participants:15,venue:"cdu",nights:"",local:"auto"}); renderBuilder(); renderAll(); saveDraft(); });
+  $("btnAddStop").addEventListener("click",()=>{ const last=state.stops[state.stops.length-1]; state.stops.push({place:!last?"alice":last.place!=="katherine"?"katherine":"alice",half:1,full:0,participants:15,venue:"cdu",nights:"",workbooks:"",local:"auto"}); renderBuilder(); renderAll(); saveDraft(); });
   $("stops").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.k) return; const s=state.stops[+t.dataset.i]; s[t.dataset.k]=(t.type==="number")?(t.value===""?"":+t.value):t.value; renderAll(); if(t.dataset.k==="place") renderBuilder(); saveDraft(); });
   $("stops").addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const i=+b.dataset.i; const a=b.dataset.act;
     if(a==="del") state.stops.splice(i,1); if(a==="up"&&i>0) [state.stops[i-1],state.stops[i]]=[state.stops[i],state.stops[i-1]]; if(a==="down"&&i<state.stops.length-1) [state.stops[i+1],state.stops[i]]=[state.stops[i],state.stops[i+1]];
