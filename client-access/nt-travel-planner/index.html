@@ -264,6 +264,7 @@ label.f .hint{font-family:var(--font-body);text-transform:none;letter-spacing:0;
         </div>
         <div>
           <h4 style="margin-bottom:.4rem">Stops, in order</h4>
+          <p class="small" style="margin-bottom:.4rem">A stop with 0 sessions is a transit stop, for example flying to Alice Springs to collect a hire car for Tennant Creek. Each leg between stops can then be flown, driven or taken by coach.</p>
           <div class="stops" id="stops"></div>
           <button class="btn sm" id="btnAddStop" type="button" style="margin-top:.5rem">Add stop</button>
         </div>
@@ -352,7 +353,7 @@ label.f .hint{font-family:var(--font-body);text-transform:none;letter-spacing:0;
   </main>
 </div>
 
-<footer class="site-foot"><div class="site-foot-inner"><span>NT Regional Travel Planner, CDU TAFE ICT, Cyber Security and Digital. Planning-phase tool; verify with carriers, Road Report NT and venues before booking.</span><span>Last updated 24 September 2026. <a href="/client-access/">Back to course access</a></span></div></footer>
+<footer class="site-foot"><div class="site-foot-inner"><span>NT Regional Travel Planner, CDU TAFE ICT, Cyber Security and Digital. Planning-phase tool; verify with carriers, Road Report NT and venues before booking.</span><span>Last updated 24 September 2026 (fly-drive update). <a href="/client-access/">Back to course access</a></span></div></footer>
 <div id="report"></div>
 <div id="modalHost"></div>
 
@@ -429,12 +430,17 @@ const PLACES = {
     hire:[{n:"Thrifty Katherine",d:"Downtown location plus a separate Tindal airport listing; rates not published on the location page (thrifty.com.au, read 22 Sep 2026).",u:"https://www.thrifty.com.au/locations/australia/northern-territory/katherine"}],
     connect:"Town-area 4G expected; crowdsourced checkers gave inconsistent results. Verify with the Telstra coverage map."},
   tennant:{name:"Tennant Creek",short:"Tennant Creek",lat:-19.647,lon:134.190,airport:"TCA",airportName:"Tennant Creek",hub:"tennant",region:"centre",
-    cdu:"CDU Tennant Creek centre, 65 Staunton Street; a smaller centre rather than a full campus (cdu.edu.au/locations).",
+    cdu:"CDU Tennant Creek Centre (Karguru Centre), 65 Staunton Street; a smaller centre rather than a full campus (cdu.edu.au/locations).",
     venues:[
-      {n:"CDU Tennant Creek centre",d:"65 Staunton Street. Confirm room, computers and internet before relying on it.",u:"https://www.cdu.edu.au/locations"},
+      {n:"CDU Tennant Creek Centre (Karguru Centre)",d:"65 Staunton Street. Training room for 15 (advised by SD). Confirm projector and internet before relying on it.",u:"https://www.cdu.edu.au/locations"},
       {n:"Barkly Regional Council Civic Hall",d:"41 Peko Road, reception@barkly.nt.gov.au, (08) 8962 0000. Kitchen, tables and chairs; wifi and computers not documented (barkly.nt.gov.au, read 22 Sep 2026).",u:"https://www.barkly.nt.gov.au/facilities"}
     ],
-    accom:[{n:"Bluestone Motor Inn",d:"Season deals from A$169; FAQ text says rooms from A$152 (property site, read 22 Sep 2026).",u:"https://bluestone-motor-inn.innorthernterritory.com/en/"}],
+    accom:[
+      {n:"Outback Caravan Park and Cabins (default)",d:"Where the team usually stays. 71 Peko Road; (08) 8962 2459; bookings@outbacktennantcreek.com.au. Cabins, pool, laundry, camp kitchen; caters for government and corporate travellers. Cabin rates are not published on the pages checked (caravanningnt.com.au, page modified 14 Jul 2025).",u:"https://southerncrossmotelgroup.com.au/portfolio-item/tennant-creek-accommodation-outback-caravan-park-and-cabins/"},
+      {n:"Bluestone Motor Inn",d:"Alternative. Season deals from A$169; FAQ text says rooms from A$152 (property site, read 22 Sep 2026).",u:"https://bluestone-motor-inn.innorthernterritory.com/en/"}
+    ],
+    access:"Most Darwin-based travellers fly to Alice Springs, collect a hire car at the airport and drive 510 km north on the sealed Stuart Highway (about 5 h 40 min plus breaks). Use the Fly to Alice Springs and drive button on the stop to set this up.",
+    flyDrive:"alice",
     hire:[{n:"Hertz Tennant Creek",d:"59 Paterson Street, (08) 8962 3040, Monday to Friday 8 am to 5 pm, closed weekends (hertz.com, read 22 Sep 2026). Weekend arrivals cannot collect a car.",u:"https://www.hertz.com/us/en/location/australia/northernterritory/tennantcreek/tcat50"}],
     connect:"Telstra 4G in town expected; not verified this pass."},
   alice:{name:"Alice Springs",short:"Alice Springs",lat:-23.698,lon:133.881,airport:"ASP",airportName:"Alice Springs",hub:"alice",region:"centre",
@@ -576,6 +582,24 @@ const CORRIDOR_RISK = {
   kakadu:{wet:["Kakadu Highway sections and park roads close in the wet; check the access report."]},
   centralArnhem:{wet:["Central Arnhem Road is impassable for most of the wet, roughly December to May (operators)."],dry:["675 km unsealed, corrugated, three fuel points; NLC transit permit required; standard hire agreements prohibit it (Visit East Arnhem, NLC, drivenow.com.au)."],buildup:["Early storms can close creek crossings without notice."]}
 };
+/* Seasonal road risk by corridor and month. Levels: low, moderate, high, closed. Evidence noted in each text. */
+const ROAD_SEASON = {
+  stuart_dp:{high:[12,1,2,3,4],moderate:[10,11],t:{high:"Wet season: the Stuart Highway around Katherine has been cut by floods (January 2023; ex-Tropical Cyclone Megan, March 2024) (ABC, NT PFES).",moderate:"Build-up storms can bring standing water late in the day."}},
+  stuart_pk:{high:[12,1,2,3,4],moderate:[10,11],t:{high:"Wet season: Katherine River flooding can close the highway and the town crossing.",moderate:"Build-up storms can bring standing water late in the day."}},
+  stuart_kt:{high:[12,1,2,3,4],moderate:[11],t:{high:"Wet season: flood cuts recorded at Katherine, Elliott and the Barkly in the 2023, 2024 and 2026 wets; over 100 NT roads were closed or impassable in March 2026 (ABC, 27 Mar 2026).",moderate:"Early storms possible; the wet can start before December."}},
+  stuart_ta:{moderate:[12,1,2,3],low:[11,4],t:{moderate:"Heavy summer rain can put water over the Stuart Highway between Tennant Creek and Alice Springs; in February 2026 it closed between Tennant Creek and Ali Curung and some sections were damaged (ABC, 23 Feb 2026). The highway is sealed, but it can close at short notice after rain.",low:"Occasional storms; closures are uncommon but possible after heavy rain."}},
+  lasseter:{moderate:[12,1,2,3],t:{moderate:"Summer rain can close low-lying sections of the Lasseter Highway; check Road Report NT."}},
+  arnhem:{high:[12,1,2,3,4],moderate:[10,11],t:{high:"Wet season: the Arnhem Highway floods across the Adelaide River and Mary River floodplains.",moderate:"Build-up storms; wildlife on the road at dusk."}},
+  kakadu:{high:[12,1,2,3,4],moderate:[10,11],t:{high:"Wet season: Kakadu Highway sections and park roads close; check the Parks Australia access report.",moderate:"Early storms can close park roads."}},
+  centralArnhem:{closed:[12,1,2,3,4,5],moderate:[10,11],t:{closed:"Central Arnhem Road is impassable for most of the wet, roughly December to May (operators).",moderate:"Early storms can close creek crossings without notice."}}
+};
+const ROAD_RANK={low:0,moderate:1,high:2,closed:3};
+function roadSeason(corridorIds, m){
+  let worst="low"; const notes=[];
+  corridorIds.forEach(id=>{ const r=ROAD_SEASON[id]; if(!r) return; let lvl="low"; ["closed","high","moderate","low"].forEach(k=>{ if(lvl==="low" && r[k] && r[k].includes(m)) lvl=k; });
+    if(r.t && r.t[lvl] && !notes.some(x=>x.t===r.t[lvl])) notes.push({lvl,t:r.t[lvl]}); if(ROAD_RANK[lvl]>ROAD_RANK[worst]) worst=lvl; });
+  return {lvl:worst, notes};
+}
 const GENERAL_RISK = {
   wet:["Cyclone season runs 1 November to 30 April; flights and roads can stop for days (BoM).","Accommodation demand is low but some regional operators reduce services in the wet."],
   buildup:["Build-up thunderstorms: afternoon flight delays are common."],
@@ -683,6 +707,8 @@ const SOURCES = [
   ["CDU locations and venue hire pages (read 22 Sep 2026)","high","https://www.cdu.edu.au/locations"],
   ["Alice Springs Town Council venue hire; GYRACC venue hire; Barkly Regional Council facilities (read 22 Sep 2026)","high","https://www.alicesprings.nt.gov.au/residents/services/resident-info/venue-hire-in-alice-springs.aspx"],
   ["Hire car snapshots: airportrentals.com and stressfreecarrental.com (18 to 22 Sep 2026); Hertz Tennant Creek; Thrifty Katherine; drivenow.com.au road restrictions","medium","https://www.drivenow.com.au/car-hire/before-you-book/road-restrictions"],
+  ["Outback Caravan Park and Cabins, Tennant Creek: Southern Cross Motel Group listing and Caravanning NT page (modified 14 Jul 2025)","medium","https://caravanningnt.com.au/outback-caravan-park-tennant-creek/"],
+  ["ABC News, Stuart Highway closed between Tennant Creek and Ali Curung, 23 Feb 2026","high","https://www.abc.net.au/news/2026-02-23/nt-rain-barkly-central-australia-roads-closed-stations-inundated/106375970"],
   ["Accommodation: Bluestone Motor Inn and Walkabout Lodge property sites (read 22 Sep 2026); aggregator teasers for Alice Springs, Jabiru and Yulara","medium","https://bluestone-motor-inn.innorthernterritory.com/en/"],
   ["NT public holidays (updated 21 Jul 2026) and school term dates (updated 5 Aug 2026), nt.gov.au","high","https://nt.gov.au/nt-public-holidays"],
   ["Event dates: Discover Central Australia, Katherine Show, North West Star (Masters Games), Visit East Arnhem (Garma), Darwin Festival","medium","https://www.discovercentralaustralia.com/"],
@@ -834,16 +860,18 @@ function legOptions(a,b){
     if(days.length>1) issues.push({t:`${days.length} driving days at a ${state.maxDrive} hour cap; ${days.length-1} overnight${days.length>2?"s":""} en route.`,lvl:"info"});
     days.filter(d=>d.over).forEach(d=>issues.push({t:`No accommodation stop fits the cap between ${NODES[d.from].n} and ${NODES[d.to].n}; that day runs ${fmtH(d.hours)}.`,lvl:"warn"}));
     if(r.hours>11 && days.length===1) issues.push({t:"Single day over 11 hours of driving; not compatible with the fatigue and daylight rules.",lvl:"crit"});
-    corridorRisks(r.corridors, keys).forEach(t=>issues.push({t,lvl:/impassable|cut|closed|inundated/i.test(t)?"crit":"warn"}));
+    const rs=roadSeason(r.corridors, state.month);
+    rs.notes.forEach(n=>issues.push({t:`Road conditions in ${MONTHS[state.month-1]} (${n.lvl} risk): ${n.t}`,lvl:n.lvl==="closed"||n.lvl==="high"?"crit":n.lvl==="moderate"?"warn":"info"}));
+    corridorRisks(r.corridors, keys).filter(t=>!rs.notes.some(n=>n.t.slice(0,40)===t.slice(0,40))).forEach(t=>issues.push({t,lvl:/impassable|cut|closed|inundated/i.test(t)?"crit":"warn"}));
     issues.push({t:"Fuel roughly every 200 km on the Stuart Highway; NT regional average unleaded 226.0 c/L and diesel 269.3 c/L in August 2026 (NT Economy).",lvl:"info"});
     verify.push("Road Report NT for each corridor on the day before departure");
     verify.push("Fleet car booked for the full span including en-route nights; Field Work Travel Plan lodged if regional");
     verify.push("Sunset time for the month; last driving hour ends before sunset");
     if(r.unsealedKm>0) verify.push("NLC transit permit issued; hire agreements exclude this road");
-    opts.push({mode:"drive",title:"Drive (fleet car)",sub:`${Math.round(r.km)} km, ${fmtH(r.hours)} driving, ${days.length} day${days.length>1?"s":""}`,route:r,days,issues,verify,travelDays:days.length,km:r.km,nights:days.length-1,
-      kv:[["Route",[...new Set(r.segs.map(s=>s.corridorName))].join(", ")],["Surface",r.unsealedKm>0?`${Math.round(r.km-r.unsealedKm)} km sealed, ${Math.round(r.unsealedKm)} km unsealed`:"Sealed throughout"],["Distance basis","Wikipedia road and town articles cross-checked against the Greyhound timetable; drive time assumes 90 km/h sealed, 80 in Kakadu, 50 unsealed, plus breaks"]]});
+    opts.push({mode:"drive",title:"Drive",sub:`${Math.round(r.km)} km, ${fmtH(r.hours)} driving, ${days.length} day${days.length>1?"s":""}`,route:r,days,issues,verify,travelDays:days.length,km:r.km,nights:days.length-1,roadRisk:rs.lvl,
+      kv:[["Road risk this month",`<span class="tag ${rs.lvl==="low"?"good":rs.lvl==="moderate"?"warn":"crit"}">${rs.lvl}</span> Live closures: <a href="https://roadreport.nt.gov.au/" target="_blank" rel="noopener">Road Report NT</a> (1800 246 199)`],["Route",[...new Set(r.segs.map(s=>s.corridorName))].join(", ")],["Surface",r.unsealedKm>0?`${Math.round(r.km-r.unsealedKm)} km sealed, ${Math.round(r.unsealedKm)} km unsealed`:"Sealed throughout"],["Distance basis","Wikipedia road and town articles cross-checked against the Greyhound timetable; drive time assumes 90 km/h sealed, 80 in Kakadu, 50 unsealed, plus breaks"]]});
   } else {
-    opts.push({mode:"drive",title:"Drive (fleet car)",na:true,sub:"No road route in this version",issues:[],verify:[],travelDays:0,km:0,nights:0,kv:[]});
+    opts.push({mode:"drive",title:"Drive",na:true,sub:"No road route in this version",issues:[],verify:[],travelDays:0,km:0,nights:0,kv:[]});
   }
   /* Coach */
   const bs = BUSES.filter(x=>(x.a===a&&x.b===b)||(x.a===b&&x.b===a));
@@ -872,12 +900,32 @@ function legs(){
     if(!pick || opts.find(o=>o.mode===pick)?.na){ pick = opts.find(o=>!o.na)?.mode || "drive"; }
     out.push({i,a:seq[i],b:seq[i+1],key,opts,pick,chosen:opts.find(o=>o.mode===pick)});
   }
+  /* Which car does each drive leg use? A chain of drive legs that starts at the origin uses a fleet car; one that starts after a flight or coach uses a hire car collected at that town. */
+  let car=null;
+  out.forEach(l=>{
+    const d=l.opts.find(o=>o.mode==="drive"&&!o.na);
+    const veh = car ? car.type : (l.a===state.origin ? "fleet" : "hire");
+    const from = car ? car.from : l.a;
+    if(d){
+      d.vehicle=veh; d.pickup=from;
+      d.title = veh==="fleet" ? "Drive (fleet car)" : `Drive (hire car from ${PLACES[from].short})`;
+      if(veh==="hire"){
+        d.issues=d.issues.filter(x=>!/fleet car is not suitable/i.test(x.t));
+        if(d.route&&d.route.unsealedKm>0) d.issues.push({t:"Standard hire agreements exclude unsealed roads; a 4WD hire with written approval is needed.",lvl:"crit"});
+        d.verify=d.verify.map(v=>/^Fleet car booked/.test(v)?`Hire car booked at ${PLACES[from].short} for the full span; unlimited kilometres and the return point confirmed`:v);
+      }
+    }
+    if(l.chosen&&!l.chosen.na&&l.chosen.mode==="drive"){ if(!car) car={type:veh,from}; l.vehicle=car.type; l.pickup=car.from; }
+    else car=null;
+  });
   return out;
 }
 
 /* ---------- COSTING ---------- */
+/* Training days at a stop: two half-day sessions fit in one day */
+function trainingDays(stop){ return (+stop.full||0) + Math.ceil((+stop.half||0)/2); }
 function stopNights(stop){
-  const td = (+stop.half||0)+(+stop.full||0);
+  const td = trainingDays(stop);
   if(stop.nights!=="" && stop.nights!=null && !isNaN(+stop.nights)) return +stop.nights;
   return td>0 ? td+1 : 0;
 }
@@ -891,20 +939,32 @@ function localMode(stop, arrivedBy){
 }
 function computeQuantities(L){
   const T=+state.trainers||1;
-  let flyLegs=0, driveKm=0, enrouteNights=0, busLegs=0;
-  L.forEach(l=>{ const c=l.chosen; if(!c||c.na) return; if(c.mode==="fly") flyLegs++; if(c.mode==="drive"){ driveKm+=c.km; enrouteNights+=c.nights; } if(c.mode==="bus") busLegs++; });
+  let flyLegs=0, driveKm=0, fleetKm=0, hireKm=0, enrouteNights=0, busLegs=0;
+  L.forEach(l=>{ const c=l.chosen; if(!c||c.na) return; if(c.mode==="fly") flyLegs++; if(c.mode==="drive"){ driveKm+=c.km; if(l.vehicle==="hire") hireKm+=c.km; else fleetKm+=c.km; enrouteNights+=c.nights; } if(c.mode==="bus") busLegs++; });
   let nights=enrouteNights, half=0, full=0, participants=0, roomFull=0, roomHalf=0, hireDays=0, taxiDays=0;
+  /* Hire car spans for fly-drive chains: from the pickup town to the drop-off town, one hire for the whole span */
+  const covered=new Set(); const spans=[]; let span=null;
+  const nStops=state.stops.length;
+  L.forEach(l=>{
+    const hire=l.chosen&&!l.chosen.na&&l.chosen.mode==="drive"&&l.vehicle==="hire";
+    if(hire){
+      if(!span){ span={from:l.pickup,stops:new Set(),enroute:0}; if(l.i-1>=0&&l.i-1<nStops) span.stops.add(l.i-1); spans.push(span); }
+      span.enroute+=l.chosen.nights; if(l.i<nStops) span.stops.add(l.i);
+    } else span=null;
+  });
+  spans.forEach(sp=>{ let n=sp.enroute; sp.stops.forEach(si=>{ n+=stopNights(state.stops[si]); covered.add(si); }); sp.days=n+1; hireDays+=sp.days; });
   state.stops.forEach((s,idx)=>{
     const n=stopNights(s); nights+=n; half+=(+s.half||0); full+=(+s.full||0); participants+=workbooks(s);
     if(s.venue!=="none"){ roomFull+=(+s.full||0); roomHalf+=(+s.half||0); }
     const arrival=L.find(l=>l.i===idx); const by=arrival?.chosen?.mode||"drive";
+    if(covered.has(idx)) return;
     const lm=localMode(s,by); if(lm==="hire") hireDays+=n+1;
     if(by==="fly" && (lm==="taxi"||lm==="none")) taxiDays+=1;
   });
   /* home-end airport transfer on the final flight back to the origin */
   const lastLeg=L[L.length-1]; if(state.returnHome && lastLeg && lastLeg.chosen && lastLeg.chosen.mode==="fly") taxiDays+=1;
   const daysAway = state.stops.length ? nights+1 + Math.max(0, busLegs) : 0;
-  return {T,flyLegs,driveKm,enrouteNights,nights,half,full,participants,roomFull,roomHalf,hireDays,taxiDays,daysAway,
+  return {T,flyLegs,driveKm,fleetKm,hireKm,spans,enrouteNights,nights,half,full,participants,roomFull,roomHalf,hireDays,taxiDays,daysAway,
     returns: Math.ceil(flyLegs/2)};
 }
 function quoteLines(q){
@@ -912,9 +972,9 @@ function quoteLines(q){
   return [
     {k:"meals",desc:`${q.daysAway} days away x ${T} trainer${T>1?"s":""}`,qty:q.daysAway*T},
     {k:"accom",desc:`${q.nights} nights x ${T} (stops plus en-route)`,qty:q.nights*T},
-    {k:"hire",desc:q.hireDays?`Hire car at stops, ${q.hireDays} days`:"No hire car in this plan",qty:q.hireDays},
+    {k:"hire",desc:q.hireDays?`Hire car, ${q.hireDays} days${q.spans.length?` (includes fly-drive from ${q.spans.map(sp=>PLACES[sp.from].short).join(", ")}, ${q.spans.map(sp=>sp.days).join(" + ")} days)`:""}`:"No hire car in this plan",qty:q.hireDays},
     {k:"flight",desc:q.flyLegs?`${q.flyLegs} flight sector${q.flyLegs>1?"s":""} = ${q.returns} return${q.returns>1?"s":""} x ${T}${q.flyLegs%2?" (odd sector count, check the cap)":""}`:"No flights in this plan",qty:q.returns*T},
-    {k:"km",desc:q.driveKm?`Fleet car ${Math.round(q.driveKm)} km`:"No fleet driving",qty:Math.round(q.driveKm)},
+    {k:"km",desc:q.driveKm?[q.fleetKm?`Fleet car ${Math.round(q.fleetKm)} km`:"",q.hireKm?`Hire car ${Math.round(q.hireKm)} km (fuel)`:""].filter(Boolean).join("; "):"No driving",qty:Math.round(q.driveKm)},
     {k:"taxi",desc:q.taxiDays?`Airport transfer days without a hire car, ${q.taxiDays} x ${T}`:(q.flyLegs?"Hire car covers airport transfers":"None"),qty:q.taxiDays*T},
     {sep:"Delivery"},
     {k:"half",desc:"Half-day sessions",qty:q.half},
@@ -946,15 +1006,26 @@ function internalLines(q,L){
   return [
     {k:"flight",label:"Flights, actual fare per trainer per return",qty:q.returns*T,unit:g("flight"),hint:"Placeholder equals the contract cap; OTA snapshots on 22 Sep 2026 showed Darwin to Alice from about A$227 to 460 one way"},
     {k:"excess",label:"Excess baggage per sector",qty:q.flyLegs,unit:g("excess"),hint:"Not found; price with the carrier"},
-    {k:"accom",label:"Accommodation per night",qty:q.nights*T,unit:g("accom"),hint:"Found: Bluestone Tennant Creek from A$152 to 169; Walkabout Lodge Nhulunbuy from A$240"},
+    {k:"accom",label:"Accommodation per night",qty:q.nights*T,unit:g("accom"),hint:"Tennant Creek default: Outback Caravan Park cabins (rate not published; enter the quoted rate). Bluestone Tennant Creek from A$152 to 169; Walkabout Lodge Nhulunbuy from A$240"},
     {k:"meals",label:"Meals and incidentals per day",qty:q.daysAway*T,unit:g("meals"),hint:"Paid as allowance"},
     {k:"hire",label:"Hire car per day",qty:q.hireDays,unit:g("hire"),hint:"Alice Springs airport economy about A$69 to 70, intermediate A$156 to 201, 4WD A$183 to 294 (sample, September 2026)"},
-    {k:"fuelc",label:`Fleet fuel: ${Math.round(q.driveKm)} km at ${kmL} L/100 km`,qty:q.driveKm?1:0,unit:fuel,hint:"Cents per litre input below; NT regional average August 2026",derived:true},
-    {k:"fleetkm",label:"CDU internal fleet charge per km",qty:Math.round(q.driveKm),unit:g("fleetkm"),hint:"Unknown; enter if CDU recharges fleet use"},
+    {k:"fuelc",label:`Fuel: ${Math.round(q.driveKm)} km at ${kmL} L/100 km`,qty:q.driveKm?1:0,unit:fuel,hint:`${q.fleetKm?Math.round(q.fleetKm)+" km fleet car; ":""}${q.hireKm?Math.round(q.hireKm)+" km hire car; ":""}cents per litre and litres per 100 km are editable; NT regional average unleaded August 2026`,derived:true},
+    {k:"fleetkm",label:"CDU internal fleet charge per km",qty:Math.round(q.fleetKm),unit:g("fleetkm"),hint:"Unknown; enter if CDU recharges fleet use"},
     {k:"venue",label:"Venue hire, actual",qty:1,unit:venue,hint:"Defaults to the contract room hire lines"},
     {k:"consum",label:"Consumables per workbook",qty:q.participants,unit:g("consum"),hint:""},
     {k:"travelDay",label:"Trainer cost per travel day (optional)",qty:travelDays*T,unit:g("travelDay"),hint:"Salary cost of non-delivery days if you want it in the margin"}
   ];
+}
+
+/* Recalculate the internal estimate in place while a unit cost is being typed (no re-render, so focus stays put) */
+function liveInternal(){
+  const L=legs(); const q=computeQuantities(L); const tot=quoteTotals(q); const il=internalLines(q,L);
+  const itot=il.reduce((s,x)=>s+x.qty*(isFinite(x.unit)?x.unit:0),0); const margin=tot.ex-itot;
+  const cell=k=>document.querySelector(`#internalTable [data-itot="${k}"]`);
+  il.forEach(x=>{ const c=cell(x.k); if(c){ c.textContent=money(x.qty*x.unit); c.closest("tr").classList.toggle("has-qty",x.qty*x.unit>0); } });
+  const ct=cell("__total"); if(ct) ct.textContent=money(itot);
+  const cm=cell("__margin"); if(cm) cm.innerHTML=`Quote GST excl ${money(tot.ex)}; difference ${money(margin)} ${margin<0?'<span class="tag crit">under</span>':'<span class="tag good">margin</span>'}`;
+  saveDraft();
 }
 
 /* ---------- AWAY FROM BASE ---------- */
@@ -1026,6 +1097,8 @@ function renderBuilder(){
       <button class="btn sm ghost" type="button" data-act="down" data-i="${i}" title="Move down" aria-label="Move down"${i===state.stops.length-1?" disabled":""}>&#9660;</button>
       <button class="btn sm ghost" type="button" data-act="del" data-i="${i}" title="Remove" aria-label="Remove stop">&#10005;</button>
     </div>
+    ${((+s.half||0)+(+s.full||0))===0?`<p class="small"><span class="tag navy">Transit stop</span> No training here; used to change from a flight to a hire car, or for an overnight on the way. Enter nights if you stay.</p>`:""}
+    ${PLACES[s.place].flyDrive && !(i>0 && state.stops[i-1].place===PLACES[s.place].flyDrive)?`<button class="btn sm" type="button" data-act="flydrive" data-i="${i}">Fly to ${esc(PLACES[PLACES[s.place].flyDrive].short)} and drive</button>`:""}
     <div class="grid-2">
       <label class="f req"><span>Half-day sessions</span><input type="number" min="0" max="20" data-i="${i}" data-k="half" value="${esc(s.half)}"></label>
       <label class="f req"><span>Full-day sessions</span><input type="number" min="0" max="20" data-i="${i}" data-k="full" value="${esc(s.full)}"></label>
@@ -1047,7 +1120,7 @@ function renderAll(){
   const keys=[...new Set(sequence().map(p=>SEASON[PLACES[p].region][state.month]))];
   const critCount=L.reduce((s,l)=>s+(l.chosen?.issues||[]).filter(x=>x.lvl==="crit").length,0);
   $("summary").innerHTML=[
-    ["Legs",L.length],["Days away",q.daysAway],["Nights",q.nights],["Fleet km",Math.round(q.driveKm).toLocaleString("en-AU")],["Flight sectors",q.flyLegs],
+    ["Legs",L.length],["Days away",q.daysAway],["Nights",q.nights],["Driving km",Math.round(q.driveKm).toLocaleString("en-AU")],["Flight sectors",q.flyLegs],
     ["Quote (GST incl)",money(tot.inc)],["Season",keys.map(k=>k==="buildup"?"build-up":k).join(" / ")],["Red flags",critCount]
   ].map(([l,v])=>`<div class="stat"><div class="v num">${esc(v)}</div><div class="l">${esc(l)}</div></div>`).join("");
   /* legs */
@@ -1125,8 +1198,8 @@ function renderCosting(q,tot,L){
   const il=internalLines(q,L); const itot=il.reduce((s,x)=>s+x.qty*x.unit,0);
   const margin=tot.ex-itot;
   $("internalTable").innerHTML=`<thead><tr><th>Cost</th><th class="n">Qty</th><th class="n">Unit</th><th class="n">Total</th><th>Notes</th></tr></thead><tbody>
-    ${il.map(x=>`<tr class="${x.qty*x.unit>0?"has-qty":""}"><td>${esc(x.label)}</td><td class="n num">${x.qty}</td><td class="n">${x.derived?`<span class="num">${money(x.unit)}</span><br><input class="q" type="number" min="0" step="1" data-int="fuelc" value="${state.internal.fuelc??INTERNAL_DEFAULTS.fuelc}" aria-label="Fuel cents per litre"> c/L <input class="q" type="number" min="1" step="0.5" data-int="lper100" value="${state.internal.lper100??INTERNAL_DEFAULTS.lper100}" aria-label="Litres per 100 km"> L/100`:`<input class="q wide" type="number" min="0" step="0.01" data-int="${x.k}" value="${(state.internal[x.k]===undefined||state.internal[x.k]==="")?(x.k==="venue"?x.unit.toFixed(2):INTERNAL_DEFAULTS[x.k]):state.internal[x.k]}" aria-label="${esc(x.label)} unit cost">`}</td><td class="n num">${money(x.qty*x.unit)}</td><td class="small">${esc(x.hint)}</td></tr>`).join("")}
-    <tr class="total"><td>Internal estimate</td><td></td><td></td><td class="n num">${money(itot)}</td><td class="small">Quote GST excl ${money(tot.ex)}; difference ${money(margin)} ${margin<0?'<span class="tag crit">under</span>':'<span class="tag good">margin</span>'}</td></tr>
+    ${il.map(x=>`<tr class="${x.qty*x.unit>0?"has-qty":""}"><td>${esc(x.label)}</td><td class="n num">${x.qty}</td><td class="n">${x.derived?`<span class="num">${money(x.unit)}</span><br><input class="q" type="number" min="0" step="1" data-int="fuelc" value="${state.internal.fuelc??INTERNAL_DEFAULTS.fuelc}" aria-label="Fuel cents per litre"> c/L <input class="q" type="number" min="1" step="0.5" data-int="lper100" value="${state.internal.lper100??INTERNAL_DEFAULTS.lper100}" aria-label="Litres per 100 km"> L/100`:`<input class="q wide" type="number" min="0" step="0.01" data-int="${x.k}" value="${(state.internal[x.k]===undefined||state.internal[x.k]==="")?(x.k==="venue"?x.unit.toFixed(2):INTERNAL_DEFAULTS[x.k]):state.internal[x.k]}" aria-label="${esc(x.label)} unit cost">`}</td><td class="n num" data-itot="${x.k}">${money(x.qty*x.unit)}</td><td class="small">${esc(x.hint)}</td></tr>`).join("")}
+    <tr class="total"><td>Internal estimate</td><td></td><td></td><td class="n num" data-itot="__total">${money(itot)}</td><td class="small" data-itot="__margin">Quote GST excl ${money(tot.ex)}; difference ${money(margin)} ${margin<0?'<span class="tag crit">under</span>':'<span class="tag good">margin</span>'}</td></tr>
   </tbody>`;
   renderAfb(q,tot,L);
 }
@@ -1137,6 +1210,7 @@ function renderPlaces(L){
     <div class="place">
       <h3>${esc(P.name)}</h3>
       <p class="small">${esc(P.cdu)}</p>
+      ${P.access?`<p class="note">${esc(P.access)}</p>`:""}
       <h4>Venues</h4><ul>${P.venues.map(item).join("")}</ul>
       <h4>Accommodation (contract rate A$243.51 a night)</h4><ul>${P.accom.length?P.accom.map(item).join(""):"<li>Home base</li>"}</ul>
       <h4>Hire cars</h4><ul>${P.hire.map(item).join("")}</ul>
@@ -1183,7 +1257,7 @@ function buildMap(L){
     if(c.mode==="drive"){
       s+=`<polyline points="${[c.route.segs[0].from,...c.route.segs.map(x=>x.to)].map(id=>X(NODES[id].lon).toFixed(1)+","+Y(NODES[id].lat).toFixed(1)).join(" ")}" fill="none" stroke="#13294B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>`;
       c.days.slice(0,-1).forEach(d=>{const n=NODES[d.to];s+=`<rect x="${(X(n.lon)-4).toFixed(1)}" y="${(Y(n.lat)-4).toFixed(1)}" width="8" height="8" fill="#fff" stroke="#13294B" stroke-width="2"/><text x="${(X(n.lon)+8).toFixed(1)}" y="${(Y(n.lat)+4).toFixed(1)}" font-size="9" fill="#003251">overnight: ${esc(n.n)}</text>`;});
-      notes.push({a:A,b:B,t:`Drive ${Math.round(c.km)} km, ${c.days.length} day${c.days.length>1?"s":""}`});
+      notes.push({a:A,b:B,t:`Drive${l.vehicle==="hire"?" (hire car)":" (fleet car)"} ${Math.round(c.km)} km, ${c.days.length} day${c.days.length>1?"s":""}`});
     } else if(c.mode==="fly"){
       const x1=X(A.lon),y1=Y(A.lat),x2=X(B.lon),y2=Y(B.lat); const mx=(x1+x2)/2+(y2-y1)*0.18, my=(y1+y2)/2-(x2-x1)*0.18;
       s+=`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} Q${mx.toFixed(1)},${my.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="#009DC1" stroke-width="2.4" stroke-dasharray="7 4"/>`;
@@ -1206,7 +1280,7 @@ function buildMap(L){
   s+=`<text x="${nx}" y="${ny}" font-size="11" font-weight="700" fill="#111417">Legs</text>`; ny+=16;
   notes.forEach(n=>{ s+=`<text x="${nx}" y="${ny}" font-size="10" font-weight="700" fill="#003251">${esc(n.a.short)} to ${esc(n.b.short)}</text>`; ny+=12; s+=`<text x="${nx}" y="${ny}" font-size="9.5" fill="#111417">${esc(n.t)}</text>`; ny+=16; });
   ny+=8; s+=`<text x="${nx}" y="${ny}" font-size="11" font-weight="700" fill="#111417">Key</text>`; ny+=14;
-  const key=[["#13294B","4","none","Drive, fleet car"],["#009DC1","2.4","7 4","Fly"],["#552855","3","2 4","Coach"],["#9AAEB0","1.6","none","Sealed highway"],["#B98C4A","1.6","5 3","Unsealed road"]];
+  const key=[["#13294B","4","none","Drive, fleet or hire car"],["#009DC1","2.4","7 4","Fly"],["#552855","3","2 4","Coach"],["#9AAEB0","1.6","none","Sealed highway"],["#B98C4A","1.6","5 3","Unsealed road"]];
   key.forEach(k=>{ s+=`<line x1="${nx}" y1="${ny-4}" x2="${nx+26}" y2="${ny-4}" stroke="${k[0]}" stroke-width="${k[1]}" stroke-dasharray="${k[2]}"/><text x="${nx+32}" y="${ny}" font-size="9.5" fill="#111417">${k[3]}</text>`; ny+=14; });
   s+=`<rect x="${nx}" y="${ny-8}" width="8" height="8" fill="#fff" stroke="#13294B" stroke-width="2"/><text x="${nx+32}" y="${ny}" font-size="9.5" fill="#111417">Overnight en route</text>`; ny+=14;
   s+=`<text x="${nx}" y="${H-4}" font-size="8.5" fill="#7A8C8E">Positions approximate; not for navigation.</text>`;
@@ -1242,7 +1316,7 @@ function buildReport(){
       <div><b>Trainers</b>${state.trainers}</div>
       <div><b>Days away</b>${q.daysAway}</div>
       <div><b>Nights</b>${q.nights}</div>
-      <div><b>Fleet km</b>${Math.round(q.driveKm).toLocaleString("en-AU")}</div>
+      <div><b>Driving km</b>${Math.round(q.driveKm).toLocaleString("en-AU")}</div>
       <div><b>Flight sectors</b>${q.flyLegs}</div>
       <div><b>Quote (GST incl)</b>${money(tot.inc)}</div>
       <div class="internal"><b>Internal estimate</b>${money(itot)}</div>
@@ -1388,10 +1462,18 @@ function bind(){
   $("btnAddStop").addEventListener("click",()=>{ const last=state.stops[state.stops.length-1]; state.stops.push({place:!last?"alice":last.place!=="katherine"?"katherine":"alice",half:1,full:0,participants:15,venue:"cdu",nights:"",workbooks:"",local:"auto"}); renderBuilder(); renderAll(); saveDraft(); });
   $("stops").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.k) return; const s=state.stops[+t.dataset.i]; s[t.dataset.k]=(t.type==="number")?(t.value===""?"":+t.value):t.value; renderAll(); if(t.dataset.k==="place") renderBuilder(); saveDraft(); });
   $("stops").addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const i=+b.dataset.i; const a=b.dataset.act;
+    if(a==="flydrive"){ const place=state.stops[i].place, via=PLACES[place].flyDrive;
+      const transit=()=>({place:via,half:0,full:0,participants:0,venue:"none",nights:"",workbooks:"",local:"auto"});
+      state.stops.splice(i+1,0,transit()); state.stops.splice(i,0,transit()); state.picks={};
+      state.picks[`${i+1}:${via}-${place}`]="drive"; state.picks[`${i+2}:${place}-${via}`]="drive";
+      renderBuilder(); renderAll(); saveDraft(); toast(`Added ${PLACES[via].short} before and after ${PLACES[place].short}: fly there, drive a hire car, fly home`); return; }
     if(a==="del") state.stops.splice(i,1); if(a==="up"&&i>0) [state.stops[i-1],state.stops[i]]=[state.stops[i],state.stops[i-1]]; if(a==="down"&&i<state.stops.length-1) [state.stops[i+1],state.stops[i]]=[state.stops[i],state.stops[i+1]];
     state.picks={}; renderBuilder(); renderAll(); saveDraft(); });
-  $("legs").addEventListener("click",e=>{ const b=e.target.closest("[data-pick]"); if(!b) return; state.picks[b.dataset.pick]=b.dataset.mode; renderAll(); saveDraft(); });
+  /* mousedown registers the pick before a pending field change re-renders the legs and swallows the click */
+  const pickLeg=e=>{ const b=e.target.closest("[data-pick]"); if(!b) return; if(e.type==="mousedown"&&e.button!==0) return; state.picks[b.dataset.pick]=b.dataset.mode; renderAll(); saveDraft(); };
+  $("legs").addEventListener("mousedown",pickLeg); $("legs").addEventListener("click",pickLeg);
   $("quoteTable").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.qty) return; state.qty[t.dataset.qty]=t.value; renderAll(); saveDraft(); });
+  $("internalTable").addEventListener("input",e=>{ const t=e.target; if(!t.dataset.int) return; state.internal[t.dataset.int]=t.value; liveInternal(); });
   $("internalTable").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.int) return; state.internal[t.dataset.int]=t.value; renderAll(); saveDraft(); });
   $("checklists").addEventListener("change",e=>{ const t=e.target; if(!t.dataset.chk) return; state.checks[t.dataset.chk]=t.checked; renderChecklists(); saveDraft(); });
   $("btnSave").addEventListener("click",savePlan); $("btnLoad").addEventListener("click",openPlans); $("btnReport").addEventListener("click",showReport);
